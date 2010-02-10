@@ -12,6 +12,7 @@
 #include "ViewPerspective.h"
 #include "Entity3D.h"
 #include "Node3D.h"
+#include "Texture2dConfigDX11.h"
 #include "Log.h"
 #include <sstream>
 //--------------------------------------------------------------------------------
@@ -21,41 +22,26 @@ ViewPerspective::ViewPerspective( RendererDX11& Renderer, int Width, int Height 
 {
 	m_sParams.iViewType = VT_PERSPECTIVE;
 
-//	m_sParams.iRenderTargets[0] = Renderer.CreateRenderTarget( Width, Height, 1 );
-//	m_sParams.iEffects[0] = Renderer.LoadEffect( std::string( "default.fx" ) );
+	// Create the resource and the view
 
-	//int i = m_sParams.iRenderTargets[0];
-	//D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&m_sParams.mProjMatrix, D3DX_PI/4, 
-	//	Renderer.GetRTWidth( i ) / Renderer.GetRTHeight( i ), 0.1f, 1000.0f );
-
-	//m_viewport.X = 0;
-	//m_viewport.Y = 0;
-	//m_viewport.Width = Width;
-	//m_viewport.Height = Height;
-	//m_viewport.MinZ = 0.0f;
-	//m_viewport.MaxZ = 1.0f;
+	//Texture2dConfigDX11 config;
+	//config.SetD
+	//m_iRenderTargetViewID = Renderer.CreateRenderTarget( Width, Height, 1 );
 
 	m_pEntity = 0;
 	m_dColor = 0x80808080;
 }
 //--------------------------------------------------------------------------------
-ViewPerspective::ViewPerspective( RendererDX11& Renderer, int RenderTargetID )
+ViewPerspective::ViewPerspective( RendererDX11& Renderer, int RenderTargetViewID )
 {
 	m_sParams.iViewType = VT_PERSPECTIVE;
 
-	//m_sParams.iRenderTargets[0] = RenderTargetID;
-	//m_sParams.iEffects[0] = Renderer.LoadEffect( std::string( "normals.fx" ) );
+	m_iRenderTargetViewID = RenderTargetViewID;
 
-	//int i = m_sParams.iRenderTargets[0];
-	//D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&m_sParams.mProjMatrix, D3DX_PI/4, 
-	//	Renderer.GetRTWidth( i ) / Renderer.GetRTHeight( i ), 0.1f, 1000.0f );
+	ViewMatrix.MakeIdentity();
 
-	//m_viewport.X = 0;
-	//m_viewport.Y = 0;
-	//m_viewport.Width = (DWORD)Renderer.GetRTWidth( RenderTargetID );
-	//m_viewport.Height = (DWORD)Renderer.GetRTHeight( RenderTargetID );
-	//m_viewport.MinZ = 0.0f;
-	//m_viewport.MaxZ = 1.0f;
+	D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&ProjMatrix, D3DX_PI/4, 
+		640.0f / 480.0f, 0.1f, 100.0f );
 
 	m_pEntity = 0;
 	m_dColor = 0x00000000;
@@ -92,7 +78,11 @@ void ViewPerspective::Draw( RendererDX11& Renderer )
 		m_pRoot->PreRender( Renderer, GetType() );
 
 		// Set the parameters for rendering this view
-		//Renderer.SetRenderTarget( m_sParams.iRenderTargets[0] );
+		// TODO: add the depth id into the render view!
+		Renderer.BindRenderTargets( m_iRenderTargetViewID, 0 );
+
+		// TODO: change this to a vector color!
+		Renderer.ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ), 1.0f );
 		//Renderer.ClearBuffers( m_dColor, 1.0f );
 
 		// Set this view's render parameters
@@ -115,8 +105,8 @@ void ViewPerspective::SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float Min
 //--------------------------------------------------------------------------------
 void ViewPerspective::SetRenderParams( RendererDX11& Renderer )
 {
-//	Renderer.SetViewMatrix( m_sParams.mViewMatrix );
-//	Renderer.SetProjMatrix( m_sParams.mProjMatrix );
+	Renderer.SetViewMatrixParameter( &m_sParams.mViewMatrix );
+	Renderer.SetProjMatrixParameter( &m_sParams.mProjMatrix );
 }
 //--------------------------------------------------------------------------------
 void ViewPerspective::SetUsageParams( RendererDX11& Renderer )

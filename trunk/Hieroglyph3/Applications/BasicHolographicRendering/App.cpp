@@ -68,6 +68,9 @@ bool App::ConfigureEngineComponents()
 			RequestTermination();			
 			return( false );
 		}
+
+		// If using the reference device, utilize a fixed time step for any animations.
+		m_pTimer->SetFixedTimeStep( 1.0f / 10.0f );
 	}
 
 	// Create a swap chain for the window that we started out with.  This
@@ -240,14 +243,13 @@ void App::Update()
 
 	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
 
-	// Clear the window to a time varying color.
+	// Use a time varying quantity for animation.
 
-	//float fRotation = sinf( m_pTimer->Runtime() ) * 3.14f;
 	static float fRotation = 0.0f;
-	fRotation += 1.0f / 120.0f * 3.14f;
+	fRotation += m_pTimer->Elapsed() * 3.14f;
 
 	static float fTessellation = 3.0f * 3.14f / 2.0f;
-	fTessellation += 1.0f / 60.0f * 3.14f;
+	fTessellation += m_pTimer->Elapsed() * 2.0f * 3.14f;
 
 	float factor = sinf( fTessellation ) * 6.0f + 7.0f;
 	m_TessParams = Vector4f( factor, factor, factor, factor );
@@ -257,7 +259,6 @@ void App::Update()
 	m_pRenderer11->SetMatrixParameter( std::wstring( L"WorldMatrix" ), &m_WorldMatrix );
 
 
-	//m_pRenderer11->ClearBuffers( 0xA0A0A0A0, 1.0f );
 	m_pRenderer11->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ), 1.0f );
 
 	const float fSeparation = 0.5f;
@@ -290,7 +291,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"BasicTessellation_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"BasicHolographicRendering_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------

@@ -25,6 +25,8 @@ Timer::Timer()
 	m_iFrameCount = 0;
 
 	m_fDelta = 0;
+	m_fFixedDelta = 0.0f;
+	m_bUseFixedStep = false;
 
 	QueryPerformanceFrequency((LARGE_INTEGER*)&m_TicksPerSecond64);
 	QueryPerformanceCounter((LARGE_INTEGER*)&m_CurrentTicks64);
@@ -43,13 +45,33 @@ void Timer::Reset()
 	m_fDelta = 0;
 }
 //--------------------------------------------------------------------------------
+void Timer::SetFixedTimeStep( float step )
+{
+	if ( step <= 0.0f )
+	{
+		m_bUseFixedStep = false;
+		m_fFixedDelta = 0.0f;
+	}
+	else
+	{
+		m_bUseFixedStep = true;
+		m_fFixedDelta = step;
+	}
+}
+//--------------------------------------------------------------------------------
 void Timer::Update( )
 {
 	m_LastTicks64 = m_CurrentTicks64;
 	QueryPerformanceCounter((LARGE_INTEGER*)&m_CurrentTicks64);
 
-	m_fDelta = (float)((__int64)m_CurrentTicks64 - (__int64)m_LastTicks64)
-		/ (__int64)m_TicksPerSecond64;
+	// Update the time increment
+	
+	if ( m_bUseFixedStep )
+		m_fDelta = m_fFixedDelta;
+	else
+		m_fDelta = (float)((__int64)m_CurrentTicks64 - (__int64)m_LastTicks64) / (__int64)m_TicksPerSecond64;
+
+	// Continue counting the frame rate regardless of the time step.
 
 	if ((float)((__int64)m_CurrentTicks64 - (__int64)m_OneSecTicks64)
 		/ (__int64)m_TicksPerSecond64 < 1.0f)

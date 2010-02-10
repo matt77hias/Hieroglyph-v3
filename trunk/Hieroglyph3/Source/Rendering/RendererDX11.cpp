@@ -1332,6 +1332,51 @@ int RendererDX11::GetSamplerStateParameter( std::wstring name )
 	return( result );	
 }
 //--------------------------------------------------------------------------------
+void RendererDX11::SetWorldMatrixParameter( Matrix4f* pMatrix )
+{
+	SetMatrixParameter( std::wstring( L"WorldMatrix" ), pMatrix );
+
+	Matrix4f WorldMatrix = GetMatrixParameter( std::wstring( L"WorldMatrix" ) );
+	Matrix4f ViewMatrix = GetMatrixParameter( std::wstring( L"ViewMatrix" ) );
+	Matrix4f ProjMatrix = GetMatrixParameter( std::wstring( L"ProjMatrix" ) );
+
+	Matrix4f ViewProjMatrix = ViewMatrix * ProjMatrix;
+	Matrix4f WorldViewProjMatrix = WorldMatrix * ViewProjMatrix;
+
+	SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &ViewProjMatrix );
+	SetMatrixParameter( std::wstring( L"WorldViewProjMatrix" ), &WorldViewProjMatrix );
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::SetViewMatrixParameter( Matrix4f* pMatrix )
+{
+	SetMatrixParameter( std::wstring( L"ViewMatrix" ), pMatrix );
+
+	Matrix4f WorldMatrix = GetMatrixParameter( std::wstring( L"WorldMatrix" ) );
+	Matrix4f ViewMatrix = GetMatrixParameter( std::wstring( L"ViewMatrix" ) );
+	Matrix4f ProjMatrix = GetMatrixParameter( std::wstring( L"ProjMatrix" ) );
+
+	Matrix4f ViewProjMatrix = ViewMatrix * ProjMatrix;
+	Matrix4f WorldViewProjMatrix = WorldMatrix * ViewProjMatrix;
+
+	SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &ViewProjMatrix );
+	SetMatrixParameter( std::wstring( L"WorldViewProjMatrix" ), &WorldViewProjMatrix );
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::SetProjMatrixParameter( Matrix4f* pMatrix )
+{
+	SetMatrixParameter( std::wstring( L"ProjMatrix" ), pMatrix );
+
+	Matrix4f WorldMatrix = GetMatrixParameter( std::wstring( L"WorldMatrix" ) );
+	Matrix4f ViewMatrix = GetMatrixParameter( std::wstring( L"ViewMatrix" ) );
+	Matrix4f ProjMatrix = GetMatrixParameter( std::wstring( L"ProjMatrix" ) );
+
+	Matrix4f ViewProjMatrix = ViewMatrix * ProjMatrix;
+	Matrix4f WorldViewProjMatrix = WorldMatrix * ViewProjMatrix;
+
+	SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &ViewProjMatrix );
+	SetMatrixParameter( std::wstring( L"WorldViewProjMatrix" ), &WorldViewProjMatrix );
+}
+//--------------------------------------------------------------------------------
 void RendererDX11::BindShader( ShaderType type, int ID )
 {
 	// Check if the shader has a valid identifier

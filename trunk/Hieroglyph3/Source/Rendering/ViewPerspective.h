@@ -45,6 +45,10 @@ namespace Glyph3
 	protected:
 		DWORD m_dColor;
 		//D3DVIEWPORT9 m_viewport;
+
+		int m_iRenderTargetViewID;
+		Matrix4f ViewMatrix;
+		Matrix4f ProjMatrix;
 	};
 };
 //--------------------------------------------------------------------------------

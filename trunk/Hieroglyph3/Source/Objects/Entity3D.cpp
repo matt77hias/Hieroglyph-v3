@@ -191,8 +191,8 @@ Matrix4f Entity3D::GetView()
 void Entity3D::PreRender( RendererDX11& Renderer, VIEWTYPE view )
 {
 	// Perform the pre-render function only if the material has been set
-	//if ( m_pMaterial )
-	//	m_pMaterial->PreRender( Renderer, view );
+	if ( m_sParams.pMaterial )
+		m_sParams.pMaterial->PreRender( Renderer, view );
 }
 //--------------------------------------------------------------------------------
 void Entity3D::Render( RendererDX11& Renderer, VIEWTYPE view )
@@ -201,18 +201,18 @@ void Entity3D::Render( RendererDX11& Renderer, VIEWTYPE view )
 	if ( ( m_sParams.pGeometry ) && ( m_sParams.pMaterial ) )
 	{
 		// Only render if the material indicates that you should
-		//if ( m_pMaterial->Params[view].bRender )
-		//{
-		//	// Set the world matrix
-		//	Renderer.SetWorldMatrix( m_sParams.mWorldMatrix );
+		if ( m_sParams.pMaterial->Params[view].bRender )
+		{
+			// Set the world matrix
+			Renderer.SetWorldMatrixParameter( &m_sParams.WorldMatrix );
 
-		//	// Set the material parameters
-		//	m_pMaterial->SetRenderParams( Renderer, view );
+			// Set the material parameters
+			m_sParams.pMaterial->SetRenderParams( Renderer, view );
 
-		//	// Send the geometry to the renderer using the appropriate
-		//	// material view effect.
-		//	Renderer.Draw( m_pMaterial->Params[view].iEffect, *m_sParams.pGC );
-		//}
+			// Send the geometry to the renderer using the appropriate
+			// material view effect.
+			Renderer.Draw( m_sParams.pMaterial->Params[view].Effect, *m_sParams.pGeometry );
+		}
 	}
 }
 //--------------------------------------------------------------------------------
@@ -347,8 +347,8 @@ void Entity3D::SetMaterial( MaterialDX11* pMaterial, bool bSingleEntity )
 {
 	if ( pMaterial )
 	{
-		//m_pMaterial = pMaterial;
-		//m_pMaterial->SetEntity( this );
+		m_sParams.pMaterial = pMaterial;
+		m_sParams.pMaterial->SetEntity( this );
 	}
 }
 //--------------------------------------------------------------------------------

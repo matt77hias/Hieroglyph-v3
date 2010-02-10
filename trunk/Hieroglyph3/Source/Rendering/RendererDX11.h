@@ -218,6 +218,13 @@ namespace Glyph3
 		int GetConstantBufferParameter( std::wstring name );
 		int GetSamplerStateParameter( std::wstring name );
 
+		// The following matrix parameters are set with specialized functions to allow
+		// the renderer to calculate the concatenated matrices.
+		
+		void SetWorldMatrixParameter( Matrix4f* pMatrix );
+		void SetViewMatrixParameter( Matrix4f* pMatrix );
+		void SetProjMatrixParameter( Matrix4f* pMatrix );
+
 		// All of the 'Bind/Unbind' functions below are used to bind various resources to the
 		// pipeline.  Currently only the CS can accept unordered access views.  A method is
 		// provided to apply the resource changes as an optimization, which allows for the

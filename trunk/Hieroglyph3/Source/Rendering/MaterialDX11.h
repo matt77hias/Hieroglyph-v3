@@ -14,6 +14,7 @@
 //--------------------------------------------------------------------------------
 #include "RendererDX11.h"
 #include "IRenderView.h"
+#include "RenderEffectDX11.h"
 //--------------------------------------------------------------------------------
 #ifndef MaterialDX11_h
 #define MaterialDX11_h
@@ -23,7 +24,7 @@ namespace Glyph3
 	struct MaterialParams
 	{
 		bool							bRender;
-		int								iEffect;
+		RenderEffectDX11				Effect;
 		TArray<RenderParameterDX11*>	vParameters;
 		TArray<IRenderView*>			vViews;
 	};

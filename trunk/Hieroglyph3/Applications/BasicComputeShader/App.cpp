@@ -65,6 +65,9 @@ bool App::ConfigureEngineComponents()
 			RequestTermination();			
 			return( false );
 		}
+
+		// If using the reference device, utilize a fixed time step for any animations.
+		m_pTimer->SetFixedTimeStep( 1.0f / 10.0f );
 	}
 
 

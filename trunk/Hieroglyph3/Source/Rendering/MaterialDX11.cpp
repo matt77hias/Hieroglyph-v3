@@ -17,7 +17,6 @@ MaterialDX11::MaterialDX11()
 {
 	for ( int i = 0; i < VT_NUM_VIEW_TYPES; i++ )
 	{
-		Params[i].iEffect = -1;
 		Params[i].bRender = false;
 
 		// Loop until no views remain in the current param set

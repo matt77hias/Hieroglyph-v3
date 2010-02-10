@@ -30,11 +30,16 @@ namespace Glyph3
 		int Framerate();
 		int MaxFramerate();
 
+		void SetFixedTimeStep( float step );
+
 	private:
 		float m_fDelta;
 		int m_iFramesPerSecond;
 		int m_iMaxFramesPerSecond;
 		int m_iFrameCount;
+
+		float m_fFixedDelta;
+		bool m_bUseFixedStep;
 
 		unsigned __int64 m_TicksPerSecond64;
 		unsigned __int64 m_StartupTicks64;

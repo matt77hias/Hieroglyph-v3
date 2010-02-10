@@ -68,6 +68,9 @@ bool App::ConfigureEngineComponents()
 			RequestTermination();			
 			return( false );
 		}
+
+		// If using the reference device, utilize a fixed time step for any animations.
+		m_pTimer->SetFixedTimeStep( 1.0f / 10.0f );
 	}
 
 	// Create a swap chain for the window that we started out with.  This
@@ -239,14 +242,13 @@ void App::Update()
 
 	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
 
-	// Clear the window to a time varying color.
+	// Use a time varying quantity for animation.
 
-	//float fRotation = sinf( m_pTimer->Runtime() ) * 3.14f;
 	static float fRotation = 0.0f;
-	fRotation += 1.0f / 120.0f * 3.14f;
+	fRotation += m_pTimer->Elapsed() * 3.14f;
 
 	static float fTessellation = 3.0f * 3.14f / 2.0f;
-	fTessellation += 1.0f / 60.0f * 3.14f;
+	fTessellation += m_pTimer->Elapsed() * 2.0f * 3.14f;
 
 	float factor = sinf( fTessellation ) * 6.0f + 7.0f;
 	m_TessParams = Vector4f( factor, factor, factor, factor );
