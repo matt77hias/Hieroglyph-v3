@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hieroglyph3", "Source\Hieroglyph3.vcproj", "{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicApplication", "Applications\BasicApplication\BasicApplication.vcproj", "{FFB165E8-4D2F-4715-AD7B-EB084FDA0975}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicTessellation", "Applications\BasicTessellation\BasicTessellation.vcproj", "{D2E817F0-1291-4F0B-BC5E-7582B5AFC0E8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicComputeShader", "Applications\BasicComputeShader\BasicComputeShader.vcproj", "{91038F7E-DB37-4526-8696-0BBD99932880}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicHolographicRendering", "Applications\BasicHolographicRendering\BasicHolographicRendering.vcproj", "{D6FA1FEE-F5F1-43F7-9AC0-37E3EC8752A8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}.Debug|Win32.Build.0 = Debug|Win32
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}.Release|Win32.ActiveCfg = Release|Win32
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}.Release|Win32.Build.0 = Release|Win32
+		{FFB165E8-4D2F-4715-AD7B-EB084FDA0975}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FFB165E8-4D2F-4715-AD7B-EB084FDA0975}.Debug|Win32.Build.0 = Debug|Win32
+		{FFB165E8-4D2F-4715-AD7B-EB084FDA0975}.Release|Win32.ActiveCfg = Release|Win32
+		{FFB165E8-4D2F-4715-AD7B-EB084FDA0975}.Release|Win32.Build.0 = Release|Win32
+		{D2E817F0-1291-4F0B-BC5E-7582B5AFC0E8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D2E817F0-1291-4F0B-BC5E-7582B5AFC0E8}.Debug|Win32.Build.0 = Debug|Win32
+		{D2E817F0-1291-4F0B-BC5E-7582B5AFC0E8}.Release|Win32.ActiveCfg = Release|Win32
+		{D2E817F0-1291-4F0B-BC5E-7582B5AFC0E8}.Release|Win32.Build.0 = Release|Win32
+		{91038F7E-DB37-4526-8696-0BBD99932880}.Debug|Win32.ActiveCfg = Debug|Win32
+		{91038F7E-DB37-4526-8696-0BBD99932880}.Debug|Win32.Build.0 = Debug|Win32
+		{91038F7E-DB37-4526-8696-0BBD99932880}.Release|Win32.ActiveCfg = Release|Win32
+		{91038F7E-DB37-4526-8696-0BBD99932880}.Release|Win32.Build.0 = Release|Win32
+		{D6FA1FEE-F5F1-43F7-9AC0-37E3EC8752A8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D6FA1FEE-F5F1-43F7-9AC0-37E3EC8752A8}.Debug|Win32.Build.0 = Debug|Win32
+		{D6FA1FEE-F5F1-43F7-9AC0-37E3EC8752A8}.Release|Win32.ActiveCfg = Release|Win32
+		{D6FA1FEE-F5F1-43F7-9AC0-37E3EC8752A8}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
