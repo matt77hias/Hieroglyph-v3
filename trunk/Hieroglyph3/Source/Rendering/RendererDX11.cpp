@@ -1264,6 +1264,9 @@ Vector4f RendererDX11::GetVectorParameter( std::wstring name )
 //--------------------------------------------------------------------------------
 Matrix4f RendererDX11::GetMatrixParameter( std::wstring name )
 {
+	// TODO: If the parameter does not exist, create it and return the default value!
+	//       This should be done for all parameter types!
+
 	Matrix4f result;
 	result.MakeZero();
 

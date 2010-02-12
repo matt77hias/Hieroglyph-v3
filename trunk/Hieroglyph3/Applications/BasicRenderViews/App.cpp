@@ -14,12 +14,8 @@
 
 #include "SwapChainConfigDX11.h"
 #include "Texture2dConfigDX11.h"
-#include "BufferConfigDX11.h"
-
-#include "GeometryLoaderDX11.h"
-#include "GeometryGeneratorDX11.h"
-#include "RenderEffectDX11.h"
 #include "RasterizerStateConfigDX11.h"
+#include "BufferConfigDX11.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -73,20 +69,15 @@ bool App::ConfigureEngineComponents()
 		m_pTimer->SetFixedTimeStep( 1.0f / 10.0f );
 	}
 
+
 	// Create a swap chain for the window that we started out with.  This
 	// demonstrates using a configuration object for fast and concise object
 	// creation.
-
-	DXGI_SAMPLE_DESC sd;
-	sd.Quality = 0;
-	sd.Count = 1;
 
 	SwapChainConfigDX11 Config;
 	Config.SetWidth( m_pWindow->GetWidth() );
 	Config.SetHeight( m_pWindow->GetHeight() );
 	Config.SetOutputWindow( m_pWindow->GetHandle() );
-	Config.SetSampleDesc( sd );
-	
 	m_iSwapChain = m_pRenderer11->CreateSwapChain( &Config );
 	m_pWindow->SetSwapChain( m_iSwapChain );
 
@@ -99,7 +90,6 @@ bool App::ConfigureEngineComponents()
 
 	Texture2dConfigDX11 DepthConfig;
 	DepthConfig.SetDepthBuffer( width, height );
-	DepthConfig.SetSampleDesc( sd );
 	int DepthID = m_pRenderer11->CreateTexture2D( &DepthConfig, 0 );
 	m_iDepthTarget = m_pRenderer11->CreateDepthStencilView( DepthID, 0 );
 	
@@ -121,7 +111,7 @@ bool App::ConfigureEngineComponents()
 
 	int ViewPort = m_pRenderer11->CreateViewPort( viewport );
 	m_pRenderer11->SetViewPort( ViewPort );
-
+	
 	return( true );
 }
 //--------------------------------------------------------------------------------
@@ -155,8 +145,7 @@ void App::Initialize()
 	pEventManager->AddEventListener( SYSTEM_KEYBOARD_KEYDOWN, this );
 	pEventManager->AddEventListener( SYSTEM_KEYBOARD_CHAR, this );
 
-	// Load the shaders and state for the tessellation effects
-
+	// First create the basic visualization render effect
 	m_pTessellationEffect = new RenderEffectDX11();
 	m_pTessellationEffect->m_iVertexShader = 
 		m_pRenderer11->LoadShader( VERTEX_SHADER,
@@ -184,50 +173,53 @@ void App::Initialize()
 	m_pTessellationEffect->m_iRasterizerState = 
 		m_pRenderer11->CreateRasterizerState( &RS );
 
-	// Set up the geometry to be rendered
+
+	// Load and initialize the geometry to be rendered.
+
 	m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
 	m_pGeometry->GenerateInputLayout( m_pTessellationEffect->m_iVertexShader );
 	m_pGeometry->LoadToBuffers();
 	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
 
-	// Build the world, view, and projection matrices
 
-	// Create the world matrix
-	D3DXMatrixIdentity( (D3DXMATRIX*)&m_WorldMatrix );
-
-	// Create the view matrix
-	D3DXVECTOR3 vLookAt = D3DXVECTOR3( 0.0f, 0.75f, 0.0f );
-	D3DXVECTOR3 vLookFrom = D3DXVECTOR3( 5.0f, 5.5f, -5.0f );
-	D3DXVECTOR3 vLookUp = D3DXVECTOR3( 0.0f, 1.0f, 0.0f );
-	D3DXMatrixLookAtLH( (D3DXMATRIX*)&m_ViewMatrix, &vLookFrom, &vLookAt, &vLookUp );
-
-	// Create the projection matrix
-	D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&m_ProjMatrix, static_cast< float >(D3DX_PI) / 2.0f, 1280.0f /  720.0f, 0.1f, 25.0f );
-
-	// Concatenate the view and projection matrices
-	m_ViewProjMatrix = m_ViewMatrix * m_ProjMatrix;
-
+	// Create the constant buffers for use with this effect
 
 	BufferConfigDX11 cbuffer;
 	cbuffer.SetDefaultConstantBuffer( 2*sizeof( D3DXMATRIX ), true );
-	m_iCB = m_pRenderer11->CreateConstantBuffer( &cbuffer, 0 );
+	int CB = m_pRenderer11->CreateConstantBuffer( &cbuffer, 0 );
+	m_pRenderer11->SetConstantBufferParameter( std::wstring( L"Transforms" ), &CB );
 
-	//m_pRenderer11->RegisterConstantBufferParameter( std::string( "Transforms" ) );
-	m_pRenderer11->SetConstantBufferParameter( std::wstring( L"Transforms" ), &m_iCB );
-	
-	//m_pRenderer11->RegisterMatrixParameter( std::wstring( "WorldViewProjMatrix" ) );
-	m_pRenderer11->SetMatrixParameter( std::wstring( L"WorldMatrix" ), &m_WorldMatrix );
-	
-	//m_pRenderer11->RegisterMatrixParameter( std::string( "WorldViewMatrix" ) );
-	m_pRenderer11->SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &m_ViewProjMatrix );
+	cbuffer.SetDefaultConstantBuffer( 2*sizeof( Vector4f ), true );
+	CB = m_pRenderer11->CreateConstantBuffer( &cbuffer, 0 );
+	m_pRenderer11->SetConstantBufferParameter( std::wstring( L"TessellationParameters" ), &CB );
 
 	m_TessParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
 	m_pRenderer11->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
 
-	cbuffer.SetDefaultConstantBuffer( 2*sizeof( Vector4f ), true );
-	int cb2 = m_pRenderer11->CreateConstantBuffer( &cbuffer, 0 );
-	m_pRenderer11->SetConstantBufferParameter( std::wstring( L"TessellationParameters" ), &cb2 );
 
+	// Create the material for use by the entities.
+
+	m_pMaterial = new MaterialDX11();
+	m_pMaterial->Params[VT_PERSPECTIVE].pEffect = m_pTessellationEffect;
+	m_pMaterial->Params[VT_PERSPECTIVE].bRender = true;
+
+
+	m_pRenderView = new ViewPerspective( *m_pRenderer11, 0 );
+	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );
+	m_pRoot = new Node3D();
+
+
+	for ( int i = 0; i < 10; i++ )
+	{
+		m_pEntity[i] = new Entity3D();
+		m_pEntity[i]->SetGeometry( m_pGeometry );
+		m_pEntity[i]->SetMaterial( m_pMaterial, false );
+		m_pEntity[i]->Position() = Vector3f( i * 3, 0.0f, 0.0f );
+
+		m_pRoot->AttachChild( m_pEntity[i] );
+	}
+	
+	m_pRenderView->SetRoot( m_pRoot );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -242,25 +234,14 @@ void App::Update()
 
 	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
 
-	// Use a time varying quantity for animation.
+	// Clear the window to a time varying color.
 
-	static float fRotation = 0.0f;
-	fRotation += m_pTimer->Elapsed() * 3.14f;
+	//float fBlue = sinf( m_pTimer->Runtime() * m_pTimer->Runtime() ) * 0.25f + 0.5f;
+	//m_pRenderer11->ClearBuffers( Vector4f( 0.0f, 0.0f, fBlue, 0.0f ), 1.0f );
 
-	static float fTessellation = 3.0f * 3.14f / 2.0f;
-	fTessellation += m_pTimer->Elapsed() * 2.0f * 3.14f;
+	m_pRoot->Update( m_pTimer->Elapsed() );
 
-	float factor = sinf( fTessellation ) * 6.0f + 7.0f;
-	m_TessParams = Vector4f( factor, factor, factor, factor );
-	m_pRenderer11->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
-
-	m_WorldMatrix.RotationY( fRotation );
-	m_pRenderer11->SetMatrixParameter( std::wstring( L"WorldMatrix" ), &m_WorldMatrix );
-
-	m_pRenderer11->ClearBuffers( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ), 1.0f );
-
-	m_pRenderer11->Draw( *m_pTessellationEffect, *m_pGeometry ); 
-
+	m_pRenderView->Draw( *m_pRenderer11 );
 
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
 
@@ -271,14 +252,21 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"BasicTessellation_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"BasicApplication_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
+	SAFE_DELETE( m_pRenderView );
+	SAFE_DELETE( m_pRoot );
+
+	for ( int i = 0; i < 10; i++ )
+		SAFE_DELETE( m_pEntity[i] );
+
+	// TODO: make the render effects managed by the materials!
 	SAFE_DELETE( m_pTessellationEffect );
-	SAFE_RELEASE( m_pGeometry );
+	
 
 	// Print the framerate out for the log before shutting down.
 
@@ -317,13 +305,6 @@ bool App::HandleEvent( IEvent* pEvent )
 			m_bSaveScreenshot = true;
 			return( true );
 		}
-		//else if ( key == 0x31 ) // '1' Key
-		//{
-		//	m_pWindow->SetPosition( 50, 50 );
-		//	m_pWindow->SetWidth( 200 );
-		//	m_pWindow->SetCaption( std::wstring( L"New Caption Update!!" ) );
-		//	return( true );
-		//}
 		else
 		{
 			return( false );

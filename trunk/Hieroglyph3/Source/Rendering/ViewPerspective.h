@@ -27,13 +27,12 @@ namespace Glyph3
 	class ViewPerspective : public IRenderView
 	{
 	public:
-		ViewPerspective( RendererDX11& Renderer, int Width, int Height );
 		ViewPerspective( RendererDX11& Renderer, int RenderTargetID );
 
 		virtual void Update( Timer& Timer );
 		virtual void Draw( RendererDX11& Renderer );
 
-		void SetBackColor( DWORD color );
+		void SetBackColor( Vector4f color );
 		void SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ );
 
 		virtual void SetRenderParams( RendererDX11& Renderer );
@@ -43,7 +42,7 @@ namespace Glyph3
 		virtual ~ViewPerspective();
 
 	protected:
-		DWORD m_dColor;
+		Vector4f m_vColor;
 		//D3DVIEWPORT9 m_viewport;
 
 		int m_iRenderTargetViewID;

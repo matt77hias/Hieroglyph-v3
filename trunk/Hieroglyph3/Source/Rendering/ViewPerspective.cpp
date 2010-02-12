@@ -18,42 +18,33 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-ViewPerspective::ViewPerspective( RendererDX11& Renderer, int Width, int Height )
-{
-	m_sParams.iViewType = VT_PERSPECTIVE;
-
-	// Create the resource and the view
-
-	//Texture2dConfigDX11 config;
-	//config.SetD
-	//m_iRenderTargetViewID = Renderer.CreateRenderTarget( Width, Height, 1 );
-
-	m_pEntity = 0;
-	m_dColor = 0x80808080;
-}
-//--------------------------------------------------------------------------------
 ViewPerspective::ViewPerspective( RendererDX11& Renderer, int RenderTargetViewID )
 {
 	m_sParams.iViewType = VT_PERSPECTIVE;
 
 	m_iRenderTargetViewID = RenderTargetViewID;
 
-	ViewMatrix.MakeIdentity();
+	D3DXVECTOR3 vLookAt = D3DXVECTOR3( 0.0f, 0.75f, 0.0f );
+	D3DXVECTOR3 vLookFrom = D3DXVECTOR3( -15.0f, 5.5f, -5.0f );
+	D3DXVECTOR3 vLookUp = D3DXVECTOR3( 0.0f, 1.0f, 0.0f );
+	D3DXMatrixLookAtLH( (D3DXMATRIX*)&ViewMatrix, &vLookFrom, &vLookAt, &vLookUp );
+
+	//ViewMatrix.MakeIdentity();
 
 	D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&ProjMatrix, D3DX_PI/4, 
 		640.0f / 480.0f, 0.1f, 100.0f );
 
 	m_pEntity = 0;
-	m_dColor = 0x00000000;
+	m_vColor.MakeZero();
 }
 //--------------------------------------------------------------------------------
 ViewPerspective::~ViewPerspective()
 {
 }
 //--------------------------------------------------------------------------------
-void ViewPerspective::SetBackColor( DWORD color )
+void ViewPerspective::SetBackColor( Vector4f color )
 {
-	m_dColor = color;
+	m_vColor = color;
 }
 //--------------------------------------------------------------------------------
 void ViewPerspective::Update( Timer& Timer )
@@ -80,10 +71,7 @@ void ViewPerspective::Draw( RendererDX11& Renderer )
 		// Set the parameters for rendering this view
 		// TODO: add the depth id into the render view!
 		Renderer.BindRenderTargets( m_iRenderTargetViewID, 0 );
-
-		// TODO: change this to a vector color!
-		Renderer.ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ), 1.0f );
-		//Renderer.ClearBuffers( m_dColor, 1.0f );
+		Renderer.ClearBuffers( m_vColor, 1.0f );
 
 		// Set this view's render parameters
 		SetRenderParams( Renderer );
@@ -105,8 +93,8 @@ void ViewPerspective::SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float Min
 //--------------------------------------------------------------------------------
 void ViewPerspective::SetRenderParams( RendererDX11& Renderer )
 {
-	Renderer.SetViewMatrixParameter( &m_sParams.mViewMatrix );
-	Renderer.SetProjMatrixParameter( &m_sParams.mProjMatrix );
+	Renderer.SetViewMatrixParameter( &ViewMatrix );
+	Renderer.SetProjMatrixParameter( &ProjMatrix );
 }
 //--------------------------------------------------------------------------------
 void ViewPerspective::SetUsageParams( RendererDX11& Renderer )

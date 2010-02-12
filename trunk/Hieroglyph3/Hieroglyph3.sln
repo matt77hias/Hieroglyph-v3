@@ -23,6 +23,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicHolographicRendering",
 		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ViewFromTheWindow", "Applications\ViewFromTheWindow\ViewFromTheWindow.vcproj", "{64EABEAD-7FF1-445A-9707-ADD5CF20D262}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicRenderViews", "Applications\BasicRenderViews\BasicRenderViews.vcproj", "{3AF292FF-5AE7-481D-93C3-4AAA087F0F4B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -49,6 +59,14 @@ Global
 		{D6FA1FEE-F5F1-43F7-9AC0-37E3EC8752A8}.Debug|Win32.Build.0 = Debug|Win32
 		{D6FA1FEE-F5F1-43F7-9AC0-37E3EC8752A8}.Release|Win32.ActiveCfg = Release|Win32
 		{D6FA1FEE-F5F1-43F7-9AC0-37E3EC8752A8}.Release|Win32.Build.0 = Release|Win32
+		{64EABEAD-7FF1-445A-9707-ADD5CF20D262}.Debug|Win32.ActiveCfg = Debug|Win32
+		{64EABEAD-7FF1-445A-9707-ADD5CF20D262}.Debug|Win32.Build.0 = Debug|Win32
+		{64EABEAD-7FF1-445A-9707-ADD5CF20D262}.Release|Win32.ActiveCfg = Release|Win32
+		{64EABEAD-7FF1-445A-9707-ADD5CF20D262}.Release|Win32.Build.0 = Release|Win32
+		{3AF292FF-5AE7-481D-93C3-4AAA087F0F4B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3AF292FF-5AE7-481D-93C3-4AAA087F0F4B}.Debug|Win32.Build.0 = Debug|Win32
+		{3AF292FF-5AE7-481D-93C3-4AAA087F0F4B}.Release|Win32.ActiveCfg = Release|Win32
+		{3AF292FF-5AE7-481D-93C3-4AAA087F0F4B}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

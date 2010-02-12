@@ -39,7 +39,7 @@ MaterialDX11::MaterialDX11()
 //--------------------------------------------------------------------------------
 MaterialDX11::~MaterialDX11()
 {
-
+	// TODO: manage the render effect lifetimes here!
 }
 //--------------------------------------------------------------------------------
 void MaterialDX11::PreRender( RendererDX11& Renderer, VIEWTYPE type )

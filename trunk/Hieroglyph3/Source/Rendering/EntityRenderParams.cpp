@@ -26,10 +26,7 @@ EntityRenderParams::EntityRenderParams()
 //--------------------------------------------------------------------------------
 EntityRenderParams::~EntityRenderParams()
 {
-	if ( pGeometry )
-		pGeometry->Release();
-
-	if ( pMaterial )
-		delete pMaterial;
+	SAFE_RELEASE( pGeometry )
+	SAFE_RELEASE( pMaterial )
 }
 //--------------------------------------------------------------------------------

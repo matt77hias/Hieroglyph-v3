@@ -211,7 +211,7 @@ void Entity3D::Render( RendererDX11& Renderer, VIEWTYPE view )
 
 			// Send the geometry to the renderer using the appropriate
 			// material view effect.
-			Renderer.Draw( m_sParams.pMaterial->Params[view].Effect, *m_sParams.pGeometry );
+			Renderer.Draw( *m_sParams.pMaterial->Params[view].pEffect, *m_sParams.pGeometry );
 		}
 	}
 }
@@ -345,11 +345,14 @@ CompositeShape* Entity3D::GetCompositeShape( )
 //--------------------------------------------------------------------------------
 void Entity3D::SetMaterial( MaterialDX11* pMaterial, bool bSingleEntity )
 {
+	if ( m_sParams.pMaterial )
+		m_sParams.pMaterial->Release();
+
 	if ( pMaterial )
-	{
-		m_sParams.pMaterial = pMaterial;
-		m_sParams.pMaterial->SetEntity( this );
-	}
+		pMaterial->AddReference();
+
+	m_sParams.pMaterial = pMaterial;
+	//m_sParams.pMaterial->SetEntity( this );
 }
 //--------------------------------------------------------------------------------
 MaterialDX11* Entity3D::GetMaterial( )
@@ -367,7 +370,8 @@ void Entity3D::SetGeometry( GeometryDX11* pGeometry )
 	if ( m_sParams.pGeometry )
 		m_sParams.pGeometry->Release();
 
-	pGeometry->AddReference();
+	if ( pGeometry )
+		pGeometry->AddReference();
 
 	m_sParams.pGeometry = pGeometry;
 }

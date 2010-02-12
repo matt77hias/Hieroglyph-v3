@@ -15,6 +15,7 @@
 #include "RendererDX11.h"
 #include "IRenderView.h"
 #include "RenderEffectDX11.h"
+#include "ISharedObject.h"
 //--------------------------------------------------------------------------------
 #ifndef MaterialDX11_h
 #define MaterialDX11_h
@@ -24,13 +25,13 @@ namespace Glyph3
 	struct MaterialParams
 	{
 		bool							bRender;
-		RenderEffectDX11				Effect;
+		RenderEffectDX11*				pEffect;
 		TArray<RenderParameterDX11*>	vParameters;
 		TArray<IRenderView*>			vViews;
 	};
 
 
-	class MaterialDX11
+	class MaterialDX11 : public ISharedObject
 	{
 	public:
 		MaterialDX11();
