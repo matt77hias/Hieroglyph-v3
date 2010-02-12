@@ -214,7 +214,7 @@ void App::Initialize()
 		m_pEntity[i] = new Entity3D();
 		m_pEntity[i]->SetGeometry( m_pGeometry );
 		m_pEntity[i]->SetMaterial( m_pMaterial, false );
-		m_pEntity[i]->Position() = Vector3f( i * 3, 0.0f, 0.0f );
+		m_pEntity[i]->Position() = Vector3f( i * 4, 4.0f * ( i % 2 ) - 2.0f, 0.0f );
 
 		m_pRoot->AttachChild( m_pEntity[i] );
 	}
@@ -238,6 +238,10 @@ void App::Update()
 
 	//float fBlue = sinf( m_pTimer->Runtime() * m_pTimer->Runtime() ) * 0.25f + 0.5f;
 	//m_pRenderer11->ClearBuffers( Vector4f( 0.0f, 0.0f, fBlue, 0.0f ), 1.0f );
+
+	Matrix3f rotation;
+	rotation.RotationX( m_pTimer->Elapsed() );
+	m_pRoot->Rotation() *= rotation;
 
 	m_pRoot->Update( m_pTimer->Elapsed() );
 
