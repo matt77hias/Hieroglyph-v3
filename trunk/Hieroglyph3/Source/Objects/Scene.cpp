@@ -9,28 +9,28 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-#include "ISceneInterface.h"
+#include "Scene.h"
 #include <sstream>
 #include "Log.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-ISceneInterface::ISceneInterface()
+Scene::Scene()
 {
 	m_pRoot = new Node3D();
 }
 //--------------------------------------------------------------------------------
-ISceneInterface::~ISceneInterface()
+Scene::~Scene()
 {
 	delete m_pRoot;
 }
 //--------------------------------------------------------------------------------
-Node3D* ISceneInterface::GetRoot()
+Node3D* Scene::GetRoot()
 {
 	return( m_pRoot );
 }
 //--------------------------------------------------------------------------------
-void ISceneInterface::Update( float time )
+void Scene::Update( float time )
 {
 	// Perform the udpate on the root, which will propagate through the scene
 	// and update all entities in the scene.
@@ -38,7 +38,7 @@ void ISceneInterface::Update( float time )
 	m_pRoot->Update( time );
 }
 //--------------------------------------------------------------------------------
-void ISceneInterface::Render( )
+void Scene::Render( )
 {
 	// Render here!  Each camera should use it's render view to create an
 	// appropriate image.
@@ -47,14 +47,14 @@ void ISceneInterface::Render( )
 		m_vCameras[i]->RenderFrame();
 }
 //--------------------------------------------------------------------------------
-void ISceneInterface::AddCamera( ICameraInterface* camera )
+void Scene::AddCamera( Camera* camera )
 {
 	m_vCameras.add( camera );
 	camera->SetScene( this );
 	AddEntity( camera->GetNode() );
 }
 //--------------------------------------------------------------------------------
-void ISceneInterface::AddEntity( Entity3D* entity )
+void Scene::AddEntity( Entity3D* entity )
 {
 	// TODO: Use a more sophisticated system for tracking the entities.  This 
 	//       could eventually allow for automatic destruction instead of manually
@@ -63,7 +63,7 @@ void ISceneInterface::AddEntity( Entity3D* entity )
 	m_pRoot->AttachChild( entity );
 }
 //--------------------------------------------------------------------------------
-void ISceneInterface::BuildPickRecord( Ray3f& ray, TArray<PickRecord>& record )
+void Scene::BuildPickRecord( Ray3f& ray, TArray<PickRecord>& record )
 {
 	m_pRoot->BuildPickRecord( ray, record );
 }

@@ -33,6 +33,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicRenderViews", "Applica
 		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicScenes", "Applications\BasicScenes\BasicScenes.vcproj", "{D21FBFE7-021F-4511-A64C-44750ED174FB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -67,6 +72,10 @@ Global
 		{3AF292FF-5AE7-481D-93C3-4AAA087F0F4B}.Debug|Win32.Build.0 = Debug|Win32
 		{3AF292FF-5AE7-481D-93C3-4AAA087F0F4B}.Release|Win32.ActiveCfg = Release|Win32
 		{3AF292FF-5AE7-481D-93C3-4AAA087F0F4B}.Release|Win32.Build.0 = Release|Win32
+		{D21FBFE7-021F-4511-A64C-44750ED174FB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D21FBFE7-021F-4511-A64C-44750ED174FB}.Debug|Win32.Build.0 = Debug|Win32
+		{D21FBFE7-021F-4511-A64C-44750ED174FB}.Release|Win32.ActiveCfg = Release|Win32
+		{D21FBFE7-021F-4511-A64C-44750ED174FB}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

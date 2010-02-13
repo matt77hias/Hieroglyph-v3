@@ -172,8 +172,8 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	if ( FAILED( hr ) )
 	{
 		Log::Get().Write( L"Unable to acquire the ID3D11Debug interface from the device!" );
-		Shutdown();
-		return( false );
+		//Shutdown();
+		//return( false );
 	}
 
 	// Rasterizer State (RS) - the first state will be index zero, so no need

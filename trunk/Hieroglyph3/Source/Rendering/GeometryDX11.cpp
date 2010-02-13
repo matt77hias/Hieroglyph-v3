@@ -246,6 +246,16 @@ int GeometryDX11::CalculateVertexSize()
 	return( m_iVertexSize );
 }
 //--------------------------------------------------------------------------------
+int GeometryDX11::CalculateVertexCount()
+{
+	// Record the number of vertices as the number of vertices in the 
+	// first element.  This could select the minimum number from all 
+	// elements, but the user should have all the same size elements...
+	m_iVertexCount = m_vElements[0]->Count();
+
+	return( m_iVertexCount );
+}
+//--------------------------------------------------------------------------------
 void GeometryDX11::GenerateInputLayout( int ShaderID )
 {
 	int iElems = m_vElements.count();
@@ -253,10 +263,8 @@ void GeometryDX11::GenerateInputLayout( int ShaderID )
 	if ( iElems == 0 )
 		return;
 
-	// Record the number of vertices as the number of vertices in the 
-	// first element.  This could select the minimum number from all 
-	// elements, but the user should have all the same size elements...
-	m_iVertexCount = m_vElements[0]->Count();
+	// Check the number of vertices to be created
+	CalculateVertexCount();
 
 	// Allocate the necesary number of element descriptions
 	TArray<D3D11_INPUT_ELEMENT_DESC> elements;
@@ -304,6 +312,9 @@ int GeometryDX11::GetInputLayout( int ShaderID )
 //--------------------------------------------------------------------------------
 void GeometryDX11::LoadToBuffers()
 {
+	// Check the number of vertices to be created
+	CalculateVertexCount();
+
 	// Check the size of the assembled vertices
 	CalculateVertexSize();
 

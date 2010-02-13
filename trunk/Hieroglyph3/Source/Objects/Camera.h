@@ -9,41 +9,35 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// ISceneInterface
+// Camera
 //
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-#ifndef ISceneInterface_h
-#define ISceneInterface_h
+#ifndef Camera_h
+#define Camera_h
 //--------------------------------------------------------------------------------
-#include "Node3D.h"
-#include "ICameraInterface.h"
-#include "TArray.h"
+#include "Actor.h"
+#include "IRenderView.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class ISceneInterface
+	class Scene;
+
+	class Camera : public Actor
 	{
 	public:
-		ISceneInterface();
-		virtual ~ISceneInterface();
+		Camera();
+		virtual ~Camera();
 
-		virtual void Update( float time );
-		virtual void Render( );
-
-		void AddCamera( ICameraInterface* camera );
-		void AddEntity( Entity3D* entity );
-
-		// Geometric queries
-		void BuildPickRecord( Ray3f& ray, TArray<PickRecord>& record );
-
-		Node3D* GetRoot();
+		void SetCameraView( IRenderView* pView );
+		void SetScene( Scene* pScene );
+		void RenderFrame();
 
 	protected:
-		Node3D* m_pRoot;
-		TArray< ICameraInterface* > m_vCameras;
+		IRenderView* m_pCameraView;
+		Scene* m_pScene;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // ISceneInterface_h
+#endif // Camera_h

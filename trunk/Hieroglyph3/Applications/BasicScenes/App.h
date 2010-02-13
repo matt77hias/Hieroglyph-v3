@@ -9,6 +9,9 @@
 #include "Node3D.h"
 #include "ViewPerspective.h"
 
+#include "Camera.h"
+#include "Scene.h"
+
 #include "GeometryLoaderDX11.h"
 #include "GeometryDX11.h"
 
@@ -50,4 +53,7 @@ protected:
 	MaterialDX11*			m_pMaterial;
 	
 	Vector4f				m_TessParams;
+
+	Camera*		m_pCamera;
+	Scene*		m_pScene;
 };

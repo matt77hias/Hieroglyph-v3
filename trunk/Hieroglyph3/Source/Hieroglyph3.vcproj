@@ -1020,6 +1020,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Rendering\MaterialGeneratorDX11.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Rendering\MaterialGeneratorDX11.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Rendering\RenderEffectDX11.cpp"
 					>
 				</File>
@@ -1043,10 +1051,6 @@
 					RelativePath=".\Rendering\ViewRenderParams.h"
 					>
 				</File>
-			</Filter>
-			<Filter
-				Name="Data Flow"
-				>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1172,71 +1176,79 @@
 		<Filter
 			Name="Objects"
 			>
-			<File
-				RelativePath=".\Objects\Actor.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Objects\Actor.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Objects\Entity3D.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Objects\Entity3D.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Objects\ICameraInterface.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Objects\ICameraInterface.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Objects\ILightInterface.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Objects\ILightInterface.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Objects\ISceneInterface.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Objects\ISceneInterface.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Objects\Node3D.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Objects\Node3D.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Objects\PickRecord.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Objects\PickRecord.h"
-				>
-			</File>
 			<Filter
-				Name="Controllers"
+				Name="Basic Objects"
 				>
 				<File
-					RelativePath=".\Objects\IController.cpp"
+					RelativePath=".\Objects\Entity3D.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Objects\IController.h"
+					RelativePath=".\Objects\Entity3D.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Objects\Node3D.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Objects\Node3D.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Objects\PickRecord.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Objects\PickRecord.h"
+					>
+				</File>
+				<Filter
+					Name="Controllers"
+					>
+					<File
+						RelativePath=".\Objects\IController.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Objects\IController.h"
+						>
+					</File>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="Scene Objects"
+				>
+				<File
+					RelativePath=".\Objects\Actor.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Objects\Actor.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Objects\Camera.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Objects\Camera.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Objects\Light.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Objects\Light.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Objects\Scene.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Objects\Scene.h"
 					>
 				</File>
 			</Filter>

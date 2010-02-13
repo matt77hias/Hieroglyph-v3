@@ -17,6 +17,8 @@
 #include "RasterizerStateConfigDX11.h"
 #include "BufferConfigDX11.h"
 
+#include "MaterialGeneratorDX11.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
@@ -145,39 +147,10 @@ void App::Initialize()
 	pEventManager->AddEventListener( SYSTEM_KEYBOARD_KEYDOWN, this );
 	pEventManager->AddEventListener( SYSTEM_KEYBOARD_CHAR, this );
 
-	// First create the basic visualization render effect
-	m_pTessellationEffect = new RenderEffectDX11();
-	m_pTessellationEffect->m_iVertexShader = 
-		m_pRenderer11->LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/BasicTessellation.hlsl" ),
-		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	m_pTessellationEffect->m_iHullShader =
-		m_pRenderer11->LoadShader( HULL_SHADER,
-		std::wstring( L"../Data/Shaders/BasicTessellation.hlsl" ),
-		std::wstring( L"HSMAIN" ),
-		std::wstring( L"hs_5_0" ) );
-	m_pTessellationEffect->m_iDomainShader =
-		m_pRenderer11->LoadShader( DOMAIN_SHADER,
-		std::wstring( L"../Data/Shaders/BasicTessellation.hlsl" ),
-		std::wstring( L"DSMAIN" ),
-		std::wstring( L"ds_5_0" ) );
-	m_pTessellationEffect->m_iPixelShader = 
-		m_pRenderer11->LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/BasicTessellation.hlsl" ),
-		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
-
-	RasterizerStateConfigDX11 RS;
-	RS.FillMode = D3D11_FILL_WIREFRAME;
-	m_pTessellationEffect->m_iRasterizerState = 
-		m_pRenderer11->CreateRasterizerState( &RS );
-
 
 	// Load and initialize the geometry to be rendered.
 
 	m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
-	m_pGeometry->GenerateInputLayout( m_pTessellationEffect->m_iVertexShader );
 	m_pGeometry->LoadToBuffers();
 	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
 
@@ -197,17 +170,14 @@ void App::Initialize()
 	m_pRenderer11->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
 
 
-	// Create the material for use by the entities.
-
-	m_pMaterial = new MaterialDX11();
-	m_pMaterial->Params[VT_PERSPECTIVE].pEffect = m_pTessellationEffect;
-	m_pMaterial->Params[VT_PERSPECTIVE].bRender = true;
-
-
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, 0 );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );
 	m_pRoot = new Node3D();
 
+
+	// Create the material for use by the entities.
+
+	m_pMaterial = MaterialGeneratorDX11::GenerateWireFrame( *m_pRenderer11 );
 
 	for ( int i = 0; i < 10; i++ )
 	{
@@ -235,9 +205,6 @@ void App::Update()
 	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
 
 	// Clear the window to a time varying color.
-
-	//float fBlue = sinf( m_pTimer->Runtime() * m_pTimer->Runtime() ) * 0.25f + 0.5f;
-	//m_pRenderer11->ClearBuffers( Vector4f( 0.0f, 0.0f, fBlue, 0.0f ), 1.0f );
 
 	Matrix3f rotation;
 	rotation.RotationX( m_pTimer->Elapsed() );
@@ -269,7 +236,7 @@ void App::Shutdown()
 		SAFE_DELETE( m_pEntity[i] );
 
 	// TODO: make the render effects managed by the materials!
-	SAFE_DELETE( m_pTessellationEffect );
+	//SAFE_DELETE( m_pTessellationEffect );
 	
 
 	// Print the framerate out for the log before shutting down.

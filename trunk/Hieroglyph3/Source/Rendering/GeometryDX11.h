@@ -60,7 +60,9 @@ namespace Glyph3
 		int GetVertexCount();
 		int GetElementCount();
 		int GetVertexSize();
+
 		int CalculateVertexSize();
+		int CalculateVertexCount();
 
 		void GenerateInputLayout( int ShaderID );
 		int GetInputLayout( int ShaderID );

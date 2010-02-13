@@ -9,35 +9,26 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// ICameraInterface
+// MaterialGeneratorDX11
 //
 //--------------------------------------------------------------------------------
-
+#ifndef MaterialGeneratorDX11_h
+#define MaterialGeneratorDX11_h
 //--------------------------------------------------------------------------------
-#ifndef ICameraInterface_h
-#define ICameraInterface_h
-//--------------------------------------------------------------------------------
-#include "Actor.h"
-#include "IRenderView.h"
+#include "MaterialDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class ISceneInterface;
-
-	class ICameraInterface : public Actor
+	class MaterialGeneratorDX11
 	{
 	public:
-		ICameraInterface();
-		virtual ~ICameraInterface();
+		static MaterialDX11* GenerateWireFrame( RendererDX11& Renderer );
 
-		void SetCameraView( IRenderView* pView );
-		void SetScene( ISceneInterface* pScene );
-		void RenderFrame();
-
-	protected:
-		IRenderView* m_pCameraView;
-		ISceneInterface* m_pScene;
+	private:
+		MaterialGeneratorDX11();
+		
 	};
 };
-//--------------------------------------------------------------------------------
-#endif // ICameraInterface_h
+#endif // MaterialGeneratorDX11_h
+
+

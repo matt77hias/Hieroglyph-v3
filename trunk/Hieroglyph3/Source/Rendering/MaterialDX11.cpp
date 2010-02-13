@@ -18,6 +18,7 @@ MaterialDX11::MaterialDX11()
 	for ( int i = 0; i < VT_NUM_VIEW_TYPES; i++ )
 	{
 		Params[i].bRender = false;
+		Params[i].pEffect = 0;
 
 		// Loop until no views remain in the current param set
 		while ( Params[i].vViews.count() > 0 )
@@ -39,7 +40,11 @@ MaterialDX11::MaterialDX11()
 //--------------------------------------------------------------------------------
 MaterialDX11::~MaterialDX11()
 {
-	// TODO: manage the render effect lifetimes here!
+	// Delete the effects that have been added to this material
+
+	for ( int i = 0; i < VT_NUM_VIEW_TYPES; i++ )
+		SAFE_DELETE( Params[i].pEffect );
+
 }
 //--------------------------------------------------------------------------------
 void MaterialDX11::PreRender( RendererDX11& Renderer, VIEWTYPE type )

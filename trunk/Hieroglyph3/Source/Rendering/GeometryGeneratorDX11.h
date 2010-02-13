@@ -22,8 +22,8 @@
 // With this specification, the various functions can be used in concert to build
 // up a complex vertex type with standard functions.
 //--------------------------------------------------------------------------------
-#ifndef CGeometryGeneratorDX9_h
-#define CGeometryGeneratorDX9_h
+#ifndef GeometryGeneratorDX11_h
+#define GeometryGeneratorDX11_h
 //--------------------------------------------------------------------------------
 #include "GeometryDX11.h"
 #include <string>

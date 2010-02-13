@@ -9,21 +9,21 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-#include "ICameraInterface.h"
-#include "ISceneInterface.h"
+#include "Camera.h"
+#include "Scene.h"
 #include <sstream>
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-ICameraInterface::ICameraInterface()
+Camera::Camera()
 {
 }
 //--------------------------------------------------------------------------------
-ICameraInterface::~ICameraInterface()
+Camera::~Camera()
 {
 }
 //--------------------------------------------------------------------------------
-void ICameraInterface::RenderFrame()
+void Camera::RenderFrame()
 {
 	if ( m_pCameraView )
 	{
@@ -39,13 +39,13 @@ void ICameraInterface::RenderFrame()
 	}
 }
 //--------------------------------------------------------------------------------
-void ICameraInterface::SetCameraView( IRenderView* pView )
+void Camera::SetCameraView( IRenderView* pView )
 {
 	m_pCameraView = pView;
 	m_pCameraView->SetEntity( m_pBody );
 }
 //--------------------------------------------------------------------------------
-void ICameraInterface::SetScene( ISceneInterface* pScene )
+void Camera::SetScene( Scene* pScene )
 {
 	m_pScene = pScene;
 }
