@@ -38,13 +38,13 @@ void Scene::Update( float time )
 	m_pRoot->Update( time );
 }
 //--------------------------------------------------------------------------------
-void Scene::Render( )
+void Scene::Render( RendererDX11& Renderer )
 {
 	// Render here!  Each camera should use it's render view to create an
 	// appropriate image.
 
 	for ( int i = 0; i < m_vCameras.count(); i++ )
-		m_vCameras[i]->RenderFrame();
+		m_vCameras[i]->RenderFrame( Renderer );
 }
 //--------------------------------------------------------------------------------
 void Scene::AddCamera( Camera* camera )

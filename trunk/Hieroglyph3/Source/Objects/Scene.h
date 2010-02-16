@@ -30,7 +30,7 @@ namespace Glyph3
 		virtual ~Scene();
 
 		virtual void Update( float time );
-		virtual void Render( );
+		virtual void Render( RendererDX11& Renderer );
 
 		void AddCamera( Camera* camera );
 		void AddEntity( Entity3D* entity );

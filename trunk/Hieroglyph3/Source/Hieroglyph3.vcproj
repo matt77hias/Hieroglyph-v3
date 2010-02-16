@@ -450,6 +450,14 @@
 				<Filter
 					Name="Window"
 					>
+					<File
+						RelativePath=".\Events\EvtWindowResize.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Events\EvtWindowResize.h"
+						>
+					</File>
 				</Filter>
 			</Filter>
 		</Filter>

@@ -46,7 +46,6 @@ protected:
 	bool					m_bSaveScreenshot;
 
 	ViewPerspective*		m_pRenderView;
-	Node3D*					m_pRoot;
 	Entity3D*				m_pEntity[10];
 	
 	GeometryDX11*			m_pGeometry;

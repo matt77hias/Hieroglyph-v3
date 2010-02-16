@@ -164,7 +164,7 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	if( FAILED( hr ) )
         return false;
 
-	// Get the debuffer interface from the device.
+	// Get the debugger interface from the device.
 
 	m_pDebugger = 0;
 	hr = m_pDevice->QueryInterface( __uuidof(ID3D11Debug), (void **)&m_pDebugger );
@@ -172,8 +172,6 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	if ( FAILED( hr ) )
 	{
 		Log::Get().Write( L"Unable to acquire the ID3D11Debug interface from the device!" );
-		//Shutdown();
-		//return( false );
 	}
 
 	// Rasterizer State (RS) - the first state will be index zero, so no need

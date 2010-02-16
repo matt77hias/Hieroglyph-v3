@@ -174,11 +174,19 @@ void App::Initialize()
 	m_pMaterial = MaterialGeneratorDX11::GenerateWireFrame( *m_pRenderer11 );
 
 
+	// Create the camera, and the render view that will produce an image of the 
+	// from the camera's point of view of the scene.
+
+	m_pCamera = new Camera();
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, 0 );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );
-	m_pRoot = new Node3D();
+	m_pCamera->SetCameraView( m_pRenderView );
 
+	// Create the scene and add the entities to it.  Then add the camera to the
+	// scene so that it will be updated via the scene interface instead of 
+	// manually manipulating it.
 
+	m_pScene = new Scene();
 	for ( int i = 0; i < 10; i++ )
 	{
 		m_pEntity[i] = new Entity3D();
@@ -186,13 +194,10 @@ void App::Initialize()
 		m_pEntity[i]->SetMaterial( m_pMaterial, false );
 		m_pEntity[i]->Position() = Vector3f( i * 4, 4.0f * ( i % 2 ) - 2.0f, 0.0f );
 
-		m_pRoot->AttachChild( m_pEntity[i] );
+		m_pScene->AddEntity( m_pEntity[i] );
 	}
-	
-	m_pRenderView->SetRoot( m_pRoot );
 
-	m_pCamera = new Camera();
-	m_pScene = new Scene();
+	m_pScene->AddCamera( m_pCamera );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -207,18 +212,19 @@ void App::Update()
 
 	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
 
-	// Clear the window to a time varying color.
-
-	//float fBlue = sinf( m_pTimer->Runtime() * m_pTimer->Runtime() ) * 0.25f + 0.5f;
-	//m_pRenderer11->ClearBuffers( Vector4f( 0.0f, 0.0f, fBlue, 0.0f ), 1.0f );
+	// Manipulate the scene here - simply rotate the root of the scene in this
+	// example.
 
 	Matrix3f rotation;
 	rotation.RotationX( m_pTimer->Elapsed() );
-	m_pRoot->Rotation() *= rotation;
+	m_pScene->GetRoot()->Rotation() *= rotation;
 
-	m_pRoot->Update( m_pTimer->Elapsed() );
+	// Update the scene, and then render all cameras within the scene.
 
-	m_pRenderView->Draw( *m_pRenderer11 );
+	m_pScene->Update( m_pTimer->Elapsed() );
+	m_pScene->Render( *m_pRenderer11 );
+
+	// Present the results of the rendering to the output window.
 
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
 
@@ -229,14 +235,13 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"BasicApplication_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"BasicScenes_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
 	SAFE_DELETE( m_pRenderView );
-	SAFE_DELETE( m_pRoot );
 
 	for ( int i = 0; i < 10; i++ )
 		SAFE_DELETE( m_pEntity[i] );

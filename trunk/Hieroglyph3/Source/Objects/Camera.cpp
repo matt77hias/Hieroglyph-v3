@@ -17,13 +17,16 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 Camera::Camera()
 {
+	m_pCameraView = 0;
+	m_pScene = 0;
 }
 //--------------------------------------------------------------------------------
 Camera::~Camera()
 {
+	// TODO: should the camera delete a renderview that has been added to it???
 }
 //--------------------------------------------------------------------------------
-void Camera::RenderFrame()
+void Camera::RenderFrame( RendererDX11& Renderer )
 {
 	if ( m_pCameraView )
 	{
@@ -34,8 +37,7 @@ void Camera::RenderFrame()
 
 		// Execute the render view
 
-		//RendererDX11::Get()->AddToViewList( m_pCameraView );
-		//RendererDX11::Get()->RenderViewList();
+		m_pCameraView->Draw( Renderer );
 	}
 }
 //--------------------------------------------------------------------------------

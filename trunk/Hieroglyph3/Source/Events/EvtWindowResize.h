@@ -9,35 +9,34 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// Camera
+// EvtWindowResize
 //
 //--------------------------------------------------------------------------------
-
+#ifndef EvtWindowResize_h
+#define EvtWindowResize_h
 //--------------------------------------------------------------------------------
-#ifndef Camera_h
-#define Camera_h
-//--------------------------------------------------------------------------------
-#include "Actor.h"
-#include "IRenderView.h"
+#include "EvtWindowMsg.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class Scene;
-
-	class Camera : public Actor
+	class EvtWindowResize : public EvtWindowMsg
 	{
 	public:
-		Camera();
-		virtual ~Camera();
+		EvtWindowResize( HWND hwnd, unsigned int wparam, long lparam );
+		virtual ~EvtWindowResize( );
 
-		void SetCameraView( IRenderView* pView );
-		void SetScene( Scene* pScene );
-		void RenderFrame( RendererDX11& Renderer );
+		virtual std::wstring GetEventName( );
+		virtual eEVENT GetEventType( );
 
-	protected:
-		IRenderView* m_pCameraView;
-		Scene* m_pScene;
+		int NewWidth();
+		int NewHeight();
+		bool IsMaxHide();	// Message is sent to all pop-up windows when some other window is maximized.
+		bool IsMaximized();	// The window has been maximized.
+		bool IsMaxShow();	// Message is sent to all pop-up windows when some other window has been restored to its former size.
+		bool IsMinimized(); // The window has been minimized.
+		bool IsRestored();	// The window has been resized, but neither the SIZE_MINIMIZED nor SIZE_MAXIMIZED value applies.
 	};
+
 };
 //--------------------------------------------------------------------------------
-#endif // Camera_h
+#endif // EvtWindowResize_h
