@@ -1060,6 +1060,26 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="DXGI"
+				>
+				<File
+					RelativePath=".\Rendering\DXGIAdapter.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Rendering\DXGIAdapter.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Rendering\DXGIOutput.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Rendering\DXGIOutput.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Geometry"

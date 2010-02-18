@@ -206,28 +206,14 @@ void App::Initialize()
 	// Concatenate the view and projection matrices
 	m_ViewProjMatrix = m_ViewMatrix * m_ProjMatrix;
 
-
-	BufferConfigDX11 cbuffer;
-	cbuffer.SetDefaultConstantBuffer( 2*sizeof( D3DXMATRIX ), true );
-	m_iCB = m_pRenderer11->CreateConstantBuffer( &cbuffer, 0 );
-
-	m_pRenderer11->SetConstantBufferParameter( std::wstring( L"Transforms" ), &m_iCB );
 	m_pRenderer11->SetMatrixParameter( std::wstring( L"WorldMatrix" ), &m_WorldMatrix );
 	m_pRenderer11->SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &m_ViewProjMatrix );
 
 	m_TessParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
 	m_pRenderer11->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
 
-	cbuffer.SetDefaultConstantBuffer( 2*sizeof( Vector4f ), true );
-	int cb2 = m_pRenderer11->CreateConstantBuffer( &cbuffer, 0 );
-	m_pRenderer11->SetConstantBufferParameter( std::wstring( L"TessellationParameters" ), &cb2 );
-
 	Vector4f Color = Vector4f ( 0.0f, 0.0f, 0.0f, 0.0f );
 	m_pRenderer11->SetVectorParameter( std::wstring( L"FinalColor" ), &Color );
-
-	cbuffer.SetDefaultConstantBuffer( 1*sizeof( Vector4f ), true );
-	int cb3 = m_pRenderer11->CreateConstantBuffer( &cbuffer, 0 );
-	m_pRenderer11->SetConstantBufferParameter( std::wstring( L"RenderingParameters" ), &cb3 );
 }
 //--------------------------------------------------------------------------------
 void App::Update()

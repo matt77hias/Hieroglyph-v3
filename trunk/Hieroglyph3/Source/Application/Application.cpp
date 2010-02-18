@@ -28,6 +28,7 @@ Application::Application()
 	m_bWindowed = true;
 
 	m_pEventMgr = 0;
+	ms_WindowID = 0;
 }
 //--------------------------------------------------------------------------------
 Application::Application( int iWidth, int iHeight, bool bWindowed )
@@ -44,6 +45,7 @@ Application::Application( int iWidth, int iHeight, bool bWindowed )
 	m_bWindowed = bWindowed;
 
 	m_pEventMgr = 0;
+	ms_WindowID = 0;
 }
 //--------------------------------------------------------------------------------
 Application::~Application( )
@@ -90,7 +92,8 @@ Application* Application::GetApplication( )
 //--------------------------------------------------------------------------------
 void Application::RequestTermination( )
 {
-	PostMessage( ms_WindowID, WM_DESTROY, 0, 0 );
+	// This triggers the termination of the application
+	PostQuitMessage( 0 );
 }
 //--------------------------------------------------------------------------------
 void Application::SetApplicationID( HINSTANCE ApplicationID )

@@ -155,20 +155,13 @@ void App::Initialize()
 	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
 
 
-	// Create the constant buffers for use with this effect
-
-	BufferConfigDX11 cbuffer;
-	cbuffer.SetDefaultConstantBuffer( 2*sizeof( D3DXMATRIX ), true );
-	int CB = m_pRenderer11->CreateConstantBuffer( &cbuffer, 0 );
-	m_pRenderer11->SetConstantBufferParameter( std::wstring( L"Transforms" ), &CB );
-
-	cbuffer.SetDefaultConstantBuffer( 2*sizeof( Vector4f ), true );
-	CB = m_pRenderer11->CreateConstantBuffer( &cbuffer, 0 );
-	m_pRenderer11->SetConstantBufferParameter( std::wstring( L"TessellationParameters" ), &CB );
+	// Create the parameters for use with this effect
 
 	m_TessParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
 	m_pRenderer11->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
 
+
+	// Create a render view to manage the drawing process
 
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, 0 );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );

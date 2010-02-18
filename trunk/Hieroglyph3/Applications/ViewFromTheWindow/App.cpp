@@ -34,16 +34,24 @@ bool App::ConfigureEngineComponents()
 	int height = this->DisplayHeight( ); 
 	bool windowed = this->DisplayWindowed( );
 
-	// Set the render window parameters and initialize the window
-	m_pWindow = new Win32RenderWindow();
-	m_pWindow->SetPosition( 25, 25 );
-	m_pWindow->SetSize( width, height );
-	m_pWindow->SetCaption( std::wstring( L"Direct3D 11 Window #1" ) );
-	m_pWindow->Initialize();
+	// Initialize the random number generator.
+	srand( GetTickCount() );
 
-	// Record the application handle.
+	for ( int i = 0; i < 4; i++ )
+	{
+		// Set the render window parameters and initialize the window
+		m_pWindow[i] = new Win32RenderWindow();
 
-	this->SetWindowID( m_pWindow->GetHandle() );
+		int x = (double)rand() / (RAND_MAX + 1) * 200 + 400;
+		int y = (double)rand() / (RAND_MAX + 1) * 200 + 300;
+		int w = (double)rand() / (RAND_MAX + 1) * 200;	
+		int h = (double)rand() / (RAND_MAX + 1) * 200;
+
+		m_pWindow[i]->SetPosition( x, y );
+		m_pWindow[i]->SetSize( w, h );
+		m_pWindow[i]->SetCaption( std::wstring( L"Direct3D 11 Window" ) );
+		m_pWindow[i]->Initialize();
+	}
 
 	
 	// Create the renderer and initialize it for the desired device
@@ -57,41 +65,46 @@ bool App::ConfigureEngineComponents()
 
 		if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_REFERENCE, D3D_FEATURE_LEVEL_10_0 ) )
 		{
-			ShowWindow( m_pWindow->GetHandle(), SW_HIDE );
-			MessageBox( m_pWindow->GetHandle(), L"Could not create a hardware or software Direct3D 11 device - the program will now abort!", L"Hieroglyph 3 Rendering", MB_ICONEXCLAMATION | MB_SYSTEMMODAL );
+			for ( int i = 0; i < 4; i++ )
+				ShowWindow( m_pWindow[i]->GetHandle(), SW_HIDE );
+
+			MessageBox( m_pWindow[0]->GetHandle(), L"Could not create a hardware or software Direct3D 11 device - the program will now abort!", L"Hieroglyph 3 Rendering", MB_ICONEXCLAMATION | MB_SYSTEMMODAL );
 			RequestTermination();			
 			return( false );
 		}
 	}
 
 
-	// Create a swap chain for the window that we started out with.  This
-	// demonstrates using a configuration object for fast and concise object
-	// creation.
+	// Create a swap chain for all of the windows.
 
-	SwapChainConfigDX11 Config;
-	Config.SetWidth( m_pWindow->GetWidth() );
-	Config.SetHeight( m_pWindow->GetHeight() );
-	Config.SetOutputWindow( m_pWindow->GetHandle() );
-	m_iSwapChain = m_pRenderer11->CreateSwapChain( &Config );
-	m_pWindow->SetSwapChain( m_iSwapChain );
+	for ( int i = 0; i < 4; i++ )
+	{
+		SwapChainConfigDX11 Config;
+		Config.SetWidth( m_pWindow[i]->GetWidth() );
+		Config.SetHeight( m_pWindow[i]->GetHeight() );
+		Config.SetOutputWindow( m_pWindow[i]->GetHandle() );
+		int	iSwapChain = m_pRenderer11->CreateSwapChain( &Config );
+		m_pWindow[i]->SetSwapChain( iSwapChain );
+	}
 
-	// We'll keep a copy of the render target index to use in later examples.
+	for ( int i = 0; i < 4; i++ )
+	{
+		// We'll keep a copy of the render target index to use in later examples.
+		m_iRenderTarget[i] = m_pRenderer11->GetSwapChainRenderTargetViewID( m_pWindow[i]->GetSwapChain() );
+	}
 
-	m_iRenderTarget = m_pRenderer11->GetSwapChainRenderTargetViewID( m_iSwapChain );
 
 	// Next we create a depth buffer for use in the traditional rendering
 	// pipeline.
 
-	Texture2dConfigDX11 DepthConfig;
-	DepthConfig.SetDepthBuffer( width, height );
-	int DepthID = m_pRenderer11->CreateTexture2D( &DepthConfig, 0 );
-	m_iDepthTarget = m_pRenderer11->CreateDepthStencilView( DepthID, 0 );
-	
-	// Bind the swap chain render target and the depth buffer for use in 
-	// rendering.  
+	for ( int i = 0; i < 4; i++ )
+	{
+		Texture2dConfigDX11 DepthConfig;
+		DepthConfig.SetDepthBuffer( m_pWindow[i]->GetWidth(), m_pWindow[i]->GetHeight() );
+		int DepthID = m_pRenderer11->CreateTexture2D( &DepthConfig, 0 );
+		m_iDepthTarget[i] = m_pRenderer11->CreateDepthStencilView( DepthID, 0 );
+	}
 
-	m_pRenderer11->BindRenderTargets( m_iRenderTarget, m_iDepthTarget );
 
 	// Create a view port to use on the scene.  This basically selects the 
 	// entire floating point area of the render target.
@@ -118,10 +131,13 @@ void App::ShutdownEngineComponents()
 		delete m_pRenderer11;
 	}
 
-	if ( m_pWindow )
+	for ( int i = 0; i < 4; i++ )
 	{
-		m_pWindow->Shutdown();
-		delete m_pWindow;
+		if ( m_pWindow[i] )
+		{
+			m_pWindow[i]->Shutdown();
+			delete m_pWindow[i];
+		}
 	}
 }
 //--------------------------------------------------------------------------------
@@ -153,12 +169,22 @@ void App::Update()
 
 	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
 
-	// Clear the window to a time varying color.
 
-	float fBlue = sinf( m_pTimer->Runtime() * m_pTimer->Runtime() ) * 0.25f + 0.5f;
+	// Perform the rendering and presentation for each window.
 
-	m_pRenderer11->ClearBuffers( Vector4f( 0.0f, 0.0f, fBlue, 0.0f ), 1.0f );
-	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
+	for ( int i = 0; i < 4; i++ )
+	{
+		// Bind the swap chain render target and the depth buffer for use in 
+		// rendering.  
+
+		m_pRenderer11->BindRenderTargets( m_iRenderTarget[i], m_iDepthTarget[i] );
+
+		float fBlue = sinf( m_pTimer->Runtime() * m_pTimer->Runtime() ) * 0.25f + 0.5f;
+
+		m_pRenderer11->ClearBuffers( Vector4f( 0.0f, 0.0f, fBlue, 0.0f ), 1.0f );
+		m_pRenderer11->Present( m_pWindow[i]->GetHandle(), m_pWindow[i]->GetSwapChain() );
+	}
+
 
 	// Save a screenshot if desired.  This is done by pressing the 's' key, which
 	// demonstrates how an event is sent and handled by an event listener (which

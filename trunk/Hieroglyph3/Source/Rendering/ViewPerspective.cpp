@@ -54,7 +54,7 @@ void ViewPerspective::Update( Timer& Timer )
 void ViewPerspective::Draw( RendererDX11& Renderer )
 {
 	if ( m_pEntity != NULL )
-		SetView( m_pEntity->GetView() );
+		ViewMatrix = m_pEntity->GetView();
 
 //	std::ostringstream s;
 //	s << "Perspective: " << this;

@@ -27,11 +27,10 @@ public:
 protected:
 
 	RendererDX11*			m_pRenderer11;
-	Win32RenderWindow*		m_pWindow;
+	Win32RenderWindow*		m_pWindow[4];
 	
-	int						m_iSwapChain;
-	int						m_iRenderTarget;
-	int						m_iDepthTarget;
+	int						m_iRenderTarget[4];
+	int						m_iDepthTarget[4];
 
 	bool					m_bSaveScreenshot;
 };

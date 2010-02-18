@@ -23,4 +23,6 @@ Items to do:
 
 - Modify shader loading function to use contextual information to choose the main function name and/or the model to compile with.
 
-[DONE]- Add standard handler for renderer that doesn't support a particular feature level as requested in the initialize method.
+[DONE] - Add standard handler for renderer that doesn't support a particular feature level as requested in the initialize method.
+
+[DONE] - Automatically create constant buffers if they don't exist when an effect is being used in rendering.  This will allow the user to create and use specialized buffers if needed, but not require manual creation if a standard one will be used.

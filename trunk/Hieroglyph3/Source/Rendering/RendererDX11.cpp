@@ -63,6 +63,9 @@
 #include "RenderEffectDX11.h"
 #include "GeometryDX11.h"
 
+#include "DXGIAdapter.h"
+#include "DXGIOutput.h"
+
 #include <sstream>
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
@@ -141,6 +144,38 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 
     HRESULT hr = S_OK;
 
+	// Create a factory to enumerate all of the hardware in the system.
+
+	IDXGIFactory* pFactory = 0;
+	hr = CreateDXGIFactory( __uuidof(IDXGIFactory), (void**)(&pFactory) );
+
+
+	// Enumerate all of the adapters in the current system.  This includes all 
+	// adapters, even the ones that don't support the ID3D11Device interface.
+
+	IDXGIAdapter* pAdapter;
+	TArray<DXGIAdapter*> vAdapters;
+	TArray<DXGIOutput*> vOutputs;
+
+	while( pFactory->EnumAdapters( vAdapters.count(), &pAdapter ) != DXGI_ERROR_NOT_FOUND ) 
+	{ 
+		vAdapters.add( new DXGIAdapter( pAdapter ) ); 
+
+		DXGI_ADAPTER_DESC desc;
+		pAdapter->GetDesc( &desc );
+
+		Log::Get().Write( desc.Description );
+	} 
+
+	// Release the adapters and the factory for now...
+
+	for ( int i = 0; i < vAdapters.count(); i++ )
+		delete vAdapters[i];
+
+	SAFE_RELEASE( pFactory );
+	
+
+	// Specify debug
     UINT CreateDeviceFlags = D3D11_CREATE_DEVICE_SINGLETHREADED; // not interested in multi-threading for now
 #ifdef _DEBUG
     CreateDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
@@ -149,7 +184,7 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 
 	D3D_FEATURE_LEVEL level[] = { FeatureLevel };
 	hr = D3D11CreateDevice( 
-				0,
+				0,//vAdapters[0]->m_pAdapter,
 				DriverType,
 				0,
 				CreateDeviceFlags,
@@ -160,6 +195,7 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 				0,
 				&m_pContext
 			);
+
 
 	if( FAILED( hr ) )
         return false;
