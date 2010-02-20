@@ -40,28 +40,20 @@ namespace Glyph3
 	{
 	public:
 		Application();
-		Application( int iWidth, int iHeight, bool bWindowed );
 		virtual ~Application();
 
 		// Initialization functions
 		static Application* GetApplication( );
 
-		void SetWindowID( HWND WindowID );
-		void SetApplicationID( HINSTANCE ApplicationID );
-
 		// Overloadable functions for end user
 		virtual bool ConfigureEngineComponents() = 0;
 		virtual void ShutdownEngineComponents() = 0;
-		virtual void Initialize();
-		virtual void Update();
-		virtual void Shutdown();
+		virtual void Initialize() = 0;
+		virtual void Update() = 0;
+		virtual void Shutdown() = 0;
 
 		// Request an exit from windows
 		void RequestTermination();
-
-		int DisplayWidth();
-		int DisplayHeight();
-		bool DisplayWindowed();
 
 		// Helpers
 		Timer* m_pTimer;
@@ -72,15 +64,6 @@ namespace Glyph3
 	protected:
 		// CApplication pointer to ensure single instance
 		static Application* ms_pApplication;
-		
-		// Windows data structures
-		HWND ms_WindowID;
-		HINSTANCE m_AppInstance;
-		
-		// Display parameters
-		int m_iWidth;
-		int m_iHeight;
-		bool m_bWindowed;
 	};
 };
 //--------------------------------------------------------------------------------

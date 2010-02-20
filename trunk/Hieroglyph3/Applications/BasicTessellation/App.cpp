@@ -28,7 +28,7 @@ App AppInstance; // Provides an instance of the application
 
 
 //--------------------------------------------------------------------------------
-App::App() : Application( 640, 480, true )
+App::App()
 {
 	m_bSaveScreenshot = false;
 }
@@ -36,9 +36,9 @@ App::App() : Application( 640, 480, true )
 bool App::ConfigureEngineComponents()
 {
 	// The application currently supplies the 
-	int width = this->DisplayWidth( ); 
-	int height = this->DisplayHeight( ); 
-	bool windowed = this->DisplayWindowed( );
+	int width = 640;
+	int height = 320;
+	bool windowed = true;
 
 	// Set the render window parameters and initialize the window
 	m_pWindow = new Win32RenderWindow();
@@ -46,10 +46,6 @@ bool App::ConfigureEngineComponents()
 	m_pWindow->SetSize( width, height );
 	m_pWindow->SetCaption( std::wstring( L"Direct3D 11 Window #1" ) );
 	m_pWindow->Initialize();
-
-	// Record the application handle.
-
-	this->SetWindowID( m_pWindow->GetHandle() );
 
 	
 	// Create the renderer and initialize it for the desired device
@@ -207,26 +203,11 @@ void App::Initialize()
 	m_ViewProjMatrix = m_ViewMatrix * m_ProjMatrix;
 
 
-	BufferConfigDX11 cbuffer;
-	cbuffer.SetDefaultConstantBuffer( 2*sizeof( D3DXMATRIX ), true );
-	m_iCB = m_pRenderer11->CreateConstantBuffer( &cbuffer, 0 );
-
-	//m_pRenderer11->RegisterConstantBufferParameter( std::string( "Transforms" ) );
-	m_pRenderer11->SetConstantBufferParameter( std::wstring( L"Transforms" ), &m_iCB );
-	
-	//m_pRenderer11->RegisterMatrixParameter( std::wstring( "WorldViewProjMatrix" ) );
 	m_pRenderer11->SetMatrixParameter( std::wstring( L"WorldMatrix" ), &m_WorldMatrix );
-	
-	//m_pRenderer11->RegisterMatrixParameter( std::string( "WorldViewMatrix" ) );
 	m_pRenderer11->SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &m_ViewProjMatrix );
 
 	m_TessParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
 	m_pRenderer11->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
-
-	cbuffer.SetDefaultConstantBuffer( 2*sizeof( Vector4f ), true );
-	int cb2 = m_pRenderer11->CreateConstantBuffer( &cbuffer, 0 );
-	m_pRenderer11->SetConstantBufferParameter( std::wstring( L"TessellationParameters" ), &cb2 );
-
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -284,8 +265,6 @@ void App::Shutdown()
 	std::wstringstream out;
 	out << L"Max FPS: " << m_pTimer->MaxFramerate();
 	Log::Get().Write( out.str() );
-
-	Application::Shutdown();
 }
 //--------------------------------------------------------------------------------
 bool App::HandleEvent( IEvent* pEvent )

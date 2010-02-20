@@ -34,9 +34,16 @@ namespace Glyph3
 		void SetScene( Scene* pScene );
 		void RenderFrame( RendererDX11& Renderer );
 
+		void SetProjectionParams( float zn, float zf, float aspect, float fov );
+
 	protected:
 		IRenderView* m_pCameraView;
 		Scene* m_pScene;
+
+		float m_fNear;
+		float m_fFar;
+		float m_fAspect;
+		float m_fFov;
 	};
 };
 //--------------------------------------------------------------------------------

@@ -5,6 +5,12 @@
 #include "Win32RenderWindow.h"
 #include "RendererDX11.h"
 
+#include "ViewPerspective.h"
+#include "GeometryDX11.h"
+#include "MaterialDX11.h"
+#include "Camera.h"
+#include "Scene.h"
+
 using namespace Glyph3;
 
 class App : public Application, public IEventListener
@@ -25,12 +31,30 @@ public:
 	virtual std::wstring GetName( );
 
 protected:
+#define NUM_WINDOWS 20
 
 	RendererDX11*			m_pRenderer11;
-	Win32RenderWindow*		m_pWindow[4];
+	Win32RenderWindow*		m_pWindow[NUM_WINDOWS];
+
+	int						m_iRenderTarget[NUM_WINDOWS];
+	int						m_iDepthTarget;
+
+	int						m_iRTV;
+	int						m_iTexture;
+
+	ViewPerspective*		m_pRenderView;
+	Node3D*					m_pNode;
+	Entity3D*				m_pEntity;
 	
-	int						m_iRenderTarget[4];
-	int						m_iDepthTarget[4];
+	GeometryDX11*			m_pGeometry;
+	MaterialDX11*			m_pMaterial;
+	
+	Vector4f				m_LightParams;
+	Vector4f				m_LightPosition;
+
+	Camera*					m_pCamera;
+	Scene*					m_pScene;
+	Vector2f				m_DesktopRes;
 
 	bool					m_bSaveScreenshot;
 };

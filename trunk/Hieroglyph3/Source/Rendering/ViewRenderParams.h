@@ -66,8 +66,6 @@ namespace Glyph3
 		int				iDepthTargets[8];
 		int				iTextures[8];
 		Vector4f		vParameters[8];
-		Matrix4f		mViewMatrix;
-		Matrix4f		mProjMatrix;
 	};
 };
 //--------------------------------------------------------------------------------

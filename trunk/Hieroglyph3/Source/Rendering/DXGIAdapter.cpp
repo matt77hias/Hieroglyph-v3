@@ -13,7 +13,7 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-DXGIAdapter::DXGIAdapter( IDXGIAdapter* pAdapter )
+DXGIAdapter::DXGIAdapter( IDXGIAdapter1* pAdapter )
 {
 	m_pAdapter = pAdapter;
 

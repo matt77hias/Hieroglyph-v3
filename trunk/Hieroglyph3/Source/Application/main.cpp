@@ -55,15 +55,9 @@ int WINAPI WinMain(	HINSTANCE h_Inst, HINSTANCE h_PrevInst,	LPSTR lpcmdline, int
 	}
 
 
-	// Record the application handle and instance
-	m_pApp->SetApplicationID( h_Inst );
-
-
 	// Call the application's ConfigureEngineComponent method.  This will load
 	// and create each of the engine components that are needed by the application,
 	// as well as the windows that are needed for interacting with the user.
-
-	m_pApp->m_pEventMgr = new EventManager();
 
 	if ( !m_pApp->ConfigureEngineComponents() )
 	{
@@ -83,7 +77,7 @@ int WINAPI WinMain(	HINSTANCE h_Inst, HINSTANCE h_PrevInst,	LPSTR lpcmdline, int
 	
 	while( bLoop )
 	{
-    	while ( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
+		while ( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
 		{ 
 			if ( msg.message == WM_QUIT )
 			{

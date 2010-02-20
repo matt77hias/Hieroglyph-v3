@@ -25,17 +25,16 @@ App AppInstance; // Provides an instance of the application
 
 
 //--------------------------------------------------------------------------------
-App::App() : Application( 640, 480, true )
+App::App()
 {
 	m_bSaveScreenshot = false;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
 {
-	// The application currently supplies the 
-	int width = this->DisplayWidth( ); 
-	int height = this->DisplayHeight( ); 
-	bool windowed = this->DisplayWindowed( );
+	int width = 640;
+	int height = 480;
+	bool windowed = true;
 
 	// Set the render window parameters and initialize the window
 	m_pWindow = new Win32RenderWindow();
@@ -44,11 +43,7 @@ bool App::ConfigureEngineComponents()
 	m_pWindow->SetCaption( std::wstring( L"Direct3D 11 Window #1" ) );
 	m_pWindow->Initialize();
 
-	// Record the application handle.
 
-	this->SetWindowID( m_pWindow->GetHandle() );
-
-	
 	// Create the renderer and initialize it for the desired device
 	// type and feature level.
 
@@ -247,8 +242,6 @@ void App::Shutdown()
 	std::wstringstream out;
 	out << L"Max FPS: " << m_pTimer->MaxFramerate();
 	Log::Get().Write( out.str() );
-
-	Application::Shutdown();
 }
 //--------------------------------------------------------------------------------
 bool App::HandleEvent( IEvent* pEvent )

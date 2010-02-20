@@ -146,34 +146,26 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 
 	// Create a factory to enumerate all of the hardware in the system.
 
-	IDXGIFactory* pFactory = 0;
+	IDXGIFactory1* pFactory = 0;
 	hr = CreateDXGIFactory( __uuidof(IDXGIFactory), (void**)(&pFactory) );
 
 
 	// Enumerate all of the adapters in the current system.  This includes all 
 	// adapters, even the ones that don't support the ID3D11Device interface.
 
-	IDXGIAdapter* pAdapter;
+	IDXGIAdapter1* pAdapter;
 	TArray<DXGIAdapter*> vAdapters;
 	TArray<DXGIOutput*> vOutputs;
 
-	while( pFactory->EnumAdapters( vAdapters.count(), &pAdapter ) != DXGI_ERROR_NOT_FOUND ) 
+	while( pFactory->EnumAdapters1( vAdapters.count(), &pAdapter ) != DXGI_ERROR_NOT_FOUND ) 
 	{ 
 		vAdapters.add( new DXGIAdapter( pAdapter ) ); 
 
-		DXGI_ADAPTER_DESC desc;
-		pAdapter->GetDesc( &desc );
+		DXGI_ADAPTER_DESC1 desc;
+		pAdapter->GetDesc1( &desc );
 
 		Log::Get().Write( desc.Description );
 	} 
-
-	// Release the adapters and the factory for now...
-
-	for ( int i = 0; i < vAdapters.count(); i++ )
-		delete vAdapters[i];
-
-	SAFE_RELEASE( pFactory );
-	
 
 	// Specify debug
     UINT CreateDeviceFlags = D3D11_CREATE_DEVICE_SINGLETHREADED; // not interested in multi-threading for now
@@ -181,10 +173,9 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
     CreateDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-
 	D3D_FEATURE_LEVEL level[] = { FeatureLevel };
 	hr = D3D11CreateDevice( 
-				0,//vAdapters[0]->m_pAdapter,
+				0, //vAdapters[0]->m_pAdapter,
 				DriverType,
 				0,
 				CreateDeviceFlags,
@@ -196,6 +187,13 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 				&m_pContext
 			);
 
+
+	// Release the adapters and the factory for now...
+
+	for ( int i = 0; i < vAdapters.count(); i++ )
+		delete vAdapters[i];
+
+	SAFE_RELEASE( pFactory );
 
 	if( FAILED( hr ) )
         return false;
@@ -2260,6 +2258,15 @@ int RendererDX11::GetSwapChainRenderTargetViewID( int ID )
 	return( -1 );
 }
 //--------------------------------------------------------------------------------
+int RendererDX11::GetSwapChainTextureID( int ID )
+{
+	if ( ( ID >= 0 ) && ( m_vSwapChains.count() ) )
+		return( m_vSwapChains[ID]->m_iTextureID );
+	
+	Log::Get().Write( L"Tried to get an invalid swap buffer index texture ID!" );
+	return( -1 );
+}
+//--------------------------------------------------------------------------------
 std::wstring RendererDX11::Print_D3D11_SHADER_DESC( D3D11_SHADER_DESC description )
 {
 	std::wstringstream s;
@@ -2585,5 +2592,52 @@ std::wstring RendererDX11::Print_D3D11_TESSELLATOR_DOMAIN( D3D11_TESSELLATOR_DOM
 	}
 
 	return( s.str() );
+}
+//--------------------------------------------------------------------------------
+Vector2f RendererDX11::GetDesktopResolution()
+{
+	// Acquire the DXGI device, then the adapter, then the output...
+
+	IDXGIDevice * pDXGIDevice;
+	HRESULT hr = m_pDevice->QueryInterface(__uuidof(IDXGIDevice), (void **)&pDXGIDevice);
+	      
+	IDXGIAdapter * pDXGIAdapter;
+	hr = pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), (void **)&pDXGIAdapter);
+
+	// Take the first output in the adapter.
+
+	IDXGIOutput* pDXGIOutput;
+	pDXGIAdapter->EnumOutputs( 0, &pDXGIOutput );
+
+	// Use the output interface to get the output description.
+
+	DXGI_OUTPUT_DESC desc;
+	pDXGIOutput->GetDesc( &desc );
+
+	// Release all of the interfaces
+
+	pDXGIOutput->Release();
+	pDXGIAdapter->Release();
+	pDXGIDevice->Release();
+
+	// Return the current output's resolution from the description.
+	return( Vector2f( desc.DesktopCoordinates.right - desc.DesktopCoordinates.left,
+						desc.DesktopCoordinates.bottom - desc.DesktopCoordinates.top ) );
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::CopySubresourceRegion( int DestResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ,
+	int SrcResource, UINT SrcSubresource, D3D11_BOX* pSrcBox )
+{
+	int DestType = DestResource & 0x00FF0000;
+	int DestID = DestResource & 0x0000FFFF;
+	ID3D11Resource* pDestResource = m_vResources[DestID]->GetResource();
+
+
+	int SrcType = SrcResource & 0x00FF0000;
+	int SrcID = SrcResource & 0x0000FFFF;
+	ID3D11Resource* pSrcResource = m_vResources[SrcID]->GetResource();
+
+	m_pContext->CopySubresourceRegion( pDestResource, DstSubresource, DstX, DstY, DstZ,
+		pSrcResource, SrcSubresource, pSrcBox );
 }
 //--------------------------------------------------------------------------------

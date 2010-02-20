@@ -26,9 +26,6 @@ ViewRenderParams::ViewRenderParams()
 		iEffects[i] = -1;
 		vParameters[i].MakeZero();
 	}
-
-	mViewMatrix.MakeIdentity( );
-	mProjMatrix.MakeIdentity( );
 }
 //--------------------------------------------------------------------------------
 VIEWTYPE ViewRenderParams::ViewNameToIndex( std::string& name )

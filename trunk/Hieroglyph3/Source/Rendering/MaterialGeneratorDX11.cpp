@@ -62,3 +62,29 @@ MaterialDX11* MaterialGeneratorDX11::GenerateWireFrame( RendererDX11& Renderer )
 	return( pMaterial );
 }
 //--------------------------------------------------------------------------------
+MaterialDX11* MaterialGeneratorDX11::GeneratePhong( RendererDX11& Renderer )
+{
+	// Create the material that will be returned
+	MaterialDX11* pMaterial = new MaterialDX11();
+
+	// Create and fill the effect that will be used for this view type
+	RenderEffectDX11* pEffect = new RenderEffectDX11();
+
+	pEffect->m_iVertexShader = 
+		Renderer.LoadShader( VERTEX_SHADER,
+		std::wstring( L"../Data/Shaders/PhongShading.hlsl" ),
+		std::wstring( L"VSMAIN" ),
+		std::wstring( L"vs_5_0" ) );
+	pEffect->m_iPixelShader = 
+		Renderer.LoadShader( PIXEL_SHADER,
+		std::wstring( L"../Data/Shaders/PhongShading.hlsl" ),
+		std::wstring( L"PSMAIN" ),
+		std::wstring( L"ps_5_0" ) );
+
+	// Enable the material to render the given view type, and set its effect.
+	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
+	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
+
+	return( pMaterial );
+}
+//--------------------------------------------------------------------------------

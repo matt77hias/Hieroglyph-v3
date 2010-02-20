@@ -16,6 +16,7 @@ using namespace Glyph3;
 RenderWindow::RenderWindow( )
 {
 	m_hWnd = 0;
+	m_dStyle = (WS_OVERLAPPEDWINDOW | WS_VISIBLE) & ~WS_THICKFRAME;
 	m_sCaption = L"";
 	m_iWidth = 640;
 	m_iHeight = 480;
@@ -38,16 +39,14 @@ void RenderWindow::SetWidth( int width )
 {
 	m_iWidth = width;
 
-	if ( m_hWnd != 0 )
-		MoveWindow( m_hWnd, m_iLeft, m_iTop, m_iWidth, m_iHeight, true );
+	UpdateWindowState();
 }
 //--------------------------------------------------------------------------------
 void RenderWindow::SetHeight( int height )
 {
 	m_iHeight = height;
 
-	if ( m_hWnd != 0 )
-		MoveWindow( m_hWnd, m_iLeft, m_iTop, m_iWidth, m_iHeight, true );
+	UpdateWindowState();
 }
 //--------------------------------------------------------------------------------
 int RenderWindow::GetWidth()
@@ -68,18 +67,24 @@ int RenderWindow::GetHeight()
 //--------------------------------------------------------------------------------
 int RenderWindow::GetLeft()
 {
-	RECT rect;
-	GetClientRect( m_hWnd, &rect );
+	POINT point;
+	point.x = 0;
+	point.y = 0;
 
-	return( rect.left );
+	ClientToScreen( m_hWnd, &point );
+
+	return( point.x );
 }
 //--------------------------------------------------------------------------------
 int RenderWindow::GetTop()
 {
-	RECT rect;
-	GetClientRect( m_hWnd, &rect );
+	POINT point;
+	point.x = 0;
+	point.y = 0;
 
-	return( rect.top );
+	ClientToScreen( m_hWnd, &point );
+
+	return( point.y );
 }
 //--------------------------------------------------------------------------------
 void RenderWindow::SetSize( int width, int height )
@@ -87,17 +92,19 @@ void RenderWindow::SetSize( int width, int height )
 	m_iWidth = width;
 	m_iHeight = height;
 
-	if ( m_hWnd != 0 )
-		MoveWindow( m_hWnd, m_iLeft, m_iTop, m_iWidth, m_iHeight, true );
+	UpdateWindowState();
 }
 //--------------------------------------------------------------------------------
 void RenderWindow::SetPosition( int left, int top )
 {
+	// The position is specified in terms of the client area - so the actual 
+	// Win32 function needs to use the modified screen coordinates that will put
+	// the window's client area at the desired location.
+
 	m_iLeft = left;
 	m_iTop = top;
 
-	if ( m_hWnd != 0 )
-		MoveWindow( m_hWnd, m_iLeft, m_iTop, m_iWidth, m_iHeight, true );
+	UpdateWindowState();
 }
 //--------------------------------------------------------------------------------
 void RenderWindow::SetCaption( std::wstring& caption )
@@ -121,5 +128,27 @@ int RenderWindow::GetSwapChain()
 void RenderWindow::SetSwapChain( int swapchain )
 {
 	m_iSwapChain = swapchain;
+}
+//--------------------------------------------------------------------------------
+void RenderWindow::UpdateWindowState()
+{
+	if ( m_hWnd != 0 )
+	{
+		RECT ClientRect;
+		ClientRect.left = 0;
+		ClientRect.top = 0;
+		ClientRect.right = m_iWidth;
+		ClientRect.bottom = m_iHeight;
+
+		// Adjust the window size for correct device size
+		RECT WindowRect = ClientRect;
+		AdjustWindowRect( &WindowRect, m_dStyle, FALSE );
+
+		int deltaX = ( WindowRect.right - ClientRect.right ) / 2;
+		int deltaY = ( WindowRect.bottom - ClientRect.right ) / 2;
+
+		MoveWindow( m_hWnd, m_iLeft - deltaX, m_iTop - deltaY, 
+			m_iWidth + deltaX * 2, m_iHeight + deltaY * 2, true );
+	}
 }
 //--------------------------------------------------------------------------------

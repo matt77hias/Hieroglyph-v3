@@ -46,7 +46,7 @@ void Win32RenderWindow::Initialize()
 	RegisterClassEx(&wc);
 
 	// Specify the window style
-	DWORD dwStyle = (WS_OVERLAPPEDWINDOW | WS_VISIBLE) & ~WS_THICKFRAME; //WS_OVERLAPPEDWINDOW; //
+	m_dStyle = (WS_OVERLAPPEDWINDOW | WS_VISIBLE) & ~WS_THICKFRAME;
 	
 
 	// Record the desired device size
@@ -56,7 +56,7 @@ void Win32RenderWindow::Initialize()
 	rc.bottom = m_iHeight;
 	
 	// Adjust the window size for correct device size
-	AdjustWindowRect(&rc, dwStyle, FALSE);
+	AdjustWindowRect(&rc, m_dStyle, FALSE);
 
 	long lwidth = rc.right - rc.left;
 	long lheight = rc.bottom - rc.top;
@@ -70,7 +70,7 @@ void Win32RenderWindow::Initialize()
 		NULL,							// extended style
 		L"HeiroglyphWin32",				// class name
 		m_sCaption.c_str(),				// instance title
-		dwStyle,						// window style
+		m_dStyle,						// window style
 		lleft,ltop,						// initial x,y
 		lwidth,							// initial width
 		lheight,						// initial height

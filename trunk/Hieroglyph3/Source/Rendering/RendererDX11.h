@@ -35,6 +35,8 @@
 #include <D3DX10core.h>
 #include <D3D11Shader.h>
 
+#include "Vector2f.h"
+#include "Vector3f.h"
 #include "Vector4f.h"
 #include "Matrix4f.h"
 
@@ -290,7 +292,19 @@ namespace Glyph3
 
 		void SaveTextureScreenShot( int ID, std::wstring filename, D3DX11_IMAGE_FILE_FORMAT format = D3DX11_IFF_PNG );
 		int GetSwapChainRenderTargetViewID( int ID );
+		int GetSwapChainTextureID( int ID );
 		
+		// This is an interim solution to get the resolution of the current 
+		// adapter output resolution.
+
+		Vector2f GetDesktopResolution();
+
+		// Copy from one resource to another resource.
+
+		void CopySubresourceRegion( int DestResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ,
+			int SrcResource, UINT SrcSubresource, D3D11_BOX* pSrcBox );
+
+
 		int LoadTexture( std::wstring filename );
 
 		// These functions are used to convert the enumerated values to human readable text.

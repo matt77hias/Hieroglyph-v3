@@ -51,6 +51,9 @@ namespace Glyph3
 		std::wstring GetCaption();
 
 	protected:
+
+		void UpdateWindowState();
+
 		HWND			m_hWnd;
 		std::wstring	m_sCaption;
 		int				m_iWidth;
@@ -59,6 +62,8 @@ namespace Glyph3
 		int				m_iTop;
 
 		int				m_iSwapChain;
+
+		DWORD			m_dStyle;
 	};
 };
 //--------------------------------------------------------------------------------

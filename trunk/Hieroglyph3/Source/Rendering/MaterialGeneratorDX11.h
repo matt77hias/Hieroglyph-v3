@@ -23,6 +23,7 @@ namespace Glyph3
 	{
 	public:
 		static MaterialDX11* GenerateWireFrame( RendererDX11& Renderer );
+		static MaterialDX11* GeneratePhong( RendererDX11& Renderer );
 
 	private:
 		MaterialGeneratorDX11();

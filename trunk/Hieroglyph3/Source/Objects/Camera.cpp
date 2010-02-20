@@ -19,6 +19,11 @@ Camera::Camera()
 {
 	m_pCameraView = 0;
 	m_pScene = 0;
+
+	m_fNear = 0.1f;
+	m_fFar = 100.0f;
+	m_fAspect = 1280.0f / 800.0f;
+	m_fFov = D3DX_PI/4;
 }
 //--------------------------------------------------------------------------------
 Camera::~Camera()
@@ -50,5 +55,20 @@ void Camera::SetCameraView( IRenderView* pView )
 void Camera::SetScene( Scene* pScene )
 {
 	m_pScene = pScene;
+}
+//--------------------------------------------------------------------------------
+void Camera::SetProjectionParams( float zn, float zf, float aspect, float fov )
+{
+	m_fNear = zn;
+	m_fFar = zf;
+	m_fAspect = aspect;
+	m_fFov = fov;
+
+	if ( m_pCameraView )
+	{
+		// Calculate and set the projection matrix for the view.
+		D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&m_pCameraView->ProjMatrix, m_fFov, 
+			m_fAspect, m_fNear, m_fFar );
+	}
 }
 //--------------------------------------------------------------------------------

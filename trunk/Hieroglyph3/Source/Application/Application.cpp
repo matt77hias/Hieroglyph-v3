@@ -16,36 +16,23 @@ Application* Application::ms_pApplication = NULL;
 //--------------------------------------------------------------------------------
 Application::Application()
 {
+	// Record the this pointer to provide access to the WinMain function.
+
 	ms_pApplication = this;
+
+	// Create and initialize the timer object for use in the subclass.
 
 	m_pTimer = new Timer();
 	m_pTimer->Update();
 
-	Log::Get().Open();
-
-	m_iWidth = 640;
-	m_iHeight = 480;
-	m_bWindowed = true;
-
-	m_pEventMgr = 0;
-	ms_WindowID = 0;
-}
-//--------------------------------------------------------------------------------
-Application::Application( int iWidth, int iHeight, bool bWindowed )
-{
-	ms_pApplication = this;
-
-	m_pTimer = new Timer();
-	m_pTimer->Update();
+	// Open the log file for use by the engine/application in general.
 
 	Log::Get().Open();
 
-	m_iWidth = iWidth;
-	m_iHeight = iHeight;
-	m_bWindowed = bWindowed;
+	// Create the event manager here since it must be the first engine component
+	// instantiated.
 
-	m_pEventMgr = 0;
-	ms_WindowID = 0;
+	m_pEventMgr = new EventManager();
 }
 //--------------------------------------------------------------------------------
 Application::~Application( )
@@ -53,36 +40,10 @@ Application::~Application( )
 	if ( m_pTimer != NULL )
 		delete m_pTimer;
 
-	Log::Get().Close();
-}
-//--------------------------------------------------------------------------------
-int Application::DisplayWidth( )
-{
-	return( m_iWidth );
-}
-//--------------------------------------------------------------------------------
-int Application::DisplayHeight( )
-{
-	return( m_iHeight );
-}
-//--------------------------------------------------------------------------------
-bool Application::DisplayWindowed( )
-{
-	return( m_bWindowed );
-}
-//--------------------------------------------------------------------------------
-void Application::Initialize( )
-{
-}
-//--------------------------------------------------------------------------------
-void Application::Update( )
-{
-}
-//--------------------------------------------------------------------------------
-void Application::Shutdown( )
-{
 	if ( m_pEventMgr )
 		delete m_pEventMgr;
+
+	Log::Get().Close();
 }
 //--------------------------------------------------------------------------------
 Application* Application::GetApplication( )
@@ -94,15 +55,5 @@ void Application::RequestTermination( )
 {
 	// This triggers the termination of the application
 	PostQuitMessage( 0 );
-}
-//--------------------------------------------------------------------------------
-void Application::SetApplicationID( HINSTANCE ApplicationID )
-{
-	m_AppInstance = ApplicationID;
-}
-//--------------------------------------------------------------------------------
-void Application::SetWindowID( HWND WindowID )
-{
-	ms_WindowID = WindowID;
 }
 //--------------------------------------------------------------------------------

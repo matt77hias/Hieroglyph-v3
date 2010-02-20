@@ -15,6 +15,9 @@
 #include "SwapChainConfigDX11.h"
 #include "Texture2dConfigDX11.h"
 
+#include "GeometryLoaderDX11.h"
+#include "MaterialGeneratorDX11.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
@@ -22,87 +25,90 @@ App AppInstance; // Provides an instance of the application
 
 
 //--------------------------------------------------------------------------------
-App::App() : Application( 640, 480, true )
+App::App()
 {
 	m_bSaveScreenshot = false;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
 {
-	// The application currently supplies the 
-	int width = this->DisplayWidth( ); 
-	int height = this->DisplayHeight( ); 
-	bool windowed = this->DisplayWindowed( );
-
-	// Initialize the random number generator.
-	srand( GetTickCount() );
-
-	for ( int i = 0; i < 4; i++ )
-	{
-		// Set the render window parameters and initialize the window
-		m_pWindow[i] = new Win32RenderWindow();
-
-		int x = (double)rand() / (RAND_MAX + 1) * 200 + 400;
-		int y = (double)rand() / (RAND_MAX + 1) * 200 + 300;
-		int w = (double)rand() / (RAND_MAX + 1) * 200;	
-		int h = (double)rand() / (RAND_MAX + 1) * 200;
-
-		m_pWindow[i]->SetPosition( x, y );
-		m_pWindow[i]->SetSize( w, h );
-		m_pWindow[i]->SetCaption( std::wstring( L"Direct3D 11 Window" ) );
-		m_pWindow[i]->Initialize();
-	}
-
-	
 	// Create the renderer and initialize it for the desired device
 	// type and feature level.
 
 	m_pRenderer11 = new RendererDX11();
 
-	if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_HARDWARE, D3D_FEATURE_LEVEL_10_0 ) )
+	if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_HARDWARE, D3D_FEATURE_LEVEL_11_0 ) )
 	{
 		Log::Get().Write( L"Could not create hardware device, trying to create the reference device..." );
 
-		if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_REFERENCE, D3D_FEATURE_LEVEL_10_0 ) )
+		if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_REFERENCE, D3D_FEATURE_LEVEL_11_0 ) )
 		{
-			for ( int i = 0; i < 4; i++ )
-				ShowWindow( m_pWindow[i]->GetHandle(), SW_HIDE );
-
 			MessageBox( m_pWindow[0]->GetHandle(), L"Could not create a hardware or software Direct3D 11 device - the program will now abort!", L"Hieroglyph 3 Rendering", MB_ICONEXCLAMATION | MB_SYSTEMMODAL );
 			RequestTermination();			
 			return( false );
 		}
+
+		// If using the reference device, utilize a fixed time step for any animations.
+		m_pTimer->SetFixedTimeStep( 1.0f / 10.0f );
 	}
 
+	// Get the current desktop resolution and make a render target 
+	// and depth buffer that can fill it.
 
-	// Create a swap chain for all of the windows.
+	m_DesktopRes = m_pRenderer11->GetDesktopResolution();
 
-	for ( int i = 0; i < 4; i++ )
+	Texture2dConfigDX11 TexConfig;
+	TexConfig.SetColorBuffer( m_DesktopRes.x, m_DesktopRes.y );
+	TexConfig.SetBindFlags( D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE );
+	TexConfig.SetFormat( DXGI_FORMAT_R8G8B8A8_UNORM );
+	m_iTexture = m_pRenderer11->CreateTexture2D( &TexConfig, 0 );
+	m_iRTV = m_pRenderer11->CreateRenderTargetView( m_iTexture, 0 );
+
+
+	// Next we create a depth buffer for use in the traditional rendering
+	// pipeline.
+
+	Texture2dConfigDX11 DepthConfig;
+	DepthConfig.SetDepthBuffer( m_DesktopRes.x, m_DesktopRes.y );
+	int DepthID = m_pRenderer11->CreateTexture2D( &DepthConfig, 0 );
+	m_iDepthTarget = m_pRenderer11->CreateDepthStencilView( DepthID, 0 );
+
+
+	// Initialize the random number generator.
+	srand( GetTickCount() );
+
+
+	// Create all of the windows.
+
+	for ( int i = 0; i < NUM_WINDOWS; i++ )
 	{
+		// Create the window wrapper class instance.
+		m_pWindow[i] = new Win32RenderWindow();
+
+		// Generate random locations and sizes of the window, constrained 
+		// to the desktop.
+		int x = (double)rand() / RAND_MAX * 800 + 200;
+		int y = (double)rand() / RAND_MAX * 400 + 0;
+		int w = (double)rand() / RAND_MAX * ( m_DesktopRes.x - x ) * 0.5f;	// Limit the right hand side to within the screen
+		int h = (double)rand() / RAND_MAX * ( m_DesktopRes.y - y ) * 0.5f;	// Limit the bottom side to within the screen
+
+		// Configure the window and initialize it.
+		m_pWindow[i]->SetPosition( x, y );
+		m_pWindow[i]->SetSize( w, h );
+		m_pWindow[i]->SetCaption( std::wstring( L"Direct3D 11 Window" ) );
+		m_pWindow[i]->Initialize();
+
+		// Create a swap chain for the window.
 		SwapChainConfigDX11 Config;
 		Config.SetWidth( m_pWindow[i]->GetWidth() );
 		Config.SetHeight( m_pWindow[i]->GetHeight() );
 		Config.SetOutputWindow( m_pWindow[i]->GetHandle() );
 		int	iSwapChain = m_pRenderer11->CreateSwapChain( &Config );
 		m_pWindow[i]->SetSwapChain( iSwapChain );
-	}
 
-	for ( int i = 0; i < 4; i++ )
-	{
-		// We'll keep a copy of the render target index to use in later examples.
-		m_iRenderTarget[i] = m_pRenderer11->GetSwapChainRenderTargetViewID( m_pWindow[i]->GetSwapChain() );
-	}
-
-
-	// Next we create a depth buffer for use in the traditional rendering
-	// pipeline.
-
-	for ( int i = 0; i < 4; i++ )
-	{
-		Texture2dConfigDX11 DepthConfig;
-		DepthConfig.SetDepthBuffer( m_pWindow[i]->GetWidth(), m_pWindow[i]->GetHeight() );
-		int DepthID = m_pRenderer11->CreateTexture2D( &DepthConfig, 0 );
-		m_iDepthTarget[i] = m_pRenderer11->CreateDepthStencilView( DepthID, 0 );
+		// We'll keep a copy of the swap chain's render target index to 
+		// use later.
+		m_iRenderTarget[i] = m_pRenderer11->GetSwapChainTextureID( iSwapChain );
 	}
 
 
@@ -110,8 +116,8 @@ bool App::ConfigureEngineComponents()
 	// entire floating point area of the render target.
 
 	D3D11_VIEWPORT viewport;
-	viewport.Width = static_cast< float >( width );
-	viewport.Height = static_cast< float >( height );
+	viewport.Width = static_cast< float >( m_DesktopRes.x );
+	viewport.Height = static_cast< float >( m_DesktopRes.y );
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
 	viewport.TopLeftX = 0;
@@ -131,7 +137,7 @@ void App::ShutdownEngineComponents()
 		delete m_pRenderer11;
 	}
 
-	for ( int i = 0; i < 4; i++ )
+	for ( int i = 0; i < NUM_WINDOWS; i++ )
 	{
 		if ( m_pWindow[i] )
 		{
@@ -155,6 +161,53 @@ void App::Initialize()
 	pEventManager->AddEventListener( SYSTEM_KEYBOARD_KEYUP, this );
 	pEventManager->AddEventListener( SYSTEM_KEYBOARD_KEYDOWN, this );
 	pEventManager->AddEventListener( SYSTEM_KEYBOARD_CHAR, this );
+
+	// Load and initialize the geometry to be rendered.
+
+	m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Sample_Scene.ms3d" ) );
+	m_pGeometry->LoadToBuffers();
+	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+
+
+	// Create the parameters for use with this effect
+
+	m_LightParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
+	m_pRenderer11->SetVectorParameter( std::wstring( L"LightColor" ), &m_LightParams );
+
+	m_LightPosition = Vector4f( 20.0f, 20.0f, -20.0f, 0.0f );
+	m_pRenderer11->SetVectorParameter( std::wstring( L"LightPositionWS" ), &m_LightPosition );
+
+	// Create the material for use by the entities.
+
+	m_pMaterial = MaterialGeneratorDX11::GeneratePhong( *m_pRenderer11 );
+
+
+	// Create the camera, and the render view that will produce an image of the 
+	// from the camera's point of view of the scene.
+
+	m_pCamera = new Camera();
+	m_pCamera->GetNode()->Rotation().RotationX( 0.307f );
+	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 2.5f, -5.0f );
+	m_pRenderView = new ViewPerspective( *m_pRenderer11, 0 );
+	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );
+	m_pCamera->SetCameraView( m_pRenderView );
+	m_pCamera->SetProjectionParams( 0.1f, 100.0f, D3DX_PI / 2.0f, m_DesktopRes.x / m_DesktopRes.y );
+
+	// Create the scene and add the entities to it.  Then add the camera to the
+	// scene so that it will be updated via the scene interface instead of 
+	// manually manipulating it.
+
+	m_pNode = new Node3D();
+	m_pEntity = new Entity3D();
+	m_pEntity->SetGeometry( m_pGeometry );
+	m_pEntity->SetMaterial( m_pMaterial, false );
+	
+	m_pNode->AttachChild( m_pEntity );
+
+	m_pScene = new Scene();
+	m_pScene->AddEntity( m_pNode );
+	m_pScene->AddCamera( m_pCamera );
+
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -170,18 +223,41 @@ void App::Update()
 	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
 
 
+	// Manipulate the scene here - simply rotate the root of the scene in this
+	// example.
+
+	Matrix3f rotation;
+	rotation.RotationY( m_pTimer->Elapsed() );
+	m_pNode->Rotation() *= rotation;
+
+
+	// Update the scene, and then render all cameras within the scene.
+
+	m_pScene->Update( m_pTimer->Elapsed() );
+	m_pScene->Render( *m_pRenderer11 );
+
+
 	// Perform the rendering and presentation for each window.
 
-	for ( int i = 0; i < 4; i++ )
+	for ( int i = 0; i < NUM_WINDOWS; i++ )
 	{
 		// Bind the swap chain render target and the depth buffer for use in 
 		// rendering.  
 
-		m_pRenderer11->BindRenderTargets( m_iRenderTarget[i], m_iDepthTarget[i] );
+		D3D11_BOX box;
+		box.left = m_pWindow[i]->GetLeft();
+		box.right = m_pWindow[i]->GetWidth() + box.left;
+		box.top = m_pWindow[i]->GetTop();
+		box.bottom = m_pWindow[i]->GetHeight() + box.top;
+		box.front = 0;
+		box.back = 1;
 
-		float fBlue = sinf( m_pTimer->Runtime() * m_pTimer->Runtime() ) * 0.25f + 0.5f;
+		if ( box.left < 0 ) box.left = 0;
+		if ( box.right > (int)m_DesktopRes.x - 1 ) box.right = (int)m_DesktopRes.x - 1;
+		if ( box.top < 0 ) box.top = 0;
+		if ( box.bottom > (int)m_DesktopRes.y - 1 ) box.bottom = (int)m_DesktopRes.y - 1;
 
-		m_pRenderer11->ClearBuffers( Vector4f( 0.0f, 0.0f, fBlue, 0.0f ), 1.0f );
+		m_pRenderer11->CopySubresourceRegion( m_iRenderTarget[i], 0, 0, 0, 0, m_iTexture, 0, &box );
 		m_pRenderer11->Present( m_pWindow[i]->GetHandle(), m_pWindow[i]->GetSwapChain() );
 	}
 
@@ -199,13 +275,20 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
+	SAFE_DELETE( m_pRenderView );
+
+	SAFE_DELETE( m_pEntity );
+	
+	SAFE_DELETE( m_pNode );
+
+	SAFE_DELETE( m_pCamera );
+	SAFE_DELETE( m_pScene );
+
 	// Print the framerate out for the log before shutting down.
 
 	std::wstringstream out;
 	out << L"Max FPS: " << m_pTimer->MaxFramerate();
 	Log::Get().Write( out.str() );
-
-	Application::Shutdown();
 }
 //--------------------------------------------------------------------------------
 bool App::HandleEvent( IEvent* pEvent )

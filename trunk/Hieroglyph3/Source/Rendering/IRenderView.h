@@ -57,15 +57,6 @@ namespace Glyph3
 
 		void SetRoot( Node3D* pRoot );
 
-		// View and projection matrix access.  These don't necesarily have 
-		// to be set in the draw phase, but they are available if they are needed.
-
-		void SetView( Matrix4f& view );
-		void SetProjection( Matrix4f& projection );
-
-		Matrix4f& GetView( );
-		Matrix4f& GetProjection( );
-
 		// The render view must set all of its rendering parameters needed to 
 		// execute itself with the SetRenderParams function.  The SetUsageParams
 		// is used to set semantics that are needed to use the output of the 
@@ -83,6 +74,9 @@ namespace Glyph3
 
 		void SetMaxRecurrence( int max );
 		int GetMaxRecurrence( );
+
+		Matrix4f ViewMatrix;
+		Matrix4f ProjMatrix;
 
 	protected:
 

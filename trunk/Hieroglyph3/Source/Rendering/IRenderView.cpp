@@ -46,32 +46,12 @@ void IRenderView::SetEntity( Entity3D* pEntity )
 	m_pEntity = pEntity;
 }
 //--------------------------------------------------------------------------------
-void IRenderView::SetView( Matrix4f& view )
-{
-	m_sParams.mViewMatrix = view;
-}
-//--------------------------------------------------------------------------------
-void IRenderView::SetProjection( Matrix4f& projection )
-{
-	m_sParams.mProjMatrix = projection;
-}
-//--------------------------------------------------------------------------------
 int IRenderView::GetRTID( int index )
 {
 	if ( ( index >= 0 ) && ( index <= 8 ) )
 		return( m_sParams.iRenderTargets[index] );
 	else
 		return( 0 );
-}
-//--------------------------------------------------------------------------------
-Matrix4f& IRenderView::GetView( )
-{
-	return( m_sParams.mViewMatrix );
-}
-//--------------------------------------------------------------------------------
-Matrix4f& IRenderView::GetProjection( )
-{
-	return( m_sParams.mProjMatrix );
 }
 //--------------------------------------------------------------------------------
 void IRenderView::SetRenderParams( RendererDX11& Renderer )

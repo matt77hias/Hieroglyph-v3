@@ -24,15 +24,8 @@ ViewPerspective::ViewPerspective( RendererDX11& Renderer, int RenderTargetViewID
 
 	m_iRenderTargetViewID = RenderTargetViewID;
 
-	D3DXVECTOR3 vLookAt = D3DXVECTOR3( 0.0f, 0.75f, 0.0f );
-	D3DXVECTOR3 vLookFrom = D3DXVECTOR3( -15.0f, 5.5f, -5.0f );
-	D3DXVECTOR3 vLookUp = D3DXVECTOR3( 0.0f, 1.0f, 0.0f );
-	D3DXMatrixLookAtLH( (D3DXMATRIX*)&ViewMatrix, &vLookFrom, &vLookAt, &vLookUp );
-
-	//ViewMatrix.MakeIdentity();
-
-	D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&ProjMatrix, D3DX_PI/4, 
-		640.0f / 480.0f, 0.1f, 100.0f );
+	ViewMatrix.MakeIdentity();
+	ProjMatrix.MakeIdentity();
 
 	m_pEntity = 0;
 	m_vColor.MakeZero();

@@ -23,11 +23,11 @@ namespace Glyph3
 	class DXGIAdapter
 	{
 	public:
-		DXGIAdapter( IDXGIAdapter* pAdapter );
+		DXGIAdapter( IDXGIAdapter1* pAdapter );
 		virtual ~DXGIAdapter();
 
 	protected:
-		IDXGIAdapter*			m_pAdapter;
+		IDXGIAdapter1*			m_pAdapter;
 		TArray<DXGIOutput*>		m_vOutputs;
 
 		friend RendererDX11;
