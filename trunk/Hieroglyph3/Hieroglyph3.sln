@@ -38,6 +38,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicScenes", "Applications
 		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WaterSimulationI", "Applications\WaterSimulationI\WaterSimulationI.vcproj", "{A01C0178-BD8A-48DD-8A0E-3CFFF1B1802F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AmbientOcclusionI", "Applications\AmbientOcclusionI\AmbientOcclusionI.vcproj", "{50DA7DA6-6E7E-4148-90EF-8A028A2BB1CA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -76,6 +86,14 @@ Global
 		{D21FBFE7-021F-4511-A64C-44750ED174FB}.Debug|Win32.Build.0 = Debug|Win32
 		{D21FBFE7-021F-4511-A64C-44750ED174FB}.Release|Win32.ActiveCfg = Release|Win32
 		{D21FBFE7-021F-4511-A64C-44750ED174FB}.Release|Win32.Build.0 = Release|Win32
+		{A01C0178-BD8A-48DD-8A0E-3CFFF1B1802F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A01C0178-BD8A-48DD-8A0E-3CFFF1B1802F}.Debug|Win32.Build.0 = Debug|Win32
+		{A01C0178-BD8A-48DD-8A0E-3CFFF1B1802F}.Release|Win32.ActiveCfg = Release|Win32
+		{A01C0178-BD8A-48DD-8A0E-3CFFF1B1802F}.Release|Win32.Build.0 = Release|Win32
+		{50DA7DA6-6E7E-4148-90EF-8A028A2BB1CA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{50DA7DA6-6E7E-4148-90EF-8A028A2BB1CA}.Debug|Win32.Build.0 = Debug|Win32
+		{50DA7DA6-6E7E-4148-90EF-8A028A2BB1CA}.Release|Win32.ActiveCfg = Release|Win32
+		{50DA7DA6-6E7E-4148-90EF-8A028A2BB1CA}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

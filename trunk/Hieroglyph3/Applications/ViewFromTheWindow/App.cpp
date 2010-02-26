@@ -61,8 +61,7 @@ bool App::ConfigureEngineComponents()
 	TexConfig.SetColorBuffer( m_DesktopRes.x, m_DesktopRes.y );
 	TexConfig.SetBindFlags( D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE );
 	TexConfig.SetFormat( DXGI_FORMAT_R8G8B8A8_UNORM );
-	m_iTexture = m_pRenderer11->CreateTexture2D( &TexConfig, 0 );
-	m_iRTV = m_pRenderer11->CreateRenderTargetView( m_iTexture, 0 );
+	m_OffscreenTexture = m_pRenderer11->CreateTexture2D( &TexConfig, 0 );
 
 
 	// Next we create a depth buffer for use in the traditional rendering
@@ -70,8 +69,7 @@ bool App::ConfigureEngineComponents()
 
 	Texture2dConfigDX11 DepthConfig;
 	DepthConfig.SetDepthBuffer( m_DesktopRes.x, m_DesktopRes.y );
-	int DepthID = m_pRenderer11->CreateTexture2D( &DepthConfig, 0 );
-	m_iDepthTarget = m_pRenderer11->CreateDepthStencilView( DepthID, 0 );
+	m_DepthTarget = m_pRenderer11->CreateTexture2D( &DepthConfig, 0 );
 
 
 	// Initialize the random number generator.
@@ -108,7 +106,7 @@ bool App::ConfigureEngineComponents()
 
 		// We'll keep a copy of the swap chain's render target index to 
 		// use later.
-		m_iRenderTarget[i] = m_pRenderer11->GetSwapChainTextureID( iSwapChain );
+		m_RenderTarget[i] = m_pRenderer11->GetSwapChainResource( iSwapChain );
 	}
 
 
@@ -188,7 +186,7 @@ void App::Initialize()
 	m_pCamera = new Camera();
 	m_pCamera->GetNode()->Rotation().RotationX( 0.307f );
 	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 2.5f, -5.0f );
-	m_pRenderView = new ViewPerspective( *m_pRenderer11, 0 );
+	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_OffscreenTexture, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
 	m_pCamera->SetProjectionParams( 0.1f, 100.0f, D3DX_PI / 2.0f, m_DesktopRes.x / m_DesktopRes.y );
@@ -257,7 +255,7 @@ void App::Update()
 		if ( box.top < 0 ) box.top = 0;
 		if ( box.bottom > (int)m_DesktopRes.y - 1 ) box.bottom = (int)m_DesktopRes.y - 1;
 
-		m_pRenderer11->CopySubresourceRegion( m_iRenderTarget[i], 0, 0, 0, 0, m_iTexture, 0, &box );
+		m_pRenderer11->CopySubresourceRegion( m_RenderTarget[i], 0, 0, 0, 0, m_OffscreenTexture, 0, &box );
 		m_pRenderer11->Present( m_pWindow[i]->GetHandle(), m_pWindow[i]->GetSwapChain() );
 	}
 

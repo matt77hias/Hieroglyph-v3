@@ -5,6 +5,12 @@
 #include "Win32RenderWindow.h"
 #include "RendererDX11.h"
 
+#include "ViewPerspective.h"
+#include "GeometryDX11.h"
+#include "MaterialDX11.h"
+#include "Camera.h"
+#include "Scene.h"
+
 using namespace Glyph3;
 
 class App : public Application, public IEventListener
@@ -28,22 +34,17 @@ protected:
 
 	RendererDX11*			m_pRenderer11;
 	Win32RenderWindow*		m_pWindow;
-	
-	int						m_iSwapChain;
+
 	ResourcePtr				m_RenderTarget;
 	ResourcePtr				m_DepthTarget;
+	ResourcePtr				m_WaterState[2];
+
+	ViewPerspective*		m_pRenderView;
+	Node3D*					m_pNode;
+	Entity3D*				m_pEntity;
+	
+	Camera*					m_pCamera;
+	Scene*					m_pScene;
 
 	bool					m_bSaveScreenshot;
-
-	RenderEffectDX11*		m_pTessellationEffect;
-	GeometryDX11*			m_pGeometry;
-
-	Matrix4f				m_WorldMatrix;
-	Matrix4f				m_ViewMatrix;
-	Matrix4f				m_ProjMatrix;
-	Matrix4f				m_ViewProjMatrix;
-	Matrix4f				m_LeftEyeMatrix;
-	Matrix4f				m_RightEyeMatrix;
-
-	Vector4f				m_TessParams;
 };

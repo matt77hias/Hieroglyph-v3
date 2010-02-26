@@ -45,7 +45,7 @@ namespace Glyph3
 		// be updated here.  The draw function will be used to set the necesary
 		// render states and render the geometry that is stored in the object list.
 
-		virtual void Update( Timer& Timer ) = 0;
+		virtual void Update( float fTime ) = 0;
 		virtual void Draw( RendererDX11& Renderer ) = 0;
 
 		// A reference is provided to allow views to reference it's entity's data.

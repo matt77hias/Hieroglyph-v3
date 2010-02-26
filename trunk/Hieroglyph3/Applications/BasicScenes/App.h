@@ -40,12 +40,13 @@ protected:
 	Win32RenderWindow*		m_pWindow;
 	
 	int						m_iSwapChain;
-	int						m_iRenderTarget;
-	int						m_iDepthTarget;
+	ResourcePtr				m_RenderTarget;
+	ResourcePtr				m_DepthTarget;
 
 	bool					m_bSaveScreenshot;
 
 	ViewPerspective*		m_pRenderView;
+	Node3D*					m_pNode;
 	Entity3D*				m_pEntity[10];
 	
 	GeometryDX11*			m_pGeometry;

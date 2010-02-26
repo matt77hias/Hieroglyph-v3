@@ -495,6 +495,14 @@
 					RelativePath=".\Rendering\ResourceDX11.h"
 					>
 				</File>
+				<File
+					RelativePath=".\Rendering\ResourceProxyDX11.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Rendering\ResourceProxyDX11.h"
+					>
+				</File>
 				<Filter
 					Name="Resource Views"
 					>
@@ -1012,14 +1020,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Rendering\IRenderView.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Rendering\IRenderView.h"
-					>
-				</File>
-				<File
 					RelativePath=".\Rendering\MaterialDX11.cpp"
 					>
 				</File>
@@ -1043,22 +1043,34 @@
 					RelativePath=".\Rendering\RenderEffectDX11.h"
 					>
 				</File>
-				<File
-					RelativePath=".\Rendering\ViewPerspective.cpp"
+				<Filter
+					Name="Views"
 					>
-				</File>
-				<File
-					RelativePath=".\Rendering\ViewPerspective.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Rendering\ViewRenderParams.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Rendering\ViewRenderParams.h"
-					>
-				</File>
+					<File
+						RelativePath=".\Rendering\IRenderView.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\IRenderView.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ViewPerspective.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ViewPerspective.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ViewRenderParams.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ViewRenderParams.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="DXGI"

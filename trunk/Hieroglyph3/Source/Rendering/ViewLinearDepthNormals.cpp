@@ -9,7 +9,7 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-#include "ViewPerspective.h"
+#include "ViewLinearDepthNormals.h"
 #include "Entity3D.h"
 #include "Node3D.h"
 #include "Texture2dConfigDX11.h"
@@ -18,9 +18,9 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-ViewPerspective::ViewPerspective( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget )
+ViewLinearDepthNormals::ViewLinearDepthNormals( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget )
 {
-	m_sParams.iViewType = VT_PERSPECTIVE;
+	m_sParams.iViewType = VT_LINEAR_DEPTH_NORMALS;
 
 	m_RenderTarget = RenderTarget;
 	m_DepthTarget = DepthTarget;
@@ -32,20 +32,20 @@ ViewPerspective::ViewPerspective( RendererDX11& Renderer, ResourcePtr RenderTarg
 	m_vColor.MakeZero();
 }
 //--------------------------------------------------------------------------------
-ViewPerspective::~ViewPerspective()
+ViewLinearDepthNormals::~ViewLinearDepthNormals()
 {
 }
 //--------------------------------------------------------------------------------
-void ViewPerspective::SetBackColor( Vector4f color )
+void ViewLinearDepthNormals::SetBackColor( Vector4f color )
 {
 	m_vColor = color;
 }
 //--------------------------------------------------------------------------------
-void ViewPerspective::Update( float fTime )
+void ViewLinearDepthNormals::Update( float fTime )
 {
 }
 //--------------------------------------------------------------------------------
-void ViewPerspective::Draw( RendererDX11& Renderer )
+void ViewLinearDepthNormals::Draw( RendererDX11& Renderer )
 {
 	if ( m_pEntity != NULL )
 		ViewMatrix = m_pEntity->GetView();
@@ -75,7 +75,7 @@ void ViewPerspective::Draw( RendererDX11& Renderer )
 	}
 }
 //--------------------------------------------------------------------------------
-void ViewPerspective::SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ )
+void ViewLinearDepthNormals::SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ )
 {
 	//m_viewport.X = x;
 	//m_viewport.Y = y;
@@ -85,13 +85,13 @@ void ViewPerspective::SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float Min
 	//m_viewport.MaxZ = MaxZ;
 }
 //--------------------------------------------------------------------------------
-void ViewPerspective::SetRenderParams( RendererDX11& Renderer )
+void ViewLinearDepthNormals::SetRenderParams( RendererDX11& Renderer )
 {
 	Renderer.SetViewMatrixParameter( &ViewMatrix );
 	Renderer.SetProjMatrixParameter( &ProjMatrix );
 }
 //--------------------------------------------------------------------------------
-void ViewPerspective::SetUsageParams( RendererDX11& Renderer )
+void ViewLinearDepthNormals::SetUsageParams( RendererDX11& Renderer )
 {
 
 }

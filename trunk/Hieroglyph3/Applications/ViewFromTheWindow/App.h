@@ -36,11 +36,9 @@ protected:
 	RendererDX11*			m_pRenderer11;
 	Win32RenderWindow*		m_pWindow[NUM_WINDOWS];
 
-	int						m_iRenderTarget[NUM_WINDOWS];
-	int						m_iDepthTarget;
-
-	int						m_iRTV;
-	int						m_iTexture;
+	ResourcePtr				m_RenderTarget[NUM_WINDOWS];
+	ResourcePtr				m_DepthTarget;
+	ResourcePtr				m_OffscreenTexture;
 
 	ViewPerspective*		m_pRenderView;
 	Node3D*					m_pNode;

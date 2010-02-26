@@ -69,13 +69,19 @@ HS_CONSTANT_DATA_OUTPUT PassThroughConstantHS(
 {	
     HS_CONSTANT_DATA_OUTPUT output;
 
-    // Insert code to compute Output here
-	output.Edges[0] = EdgeFactors.x; //2.0f;
-	output.Edges[1] = EdgeFactors.y; //2.0f;
-	output.Edges[2] = EdgeFactors.z; //2.0f;
+ //   // Insert code to compute Output here
+	//output.Edges[0] = EdgeFactors.x; //2.0f;
+	//output.Edges[1] = EdgeFactors.y; //2.0f;
+	//output.Edges[2] = EdgeFactors.z; //2.0f;
 
-	output.Inside = EdgeFactors.w; //2.0f;
-    
+	//output.Inside = EdgeFactors.w; //2.0f;
+
+	output.Edges[0] = 2.0f;
+	output.Edges[1] = 2.0f;
+	output.Edges[2] = 2.0f;
+
+	output.Inside = 2.0f;
+
     return output;
 }
 //--------------------------------------------------------------------------------

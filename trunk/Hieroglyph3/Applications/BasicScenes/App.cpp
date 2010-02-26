@@ -80,20 +80,19 @@ bool App::ConfigureEngineComponents()
 
 	// We'll keep a copy of the render target index to use in later examples.
 
-	m_iRenderTarget = m_pRenderer11->GetSwapChainRenderTargetViewID( m_iSwapChain );
+	m_RenderTarget = m_pRenderer11->GetSwapChainResource( m_iSwapChain );
 
 	// Next we create a depth buffer for use in the traditional rendering
 	// pipeline.
 
 	Texture2dConfigDX11 DepthConfig;
 	DepthConfig.SetDepthBuffer( width, height );
-	int DepthID = m_pRenderer11->CreateTexture2D( &DepthConfig, 0 );
-	m_iDepthTarget = m_pRenderer11->CreateDepthStencilView( DepthID, 0 );
+	m_DepthTarget = m_pRenderer11->CreateTexture2D( &DepthConfig, 0 );
 	
 	// Bind the swap chain render target and the depth buffer for use in 
 	// rendering.  
 
-	m_pRenderer11->BindRenderTargets( m_iRenderTarget, m_iDepthTarget );
+	m_pRenderer11->BindRenderTargets( m_RenderTarget, m_DepthTarget );
 
 	// Create a view port to use on the scene.  This basically selects the 
 	// entire floating point area of the render target.
@@ -166,15 +165,18 @@ void App::Initialize()
 
 	m_pCamera = new Camera();
 	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 0.0f, -15.0f );
-	m_pRenderView = new ViewPerspective( *m_pRenderer11, 0 );
+	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
+	m_pCamera->SetProjectionParams( 0.1f, 100.0f, D3DX_PI / 2.0f, 640.0f / 320.0f );
 
 	// Create the scene and add the entities to it.  Then add the camera to the
 	// scene so that it will be updated via the scene interface instead of 
 	// manually manipulating it.
 
-	m_pScene = new Scene();
+	m_pNode = new Node3D();
+
+	
 	for ( int i = 0; i < 10; i++ )
 	{
 		m_pEntity[i] = new Entity3D();
@@ -182,9 +184,11 @@ void App::Initialize()
 		m_pEntity[i]->SetMaterial( m_pMaterial, false );
 		m_pEntity[i]->Position() = Vector3f( i * 4, 4.0f * ( i % 2 ) - 2.0f, 0.0f );
 
-		m_pScene->AddEntity( m_pEntity[i] );
+		m_pNode->AttachChild( m_pEntity[i] );
 	}
 
+	m_pScene = new Scene();
+	m_pScene->AddEntity( m_pNode );
 	m_pScene->AddCamera( m_pCamera );
 }
 //--------------------------------------------------------------------------------
@@ -205,7 +209,7 @@ void App::Update()
 
 	Matrix3f rotation;
 	rotation.RotationX( m_pTimer->Elapsed() );
-	m_pScene->GetRoot()->Rotation() *= rotation;
+	m_pNode->Rotation() *= rotation;
 
 	// Update the scene, and then render all cameras within the scene.
 
@@ -233,6 +237,8 @@ void App::Shutdown()
 
 	for ( int i = 0; i < 10; i++ )
 		SAFE_DELETE( m_pEntity[i] );
+
+	SAFE_DELETE( m_pNode );
 
 	SAFE_DELETE( m_pCamera );
 	SAFE_DELETE( m_pScene );

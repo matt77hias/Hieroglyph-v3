@@ -79,20 +79,21 @@ bool App::ConfigureEngineComponents()
 
 	// We'll keep a copy of the render target index to use in later examples.
 
-	m_iRenderTarget = m_pRenderer11->GetSwapChainRenderTargetViewID( m_iSwapChain );
+	m_RenderTarget = m_pRenderer11->GetSwapChainResource( m_iSwapChain );
+
 
 	// Next we create a depth buffer for use in the traditional rendering
 	// pipeline.
 
 	Texture2dConfigDX11 DepthConfig;
 	DepthConfig.SetDepthBuffer( width, height );
-	int DepthID = m_pRenderer11->CreateTexture2D( &DepthConfig, 0 );
-	m_iDepthTarget = m_pRenderer11->CreateDepthStencilView( DepthID, 0 );
-	
+	m_DepthTarget = m_pRenderer11->CreateTexture2D( &DepthConfig, 0 );
+
+
 	// Bind the swap chain render target and the depth buffer for use in 
 	// rendering.  
 
-	m_pRenderer11->BindRenderTargets( m_iRenderTarget, m_iDepthTarget );
+	m_pRenderer11->BindRenderTargets( m_RenderTarget, m_DepthTarget );
 
 	// Create a view port to use on the scene.  This basically selects the 
 	// entire floating point area of the render target.
@@ -145,17 +146,15 @@ void App::Initialize()
 	// use for input to the compute shader.  By specifying null for the 
 	// configuration, the view is created from the default resource configuration.
 
-	m_iTexture = m_pRenderer11->LoadTexture( L"../Data/Textures/Outcrop.png" );
-	m_iTextureSRV = m_pRenderer11->CreateShaderResourceView( m_iTexture, 0 );
+	m_Texture = m_pRenderer11->LoadTexture( L"../Data/Textures/Outcrop.png" );
+	
 
 	// Create the texture for output of the compute shader.
 	Texture2dConfigDX11 FilteredConfig;
 	FilteredConfig.SetColorBuffer( 640, 480 ); 
 	FilteredConfig.SetBindFlags( D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE );
 
-	m_iOutput = m_pRenderer11->CreateTexture2D( &FilteredConfig, 0 );
-	m_iOutputUAV = m_pRenderer11->CreateUnorderedAccessView( m_iOutput, 0 );
-	m_iOutputSRV = m_pRenderer11->CreateShaderResourceView( m_iOutput, 0 );
+	m_Output = m_pRenderer11->CreateTexture2D( &FilteredConfig, 0 );
 
 	// Create RenderEffectDX11 instances to utilize the DX11 pipeline for 
 	// processing data.  Both the standard rendering pipeline and the compute
@@ -188,11 +187,14 @@ void App::Initialize()
 	m_pFullScreen->GenerateInputLayout( m_pTextureEffect->m_iVertexShader );
 	m_pFullScreen->LoadToBuffers();
 
-	// Generate the bindings for the resources
+	// Specify the bindings for the resources.  These take as input a parameter
+	// name and a resource proxy object created above.  This will connect these
+	// resources with the appropriate shader variables at rendering time.  The
+	// resource proxy object contains the needed 'ResourceView' instances.
 
-	m_pRenderer11->SetShaderResourceParameter( L"InputMap", &m_iTextureSRV );
-	m_pRenderer11->SetUnorderedAccessParameter( L"OutputMap", &m_iOutputUAV );
-	m_pRenderer11->SetShaderResourceParameter( L"ColorMap00", &m_iOutputSRV );
+	m_pRenderer11->SetShaderResourceParameter( L"InputMap", m_Texture );
+	m_pRenderer11->SetUnorderedAccessParameter( L"OutputMap", m_Output );
+	m_pRenderer11->SetShaderResourceParameter( L"ColorMap00", m_Output );
 }
 //--------------------------------------------------------------------------------
 void App::Update()

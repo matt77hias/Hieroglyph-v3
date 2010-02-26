@@ -48,6 +48,8 @@
 #include "PixelStageDX11.h"
 #include "ComputeStageDX11.h"
 
+#include "ResourceProxyDX11.h"
+
 #define SAFE_RELEASE( x ) {if(x){(x)->Release();(x)=NULL;}}
 #define SAFE_DELETE( x ) {if(x){delete (x);(x)=NULL;}}
 
@@ -100,7 +102,7 @@ namespace Glyph3
 	class RenderEffectDX11;
 
 	class RenderParameterDX11;
-
+	
 	enum ResourceType
 	{
 		RT_VERTEXBUFFER = 0x010000,
@@ -150,15 +152,15 @@ namespace Glyph3
 		// structures - vertex, index, and constant buffers.  These all utilize the
 		// same ID3D11Buffer interface, and only vary with a flag in the description.
 
-		int CreateVertexBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
-		int CreateIndexBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
-		int CreateConstantBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
-		int CreateStructuredBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
-		int CreateByteAddressBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
+		ResourcePtr CreateVertexBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
+		ResourcePtr CreateIndexBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
+		ResourcePtr CreateConstantBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
+		ResourcePtr CreateStructuredBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
+		ResourcePtr CreateByteAddressBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
 
-		int CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData ); 
-		int CreateTexture2D( Texture2dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData ); 
-		int CreateTexture3D( Texture3dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData ); 
+		ResourcePtr CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData ); 
+		ResourcePtr CreateTexture2D( Texture2dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData ); 
+		ResourcePtr CreateTexture3D( Texture3dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData ); 
 
 		// The resources created in the above function calls can only be accessed by
 		// the rendering pipeline when they are bound with resource views.  The following 
@@ -205,10 +207,11 @@ namespace Glyph3
 
 		void SetVectorParameter( std::wstring name, Vector4f* pVector );
 		void SetMatrixParameter( std::wstring name, Matrix4f* pMatrix );
-		void SetShaderResourceParameter( std::wstring name, int* pID );
-		void SetUnorderedAccessParameter( std::wstring name, int* pID );
-		void SetConstantBufferParameter( std::wstring name, int* pID );
 		void SetSamplerParameter( std::wstring name, int* pID );
+		void SetShaderResourceParameter( std::wstring name, ResourcePtr resource );
+		void SetUnorderedAccessParameter( std::wstring name, ResourcePtr resource );
+		void SetConstantBufferParameter( std::wstring name, ResourcePtr resource );
+		
 
 		// Each of the parameter types can also be accessed to inspect their current
 		// value prior to setting them.
@@ -247,24 +250,18 @@ namespace Glyph3
 		void BindInputLayout( int ID );
 		void UnbindInputLayout( );
 
-		void BindVertexBuffer( int ID, UINT stride );
+		void BindVertexBuffer( ResourcePtr resource, UINT stride );
 		void UnbindVertexBuffer( );
 
-		void BindIndexBuffer( int ID );
+		void BindIndexBuffer( ResourcePtr resource );
 		void UnbindIndexBuffer( );
 
-		void BindRenderTargets( int RenderID, int DepthID );
+		void BindRenderTargets( ResourcePtr RenderID, ResourcePtr DepthID );
 		void UnbindRenderTargets( );
 
 		void BindShader( ShaderType type, int ID );
 		void UnbindShader( ShaderType type );
 
-		// This function allows a client of the renderer to specify the stride
-		// of the vertices within a particular vertex buffer.  This may become
-		// unneeded later on if the IA configuration can be used to determine
-		// the stride automatically.
-
-		void SetVertexBufferStride( int ID, UINT stride );
 
 		// Resources can be mapped in order to manually modify or read their
 		// contents.  The returned structure provides information about the
@@ -291,8 +288,8 @@ namespace Glyph3
 		std::wstring PrintPipelineStatistics( );
 
 		void SaveTextureScreenShot( int ID, std::wstring filename, D3DX11_IMAGE_FILE_FORMAT format = D3DX11_IFF_PNG );
-		int GetSwapChainRenderTargetViewID( int ID );
-		int GetSwapChainTextureID( int ID );
+		
+		ResourcePtr GetSwapChainResource( int ID );
 		
 		// This is an interim solution to get the resolution of the current 
 		// adapter output resolution.
@@ -301,11 +298,11 @@ namespace Glyph3
 
 		// Copy from one resource to another resource.
 
-		void CopySubresourceRegion( int DestResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ,
-			int SrcResource, UINT SrcSubresource, D3D11_BOX* pSrcBox );
+		void CopySubresourceRegion( ResourcePtr DestResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ,
+			ResourcePtr SrcResource, UINT SrcSubresource, D3D11_BOX* pSrcBox );
 
 
-		int LoadTexture( std::wstring filename );
+		ResourcePtr LoadTexture( std::wstring filename );
 
 		// These functions are used to convert the enumerated values to human readable text.
 		// This is convenient for logging or displaying various states.

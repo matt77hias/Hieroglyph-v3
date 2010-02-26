@@ -125,19 +125,12 @@ void Entity3D::Update( float time )
 //--------------------------------------------------------------------------------
 void Entity3D::UpdateLocal( float fTime )
 {
+	// Update the controllers that are attached to this entity.
+
 	for ( int i = 0; i < m_Controllers.count(); i++ )
 		m_Controllers[i]->Update( fTime );
 
-//	m_vTranslation = m_vTranslation + (m_PosChange * fTime);
-	
-//	CMatrix3f Rot;
-//	Rot.RotationX(m_RotChange.x());
-//	m_mRotation = Rot * m_mRotation;
-//	Rot.RotationY(m_RotChange.y());
-//	m_mRotation = m_mRotation * Rot;
-
-//	m_PosChange.MakeZero(); 
-//	m_RotChange.MakeZero();
+	// Load the local space matrix with the rotation and translation components.
 
 	m_mLocal.MakeIdentity( );
 	m_mLocal.SetRotation( m_mRotation );
@@ -146,12 +139,17 @@ void Entity3D::UpdateLocal( float fTime )
 //--------------------------------------------------------------------------------
 void Entity3D::UpdateWorld( )
 {
+	// If the entity has a parent, then update its world matrix accordingly.
+
 	if (m_pParent)
         m_mWorld = m_mLocal * m_pParent->WorldMatrix();
 	else
 		m_mWorld = m_mLocal;
 
 	// Update bounding sphere with the new world space position and orientation.
+	// TODO: The shape classes should be transformed via matrix functions instead
+	//       of manual manipulation like this!
+
 	Vector3f center = m_ModelBoundingSphere.Center;
 	Vector4f modelposition = Vector4f( center.x, center.y, center.z, 1.0f );
 	Vector4f worldposition = m_mWorld * modelposition;

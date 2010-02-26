@@ -54,8 +54,10 @@ void ShaderDX11::UpdateParameters( RendererDX11* pRenderer )
 
 				// Create the buffer and set it as a constant buffer parameter.  This
 				// creates a parameter object to be used in the future.
-				index = pRenderer->CreateConstantBuffer( &cbuffer, 0 );
-				pRenderer->SetConstantBufferParameter( ConstantBuffers[i].Description.Name, &index );
+				ResourcePtr resource = pRenderer->CreateConstantBuffer( &cbuffer, 0 );
+				index = resource->m_iResource;
+
+				pRenderer->SetConstantBufferParameter( ConstantBuffers[i].Description.Name, resource );
 			}
 
 			// Map the constant buffer into system memory.  We map the buffer 

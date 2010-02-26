@@ -9,30 +9,45 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// SwapChainDX11
+// ViewSimulation
 //
 //--------------------------------------------------------------------------------
-#include "RendererDX11.h"
+#ifndef ViewSimulation_h
+#define ViewSimulation_h
 //--------------------------------------------------------------------------------
-#ifndef SwapChainDX11_h
-#define SwapChainDX11_h
+#include "IRenderView.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class SwapChainDX11
+	class Entity3D;
+
+	struct GridPoint
+	{
+		float height;
+		Vector4f flow;
+	};
+
+	class ViewSimulation : public IRenderView
 	{
 	public:
-		SwapChainDX11( IDXGISwapChain* pSwapChain, ResourcePtr resource );
-		virtual ~SwapChainDX11();
+		ViewSimulation( RendererDX11& Renderer, int SizeX, int SizeY );
+
+		virtual void Update( float fTime );
+		virtual void Draw( RendererDX11& Renderer );
+
+		virtual void SetRenderParams( RendererDX11& Renderer );
+		virtual void SetUsageParams( RendererDX11& Renderer );
+
+
+		virtual ~ViewSimulation();
 
 	protected:
-		IDXGISwapChain*			m_pSwapChain;
-		ResourcePtr				m_Resource;
+		int ThreadGroupsX;
+		int ThreadGroupsY;
 
-		friend RendererDX11;
+		ResourcePtr WaterState[2];
+		RenderEffectDX11*	pWaterEffect;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // SwapChainDX11_h
-//--------------------------------------------------------------------------------
-
+#endif // ViewSimulation_h

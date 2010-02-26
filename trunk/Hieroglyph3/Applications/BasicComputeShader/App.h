@@ -32,17 +32,14 @@ protected:
 	Win32RenderWindow*		m_pWindow;
 	
 	int						m_iSwapChain;
-	int						m_iRenderTarget;
-	int						m_iDepthTarget;
+	ResourcePtr				m_RenderTarget;
+	ResourcePtr				m_DepthTarget;
 
 	// Input Texture IDs
-	int						m_iTexture;
-	int						m_iTextureSRV;
+	ResourcePtr				m_Texture;
 
 	// Output Texture IDs
-	int						m_iOutput;
-	int						m_iOutputUAV;
-	int						m_iOutputSRV;
+	ResourcePtr				m_Output;
 
 	// Geometry for full screen pass
 	GeometryDX11*			m_pFullScreen;

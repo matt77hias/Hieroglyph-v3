@@ -64,9 +64,67 @@ void GeometryGeneratorDX11::GenerateFullScreenQuad( GeometryDX11* pGeometry )
 
 		face = TriangleIndices( 1, 2, 3 );
 		pGeometry->AddFace( face );
-
-		//pGeometry->GenerateVertexDeclaration();
-		//pGeometry->LoadToBuffers();	
 	}
 }
 //--------------------------------------------------------------------------------
+void GeometryGeneratorDX11::GenerateTexturedPlane( GeometryDX11* pGeometry, int SizeX, int SizeY )
+{
+	if ( pGeometry )
+	{
+		VertexElementDX11* pPositions = new VertexElementDX11( 3, SizeX * SizeY );
+		pPositions->m_SemanticName = "POSITION";
+		pPositions->m_uiSemanticIndex = 0;
+		pPositions->m_Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		pPositions->m_uiInputSlot = 0;
+		pPositions->m_uiAlignedByteOffset = 0;
+		pPositions->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		pPositions->m_uiInstanceDataStepRate = 0;
+
+		VertexElementDX11* pTexCoords = new VertexElementDX11( 2, SizeX * SizeY );
+		pTexCoords->m_SemanticName = "TEXCOORDS";
+		pTexCoords->m_uiSemanticIndex = 0;
+		pTexCoords->m_Format = DXGI_FORMAT_R32G32_FLOAT;
+		pTexCoords->m_uiInputSlot = 0;
+		pTexCoords->m_uiAlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		pTexCoords->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		pTexCoords->m_uiInstanceDataStepRate = 0;
+
+		Vector3f* pPos = pPositions->Get3f( 0 );
+		Vector2f* pTex = pTexCoords->Get2f( 0 );
+
+		// Set the locations and texture coordinates first.
+		for ( int y = 0; y < SizeY; y++ )
+		{
+			for ( int x = 0; x < SizeX; x++ )
+			{
+				pPos[y*SizeX+x] = Vector3f( x, 0.0f, y );		// Upper left
+				pTex[y*SizeX+x] = Vector2f( x, y );
+			}
+		}
+
+		// Generate the triangle faces of the plane.
+		for ( int j = 0; j < SizeY-1; j++ )
+		{
+			for ( int i = 0; i < SizeX-1; i++ )
+			{
+				TriangleIndices f1;
+				TriangleIndices f2;
+
+				f1.P1() = j*SizeX + i;
+				f1.P2() = (j*SizeX + i) + SizeX;
+				f1.P3() = (j*SizeX + i) + 1;
+
+				f2.P1() = (j*SizeX + i) + 1;
+				f2.P2() = (j*SizeX + i) + SizeX;
+				f2.P3() = (j*SizeX + i) + SizeX + 1;
+
+				pGeometry->AddFace( f1 );
+				pGeometry->AddFace( f2 );
+			}
+		}
+
+		// Add the vertex elements to the geometry object.
+		pGeometry->AddElement( pPositions );
+		pGeometry->AddElement( pTexCoords );
+	}
+}

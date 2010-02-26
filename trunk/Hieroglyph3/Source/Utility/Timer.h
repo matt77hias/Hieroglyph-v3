@@ -29,6 +29,7 @@ namespace Glyph3
 		float Elapsed();
 		int Framerate();
 		int MaxFramerate();
+		int FrameCount();
 
 		void SetFixedTimeStep( float step );
 

@@ -13,11 +13,10 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-SwapChainDX11::SwapChainDX11( IDXGISwapChain* pSwapChain, int textureID, int viewID )
+SwapChainDX11::SwapChainDX11( IDXGISwapChain* pSwapChain, ResourcePtr resource )
 {
 	m_pSwapChain = pSwapChain;
-	m_iTextureID = textureID;
-	m_iViewID = viewID;
+	m_Resource = resource;
 }
 //--------------------------------------------------------------------------------
 SwapChainDX11::~SwapChainDX11()

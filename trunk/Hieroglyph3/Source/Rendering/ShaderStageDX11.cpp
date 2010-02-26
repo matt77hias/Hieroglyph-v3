@@ -72,6 +72,11 @@ void ShaderStageDX11::SetShaderResourceView( int index, ID3D11ShaderResourceView
 //--------------------------------------------------------------------------------
 void ShaderStageDX11::SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV )
 {
+	// TODO: Add some member variable to the renderer to indicate the current 
+	//       feature level of the device.  This can then be used to limit the
+	//       number of unordered access views that can be set at once (i.e. the
+	//       number of UAVs on feature level < 11 is limited to 1!
+
 	if ( ( index >= 0 ) && ( index < D3D11_PS_CS_UAV_REGISTER_COUNT ) )
 	{
 		UnorderedAccessViews[index] = pUAV;

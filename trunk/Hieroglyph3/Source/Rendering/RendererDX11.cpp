@@ -370,6 +370,7 @@ int RendererDX11::CreateSwapChain( SwapChainConfigDX11* pConfig )
 	IDXGISwapChain* pSwapChain = 0;
 	hr = pFactory->CreateSwapChain( m_pDevice, &pConfig->m_State, &pSwapChain );
 
+
 	// Release the factory regardless of pass or fail.
 
 	pDXGIDevice->Release();
@@ -382,10 +383,10 @@ int RendererDX11::CreateSwapChain( SwapChainConfigDX11* pConfig )
 		return( -1 );
 	}
 
-	// Create and store the render target object from this swap chain.
+
+	// Acquire the texture interface from the swap chain.
 
 	ID3D11Texture2D* pSwapChainBuffer = 0;
-
 	hr = pSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), reinterpret_cast< void** >( &pSwapChainBuffer ) );
 
 	if ( FAILED( hr ) )
@@ -394,31 +395,33 @@ int RendererDX11::CreateSwapChain( SwapChainConfigDX11* pConfig )
 		return( -1 );
 	}
 
-	ID3D11RenderTargetView* pRenderTargetView = 0;
-
-	hr = m_pDevice->CreateRenderTargetView( pSwapChainBuffer, 0, &pRenderTargetView );
-
-	if ( FAILED( hr ) )
-	{
-		Log::Get().Write( L"Failed to create render target view of swap chain's back buffer!" );
-		return( -1 );
-	}
 
 	// Add the swap chain's back buffer texture and render target views to the internal data
 	// structures to allow setting them later on.
 
 	m_vResources.add( new Texture2dDX11( pSwapChainBuffer ) );
-	m_vRenderTargetViews.add( new RenderTargetViewDX11( pRenderTargetView ) );
+
 
 	// If we get here, then we succeeded in creating our swap chain and it's constituent parts.
 	// Now we create the wrapper object and store the result in our container.
 
-	m_vSwapChains.add( new SwapChainDX11( pSwapChain, m_vResources.count() - 1, m_vRenderTargetViews.count() - 1 ) );
+	int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE2D;
+	Texture2dConfigDX11 TextureConfig;
+	pSwapChainBuffer->GetDesc( &TextureConfig.m_State );
+
+	ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, &TextureConfig, this ) );
+	
+	
+	// With the resource proxy created, create the swap chain wrapper and store it.
+	// The resource proxy can then be used later on by the application to get the 
+	// RTV or texture ID if needed.
+
+	m_vSwapChains.add( new SwapChainDX11( pSwapChain, Proxy ) );
 
 	return( m_vSwapChains.count() - 1 );
 }
 //--------------------------------------------------------------------------------
-int RendererDX11::CreateVertexBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData )
+ResourcePtr RendererDX11::CreateVertexBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData )
 {
 	// Create the buffer with the specified configuration.
 	
@@ -433,13 +436,17 @@ int RendererDX11::CreateVertexBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOU
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		return( ( m_vResources.count() - 1 ) + RT_VERTEXBUFFER );
+
+		int ResourceID = ( m_vResources.count() - 1 ) + RT_VERTEXBUFFER;
+		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
+
+		return( Proxy );
 	}
 
-	return( -1 );
+	return( ResourcePtr( new ResourceProxyDX11() ) );
 }
 //--------------------------------------------------------------------------------
-int RendererDX11::CreateIndexBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData )
+ResourcePtr RendererDX11::CreateIndexBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData )
 {
 	// Create the buffer with the specified configuration.
 
@@ -454,13 +461,17 @@ int RendererDX11::CreateIndexBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOUR
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		return( ( m_vResources.count() - 1 ) + RT_INDEXBUFFER );
+
+		int ResourceID = ( m_vResources.count() - 1 ) + RT_INDEXBUFFER;
+		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
+
+		return( Proxy );
 	}
 
-	return( -1 );
+	return( ResourcePtr( new ResourceProxyDX11() ) );
 }
 //--------------------------------------------------------------------------------
-int RendererDX11::CreateStructuredBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData )
+ResourcePtr RendererDX11::CreateStructuredBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData )
 {
 	// Create the buffer with the specified configuration.
 
@@ -475,13 +486,17 @@ int RendererDX11::CreateStructuredBuffer( BufferConfigDX11* pConfig,  D3D11_SUBR
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		return( ( m_vResources.count() - 1 ) + RT_STRUCTUREDBUFFER );
+
+		int ResourceID = ( m_vResources.count() - 1 ) + RT_STRUCTUREDBUFFER;
+		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
+
+		return( Proxy );
 	}
 
-	return( -1 );
+	return( ResourcePtr( new ResourceProxyDX11() ) );
 }
 //--------------------------------------------------------------------------------
-int RendererDX11::CreateByteAddressBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData )
+ResourcePtr RendererDX11::CreateByteAddressBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData )
 {
 	// Create the buffer with the specified configuration.
 
@@ -496,13 +511,17 @@ int RendererDX11::CreateByteAddressBuffer( BufferConfigDX11* pConfig,  D3D11_SUB
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		return( ( m_vResources.count() - 1 ) + RT_BYTEADDRESSBUFFER );
+
+		int ResourceID = ( m_vResources.count() - 1 ) + RT_BYTEADDRESSBUFFER;
+		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
+
+		return( Proxy );
 	}
 
-	return( -1 );
+	return( ResourcePtr( new ResourceProxyDX11() ) );
 }
 //--------------------------------------------------------------------------------
-int RendererDX11::CreateConstantBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData )
+ResourcePtr RendererDX11::CreateConstantBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData )
 {
 	// Set the constant buffer flag in addition to any other flags that
 	// the user has set.
@@ -518,13 +537,17 @@ int RendererDX11::CreateConstantBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRES
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		return( ( m_vResources.count() - 1 ) + RT_CONSTANTBUFFER );
+	
+		int ResourceID = ( m_vResources.count() - 1 ) + RT_CONSTANTBUFFER;
+		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
+
+		return( Proxy );
 	}
 
-	return( -1 );
+	return( ResourcePtr( new ResourceProxyDX11() ) );
 }
 //--------------------------------------------------------------------------------
-int RendererDX11::CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData )
+ResourcePtr RendererDX11::CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData )
 {
 	ID3D11Texture1D* pTexture = 0;
 	HRESULT hr = m_pDevice->CreateTexture1D( &pConfig->m_State, pData, &pTexture );
@@ -537,13 +560,17 @@ int RendererDX11::CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_SUBRESOUR
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		return( ( m_vResources.count() - 1 ) + RT_TEXTURE1D );
+		
+		int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE1D;
+		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
+
+		return( Proxy );
 	}
 
-	return( -1 );
+	return( ResourcePtr( new ResourceProxyDX11() ) );
 }
 //--------------------------------------------------------------------------------
-int RendererDX11::CreateTexture2D( Texture2dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData )
+ResourcePtr RendererDX11::CreateTexture2D( Texture2dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData )
 {
 	ID3D11Texture2D* pTexture = 0;
 	HRESULT hr = m_pDevice->CreateTexture2D( &pConfig->m_State, pData, &pTexture );
@@ -556,13 +583,17 @@ int RendererDX11::CreateTexture2D( Texture2dConfigDX11* pConfig, D3D11_SUBRESOUR
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		return( ( m_vResources.count() - 1 ) + RT_TEXTURE2D );
+		
+		int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE2D;
+		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
+
+		return( Proxy );
 	}
 
-	return( -1 );
+	return( ResourcePtr( new ResourceProxyDX11() ) );
 }
 //--------------------------------------------------------------------------------
-int RendererDX11::CreateTexture3D( Texture3dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData )
+ResourcePtr RendererDX11::CreateTexture3D( Texture3dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData )
 {
 	ID3D11Texture3D* pTexture = 0;
 	HRESULT hr = m_pDevice->CreateTexture3D( &pConfig->m_State, pData, &pTexture );
@@ -575,10 +606,14 @@ int RendererDX11::CreateTexture3D( Texture3dConfigDX11* pConfig, D3D11_SUBRESOUR
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		return( ( m_vResources.count() - 1 ) + RT_TEXTURE3D );
+		
+		int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE3D;
+		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
+
+		return( Proxy );
 	}
 
-	return( -1 );
+	return( ResourcePtr( new ResourceProxyDX11() ) );
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateShaderResourceView( int ResourceID, D3D11_SHADER_RESOURCE_VIEW_DESC* pDesc )
@@ -1212,7 +1247,7 @@ void RendererDX11::SetMatrixParameter( std::wstring name, Matrix4f* pMatrix )
 		Log::Get().Write( L"Matrix parameter name collision!" );
 }
 //--------------------------------------------------------------------------------
-void RendererDX11::SetShaderResourceParameter( std::wstring name, int* pID )
+void RendererDX11::SetShaderResourceParameter( std::wstring name, ResourcePtr resource )
 {
 	RenderParameterDX11* pParameter = m_Parameters[name];
 
@@ -1224,12 +1259,12 @@ void RendererDX11::SetShaderResourceParameter( std::wstring name, int* pID )
 	}
 
 	if ( pParameter->GetParameterType() == SHADER_RESOURCE )
-		pParameter->SetParameterData( reinterpret_cast<void*>( pID ) );
+		pParameter->SetParameterData( reinterpret_cast<void*>( &resource->m_iResourceSRV ) );
 	else
 		Log::Get().Write( L"Shader resource view parameter name collision!" );
 }
 //--------------------------------------------------------------------------------
-void RendererDX11::SetUnorderedAccessParameter( std::wstring name, int* pID )
+void RendererDX11::SetUnorderedAccessParameter( std::wstring name, ResourcePtr resource )
 {
 	RenderParameterDX11* pParameter = m_Parameters[name];
 
@@ -1241,12 +1276,12 @@ void RendererDX11::SetUnorderedAccessParameter( std::wstring name, int* pID )
 	}
 
 	if ( pParameter->GetParameterType() == UNORDERED_ACCESS )
-		pParameter->SetParameterData( reinterpret_cast<void*>( pID ) );
+		pParameter->SetParameterData( reinterpret_cast<void*>( &resource->m_iResourceUAV ) );
 	else
 		Log::Get().Write( L"Unordered access view parameter name collision!" );
 }
 //--------------------------------------------------------------------------------
-void RendererDX11::SetConstantBufferParameter( std::wstring name, int* pID )
+void RendererDX11::SetConstantBufferParameter( std::wstring name, ResourcePtr resource )
 {
 	RenderParameterDX11* pParameter = m_Parameters[name];
 
@@ -1258,7 +1293,7 @@ void RendererDX11::SetConstantBufferParameter( std::wstring name, int* pID )
 	}
 
 	if ( pParameter->GetParameterType() == CBUFFER )
-		pParameter->SetParameterData( reinterpret_cast<void*>( pID ) );
+		pParameter->SetParameterData( reinterpret_cast<void*>( &resource->m_iResource ) );
 	else
 		Log::Get().Write( L"Constant buffer parameter name collision!" );
 }
@@ -1674,10 +1709,12 @@ void RendererDX11::BindInputLayout( int ID )
 		Log::Get().Write( L"Tried to bind an invalid input layout ID!" );
 }
 //--------------------------------------------------------------------------------
-void RendererDX11::BindVertexBuffer( int index, UINT stride )
+void RendererDX11::BindVertexBuffer( ResourcePtr resource, UINT stride )
 {
 	// TODO: Add the ability to set multiple vertex buffers at once, and to 
 	//       provide an offset to the data contained in the buffers.
+
+	int index = resource->m_iResource;
 
 	// Select only the index portion of the handle.
 	int TYPE	= index & 0x00FF0000;
@@ -1695,19 +1732,10 @@ void RendererDX11::BindVertexBuffer( int index, UINT stride )
 		Log::Get().Write( L"Tried to bind an invalid vertex buffer ID!" );
 }
 //--------------------------------------------------------------------------------
-void RendererDX11::SetVertexBufferStride( int index, UINT stride )
-{
-	// Select only the index portion of the handle.
-	int TYPE	= index & 0x00FF0000;
-	int ID		= index & 0x0000FFFF;
-
-	((VertexBufferDX11*)m_vResources[ID])->m_iVertexSize = stride;
-	//Log::Get().Write( L"Tried to bind an invalid vertex buffer ID!" );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::BindIndexBuffer( int index )
+void RendererDX11::BindIndexBuffer( ResourcePtr resource )
 {
 	// TODO: Add the ability to use different formats and offsets to this function!
+	int index = resource->m_iResource;
 
 	// Select only the index portion of the handle.
 	int TYPE	= index & 0x00FF0000;
@@ -1722,9 +1750,11 @@ void RendererDX11::BindIndexBuffer( int index )
 		Log::Get().Write( L"Tried to bind an invalid index buffer ID!" );
 }
 //--------------------------------------------------------------------------------
-void RendererDX11::BindRenderTargets( int RenderID, int DepthID )
+void RendererDX11::BindRenderTargets( ResourcePtr RenderTarget, ResourcePtr DepthTarget )
 {
 	// TODO: Add the ability to bind multiple render target views!
+	int RenderID = RenderTarget->m_iResourceRTV;
+	int DepthID = DepthTarget->m_iResourceDSV;
 
 	if ( ( RenderID >= 0 ) && ( RenderID < m_vRenderTargetViews.count() ) 
 		&& ( DepthID >= 0 ) && ( DepthID < m_vDepthStencilViews.count() ) )
@@ -1821,8 +1851,8 @@ void RendererDX11::Draw( RenderEffectDX11& effect, GeometryDX11& geometry )
 
 	// Bind the vertex and index buffers.
 
-	BindVertexBuffer( geometry.m_iVB, geometry.GetVertexSize() );
-	BindIndexBuffer( geometry.m_iIB );
+	BindVertexBuffer( geometry.m_VB, geometry.GetVertexSize() );
+	BindIndexBuffer( geometry.m_IB );
 
 	// Bind the input layout.  The layout will be automatically generated if it
 	// doesn't already exist.
@@ -1954,7 +1984,7 @@ void RendererDX11::SaveTextureScreenShot( int index, std::wstring filename, D3DX
 	}
 }
 //--------------------------------------------------------------------------------
-int RendererDX11::LoadTexture( std::wstring filename )
+ResourcePtr RendererDX11::LoadTexture( std::wstring filename )
 {
 	ID3D11Resource* pTexture = 0;
 
@@ -1970,12 +2000,18 @@ int RendererDX11::LoadTexture( std::wstring filename )
 	if ( FAILED( hr ) )
 	{
 		Log::Get().Write( L"Failed to load texture from file!" );
-		return( -1 );
+		return( ResourcePtr( new ResourceProxyDX11() ) );
 	}
 
 	m_vResources.add( new Texture2dDX11( reinterpret_cast< ID3D11Texture2D* >( pTexture ) ) );
 
-	return( m_vResources.count() - 1 + RT_TEXTURE2D );
+	int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE2D;
+	Texture2dConfigDX11 TextureConfig;
+	reinterpret_cast< ID3D11Texture2D* >( pTexture )->GetDesc( &TextureConfig.m_State );
+
+	//ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, &TextureConfig, this ) );
+	return( ResourcePtr( new ResourceProxyDX11( ResourceID, &TextureConfig, this ) ) );
+	//return( Proxy );
 }
 //--------------------------------------------------------------------------------
 void RendererDX11::UnbindShader( ShaderType type )
@@ -2249,22 +2285,14 @@ IndexBufferDX11* RendererDX11::GetIndexBuffer( int index )
 		return( 0 );
 }
 //--------------------------------------------------------------------------------
-int RendererDX11::GetSwapChainRenderTargetViewID( int ID )
+ResourcePtr RendererDX11::GetSwapChainResource( int ID )
 {
 	if ( ( ID >= 0 ) && ( m_vSwapChains.count() ) )
-		return( m_vSwapChains[ID]->m_iViewID );
-	
-	Log::Get().Write( L"Tried to get an invalid swap buffer index render target view ID!" );
-	return( -1 );
-}
-//--------------------------------------------------------------------------------
-int RendererDX11::GetSwapChainTextureID( int ID )
-{
-	if ( ( ID >= 0 ) && ( m_vSwapChains.count() ) )
-		return( m_vSwapChains[ID]->m_iTextureID );
+		return( m_vSwapChains[ID]->m_Resource );
 	
 	Log::Get().Write( L"Tried to get an invalid swap buffer index texture ID!" );
-	return( -1 );
+
+	return( ResourcePtr( new ResourceProxyDX11() ) );
 }
 //--------------------------------------------------------------------------------
 std::wstring RendererDX11::Print_D3D11_SHADER_DESC( D3D11_SHADER_DESC description )
@@ -2625,16 +2653,16 @@ Vector2f RendererDX11::GetDesktopResolution()
 						desc.DesktopCoordinates.bottom - desc.DesktopCoordinates.top ) );
 }
 //--------------------------------------------------------------------------------
-void RendererDX11::CopySubresourceRegion( int DestResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ,
-	int SrcResource, UINT SrcSubresource, D3D11_BOX* pSrcBox )
+void RendererDX11::CopySubresourceRegion( ResourcePtr DestResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ,
+	ResourcePtr SrcResource, UINT SrcSubresource, D3D11_BOX* pSrcBox )
 {
-	int DestType = DestResource & 0x00FF0000;
-	int DestID = DestResource & 0x0000FFFF;
+	int DestType = DestResource->m_iResource & 0x00FF0000;
+	int DestID = DestResource->m_iResource & 0x0000FFFF;
 	ID3D11Resource* pDestResource = m_vResources[DestID]->GetResource();
 
 
-	int SrcType = SrcResource & 0x00FF0000;
-	int SrcID = SrcResource & 0x0000FFFF;
+	int SrcType = SrcResource->m_iResource & 0x00FF0000;
+	int SrcID = SrcResource->m_iResource & 0x0000FFFF;
 	ID3D11Resource* pSrcResource = m_vResources[SrcID]->GetResource();
 
 	m_pContext->CopySubresourceRegion( pDestResource, DstSubresource, DstX, DstY, DstZ,

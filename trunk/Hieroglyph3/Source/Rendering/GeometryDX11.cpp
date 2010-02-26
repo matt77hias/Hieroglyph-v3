@@ -22,9 +22,6 @@ GeometryDX11::GeometryDX11( )
 	m_iVertexSize = 0;
 	m_iVertexCount = 0;
 
-	m_iVB = -1;
-	m_iIB = -1;
-
 	// Default to triangle lists
 	m_ePrimType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 }
@@ -343,8 +340,9 @@ void GeometryDX11::LoadToBuffers()
 
 	BufferConfigDX11 vbuffer;
 	vbuffer.SetDefaultVertexBuffer( vertices_length, false );
-	m_iVB = RendererDX11::Get()->CreateVertexBuffer( &vbuffer, &data );
-	RendererDX11::Get()->SetVertexBufferStride( m_iVB, m_iVertexSize );
+	m_VB = RendererDX11::Get()->CreateVertexBuffer( &vbuffer, &data );
+	// TODO: Make sure this can really be removed!
+	//RendererDX11::Get()->SetVertexBufferStride( m_VB->m_iResource, m_iVertexSize );
 
 	delete [] pBytes; 
 	// TODO: add error checking here!
@@ -359,7 +357,7 @@ void GeometryDX11::LoadToBuffers()
 	
 	BufferConfigDX11 ibuffer;
 	ibuffer.SetDefaultIndexBuffer( sizeof( UINT ) * GetIndexCount(), false );
-	m_iIB = RendererDX11::Get()->CreateIndexBuffer( &ibuffer, &data );
+	m_IB = RendererDX11::Get()->CreateIndexBuffer( &ibuffer, &data );
 }
 //--------------------------------------------------------------------------------
 UINT GeometryDX11::GetIndexCount()

@@ -74,8 +74,8 @@ namespace Glyph3
 		
 		std::map<int,InputLayoutKey*> m_InputLayouts;
 
-		int m_iVB;
-		int m_iIB;
+		ResourcePtr m_VB;
+		ResourcePtr m_IB;
 
 		// The size 
 		int m_iVertexSize;

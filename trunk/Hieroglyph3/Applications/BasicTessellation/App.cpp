@@ -88,7 +88,7 @@ bool App::ConfigureEngineComponents()
 
 	// We'll keep a copy of the render target index to use in later examples.
 
-	m_iRenderTarget = m_pRenderer11->GetSwapChainRenderTargetViewID( m_iSwapChain );
+	m_RenderTarget = m_pRenderer11->GetSwapChainResource( m_iSwapChain );
 
 	// Next we create a depth buffer for use in the traditional rendering
 	// pipeline.
@@ -96,13 +96,12 @@ bool App::ConfigureEngineComponents()
 	Texture2dConfigDX11 DepthConfig;
 	DepthConfig.SetDepthBuffer( width, height );
 	DepthConfig.SetSampleDesc( sd );
-	int DepthID = m_pRenderer11->CreateTexture2D( &DepthConfig, 0 );
-	m_iDepthTarget = m_pRenderer11->CreateDepthStencilView( DepthID, 0 );
-	
+	m_DepthTarget = m_pRenderer11->CreateTexture2D( &DepthConfig, 0 );
+		
 	// Bind the swap chain render target and the depth buffer for use in 
 	// rendering.  
 
-	m_pRenderer11->BindRenderTargets( m_iRenderTarget, m_iDepthTarget );
+	m_pRenderer11->BindRenderTargets( m_RenderTarget, m_DepthTarget );
 
 	// Create a view port to use on the scene.  This basically selects the 
 	// entire floating point area of the render target.

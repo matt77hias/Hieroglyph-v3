@@ -30,8 +30,8 @@ protected:
 	Win32RenderWindow*		m_pWindow;
 	
 	int						m_iSwapChain;
-	int						m_iRenderTarget;
-	int						m_iDepthTarget;
+	ResourcePtr				m_RenderTarget;
+	ResourcePtr				m_DepthTarget;
 
 	bool					m_bSaveScreenshot;
 
@@ -44,6 +44,4 @@ protected:
 	Matrix4f				m_ViewProjMatrix;
 
 	Vector4f				m_TessParams;
-
-	int						m_iCB;
 };

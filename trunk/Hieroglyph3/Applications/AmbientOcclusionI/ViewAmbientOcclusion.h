@@ -9,30 +9,44 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// SwapChainDX11
+// ViewAmbientOcclusion
 //
 //--------------------------------------------------------------------------------
-#include "RendererDX11.h"
+#ifndef ViewAmbientOcclusion_h
+#define ViewAmbientOcclusion_h
 //--------------------------------------------------------------------------------
-#ifndef SwapChainDX11_h
-#define SwapChainDX11_h
+#include "IRenderView.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class SwapChainDX11
+	class Entity3D;
+
+	class ViewAmbientOcclusion : public IRenderView
 	{
 	public:
-		SwapChainDX11( IDXGISwapChain* pSwapChain, ResourcePtr resource );
-		virtual ~SwapChainDX11();
+		ViewAmbientOcclusion( RendererDX11& Renderer, int SizeX, int SizeY );
+
+		virtual void Update( float fTime );
+		virtual void Draw( RendererDX11& Renderer );
+
+		virtual void SetRenderParams( RendererDX11& Renderer );
+		virtual void SetUsageParams( RendererDX11& Renderer );
+
+
+		virtual ~ViewAmbientOcclusion();
 
 	protected:
-		IDXGISwapChain*			m_pSwapChain;
-		ResourcePtr				m_Resource;
+		int ResolutionX;
+		int ResolutionY;
 
-		friend RendererDX11;
+		ResourcePtr DepthNormalBuffer;
+		ResourcePtr OcclusionBuffer;
+		ResourcePtr BilateralBuffer;
+
+		RenderEffectDX11*	pOcclusionEffect;
+		RenderEffectDX11*	pBilateralXEffect;
+		RenderEffectDX11*	pBilateralYEffect;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // SwapChainDX11_h
-//--------------------------------------------------------------------------------
-
+#endif // ViewAmbientOcclusion_h

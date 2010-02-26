@@ -9,14 +9,14 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// ViewPerspective
+// ViewLinearDepthNormals
 //
-// ViewPerspective is intended to be the primary render view that most of the
+// ViewLinearDepthNormals is intended to be the primary render view that most of the
 // everyday rendering will use.  This render view will use the scene graph to
 // select the currently visible objects and render them.
 //--------------------------------------------------------------------------------
-#ifndef ViewPerspective_h
-#define ViewPerspective_h
+#ifndef ViewLinearDepthNormals_h
+#define ViewLinearDepthNormals_h
 //--------------------------------------------------------------------------------
 #include "IRenderView.h"
 //--------------------------------------------------------------------------------
@@ -24,10 +24,10 @@ namespace Glyph3
 {
 	class Entity3D;
 
-	class ViewPerspective : public IRenderView
+	class ViewLinearDepthNormals : public IRenderView
 	{
 	public:
-		ViewPerspective( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget );
+		ViewLinearDepthNormals( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget );
 
 		virtual void Update( float fTime );
 		virtual void Draw( RendererDX11& Renderer );
@@ -39,7 +39,7 @@ namespace Glyph3
 		virtual void SetUsageParams( RendererDX11& Renderer );
 
 
-		virtual ~ViewPerspective();
+		virtual ~ViewLinearDepthNormals();
 
 	protected:
 		Vector4f m_vColor;
@@ -50,4 +50,4 @@ namespace Glyph3
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // ViewPerspective_h
+#endif // ViewLinearDepthNormals_h

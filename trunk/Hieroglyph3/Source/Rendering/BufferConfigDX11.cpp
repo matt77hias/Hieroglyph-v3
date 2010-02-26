@@ -101,7 +101,7 @@ void BufferConfigDX11::SetDefaultIndexBuffer( UINT size, bool dynamic )
 //--------------------------------------------------------------------------------
 void BufferConfigDX11::SetDefaultStructuredBuffer( UINT size, UINT structsize )
 {
-	m_State.ByteWidth = size;
+	m_State.ByteWidth = size * structsize;
     m_State.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
     m_State.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
     m_State.StructureByteStride = structsize;
