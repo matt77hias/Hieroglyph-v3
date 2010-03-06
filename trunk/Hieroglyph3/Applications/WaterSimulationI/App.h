@@ -37,7 +37,6 @@ protected:
 
 	ResourcePtr				m_RenderTarget;
 	ResourcePtr				m_DepthTarget;
-	ResourcePtr				m_WaterState[2];
 
 	ViewPerspective*		m_pRenderView;
 	Node3D*					m_pNode;

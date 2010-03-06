@@ -72,7 +72,7 @@ bool App::ConfigureEngineComponents()
 
 	// Create the window.
 	int width = 640;
-	int height = 360;
+	int height = 480;
 
 	// Create the window wrapper class instance.
 	m_pWindow = new Win32RenderWindow();
@@ -130,49 +130,61 @@ void App::ShutdownEngineComponents()
 //--------------------------------------------------------------------------------
 void App::Initialize()
 {
-	// Create and initialize the geometry to be rendered.  This represents a 
-	// heightmap that will be tessellated modified with the water state.
+	// Get some information about the render target before initializing.
 
-	const int DispatchSizeX = 8;
-	const int DispatchSizeZ = 8;
+	D3D11_TEXTURE2D_DESC desc = m_RenderTarget->m_pTexture2dConfig->GetTextureDesc();
+
+	unsigned int ResolutionX = desc.Width;
+	unsigned int ResolutionY = desc.Height;
+
+
+	// Create and initialize the geometry to be rendered.  
 
 	GeometryDX11* pGeometry = new GeometryDX11();
-	GeometryGeneratorDX11::GenerateTexturedPlane( pGeometry, 16 * DispatchSizeX, 16 * DispatchSizeZ );
+	pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Sample_Scene.ms3d" ) );
 	pGeometry->LoadToBuffers();
+	//pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
 	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-	
 
 	// Create the material for use by the entity.
 	MaterialDX11* pMaterial = new MaterialDX11();
+
+	// Create and fill the effect that will be used for this view type
+	RenderEffectDX11* pDepthEffect = new RenderEffectDX11();
+
+	pDepthEffect->m_iVertexShader = 
+		m_pRenderer11->LoadShader( VERTEX_SHADER,
+		std::wstring( L"../Data/Shaders/DepthVS.hlsl" ),
+		std::wstring( L"VSMAIN" ),
+		std::wstring( L"vs_5_0" ) );
+	pDepthEffect->m_iPixelShader = 
+		m_pRenderer11->LoadShader( PIXEL_SHADER,
+		std::wstring( L"../Data/Shaders/DepthPS.hlsl" ),
+		std::wstring( L"PSMAIN" ),
+		std::wstring( L"ps_5_0" ) );
+
+	// Enable the material to render the given view type, and set its effect.
+	pMaterial->Params[VT_LINEAR_DEPTH_NORMALS].bRender = true;
+	pMaterial->Params[VT_LINEAR_DEPTH_NORMALS].pEffect = pDepthEffect;
 
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 
 	pEffect->m_iVertexShader = 
 		m_pRenderer11->LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/HeightmapVisualization.hlsl" ),
+		std::wstring( L"../Data/Shaders/FinalVS.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_4_0" ) );
+		std::wstring( L"vs_5_0" ) );
 	pEffect->m_iPixelShader = 
 		m_pRenderer11->LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/HeightmapVisualization.hlsl" ),
+		std::wstring( L"../Data/Shaders/FinalPS.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_4_0" ) );
-
-	RasterizerStateConfigDX11 RS;
-	RS.FillMode = D3D11_FILL_WIREFRAME;
-
-	pEffect->m_iRasterizerState = 
-		m_pRenderer11->CreateRasterizerState( &RS );
+		std::wstring( L"ps_5_0" ) );
 
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
 	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
-	pMaterial->Params[VT_PERSPECTIVE].vViews.add( new ViewAmbientOcclusion( *m_pRenderer11, DispatchSizeX, DispatchSizeZ ) );
 
-	// Set any parameters that will be needed by the shaders used above.
-	Vector4f DispatchSize = Vector4f( (float)DispatchSizeX, (float)DispatchSizeZ, (float)DispatchSizeX * 16, (float)DispatchSizeZ * 16 );
-	m_pRenderer11->SetVectorParameter( std::wstring( L"DispatchSize" ), &DispatchSize );
 
 	Vector4f FinalColor = Vector4f( 0.5f, 1.0f, 0.5f, 1.0f );
 	m_pRenderer11->SetVectorParameter( std::wstring( L"FinalColor" ), &FinalColor );
@@ -181,12 +193,12 @@ void App::Initialize()
 	// from the camera's point of view of the scene.
 
 	m_pCamera = new Camera();
-	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.307f, 0.707f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( -70.0f, 20.5f, -75.0f );
-	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
+	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.407f, -0.707f, 0.0f ) );
+	m_pCamera->GetNode()->Position() = Vector3f( 4.0f, 4.5f, -4.0f );
+	m_pRenderView = new ViewAmbientOcclusion( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
-	m_pCamera->SetProjectionParams( 0.1f, 500.0f, D3DX_PI / 2.0f, 640.0f / 480.0f );
+	m_pCamera->SetProjectionParams( 0.1f, 500.0f, (float)D3DX_PI / 2.0f, (float)ResolutionX / (float)ResolutionY );
 
 	// Create the scene and add the entities to it.  Then add the camera to the
 	// scene so that it will be updated via the scene interface instead of 
@@ -196,7 +208,7 @@ void App::Initialize()
 	m_pEntity = new Entity3D();
 	m_pEntity->SetGeometry( pGeometry );
 	m_pEntity->SetMaterial( pMaterial, false );
-	m_pEntity->Position() = Vector3f( -8.0f * DispatchSizeX, 0.0f, -8.0f * DispatchSizeZ );  
+	m_pEntity->Position() = Vector3f( 0.0f, 0.0f, 0.0f );  
 
 	m_pNode->AttachChild( m_pEntity );
 
@@ -222,10 +234,6 @@ void App::Update()
 
 	Vector4f TimeFactors = Vector4f( m_pTimer->Elapsed(), (float)m_pTimer->Framerate(), 
 		m_pTimer->Runtime(), (float)m_pTimer->FrameCount() );
-
-	//std::wstringstream s;
-	//s << L"Frame Number: " << m_pTimer->FrameCount() << L" Elapsed Time: " << m_pTimer->Elapsed();
-	//Log::Get().Write( s.str() );
 
 	m_pRenderer11->SetVectorParameter( std::wstring( L"TimeFactors" ), &TimeFactors );
 

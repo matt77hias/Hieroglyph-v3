@@ -50,12 +50,6 @@ void ViewPerspective::Draw( RendererDX11& Renderer )
 	if ( m_pEntity != NULL )
 		ViewMatrix = m_pEntity->GetView();
 
-//	std::ostringstream s;
-//	s << "Perspective: " << this;
-//	s << ", Recurrence: " << m_iCurrRecurrence;
-//	CLog::Get().Write( s.str() );
-
-	//CEntity3D* pRoot = CEntity3D::m_pRoot;
 
 	if ( m_pRoot )
 	{
@@ -63,7 +57,6 @@ void ViewPerspective::Draw( RendererDX11& Renderer )
 		m_pRoot->PreRender( Renderer, GetType() );
 
 		// Set the parameters for rendering this view
-		// TODO: add the depth id into the render view!
 		Renderer.BindRenderTargets( m_RenderTarget, m_DepthTarget );
 		Renderer.ClearBuffers( m_vColor, 1.0f );
 

@@ -15,16 +15,16 @@
 #ifndef ViewAmbientOcclusion_h
 #define ViewAmbientOcclusion_h
 //--------------------------------------------------------------------------------
-#include "IRenderView.h"
+#include "ViewPerspective.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
 	class Entity3D;
 
-	class ViewAmbientOcclusion : public IRenderView
+	class ViewAmbientOcclusion : public ViewPerspective
 	{
 	public:
-		ViewAmbientOcclusion( RendererDX11& Renderer, int SizeX, int SizeY );
+		ViewAmbientOcclusion( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget );
 
 		virtual void Update( float fTime );
 		virtual void Draw( RendererDX11& Renderer );

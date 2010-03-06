@@ -20,7 +20,7 @@
 // Copyright (C) 2009 Jason Zink.  All rights reserved.
 //-----------------------------------------------------------------------------
 
-Texture2D					DepthMap : register( t0 );
+Texture2D					DepthNormalBuffer : register( t0 );
 RWTexture2D<float>			AmbientOcclusionTarget : register( u0 );
 
 SamplerState DepthSampler
@@ -147,25 +147,25 @@ void CSMAIN( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThr
 #ifndef USE_GATHER
 	int3 Sample0 = ThreadLocation + OffsetLocation;
 	Sample0 = clamp( Sample0, int3( 0, 0, 0 ), int3( totalsize_x-1, totalsize_y-1, 0 ) );
-	LoadedDepths[ThreadLocation.x][ThreadLocation.y] =  DepthMap.Load(Sample0).w * zf;
+	LoadedDepths[ThreadLocation.x][ThreadLocation.y] =  DepthNormalBuffer.Load(Sample0).w * zf;
 
 	ThreadLocation = ThreadLocation + int3(1,0,0);
 	int3 Sample1 = ThreadLocation + OffsetLocation;
-	LoadedDepths[ThreadLocation.x][ThreadLocation.y] =  DepthMap.Load(Sample1).w * zf;
+	LoadedDepths[ThreadLocation.x][ThreadLocation.y] =  DepthNormalBuffer.Load(Sample1).w * zf;
 	
 	ThreadLocation = ThreadLocation + int3(-1,1,0);
 	int3 Sample2 = ThreadLocation + OffsetLocation;
-	LoadedDepths[ThreadLocation.x][ThreadLocation.y] =  DepthMap.Load(Sample2).w * zf;
+	LoadedDepths[ThreadLocation.x][ThreadLocation.y] =  DepthNormalBuffer.Load(Sample2).w * zf;
 
 	ThreadLocation = ThreadLocation + int3(1,0,0);
 	int3 Sample3 = ThreadLocation + OffsetLocation;
-	LoadedDepths[ThreadLocation.x][ThreadLocation.y] =  DepthMap.Load(Sample3).w * zf;
+	LoadedDepths[ThreadLocation.x][ThreadLocation.y] =  DepthNormalBuffer.Load(Sample3).w * zf;
 #else
 	float2 fGatherSample;
 	fGatherSample.x = ((float)GroupID.x * (float)size_x - (float)kernel_x + (float)GroupThreadID.x * 2.0f ) / xres;
 	fGatherSample.y = ((float)GroupID.y * (float)size_y - (float)kernel_y + (float)GroupThreadID.y * 2.0f ) / yres;
 	
-	float4 fDepths = DepthMap.GatherAlpha( DepthSampler, fGatherSample + float2( 0.5f / (float)xres, 0.5f / (float)yres ) ) * zf;
+	float4 fDepths = DepthNormalBuffer.GatherAlpha( DepthSampler, fGatherSample + float2( 0.5f / (float)xres, 0.5f / (float)yres ) ) * zf;
 	LoadedDepths[ThreadLocation.x][ThreadLocation.y] = fDepths.w;
 	LoadedDepths[ThreadLocation.x+1][ThreadLocation.y] = fDepths.z;
 	LoadedDepths[ThreadLocation.x+1][ThreadLocation.y+1] = fDepths.y;
@@ -229,7 +229,7 @@ void CSMAIN( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThr
 	float fNumSamples = 0.0f;
 	float fResults = 0.0f;
 	
-	float4 fPixelData = DepthMap.Load( texturelocation );
+	float4 fPixelData = DepthNormalBuffer.Load( texturelocation );
 	float fPixelDepth = fPixelData.w * zf;
 	float3 fPixelNormal = fPixelData.xyz * 2.0f - 1.0f;
 
@@ -266,7 +266,7 @@ void CSMAIN( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThr
 			int3 iNewOffset = ViewPosToScreenPos( Sample3D );
 	
 #ifndef USE_GSM
-			float fSample = DepthMap.Load( iNewOffset ).w * zf;
+			float fSample = DepthNormalBuffer.Load( iNewOffset ).w * zf;
 #else
 			float fSample = LoadDepth( iNewOffset - OffsetLocation );
 #endif // USE_GSM

@@ -18,12 +18,13 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-ViewAmbientOcclusion::ViewAmbientOcclusion( RendererDX11& Renderer, int SizeX, int SizeY )
+ViewAmbientOcclusion::ViewAmbientOcclusion( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget )
+: ViewPerspective( Renderer, RenderTarget, DepthTarget )
 {
-	m_sParams.iViewType = VT_SIMULATION;
+	D3D11_TEXTURE2D_DESC desc = RenderTarget->m_pTexture2dConfig->GetTextureDesc();
 
-	ResolutionX = SizeX;
-	ResolutionY = SizeY;
+	ResolutionX = desc.Width;
+	ResolutionY = desc.Height;
 
 	// Create the resources to be used in this rendering algorithm.  The 
 	// depth/normal buffer will have four components, and be used as a render
@@ -52,7 +53,7 @@ ViewAmbientOcclusion::ViewAmbientOcclusion( RendererDX11& Renderer, int SizeX, i
 	pOcclusionEffect = new RenderEffectDX11();
 	pOcclusionEffect->m_iComputeShader = 
 		Renderer.LoadShader( COMPUTE_SHADER,
-		std::wstring( L"../Data/Shaders/AmbientOcclusionCS_16.hlsl" ),
+		std::wstring( L"../Data/Shaders/AmbientOcclusionCS_32.hlsl" ),
 		std::wstring( L"CSMAIN" ),
 		std::wstring( L"cs_5_0" ) );
 
@@ -84,33 +85,74 @@ void ViewAmbientOcclusion::Update( float fTime )
 //--------------------------------------------------------------------------------
 void ViewAmbientOcclusion::Draw( RendererDX11& Renderer )
 {
-	// Set this view's render parameters.
-	SetRenderParams( Renderer );
+	// Set the view matrix if this render view is associated with an entity.
+	if ( m_pEntity != NULL )
+		ViewMatrix = m_pEntity->GetView();
 
-	// Perform the dispatch call to update the simulation state.
-//	Renderer.Dispatch( *pWaterEffect, ThreadGroupsX, ThreadGroupsY, 1 );
+	// Render the depth/normal buffer, keeping the depth target for a later pass.
+	if ( m_pRoot )
+	{
+		// Run through the graph and pre-render the entities
+		m_pRoot->PreRender( Renderer, VT_LINEAR_DEPTH_NORMALS );
 
-	// Switch the two resources so that the current state is maintained in slot 0.
-	//ResourcePtr TempState = WaterState[0];
-	//WaterState[0] = WaterState[1];
-	//WaterState[1] = TempState;
+		// Set the parameters for rendering this view
+		Renderer.BindRenderTargets( DepthNormalBuffer, m_DepthTarget );
+		Renderer.ClearBuffers( m_vColor, 1.0f );
+
+		// Set the perspective view's render parameters, since the depth normal
+		// buffer is a perspective rendering.
+		ViewPerspective::SetRenderParams( Renderer );
+
+		// Run through the graph and render each of the entities
+		m_pRoot->Render( Renderer, VT_LINEAR_DEPTH_NORMALS );
+	}
+	
+	// TODO: I added this bind statement here to force the DepthNormalBuffer to not
+	//       be bound to the pipeline anymore.  This should be done automatically, or
+	//       with an explicit method to clear render targets or something similar.
+	//       One automatic way would be to check the resource being set for the shader
+	//       resource parameter, to see if it is a render target view as well.  If so,
+	//       then clear the render targets when the SRV is set.
+
+	Renderer.BindRenderTargets( m_RenderTarget, m_DepthTarget );
+
+	// Process the occlusion buffer next.  Start by setting the needed resource
+	// parameters for the depth/normal buffer and the occlusion buffer.
+	ViewAmbientOcclusion::SetRenderParams( Renderer );
+
+	// Execute the compute shader to calculate the raw occlusion buffer.
+	Renderer.Dispatch( *pOcclusionEffect, ResolutionX / 32, ResolutionY / 32, 1 );
+
+	// Perform the blurring operations next.
+	Renderer.Dispatch( *pBilateralXEffect, 1, ResolutionY, 1 );
+	Renderer.Dispatch( *pBilateralYEffect, ResolutionX, 1, 1 );
+	Renderer.Dispatch( *pBilateralXEffect, 1, ResolutionY, 1 );
+	Renderer.Dispatch( *pBilateralYEffect, ResolutionX, 1, 1 );
+
+	// Perform the final rendering pass now.  This will use the ViewAmbientOcclusion
+	// output parameters (i.e. a shader resource view with occlusion buffer in it), and 
+	// render with the perspective view's draw method.
+	ViewAmbientOcclusion::SetUsageParams( Renderer );
+	ViewPerspective::SetRenderParams( Renderer );
+
+	ViewPerspective::Draw( Renderer );
 }
 //--------------------------------------------------------------------------------
 void ViewAmbientOcclusion::SetRenderParams( RendererDX11& Renderer )
 {
 	// Set the parameters for this view to be able to perform its processing
-	// sequence.  In this case, water state '0' is always considered the current
-	// state.
+	// sequence.  In this case, we set the depth/normal buffer as a shader 
+	// resource and the occlusion buffer as an unordered access view.
 
-//	Renderer.SetShaderResourceParameter( L"CurrentWaterState", WaterState[0] );
-//	Renderer.SetUnorderedAccessParameter( L"NewWaterState", WaterState[1] );
+	Renderer.SetShaderResourceParameter( L"DepthNormalBuffer", DepthNormalBuffer );
+	Renderer.SetUnorderedAccessParameter( L"AmbientOcclusionTarget", OcclusionBuffer );
 }
 //--------------------------------------------------------------------------------
 void ViewAmbientOcclusion::SetUsageParams( RendererDX11& Renderer )
 {
-	// Set the parameters for allowing an application to use the current state
-	// as a height map via a shader resource view.
+	// Set the parameters for allowing an application to use the current resources
+	// for rendering.
 
-//	Renderer.SetShaderResourceParameter( L"CurrentWaterState", WaterState[0] );
+	Renderer.SetShaderResourceParameter( L"AmbientOcclusionBuffer", OcclusionBuffer );
 }
 //--------------------------------------------------------------------------------

@@ -1410,9 +1410,11 @@ void RendererDX11::SetWorldMatrixParameter( Matrix4f* pMatrix )
 	Matrix4f ViewMatrix = GetMatrixParameter( std::wstring( L"ViewMatrix" ) );
 	Matrix4f ProjMatrix = GetMatrixParameter( std::wstring( L"ProjMatrix" ) );
 
+	Matrix4f WorldViewMatrix = WorldMatrix * ViewMatrix;
 	Matrix4f ViewProjMatrix = ViewMatrix * ProjMatrix;
 	Matrix4f WorldViewProjMatrix = WorldMatrix * ViewProjMatrix;
 
+	SetMatrixParameter( std::wstring( L"WorldViewMatrix" ), &WorldViewMatrix );
 	SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &ViewProjMatrix );
 	SetMatrixParameter( std::wstring( L"WorldViewProjMatrix" ), &WorldViewProjMatrix );
 }
@@ -1425,9 +1427,11 @@ void RendererDX11::SetViewMatrixParameter( Matrix4f* pMatrix )
 	Matrix4f ViewMatrix = GetMatrixParameter( std::wstring( L"ViewMatrix" ) );
 	Matrix4f ProjMatrix = GetMatrixParameter( std::wstring( L"ProjMatrix" ) );
 
+	Matrix4f WorldViewMatrix = WorldMatrix * ViewMatrix;
 	Matrix4f ViewProjMatrix = ViewMatrix * ProjMatrix;
 	Matrix4f WorldViewProjMatrix = WorldMatrix * ViewProjMatrix;
 
+	SetMatrixParameter( std::wstring( L"WorldViewMatrix" ), &WorldViewMatrix );
 	SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &ViewProjMatrix );
 	SetMatrixParameter( std::wstring( L"WorldViewProjMatrix" ), &WorldViewProjMatrix );
 }
@@ -1440,9 +1444,11 @@ void RendererDX11::SetProjMatrixParameter( Matrix4f* pMatrix )
 	Matrix4f ViewMatrix = GetMatrixParameter( std::wstring( L"ViewMatrix" ) );
 	Matrix4f ProjMatrix = GetMatrixParameter( std::wstring( L"ProjMatrix" ) );
 
+	Matrix4f WorldViewMatrix = WorldMatrix * ViewMatrix;
 	Matrix4f ViewProjMatrix = ViewMatrix * ProjMatrix;
 	Matrix4f WorldViewProjMatrix = WorldMatrix * ViewProjMatrix;
 
+	SetMatrixParameter( std::wstring( L"WorldViewMatrix" ), &WorldViewMatrix );
 	SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &ViewProjMatrix );
 	SetMatrixParameter( std::wstring( L"WorldViewProjMatrix" ), &WorldViewProjMatrix );
 }

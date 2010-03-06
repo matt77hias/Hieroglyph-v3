@@ -48,6 +48,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AmbientOcclusionI", "Applic
 		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageProcessor", "Applications\ImageProcessor\ImageProcessor.vcproj", "{84F60DAA-B6D4-4BBE-A389-5671AE26D85B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SkinAndBones", "Applications\SkinAndBones\SkinAndBones.vcproj", "{E451755D-66D6-4FFA-8804-DAADAA319A91}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -94,6 +104,14 @@ Global
 		{50DA7DA6-6E7E-4148-90EF-8A028A2BB1CA}.Debug|Win32.Build.0 = Debug|Win32
 		{50DA7DA6-6E7E-4148-90EF-8A028A2BB1CA}.Release|Win32.ActiveCfg = Release|Win32
 		{50DA7DA6-6E7E-4148-90EF-8A028A2BB1CA}.Release|Win32.Build.0 = Release|Win32
+		{84F60DAA-B6D4-4BBE-A389-5671AE26D85B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{84F60DAA-B6D4-4BBE-A389-5671AE26D85B}.Debug|Win32.Build.0 = Debug|Win32
+		{84F60DAA-B6D4-4BBE-A389-5671AE26D85B}.Release|Win32.ActiveCfg = Release|Win32
+		{84F60DAA-B6D4-4BBE-A389-5671AE26D85B}.Release|Win32.Build.0 = Release|Win32
+		{E451755D-66D6-4FFA-8804-DAADAA319A91}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E451755D-66D6-4FFA-8804-DAADAA319A91}.Debug|Win32.Build.0 = Debug|Win32
+		{E451755D-66D6-4FFA-8804-DAADAA319A91}.Release|Win32.ActiveCfg = Release|Win32
+		{E451755D-66D6-4FFA-8804-DAADAA319A91}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
