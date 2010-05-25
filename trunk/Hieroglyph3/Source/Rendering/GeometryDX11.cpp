@@ -341,8 +341,6 @@ void GeometryDX11::LoadToBuffers()
 	BufferConfigDX11 vbuffer;
 	vbuffer.SetDefaultVertexBuffer( vertices_length, false );
 	m_VB = RendererDX11::Get()->CreateVertexBuffer( &vbuffer, &data );
-	// TODO: Make sure this can really be removed!
-	//RendererDX11::Get()->SetVertexBufferStride( m_VB->m_iResource, m_iVertexSize );
 
 	delete [] pBytes; 
 	// TODO: add error checking here!

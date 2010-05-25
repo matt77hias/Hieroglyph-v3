@@ -24,6 +24,7 @@ namespace Glyph3
 	{
 	public:
 		VectorParameterDX11();
+		VectorParameterDX11( VectorParameterDX11& copy );
 		virtual ~VectorParameterDX11();
 
 		virtual void SetParameterData( void* pData );

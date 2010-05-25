@@ -71,6 +71,10 @@ namespace Glyph3
 
 		int find( const T& element );
 
+		// Helper method for quickly checking if an index is within bounds.
+		
+		bool inrange( int index );
+
 		// Array style access
 	    T& operator[] (int i);
 		const T& operator[] (int i) const;

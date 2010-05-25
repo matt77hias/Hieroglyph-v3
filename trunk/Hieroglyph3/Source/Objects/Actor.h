@@ -28,9 +28,13 @@ namespace Glyph3
 		Node3D* GetNode();
 		Entity3D* GetBody();
 
+		void AddElement( Entity3D* pElement );
+
 	protected:
 		Node3D*					m_pRoot;
 		Entity3D*				m_pBody;
+
+		TArray<Entity3D*>		m_Elements;
 	};
 };
 //--------------------------------------------------------------------------------

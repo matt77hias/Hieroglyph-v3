@@ -35,6 +35,7 @@ namespace Glyph3
 		virtual void Update( float fTime ) = 0;
 
 		void SetEntity( Entity3D* pObject );
+		Entity3D* GetEntity( );
 
 	protected:
 		Entity3D* m_pEntity;

@@ -15,6 +15,7 @@
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
 #include <sstream>
+#include "ActorGenerator.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -70,6 +71,11 @@ ViewAmbientOcclusion::ViewAmbientOcclusion( RendererDX11& Renderer, ResourcePtr 
 		std::wstring( L"../Data/Shaders/SeparableBilateralCS.hlsl" ),
 		std::wstring( L"CS_Vertical" ),
 		std::wstring( L"cs_5_0" ) );
+
+	// Create the visualization actor and send in the occlusion buffer
+
+	pVisActor = ActorGenerator::GenerateVisualizationTexture2D( Renderer, 
+			DepthNormalBuffer, 0 );
 }
 //--------------------------------------------------------------------------------
 ViewAmbientOcclusion::~ViewAmbientOcclusion()
@@ -77,6 +83,8 @@ ViewAmbientOcclusion::~ViewAmbientOcclusion()
 	SAFE_DELETE( pOcclusionEffect );
 	SAFE_DELETE( pBilateralXEffect );
 	SAFE_DELETE( pBilateralYEffect );
+
+	SAFE_DELETE( pVisActor );
 }
 //--------------------------------------------------------------------------------
 void ViewAmbientOcclusion::Update( float fTime )
@@ -126,8 +134,8 @@ void ViewAmbientOcclusion::Draw( RendererDX11& Renderer )
 	// Perform the blurring operations next.
 	Renderer.Dispatch( *pBilateralXEffect, 1, ResolutionY, 1 );
 	Renderer.Dispatch( *pBilateralYEffect, ResolutionX, 1, 1 );
-	Renderer.Dispatch( *pBilateralXEffect, 1, ResolutionY, 1 );
-	Renderer.Dispatch( *pBilateralYEffect, ResolutionX, 1, 1 );
+	//Renderer.Dispatch( *pBilateralXEffect, 1, ResolutionY, 1 );
+	//Renderer.Dispatch( *pBilateralYEffect, ResolutionX, 1, 1 );
 
 	// Perform the final rendering pass now.  This will use the ViewAmbientOcclusion
 	// output parameters (i.e. a shader resource view with occlusion buffer in it), and 
@@ -136,6 +144,10 @@ void ViewAmbientOcclusion::Draw( RendererDX11& Renderer )
 	ViewPerspective::SetRenderParams( Renderer );
 
 	ViewPerspective::Draw( Renderer );
+
+	// Add the visualization rendering into the scene
+	pVisActor->GetNode()->Render( Renderer, VT_PERSPECTIVE );
+	
 }
 //--------------------------------------------------------------------------------
 void ViewAmbientOcclusion::SetRenderParams( RendererDX11& Renderer )

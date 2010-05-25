@@ -186,7 +186,7 @@ void App::Initialize()
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.2f, 0.2f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
-	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, D3DX_PI / 2.0f, 640.0f / 480.0f );
+	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>( D3DX_PI ) / 2.0f, 640.0f / 480.0f );
 
 	// Create the scene and add the entities to it.  Then add the camera to the
 	// scene so that it will be updated via the scene interface instead of 
@@ -271,8 +271,6 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pRenderView );
-
 	SAFE_DELETE( m_pEntity );
 	
 	SAFE_DELETE( m_pNode );

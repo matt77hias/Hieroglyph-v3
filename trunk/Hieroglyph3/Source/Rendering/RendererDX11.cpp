@@ -55,6 +55,7 @@
 
 #include "VectorParameterDX11.h"
 #include "MatrixParameterDX11.h"
+#include "MatrixArrayParameterDX11.h"
 #include "ShaderResourceParameterDX11.h"
 #include "UnorderedAccessParameterDX11.h"
 #include "ConstantBufferParameterDX11.h"
@@ -622,8 +623,9 @@ int RendererDX11::CreateShaderResourceView( int ResourceID, D3D11_SHADER_RESOURC
 	int ID = ResourceID & 0xFFFF;
 	ID3D11Resource* pResource = 0;
 
-	// TODO: Add bounds checking...
-	pResource = m_vResources[ID]->GetResource();
+	// Check if this ID is in range
+	if ( m_vResources.inrange( ID ) )
+		pResource = m_vResources[ID]->GetResource();
 
 	if ( pResource )
 	{
@@ -648,7 +650,9 @@ int RendererDX11::CreateRenderTargetView( int ResourceID, D3D11_RENDER_TARGET_VI
 	int ID = ResourceID & 0xFFFF;
 	ID3D11Resource* pResource = 0;
 
-	pResource = m_vResources[ID]->GetResource();
+	// Check if this ID is in range
+	if ( m_vResources.inrange( ID ) )
+		pResource = m_vResources[ID]->GetResource();
 
 	if ( pResource )
 	{
@@ -673,7 +677,9 @@ int RendererDX11::CreateDepthStencilView( int ResourceID, D3D11_DEPTH_STENCIL_VI
 	int ID = ResourceID & 0x0000FFFF;
 	ID3D11Resource* pResource = 0;
 
-	pResource = m_vResources[ID]->GetResource();
+	// Check if this ID is in range
+	if ( m_vResources.inrange( ID ) )
+		pResource = m_vResources[ID]->GetResource();
 
 	if ( pResource )
 	{
@@ -698,7 +704,9 @@ int RendererDX11::CreateUnorderedAccessView( int ResourceID, D3D11_UNORDERED_ACC
 	int ID = ResourceID & 0xFFFF;
 	ID3D11Resource* pResource = 0;
 
-	pResource = m_vResources[ID]->GetResource();
+	// Check if this ID is in range
+	if ( m_vResources.inrange( ID ) )
+		pResource = m_vResources[ID]->GetResource();
 
 	if ( pResource )
 	{
@@ -956,7 +964,7 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 
 	// Return the index for future referencing.
 
-	pShaderWrapper->PrintShaderDetails();
+	//pShaderWrapper->PrintShaderDetails();
 
 	return( m_vShaders.count() - 1 );
 
@@ -1247,6 +1255,119 @@ void RendererDX11::SetMatrixParameter( std::wstring name, Matrix4f* pMatrix )
 		Log::Get().Write( L"Matrix parameter name collision!" );
 }
 //--------------------------------------------------------------------------------
+void RendererDX11::SetMatrixArrayParameter( std::wstring name, int count, Matrix4f* pMatrix )
+{
+	RenderParameterDX11* pParameter = m_Parameters[name];
+
+	// Only create the new parameter if it hasn't already been registered
+	if ( pParameter == 0 )
+	{
+		pParameter = new MatrixArrayParameterDX11( count );
+		m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pParameter );
+	}
+	
+	if ( pParameter->GetParameterType() == MATRIX_ARRAY )
+		pParameter->SetParameterData( reinterpret_cast<void*>( pMatrix ) );
+	else
+		Log::Get().Write( L"Matrix Array parameter name collision!" );
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::SetParameter( RenderParameterDX11* pParameter )
+{
+	std::wstring name = pParameter->GetName();
+	RenderParameterDX11* pCurrent = m_Parameters[name];
+
+	if ( pParameter )
+	{
+		if ( pParameter->GetParameterType() == VECTOR )
+		{
+			// Only create the new parameter if it hasn't already been registered
+			if ( pCurrent == 0 )
+			{
+				pCurrent = new VectorParameterDX11();
+				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
+			}
+
+			*reinterpret_cast<VectorParameterDX11*>( pCurrent )
+				= *reinterpret_cast<VectorParameterDX11*>( pParameter );
+		}
+		if ( pParameter->GetParameterType() == MATRIX )
+		{
+			// Only create the new parameter if it hasn't already been registered
+			if ( pCurrent == 0 )
+			{
+				pCurrent = new MatrixParameterDX11();
+				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
+			}
+
+			*reinterpret_cast<MatrixParameterDX11*>( pCurrent )
+				= *reinterpret_cast<MatrixParameterDX11*>( pParameter );
+		}
+		if ( pParameter->GetParameterType() == MATRIX_ARRAY )
+		{
+			// Only create the new parameter if it hasn't already been registered
+			if ( pCurrent == 0 )
+			{
+				int count = reinterpret_cast<MatrixArrayParameterDX11*>( pParameter )->GetMatrixCount();
+				pCurrent = new MatrixArrayParameterDX11( count );
+				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
+			}
+
+			// This assignment performs a deep copy of the matrix array.
+			*reinterpret_cast<MatrixArrayParameterDX11*>( pCurrent )
+				= *reinterpret_cast<MatrixArrayParameterDX11*>( pParameter );
+		}
+		if ( pParameter->GetParameterType() == SHADER_RESOURCE )
+		{
+			// Only create the new parameter if it hasn't already been registered
+			if ( pCurrent == 0 )
+			{
+				pCurrent = new ShaderResourceParameterDX11();
+				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
+			}
+
+			*reinterpret_cast<ShaderResourceParameterDX11*>( pCurrent )
+				= *reinterpret_cast<ShaderResourceParameterDX11*>( pParameter );
+		}
+		if ( pParameter->GetParameterType() == UNORDERED_ACCESS )
+		{
+			// Only create the new parameter if it hasn't already been registered
+			if ( pCurrent == 0 )
+			{
+				pCurrent = new UnorderedAccessParameterDX11();
+				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
+			}
+
+			*reinterpret_cast<UnorderedAccessParameterDX11*>( pCurrent )
+				= *reinterpret_cast<UnorderedAccessParameterDX11*>( pParameter );
+		}
+		if ( pParameter->GetParameterType() == CBUFFER )
+		{
+			// Only create the new parameter if it hasn't already been registered
+			if ( pCurrent == 0 )
+			{
+				pCurrent = new ConstantBufferParameterDX11();
+				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
+			}
+
+			*reinterpret_cast<ConstantBufferParameterDX11*>( pCurrent )
+				= *reinterpret_cast<ConstantBufferParameterDX11*>( pParameter );
+		}
+		if ( pParameter->GetParameterType() == SAMPLER )
+		{
+			// Only create the new parameter if it hasn't already been registered
+			if ( pCurrent == 0 )
+			{
+				pCurrent = new SamplerParameterDX11();
+				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
+			}
+
+			*reinterpret_cast<SamplerParameterDX11*>( pCurrent )
+				= *reinterpret_cast<SamplerParameterDX11*>( pParameter );
+		}
+	}
+}
+//--------------------------------------------------------------------------------
 void RendererDX11::SetShaderResourceParameter( std::wstring name, ResourcePtr resource )
 {
 	RenderParameterDX11* pParameter = m_Parameters[name];
@@ -1323,27 +1444,60 @@ Vector4f RendererDX11::GetVectorParameter( std::wstring name )
 	RenderParameterDX11* pParam = m_Parameters[name];
 
 	if ( pParam != 0 )
+	{
 		if ( pParam->GetParameterType() == VECTOR ) 
 			result = reinterpret_cast<VectorParameterDX11*>( pParam )->GetVector();
+	}
+	else
+	{
+		pParam = new VectorParameterDX11();
+		m_Parameters[name] = pParam;
+	}
 
 	return( result );
 }
 //--------------------------------------------------------------------------------
 Matrix4f RendererDX11::GetMatrixParameter( std::wstring name )
 {
-	// TODO: If the parameter does not exist, create it and return the default value!
-	//       This should be done for all parameter types!
-
 	Matrix4f result;
 	result.MakeZero();
 
 	RenderParameterDX11* pParam = m_Parameters[name];
 
 	if ( pParam != 0 )
+	{
 		if ( pParam->GetParameterType() == MATRIX ) 
 			result = reinterpret_cast<MatrixParameterDX11*>( pParam )->GetMatrix();
+	}
+	else
+	{
+		pParam = new MatrixParameterDX11();
+		m_Parameters[name] = pParam;
+	}
 
 	return( result );
+}
+//--------------------------------------------------------------------------------
+Matrix4f* RendererDX11::GetMatrixArrayParameter( std::wstring name, int count )
+{
+	Matrix4f* pResult = 0;
+
+	RenderParameterDX11* pParam = m_Parameters[name];
+
+	if ( pParam != 0 )
+	{
+		if ( pParam->GetParameterType() == MATRIX_ARRAY ) 
+			if ( reinterpret_cast<MatrixArrayParameterDX11*>( pParam )->GetMatrixCount() == count )
+				pResult = reinterpret_cast<MatrixArrayParameterDX11*>( pParam )->GetMatrices();
+	}
+	else
+	{
+		pParam = new MatrixArrayParameterDX11( count );
+		m_Parameters[name] = pParam;
+		pResult = reinterpret_cast<MatrixArrayParameterDX11*>( pParam )->GetMatrices();
+	}
+
+	return( pResult );
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::GetShaderResourceParameter( std::wstring name )
@@ -1354,8 +1508,15 @@ int RendererDX11::GetShaderResourceParameter( std::wstring name )
 	RenderParameterDX11* pParam = m_Parameters[name];
 
 	if ( pParam != 0 )
+	{
 		if ( pParam->GetParameterType() == SHADER_RESOURCE ) 
 			result = reinterpret_cast<ShaderResourceParameterDX11*>( pParam )->GetIndex();
+	}
+	else
+	{
+		pParam = new ShaderResourceParameterDX11();
+		m_Parameters[name] = pParam;
+	}
 
 	return( result );
 }
@@ -1368,8 +1529,15 @@ int RendererDX11::GetUnorderedAccessParameter( std::wstring name )
 	RenderParameterDX11* pParam = m_Parameters[name];
 
 	if ( pParam != 0 )
+	{
 		if ( pParam->GetParameterType() == UNORDERED_ACCESS ) 
 			result = reinterpret_cast<UnorderedAccessParameterDX11*>( pParam )->GetIndex();
+	}
+	else
+	{
+		pParam = new UnorderedAccessParameterDX11();
+		m_Parameters[name] = pParam;
+	}
 
 	return( result );
 }
@@ -1382,8 +1550,15 @@ int RendererDX11::GetConstantBufferParameter( std::wstring name )
 	RenderParameterDX11* pParam = m_Parameters[name];
 
 	if ( pParam != 0 )
+	{
 		if ( pParam->GetParameterType() == CBUFFER ) 
 			result = reinterpret_cast<ConstantBufferParameterDX11*>( pParam )->GetIndex();
+	}
+	else
+	{
+		pParam = new ConstantBufferParameterDX11();
+		m_Parameters[name] = pParam;
+	}
 
 	return( result );
 }
@@ -1396,8 +1571,15 @@ int RendererDX11::GetSamplerStateParameter( std::wstring name )
 	RenderParameterDX11* pParam = m_Parameters[name];
 
 	if ( pParam != 0 )
+	{
 		if ( pParam->GetParameterType() == SAMPLER ) 
 			result = reinterpret_cast<SamplerParameterDX11*>( pParam )->GetIndex();
+	}
+	else
+	{
+		pParam = new SamplerParameterDX11();
+		m_Parameters[name] = pParam;
+	}
 
 	return( result );	
 }
@@ -1747,11 +1929,13 @@ void RendererDX11::BindIndexBuffer( ResourcePtr resource )
 	int TYPE	= index & 0x00FF0000;
 	int ID		= index & 0x0000FFFF;
 
-	// TODO: do the in bounds check before indexing the resource!
-	ID3D11Buffer* Buffers = (ID3D11Buffer*)m_vResources[ID]->GetResource();
-
-	if ( ( ID >= 0 ) && ( ID < m_vResources.count() ) )
+	// If the resource is in range, then attempt to set it
+	if ( m_vResources.inrange( ID ) )
+	{
+		ID3D11Buffer* Buffers = 0;
+		Buffers = (ID3D11Buffer*)m_vResources[ID]->GetResource();
 		m_pContext->IASetIndexBuffer( Buffers, DXGI_FORMAT_R32_UINT, 0 );
+	}
 	else
 		Log::Get().Write( L"Tried to bind an invalid index buffer ID!" );
 }
@@ -2655,8 +2839,8 @@ Vector2f RendererDX11::GetDesktopResolution()
 	pDXGIDevice->Release();
 
 	// Return the current output's resolution from the description.
-	return( Vector2f( desc.DesktopCoordinates.right - desc.DesktopCoordinates.left,
-						desc.DesktopCoordinates.bottom - desc.DesktopCoordinates.top ) );
+	return( Vector2f( static_cast<float>( desc.DesktopCoordinates.right - desc.DesktopCoordinates.left ),
+						static_cast<float>( desc.DesktopCoordinates.bottom - desc.DesktopCoordinates.top ) ) );
 }
 //--------------------------------------------------------------------------------
 void RendererDX11::CopySubresourceRegion( ResourcePtr DestResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ,

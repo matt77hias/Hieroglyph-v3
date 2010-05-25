@@ -18,6 +18,11 @@ ConstantBufferParameterDX11::ConstantBufferParameterDX11()
 	m_iCBuffer = -1;
 }
 //--------------------------------------------------------------------------------
+ConstantBufferParameterDX11::ConstantBufferParameterDX11( ConstantBufferParameterDX11& copy )
+{
+	m_iCBuffer = copy.m_iCBuffer;
+}
+//--------------------------------------------------------------------------------
 ConstantBufferParameterDX11::~ConstantBufferParameterDX11()
 {
 }

@@ -24,6 +24,7 @@ namespace Glyph3
 	{
 	public:
 		MatrixParameterDX11();
+		MatrixParameterDX11( MatrixParameterDX11& copy );
 		virtual ~MatrixParameterDX11();
 
 		virtual void SetParameterData( void* pData );

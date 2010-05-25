@@ -18,6 +18,11 @@ SamplerParameterDX11::SamplerParameterDX11()
 	m_iSampler = -1;
 }
 //--------------------------------------------------------------------------------
+SamplerParameterDX11::SamplerParameterDX11( SamplerParameterDX11& copy )
+{
+	m_iSampler = copy.m_iSampler;
+}
+//--------------------------------------------------------------------------------
 SamplerParameterDX11::~SamplerParameterDX11()
 {
 }

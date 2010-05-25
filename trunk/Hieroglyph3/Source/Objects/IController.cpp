@@ -27,3 +27,8 @@ void IController::SetEntity( Entity3D* pEntity )
 	m_pEntity = pEntity;
 }
 //--------------------------------------------------------------------------------
+Entity3D* IController::GetEntity()
+{
+	return( m_pEntity );
+}
+//--------------------------------------------------------------------------------

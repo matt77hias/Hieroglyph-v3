@@ -23,6 +23,7 @@ namespace Glyph3
 	{
 	public:
 		UnorderedAccessParameterDX11();
+		UnorderedAccessParameterDX11( UnorderedAccessParameterDX11& copy );
 		virtual ~UnorderedAccessParameterDX11();
 
 		virtual void SetParameterData( void* pData );

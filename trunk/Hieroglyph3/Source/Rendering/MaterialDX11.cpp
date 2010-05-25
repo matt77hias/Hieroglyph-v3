@@ -45,6 +45,10 @@ MaterialDX11::~MaterialDX11()
 	for ( int i = 0; i < VT_NUM_VIEW_TYPES; i++ )
 		SAFE_DELETE( Params[i].pEffect );
 
+	// Delete the parameters that have been added to this material.
+
+	for ( int i = 0; i < m_RenderParameters.count(); i++ )
+		SAFE_DELETE( m_RenderParameters[i] );
 }
 //--------------------------------------------------------------------------------
 void MaterialDX11::PreRender( RendererDX11& Renderer, VIEWTYPE type )
@@ -55,6 +59,13 @@ void MaterialDX11::PreRender( RendererDX11& Renderer, VIEWTYPE type )
 
 	for ( int i = 0; i < Params[type].vViews.count(); i++ )
 		Params[type].vViews[i]->Draw( Renderer );
+}
+//--------------------------------------------------------------------------------
+void MaterialDX11::AddRenderParameter( RenderParameterDX11* pParameter )
+{
+	// Add the parameter to the list
+	if ( pParameter )
+		m_RenderParameters.add( pParameter );
 }
 //--------------------------------------------------------------------------------
 void MaterialDX11::SetRenderParams( RendererDX11& Renderer, VIEWTYPE type )
@@ -72,17 +83,10 @@ void MaterialDX11::SetRenderParams( RendererDX11& Renderer, VIEWTYPE type )
 	for ( int i = 0; i < Params[type].vViews.count(); i++ )
 		Params[type].vViews[i]->SetUsageParams( Renderer );
 
-	// TODO:
-	// More parameters can be added here - these are only for testing purposes...
-	//Renderer.SetVectorParameter( std::string("ObjectParm00"), &vParameters[0] );
-	//Renderer.SetVectorParameter( std::string("ObjectParm01"), &vParameters[1] );
-	//Renderer.SetVectorParameter( std::string("ObjectParm02"), &vParameters[2] );
-	//Renderer.SetVectorParameter( std::string("ObjectParm03"), &vParameters[3] );
+	// Set the additional render parameters that have been added to the material.
 
-	//Renderer.SetTextureParameter( std::string("ObjectTex00"), Params[type].iTextures[0] );
-	//Renderer.SetTextureParameter( std::string("ObjectTex01"), Params[type].iTextures[1] );
-	//Renderer.SetTextureParameter( std::string("ObjectTex02"), Params[type].iTextures[2] );
-	//Renderer.SetTextureParameter( std::string("ObjectTex03"), Params[type].iTextures[3] );
+	for ( int i = 0; i < m_RenderParameters.count(); i++ )
+		Renderer.SetParameter( m_RenderParameters[i] );
 }
 //--------------------------------------------------------------------------------
 void MaterialDX11::SetEntity( Entity3D* pEntity )

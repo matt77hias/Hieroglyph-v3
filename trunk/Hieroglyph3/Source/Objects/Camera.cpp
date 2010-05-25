@@ -23,12 +23,15 @@ Camera::Camera()
 	m_fNear = 0.1f;
 	m_fFar = 100.0f;
 	m_fAspect = 1280.0f / 800.0f;
-	m_fFov = D3DX_PI/4;
+	m_fFov = static_cast<float>( D3DX_PI ) / 4.0f;
 }
 //--------------------------------------------------------------------------------
 Camera::~Camera()
 {
-	// TODO: should the camera delete a renderview that has been added to it???
+	// If a render view has been added to the camera, then delete it when the 
+	// camera is released.
+
+	SAFE_DELETE( m_pCameraView );
 }
 //--------------------------------------------------------------------------------
 void Camera::RenderFrame( RendererDX11& Renderer )

@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects"
+				AdditionalIncludeDirectories="Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -76,7 +76,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy Application\*.h ..\SDK\Include&#x0D;&#x0A;copy Events\*.h ..\SDK\Include&#x0D;&#x0A;copy Mathematics\*.h ..\SDK\Include&#x0D;&#x0A;copy Scripting\*.h ..\SDK\Include&#x0D;&#x0A;copy Scripting\Library\*libd.lib ..\SDK\Library\Debug&#x0D;&#x0A;copy Scripting\Library\*libd.pdb ..\SDK\Library\Debug&#x0D;&#x0A;copy Utility\*.h ..\SDK\Include&#x0D;&#x0A;copy Utility\*.inl ..\SDK\Include&#x0D;&#x0A;copy Rendering\*.h ..\SDK\Include&#x0D;&#x0A;copy Geometry\*.h ..\SDK\Include&#x0D;&#x0A;copy Intersection\*.h ..\SDK\Include&#x0D;&#x0A;copy Objects\*.h ..\SDK\Include&#x0D;&#x0A;"
+				CommandLine="copy Application\*.h ..\SDK\Include&#x0D;&#x0A;copy Events\*.h ..\SDK\Include&#x0D;&#x0A;copy Mathematics\*.h ..\SDK\Include&#x0D;&#x0A;copy Scripting\*.h ..\SDK\Include&#x0D;&#x0A;copy Scripting\Library\*libd.lib ..\SDK\Library\Debug&#x0D;&#x0A;copy Scripting\Library\*libd.pdb ..\SDK\Library\Debug&#x0D;&#x0A;copy Utility\*.h ..\SDK\Include&#x0D;&#x0A;copy Utility\*.inl ..\SDK\Include&#x0D;&#x0A;copy Rendering\*.h ..\SDK\Include&#x0D;&#x0A;copy Geometry\*.h ..\SDK\Include&#x0D;&#x0A;copy Intersection\*.h ..\SDK\Include&#x0D;&#x0A;copy Objects\*.h ..\SDK\Include&#x0D;&#x0A;copy Animation\*.h ..\SDK\Include&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -106,7 +106,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects"
+				AdditionalIncludeDirectories="Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -140,7 +140,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy Application\*.h ..\SDK\Include&#x0D;&#x0A;copy Events\*.h ..\SDK\Include&#x0D;&#x0A;copy Mathematics\*.h ..\SDK\Include&#x0D;&#x0A;copy Scripting\*.h ..\SDK\Include&#x0D;&#x0A;copy Scripting\Library\*lib.lib ..\SDK\Library\Release&#x0D;&#x0A;copy Scripting\Library\*lib.pdb ..\SDK\Library\Release&#x0D;&#x0A;copy Utility\*.h ..\SDK\Include&#x0D;&#x0A;copy Utility\*.inl ..\SDK\Include&#x0D;&#x0A;copy Rendering\*.h ..\SDK\Include&#x0D;&#x0A;copy Geometry\*.h ..\SDK\Include&#x0D;&#x0A;copy Intersection\*.h ..\SDK\Include&#x0D;&#x0A;copy Objects\*.h ..\SDK\Include&#x0D;&#x0A;"
+				CommandLine="copy Application\*.h ..\SDK\Include&#x0D;&#x0A;copy Events\*.h ..\SDK\Include&#x0D;&#x0A;copy Mathematics\*.h ..\SDK\Include&#x0D;&#x0A;copy Scripting\*.h ..\SDK\Include&#x0D;&#x0A;copy Scripting\Library\*lib.lib ..\SDK\Library\Release&#x0D;&#x0A;copy Scripting\Library\*lib.pdb ..\SDK\Library\Release&#x0D;&#x0A;copy Utility\*.h ..\SDK\Include&#x0D;&#x0A;copy Utility\*.inl ..\SDK\Include&#x0D;&#x0A;copy Rendering\*.h ..\SDK\Include&#x0D;&#x0A;copy Geometry\*.h ..\SDK\Include&#x0D;&#x0A;copy Intersection\*.h ..\SDK\Include&#x0D;&#x0A;copy Objects\*.h ..\SDK\Include&#x0D;&#x0A;copy Animation\*.h ..\SDK\Include&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -464,6 +464,18 @@
 		<Filter
 			Name="Scripting"
 			>
+			<File
+				RelativePath=".\Scripting\IScriptInterface.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Scripting\ScriptIntfEntity3D.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Scripting\ScriptIntfEntity3D.h"
+				>
+			</File>
 			<File
 				RelativePath=".\Scripting\ScriptManager.cpp"
 				>
@@ -908,6 +920,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Rendering\MatrixArrayParameterDX11.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Rendering\MatrixArrayParameterDX11.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Rendering\MatrixParameterDX11.cpp"
 					>
 				</File>
@@ -1254,6 +1274,14 @@
 						RelativePath=".\Objects\IController.h"
 						>
 					</File>
+					<File
+						RelativePath=".\Objects\SkinnedBoneController.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Objects\SkinnedBoneController.h"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -1291,7 +1319,39 @@
 					RelativePath=".\Objects\Scene.h"
 					>
 				</File>
+				<File
+					RelativePath=".\Objects\SkinnedActor.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Objects\SkinnedActor.h"
+					>
+				</File>
 			</Filter>
+			<Filter
+				Name="Visualization Objects"
+				>
+				<File
+					RelativePath=".\Objects\ActorGenerator.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Objects\ActorGenerator.h"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Animation"
+			>
+			<File
+				RelativePath=".\Animation\AnimationStream.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Animation\AnimationStream.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

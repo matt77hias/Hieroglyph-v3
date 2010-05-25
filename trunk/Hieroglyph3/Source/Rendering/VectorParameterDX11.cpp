@@ -18,6 +18,11 @@ VectorParameterDX11::VectorParameterDX11()
 	m_Vector.MakeZero();
 }
 //--------------------------------------------------------------------------------
+VectorParameterDX11::VectorParameterDX11( VectorParameterDX11& copy )
+{
+	m_Vector = copy.m_Vector;
+}
+//--------------------------------------------------------------------------------
 VectorParameterDX11::~VectorParameterDX11()
 {
 }

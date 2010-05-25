@@ -9,39 +9,42 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
+// SkinnedActor
+//
+//--------------------------------------------------------------------------------
+#ifndef SkinnedActor_h
+#define SkinnedActor_h
+//--------------------------------------------------------------------------------
 #include "Actor.h"
+#include "SkinnedBoneController.h"
+#include "AnimationStream.h"
 //--------------------------------------------------------------------------------
-using namespace Glyph3;
-//--------------------------------------------------------------------------------
-Actor::Actor()
+namespace Glyph3
 {
-	m_pRoot = new Node3D();
-	m_pBody = new Entity3D();
-	m_pRoot->AttachChild( m_pBody );
+	class MatrixArrayParameterDX11;
 
-	// Add the root and body to the element list for cleanup later on.
-	AddElement( m_pRoot );
-	AddElement( m_pBody );
-}
+	class SkinnedActor : public Actor
+	{
+	public:
+		SkinnedActor();
+		virtual ~SkinnedActor();
+
+		void AddBoneNode( Node3D* pBone, 
+						Vector3f BindPosition,
+						Vector3f BindRotation,
+						AnimationStream<Vector3f>* pPositions = 0,
+						AnimationStream<Vector3f>* pRotations = 0 ); 
+		void SetBindPose( );
+		void SetSkinningMatrices( RendererDX11& Renderer );
+		void PlayAnimation( int index );
+		void PlayAnimation( std::wstring& name );
+		void PlayAllAnimations( );
+
+	protected:
+		TArray<SkinnedBoneController*>	m_Bones;
+		MatrixArrayParameterDX11*		m_pMatrixParameter;
+		Matrix4f*						m_pMatrices;
+	};
+};
 //--------------------------------------------------------------------------------
-Actor::~Actor()
-{
-	for ( int i = 0; i < m_Elements.count(); i++ )
-		SAFE_DELETE( m_Elements[i] );
-}
-//--------------------------------------------------------------------------------
-Node3D* Actor::GetNode()
-{
-	return( m_pRoot );
-}
-//--------------------------------------------------------------------------------
-Entity3D* Actor::GetBody()
-{
-	return( m_pBody );
-}
-//--------------------------------------------------------------------------------
-void Actor::AddElement( Entity3D* pElement )
-{
-	m_Elements.add( pElement );
-}
-//--------------------------------------------------------------------------------
+#endif // SkinnedActor_h

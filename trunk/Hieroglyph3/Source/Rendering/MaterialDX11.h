@@ -15,6 +15,7 @@
 #include "RendererDX11.h"
 #include "IRenderView.h"
 #include "RenderEffectDX11.h"
+#include "RenderParameterDX11.h"
 #include "ISharedObject.h"
 //--------------------------------------------------------------------------------
 #ifndef MaterialDX11_h
@@ -41,9 +42,12 @@ namespace Glyph3
 		void SetRenderParams( RendererDX11& Renderer, VIEWTYPE type );
 		void SetEntity( Entity3D* pEntity );
 
+		void AddRenderParameter( RenderParameterDX11* pParameter );
+
 	public:
 		MaterialParams			Params[VT_NUM_VIEW_TYPES];
 		Entity3D*				m_pEntity;
+		TArray< RenderParameterDX11* > m_RenderParameters;
 	};
 };
 //--------------------------------------------------------------------------------

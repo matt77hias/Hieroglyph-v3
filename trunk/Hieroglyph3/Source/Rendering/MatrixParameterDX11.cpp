@@ -18,6 +18,11 @@ MatrixParameterDX11::MatrixParameterDX11()
 	m_Matrix.MakeIdentity();
 }
 //--------------------------------------------------------------------------------
+MatrixParameterDX11::MatrixParameterDX11( MatrixParameterDX11& copy )
+{
+	m_Matrix = copy.m_Matrix;
+}
+//--------------------------------------------------------------------------------
 MatrixParameterDX11::~MatrixParameterDX11()
 {
 }

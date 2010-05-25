@@ -20,8 +20,6 @@
 #include "MaterialGeneratorDX11.h"
 #include "RasterizerStateConfigDX11.h"
 
-#include "ViewSimulation.h"
-
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
@@ -168,7 +166,6 @@ void App::Initialize()
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
 	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
-	pMaterial->Params[VT_PERSPECTIVE].vViews.add( new ViewSimulation( *m_pRenderer11, DispatchSizeX, DispatchSizeZ ) );
 
 	// Set any parameters that will be needed by the shaders used above.
 	Vector4f DispatchSize = Vector4f( (float)DispatchSizeX, (float)DispatchSizeZ, (float)DispatchSizeX * 16, (float)DispatchSizeZ * 16 );
@@ -186,7 +183,7 @@ void App::Initialize()
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.2f, 0.2f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
-	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, D3DX_PI / 2.0f, 640.0f / 480.0f );
+	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>( D3DX_PI ) / 2.0f, 640.0f / 480.0f );
 
 	// Create the scene and add the entities to it.  Then add the camera to the
 	// scene so that it will be updated via the scene interface instead of 

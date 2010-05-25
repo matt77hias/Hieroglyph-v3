@@ -17,7 +17,22 @@ RenderParameterDX11::RenderParameterDX11()
 {
 }
 //--------------------------------------------------------------------------------
+RenderParameterDX11::RenderParameterDX11( RenderParameterDX11& copy )
+{
+	m_sParameterName = copy.m_sParameterName;
+}
+//--------------------------------------------------------------------------------
 RenderParameterDX11::~RenderParameterDX11()
 {
+}
+//--------------------------------------------------------------------------------
+std::wstring& RenderParameterDX11::GetName()
+{
+	return( m_sParameterName );
+}
+//--------------------------------------------------------------------------------
+void RenderParameterDX11::SetName( std::wstring& name )
+{
+	m_sParameterName = name;
 }
 //--------------------------------------------------------------------------------

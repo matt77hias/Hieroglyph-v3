@@ -211,7 +211,8 @@ namespace Glyph3
 		void SetShaderResourceParameter( std::wstring name, ResourcePtr resource );
 		void SetUnorderedAccessParameter( std::wstring name, ResourcePtr resource );
 		void SetConstantBufferParameter( std::wstring name, ResourcePtr resource );
-		
+		void SetMatrixArrayParameter( std::wstring name, int count, Matrix4f* pMatrices );
+		void SetParameter( RenderParameterDX11* pParameter );
 
 		// Each of the parameter types can also be accessed to inspect their current
 		// value prior to setting them.
@@ -222,6 +223,8 @@ namespace Glyph3
 		int GetUnorderedAccessParameter( std::wstring name );
 		int GetConstantBufferParameter( std::wstring name );
 		int GetSamplerStateParameter( std::wstring name );
+		Matrix4f* GetMatrixArrayParameter( std::wstring name, int count );
+
 
 		// The following matrix parameters are set with specialized functions to allow
 		// the renderer to calculate the concatenated matrices.

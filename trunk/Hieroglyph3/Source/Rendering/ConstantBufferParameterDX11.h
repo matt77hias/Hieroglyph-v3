@@ -24,6 +24,7 @@ namespace Glyph3
 	{
 	public:
 		ConstantBufferParameterDX11();
+		ConstantBufferParameterDX11( ConstantBufferParameterDX11& copy );
 		virtual ~ConstantBufferParameterDX11();
 
 		virtual void SetParameterData( void* pData );

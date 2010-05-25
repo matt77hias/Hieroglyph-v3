@@ -9,32 +9,28 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// ShaderResourceParameterDX11
+// ActorGenerator
 //
 //--------------------------------------------------------------------------------
-#include "RenderParameterDX11.h"
-#include "Vector4f.h"
+#ifndef ActorGenerator_h
+#define ActorGenerator_h
 //--------------------------------------------------------------------------------
-#ifndef ShaderResourceParameterDX11_h
-#define ShaderResourceParameterDX11_h
+#include "Actor.h"
+#include "MaterialDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class ShaderResourceParameterDX11 : public RenderParameterDX11
+	class ActorGenerator
 	{
 	public:
-		ShaderResourceParameterDX11();
-		ShaderResourceParameterDX11( ShaderResourceParameterDX11& copy );
-		virtual ~ShaderResourceParameterDX11();
+		static Actor* GenerateVisualizationTexture2D( RendererDX11& Renderer, 
+			ResourcePtr resource, MaterialDX11* pMaterial );
 
-		virtual void SetParameterData( void* pData );
-		virtual ParameterType GetParameterType();
-		int GetIndex();
-	protected:
-		int		m_iShaderResourceView;
+	private:
+		ActorGenerator();
+		
 	};
 };
-//--------------------------------------------------------------------------------
-#endif // ShaderResourceParameterDX11_h
-//--------------------------------------------------------------------------------
+#endif // ActorGenerator_h
+
 

@@ -35,6 +35,8 @@ namespace Glyph3
 	public:
 		static void GenerateFullScreenQuad( GeometryDX11* pGeometry );
 		static void GenerateTexturedPlane( GeometryDX11* pGeometry, int SizeX, int SizeY );
+		static void GenerateSkinnedBiped( GeometryDX11* pGeometry );
+		static void GenerateAxisGeometry( GeometryDX11* pGeometry );
 
 	private:
 		GeometryGeneratorDX11();

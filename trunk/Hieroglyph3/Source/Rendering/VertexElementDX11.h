@@ -49,6 +49,8 @@ namespace Glyph3
 		Vector3f*		Get3f( int i );
 		Vector4f*		Get4f( int i );
 
+		int*			Get1i( int i );
+
 		float*					operator[]( int i );
 		const float*			operator[]( int i ) const;
 

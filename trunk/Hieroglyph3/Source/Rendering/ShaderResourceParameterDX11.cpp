@@ -18,6 +18,11 @@ ShaderResourceParameterDX11::ShaderResourceParameterDX11()
 	m_iShaderResourceView = -1;
 }
 //--------------------------------------------------------------------------------
+ShaderResourceParameterDX11::ShaderResourceParameterDX11( ShaderResourceParameterDX11& copy )
+{
+	m_iShaderResourceView = copy.m_iShaderResourceView;
+}
+//--------------------------------------------------------------------------------
 ShaderResourceParameterDX11::~ShaderResourceParameterDX11()
 {
 }

@@ -9,39 +9,36 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-#include "Actor.h"
+// MatrixArrayParameterDX11
+//
 //--------------------------------------------------------------------------------
-using namespace Glyph3;
+#include "RenderParameterDX11.h"
+#include "Matrix4f.h"
 //--------------------------------------------------------------------------------
-Actor::Actor()
+#ifndef MatrixArrayParameterDX11_h
+#define MatrixArrayParameterDX11_h
+//--------------------------------------------------------------------------------
+namespace Glyph3
 {
-	m_pRoot = new Node3D();
-	m_pBody = new Entity3D();
-	m_pRoot->AttachChild( m_pBody );
+	class MatrixArrayParameterDX11 : public RenderParameterDX11
+	{
+	public:
+		MatrixArrayParameterDX11( int count );
+		MatrixArrayParameterDX11( MatrixArrayParameterDX11& copy );
+		MatrixArrayParameterDX11& operator=( MatrixArrayParameterDX11& parameter );
+		virtual ~MatrixArrayParameterDX11();
 
-	// Add the root and body to the element list for cleanup later on.
-	AddElement( m_pRoot );
-	AddElement( m_pBody );
-}
+		virtual void SetParameterData( void* pData );
+		virtual ParameterType GetParameterType();
+		int GetMatrixCount();
+		Matrix4f* GetMatrices();
+
+	protected:
+		int				m_iMatrixCount;
+		Matrix4f*		m_pMatrices;
+	};
+};
 //--------------------------------------------------------------------------------
-Actor::~Actor()
-{
-	for ( int i = 0; i < m_Elements.count(); i++ )
-		SAFE_DELETE( m_Elements[i] );
-}
+#endif // MatrixArrayParameterDX11_h
 //--------------------------------------------------------------------------------
-Node3D* Actor::GetNode()
-{
-	return( m_pRoot );
-}
-//--------------------------------------------------------------------------------
-Entity3D* Actor::GetBody()
-{
-	return( m_pBody );
-}
-//--------------------------------------------------------------------------------
-void Actor::AddElement( Entity3D* pElement )
-{
-	m_Elements.add( pElement );
-}
-//--------------------------------------------------------------------------------
+

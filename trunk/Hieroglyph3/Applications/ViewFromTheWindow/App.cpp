@@ -58,7 +58,7 @@ bool App::ConfigureEngineComponents()
 	m_DesktopRes = m_pRenderer11->GetDesktopResolution();
 
 	Texture2dConfigDX11 TexConfig;
-	TexConfig.SetColorBuffer( m_DesktopRes.x, m_DesktopRes.y );
+	TexConfig.SetColorBuffer( static_cast<unsigned int>( m_DesktopRes.x ), static_cast<unsigned int>( m_DesktopRes.y ) );
 	TexConfig.SetBindFlags( D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE );
 	TexConfig.SetFormat( DXGI_FORMAT_R8G8B8A8_UNORM );
 	m_OffscreenTexture = m_pRenderer11->CreateTexture2D( &TexConfig, 0 );
@@ -68,7 +68,7 @@ bool App::ConfigureEngineComponents()
 	// pipeline.
 
 	Texture2dConfigDX11 DepthConfig;
-	DepthConfig.SetDepthBuffer( m_DesktopRes.x, m_DesktopRes.y );
+	DepthConfig.SetDepthBuffer( static_cast<unsigned int>( m_DesktopRes.x ), static_cast<unsigned int>( m_DesktopRes.y ) );
 	m_DepthTarget = m_pRenderer11->CreateTexture2D( &DepthConfig, 0 );
 
 
@@ -85,10 +85,10 @@ bool App::ConfigureEngineComponents()
 
 		// Generate random locations and sizes of the window, constrained 
 		// to the desktop.
-		int x = (double)rand() / RAND_MAX * 800 + 200;
-		int y = (double)rand() / RAND_MAX * 400 + 0;
-		int w = (double)rand() / RAND_MAX * ( m_DesktopRes.x - x ) * 0.5f;	// Limit the right hand side to within the screen
-		int h = (double)rand() / RAND_MAX * ( m_DesktopRes.y - y ) * 0.5f;	// Limit the bottom side to within the screen
+		int x = static_cast<int>( (double)rand() / RAND_MAX * 800 + 200 );
+		int y = static_cast<int>( (double)rand() / RAND_MAX * 400 + 0 );
+		int w = static_cast<int>( (double)rand() / RAND_MAX * ( m_DesktopRes.x - x ) * 0.5f );	// Limit the right hand side to within the screen
+		int h = static_cast<int>( (double)rand() / RAND_MAX * ( m_DesktopRes.y - y ) * 0.5f );	// Limit the bottom side to within the screen
 
 		// Configure the window and initialize it.
 		m_pWindow[i]->SetPosition( x, y );
@@ -189,7 +189,7 @@ void App::Initialize()
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_OffscreenTexture, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
-	m_pCamera->SetProjectionParams( 0.1f, 100.0f, D3DX_PI / 2.0f, m_DesktopRes.x / m_DesktopRes.y );
+	m_pCamera->SetProjectionParams( 0.1f, 100.0f, static_cast<float>( D3DX_PI ) / 2.0f, m_DesktopRes.x / m_DesktopRes.y );
 
 	// Create the scene and add the entities to it.  Then add the camera to the
 	// scene so that it will be updated via the scene interface instead of 
@@ -251,9 +251,9 @@ void App::Update()
 		box.back = 1;
 
 		if ( box.left < 0 ) box.left = 0;
-		if ( box.right > (int)m_DesktopRes.x - 1 ) box.right = (int)m_DesktopRes.x - 1;
+		if ( box.right > (unsigned int)m_DesktopRes.x - 1 ) box.right = (unsigned int)m_DesktopRes.x - 1;
 		if ( box.top < 0 ) box.top = 0;
-		if ( box.bottom > (int)m_DesktopRes.y - 1 ) box.bottom = (int)m_DesktopRes.y - 1;
+		if ( box.bottom > (unsigned int)m_DesktopRes.y - 1 ) box.bottom = (unsigned int)m_DesktopRes.y - 1;
 
 		m_pRenderer11->CopySubresourceRegion( m_RenderTarget[i], 0, 0, 0, 0, m_OffscreenTexture, 0, &box );
 		m_pRenderer11->Present( m_pWindow[i]->GetHandle(), m_pWindow[i]->GetSwapChain() );
@@ -273,8 +273,6 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pRenderView );
-
 	SAFE_DELETE( m_pEntity );
 	
 	SAFE_DELETE( m_pNode );

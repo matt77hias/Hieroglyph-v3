@@ -23,6 +23,7 @@ namespace Glyph3
 	{
 		VECTOR,
 		MATRIX,
+		MATRIX_ARRAY,
 		SHADER_RESOURCE,
 		UNORDERED_ACCESS,
 		CBUFFER,
@@ -33,10 +34,14 @@ namespace Glyph3
 	{
 	public:
 		RenderParameterDX11();
+		RenderParameterDX11( RenderParameterDX11& copy );
 		virtual ~RenderParameterDX11();
 
 		virtual void SetParameterData( void* pData ) = 0;
 		virtual ParameterType GetParameterType() = 0;
+
+		void SetName( std::wstring& name );
+		std::wstring& GetName();
 
 	protected:
 		std::wstring	m_sParameterName;

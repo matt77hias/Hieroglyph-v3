@@ -273,14 +273,12 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"WaterSimulation_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"AmbientOcclusion_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pRenderView );
-
 	SAFE_DELETE( m_pEntity );
 	
 	SAFE_DELETE( m_pNode );

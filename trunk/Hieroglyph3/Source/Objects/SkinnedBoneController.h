@@ -9,47 +9,47 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// ViewAmbientOcclusion
+// SkinnedBoneController
 //
 //--------------------------------------------------------------------------------
-#ifndef ViewAmbientOcclusion_h
-#define ViewAmbientOcclusion_h
+#ifndef SkinnedBoneController_h
+#define SkinnedBoneController_h
 //--------------------------------------------------------------------------------
-#include "ViewPerspective.h"
-#include "Actor.h"
+#include "IController.h"
+#include "AnimationStream.h"
+#include "Matrix4f.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class Entity3D;
-
-	class ViewAmbientOcclusion : public ViewPerspective
+	class SkinnedBoneController : public IController
 	{
 	public:
-		ViewAmbientOcclusion( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget );
-
+		SkinnedBoneController( );
+		virtual ~SkinnedBoneController( );
 		virtual void Update( float fTime );
-		virtual void Draw( RendererDX11& Renderer );
 
-		virtual void SetRenderParams( RendererDX11& Renderer );
-		virtual void SetUsageParams( RendererDX11& Renderer );
+		void SetBindPose();
+		Matrix4f GetTransform();
 
+		void SetPositionStream( AnimationStream<Vector3f>* pStream );
+		void SetRotationStream( AnimationStream<Vector3f>* pStream );
+		AnimationStream<Vector3f>* GetPositionStream( );
+		AnimationStream<Vector3f>* GetRotationStream( );
 
-		virtual ~ViewAmbientOcclusion();
+		void SetBindPosition( Vector3f position );
+		void SetBindRotation( Vector3f rotation );
+		Vector3f GetBindPosition( );
+		Vector3f GetBindRotation( );
 
+		
 	protected:
-		int ResolutionX;
-		int ResolutionY;
-
-		ResourcePtr DepthNormalBuffer;
-		ResourcePtr OcclusionBuffer;
-		ResourcePtr BilateralBuffer;
-
-		RenderEffectDX11*	pOcclusionEffect;
-		RenderEffectDX11*	pBilateralXEffect;
-		RenderEffectDX11*	pBilateralYEffect;
-
-		Actor*				pVisActor;
+		Matrix4f m_InvBindPose;
+		AnimationStream<Vector3f>*	m_pPositionStream;
+		AnimationStream<Vector3f>*	m_pRotationStream;
+		Vector3f					m_kBindPosition;
+		Vector3f					m_kBindRotation;
+		bool						m_bActivate;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // ViewAmbientOcclusion_h
+#endif // SkinnedBoneController_h

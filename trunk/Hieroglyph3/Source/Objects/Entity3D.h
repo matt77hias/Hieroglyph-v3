@@ -22,7 +22,6 @@
 #include "Matrix4f.h"
 #include "Ray3f.h"
 #include "Frustum3f.h"
-//#include "Timer.h"
 #include "RendererDX11.h"
 #include "PickRecord.h"
 #include "MaterialDX11.h"
@@ -30,6 +29,7 @@
 #include "TArray.h"
 #include "CompositeShape.h"
 #include "EntityRenderParams.h"
+
 #include <string>
 #include <vector>
 //--------------------------------------------------------------------------------
@@ -60,6 +60,9 @@ namespace Glyph3
 		MaterialDX11* GetMaterial( );
 
 		void SetGeometry( GeometryDX11* pGeometry );
+
+		void AddRenderParameter( RenderParameterDX11* pParameter );
+		void SetRenderParams( RendererDX11& Renderer );
 
 		// Various entity properties are accessed here.
 
@@ -130,6 +133,7 @@ namespace Glyph3
 		Entity3D* m_pParent;
 		int m_iEntityID;
 		TArray< IController* > m_Controllers;
+		TArray< RenderParameterDX11* > m_RenderParameters;
 
 	public:
 		EntityRenderParams m_sParams;

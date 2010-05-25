@@ -10,6 +10,8 @@
 #include "MaterialDX11.h"
 #include "Camera.h"
 #include "Scene.h"
+#include "SkinnedActor.h"
+#include "AnimationStream.h"
 
 using namespace Glyph3;
 
@@ -40,10 +42,12 @@ protected:
 
 	ViewPerspective*		m_pRenderView;
 	Node3D*					m_pNode;
-	Entity3D*				m_pEntity;
+	SkinnedActor*			m_pActor;
 	
 	Camera*					m_pCamera;
 	Scene*					m_pScene;
+
+	AnimationStream<Vector3f>*	m_pAnimationStream;
 
 	bool					m_bSaveScreenshot;
 };

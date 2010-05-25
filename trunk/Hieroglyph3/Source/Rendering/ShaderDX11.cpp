@@ -67,7 +67,10 @@ void ShaderDX11::UpdateParameters( RendererDX11* pRenderer )
 			D3D11_MAPPED_SUBRESOURCE resource = 
 				pRenderer->MapResource( index, 0, D3D11_MAP_WRITE_DISCARD, 0 );
 
-			// Update each variable in the constant buffer
+			// Update each variable in the constant buffer.  These variables are identified
+			// by their type, and are currently allowed to be Vector4f, Matrix4f, or Matrix4f
+			// arrays.  Additional types will be added as they are needed...
+
 			for ( int j = 0; j < ConstantBuffers[i].Variables.count(); j++ )
 			{
 				std::wstring name = ConstantBuffers[i].Variables[j].Name;
@@ -80,17 +83,25 @@ void ShaderDX11::UpdateParameters( RendererDX11* pRenderer )
 					Vector4f* pBuf = (Vector4f*)((char*)resource.pData + offset);
 					*pBuf = vector;
 				}
-				else if ( ConstantBuffers[i].Types[j].Class == D3D10_SVC_MATRIX_ROWS )
+				else if ( ( ConstantBuffers[i].Types[j].Class == D3D10_SVC_MATRIX_ROWS ) ||
+					( ConstantBuffers[i].Types[j].Class == D3D10_SVC_MATRIX_COLUMNS ) )
 				{
-					Matrix4f matrix = pRenderer->GetMatrixParameter( name );
-					Matrix4f* pBuf = (Matrix4f*)((char*)resource.pData + offset);
-					*pBuf = matrix;
-				}
-				else if ( ConstantBuffers[i].Types[j].Class == D3D10_SVC_MATRIX_COLUMNS )
-				{
-					Matrix4f matrix = pRenderer->GetMatrixParameter( name );
-					Matrix4f* pBuf = (Matrix4f*)((char*)resource.pData + offset);
-					*pBuf = matrix;
+					// Check if it is an array of matrices first...
+					unsigned int count = ConstantBuffers[i].Types[j].Elements;
+					if ( count == 0 ) 
+					{
+						Matrix4f matrix = pRenderer->GetMatrixParameter( name );
+						Matrix4f* pBuf = (Matrix4f*)((char*)resource.pData + offset);
+						*pBuf = matrix;
+					}
+					else 
+					{
+						// If a matrix array, then use the corresponding parameter type.
+						// TODO: If the shader expects a different number of matrices than are present
+						//       from the matrix array parameter, then this causes an exception!
+						Matrix4f* pMatrices = pRenderer->GetMatrixArrayParameter( name, count );
+						memcpy( ((char*)resource.pData + offset), (char*)pMatrices, ConstantBuffers[i].Variables[j].Size );
+					}
 				}
 				else
 				{

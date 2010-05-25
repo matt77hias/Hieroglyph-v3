@@ -12,7 +12,8 @@
 cbuffer Transforms
 {
 	matrix WorldMatrix;	
-	matrix WorldViewProjMatrix;
+	matrix ViewProjMatrix;
+	matrix SkinMatrices[4];
 };
 
 cbuffer LightParameters
@@ -28,8 +29,8 @@ cbuffer LightParameters
 //--------------------------------------------------------------------------------
 struct VS_INPUT
 {
-	float3 position 		: POSITION;
-	float3 normal			: NORMAL;
+	float3	position 		: POSITION;
+	int		bone			: BONEIDS;
 };
 //--------------------------------------------------------------------------------
 struct VS_OUTPUT
@@ -42,17 +43,11 @@ VS_OUTPUT VSMAIN( in VS_INPUT input )
 {
 	VS_OUTPUT output;
 	
-	output.position = mul( float4( input.position, 1.0f ), WorldViewProjMatrix );
-
-	float3 NormalWS = mul( input.normal, (float3x3)WorldMatrix );
-	//float diffuse = dot( normalize( LightPositionWS ), NormalWS );
-	float diffuse = dot( normalize( float3( 1.0f, 1.0f, -1.0f ) ), NormalWS );
-
-	//float diffuse = dot( float3( 0.0f, 0.0f, -1.0f ), NormalWS );
-	//float diffuse = dot( float3( 0.0f, 0.0f, -1.0f ), float3( 0.0f, 0.0f, -1.0f ) );
-	//output.color = LightColor;//float4( 0.5f, 0.5f, 0.5f, 0.5f );
-	//output.color.rgb = LightColor * diffuse;
-	output.color.rgb = float3( 0.8f, 0.8f, 0.8f ) * diffuse;
+	//output.position = mul( float4( input.position, 1.0f ), WorldViewProjMatrix );
+	output.position = mul( float4( input.position, 1.0f ), SkinMatrices[input.bone] );
+	//output.position = mul( output.position, WorldMatrix );
+	output.position = mul( output.position, ViewProjMatrix );
+	output.color.rgb = LightColor;
 	output.color.a = 1.0f;
 
 	return output;

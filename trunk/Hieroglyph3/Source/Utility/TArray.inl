@@ -118,6 +118,12 @@ int TArray<T>::find( const T& element )
 }
 //--------------------------------------------------------------------------------
 template <class T>
+bool TArray<T>::inrange( int index )
+{
+	return( ( index >= 0 ) && ( index < m_iQuantity ) );
+}
+//--------------------------------------------------------------------------------
+template <class T>
 T& TArray<T>::operator[] (int i)
 {
 	if ( i < 0 )

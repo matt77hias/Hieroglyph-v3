@@ -61,6 +61,11 @@ Vector4f* VertexElementDX11::Get4f( int i )
 	return( (Vector4f*)&m_pfData[ 4*i ] );
 }
 //--------------------------------------------------------------------------------
+int* VertexElementDX11::Get1i( int i )
+{
+	return( (int*)&m_pfData[ i ] );
+}
+//--------------------------------------------------------------------------------
 float* VertexElementDX11::operator[]( int i )
 {
 	return( &m_pfData[ m_iTuple * i ] );

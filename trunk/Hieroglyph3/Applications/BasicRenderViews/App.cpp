@@ -162,8 +162,8 @@ void App::Initialize()
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );
 
-	D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&m_pRenderView->ProjMatrix, D3DX_PI/4, 
-		640.0f / 320.0f, 0.1f, 100.0f );
+	D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&m_pRenderView->ProjMatrix, 
+		static_cast<float>( D3DX_PI ) / 4, 640.0f / 320.0f, 0.1f, 100.0f );
 
 	m_pRoot = new Node3D();
 
@@ -177,7 +177,7 @@ void App::Initialize()
 		m_pEntity[i] = new Entity3D();
 		m_pEntity[i]->SetGeometry( m_pGeometry );
 		m_pEntity[i]->SetMaterial( m_pMaterial, false );
-		m_pEntity[i]->Position() = Vector3f( i * 4, 4.0f * ( i % 2 ) - 2.0f, 0.0f );
+		m_pEntity[i]->Position() = Vector3f( static_cast<float>( i ) * 4, 4.0f * ( i % 2 ) - 2.0f, 0.0f );
 
 		m_pRoot->AttachChild( m_pEntity[i] );
 	}

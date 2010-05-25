@@ -23,6 +23,7 @@ namespace Glyph3
 	{
 	public:
 		SamplerParameterDX11();
+		SamplerParameterDX11( SamplerParameterDX11& copy );
 		virtual ~SamplerParameterDX11();
 
 		virtual void SetParameterData( void* pData );

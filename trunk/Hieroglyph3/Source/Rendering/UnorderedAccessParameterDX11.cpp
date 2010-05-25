@@ -18,6 +18,11 @@ UnorderedAccessParameterDX11::UnorderedAccessParameterDX11()
 	m_iUnorderedAccessView = -1;
 }
 //--------------------------------------------------------------------------------
+UnorderedAccessParameterDX11::UnorderedAccessParameterDX11( UnorderedAccessParameterDX11& copy )
+{
+	m_iUnorderedAccessView = copy.m_iUnorderedAccessView;
+}
+//--------------------------------------------------------------------------------
 UnorderedAccessParameterDX11::~UnorderedAccessParameterDX11()
 {
 }

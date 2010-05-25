@@ -13,6 +13,7 @@
 #include "Log.h"
 #include "GeometryDX11.h"
 #include "IntrRay3fSphere3f.h"
+#include "RenderParameterDX11.h"
 #include <sstream>
 #include <algorithm>
 //--------------------------------------------------------------------------------
@@ -54,6 +55,9 @@ Entity3D::~Entity3D()
 {
 	for ( int i = 0; i < m_Controllers.count(); i++ )
 		delete m_Controllers[i];
+
+	for ( int i = 0; i < m_RenderParameters.count(); i++ )
+		delete m_RenderParameters[i];
 
 	if ( m_pComposite )
 		delete m_pComposite;
@@ -201,10 +205,10 @@ void Entity3D::Render( RendererDX11& Renderer, VIEWTYPE view )
 		// Only render if the material indicates that you should
 		if ( m_sParams.pMaterial->Params[view].bRender )
 		{
-			// Set the world matrix
-			Renderer.SetWorldMatrixParameter( &m_sParams.WorldMatrix );
+			// Set the entity render parameters
+			this->SetRenderParams( Renderer );
 
-			// Set the material parameters
+			// Set the material render parameters
 			m_sParams.pMaterial->SetRenderParams( Renderer, view );
 
 			// Send the geometry to the renderer using the appropriate
@@ -212,6 +216,23 @@ void Entity3D::Render( RendererDX11& Renderer, VIEWTYPE view )
 			Renderer.Draw( *m_sParams.pMaterial->Params[view].pEffect, *m_sParams.pGeometry );
 		}
 	}
+}
+//--------------------------------------------------------------------------------
+void Entity3D::AddRenderParameter( RenderParameterDX11* pParameter )
+{
+	// Add the parameter to the list
+	if ( pParameter )
+		m_RenderParameters.add( pParameter );
+}
+//--------------------------------------------------------------------------------
+void Entity3D::SetRenderParams( RendererDX11& Renderer )
+{
+	// Set the world matrix
+	Renderer.SetWorldMatrixParameter( &m_sParams.WorldMatrix );
+	
+	// Scroll through each parameter and set it in the renderer
+	for ( int i = 0; i < m_RenderParameters.count(); i++ )
+		Renderer.SetParameter( m_RenderParameters[i] );
 }
 //--------------------------------------------------------------------------------
 void Entity3D::Hide( bool bHide )
