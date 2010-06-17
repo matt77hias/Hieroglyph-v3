@@ -768,6 +768,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Rendering\SamplerStateConfigDX11.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Rendering\SamplerStateConfigDX11.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Rendering\SamplerStateDX11.cpp"
 					>
 				</File>
@@ -785,7 +793,7 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="Shaders"
+				Name="Pipeline"
 				>
 				<Filter
 					Name="Shader Programs"
@@ -904,6 +912,18 @@
 					</File>
 					<File
 						RelativePath=".\Rendering\VertexStageDX11.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Fixed Stages"
+					>
+					<File
+						RelativePath=".\Rendering\OutputMergerStageDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\OutputMergerStageDX11.h"
 						>
 					</File>
 				</Filter>

@@ -48,6 +48,8 @@
 #include "PixelStageDX11.h"
 #include "ComputeStageDX11.h"
 
+#include "OutputMergerStageDX11.h"
+
 #include "ResourceProxyDX11.h"
 
 #define SAFE_RELEASE( x ) {if(x){(x)->Release();(x)=NULL;}}
@@ -199,7 +201,8 @@ namespace Glyph3
 		// later use.  Either an application can directly set these values or a render effect
 		// can encapsulate the entire pipeline configuration.
 
-		int LoadShader( ShaderType type, std::wstring& filename, std::wstring& function, std::wstring& model );
+		int LoadShader( ShaderType type, std::wstring& filename, std::wstring& function, 
+			std::wstring& model, bool enablelogging = true );
 
 		// Here we allow rendering parameters to be registered and set by name.  These 
 		// parameters are then available for setting their value and subsequent use 
@@ -259,8 +262,18 @@ namespace Glyph3
 		void BindIndexBuffer( ResourcePtr resource );
 		void UnbindIndexBuffer( );
 
-		void BindRenderTargets( ResourcePtr RenderID, ResourcePtr DepthID );
-		void UnbindRenderTargets( );
+		// TODO: Create objects to represent each of the fixed function stages, and 
+		//       utilize this 'Clear', 'Bind', and 'Apply' paradigm.
+
+		// Render targets are bound to the output merger stage, which is represented
+		// internally as a seperate class.  The array of render targets is cached on
+		// the CPU side prior to actual binding with the API.  This allows a series of
+		// changes to be made to several render targerts prior to actually binding.
+
+		void BindRenderTargets( int index, ResourcePtr RenderID );
+		void BindDepthTarget( ResourcePtr DepthID );
+		void ClearRenderTargets( );	
+		void ApplyRenderTargets( );
 
 		void BindShader( ShaderType type, int ID );
 		void UnbindShader( ShaderType type );
@@ -398,6 +411,10 @@ namespace Glyph3
 		// type enumeration for fast access.
 
 		ShaderStageDX11*	ShaderStages[6];
+
+
+		OutputMergerStageDX11	OutputMergerStage;
+		
 
 		// Internal API for friends to use - only the rendering system should use these!
 		

@@ -725,7 +725,7 @@ int RendererDX11::CreateUnorderedAccessView( int ResourceID, D3D11_UNORDERED_ACC
 	return( -1 );
 }
 //--------------------------------------------------------------------------------
-int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstring& function, std::wstring& model )
+int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstring& function, std::wstring& model, bool enablelogging )
 {
 	HRESULT hr = S_OK;
 
@@ -752,7 +752,7 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 		&hr
 		) ) )
 	{
-		if ( pErrorMessages != 0 )
+		if ( ( enablelogging ) && ( pErrorMessages != 0 ) )
 		{
 			LPVOID pCompileErrors = pErrorMessages->GetBufferPointer();
 			const char* pMessage = (const char*)pCompileErrors;
@@ -1940,22 +1940,32 @@ void RendererDX11::BindIndexBuffer( ResourcePtr resource )
 		Log::Get().Write( L"Tried to bind an invalid index buffer ID!" );
 }
 //--------------------------------------------------------------------------------
-void RendererDX11::BindRenderTargets( ResourcePtr RenderTarget, ResourcePtr DepthTarget )
+void RendererDX11::BindRenderTargets( int index, ResourcePtr RenderTarget )
 {
-	// TODO: Add the ability to bind multiple render target views!
 	int RenderID = RenderTarget->m_iResourceRTV;
-	int DepthID = DepthTarget->m_iResourceDSV;
-
-	if ( ( RenderID >= 0 ) && ( RenderID < m_vRenderTargetViews.count() ) 
-		&& ( DepthID >= 0 ) && ( DepthID < m_vDepthStencilViews.count() ) )
+	
+	if ( ( RenderID >= 0 ) && ( RenderID < m_vRenderTargetViews.count() ) )
 	{
 		ID3D11RenderTargetView* pRenderTarget = { m_vRenderTargetViews[RenderID]->m_pRenderTargetView };
-		ID3D11DepthStencilView* pDepthStencilView = m_vDepthStencilViews[DepthID]->m_pDepthStencilView;
 
-		m_pContext->OMSetRenderTargets( 1, &pRenderTarget, pDepthStencilView );
+		OutputMergerStage.SetRenderTargetView( index, pRenderTarget );
 	}
 	else
-		Log::Get().Write( L"Tried to bind an invalid render target or depth stencil view!" );
+		Log::Get().Write( L"Tried to bind an invalid render target view!" );
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::BindDepthTarget( ResourcePtr DepthTarget )
+{
+	int DepthID = DepthTarget->m_iResourceDSV;
+
+	if ( ( DepthID >= 0 ) && ( DepthID < m_vDepthStencilViews.count() ) )
+	{
+		ID3D11DepthStencilView* pDepthStencilView = m_vDepthStencilViews[DepthID]->m_pDepthStencilView;
+
+		OutputMergerStage.SetDepthStencilView( pDepthStencilView );
+	}
+	else
+		Log::Get().Write( L"Tried to bind an invalid depth stencil view!" );
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateInputLayout( TArray<D3D11_INPUT_ELEMENT_DESC>& elements, int ShaderID  )
@@ -2322,14 +2332,14 @@ void RendererDX11::UnbindIndexBuffer( )
 	m_pContext->IASetIndexBuffer( 0, DXGI_FORMAT_R32_UINT, 0 );
 }
 //--------------------------------------------------------------------------------
-void RendererDX11::UnbindRenderTargets( )
+void RendererDX11::ClearRenderTargets( )
 {
-	// TODO: Add the ability to unbind multiple render target views!
-
-	ID3D11RenderTargetView* pRenderTarget = { 0 };
-	ID3D11DepthStencilView* pDepthStencilView = 0;
-
-	m_pContext->OMSetRenderTargets( 1, &pRenderTarget, pDepthStencilView );
+	OutputMergerStage.UnbindResources( m_pContext );
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::ApplyRenderTargets( )
+{
+	OutputMergerStage.BindResources( m_pContext );
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateBlendState( BlendStateConfigDX11* pConfig )

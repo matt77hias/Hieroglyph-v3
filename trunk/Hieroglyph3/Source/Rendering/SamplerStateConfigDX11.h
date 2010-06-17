@@ -9,31 +9,30 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// MaterialGeneratorDX11
+// SamplerStateConfigDX11
 //
 //--------------------------------------------------------------------------------
-#ifndef MaterialGeneratorDX11_h
-#define MaterialGeneratorDX11_h
+#include "RendererDX11.h"
 //--------------------------------------------------------------------------------
-#include "MaterialDX11.h"
+#ifndef SamplerStateConfigDX11_h
+#define SamplerStateConfigDX11_h
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class MaterialGeneratorDX11
+	class SamplerStateConfigDX11 : public D3D11_SAMPLER_DESC
 	{
 	public:
-		static MaterialDX11* GenerateWireFrame( RendererDX11& Renderer );
-		static MaterialDX11* GenerateSkinnedSolid( RendererDX11& Renderer );
+		SamplerStateConfigDX11();
+		~SamplerStateConfigDX11();
 
-		static MaterialDX11* GeneratePhong( RendererDX11& Renderer );
-		static MaterialDX11* GenerateSolidColor( RendererDX11& Renderer );
+		void SetDefaults();
 
-		static MaterialDX11* GenerateFromFile( RendererDX11& Renderer, std::wstring& file, unsigned int shaders );
-	private:
-		MaterialGeneratorDX11();
-		
+	protected:
+
+		friend RendererDX11;
 	};
 };
-#endif // MaterialGeneratorDX11_h
-
+//--------------------------------------------------------------------------------
+#endif // SamplerStateConfigDX11_h
+//--------------------------------------------------------------------------------
 

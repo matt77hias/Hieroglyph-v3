@@ -103,7 +103,11 @@ bool App::ConfigureEngineComponents()
 	// Bind the swap chain render target and the depth buffer for use in 
 	// rendering.  
 
-	m_pRenderer11->BindRenderTargets( m_RenderTarget, m_DepthTarget );
+	m_pRenderer11->ClearRenderTargets();
+	m_pRenderer11->BindRenderTargets( 0, m_RenderTarget );
+	m_pRenderer11->BindDepthTarget( m_DepthTarget );
+	m_pRenderer11->ApplyRenderTargets();
+
 
 
 	// Create a view port to use on the scene.  This basically selects the 

@@ -104,7 +104,10 @@ void ViewAmbientOcclusion::Draw( RendererDX11& Renderer )
 		m_pRoot->PreRender( Renderer, VT_LINEAR_DEPTH_NORMALS );
 
 		// Set the parameters for rendering this view
-		Renderer.BindRenderTargets( DepthNormalBuffer, m_DepthTarget );
+		Renderer.ClearRenderTargets();
+		Renderer.BindRenderTargets( 0, DepthNormalBuffer );
+		Renderer.BindDepthTarget( m_DepthTarget );
+		Renderer.ApplyRenderTargets();
 		Renderer.ClearBuffers( m_vColor, 1.0f );
 
 		// Set the perspective view's render parameters, since the depth normal
@@ -122,7 +125,8 @@ void ViewAmbientOcclusion::Draw( RendererDX11& Renderer )
 	//       resource parameter, to see if it is a render target view as well.  If so,
 	//       then clear the render targets when the SRV is set.
 
-	Renderer.BindRenderTargets( m_RenderTarget, m_DepthTarget );
+	Renderer.ClearRenderTargets();
+	Renderer.ApplyPipelineResources();
 
 	// Process the occlusion buffer next.  Start by setting the needed resource
 	// parameters for the depth/normal buffer and the occlusion buffer.

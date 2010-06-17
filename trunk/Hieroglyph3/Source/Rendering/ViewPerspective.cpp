@@ -57,7 +57,11 @@ void ViewPerspective::Draw( RendererDX11& Renderer )
 		m_pRoot->PreRender( Renderer, GetType() );
 
 		// Set the parameters for rendering this view
-		Renderer.BindRenderTargets( m_RenderTarget, m_DepthTarget );
+		Renderer.ClearRenderTargets();
+		Renderer.BindRenderTargets( 0, m_RenderTarget );
+		Renderer.BindDepthTarget( m_DepthTarget );
+		Renderer.ApplyRenderTargets();
+
 		Renderer.ClearBuffers( m_vColor, 1.0f );
 
 		// Set this view's render parameters
