@@ -11,6 +11,7 @@
 #include "EvtKeyDown.h"
 
 #include "ScriptManager.h"
+#include "ScriptIntfApp.h"
 
 #include "SwapChainConfigDX11.h"
 #include "Texture2dConfigDX11.h"
@@ -19,6 +20,10 @@
 #include "GeometryGeneratorDX11.h"
 #include "MaterialGeneratorDX11.h"
 #include "RasterizerStateConfigDX11.h"
+
+#include "ScriptIntfApp.h"
+#include "ScriptIntfActor.h"
+#include "ConsoleWindow.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -107,7 +112,14 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftY = 0;
 
 	m_pRenderer11->SetViewPort( m_pRenderer11->CreateViewPort( viewport ) );
+
 	
+	// Create an instance of the script manager
+
+	m_pScriptMgr = 0;
+	m_pScriptMgr = new ScriptManager();
+
+
 	return( true );
 }
 //--------------------------------------------------------------------------------
@@ -119,6 +131,9 @@ void App::ShutdownEngineComponents()
 		delete m_pRenderer11;
 	}
 
+	// Release the script manager
+	SAFE_DELETE( m_pScriptMgr );
+
 	if ( m_pWindow )
 	{
 		m_pWindow->Shutdown();
@@ -128,18 +143,6 @@ void App::ShutdownEngineComponents()
 //--------------------------------------------------------------------------------
 void App::Initialize()
 {
-	// Create and initialize the geometry to be rendered.  
-	//GeometryDX11* pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
-	GeometryDX11* pGeometry = new GeometryDX11();
-	GeometryGeneratorDX11::GenerateSkinnedBiped( pGeometry );
-	pGeometry->LoadToBuffers();
-	//pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
-	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_LINELIST );
-
-	// Create the material for use by the entity.
-	MaterialDX11* pMaterial = MaterialGeneratorDX11::GenerateSkinnedSolid( *m_pRenderer11 );
-	//MaterialDX11* pMaterial = 0;
-
 	// Create the parameters for use with this effect
 	Vector4f LightParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
 	m_pRenderer11->SetVectorParameter( std::wstring( L"LightColor" ), &LightParams );
@@ -162,33 +165,22 @@ void App::Initialize()
 	// scene so that it will be updated via the scene interface instead of 
 	// manually manipulating it.
 
-	m_pNode = new Node3D();
+	//m_pNode = new Node3D();
 	
-	// Create the skinned actor.  This actor is essentially a single entity that
-	// geometry representing the bind pose for the actor.  The bone information
-	// must be present in the geometry, and then a node must be added to the 
-	// skinned actor's root node for each bone required in the model.
-	
-	// Each node/bone is then used to calculate the transformation matrices for
-	// their respective vertices.  This allows each of the nodes to be controlled
-	// relative to their parent node, and automatically update the required 
-	// transforms used to render the posed mesh.
-
-	m_pActor = new SkinnedActor();
-	
-	GeometryLoaderDX11::loadMS3DFileWithAnimation( std::wstring( L"../Data/Models/TBone.ms3d" ), m_pActor );
-
-	m_pActor->GetBody()->SetMaterial( pMaterial, false );
-
-	m_pNode->AttachChild( m_pActor->GetNode() );
-
-	m_pScene->AddEntity( m_pNode );
 	m_pScene->AddCamera( m_pCamera );
 
-	m_pActor->SetBindPose();
-	m_pActor->SetSkinningMatrices( *m_pRenderer11 );
 
-	m_pActor->PlayAllAnimations();
+
+	// Initialize the 'App' and 'Actor' interface
+	ScriptIntfApp AppIntf;
+	ScriptIntfActor ActorIntf;
+
+	ScriptManager::Get()->Run( "../Data/Scripts/SceneTestScript.lua" );
+
+	// Call the application initialization function of the script.
+	ScriptIntfApp::Initialize( );
+
+	ConsoleWindow::StartConsole( 0, m_pScriptMgr );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -208,17 +200,19 @@ void App::Update()
 	// Manipulate the scene here - simply rotate the root of the scene in this
 	// example.
 
-	Matrix3f rotation;
-	rotation.RotationY( m_pTimer->Elapsed() * 0.2f );
-	m_pNode->Rotation() *= rotation;
+	//Matrix3f rotation;
+	//rotation.RotationY( m_pTimer->Elapsed() * 0.2f );
+	//m_pNode->Rotation() *= rotation;
+
+
+	// Call the update function of the script
+
+	ScriptIntfApp::Update( m_pTimer->Elapsed() );
 
 
 	// Update the scene, and then render all cameras within the scene.
 
 	m_pScene->Update( m_pTimer->Elapsed() );
-
-	m_pActor->SetSkinningMatrices( *m_pRenderer11 );
-
 	m_pScene->Render( *m_pRenderer11 );
 
 
@@ -234,16 +228,17 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"SkinAndBones_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"BasicScripting_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pActor );
-	
-	SAFE_DELETE( m_pNode );
+	ScriptIntfApp::Shutdown( );
 
+	ConsoleWindow::StopConsole();
+
+	//SAFE_DELETE( m_pNode );
 	SAFE_DELETE( m_pCamera );
 
 	// Print the framerate out for the log before shutting down.

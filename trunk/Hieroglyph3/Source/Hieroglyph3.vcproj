@@ -213,6 +213,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Application\ConsoleWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Application\ConsoleWindow.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Application\FileSystem.cpp"
 				>
 			</File>
@@ -469,14 +477,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Scripting\ScriptIntfEntity3D.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Scripting\ScriptIntfEntity3D.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Scripting\ScriptManager.cpp"
 				>
 			</File>
@@ -484,6 +484,26 @@
 				RelativePath=".\Scripting\ScriptManager.h"
 				>
 			</File>
+			<Filter
+				Name="Interfaces"
+				>
+				<File
+					RelativePath=".\Scripting\ScriptIntfActor.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Scripting\ScriptIntfActor.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Scripting\ScriptIntfApp.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Scripting\ScriptIntfApp.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Rendering"

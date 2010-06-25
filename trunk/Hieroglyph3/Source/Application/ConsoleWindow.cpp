@@ -1,26 +1,27 @@
 //--------------------------------------------------------------------------------
-#include "CWinConsole.h"
-#include "CScriptManager.h"
-//#include <math.h>
+#include "ConsoleWindow.h"
+#include "ScriptManager.h"
+#include "GlyphString.h"
 //--------------------------------------------------------------------------------
-using namespace Glyph2;
+using namespace Glyph3;
 //--------------------------------------------------------------------------------
 luaL_reg DebugGlue[];
-CWinConsole* Glyph2::g_Console = NULL;
+ConsoleWindow* Glyph3::g_Console = NULL;
 
-volatile bool CWinConsole::m_bWinIsActive = true;
-volatile HWND CWinConsole::m_hWnd = NULL;
-volatile HWND CWinConsole::m_hEditControl = NULL;
+volatile bool ConsoleWindow::m_bWinIsActive = true;
+volatile HWND ConsoleWindow::m_hWnd = NULL;
+volatile HWND ConsoleWindow::m_hEditControl = NULL;
 
-char CWinConsole::m_CommandBuffer[4096];
+//char ConsoleWindow::m_CommandBuffer[4096];
+wchar_t ConsoleWindow::m_CommandBufferW[4096];
 
 WNDPROC lpfnInputEdit;  // Storage for subclassed edit control 
 //--------------------------------------------------------------------------------
-HWND CWinConsole::StartConsole( HINSTANCE hInstance, CScriptManager* pScriptContext )
+HWND ConsoleWindow::StartConsole( HINSTANCE hInstance, ScriptManager* pScriptContext )
 {
 	if(!g_Console)
 	{
-		g_Console = new CWinConsole();
+		g_Console = new ConsoleWindow();
 	}
 
 	if(!m_hWnd)
@@ -37,7 +38,7 @@ HWND CWinConsole::StartConsole( HINSTANCE hInstance, CScriptManager* pScriptCont
 	return (m_hWnd);
 }
 //--------------------------------------------------------------------------------
-void CWinConsole::StopConsole()
+void ConsoleWindow::StopConsole()
 {
 	if( g_Console )
 	{
@@ -49,13 +50,14 @@ void CWinConsole::StopConsole()
 	}
 }
 //--------------------------------------------------------------------------------
-CWinConsole::CWinConsole()
+ConsoleWindow::ConsoleWindow()
 {
 	m_hWnd = NULL;
-	memset(m_CommandBuffer, 0, 4096);
+	//memset( m_CommandBuffer, 0, 4096*sizeof(char) );
+	memset( m_CommandBufferW, 0, 4096*sizeof(wchar_t) );
 }
 //--------------------------------------------------------------------------------
-CWinConsole::~CWinConsole()
+ConsoleWindow::~ConsoleWindow()
 {
 	if( m_hWnd )
 	{
@@ -64,7 +66,7 @@ CWinConsole::~CWinConsole()
 	}
 }
 //--------------------------------------------------------------------------------
-void CWinConsole::AdjustScrollBar(void)
+void ConsoleWindow::AdjustScrollBar(void)
 {
 	SCROLLINFO si;
 
@@ -77,7 +79,7 @@ void CWinConsole::AdjustScrollBar(void)
 	SetScrollInfo(m_hWnd, SB_VERT, &si, TRUE); 
 }
 //--------------------------------------------------------------------------------
-void CWinConsole::ResizeControls(void)
+void ConsoleWindow::ResizeControls(void)
 {
 	RECT r;
 
@@ -90,7 +92,7 @@ void CWinConsole::ResizeControls(void)
 	InvalidateRect(m_hWnd, NULL, TRUE);
 }
 //--------------------------------------------------------------------------------
-void CWinConsole::Paint(HDC hDC)
+void ConsoleWindow::Paint(HDC hDC)
 {
 	SetTextColor(hDC, RGB(64,255,64));
 	SetBkColor(hDC, RGB(0,0,0));
@@ -112,13 +114,13 @@ void CWinConsole::Paint(HDC hDC)
 
 	while(it != m_stringList.end())
 	{
-		TextOut(hDC, x, y, (*it).c_str(), strlen((*it).c_str()));
+		TextOut(hDC, x, y, GlyphString::ToUnicode(std::string(*it)).c_str(), strlen((*it).c_str()));
 		y -= 16;
 		++it;
 	}
 }
 //--------------------------------------------------------------------------------
-LRESULT WINAPI CWinConsole::MsgProc( HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT WINAPI ConsoleWindow::MsgProc( HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
 	HDC hdc;
@@ -182,7 +184,7 @@ LRESULT WINAPI CWinConsole::MsgProc( HWND hWnd, unsigned uMsg, WPARAM wParam, LP
             // User clicked the shaft above the scroll box. 
  
             case SB_PAGEUP: 
-				g_Console->m_ScrollyPos = std::min((int) (g_Console->m_ScrollyPos+g_Console->m_textAreaHeight), (int) (g_Console->m_stringList.size() - g_Console->m_textAreaHeight)+1);
+				//g_Console->m_ScrollyPos = std::min((int) (g_Console->m_ScrollyPos+g_Console->m_textAreaHeight), (int) (g_Console->m_stringList.size() - g_Console->m_textAreaHeight)+1);
                  //yInc = min(-1, -yClient / yChar); 
                  break; 
  
@@ -195,14 +197,14 @@ LRESULT WINAPI CWinConsole::MsgProc( HWND hWnd, unsigned uMsg, WPARAM wParam, LP
             // User clicked the top arrow. 
  
             case SB_LINEUP: 
-				g_Console->m_ScrollyPos = std::min(g_Console->m_ScrollyPos+1, (int) (g_Console->m_stringList.size() - g_Console->m_textAreaHeight)+1);
+				//g_Console->m_ScrollyPos = std::min(g_Console->m_ScrollyPos+1, (int) (g_Console->m_stringList.size() - g_Console->m_textAreaHeight)+1);
                 break; 
  
             // User clicked the bottom arrow. 
  
             case SB_LINEDOWN: 
                  //yInc = 1; 
-				g_Console->m_ScrollyPos = std::max(g_Console->m_ScrollyPos-1, 0);
+				//g_Console->m_ScrollyPos = std::max(g_Console->m_ScrollyPos-1, 0);
                  break; 
  
             // User dragged the scroll box. 
@@ -230,26 +232,27 @@ LRESULT WINAPI CWinConsole::MsgProc( HWND hWnd, unsigned uMsg, WPARAM wParam, LP
 		case WM_USER:
 			// command ready from edit control
 			// string should be in m_CommandBuffer
-			Write(m_CommandBuffer);
-			if (0 != luaL_loadbuffer( CScriptManager::Get()->GetState(), /* g_Console->m_pScriptContext->GetScriptContext()*/
-					m_CommandBuffer, strlen(m_CommandBuffer), NULL))
+			std::string command = GlyphString::ToAscii( std::wstring( m_CommandBufferW ) );
+			Write(command.c_str());
+			if (0 != luaL_loadbuffer( ScriptManager::Get()->GetState(), /* g_Console->m_pScriptContext->GetScriptContext()*/
+					command.c_str(), command.length(), NULL))
 			{
 				Write("Error loading Command\n");
 			}
-			if (0 != lua_pcall( CScriptManager::Get()->GetState(), /*g_Console->m_pScriptContext->GetScriptContext()*/ 0, LUA_MULTRET, 0))
+			if (0 != lua_pcall( ScriptManager::Get()->GetState(), /*g_Console->m_pScriptContext->GetScriptContext()*/ 0, LUA_MULTRET, 0))
 			{
 				Write("Error in Command\n");
-				Write(luaL_checkstring( CScriptManager::Get()->GetState()/*g_Console->m_pScriptContext->GetScriptContext()*/, -1));
+				Write(luaL_checkstring( ScriptManager::Get()->GetState()/*g_Console->m_pScriptContext->GetScriptContext()*/, -1));
 			}
 			// clear buffer when done processing
-			memset(m_CommandBuffer, 0, 4096);
+			memset(m_CommandBufferW, 0, 4096*sizeof(wchar_t));
 			break;
     }
 
     return DefWindowProc( hWnd, uMsg, wParam, lParam );
 }
 //--------------------------------------------------------------------------------
-void CWinConsole::Write(const char *pString)
+void ConsoleWindow::Write(const char *pString)
 {
 	if(g_Console && m_hWnd)
 	{
@@ -265,7 +268,7 @@ void CWinConsole::Write(const char *pString)
 			else
 			{
 				buf[indx] = 0;
-				g_Console->m_stringList.push_front(buf);
+				g_Console->m_stringList.push_front( buf );
 				indx = 0;
 			}
 
@@ -274,7 +277,7 @@ void CWinConsole::Write(const char *pString)
 		if(indx > 0)
 		{
 			buf[indx] = 0;
-			g_Console->m_stringList.push_front(buf);
+			g_Console->m_stringList.push_front( buf );
 		}
 		InvalidateRect(m_hWnd, NULL, TRUE);
 		delete buf;
@@ -283,7 +286,7 @@ void CWinConsole::Write(const char *pString)
 	g_Console->AdjustScrollBar();
 }
 //--------------------------------------------------------------------------------
-LRESULT CALLBACK CWinConsole::SubclassInputEditProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam ) 
+LRESULT CALLBACK ConsoleWindow::SubclassInputEditProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam ) 
 {     
 	switch( message )     
 	{         
@@ -297,7 +300,7 @@ LRESULT CALLBACK CWinConsole::SubclassInputEditProc( HWND hWnd, UINT message, WP
 			lSizeofString = SendMessage( hWnd, WM_GETTEXTLENGTH, 0, 0 );
 
             // Get the string                 
-			SendMessage( hWnd, WM_GETTEXT, lSizeofString + 1, (LPARAM) m_CommandBuffer ); 
+			SendMessage( hWnd, WM_GETTEXT, lSizeofString + 1, (LPARAM) m_CommandBufferW ); 
 
 			// send message to parent that command was entered
 			SendMessage( m_hWnd, WM_USER, 0, lSizeofString );
@@ -311,7 +314,7 @@ LRESULT CALLBACK CWinConsole::SubclassInputEditProc( HWND hWnd, UINT message, WP
 	return CallWindowProc( lpfnInputEdit, hWnd, message, wParam, lParam ); 
 }
 //--------------------------------------------------------------------------------
-void CWinConsole::Init( HINSTANCE hInstance )
+void ConsoleWindow::Init( HINSTANCE hInstance )
 {
  	m_hInstance = hInstance;
 	m_ScrollyPos = 0;
@@ -329,12 +332,12 @@ void CWinConsole::Init( HINSTANCE hInstance )
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.hbrBackground = (HBRUSH) GetStockObject(BLACK_BRUSH);
     wc.lpszMenuName = NULL;
-    wc.lpszClassName = "WinConsole";
+    wc.lpszClassName = L"ConsoleWindow";
 
 	RegisterClass( &wc );
 
-    m_hWnd = CreateWindow( "WinConsole",		// class
-                        "LUA WinConsole",		// caption
+    m_hWnd = CreateWindow( L"ConsoleWindow",	// class
+                        L"LUA WinConsole",		// caption
                         WS_OVERLAPPEDWINDOW,	// style 
                         700,					// left
                         400,					// top
@@ -349,8 +352,8 @@ void CWinConsole::Init( HINSTANCE hInstance )
     UpdateWindow( m_hWnd );
     SetFocus( m_hWnd );
 
-	m_hEditControl = CreateWindow( "EDIT",	// class
-                        "",					// caption
+	m_hEditControl = CreateWindow( L"EDIT",	// class
+                        L"",					// caption
                         ES_LEFT | WS_CHILD, // style 
                         2,					// left
                         404,				// top
@@ -392,13 +395,13 @@ static int Debug_Print(lua_State *L)
 			return luaL_error( L, "`tostring' must return a string to `print'" );
 		
 		if ( i > 1 )
-			CWinConsole::Write( "\t" );
+			ConsoleWindow::Write( "\t" );
 
-		CWinConsole::Write( s );
+		ConsoleWindow::Write( s );
 		lua_pop( L, 1 );  /* pop result */
 	}
 
-	CWinConsole::Write( "\n" );
+	ConsoleWindow::Write( "\n" );
 
 #endif
 	return 0;
@@ -412,8 +415,8 @@ luaL_reg DebugGlue[] =
   {NULL, NULL}
 };
 //--------------------------------------------------------------------------------
-HWND CWinConsole::GetHandle()
+HWND ConsoleWindow::GetHandle()
 {
-	return( CWinConsole::m_hWnd );
+	return( ConsoleWindow::m_hWnd );
 }
 //--------------------------------------------------------------------------------

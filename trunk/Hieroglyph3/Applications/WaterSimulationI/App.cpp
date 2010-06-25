@@ -200,7 +200,6 @@ void App::Initialize()
 
 	m_pNode->AttachChild( m_pEntity );
 
-	m_pScene = new Scene();
 	m_pScene->AddEntity( m_pNode );
 	m_pScene->AddCamera( m_pCamera );
 
@@ -276,7 +275,6 @@ void App::Shutdown()
 	SAFE_DELETE( m_pNode );
 
 	SAFE_DELETE( m_pCamera );
-	SAFE_DELETE( m_pScene );
 
 	// Print the framerate out for the log before shutting down.
 

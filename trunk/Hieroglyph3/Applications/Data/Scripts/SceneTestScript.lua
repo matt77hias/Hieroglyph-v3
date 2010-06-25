@@ -1,0 +1,57 @@
+
+dofile( "../Data/Scripts/Actor.lua" )
+
+
+
+
+App.Log( "Outside" );
+
+function Initialize()
+
+	handle = 0;
+	App.Log( "Handle Value: " .. handle );
+
+	handle = App.CreateActor( "../Data/Models/box.ms3d", "Phong" );
+	a1 = Actor:Create( handle );
+
+	App.Log( "Handle Value: " .. handle );
+
+end
+
+
+
+function Update( time )
+	App.Log( tostring( time ) );
+end
+
+
+function Render()
+
+end
+
+--
+
+function Shutdown()
+	App.Log( "Shutdown" );
+end
+
+
+function OnKeyDown( char )
+
+	if char == 49 then
+	end
+
+	if char == 50 then -- '2' Key
+	end
+	
+	if char == 51 then
+	end
+
+	if char == 52 then
+	end
+	
+	if char == 53 then
+	end
+
+end
+

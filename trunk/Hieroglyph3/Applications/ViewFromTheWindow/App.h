@@ -51,7 +51,6 @@ protected:
 	Vector4f				m_LightPosition;
 
 	Camera*					m_pCamera;
-	Scene*					m_pScene;
 	Vector2f				m_DesktopRes;
 
 	bool					m_bSaveScreenshot;

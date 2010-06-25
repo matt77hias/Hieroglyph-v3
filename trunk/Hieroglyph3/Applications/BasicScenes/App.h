@@ -55,5 +55,4 @@ protected:
 	Vector4f				m_TessParams;
 
 	Camera*		m_pCamera;
-	Scene*		m_pScene;
 };

@@ -43,7 +43,6 @@ protected:
 	Entity3D*				m_pEntity;
 	
 	Camera*					m_pCamera;
-	Scene*					m_pScene;
 
 	bool					m_bSaveScreenshot;
 };

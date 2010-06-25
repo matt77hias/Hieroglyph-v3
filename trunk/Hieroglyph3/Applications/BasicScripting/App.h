@@ -4,6 +4,7 @@
 
 #include "Win32RenderWindow.h"
 #include "RendererDX11.h"
+#include "ScriptManager.h"
 
 #include "ViewPerspective.h"
 #include "GeometryDX11.h"
@@ -35,6 +36,7 @@ public:
 protected:
 
 	RendererDX11*			m_pRenderer11;
+	ScriptManager*			m_pScriptMgr;
 	Win32RenderWindow*		m_pWindow;
 
 	ResourcePtr				m_RenderTarget;

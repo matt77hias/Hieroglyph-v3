@@ -40,14 +40,14 @@ namespace Glyph3
 {
 	struct sClassData
 	{
-		std::wstring name;
+		std::string name;
 		unsigned int count;
 		unsigned int id;
 
 	public:
 		sClassData()
 		{
-			name = L"";
+			name = "";
 			count = 0;
 			id = 0;
 		};
@@ -90,15 +90,15 @@ namespace Glyph3
 		static ScriptManager* Get();
 
 		// Registration of standard static functions
-		void RegisterFunction( const wchar_t* name, lua_CFunction function );
-		void RegisterClassFunction( const wchar_t* classname, const wchar_t* funcname, lua_CFunction function );
+		void RegisterFunction( const char* name, lua_CFunction function );
+		void RegisterClassFunction( const char* classname, const char* funcname, lua_CFunction function );
 
-		void ExecuteChunk( wchar_t* chunk );
+		void ExecuteChunk( char* chunk );
 		
 		// Registration of classes, their class methods, and instances of
 		// an object.
-		unsigned int RegisterEngineClass( const wchar_t* name );
-		unsigned int RegisterEngineObject( const wchar_t* name, void* pObject );
+		unsigned int RegisterEngineClass( const char* name );
+		unsigned int RegisterEngineObject( const char* name, void* pObject );
 
 		bool UnRegisterObjectByHandle( unsigned int handle );
 		bool UnRegisterObjectByPointer( void* pObject );
@@ -113,7 +113,7 @@ namespace Glyph3
 		void* GetObjectPointer( unsigned int ID );
 		unsigned int GetObjectHandle( void* pObject );
 
-		void Run( wchar_t *fp_szFileName );
+		void Run( char *fp_szFileName );
 		lua_State* GetState( );
 
 	protected:
@@ -125,7 +125,7 @@ namespace Glyph3
 		lua_State* m_pLuaState;
 
 		int m_iClassIndex;
-		std::map< const wchar_t*, sClassData > m_kClassRegistry;
+		std::map< const char*, sClassData > m_kClassRegistry;
 		std::map< unsigned int, sObjectData > m_kObjectRegistry;
 		std::map< void*, sPointerData > m_kPointerRegistry;
 	};

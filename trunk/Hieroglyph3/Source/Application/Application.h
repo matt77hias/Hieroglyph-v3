@@ -33,6 +33,7 @@
 #include "Log.h"
 #include "Timer.h"
 #include "EventManager.h"
+#include "Scene.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -60,6 +61,11 @@ namespace Glyph3
 
 		// Engine Components
 		EventManager* m_pEventMgr;
+
+		// Scene Holder
+		Scene* m_pScene;
+
+		// TODO: Perhaps the scene should be added in a subclass instead of here???
 
 	protected:
 		// CApplication pointer to ensure single instance

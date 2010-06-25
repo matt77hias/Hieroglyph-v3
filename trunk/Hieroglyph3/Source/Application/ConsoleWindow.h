@@ -1,21 +1,21 @@
 //--------------------------------------------------------------------------------
-// WinConsole.h: interface for the CWinConsole class.
+// WinConsole.h: interface for the ConsoleWindow class.
 //
 //--------------------------------------------------------------------------------
-#ifndef CWinConsole_h
-#define CWinConsole_h
+#ifndef ConsoleWindow_h
+#define ConsoleWindow_h
 //--------------------------------------------------------------------------------
 #include "windows.h"
-#include "CScriptManager.h"
+#include "ScriptManager.h"
 #include <string>
 #include <list>
 //--------------------------------------------------------------------------------
-namespace Glyph2
+namespace Glyph3
 {
-	class CWinConsole  
+	class ConsoleWindow  
 	{
 	public:
-		static HWND StartConsole(HINSTANCE hInstance, CScriptManager* pScriptContext);
+		static HWND StartConsole(HINSTANCE hInstance, ScriptManager* pScriptContext);
 		static void StopConsole();
 		static void Write(const char *pString);
 
@@ -27,8 +27,8 @@ namespace Glyph2
 		static HWND GetHandle();
 
 	private:
-		CWinConsole();
-		virtual ~CWinConsole();
+		ConsoleWindow();
+		virtual ~ConsoleWindow();
 
 		void	Init(HINSTANCE hInstance);
 		void	ResizeControls(void);
@@ -41,17 +41,18 @@ namespace Glyph2
 		static volatile HWND m_hWnd;
 		static volatile HWND m_hEditControl;
 		static char m_CommandBuffer[4096];
+		static wchar_t m_CommandBufferW[4096];
 		
 		std::list<std::string> m_stringList;
 		HINSTANCE m_hInstance;
 
-		CScriptManager* m_pScriptContext;
+		ScriptManager* m_pScriptContext;
 
 		int m_ScrollyPos;
 		int m_textAreaHeight;
 	};
 
-	extern CWinConsole *g_Console;
+	extern ConsoleWindow *g_Console;
 };
 //--------------------------------------------------------------------------------
-#endif // CWinConsole_h
+#endif // ConsoleWindow_h

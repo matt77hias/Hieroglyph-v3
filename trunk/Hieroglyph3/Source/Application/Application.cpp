@@ -33,10 +33,17 @@ Application::Application()
 	// instantiated.
 
 	m_pEventMgr = new EventManager();
+
+	// Create an initial scene to be used by the applications.
+
+	m_pScene = new Scene();
 }
 //--------------------------------------------------------------------------------
 Application::~Application( )
 {
+	if ( m_pScene != 0 )
+		delete m_pScene;
+
 	if ( m_pTimer != NULL )
 		delete m_pTimer;
 

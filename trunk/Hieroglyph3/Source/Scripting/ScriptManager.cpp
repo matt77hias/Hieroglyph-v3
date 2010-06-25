@@ -16,7 +16,7 @@
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ScriptManager* ScriptManager::ms_pScriptManager = NULL;
-ScriptManager ScriptMgr;
+//ScriptManager ScriptMgr;
 //--------------------------------------------------------------------------------
 ScriptManager::ScriptManager()
 {
@@ -42,40 +42,40 @@ ScriptManager* ScriptManager::Get()
 	return( ms_pScriptManager );
 }
 //--------------------------------------------------------------------------------
-void ScriptManager::Run( wchar_t* FileName )
+void ScriptManager::Run( char* FileName )
 {
-	char AsciiFileName[1024];
-	WideCharToMultiByte( CP_ACP, 0, FileName, -1, AsciiFileName, 1024, NULL, NULL);
+//	char AsciiFileName[1024];
+//	WideCharToMultiByte( CP_ACP, 0, FileName, -1, AsciiFileName, 1024, NULL, NULL);
  
-	luaL_dofile( m_pLuaState, AsciiFileName );
+	luaL_dofile( m_pLuaState, FileName );
 }
 //--------------------------------------------------------------------------------
-void ScriptManager::ExecuteChunk( wchar_t* chunk )
+void ScriptManager::ExecuteChunk( char* chunk )
 {
-	char AsciiChunk[1024];
-	WideCharToMultiByte( CP_ACP, 0, chunk, -1, AsciiChunk, 1024, NULL, NULL);
+//	char AsciiChunk[1024];
+//	WideCharToMultiByte( CP_ACP, 0, chunk, -1, AsciiChunk, 1024, NULL, NULL);
 
-	luaL_dostring( m_pLuaState, AsciiChunk );
+	luaL_dostring( m_pLuaState, chunk );
 }
 //--------------------------------------------------------------------------------
-void ScriptManager::RegisterFunction( const wchar_t* name, lua_CFunction function )
+void ScriptManager::RegisterFunction( const char* name, lua_CFunction function )
 {
-	char AsciiName[1024];
-	WideCharToMultiByte( CP_ACP, 0, name, -1, AsciiName, 1024, NULL, NULL);
+//	char AsciiName[1024];
+//	WideCharToMultiByte( CP_ACP, 0, name, -1, AsciiName, 1024, NULL, NULL);
 
-	lua_register( m_pLuaState, AsciiName, function );
+	lua_register( m_pLuaState, name, function );
 }
 //--------------------------------------------------------------------------------
-void ScriptManager::RegisterClassFunction( const wchar_t* classname, const wchar_t* funcname, lua_CFunction function )
+void ScriptManager::RegisterClassFunction( const char* classname, const char* funcname, lua_CFunction function )
 {
-	char AsciiClassName[1024];
-	char AsciiFuncName[1024];
-	WideCharToMultiByte( CP_ACP, 0, classname, -1, AsciiClassName, 1024, NULL, NULL);
-	WideCharToMultiByte( CP_ACP, 0, funcname, -1, AsciiFuncName, 1024, NULL, NULL);
+//	char AsciiClassName[1024];
+//	char AsciiFuncName[1024];
+//	WideCharToMultiByte( CP_ACP, 0, classname, -1, AsciiClassName, 1024, NULL, NULL);
+//	WideCharToMultiByte( CP_ACP, 0, funcname, -1, AsciiFuncName, 1024, NULL, NULL);
 
-	lua_getfield( m_pLuaState, LUA_GLOBALSINDEX, AsciiClassName );	// Get the class's table
+	lua_getfield( m_pLuaState, LUA_GLOBALSINDEX, classname );	// Get the class's table
 	lua_pushcfunction( m_pLuaState, function );		// Push the function onto the stack
-	lua_setfield( m_pLuaState, -2, AsciiFuncName );		// Store the function in the class
+	lua_setfield( m_pLuaState, -2, funcname );		// Store the function in the class
 	lua_pop( m_pLuaState, 1 );						// Pop the table off of the stack
 }
 //--------------------------------------------------------------------------------
@@ -84,14 +84,14 @@ lua_State* ScriptManager::GetState( )
 	return( m_pLuaState );
 }
 //--------------------------------------------------------------------------------
-unsigned int ScriptManager::RegisterEngineClass( const wchar_t* name )
+unsigned int ScriptManager::RegisterEngineClass( const char* name )
 {
-	char AsciiName[1024];
-	WideCharToMultiByte( CP_ACP, 0, name, -1, AsciiName, 1024, NULL, NULL);
+//	char AsciiName[1024];
+//	WideCharToMultiByte( CP_ACP, 0, name, -1, AsciiName, 1024, NULL, NULL);
 
 	sClassData data = m_kClassRegistry[name];
 
-	if ( data.name == L"" )
+	if ( data.name == "" )
 	{
 		data.name = name;
 		data.id = m_iClassIndex << 16;	// upper 16 bits are for class ID
@@ -103,7 +103,7 @@ unsigned int ScriptManager::RegisterEngineClass( const wchar_t* name )
 		// Create a new table, and store it at the class name of the global
 		// lua environment.
 		lua_newtable( m_pLuaState );
-		lua_setfield( m_pLuaState, LUA_GLOBALSINDEX, AsciiName );
+		lua_setfield( m_pLuaState, LUA_GLOBALSINDEX, name );
 	}
 
 	return( data.id );
@@ -114,7 +114,7 @@ unsigned int ScriptManager::RegisterEngineClass( const wchar_t* name )
 //
 //}
 //--------------------------------------------------------------------------------
-unsigned int ScriptManager::RegisterEngineObject( const wchar_t* name, void* pObject )
+unsigned int ScriptManager::RegisterEngineObject( const char* name, void* pObject )
 {
 	// Test if the object has already been registered
 	if ( m_kPointerRegistry[pObject].handle != 0xffffffff ) 
@@ -124,7 +124,7 @@ unsigned int ScriptManager::RegisterEngineObject( const wchar_t* name, void* pOb
 	}
 
 	// Ensure that the class has been previously registered.
-	if ( m_kClassRegistry[name].name == L"" )
+	if ( m_kClassRegistry[name].name == "" )
 		RegisterEngineClass( name );
 
 	// Calculate the handle based on the class ID and the number of objects
