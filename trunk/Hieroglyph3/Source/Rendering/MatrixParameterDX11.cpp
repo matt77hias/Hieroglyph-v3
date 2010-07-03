@@ -42,3 +42,15 @@ Matrix4f MatrixParameterDX11::GetMatrix()
 	return( m_Matrix );
 }
 //--------------------------------------------------------------------------------
+void MatrixParameterDX11::UpdateValue( RenderParameterDX11* pParameter )
+{
+	if ( pParameter )
+	{
+		if ( ( pParameter->GetParameterType() == MATRIX ) && ( pParameter->GetName() == this->GetName() ) )
+		{
+			MatrixParameterDX11* pBuffer = (MatrixParameterDX11*)pParameter;
+			m_Matrix = pBuffer->GetMatrix();
+		}
+	}
+}
+//--------------------------------------------------------------------------------

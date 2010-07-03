@@ -24,6 +24,12 @@ namespace Glyph3
 		static int SetPosition( lua_State* pLuaState );
 		static int GetRotation( lua_State* pLuaState );
 		static int SetRotation( lua_State* pLuaState );
+
+		static int AttachChild( lua_State* pLuaState );
+		static int DetachChild( lua_State* pLuaState );
+
+		static int SetEntityVectorParameter( lua_State* pLuaState );
+		static int SetMaterialVectorParameter( lua_State* pLuaState );
 	};
 };
 //--------------------------------------------------------------------------------

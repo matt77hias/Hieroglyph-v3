@@ -42,3 +42,20 @@ Vector4f VectorParameterDX11::GetVector()
 	return( m_Vector );
 }
 //--------------------------------------------------------------------------------
+void VectorParameterDX11::SetVector( Vector4f v )
+{
+	m_Vector = v;
+}
+//--------------------------------------------------------------------------------
+void VectorParameterDX11::UpdateValue( RenderParameterDX11* pParameter )
+{
+	if ( pParameter )
+	{
+		if ( ( pParameter->GetParameterType() == VECTOR ) && ( pParameter->GetName() == this->GetName() ) )
+		{
+			VectorParameterDX11* pVector = (VectorParameterDX11*)pParameter;
+			m_Vector = pVector->GetVector();
+		}
+	}
+}
+//--------------------------------------------------------------------------------

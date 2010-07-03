@@ -75,7 +75,10 @@ void Node3D::DetachChild( Entity3D* Child )
 	for ( int i = 0; i < m_vChildren.count(); i++ )
 	{
 		if ( m_vChildren[i] == Child )
-			m_vChildren[i] = NULL;
+		{
+			m_vChildren[i]->DetachParent();
+			m_vChildren[i] = 0;
+		}
 	}
 }
 //--------------------------------------------------------------------------------

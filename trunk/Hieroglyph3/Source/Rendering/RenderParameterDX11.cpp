@@ -10,6 +10,13 @@
 
 //--------------------------------------------------------------------------------
 #include "RenderParameterDX11.h"
+#include "ConstantBufferParameterDX11.h"
+#include "MatrixParameterDX11.h"
+#include "MatrixArrayParameterDX11.h"
+#include "SamplerParameterDX11.h"
+#include "ShaderResourceParameterDX11.h"
+#include "UnorderedAccessParameterDX11.h"
+#include "VectorParameterDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -34,5 +41,51 @@ std::wstring& RenderParameterDX11::GetName()
 void RenderParameterDX11::SetName( std::wstring& name )
 {
 	m_sParameterName = name;
+}
+//--------------------------------------------------------------------------------
+RenderParameterDX11* RenderParameterDX11::CreateCopy()
+{
+	RenderParameterDX11* pParam = 0;
+
+	switch ( this->GetParameterType() )
+	{
+	case VECTOR:
+		pParam = new VectorParameterDX11();
+		pParam->SetName( GetName() );
+		pParam->UpdateValue( this );
+		break;
+	case MATRIX:
+		pParam = new MatrixParameterDX11();
+		pParam->SetName( GetName() );
+		pParam->UpdateValue( this );
+		break;
+	case MATRIX_ARRAY:
+		pParam = new MatrixArrayParameterDX11( ((MatrixArrayParameterDX11*)this)->GetMatrixCount() );
+		pParam->SetName( GetName() );
+		pParam->UpdateValue( this );
+		break;
+	case SHADER_RESOURCE:
+		pParam = new ShaderResourceParameterDX11();
+		pParam->SetName( GetName() );
+		pParam->UpdateValue( this );
+		break;
+	case UNORDERED_ACCESS:
+		pParam = new UnorderedAccessParameterDX11();
+		pParam->SetName( GetName() );
+		pParam->UpdateValue( this );
+		break;
+	case CBUFFER:
+		pParam = new ConstantBufferParameterDX11();
+		pParam->SetName( GetName() );
+		pParam->UpdateValue( this );
+		break;
+	case SAMPLER:
+		pParam = new SamplerParameterDX11();
+		pParam->SetName( GetName() );
+		pParam->UpdateValue( this );
+		break;
+	}
+
+	return( pParam );
 }
 //--------------------------------------------------------------------------------

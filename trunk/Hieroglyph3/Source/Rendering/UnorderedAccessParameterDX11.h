@@ -30,6 +30,8 @@ namespace Glyph3
 		virtual ParameterType GetParameterType();
 		int GetIndex();
 
+		void UpdateValue( RenderParameterDX11* pParameter );
+
 	protected:
 		int		m_iUnorderedAccessView;
 	};

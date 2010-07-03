@@ -42,3 +42,15 @@ int ConstantBufferParameterDX11::GetIndex()
 	return( m_iCBuffer );
 }
 //--------------------------------------------------------------------------------
+void ConstantBufferParameterDX11::UpdateValue( RenderParameterDX11* pParameter )
+{
+	if ( pParameter )
+	{
+		if ( ( pParameter->GetParameterType() == CBUFFER ) && ( pParameter->GetName() == this->GetName() ) )
+		{
+			ConstantBufferParameterDX11* pBuffer = (ConstantBufferParameterDX11*)pParameter;
+			m_iCBuffer = pBuffer->GetIndex();
+		}
+	}
+}
+//--------------------------------------------------------------------------------

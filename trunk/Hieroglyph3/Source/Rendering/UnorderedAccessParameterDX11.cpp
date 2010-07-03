@@ -42,3 +42,15 @@ int UnorderedAccessParameterDX11::GetIndex()
 	return( m_iUnorderedAccessView );
 }
 //--------------------------------------------------------------------------------
+void UnorderedAccessParameterDX11::UpdateValue( RenderParameterDX11* pParameter )
+{
+	if ( pParameter )
+	{
+		if ( ( pParameter->GetParameterType() == UNORDERED_ACCESS ) && ( pParameter->GetName() == this->GetName() ) )
+		{
+			UnorderedAccessParameterDX11* pBuffer = (UnorderedAccessParameterDX11*)pParameter;
+			m_iUnorderedAccessView = pBuffer->GetIndex();
+		}
+	}
+}
+//--------------------------------------------------------------------------------

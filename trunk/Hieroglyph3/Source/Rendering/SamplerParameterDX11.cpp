@@ -42,3 +42,15 @@ int SamplerParameterDX11::GetIndex()
 	return( m_iSampler );
 }
 //--------------------------------------------------------------------------------
+void SamplerParameterDX11::UpdateValue( RenderParameterDX11* pParameter )
+{
+	if ( pParameter )
+	{
+		if ( ( pParameter->GetParameterType() == SAMPLER ) && ( pParameter->GetName() == this->GetName() ) )
+		{
+			SamplerParameterDX11* pBuffer = (SamplerParameterDX11*)pParameter;
+			m_iSampler = pBuffer->GetIndex();
+		}
+	}
+}
+//--------------------------------------------------------------------------------

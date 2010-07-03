@@ -205,11 +205,14 @@ void Entity3D::Render( RendererDX11& Renderer, VIEWTYPE view )
 		// Only render if the material indicates that you should
 		if ( m_sParams.pMaterial->Params[view].bRender )
 		{
+			// Set the material render parameters.  This is done before the entity
+			// render parameters so that unique values can be set by the individual
+			// entities, and still allow the material to set parameters for any
+			// entities that don't specialize the parameters.
+			m_sParams.pMaterial->SetRenderParams( Renderer, view );
+
 			// Set the entity render parameters
 			this->SetRenderParams( Renderer );
-
-			// Set the material render parameters
-			m_sParams.pMaterial->SetRenderParams( Renderer, view );
 
 			// Send the geometry to the renderer using the appropriate
 			// material view effect.
@@ -220,9 +223,35 @@ void Entity3D::Render( RendererDX11& Renderer, VIEWTYPE view )
 //--------------------------------------------------------------------------------
 void Entity3D::AddRenderParameter( RenderParameterDX11* pParameter )
 {
-	// Add the parameter to the list
 	if ( pParameter )
-		m_RenderParameters.add( pParameter );
+	{
+
+		// Search the list to see if this parameter is already there
+		RenderParameterDX11* pCurr = 0;
+
+		for ( int i = 0; i < m_RenderParameters.count(); i++ )
+		{
+			if ( pParameter->GetName() == m_RenderParameters[i]->GetName() )
+			{
+				pCurr = m_RenderParameters[i];
+				break;
+			}
+		}
+
+		if ( !pCurr )
+		{
+			// Add the parameter to the list.  We make a copy since we don't know
+			// who created the input object and can't take ownership of it.  It 
+			// may even be created on the stack, leading to disaster at the first
+			// use if we just took a copy of the pointer...
+			RenderParameterDX11* pCopy = pParameter->CreateCopy();
+			m_RenderParameters.add( pCopy );
+		}
+		else
+		{
+			pCurr->UpdateValue( pParameter ); 
+		}
+	}
 }
 //--------------------------------------------------------------------------------
 void Entity3D::SetRenderParams( RendererDX11& Renderer )

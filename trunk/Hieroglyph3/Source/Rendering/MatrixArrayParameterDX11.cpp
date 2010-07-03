@@ -77,3 +77,18 @@ Matrix4f* MatrixArrayParameterDX11::GetMatrices()
 	return( m_pMatrices );
 }
 //--------------------------------------------------------------------------------
+void MatrixArrayParameterDX11::UpdateValue( RenderParameterDX11* pParameter )
+{
+	if ( pParameter )
+	{
+		if ( ( pParameter->GetParameterType() == MATRIX_ARRAY ) && ( pParameter->GetName() == this->GetName() ) )
+		{
+			MatrixArrayParameterDX11* pBuffer = (MatrixArrayParameterDX11*)pParameter;
+			if ( this->GetMatrixCount() == pBuffer->GetMatrixCount() )
+			{
+				memcpy( (void*)m_pMatrices, (void*)pBuffer->GetMatrices(), m_iMatrixCount * sizeof( Matrix4f ) );
+			}
+		}
+	}
+}
+//--------------------------------------------------------------------------------

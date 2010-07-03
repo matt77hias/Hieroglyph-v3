@@ -51,8 +51,8 @@ VS_OUTPUT VSMAIN( in VS_INPUT input )
 	//float diffuse = dot( float3( 0.0f, 0.0f, -1.0f ), NormalWS );
 	//float diffuse = dot( float3( 0.0f, 0.0f, -1.0f ), float3( 0.0f, 0.0f, -1.0f ) );
 	//output.color = LightColor;//float4( 0.5f, 0.5f, 0.5f, 0.5f );
-	//output.color.rgb = LightColor * diffuse;
-	output.color.rgb = float3( 0.8f, 0.8f, 0.8f ) * diffuse;
+	output.color.rgb = LightColor * diffuse;
+	//output.color.rgb = float3( 0.8f, 0.8f, 0.8f ) * diffuse;
 	output.color.a = 1.0f;
 
 	return output;

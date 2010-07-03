@@ -42,3 +42,15 @@ int ShaderResourceParameterDX11::GetIndex()
 	return( m_iShaderResourceView );
 }
 //--------------------------------------------------------------------------------
+void ShaderResourceParameterDX11::UpdateValue( RenderParameterDX11* pParameter )
+{
+	if ( pParameter )
+	{
+		if ( ( pParameter->GetParameterType() == SHADER_RESOURCE ) && ( pParameter->GetName() == this->GetName() ) )
+		{
+			ShaderResourceParameterDX11* pBuffer = (ShaderResourceParameterDX11*)pParameter;
+			m_iShaderResourceView = pBuffer->GetIndex();
+		}
+	}
+}
+//--------------------------------------------------------------------------------

@@ -29,7 +29,11 @@ namespace Glyph3
 
 		virtual void SetParameterData( void* pData );
 		virtual ParameterType GetParameterType();
+		
 		Vector4f GetVector();
+		void SetVector( Vector4f v );
+
+		void UpdateValue( RenderParameterDX11* pParameter );
 
 	protected:
 		Vector4f	m_Vector;

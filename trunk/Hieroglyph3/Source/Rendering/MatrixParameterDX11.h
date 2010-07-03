@@ -31,6 +31,8 @@ namespace Glyph3
 		virtual ParameterType GetParameterType();
 		Matrix4f GetMatrix();
 
+		void UpdateValue( RenderParameterDX11* pParameter );
+
 	protected:
 		Matrix4f	m_Matrix;
 	};

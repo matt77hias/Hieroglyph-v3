@@ -29,6 +29,9 @@ namespace Glyph3
 		virtual void SetParameterData( void* pData );
 		virtual ParameterType GetParameterType();
 		int GetIndex();
+
+		void UpdateValue( RenderParameterDX11* pParameter );
+
 	protected:
 		int		m_iSampler;
 	};

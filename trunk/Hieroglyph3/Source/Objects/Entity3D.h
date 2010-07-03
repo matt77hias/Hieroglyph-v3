@@ -63,6 +63,7 @@ namespace Glyph3
 
 		void AddRenderParameter( RenderParameterDX11* pParameter );
 		void SetRenderParams( RendererDX11& Renderer );
+		
 
 		// Various entity properties are accessed here.
 

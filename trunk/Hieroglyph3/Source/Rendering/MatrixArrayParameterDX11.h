@@ -33,6 +33,8 @@ namespace Glyph3
 		int GetMatrixCount();
 		Matrix4f* GetMatrices();
 
+		void UpdateValue( RenderParameterDX11* pParameter );
+
 	protected:
 		int				m_iMatrixCount;
 		Matrix4f*		m_pMatrices;

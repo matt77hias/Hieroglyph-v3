@@ -1,5 +1,7 @@
 //--------------------------------------------------------------------------------
 #include "ScriptIntfActor.h"
+#include "VectorParameterDX11.h"
+
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -77,11 +79,115 @@ int ScriptIntfActor::SetRotation( lua_State* pLuaState )
 	return( 0 );
 }
 //--------------------------------------------------------------------------------
+int ScriptIntfActor::AttachChild( lua_State* pLuaState )
+{
+	int iNumArgs				= lua_gettop( pLuaState );
+
+	unsigned int handle1		= lua_tointeger( pLuaState, 1 );
+	unsigned int handle2		= lua_tointeger( pLuaState, 2 );
+	
+	Actor* pParent = (Actor*)ScriptManager::Get()->GetObjectPointer( handle1 );
+	Actor* pChild = (Actor*)ScriptManager::Get()->GetObjectPointer( handle2 );
+
+	if ( pParent && pChild )
+	{
+		pChild->GetNode()->DetachParent();
+		pParent->GetNode()->AttachChild( pChild->GetNode() );
+		return( 0 );
+	}
+
+	// TODO: Add error logging here to indicate actor wasn't found
+
+	return( 0 );
+}
+//--------------------------------------------------------------------------------
+int ScriptIntfActor::DetachChild( lua_State* pLuaState )
+{
+	int iNumArgs				= lua_gettop( pLuaState );
+
+	unsigned int handle1		= lua_tointeger( pLuaState, 1 );
+	unsigned int handle2		= lua_tointeger( pLuaState, 2 );
+	
+	Actor* pParent = (Actor*)ScriptManager::Get()->GetObjectPointer( handle1 );
+	Actor* pChild = (Actor*)ScriptManager::Get()->GetObjectPointer( handle2 );
+
+	if ( pParent && pChild )
+	{
+		pParent->GetNode()->DetachChild( pChild->GetNode() );
+		return( 0 );
+	}
+
+	// TODO: Add error logging here to indicate actor wasn't found
+
+	return( 0 );
+}
+//--------------------------------------------------------------------------------
+int ScriptIntfActor::SetEntityVectorParameter( lua_State* pLuaState )
+{
+	int iNumArgs				= lua_gettop( pLuaState );
+
+	unsigned int handle			= lua_tointeger( pLuaState, 1 );
+	
+	std::wstring name			= GlyphString::ToUnicode( std::string( lua_tostring( pLuaState, 2 ) ) );
+	float x						= static_cast<float>( lua_tonumber( pLuaState, 3 ) );
+	float y						= static_cast<float>( lua_tonumber( pLuaState, 4 ) );
+	float z						= static_cast<float>( lua_tonumber( pLuaState, 5 ) );
+	float w						= static_cast<float>( lua_tonumber( pLuaState, 6 ) );
+	
+	Actor* pActor = (Actor*)ScriptManager::Get()->GetObjectPointer( handle );
+
+	if ( pActor )
+	{
+		VectorParameterDX11 Vector;
+		Vector.SetName( name );
+		Vector.SetVector( Vector4f( x,y,z,w ) );
+		pActor->GetBody()->AddRenderParameter( &Vector );
+		return( 0 );
+	}
+
+	// TODO: Add error logging here to indicate actor wasn't found
+
+	return( 0 );
+}
+//--------------------------------------------------------------------------------
+int ScriptIntfActor::SetMaterialVectorParameter( lua_State* pLuaState )
+{
+	int iNumArgs				= lua_gettop( pLuaState );
+
+	unsigned int handle			= lua_tointeger( pLuaState, 1 );
+	
+	std::wstring name			= GlyphString::ToUnicode( std::string( lua_tostring( pLuaState, 2 ) ) );
+	float x						= static_cast<float>( lua_tonumber( pLuaState, 3 ) );
+	float y						= static_cast<float>( lua_tonumber( pLuaState, 4 ) );
+	float z						= static_cast<float>( lua_tonumber( pLuaState, 5 ) );
+	float w						= static_cast<float>( lua_tonumber( pLuaState, 6 ) );
+	
+	Actor* pActor = (Actor*)ScriptManager::Get()->GetObjectPointer( handle );
+
+	if ( pActor )
+	{
+
+		VectorParameterDX11 Vector;
+		Vector.SetName( name );
+		Vector.SetVector( Vector4f( x,y,z,w ) );
+		pActor->GetBody()->GetMaterial()->AddRenderParameter( &Vector );
+		return( 0 );
+	}
+
+	// TODO: Add error logging here to indicate actor wasn't found
+
+	return( 0 );
+}
+//--------------------------------------------------------------------------------
 void ScriptIntfActor::InitializeInterface()
 {
 	ScriptManager::Get()->RegisterEngineClass( "Actor" );
 	ScriptManager::Get()->RegisterClassFunction( "Actor", "_SetPosition", ScriptIntfActor::SetPosition );
 	ScriptManager::Get()->RegisterClassFunction( "Actor", "_GetPosition", ScriptIntfActor::GetPosition );
 	ScriptManager::Get()->RegisterClassFunction( "Actor", "_SetRotation", ScriptIntfActor::SetRotation );
+	ScriptManager::Get()->RegisterClassFunction( "Actor", "_AttachChild", ScriptIntfActor::AttachChild );
+	ScriptManager::Get()->RegisterClassFunction( "Actor", "_DetachChild", ScriptIntfActor::DetachChild );
+	ScriptManager::Get()->RegisterClassFunction( "Actor", "_SetEntityVectorParameter", ScriptIntfActor::SetEntityVectorParameter );
+	ScriptManager::Get()->RegisterClassFunction( "Actor", "_SetMaterialVectorParameter", ScriptIntfActor::SetMaterialVectorParameter );
 }
 //--------------------------------------------------------------------------------

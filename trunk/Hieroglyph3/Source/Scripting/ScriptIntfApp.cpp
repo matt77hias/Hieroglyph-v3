@@ -1,0 +1,115 @@
+//--------------------------------------------------------------------------------
+#include "ScriptIntfApp.h"
+#include "Log.h"
+#include "GlyphString.h"
+#include "Actor.h"
+#include "GeometryLoaderDX11.h"
+#include "MaterialGeneratorDX11.h"
+//--------------------------------------------------------------------------------
+using namespace Glyph3;
+//--------------------------------------------------------------------------------
+ScriptIntfApp::ScriptIntfApp()
+{
+	InitializeInterface();
+}
+//--------------------------------------------------------------------------------
+ScriptIntfApp::~ScriptIntfApp()
+{
+}
+//--------------------------------------------------------------------------------
+int ScriptIntfApp::Log( lua_State* pLuaState )
+{
+	int iNumArgs			= lua_gettop( pLuaState );
+
+	const char* message		= lua_tostring( pLuaState, 1 );
+
+	Log::Get().Write( GlyphString::ToUnicode( std::string( message ) ) );
+
+	return( 0 );
+}
+//--------------------------------------------------------------------------------
+int ScriptIntfApp::Framerate( lua_State* pLuaState )
+{
+	int iNumArgs			= lua_gettop( pLuaState );
+
+	lua_pushnumber( pLuaState, Application::GetApplication()->m_pTimer->Framerate() );
+
+	return( 1 );
+}
+//--------------------------------------------------------------------------------
+int ScriptIntfApp::CreateActor( lua_State* pLuaState )
+{
+	// The arguments to create actor are two strings - one for the geometry file
+	// to use and the other for the material identifier.
+
+	int iNumArgs			= lua_gettop( pLuaState );
+
+	const char* geometry	= lua_tostring( pLuaState, 1 );
+	const char* material	= lua_tostring( pLuaState, 2 );
+
+	// TODO: utilize a common material for all of the objects created in this way!
+	Actor* pActor = new Actor();
+	GeometryDX11* pGeometry = GeometryLoaderDX11::loadMS3DFile2( GlyphString::ToUnicode( std::string( geometry ) ) );
+	pGeometry->LoadToBuffers();
+	pActor->GetBody()->SetGeometry( pGeometry );
+	pActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GeneratePhong( *RendererDX11::Get() ) );
+
+	// Add this actor the application's scene.
+
+	Application::GetApplication()->m_pScene->AddEntity( pActor->GetNode() );
+
+	// Register the object with the ScriptManager, and get a handle to the object.
+	// This is the return value for this function.
+
+	unsigned int handle = ScriptManager::Get()->RegisterEngineObject( "Actor", pActor );
+
+	lua_pushinteger( pLuaState, handle );
+
+	return( 1 );
+}
+//--------------------------------------------------------------------------------
+void ScriptIntfApp::Initialize()
+{
+	lua_State* pLuaState = ScriptManager::Get()->GetState();
+	lua_getfield( pLuaState, LUA_GLOBALSINDEX, "Initialize" );
+    lua_call( pLuaState, 0, 0 );
+}
+//--------------------------------------------------------------------------------
+void ScriptIntfApp::Update( float time )
+{
+	lua_State* pLuaState = ScriptManager::Get()->GetState();
+	lua_getfield( pLuaState, LUA_GLOBALSINDEX, "Update" );
+    lua_pushnumber( pLuaState, time );
+    lua_call( pLuaState, 1, 0 );
+}
+//--------------------------------------------------------------------------------
+void ScriptIntfApp::Render()
+{
+	lua_State* pLuaState = ScriptManager::Get()->GetState();
+	lua_getfield( pLuaState, LUA_GLOBALSINDEX, "Render" );
+    lua_call( pLuaState, 0, 0 );
+}
+//--------------------------------------------------------------------------------
+void ScriptIntfApp::Shutdown()
+{
+	lua_State* pLuaState = ScriptManager::Get()->GetState();
+	lua_getfield( pLuaState, LUA_GLOBALSINDEX, "Shutdown" );
+    lua_call( pLuaState, 0, 0 );
+}
+//--------------------------------------------------------------------------------
+void ScriptIntfApp::OnKeyDown( unsigned int key )
+{
+	lua_State* pLuaState = ScriptManager::Get()->GetState();
+	lua_getfield( pLuaState, LUA_GLOBALSINDEX, "OnKeyDown" );
+	lua_pushnumber( pLuaState, key );
+    lua_call( pLuaState, 1, 0 );
+}
+//--------------------------------------------------------------------------------
+void ScriptIntfApp::InitializeInterface()
+{
+	ScriptManager::Get()->RegisterEngineClass( "App" );
+	ScriptManager::Get()->RegisterClassFunction( "App", "Log", ScriptIntfApp::Log );
+	ScriptManager::Get()->RegisterClassFunction( "App", "Framerate", ScriptIntfApp::Framerate );
+	ScriptManager::Get()->RegisterClassFunction( "App", "CreateActor", ScriptIntfApp::CreateActor );
+}
+//--------------------------------------------------------------------------------

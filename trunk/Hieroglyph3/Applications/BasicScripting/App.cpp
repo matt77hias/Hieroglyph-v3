@@ -257,6 +257,7 @@ bool App::HandleEvent( IEvent* pEvent )
 		EvtKeyDown* pKeyDown = (EvtKeyDown*)pEvent;
 
 		unsigned int key = pKeyDown->GetCharacterCode();
+		ScriptIntfApp::OnKeyDown( key );
 
 		return( true );
 	}
