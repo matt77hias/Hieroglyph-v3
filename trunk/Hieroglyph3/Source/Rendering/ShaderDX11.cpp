@@ -14,6 +14,8 @@
 #include "Log.h"
 #include "GlyphString.h"
 #include <sstream>
+#include "ParameterManagerDX11.h"
+#include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -26,7 +28,7 @@ ShaderDX11::~ShaderDX11()
 
 }
 //--------------------------------------------------------------------------------
-void ShaderDX11::UpdateParameters( RendererDX11* pRenderer )
+void ShaderDX11::UpdateParameters( PipelineManagerDX11* pPipeline, ParameterManagerDX11* pParamManager )
 {
 	// Renderer will call this function when binding the shader to the pipeline.
 	// This function will then call renderer functions to update each constant
@@ -38,7 +40,8 @@ void ShaderDX11::UpdateParameters( RendererDX11* pRenderer )
 		{
 			// Get the index of the constant buffer parameter currently set with 
 			// this name.
-			int index = pRenderer->GetConstantBufferParameter( ConstantBuffers[i].Description.Name );
+
+			int index = pParamManager->GetConstantBufferParameter( ConstantBuffers[i].Description.Name );
 
 			// If the constant buffer does not exist yet, create a one with 
 			// standard options - writeable by the CPU and only bound as a 
@@ -54,10 +57,10 @@ void ShaderDX11::UpdateParameters( RendererDX11* pRenderer )
 
 				// Create the buffer and set it as a constant buffer parameter.  This
 				// creates a parameter object to be used in the future.
-				ResourcePtr resource = pRenderer->CreateConstantBuffer( &cbuffer, 0 );
+				ResourcePtr resource = RendererDX11::Get()->CreateConstantBuffer( &cbuffer, 0 );
 				index = resource->m_iResource;
 
-				pRenderer->SetConstantBufferParameter( ConstantBuffers[i].Description.Name, resource );
+				pParamManager->SetConstantBufferParameter( ConstantBuffers[i].Description.Name, resource );
 			}
 
 			// Map the constant buffer into system memory.  We map the buffer 
@@ -65,7 +68,7 @@ void ShaderDX11::UpdateParameters( RendererDX11* pRenderer )
 			// buffer already.
 
 			D3D11_MAPPED_SUBRESOURCE resource = 
-				pRenderer->MapResource( index, 0, D3D11_MAP_WRITE_DISCARD, 0 );
+				pPipeline->MapResource( index, 0, D3D11_MAP_WRITE_DISCARD, 0 );
 
 			// Update each variable in the constant buffer.  These variables are identified
 			// by their type, and are currently allowed to be Vector4f, Matrix4f, or Matrix4f
@@ -79,7 +82,7 @@ void ShaderDX11::UpdateParameters( RendererDX11* pRenderer )
 				
 				if ( ConstantBuffers[i].Types[j].Class == D3D10_SVC_VECTOR )
 				{
-					Vector4f vector = pRenderer->GetVectorParameter( name );
+					Vector4f vector = pParamManager->GetVectorParameter( name );
 					Vector4f* pBuf = (Vector4f*)((char*)resource.pData + offset);
 					*pBuf = vector;
 				}
@@ -90,7 +93,7 @@ void ShaderDX11::UpdateParameters( RendererDX11* pRenderer )
 					unsigned int count = ConstantBuffers[i].Types[j].Elements;
 					if ( count == 0 ) 
 					{
-						Matrix4f matrix = pRenderer->GetMatrixParameter( name );
+						Matrix4f matrix = pParamManager->GetMatrixParameter( name );
 						Matrix4f* pBuf = (Matrix4f*)((char*)resource.pData + offset);
 						*pBuf = matrix;
 					}
@@ -99,7 +102,7 @@ void ShaderDX11::UpdateParameters( RendererDX11* pRenderer )
 						// If a matrix array, then use the corresponding parameter type.
 						// TODO: If the shader expects a different number of matrices than are present
 						//       from the matrix array parameter, then this causes an exception!
-						Matrix4f* pMatrices = pRenderer->GetMatrixArrayParameter( name, count );
+						Matrix4f* pMatrices = pParamManager->GetMatrixArrayParameter( name, count );
 						memcpy( ((char*)resource.pData + offset), (char*)pMatrices, ConstantBuffers[i].Variables[j].Size );
 					}
 				}
@@ -109,12 +112,12 @@ void ShaderDX11::UpdateParameters( RendererDX11* pRenderer )
 				}
 			}
 
-			pRenderer->UnMapResource( index, 0 );
+			pPipeline->UnMapResource( index, 0 );
 		}
 	}
 }
 //--------------------------------------------------------------------------------
-void ShaderDX11::BindParameters( RendererDX11* pRenderer )
+void ShaderDX11::BindParameters( PipelineManagerDX11* pPipeline, ParameterManagerDX11* pParamManager )
 {
 	// Here the shader will attempt to bind each parameter needed by the pipeline.
 	// The renderer supplies methods for binding a parameter based on the name
@@ -129,40 +132,40 @@ void ShaderDX11::BindParameters( RendererDX11* pRenderer )
 		switch ( ResourceBindings[i].Type )
 		{
 		case D3D10_SIT_CBUFFER:
-			pRenderer->BindConstantBufferParameter( GetType(), name, slot );
+			pPipeline->BindConstantBufferParameter( GetType(), name, slot, pParamManager );
 			break;
 		case D3D10_SIT_TBUFFER:
-			pRenderer->BindConstantBufferParameter( GetType(), name, slot );
+			pPipeline->BindConstantBufferParameter( GetType(), name, slot, pParamManager );
 			break;
 		case D3D10_SIT_TEXTURE:
-			pRenderer->BindShaderResourceParameter( GetType(), name, slot );
+			pPipeline->BindShaderResourceParameter( GetType(), name, slot, pParamManager );
 			break;
 		case D3D10_SIT_SAMPLER:
-			pRenderer->BindSamplerStateParameter( GetType(), name, slot );
+			pPipeline->BindSamplerStateParameter( GetType(), name, slot, pParamManager );
 			break;
 		case D3D11_SIT_UAV_RWTYPED:
-			pRenderer->BindUnorderedAccessParameter( GetType(), name, slot );
+			pPipeline->BindUnorderedAccessParameter( GetType(), name, slot, pParamManager );
 			break;
 		case D3D11_SIT_STRUCTURED:
-			pRenderer->BindShaderResourceParameter( GetType(), name, slot );
+			pPipeline->BindShaderResourceParameter( GetType(), name, slot, pParamManager );
 			break;
 		case D3D11_SIT_UAV_RWSTRUCTURED:
-			pRenderer->BindUnorderedAccessParameter( GetType(), name, slot );
+			pPipeline->BindUnorderedAccessParameter( GetType(), name, slot, pParamManager );
 			break;
 		case D3D11_SIT_BYTEADDRESS:
-			pRenderer->BindShaderResourceParameter( GetType(), name, slot );
+			pPipeline->BindShaderResourceParameter( GetType(), name, slot, pParamManager );
 			break;
 		case D3D11_SIT_UAV_RWBYTEADDRESS:
-			pRenderer->BindUnorderedAccessParameter( GetType(), name, slot );
+			pPipeline->BindUnorderedAccessParameter( GetType(), name, slot, pParamManager );
 			break;
 		case D3D11_SIT_UAV_APPEND_STRUCTURED:
-			pRenderer->BindUnorderedAccessParameter( GetType(), name, slot );
+			pPipeline->BindUnorderedAccessParameter( GetType(), name, slot, pParamManager );
 			break;
 		case D3D11_SIT_UAV_CONSUME_STRUCTURED:
-			pRenderer->BindUnorderedAccessParameter( GetType(), name, slot );
+			pPipeline->BindUnorderedAccessParameter( GetType(), name, slot, pParamManager );
 			break;
 		case D3D11_SIT_UAV_RWSTRUCTURED_WITH_COUNTER:
-			pRenderer->BindUnorderedAccessParameter( GetType(), name, slot );
+			pPipeline->BindUnorderedAccessParameter( GetType(), name, slot, pParamManager );
 			break;
 		}
 	}

@@ -30,23 +30,24 @@ namespace Glyph3
 		ViewPerspective( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget );
 
 		virtual void Update( float fTime );
-		virtual void Draw( RendererDX11& Renderer );
+		virtual void PreDraw( RendererDX11* pRenderer );
+		virtual void Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager );
 
-		void SetBackColor( Vector4f color );
-		void SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ );
+		virtual void SetBackColor( Vector4f color );
+		virtual void SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ );
 
-		virtual void SetRenderParams( RendererDX11& Renderer );
-		virtual void SetUsageParams( RendererDX11& Renderer );
+		virtual void SetRenderParams( ParameterManagerDX11* pParamManager );
+		virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
 
 
 		virtual ~ViewPerspective();
 
 	protected:
-		Vector4f m_vColor;
-		//D3DVIEWPORT9 m_viewport;
+		Vector4f		m_vColor;
+		int				m_iViewport;
 
-		ResourcePtr m_RenderTarget;
-		ResourcePtr m_DepthTarget;
+		ResourcePtr		m_RenderTarget;
+		ResourcePtr		m_DepthTarget;
 	};
 };
 //--------------------------------------------------------------------------------

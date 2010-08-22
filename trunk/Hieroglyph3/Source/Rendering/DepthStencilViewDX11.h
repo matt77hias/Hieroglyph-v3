@@ -13,6 +13,7 @@
 //
 //--------------------------------------------------------------------------------
 #include "ResourceViewDX11.h"
+#include "PipelineManagerDx11.h"
 //--------------------------------------------------------------------------------
 #ifndef DepthStencilViewDX11_h
 #define DepthStencilViewDX11_h
@@ -27,7 +28,8 @@ namespace Glyph3
 
 	protected:
 		ID3D11DepthStencilView*			m_pDepthStencilView;
-		friend RendererDX11;
+		
+		friend PipelineManagerDX11;
 	};
 };
 //--------------------------------------------------------------------------------

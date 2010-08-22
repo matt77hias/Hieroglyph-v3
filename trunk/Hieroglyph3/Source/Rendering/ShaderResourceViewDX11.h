@@ -13,6 +13,7 @@
 //
 //--------------------------------------------------------------------------------
 #include "ResourceViewDX11.h"
+#include "PipelineManagerDx11.h"
 //--------------------------------------------------------------------------------
 #ifndef ShaderResourceViewDX11_h
 #define ShaderResourceViewDX11_h
@@ -27,7 +28,8 @@ namespace Glyph3
 
 	protected:
 		ID3D11ShaderResourceView*			m_pShaderResourceView;
-		friend RendererDX11;
+		
+		friend PipelineManagerDX11;
 	};
 };
 //--------------------------------------------------------------------------------

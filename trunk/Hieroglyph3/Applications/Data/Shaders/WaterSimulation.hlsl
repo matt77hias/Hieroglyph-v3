@@ -131,8 +131,9 @@ void CSMAIN( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThr
 	const float FLUID_DENSITY = 1.0f;
 	const float COLUMN_AREA = 0.05f;
 	const float DAMPING_FACTOR = 0.9995f;
+	
 	float fAccelFactor = ( min( TimeFactors.x, TIME_STEP ) * PIPE_AREA * GRAVITATION ) / ( PIPE_LENGTH * COLUMN_AREA );
-
+	
 	// Calculate the new flow, and add in the previous flow value as well.  The damping factor
 	// degrades the amount of inertia in the system.
 	NewFlow = ( NewFlow * fAccelFactor + loadedpoints[GroupIndex].Flow ) * DAMPING_FACTOR;

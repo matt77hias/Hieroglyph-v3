@@ -16,6 +16,7 @@
 #include "RenderParameterDX11.h"
 #include <sstream>
 #include <algorithm>
+#include "ParameterManagerDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -190,14 +191,14 @@ Matrix4f Entity3D::GetView()
 	return( Ret );
 }
 //--------------------------------------------------------------------------------
-void Entity3D::PreRender( RendererDX11& Renderer, VIEWTYPE view )
+void Entity3D::PreRender( RendererDX11* pRenderer, VIEWTYPE view )
 {
 	// Perform the pre-render function only if the material has been set
 	if ( m_sParams.pMaterial )
-		m_sParams.pMaterial->PreRender( Renderer, view );
+		m_sParams.pMaterial->PreRender( pRenderer, view );
 }
 //--------------------------------------------------------------------------------
-void Entity3D::Render( RendererDX11& Renderer, VIEWTYPE view )
+void Entity3D::Render( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager, VIEWTYPE view )
 {
 	// Test if the entity contains any geometry, and it has a material
 	if ( ( m_sParams.pGeometry ) && ( m_sParams.pMaterial ) )
@@ -209,14 +210,14 @@ void Entity3D::Render( RendererDX11& Renderer, VIEWTYPE view )
 			// render parameters so that unique values can be set by the individual
 			// entities, and still allow the material to set parameters for any
 			// entities that don't specialize the parameters.
-			m_sParams.pMaterial->SetRenderParams( Renderer, view );
+			m_sParams.pMaterial->SetRenderParams( pParamManager, view );
 
 			// Set the entity render parameters
-			this->SetRenderParams( Renderer );
+			this->SetRenderParams( pParamManager );
 
 			// Send the geometry to the renderer using the appropriate
 			// material view effect.
-			Renderer.Draw( *m_sParams.pMaterial->Params[view].pEffect, *m_sParams.pGeometry );
+			pPipelineManager->Draw( *m_sParams.pMaterial->Params[view].pEffect, *m_sParams.pGeometry, pParamManager );
 		}
 	}
 }
@@ -254,14 +255,14 @@ void Entity3D::AddRenderParameter( RenderParameterDX11* pParameter )
 	}
 }
 //--------------------------------------------------------------------------------
-void Entity3D::SetRenderParams( RendererDX11& Renderer )
+void Entity3D::SetRenderParams( ParameterManagerDX11* pParamManager )
 {
 	// Set the world matrix
-	Renderer.SetWorldMatrixParameter( &m_sParams.WorldMatrix );
+	pParamManager->SetWorldMatrixParameter( &m_sParams.WorldMatrix );
 	
 	// Scroll through each parameter and set it in the renderer
 	for ( int i = 0; i < m_RenderParameters.count(); i++ )
-		Renderer.SetParameter( m_RenderParameters[i] );
+		pParamManager->SetParameter( m_RenderParameters[i] );
 }
 //--------------------------------------------------------------------------------
 void Entity3D::Hide( bool bHide )

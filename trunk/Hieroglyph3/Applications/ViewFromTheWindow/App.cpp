@@ -18,6 +18,8 @@
 #include "GeometryLoaderDX11.h"
 #include "MaterialGeneratorDX11.h"
 
+#include "ParameterManagerDX11.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
@@ -122,7 +124,7 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftY = 0;
 
 	int ViewPort = m_pRenderer11->CreateViewPort( viewport );
-	m_pRenderer11->SetViewPort( ViewPort );
+	m_pRenderer11->m_pPipeMgr->SetViewPort( ViewPort );
 	
 	return( true );
 }
@@ -170,10 +172,10 @@ void App::Initialize()
 	// Create the parameters for use with this effect
 
 	m_LightParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
-	m_pRenderer11->SetVectorParameter( std::wstring( L"LightColor" ), &m_LightParams );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"LightColor" ), &m_LightParams );
 
 	m_LightPosition = Vector4f( 20.0f, 20.0f, -20.0f, 0.0f );
-	m_pRenderer11->SetVectorParameter( std::wstring( L"LightPositionWS" ), &m_LightPosition );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"LightPositionWS" ), &m_LightPosition );
 
 	// Create the material for use by the entities.
 
@@ -231,7 +233,7 @@ void App::Update()
 	// Update the scene, and then render all cameras within the scene.
 
 	m_pScene->Update( m_pTimer->Elapsed() );
-	m_pScene->Render( *m_pRenderer11 );
+	m_pScene->Render( m_pRenderer11 );
 
 
 	// Perform the rendering and presentation for each window.
@@ -254,7 +256,7 @@ void App::Update()
 		if ( box.top < 0 ) box.top = 0;
 		if ( box.bottom > (unsigned int)m_DesktopRes.y - 1 ) box.bottom = (unsigned int)m_DesktopRes.y - 1;
 
-		m_pRenderer11->CopySubresourceRegion( m_RenderTarget[i], 0, 0, 0, 0, m_OffscreenTexture, 0, &box );
+		m_pRenderer11->m_pPipeMgr->CopySubresourceRegion( m_RenderTarget[i], 0, 0, 0, 0, m_OffscreenTexture, 0, &box );
 		m_pRenderer11->Present( m_pWindow[i]->GetHandle(), m_pWindow[i]->GetSwapChain() );
 	}
 
@@ -266,7 +268,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"BasicApplication_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->m_pPipeMgr->SaveTextureScreenShot( 0, std::wstring( L"BasicApplication_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------

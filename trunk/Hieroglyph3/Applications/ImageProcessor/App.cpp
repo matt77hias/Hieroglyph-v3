@@ -20,6 +20,8 @@
 #include "MaterialGeneratorDX11.h"
 #include "RasterizerStateConfigDX11.h"
 
+#include "ParameterManagerDX11.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
@@ -106,7 +108,7 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 
-	m_pRenderer11->SetViewPort( m_pRenderer11->CreateViewPort( viewport ) );
+	m_pRenderer11->m_pPipeMgr->SetViewPort( m_pRenderer11->CreateViewPort( viewport ) );
 	
 	return( true );
 }
@@ -169,10 +171,10 @@ void App::Initialize()
 
 	// Set any parameters that will be needed by the shaders used above.
 	Vector4f DispatchSize = Vector4f( (float)DispatchSizeX, (float)DispatchSizeZ, (float)DispatchSizeX * 16, (float)DispatchSizeZ * 16 );
-	m_pRenderer11->SetVectorParameter( std::wstring( L"DispatchSize" ), &DispatchSize );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"DispatchSize" ), &DispatchSize );
 
 	Vector4f FinalColor = Vector4f( 0.5f, 1.0f, 0.5f, 1.0f );
-	m_pRenderer11->SetVectorParameter( std::wstring( L"FinalColor" ), &FinalColor );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"FinalColor" ), &FinalColor );
 
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
@@ -223,7 +225,7 @@ void App::Update()
 	//s << L"Frame Number: " << m_pTimer->FrameCount() << L" Elapsed Time: " << m_pTimer->Elapsed();
 	//Log::Get().Write( s.str() );
 
-	m_pRenderer11->SetVectorParameter( std::wstring( L"TimeFactors" ), &TimeFactors );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"TimeFactors" ), &TimeFactors );
 
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.
@@ -244,7 +246,7 @@ void App::Update()
 	//m_pRenderer11->StartPipelineStatistics();
 
 	m_pScene->Update( m_pTimer->Elapsed() );
-	m_pScene->Render( *m_pRenderer11 );
+	m_pScene->Render( m_pRenderer11 );
 
 	//m_pRenderer11->EndPipelineStatistics();
 	//Log::Get().Write( m_pRenderer11->PrintPipelineStatistics() );
@@ -261,14 +263,12 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"WaterSimulation_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->m_pPipeMgr->SaveTextureScreenShot( 0, std::wstring( L"WaterSimulation_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pRenderView );
-
 	SAFE_DELETE( m_pEntity );
 	
 	SAFE_DELETE( m_pNode );

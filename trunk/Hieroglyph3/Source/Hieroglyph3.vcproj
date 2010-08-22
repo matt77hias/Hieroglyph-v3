@@ -772,6 +772,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Rendering\InputLayoutDX11.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Rendering\InputLayoutDX11.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Rendering\RasterizerStateConfigDX11.cpp"
 					>
 				</File>
@@ -815,6 +823,14 @@
 			<Filter
 				Name="Pipeline"
 				>
+				<File
+					RelativePath=".\Rendering\PipelineManagerDX11.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Rendering\PipelineManagerDX11.h"
+					>
+				</File>
 				<Filter
 					Name="Shader Programs"
 					>
@@ -949,72 +965,92 @@
 				</Filter>
 			</Filter>
 			<Filter
-				Name="Parameters"
+				Name="Parameter System"
 				>
 				<File
-					RelativePath=".\Rendering\ConstantBufferParameterDX11.cpp"
+					RelativePath=".\Rendering\ParameterManagerDX11.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Rendering\ConstantBufferParameterDX11.h"
+					RelativePath=".\Rendering\ParameterManagerDX11.h"
 					>
 				</File>
-				<File
-					RelativePath=".\Rendering\MatrixArrayParameterDX11.cpp"
+				<Filter
+					Name="Parameters"
 					>
-				</File>
-				<File
-					RelativePath=".\Rendering\MatrixArrayParameterDX11.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Rendering\MatrixParameterDX11.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Rendering\MatrixParameterDX11.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Rendering\RenderParameterDX11.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Rendering\RenderParameterDX11.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Rendering\SamplerParameterDX11.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Rendering\SamplerParameterDX11.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Rendering\ShaderResourceParameterDX11.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Rendering\ShaderResourceParameterDX11.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Rendering\UnorderedAccessParameterDX11.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Rendering\UnorderedAccessParameterDX11.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Rendering\VectorParameterDX11.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Rendering\VectorParameterDX11.h"
-					>
-				</File>
+					<File
+						RelativePath=".\Rendering\ConstantBufferParameterDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ConstantBufferParameterDX11.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\EntityParameterDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\EntityParameterDX11.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\MatrixArrayParameterDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\MatrixArrayParameterDX11.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\MatrixParameterDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\MatrixParameterDX11.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\RenderParameterDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\RenderParameterDX11.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\SamplerParameterDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\SamplerParameterDX11.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ShaderResourceParameterDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ShaderResourceParameterDX11.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\UnorderedAccessParameterDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\UnorderedAccessParameterDX11.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\VectorParameterDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\VectorParameterDX11.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Geometry"
@@ -1041,14 +1077,6 @@
 				</File>
 				<File
 					RelativePath=".\Rendering\GeometryLoaderDX11.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Rendering\InputLayoutDX11.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Rendering\InputLayoutDX11.h"
 					>
 				</File>
 				<File
@@ -1115,6 +1143,30 @@
 						>
 					</File>
 					<File
+						RelativePath=".\Rendering\ViewAmbientOcclusion.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ViewAmbientOcclusion.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ViewDepthNormal.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ViewDepthNormal.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ViewOcclusion.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ViewOcclusion.h"
+						>
+					</File>
+					<File
 						RelativePath=".\Rendering\ViewPerspective.cpp"
 						>
 					</File>
@@ -1149,6 +1201,22 @@
 				</File>
 				<File
 					RelativePath=".\Rendering\DXGIOutput.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Renderer Components"
+				>
+			</Filter>
+			<Filter
+				Name="Multithreading"
+				>
+				<File
+					RelativePath=".\Rendering\CommandListDX11.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Rendering\CommandListDX11.h"
 					>
 				</File>
 			</Filter>

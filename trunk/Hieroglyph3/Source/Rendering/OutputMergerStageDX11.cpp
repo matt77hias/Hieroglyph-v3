@@ -67,10 +67,10 @@ void OutputMergerStageDX11::BindResources( ID3D11DeviceContext* pContext )
 			break;
 		}
 	}
-	
+
 	// If any targets are different then copy them over.
 	if ( max > 0 )
-		pContext->OMSetRenderTargets( max, RenderTargetViews, DepthTargetViews );
+		pContext->OMSetRenderTargets( 7, RenderTargetViews, DepthTargetViews );
 	
 	// Update the API views to know what to update next time.
 	for ( int i = 0; i < 8; i++ )

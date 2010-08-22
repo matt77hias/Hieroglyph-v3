@@ -13,6 +13,7 @@
 //
 //--------------------------------------------------------------------------------
 #include "ShaderDX11.h"
+#include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 #ifndef DomainShaderDX11_h
 #define DomainShaderDX11_h
@@ -30,7 +31,7 @@ namespace Glyph3
 	protected:
 		ID3D11DomainShader*			m_pDomainShader;
 
-		friend RendererDX11;
+		friend PipelineManagerDX11;
 	};
 };
 //--------------------------------------------------------------------------------

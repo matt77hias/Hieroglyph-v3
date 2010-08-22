@@ -39,7 +39,7 @@ VIEWTYPE ViewRenderParams::ViewNameToIndex( std::string& name )
 	else if ( name == "screen_space_ambient_occlusion" )
 		return( VT_SSAO );
 	else if ( name == "linear_depth" )
-		return( VT_LINEAR_DEPTH_NORMALS );
+		return( VT_LINEAR_DEPTH_NORMAL );
 
 	// VT_INVALID should be index 0, which shouldn't be used for anything...
 	return( VT_INVALID );

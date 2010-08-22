@@ -19,6 +19,8 @@
 
 #include "MaterialGeneratorDX11.h"
 
+#include "ParameterManagerDX11.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
@@ -94,10 +96,10 @@ bool App::ConfigureEngineComponents()
 	// Bind the swap chain render target and the depth buffer for use in 
 	// rendering.  
 
-	m_pRenderer11->ClearRenderTargets();
-	m_pRenderer11->BindRenderTargets( 0, m_RenderTarget );
-	m_pRenderer11->BindDepthTarget( m_DepthTarget );
-	m_pRenderer11->ApplyRenderTargets();
+	m_pRenderer11->m_pPipeMgr->ClearRenderTargets();
+	m_pRenderer11->m_pPipeMgr->BindRenderTargets( 0, m_RenderTarget );
+	m_pRenderer11->m_pPipeMgr->BindDepthTarget( m_DepthTarget );
+	m_pRenderer11->m_pPipeMgr->ApplyRenderTargets();
 
 
 	// Create a view port to use on the scene.  This basically selects the 
@@ -112,7 +114,7 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftY = 0;
 
 	int ViewPort = m_pRenderer11->CreateViewPort( viewport );
-	m_pRenderer11->SetViewPort( ViewPort );
+	m_pRenderer11->m_pPipeMgr->SetViewPort( ViewPort );
 	
 	return( true );
 }
@@ -158,7 +160,7 @@ void App::Initialize()
 	// Create the parameters for use with this effect
 
 	m_TessParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
-	m_pRenderer11->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
 
 
 	// Create a render view to manage the drawing process
@@ -166,8 +168,10 @@ void App::Initialize()
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );
 
-	D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&m_pRenderView->ProjMatrix, 
-		static_cast<float>( D3DX_PI ) / 4, 640.0f / 320.0f, 0.1f, 100.0f );
+	Matrix4f proj;
+	D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&proj, static_cast<float>( D3DX_PI ) / 4, 640.0f / 320.0f, 0.1f, 100.0f );
+
+	m_pRenderView->SetProjMatrix( proj );
 
 	m_pRoot = new Node3D();
 
@@ -209,7 +213,7 @@ void App::Update()
 
 	m_pRoot->Update( m_pTimer->Elapsed() );
 
-	m_pRenderView->Draw( *m_pRenderer11 );
+	m_pRenderView->Draw( m_pRenderer11->m_pPipeMgr, m_pRenderer11->m_pParamMgr );
 
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
 
@@ -220,7 +224,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"BasicApplication_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->m_pPipeMgr->SaveTextureScreenShot( 0, std::wstring( L"BasicApplication_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------

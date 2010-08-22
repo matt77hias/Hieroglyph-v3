@@ -10,6 +10,7 @@
 
 //--------------------------------------------------------------------------------
 #include "RenderEffectDX11.h"
+#include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -32,32 +33,32 @@ RenderEffectDX11::~RenderEffectDX11()
 
 }
 //--------------------------------------------------------------------------------
-void RenderEffectDX11::ConfigurePipeline( RendererDX11* pRenderer )
+void RenderEffectDX11::ConfigurePipeline( PipelineManagerDX11* pPipeline, ParameterManagerDX11* pParamManager )
 {
 	// For the standard states, only apply the state change if there is a valid
 	// state in this render effect.  If not, use the current state that has already
 	// been specified before this effect was bound.
 
 	if ( m_iBlendState != -1 )
-		pRenderer->SetBlendState( m_iBlendState );
+		pPipeline->SetBlendState( m_iBlendState );
 
 	if ( m_iDepthStencilState != -1 )
-		pRenderer->SetDepthStencilState( m_iDepthStencilState );
+		pPipeline->SetDepthStencilState( m_iDepthStencilState );
 
 	if ( m_iRasterizerState != -1 )
-		pRenderer->SetRasterizerState( m_iRasterizerState );
+		pPipeline->SetRasterizerState( m_iRasterizerState );
 
 	// For the shaders, we bind each one even if the shader is not valid in this
 	// render effect.  This allows for various pipeline stages to be disabled when
 	// they are not being used.  The renderer will update each shader's required
 	// resources based on the shader reflection information stored in each shader.
 
-	pRenderer->BindShader( VERTEX_SHADER, m_iVertexShader );
-	pRenderer->BindShader( HULL_SHADER, m_iHullShader );
-	pRenderer->BindShader( DOMAIN_SHADER, m_iDomainShader );
-	pRenderer->BindShader( GEOMETRY_SHADER, m_iGeometryShader );
-	pRenderer->BindShader( PIXEL_SHADER, m_iPixelShader );
-	pRenderer->BindShader( COMPUTE_SHADER, m_iComputeShader );
+	pPipeline->BindShader( VERTEX_SHADER, m_iVertexShader, pParamManager );
+	pPipeline->BindShader( HULL_SHADER, m_iHullShader, pParamManager );
+	pPipeline->BindShader( DOMAIN_SHADER, m_iDomainShader, pParamManager );
+	pPipeline->BindShader( GEOMETRY_SHADER, m_iGeometryShader, pParamManager );
+	pPipeline->BindShader( PIXEL_SHADER, m_iPixelShader, pParamManager );
+	pPipeline->BindShader( COMPUTE_SHADER, m_iComputeShader, pParamManager );
 
 	// After making the changes to the resources above, the renderer will apply 
 	// the changes to the pipeline when a draw/dispatch call is made.

@@ -18,6 +18,8 @@
 #include "GeometryGeneratorDX11.h"
 #include "RenderEffectDX11.h"
 
+#include "ParameterManagerDX11.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
@@ -93,10 +95,10 @@ bool App::ConfigureEngineComponents()
 	// Bind the swap chain render target and the depth buffer for use in 
 	// rendering.  
 
-	m_pRenderer11->ClearRenderTargets();
-	m_pRenderer11->BindRenderTargets( 0, m_RenderTarget );
-	m_pRenderer11->BindDepthTarget( m_DepthTarget );
-	m_pRenderer11->ApplyRenderTargets();
+	m_pRenderer11->m_pPipeMgr->ClearRenderTargets();
+	m_pRenderer11->m_pPipeMgr->BindRenderTargets( 0, m_RenderTarget );
+	m_pRenderer11->m_pPipeMgr->BindDepthTarget( m_DepthTarget );
+	m_pRenderer11->m_pPipeMgr->ApplyRenderTargets();
 
 
 	// Create a view port to use on the scene.  This basically selects the 
@@ -111,7 +113,7 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftY = 0;
 
 	int ViewPort = m_pRenderer11->CreateViewPort( viewport );
-	m_pRenderer11->SetViewPort( ViewPort );
+	m_pRenderer11->m_pPipeMgr->SetViewPort( ViewPort );
 	
 	return( true );
 }
@@ -196,9 +198,9 @@ void App::Initialize()
 	// resources with the appropriate shader variables at rendering time.  The
 	// resource proxy object contains the needed 'ResourceView' instances.
 
-	m_pRenderer11->SetShaderResourceParameter( L"InputMap", m_Texture );
-	m_pRenderer11->SetUnorderedAccessParameter( L"OutputMap", m_Output );
-	m_pRenderer11->SetShaderResourceParameter( L"ColorMap00", m_Output );
+	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
+	m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
+	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"ColorMap00", m_Output );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -217,12 +219,12 @@ void App::Update()
 	// is that the texture is 640x480 - if there is a different size then the 
 	// dispatch call can be modified accordingly.
 
-	m_pRenderer11->Dispatch( *m_pFilterEffect, 32, 24, 1 );
+	m_pRenderer11->m_pPipeMgr->Dispatch( *m_pFilterEffect, 32, 24, 1, m_pRenderer11->m_pParamMgr );
 
 	// Render the texture to the backbuffer.
 
-	m_pRenderer11->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ), 1.0f );
-	m_pRenderer11->Draw( *m_pTextureEffect, *m_pFullScreen );
+	m_pRenderer11->m_pPipeMgr->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ), 1.0f );
+	m_pRenderer11->m_pPipeMgr->Draw( *m_pTextureEffect, *m_pFullScreen, m_pRenderer11->m_pParamMgr );
 
 	// Present the results to the window.
 
@@ -235,7 +237,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"BasicApplication_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->m_pPipeMgr->SaveTextureScreenShot( 0, std::wstring( L"BasicApplication_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------

@@ -13,6 +13,7 @@
 //
 //--------------------------------------------------------------------------------
 #include "RendererDX11.h"
+#include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 #ifndef InputLayoutDX11_h
 #define InputLayoutDX11_h
@@ -28,7 +29,7 @@ namespace Glyph3
 	protected:
 		ID3D11InputLayout*			m_pInputLayout;
 
-		friend RendererDX11;
+		friend PipelineManagerDX11;
 	};
 };
 //--------------------------------------------------------------------------------

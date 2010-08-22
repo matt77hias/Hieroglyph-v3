@@ -17,6 +17,7 @@
 // renderer based on it's current state.
 //--------------------------------------------------------------------------------
 #include "RendererDX11.h"
+#include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 #ifndef RenderEffectDX11_h
 #define RenderEffectDX11_h
@@ -29,7 +30,7 @@ namespace Glyph3
 		RenderEffectDX11();
 		virtual ~RenderEffectDX11();
 
-		void ConfigurePipeline( RendererDX11* pRenderer );
+		void ConfigurePipeline( PipelineManagerDX11* pPipeline, ParameterManagerDX11* pParamManager );
 
 	public:
 		int		m_iVertexShader;

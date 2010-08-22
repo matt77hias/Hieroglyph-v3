@@ -13,6 +13,7 @@
 //
 //--------------------------------------------------------------------------------
 #include "ShaderDX11.h"
+#include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 #ifndef GeometryShaderDX11_h
 #define GeometryShaderDX11_h
@@ -30,7 +31,7 @@ namespace Glyph3
 	protected:
 		ID3D11GeometryShader*			m_pGeometryShader;
 
-		friend RendererDX11;
+		friend PipelineManagerDX11;
 	};
 };
 //--------------------------------------------------------------------------------

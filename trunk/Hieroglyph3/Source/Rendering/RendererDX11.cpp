@@ -63,10 +63,17 @@
 
 #include "RenderEffectDX11.h"
 #include "GeometryDX11.h"
+#include "CommandListDX11.h"
 
 #include "DXGIAdapter.h"
 #include "DXGIOutput.h"
 
+#include "ParameterManagerDX11.h"
+#include "PipelineManagerDX11.h"
+
+#include "IRenderView.h"
+
+#include "Process.h"
 #include <sstream>
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
@@ -79,23 +86,18 @@ RendererDX11::RendererDX11()
 		m_spRenderer = this;
 
 	m_pDevice = 0;
-	m_pContext = 0;
 	m_pDebugger = 0;
 	m_driverType = D3D_DRIVER_TYPE_NULL;
-	m_pQuery = 0;
 
-	// Reference the shader stages for use in the binding process.
 
-	ShaderStages[VERTEX_SHADER] = &VertexShaderStage;
-	ShaderStages[HULL_SHADER] = &HullShaderStage;
-	ShaderStages[DOMAIN_SHADER] = &DomainShaderStage;
-	ShaderStages[GEOMETRY_SHADER] = &GeometryShaderStage;
-	ShaderStages[PIXEL_SHADER] = &PixelShaderStage;
-	ShaderStages[COMPUTE_SHADER] = &ComputeShaderStage;
+	m_pParamMgr = 0;
+	m_pPipeMgr = 0;
+	m_pDeferredPipeline = 0;
 }
 //--------------------------------------------------------------------------------
 RendererDX11::~RendererDX11()
 {
+	
 }
 //--------------------------------------------------------------------------------
 RendererDX11* RendererDX11::Get()
@@ -169,10 +171,13 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	} 
 
 	// Specify debug
-    UINT CreateDeviceFlags = D3D11_CREATE_DEVICE_SINGLETHREADED; // not interested in multi-threading for now
+    //UINT CreateDeviceFlags = D3D11_CREATE_DEVICE_SINGLETHREADED; // not interested in multi-threading for now
+	UINT CreateDeviceFlags = 0;
 #ifdef _DEBUG
     CreateDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
+
+	ID3D11DeviceContext* pContext = 0;
 
 	D3D_FEATURE_LEVEL level[] = { FeatureLevel };
 	hr = D3D11CreateDevice( 
@@ -185,7 +190,7 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 				D3D11_SDK_VERSION,
 				&m_pDevice,
 				0,
-				&m_pContext
+				&pContext
 			);
 
 
@@ -209,23 +214,40 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 		Log::Get().Write( L"Unable to acquire the ID3D11Debug interface from the device!" );
 	}
 
+	// Create the renderer components here, including the parameter manager, 
+	// pipeline manager, and resource manager.
+
+	m_pParamMgr = new ParameterManagerDX11();
+	m_pPipeMgr = new PipelineManagerDX11();
+	m_pPipeMgr->m_pContext = pContext;
+
+	// Create deferred contexts if desired...
+	ID3D11DeviceContext* pDeferred = 0;
+	m_pDevice->CreateDeferredContext( 0, &pDeferred );
+
+	m_pDeferredPipeline = new PipelineManagerDX11();
+	m_pDeferredPipeline->m_pContext = pDeferred;
+
 	// Rasterizer State (RS) - the first state will be index zero, so no need
 	// to keep a copy of it here.
 
 	RasterizerStateConfigDX11 RasterizerState;
-	SetRasterizerState( CreateRasterizerState( &RasterizerState ) );
+	m_pPipeMgr->SetRasterizerState( CreateRasterizerState( &RasterizerState ) );
+	m_pDeferredPipeline->SetRasterizerState( 0 );
 
 	// Depth Stencil State (DS) - the first state will be index zero, so no need
 	// to keep a copy of it here.
 
 	DepthStencilStateConfigDX11 DepthStencilState;
-	SetDepthStencilState( CreateDepthStencilState( &DepthStencilState ) );
+	m_pPipeMgr->SetDepthStencilState( CreateDepthStencilState( &DepthStencilState ) );
+	m_pDeferredPipeline->SetDepthStencilState( 0 );
 
 	// Output Merger State (OM) - the first state will be index zero, so no need
 	// to keep a copy of it here.
 
 	BlendStateConfigDX11 BlendState;
-	SetBlendState( CreateBlendState( &BlendState ) );
+	m_pPipeMgr->SetBlendState( CreateBlendState( &BlendState ) );
+	m_pDeferredPipeline->SetBlendState( 0 );
 
 	// Create a query object to be used to gather statistics on the pipeline.
 
@@ -233,14 +255,14 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	queryDesc.Query = D3D11_QUERY_PIPELINE_STATISTICS;
 	queryDesc.MiscFlags = 0;
 
-	hr = m_pDevice->CreateQuery( &queryDesc, &m_pQuery );
+	//hr = m_pDevice->CreateQuery( &queryDesc, &m_pQuery );
 
-	if ( FAILED( hr ) )
-	{
-		Log::Get().Write( L"Unable to create a query object!" );
-		Shutdown();
-		return( false );
-	}
+	//if ( FAILED( hr ) )
+	//{
+	//	Log::Get().Write( L"Unable to create a query object!" );
+	//	Shutdown();
+	//	return( false );
+	//}
 
 
     D3D11_FEATURE_DATA_D3D10_X_HARDWARE_OPTIONS Options;
@@ -248,19 +270,84 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	if ( Options.ComputeShaders_Plus_RawAndStructuredBuffers_Via_Shader_4_x )
 		Log::Get().Write( L"Device supports compute shaders plus raw and structured buffers via shader 4.x" );
 
+
+	D3D11_FEATURE_DATA_THREADING ThreadingOptions;
+	m_pDevice->CheckFeatureSupport( D3D11_FEATURE_THREADING, &ThreadingOptions, sizeof( ThreadingOptions ) );
+
 	// TODO: Enumerate all of the formats and quality levels available for the given format.
 	//       It may be beneficial to allow this query from the user instead of enumerating
 	//       all possible formats...
 	//UINT NumQuality;
 	//HRESULT hr1 = m_pDevice->CheckMultisampleQualityLevels( DXGI_FORMAT_R8G8B8A8_UNORM, 4, &NumQuality );
 
+
+	// Initialize the multithreading portion of the renderer.  This includes
+	// creating the threads themselves, initializing the thread payloads as well.
+
+	for ( int i = 0; i < NUM_THREADS; i++ )
+	{
+		// Mark each payload so that the thread knows which synchronization primitives to use.
+		g_aPayload[i].id = i;
+
+		// Create a deferred context for each thread's pipeline.
+		ID3D11DeviceContext* pDeferred = 0;
+		m_pDevice->CreateDeferredContext( 0, &pDeferred );
+
+		// Create the pipeline and set the context.
+		g_aPayload[i].pPipeline = new PipelineManagerDX11();
+		g_aPayload[i].pPipeline->m_pContext = pDeferred;
+		g_aPayload[i].pPipeline->SetRasterizerState( 0 );
+		g_aPayload[i].pPipeline->SetDepthStencilState( 0 );
+		g_aPayload[i].pPipeline->SetBlendState( 0 );
+
+
+		// Create the command list.
+		g_aPayload[i].pList = new CommandListDX11();
+		
+		// Generate a new parameter manager for each thread.
+		g_aPayload[i].pParamManager = new ParameterManagerDX11();
+		g_aPayload[i].pParamManager->AttachParent( m_pParamMgr );
+
+		// Initialize the payload data variables.
+		g_aPayload[i].bComplete = true;
+		g_aPayload[i].pRenderView = 0;
+
+		// Create the threads in a suspended state.
+		g_aThreadHandles[i] = 0;
+		g_aThreadHandles[i] = (HANDLE)_beginthreadex( 0, 0, _RenderViewThreadProc, &g_aPayload[i], CREATE_SUSPENDED, 0 );
+
+		// Create the synchronization events.
+		g_aBeginEventHandle[i] = CreateEvent( 0, FALSE, FALSE, 0 );
+		g_aEndEventHandle[i] = CreateEvent( 0, FALSE, FALSE, 0 );
+
+		// Start the thread up now that it has a synch object to use.
+		ResumeThread( g_aThreadHandles[i] );
+	}
+
 	return( true );
 }
 //--------------------------------------------------------------------------------
 void RendererDX11::Shutdown()
 {
-	if( m_pContext ) m_pContext->ClearState();
-	if( m_pContext ) m_pContext->Flush();
+	// Shutdown all of the threads
+	for ( int i = 0; i < NUM_THREADS; i++ )
+	{
+		g_aPayload[i].bComplete = true;
+		g_aPayload[i].pRenderView = 0;
+		
+		SAFE_DELETE( g_aPayload[i].pParamManager );
+		SAFE_DELETE( g_aPayload[i].pPipeline );
+		SAFE_DELETE( g_aPayload[i].pList );
+
+		CloseHandle( g_aThreadHandles[i] );
+		CloseHandle( g_aBeginEventHandle[i] );
+		CloseHandle( g_aEndEventHandle[i] );
+	}
+
+
+	SAFE_DELETE( m_pParamMgr );
+	SAFE_DELETE( m_pPipeMgr );
+	SAFE_DELETE( m_pDeferredPipeline );
 
 	// Since these are all managed with smart pointers, we just empty the
 	// container and the objects will automatically be deleted.
@@ -297,34 +384,9 @@ void RendererDX11::Shutdown()
 		delete m_vSwapChains[i];
 
 	// Clear the context and the device
-	SAFE_RELEASE( m_pQuery );
-	SAFE_RELEASE( m_pContext );
+
 	SAFE_RELEASE( m_pDevice );
 	SAFE_RELEASE( m_pDebugger );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::ClearBuffers( Vector4f color, float depth )
-{
-	// Get the current render target view and depth stencil view from the OM stage.
-	ID3D11RenderTargetView* pRenderTargetView = 0;
-	ID3D11DepthStencilView* pDepthStencilView = 0;
-
-	m_pContext->OMGetRenderTargets( 1, &pRenderTargetView, &pDepthStencilView );
-
-	if ( pRenderTargetView )
-	{
-		float clearColours[] = { color.x, color.y, color.z, color.w }; // RGBA
-		m_pContext->ClearRenderTargetView( pRenderTargetView, clearColours );
-	}
-
-	if ( pDepthStencilView )
-	{
-		m_pContext->ClearDepthStencilView( pDepthStencilView, D3D11_CLEAR_DEPTH, depth, 0 );
-	}
-
-	// Release the two views
-	SAFE_RELEASE( pRenderTargetView );
-	SAFE_RELEASE( pDepthStencilView );
 }
 //--------------------------------------------------------------------------------
 void RendererDX11::Present( HWND hWnd, int SwapChain )
@@ -1221,753 +1283,6 @@ const char* RendererDX11::TranslateResourceReturnType( D3D11_RESOURCE_RETURN_TYP
 	return( "UNKOWN_RESOURCE_RETURN_TYPE" );
 }
 //--------------------------------------------------------------------------------
-void RendererDX11::SetVectorParameter( std::wstring name, Vector4f* pVector )
-{
-	RenderParameterDX11* pParameter = m_Parameters[name];
-
-	// Only create the new parameter if it hasn't already been registered
-	if ( pParameter == 0 )
-	{
-		pParameter = new VectorParameterDX11();
-		m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pParameter );
-	}
-
-	if ( pParameter->GetParameterType() == VECTOR )
-		pParameter->SetParameterData( reinterpret_cast<void*>( pVector ) );
-	else
-		Log::Get().Write( L"Vector parameter name collision!" );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::SetMatrixParameter( std::wstring name, Matrix4f* pMatrix )
-{
-	RenderParameterDX11* pParameter = m_Parameters[name];
-
-	// Only create the new parameter if it hasn't already been registered
-	if ( pParameter == 0 )
-	{
-		pParameter = new MatrixParameterDX11();
-		m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pParameter );
-	}
-	
-	if ( pParameter->GetParameterType() == MATRIX )
-		pParameter->SetParameterData( reinterpret_cast<void*>( pMatrix ) );
-	else
-		Log::Get().Write( L"Matrix parameter name collision!" );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::SetMatrixArrayParameter( std::wstring name, int count, Matrix4f* pMatrix )
-{
-	RenderParameterDX11* pParameter = m_Parameters[name];
-
-	// Only create the new parameter if it hasn't already been registered
-	if ( pParameter == 0 )
-	{
-		pParameter = new MatrixArrayParameterDX11( count );
-		m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pParameter );
-	}
-	
-	if ( pParameter->GetParameterType() == MATRIX_ARRAY )
-		pParameter->SetParameterData( reinterpret_cast<void*>( pMatrix ) );
-	else
-		Log::Get().Write( L"Matrix Array parameter name collision!" );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::SetParameter( RenderParameterDX11* pParameter )
-{
-	std::wstring name = pParameter->GetName();
-	RenderParameterDX11* pCurrent = m_Parameters[name];
-
-	if ( pParameter )
-	{
-		if ( pParameter->GetParameterType() == VECTOR )
-		{
-			// Only create the new parameter if it hasn't already been registered
-			if ( pCurrent == 0 )
-			{
-				pCurrent = new VectorParameterDX11();
-				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
-			}
-
-			*reinterpret_cast<VectorParameterDX11*>( pCurrent )
-				= *reinterpret_cast<VectorParameterDX11*>( pParameter );
-		}
-		if ( pParameter->GetParameterType() == MATRIX )
-		{
-			// Only create the new parameter if it hasn't already been registered
-			if ( pCurrent == 0 )
-			{
-				pCurrent = new MatrixParameterDX11();
-				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
-			}
-
-			*reinterpret_cast<MatrixParameterDX11*>( pCurrent )
-				= *reinterpret_cast<MatrixParameterDX11*>( pParameter );
-		}
-		if ( pParameter->GetParameterType() == MATRIX_ARRAY )
-		{
-			// Only create the new parameter if it hasn't already been registered
-			if ( pCurrent == 0 )
-			{
-				int count = reinterpret_cast<MatrixArrayParameterDX11*>( pParameter )->GetMatrixCount();
-				pCurrent = new MatrixArrayParameterDX11( count );
-				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
-			}
-
-			// This assignment performs a deep copy of the matrix array.
-			*reinterpret_cast<MatrixArrayParameterDX11*>( pCurrent )
-				= *reinterpret_cast<MatrixArrayParameterDX11*>( pParameter );
-		}
-		if ( pParameter->GetParameterType() == SHADER_RESOURCE )
-		{
-			// Only create the new parameter if it hasn't already been registered
-			if ( pCurrent == 0 )
-			{
-				pCurrent = new ShaderResourceParameterDX11();
-				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
-			}
-
-			*reinterpret_cast<ShaderResourceParameterDX11*>( pCurrent )
-				= *reinterpret_cast<ShaderResourceParameterDX11*>( pParameter );
-		}
-		if ( pParameter->GetParameterType() == UNORDERED_ACCESS )
-		{
-			// Only create the new parameter if it hasn't already been registered
-			if ( pCurrent == 0 )
-			{
-				pCurrent = new UnorderedAccessParameterDX11();
-				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
-			}
-
-			*reinterpret_cast<UnorderedAccessParameterDX11*>( pCurrent )
-				= *reinterpret_cast<UnorderedAccessParameterDX11*>( pParameter );
-		}
-		if ( pParameter->GetParameterType() == CBUFFER )
-		{
-			// Only create the new parameter if it hasn't already been registered
-			if ( pCurrent == 0 )
-			{
-				pCurrent = new ConstantBufferParameterDX11();
-				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
-			}
-
-			*reinterpret_cast<ConstantBufferParameterDX11*>( pCurrent )
-				= *reinterpret_cast<ConstantBufferParameterDX11*>( pParameter );
-		}
-		if ( pParameter->GetParameterType() == SAMPLER )
-		{
-			// Only create the new parameter if it hasn't already been registered
-			if ( pCurrent == 0 )
-			{
-				pCurrent = new SamplerParameterDX11();
-				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
-			}
-
-			*reinterpret_cast<SamplerParameterDX11*>( pCurrent )
-				= *reinterpret_cast<SamplerParameterDX11*>( pParameter );
-		}
-	}
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::SetShaderResourceParameter( std::wstring name, ResourcePtr resource )
-{
-	RenderParameterDX11* pParameter = m_Parameters[name];
-
-	// Only create the new parameter if it hasn't already been registered
-	if ( pParameter == 0 )
-	{
-		pParameter = new ShaderResourceParameterDX11();
-		m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pParameter );
-	}
-
-	if ( pParameter->GetParameterType() == SHADER_RESOURCE )
-		pParameter->SetParameterData( reinterpret_cast<void*>( &resource->m_iResourceSRV ) );
-	else
-		Log::Get().Write( L"Shader resource view parameter name collision!" );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::SetUnorderedAccessParameter( std::wstring name, ResourcePtr resource )
-{
-	RenderParameterDX11* pParameter = m_Parameters[name];
-
-	// Only create the new parameter if it hasn't already been registered
-	if ( pParameter == 0 )
-	{
-		pParameter = new UnorderedAccessParameterDX11();
-		m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pParameter );
-	}
-
-	if ( pParameter->GetParameterType() == UNORDERED_ACCESS )
-		pParameter->SetParameterData( reinterpret_cast<void*>( &resource->m_iResourceUAV ) );
-	else
-		Log::Get().Write( L"Unordered access view parameter name collision!" );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::SetConstantBufferParameter( std::wstring name, ResourcePtr resource )
-{
-	RenderParameterDX11* pParameter = m_Parameters[name];
-
-	// Only create the new parameter if it hasn't already been registered
-	if ( pParameter == 0 )
-	{
-		pParameter = new ConstantBufferParameterDX11();
-		m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pParameter );
-	}
-
-	if ( pParameter->GetParameterType() == CBUFFER )
-		pParameter->SetParameterData( reinterpret_cast<void*>( &resource->m_iResource ) );
-	else
-		Log::Get().Write( L"Constant buffer parameter name collision!" );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::SetSamplerParameter( std::wstring name, int* pID )
-{
-	RenderParameterDX11* pParameter = m_Parameters[name];
-
-	// Only create the new parameter if it hasn't already been registered
-	if ( pParameter == 0 )
-	{
-		pParameter = new SamplerParameterDX11();
-		m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pParameter );
-	}
-
-	if ( pParameter->GetParameterType() == SAMPLER )
-		pParameter->SetParameterData( reinterpret_cast<void*>( pID ) );
-	else
-		Log::Get().Write( L"Sampler parameter name collision!" );
-}
-//--------------------------------------------------------------------------------
-Vector4f RendererDX11::GetVectorParameter( std::wstring name )
-{
-	Vector4f result;
-	result.MakeZero();
-
-	RenderParameterDX11* pParam = m_Parameters[name];
-
-	if ( pParam != 0 )
-	{
-		if ( pParam->GetParameterType() == VECTOR ) 
-			result = reinterpret_cast<VectorParameterDX11*>( pParam )->GetVector();
-	}
-	else
-	{
-		pParam = new VectorParameterDX11();
-		m_Parameters[name] = pParam;
-	}
-
-	return( result );
-}
-//--------------------------------------------------------------------------------
-Matrix4f RendererDX11::GetMatrixParameter( std::wstring name )
-{
-	Matrix4f result;
-	result.MakeZero();
-
-	RenderParameterDX11* pParam = m_Parameters[name];
-
-	if ( pParam != 0 )
-	{
-		if ( pParam->GetParameterType() == MATRIX ) 
-			result = reinterpret_cast<MatrixParameterDX11*>( pParam )->GetMatrix();
-	}
-	else
-	{
-		pParam = new MatrixParameterDX11();
-		m_Parameters[name] = pParam;
-	}
-
-	return( result );
-}
-//--------------------------------------------------------------------------------
-Matrix4f* RendererDX11::GetMatrixArrayParameter( std::wstring name, int count )
-{
-	Matrix4f* pResult = 0;
-
-	RenderParameterDX11* pParam = m_Parameters[name];
-
-	if ( pParam != 0 )
-	{
-		if ( pParam->GetParameterType() == MATRIX_ARRAY ) 
-			if ( reinterpret_cast<MatrixArrayParameterDX11*>( pParam )->GetMatrixCount() == count )
-				pResult = reinterpret_cast<MatrixArrayParameterDX11*>( pParam )->GetMatrices();
-	}
-	else
-	{
-		pParam = new MatrixArrayParameterDX11( count );
-		m_Parameters[name] = pParam;
-		pResult = reinterpret_cast<MatrixArrayParameterDX11*>( pParam )->GetMatrices();
-	}
-
-	return( pResult );
-}
-//--------------------------------------------------------------------------------
-int RendererDX11::GetShaderResourceParameter( std::wstring name )
-{
-	int result;
-	result = -1;
-
-	RenderParameterDX11* pParam = m_Parameters[name];
-
-	if ( pParam != 0 )
-	{
-		if ( pParam->GetParameterType() == SHADER_RESOURCE ) 
-			result = reinterpret_cast<ShaderResourceParameterDX11*>( pParam )->GetIndex();
-	}
-	else
-	{
-		pParam = new ShaderResourceParameterDX11();
-		m_Parameters[name] = pParam;
-	}
-
-	return( result );
-}
-//--------------------------------------------------------------------------------
-int RendererDX11::GetUnorderedAccessParameter( std::wstring name )
-{
-	int result;
-	result = -1;
-
-	RenderParameterDX11* pParam = m_Parameters[name];
-
-	if ( pParam != 0 )
-	{
-		if ( pParam->GetParameterType() == UNORDERED_ACCESS ) 
-			result = reinterpret_cast<UnorderedAccessParameterDX11*>( pParam )->GetIndex();
-	}
-	else
-	{
-		pParam = new UnorderedAccessParameterDX11();
-		m_Parameters[name] = pParam;
-	}
-
-	return( result );
-}
-//--------------------------------------------------------------------------------
-int RendererDX11::GetConstantBufferParameter( std::wstring name )
-{
-	int result;
-	result = -1;
-
-	RenderParameterDX11* pParam = m_Parameters[name];
-
-	if ( pParam != 0 )
-	{
-		if ( pParam->GetParameterType() == CBUFFER ) 
-			result = reinterpret_cast<ConstantBufferParameterDX11*>( pParam )->GetIndex();
-	}
-	else
-	{
-		pParam = new ConstantBufferParameterDX11();
-		m_Parameters[name] = pParam;
-	}
-
-	return( result );
-}
-//--------------------------------------------------------------------------------
-int RendererDX11::GetSamplerStateParameter( std::wstring name )
-{
-	int result;
-	result = -1;
-
-	RenderParameterDX11* pParam = m_Parameters[name];
-
-	if ( pParam != 0 )
-	{
-		if ( pParam->GetParameterType() == SAMPLER ) 
-			result = reinterpret_cast<SamplerParameterDX11*>( pParam )->GetIndex();
-	}
-	else
-	{
-		pParam = new SamplerParameterDX11();
-		m_Parameters[name] = pParam;
-	}
-
-	return( result );	
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::SetWorldMatrixParameter( Matrix4f* pMatrix )
-{
-	SetMatrixParameter( std::wstring( L"WorldMatrix" ), pMatrix );
-
-	Matrix4f WorldMatrix = GetMatrixParameter( std::wstring( L"WorldMatrix" ) );
-	Matrix4f ViewMatrix = GetMatrixParameter( std::wstring( L"ViewMatrix" ) );
-	Matrix4f ProjMatrix = GetMatrixParameter( std::wstring( L"ProjMatrix" ) );
-
-	Matrix4f WorldViewMatrix = WorldMatrix * ViewMatrix;
-	Matrix4f ViewProjMatrix = ViewMatrix * ProjMatrix;
-	Matrix4f WorldViewProjMatrix = WorldMatrix * ViewProjMatrix;
-
-	SetMatrixParameter( std::wstring( L"WorldViewMatrix" ), &WorldViewMatrix );
-	SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &ViewProjMatrix );
-	SetMatrixParameter( std::wstring( L"WorldViewProjMatrix" ), &WorldViewProjMatrix );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::SetViewMatrixParameter( Matrix4f* pMatrix )
-{
-	SetMatrixParameter( std::wstring( L"ViewMatrix" ), pMatrix );
-
-	Matrix4f WorldMatrix = GetMatrixParameter( std::wstring( L"WorldMatrix" ) );
-	Matrix4f ViewMatrix = GetMatrixParameter( std::wstring( L"ViewMatrix" ) );
-	Matrix4f ProjMatrix = GetMatrixParameter( std::wstring( L"ProjMatrix" ) );
-
-	Matrix4f WorldViewMatrix = WorldMatrix * ViewMatrix;
-	Matrix4f ViewProjMatrix = ViewMatrix * ProjMatrix;
-	Matrix4f WorldViewProjMatrix = WorldMatrix * ViewProjMatrix;
-
-	SetMatrixParameter( std::wstring( L"WorldViewMatrix" ), &WorldViewMatrix );
-	SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &ViewProjMatrix );
-	SetMatrixParameter( std::wstring( L"WorldViewProjMatrix" ), &WorldViewProjMatrix );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::SetProjMatrixParameter( Matrix4f* pMatrix )
-{
-	SetMatrixParameter( std::wstring( L"ProjMatrix" ), pMatrix );
-
-	Matrix4f WorldMatrix = GetMatrixParameter( std::wstring( L"WorldMatrix" ) );
-	Matrix4f ViewMatrix = GetMatrixParameter( std::wstring( L"ViewMatrix" ) );
-	Matrix4f ProjMatrix = GetMatrixParameter( std::wstring( L"ProjMatrix" ) );
-
-	Matrix4f WorldViewMatrix = WorldMatrix * ViewMatrix;
-	Matrix4f ViewProjMatrix = ViewMatrix * ProjMatrix;
-	Matrix4f WorldViewProjMatrix = WorldMatrix * ViewProjMatrix;
-
-	SetMatrixParameter( std::wstring( L"WorldViewMatrix" ), &WorldViewMatrix );
-	SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &ViewProjMatrix );
-	SetMatrixParameter( std::wstring( L"WorldViewProjMatrix" ), &WorldViewProjMatrix );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::BindShader( ShaderType type, int ID )
-{
-	// Check if the shader has a valid identifier
-	if ( ( ID >= 0 ) && ( ID < m_vShaders.count() ) )
-	{
-		// Get a copy of the shader object for use in the remainder of this function.
-
-		ShaderDX11* pShaderDX11 = m_vShaders[ID];
-
-		// Before binding the shader, have it update its required parameters.  These
-		// parameters will then be bound to the pipeline after the shader is bound.
-		
-		pShaderDX11->UpdateParameters( this );
-
-		// Perform the actual binding to the pipeline, and then bind all needed
-		// parameters.
-
-		if ( pShaderDX11->GetType() == type )
-		{
-			switch( type )
-			{
-				case VERTEX_SHADER:
-				{
-					ID3D11VertexShader* pShader = reinterpret_cast<VertexShaderDX11*>( pShaderDX11 )->m_pVertexShader;
-					m_pContext->VSSetShader( pShader, 0, 0 );
-					break;
-				}
-				case HULL_SHADER:
-				{
-					ID3D11HullShader* pShader = reinterpret_cast<HullShaderDX11*>( pShaderDX11 )->m_pHullShader;
-					m_pContext->HSSetShader( pShader, 0, 0 );
-					break;
-				}
-				case DOMAIN_SHADER:
-				{
-					ID3D11DomainShader* pShader = reinterpret_cast<DomainShaderDX11*>( pShaderDX11 )->m_pDomainShader;
-					m_pContext->DSSetShader( pShader, 0, 0 );
-					break;
-				}
-				case GEOMETRY_SHADER:
-				{
-					ID3D11GeometryShader* pShader = reinterpret_cast<GeometryShaderDX11*>( pShaderDX11 )->m_pGeometryShader;
-					m_pContext->GSSetShader( pShader, 0, 0 );
-					break;
-				}
-				case PIXEL_SHADER:
-				{
-					ID3D11PixelShader* pShader = reinterpret_cast<PixelShaderDX11*>( pShaderDX11 )->m_pPixelShader;
-					m_pContext->PSSetShader( pShader, 0, 0 );
-					break;
-				}
-				case COMPUTE_SHADER:
-				{
-					ID3D11ComputeShader* pShader = reinterpret_cast<ComputeShaderDX11*>( pShaderDX11 )->m_pComputeShader;
-					m_pContext->CSSetShader( pShader, 0, 0 );
-					break;
-				}
-			}
-
-			pShaderDX11->BindParameters( this );
-		}
-		else
-		{
-			Log::Get().Write( L"Tried to set the wrong type of shader ID!" );
-		}
-	}
-	else
-	{
-		if ( ID == -1 )
-			this->UnbindShader( type );
-		else
-			Log::Get().Write( L"Tried to set an invalid shader ID!" );
-	}
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::BindConstantBufferParameter( ShaderType type, std::wstring name, UINT slot )
-{
-	if ( m_Parameters[name] != 0 )
-	{
-		// Check the type of the parameter
-		if ( m_Parameters[name]->GetParameterType() == CBUFFER )
-		{
-			ConstantBufferParameterDX11* pBuffer = reinterpret_cast<ConstantBufferParameterDX11*>( m_Parameters[name] );
-			int ID = ( pBuffer->GetIndex() & 0xffff ); 
-
-			// Allow a range including -1 up to the number of resources
-			if ( ( ID >= -1 ) && ( ID < m_vResources.count() ) )
-			{
-				// Get the resource to be set, and pass it in to the desired shader type
-				
-				ID3D11Buffer* pBuffer = 0;
-				
-				if ( ID >= 0 )
-					pBuffer = (ID3D11Buffer*)m_vResources[ID]->GetResource();
-
-				ShaderStages[type]->SetConstantBuffer( slot, pBuffer );
-			}
-			else
-			{
-				Log::Get().Write( L"Tried to set an invalid constant buffer ID!" );
-			}
-		}
-		else
-		{
-			Log::Get().Write( L"Tried to set a non-constant buffer ID as a constant buffer!" );
-		}
-	}
-	else
-	{
-		Log::Get().Write( L"Tried to set a non-existing parameter as a constant buffer!" );
-	}
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::BindShaderResourceParameter( ShaderType type, std::wstring name, UINT slot )
-{
-	if ( m_Parameters[name] != 0 )
-	{
-		// Check the type of the parameter
-		if ( m_Parameters[name]->GetParameterType() == SHADER_RESOURCE )
-		{
-			ShaderResourceParameterDX11* pResource = 
-				reinterpret_cast<ShaderResourceParameterDX11*>( m_Parameters[name] );
-
-			int ID = pResource->GetIndex(); 
-
-			// Allow a range including -1 up to the number of resources views
-			if ( ( ID >= -1 ) && ( ID < m_vShaderResourceViews.count() ) )
-			{
-				// Get the resource to be set, and pass it in to the desired shader type
-
-				ID3D11ShaderResourceView* pResourceView = 0;
-
-				if ( ID >= 0 )
-					pResourceView = m_vShaderResourceViews[ID]->m_pShaderResourceView;
-
-				ShaderStages[type]->SetShaderResourceView( slot, pResourceView );
-			}
-			else
-			{
-				Log::Get().Write( L"Tried to set an invalid shader resource ID!" );
-			}
-		}
-		else
-		{
-			Log::Get().Write( L"Tried to set a non-shader resource ID as a shader resource!" );
-		}
-	}
-	else
-	{
-		Log::Get().Write( L"Tried to set a non-existing parameter as a shader resource!" );
-	}
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::BindUnorderedAccessParameter( ShaderType type, std::wstring name, UINT slot )
-{
-	if ( m_Parameters[name] != 0 )
-	{
-		// Check the type of the parameter
-		if ( m_Parameters[name]->GetParameterType() == UNORDERED_ACCESS )
-		{
-			UnorderedAccessParameterDX11* pResource = 
-				reinterpret_cast<UnorderedAccessParameterDX11*>( m_Parameters[name] );
-
-			int ID = pResource->GetIndex(); 
-
-			// Allow a range including -1 up to the number of resources views
-			if ( ( ID >= -1 ) && ( ID < m_vUnorderedAccessViews.count() ) )
-			{
-				// Get the resource to be set, and pass it in to the desired shader type
-
-				ID3D11UnorderedAccessView* pResourceView = 0;
-
-				if ( ID >= 0 )
-					pResourceView = m_vUnorderedAccessViews[ID]->m_pUnorderedAccessView;
-
-				ShaderStages[type]->SetUnorderedAccessView( slot, pResourceView );
-			}
-			else
-			{
-				Log::Get().Write( L"Tried to set an invalid shader resource ID!" );
-			}
-		}
-		else
-		{
-			Log::Get().Write( L"Tried to set a non-shader resource ID as a shader resource!" );
-		}
-	}
-	else
-	{
-		Log::Get().Write( L"Tried to set a non-existing parameter as a unordered access view!" );
-	}
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::BindSamplerStateParameter( ShaderType type, std::wstring name, UINT slot )
-{
-	if ( m_Parameters[name] != 0 )
-	{
-		// Check the type of the parameter
-		if ( m_Parameters[name]->GetParameterType() == SAMPLER )
-		{
-			SamplerParameterDX11* pResource = 
-				reinterpret_cast<SamplerParameterDX11*>( m_Parameters[name] );
-
-			int ID = pResource->GetIndex(); 
-
-			// Allow a range including -1 up to the number of samplers
-
-			if ( ( ID >= -1 ) && ( ID < m_vSamplerStates.count() ) )
-			{
-				// Get the resource to be set, and pass it in to the desired shader type
-
-				ID3D11SamplerState* pSampler = 0;
-
-				if ( ID >= 0 )
-					pSampler = m_vSamplerStates[ID]->m_pState; 
-
-				ShaderStages[type]->SetSamplerState( slot, pSampler );
-			}
-			else
-			{
-				Log::Get().Write( L"Tried to set an invalid sampler state ID!" );
-			}
-		}
-		else
-		{
-			Log::Get().Write( L"Tried to set a non-sampler state ID as a sampler state!" );
-		}
-	}
-	else
-	{
-		Log::Get().Write( L"Tried to set a non-existing parameter as a sampler state!" );
-	}
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::ApplyPipelineResources( )
-{
-	VertexShaderStage.BindResources( m_pContext );
-	HullShaderStage.BindResources( m_pContext );
-	DomainShaderStage.BindResources( m_pContext );
-	GeometryShaderStage.BindResources( m_pContext );
-	PixelShaderStage.BindResources( m_pContext );
-	ComputeShaderStage.BindResources( m_pContext );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::ClearPipelineResources( )
-{
-	VertexShaderStage.UnbindResources( m_pContext );
-	HullShaderStage.UnbindResources( m_pContext );
-	DomainShaderStage.UnbindResources( m_pContext );
-	GeometryShaderStage.UnbindResources( m_pContext );
-	PixelShaderStage.UnbindResources( m_pContext );
-	ComputeShaderStage.UnbindResources( m_pContext );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::BindInputLayout( int ID )
-{
-	if ( ( ID >= 0 ) && ( ID < m_vInputLayouts.count() ) )
-		m_pContext->IASetInputLayout( m_vInputLayouts[ID]->m_pInputLayout );
-	else
-		Log::Get().Write( L"Tried to bind an invalid input layout ID!" );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::BindVertexBuffer( ResourcePtr resource, UINT stride )
-{
-	// TODO: Add the ability to set multiple vertex buffers at once, and to 
-	//       provide an offset to the data contained in the buffers.
-
-	int index = resource->m_iResource;
-
-	// Select only the index portion of the handle.
-	int TYPE	= index & 0x00FF0000;
-	int ID		= index & 0x0000FFFF;
-
-	ID3D11Buffer* Buffers = { (ID3D11Buffer*)m_vResources[ID]->GetResource() };
-	UINT Strides = { stride };
-	UINT Offsets = { 0 };
-
-	if ( ( ID >= 0 ) && ( ID < m_vResources.count() ) )
-	{
-		m_pContext->IASetVertexBuffers( 0, 1, &Buffers, &Strides, &Offsets );
-	}
-	else
-		Log::Get().Write( L"Tried to bind an invalid vertex buffer ID!" );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::BindIndexBuffer( ResourcePtr resource )
-{
-	// TODO: Add the ability to use different formats and offsets to this function!
-	int index = resource->m_iResource;
-
-	// Select only the index portion of the handle.
-	int TYPE	= index & 0x00FF0000;
-	int ID		= index & 0x0000FFFF;
-
-	// If the resource is in range, then attempt to set it
-	if ( m_vResources.inrange( ID ) )
-	{
-		ID3D11Buffer* Buffers = 0;
-		Buffers = (ID3D11Buffer*)m_vResources[ID]->GetResource();
-		m_pContext->IASetIndexBuffer( Buffers, DXGI_FORMAT_R32_UINT, 0 );
-	}
-	else
-		Log::Get().Write( L"Tried to bind an invalid index buffer ID!" );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::BindRenderTargets( int index, ResourcePtr RenderTarget )
-{
-	int RenderID = RenderTarget->m_iResourceRTV;
-	
-	if ( ( RenderID >= 0 ) && ( RenderID < m_vRenderTargetViews.count() ) )
-	{
-		ID3D11RenderTargetView* pRenderTarget = { m_vRenderTargetViews[RenderID]->m_pRenderTargetView };
-
-		OutputMergerStage.SetRenderTargetView( index, pRenderTarget );
-	}
-	else
-		Log::Get().Write( L"Tried to bind an invalid render target view!" );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::BindDepthTarget( ResourcePtr DepthTarget )
-{
-	int DepthID = DepthTarget->m_iResourceDSV;
-
-	if ( ( DepthID >= 0 ) && ( DepthID < m_vDepthStencilViews.count() ) )
-	{
-		ID3D11DepthStencilView* pDepthStencilView = m_vDepthStencilViews[DepthID]->m_pDepthStencilView;
-
-		OutputMergerStage.SetDepthStencilView( pDepthStencilView );
-	}
-	else
-		Log::Get().Write( L"Tried to bind an invalid depth stencil view!" );
-}
-//--------------------------------------------------------------------------------
 int RendererDX11::CreateInputLayout( TArray<D3D11_INPUT_ELEMENT_DESC>& elements, int ShaderID  )
 {
 	// Create array of elements here for the API call.
@@ -2011,179 +1326,6 @@ int RendererDX11::CreateInputLayout( TArray<D3D11_INPUT_ELEMENT_DESC>& elements,
 	return( m_vInputLayouts.count() - 1 );
 }
 //--------------------------------------------------------------------------------
-D3D11_MAPPED_SUBRESOURCE RendererDX11::MapResource( int index, UINT subresource, D3D11_MAP actions, UINT flags )
-{
-	int TYPE	= index & 0x00FF0000;
-	int ID		= index & 0x0000FFFF;
-
-	ID3D11Resource* pResource = 0;
-	D3D11_MAPPED_SUBRESOURCE Data;
-
-	pResource = m_vResources[ID]->GetResource();
-
-	// Map the resource
-	HRESULT hr = m_pContext->Map( pResource, subresource, actions, flags, &Data );
-	
-	if ( FAILED( hr ) )
-		Log::Get().Write( L"Failed to map resource!" );
-
-	return( Data );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::UnMapResource( int index, UINT subresource )
-{
-	int TYPE	= index & 0x00FF0000;
-	int ID		= index & 0x0000FFFF;
-
-	ID3D11Resource* pResource = 0;
-
-	pResource = m_vResources[ID]->GetResource();
-
-	// Unmap the resource - there is no HRESULT returned, so trust that it works...
-	m_pContext->Unmap( pResource, subresource );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::Draw( RenderEffectDX11& effect, GeometryDX11& geometry )
-{
-	// Specify the type of geometry that we will be dealing with.
-
-	m_pContext->IASetPrimitiveTopology( geometry.GetPrimitiveType() );
-
-	// Bind the vertex and index buffers.
-
-	BindVertexBuffer( geometry.m_VB, geometry.GetVertexSize() );
-	BindIndexBuffer( geometry.m_IB );
-
-	// Bind the input layout.  The layout will be automatically generated if it
-	// doesn't already exist.
-
-	BindInputLayout( geometry.GetInputLayout( effect.m_iVertexShader ) );
-
-	// Use the effect to load all of the pipeline stages here.
-
-	ClearPipelineResources();
-	effect.ConfigurePipeline( this );
-	ApplyPipelineResources();
-
-	// TODO: comprehend the last two parameters here and how they can be used...
-
-	m_pContext->DrawIndexed( geometry.GetIndexCount(), 0, 0 );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::Dispatch( RenderEffectDX11& effect, UINT x, UINT y, UINT z )
-{
-	// Use the effect to load all of the pipeline stages here.
-
-	ClearPipelineResources();
-	effect.ConfigurePipeline( this );
-	ApplyPipelineResources();
-
-	m_pContext->Dispatch( x, y, z );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::StartPipelineStatistics( )
-{
-	if ( m_pQuery )
-		m_pContext->Begin( m_pQuery );
-	else
-		Log::Get().Write( L"Tried to begin pipeline statistics without a query object!" );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::EndPipelineStatistics( )
-{
-	if ( m_pQuery )
-		m_pContext->End( m_pQuery );
-	else
-		Log::Get().Write( L"Tried to end pipeline statistics without a valid query object!" );
-}
-//--------------------------------------------------------------------------------
-std::wstring RendererDX11::PrintPipelineStatistics( )
-{
-	D3D11_QUERY_DATA_PIPELINE_STATISTICS QueryData; // This data type is different depending on the query type
-
-	if ( S_OK == m_pContext->GetData( m_pQuery, &QueryData, sizeof(QueryData), 0) )
-	{
-		std::wstringstream s;
-		s << "Pipeline Statistics:" << std::endl;
-		s << "Number of vertices read by the IA: " << QueryData.IAVertices << std::endl;
-		s << "Number of primitives read by the IA: " << QueryData.IAPrimitives << std::endl;
-		s << "Number of vertex shader invocations: " << QueryData.VSInvocations << std::endl;
-		s << "Number of hull shader invocations: " << QueryData.HSInvocations << std::endl;
-		s << "Number of domain shader invocations: " << QueryData.DSInvocations << std::endl;
-		s << "Number of geometry shader invocations: " << QueryData.GSInvocations << std::endl;
-		s << "Number of primitives output by the geometry shader: " << QueryData.GSPrimitives << std::endl;
-		s << "Number of primitives sent to the rasterizer: " << QueryData.CInvocations << std::endl;
-		s << "Number of primitives rendered: " << QueryData.CPrimitives << std::endl;
-		s << "Number of pixel shader invocations: " << QueryData.PSInvocations << std::endl;
-
-		return( s.str() );
-	}
-
-	return( std::wstring( L"Statistics currently not available..." ) );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::SaveTextureScreenShot( int index, std::wstring filename, D3DX11_IMAGE_FILE_FORMAT format )
-{
-	// Get the index from the handle
-	int TYPE	= index & 0x00FF0000;
-	int ID		= index & 0x0000FFFF;
-
-	if ( ( ID >= 0 ) && ( ID < m_vResources.count() ) )
-	{
-		// Increment the file number for allowing a sequence of images to be stored...
-		static int iScreenNum = 100000;
-		iScreenNum++;
-
-		// Build the output file name
-		std::wstringstream out;
-		out << filename << iScreenNum;
-
-		// Select the appropriate format to add the extension to the name.  DDS format
-		// may be the only one that can handle certain texture formats, so it may be a 
-		// backup format later on.
-
-		switch ( format )
-		{
-		case D3DX11_IFF_BMP:
-			out << ".bmp";
-			break;
-		case D3DX11_IFF_JPG:
-			out << ".jpg";
-			break;
-		case D3DX11_IFF_PNG:
-			out << ".png";
-			break;
-		case D3DX11_IFF_DDS:
-			out << ".dds";
-			break;
-		case D3DX11_IFF_TIFF:
-			out << ".tiff";
-			break;
-		case D3DX11_IFF_GIF:
-			out << ".gif";
-			break;
-		case D3DX11_IFF_WMP:
-			out << ".wmp";
-			break;
-		default:
-			Log::Get().Write( L"Tried to save a texture image in an unsupported format!" );
-		}
-
-		// Get the texture as a resource and save it to file
-		ID3D11Resource* pResource = m_vResources[ID]->GetResource();
-
-		HRESULT hr = D3DX11SaveTextureToFile(
-		  m_pContext,
-		  pResource,
-		  format,
-		  out.str().c_str()
-		);
-
-		if ( FAILED( hr ) )
-			Log::Get().Write( L"D3DX11SaveTextureToFile has failed!" );
-	}
-}
-//--------------------------------------------------------------------------------
 ResourcePtr RendererDX11::LoadTexture( std::wstring filename )
 {
 	ID3D11Resource* pTexture = 0;
@@ -2212,31 +1354,6 @@ ResourcePtr RendererDX11::LoadTexture( std::wstring filename )
 	//ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, &TextureConfig, this ) );
 	return( ResourcePtr( new ResourceProxyDX11( ResourceID, &TextureConfig, this ) ) );
 	//return( Proxy );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::UnbindShader( ShaderType type )
-{
-	switch( type )
-	{
-	case VERTEX_SHADER:
-		m_pContext->VSSetShader( 0, 0, 0 );
-		break;
-	case HULL_SHADER:
-		m_pContext->HSSetShader( 0, 0, 0 );
-		break;
-	case DOMAIN_SHADER:
-		m_pContext->DSSetShader( 0, 0, 0 );
-		break;
-	case GEOMETRY_SHADER:
-		m_pContext->GSSetShader( 0, 0, 0 );
-		break;
-	case PIXEL_SHADER:
-		m_pContext->PSSetShader( 0, 0, 0 );
-		break;
-	case COMPUTE_SHADER:
-		m_pContext->CSSetShader( 0, 0, 0 );
-		break;
-	}
 }
 //--------------------------------------------------------------------------------
 //void RendererDX11::UnBindConstantBufferParameters( ShaderType type, UINT start, UINT number )
@@ -2311,36 +1428,6 @@ void RendererDX11::UnbindShader( ShaderType type )
 //		}
 //	}
 //}
-//--------------------------------------------------------------------------------
-void RendererDX11::UnbindInputLayout( )
-{
-	m_pContext->IASetInputLayout( 0 );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::UnbindVertexBuffer( )
-{
-	// TODO: Add the ability to unbind multiple vertex buffers at once!
-	ID3D11Buffer* Buffers = { 0 };
-	UINT Strides = { 0 };
-	UINT Offsets = { 0 };
-
-	m_pContext->IASetVertexBuffers( 0, 1, &Buffers, &Strides, &Offsets );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::UnbindIndexBuffer( )
-{
-	m_pContext->IASetIndexBuffer( 0, DXGI_FORMAT_R32_UINT, 0 );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::ClearRenderTargets( )
-{
-	OutputMergerStage.UnbindResources( m_pContext );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::ApplyRenderTargets( )
-{
-	OutputMergerStage.BindResources( m_pContext );
-}
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateBlendState( BlendStateConfigDX11* pConfig )
 {
@@ -2419,54 +1506,6 @@ int RendererDX11::CreateViewPort( D3D11_VIEWPORT viewport )
 	m_vViewPorts.add( pViewPort );
 
 	return( m_vViewPorts.count() - 1 );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::SetBlendState( int ID )
-{
-	if ( ( ID >= 0 ) && ( ID < m_vBlendStates.count() ) )
-	{
-		ID3D11BlendState* pBlendState = m_vBlendStates[ID]->m_pState;
-		float afBlendFactors[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		m_pContext->OMSetBlendState( pBlendState, afBlendFactors, 0xFFFFFFFF );
-	}
-	else
-	{
-		Log::Get().Write( L"Tried to set an invalid blend state ID!" );
-	}
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::SetDepthStencilState( int ID )
-{
-	if ( ( ID >= 0 ) && ( ID < m_vDepthStencilStates.count() ) )
-	{
-		ID3D11DepthStencilState* pDepthState = m_vDepthStencilStates[ID]->m_pState;
-		m_pContext->OMSetDepthStencilState( pDepthState, 0 );
-	}
-	else
-	{
-		Log::Get().Write( L"Tried to set an invalid depth stencil state ID!" );
-	}
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::SetRasterizerState( int ID )
-{
-	if ( ( ID >= 0 ) && ( ID < m_vRasterizerStates.count() ) )
-	{
-		ID3D11RasterizerState* pRasterizerState = m_vRasterizerStates[ID]->m_pState;
-		m_pContext->RSSetState( pRasterizerState );
-	}
-	else
-	{
-		Log::Get().Write( L"Tried to set an invalid rasterizer state ID!" );
-	}
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::SetViewPort( int ID )
-{
-	if ( ( ID >= 0 ) && ( ID < m_vViewPorts.count() ) )
-		m_pContext->RSSetViewports( 1, &m_vViewPorts[ID]->m_ViewPort );
-	else
-		Log::Get().Write( L"Tried to set an invalid view port index!" );
 }
 //--------------------------------------------------------------------------------
 VertexBufferDX11* RendererDX11::GetVertexBuffer( int index )
@@ -2853,19 +1892,172 @@ Vector2f RendererDX11::GetDesktopResolution()
 						static_cast<float>( desc.DesktopCoordinates.bottom - desc.DesktopCoordinates.top ) ) );
 }
 //--------------------------------------------------------------------------------
-void RendererDX11::CopySubresourceRegion( ResourcePtr DestResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ,
-	ResourcePtr SrcResource, UINT SrcSubresource, D3D11_BOX* pSrcBox )
+boost::shared_ptr<BlendStateDX11> RendererDX11::GetBlendState( int index )
 {
-	int DestType = DestResource->m_iResource & 0x00FF0000;
-	int DestID = DestResource->m_iResource & 0x0000FFFF;
-	ID3D11Resource* pDestResource = m_vResources[DestID]->GetResource();
+	return( m_vBlendStates[index] ); 
+}
+//--------------------------------------------------------------------------------
+boost::shared_ptr<DepthStencilStateDX11> RendererDX11::GetDepthState( int index )
+{
+	return( m_vDepthStencilStates[index] );
+}
+//--------------------------------------------------------------------------------
+boost::shared_ptr<RasterizerStateDX11> RendererDX11::GetRasterizerState( int index )
+{
+	return( m_vRasterizerStates[index] );
+}
+//--------------------------------------------------------------------------------
+ViewPortDX11* RendererDX11::GetViewPort( int index )
+{
+	return( m_vViewPorts[index] );
+}
+//--------------------------------------------------------------------------------
+ResourceDX11* RendererDX11::GetResource( int index )
+{
+	return( m_vResources[index] );
+}
+//--------------------------------------------------------------------------------
+ShaderResourceViewDX11*	RendererDX11::GetShaderResourceView( int index )
+{
+	return( m_vShaderResourceViews[index] );
+}
+//--------------------------------------------------------------------------------
+RenderTargetViewDX11* RendererDX11::GetRenderTargetView( int index )
+{
+	return( m_vRenderTargetViews[index] );
+}
+//--------------------------------------------------------------------------------
+DepthStencilViewDX11* RendererDX11::GetDepthStencilView( int index )
+{
+	return( m_vDepthStencilViews[index] );
+}
+//--------------------------------------------------------------------------------
+UnorderedAccessViewDX11* RendererDX11::GetUnorderedAccessView( int index )
+{
+	return( m_vUnorderedAccessViews[index] );
+}
+//--------------------------------------------------------------------------------
+InputLayoutDX11* RendererDX11::GetInputLayout( int index )
+{
+	return( m_vInputLayouts[index] );
+}
+//--------------------------------------------------------------------------------
+SamplerStateDX11* RendererDX11::GetSamplerState( int index )
+{
+	return( m_vSamplerStates[index] );
+}
+//--------------------------------------------------------------------------------
+ShaderDX11* RendererDX11::GetShader( int index )
+{
+	if ( m_vShaders.inrange( index ) )
+		return( m_vShaders[index] );
+	else
+		return( 0 );
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::QueueRenderView( IRenderView* pRenderView )
+{
+	m_vQueuedViews.add( pRenderView );
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::ProcessRenderViewQueue( )
+{
+	//for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
+	//	m_vQueuedViews[i]->Draw( m_pPipeMgr, g_aPayload[i].pParamManager );
+	//	//m_vQueuedViews[i]->Draw( m_pPipeMgr, m_pParamMgr );
+
+	//m_vQueuedViews.empty();
 
 
-	int SrcType = SrcResource->m_iResource & 0x00FF0000;
-	int SrcID = SrcResource->m_iResource & 0x0000FFFF;
-	ID3D11Resource* pSrcResource = m_vResources[SrcID]->GetResource();
+	//for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
+	//{
+	//	g_aPayload[i].pRenderView = m_vQueuedViews[i];
+	//	SetEvent( g_aBeginEventHandle[i] );
+	//}
 
-	m_pContext->CopySubresourceRegion( pDestResource, DstSubresource, DstX, DstY, DstZ,
-		pSrcResource, SrcSubresource, pSrcBox );
+	//WaitForMultipleObjects( (DWORD)m_vQueuedViews.count(), g_aEndEventHandle, true, INFINITE );
+	//
+	//for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
+	//{
+	//	g_aPayload[i].pPipeline->m_pContext->ClearState();
+	//	m_pPipeMgr->ExecuteCommandList( g_aPayload[i].pList );
+	//	g_aPayload[i].pList->ReleaseList();
+	//}
+
+	//m_vQueuedViews.empty();
+
+
+	// While processed count > 0
+	//   Execute NUM_THREADS work loads
+	//   WFMO
+	//   Execute command lists
+	//   Update processed count and loop
+
+
+
+	for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
+	{
+		g_aPayload[i].pRenderView = m_vQueuedViews[i];
+		SetEvent( g_aBeginEventHandle[i] );
+	}
+
+	WaitForMultipleObjects( (DWORD)m_vQueuedViews.count(), g_aEndEventHandle, true, INFINITE );
+	
+	for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
+	{
+		g_aPayload[i].pPipeline->m_pContext->ClearState();
+		m_pPipeMgr->ExecuteCommandList( g_aPayload[i].pList );
+		g_aPayload[i].pList->ReleaseList();
+	}
+
+	m_vQueuedViews.empty();
+
+}
+//--------------------------------------------------------------------------------
+
+
+//--------------------------------------------------------------------------------
+// Here is the render view process for each thread.  The intention here is to 
+// have a thread perform a single render view's rendering commands to generate
+// a command list.  This list is later used by the immediate context to execute
+// the list.
+//--------------------------------------------------------------------------------
+HANDLE						g_aThreadHandles[NUM_THREADS];
+Glyph3::ThreadPayLoad		g_aPayload[NUM_THREADS];
+HANDLE						g_aBeginEventHandle[NUM_THREADS];
+HANDLE						g_aEndEventHandle[NUM_THREADS];
+
+
+unsigned int WINAPI _RenderViewThreadProc( void* lpParameter )
+{
+	ThreadPayLoad* pPayload = (ThreadPayLoad*) lpParameter;
+
+	int id = pPayload->id;
+
+
+	for ( ; ; )
+	{
+		// Wait for the main thread to signal that there is a payload available.
+		WaitForSingleObject( g_aBeginEventHandle[id], INFINITE );
+
+		pPayload->pPipeline->m_pContext->ClearState();
+		pPayload->pPipeline->SetRasterizerState( 0 );
+		pPayload->pPipeline->SetDepthStencilState( 0 );
+		pPayload->pPipeline->SetBlendState( 0 );
+
+
+		// Execute the render view with the provided pipeline and parameter managers.
+		pPayload->pRenderView->Draw( pPayload->pPipeline, pPayload->pParamManager );
+
+		pPayload->pPipeline->m_pContext->ClearState();
+
+		// Generate the command list.
+		pPayload->pPipeline->GenerateCommandList( pPayload->pList );
+
+		// Signal to the main thread that the view has been collected into a command list.
+		SetEvent( g_aEndEventHandle[id] );
+	}
+
+	return( 0 );
 }
 //--------------------------------------------------------------------------------

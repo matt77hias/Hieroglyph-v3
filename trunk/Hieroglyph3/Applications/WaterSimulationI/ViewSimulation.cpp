@@ -15,6 +15,7 @@
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
 #include <sstream>
+#include "ParameterManagerDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -93,13 +94,21 @@ void ViewSimulation::Update( float fTime )
 {
 }
 //--------------------------------------------------------------------------------
-void ViewSimulation::Draw( RendererDX11& Renderer )
+void ViewSimulation::PreDraw( RendererDX11* pRenderer )
+{
+	// Queue this view into the renderer for processing.  Since this is a 
+	// simulation style view, there is no root and hence no additional recursive
+	// 'PreDraw'ing required.
+	pRenderer->QueueRenderView( this );
+}
+//--------------------------------------------------------------------------------
+void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager )
 {
 	// Set this view's render parameters.
-	SetRenderParams( Renderer );
+	SetRenderParams( pParamManager );
 
 	// Perform the dispatch call to update the simulation state.
-	Renderer.Dispatch( *pWaterEffect, ThreadGroupsX, ThreadGroupsY, 1 );
+	pPipelineManager->Dispatch( *pWaterEffect, ThreadGroupsX, ThreadGroupsY, 1, pParamManager );
 
 	// Switch the two resources so that the current state is maintained in slot 0.
 	ResourcePtr TempState = WaterState[0];
@@ -107,21 +116,24 @@ void ViewSimulation::Draw( RendererDX11& Renderer )
 	WaterState[1] = TempState;
 }
 //--------------------------------------------------------------------------------
-void ViewSimulation::SetRenderParams( RendererDX11& Renderer )
+void ViewSimulation::SetRenderParams( ParameterManagerDX11* pParamManager )
 {
 	// Set the parameters for this view to be able to perform its processing
 	// sequence.  In this case, water state '0' is always considered the current
 	// state.
 
-	Renderer.SetShaderResourceParameter( L"CurrentWaterState", WaterState[0] );
-	Renderer.SetUnorderedAccessParameter( L"NewWaterState", WaterState[1] );
+	pParamManager->SetShaderResourceParameter( L"CurrentWaterState", WaterState[0] );
+	pParamManager->SetUnorderedAccessParameter( L"NewWaterState", WaterState[1] );
 }
 //--------------------------------------------------------------------------------
-void ViewSimulation::SetUsageParams( RendererDX11& Renderer )
+void ViewSimulation::SetUsageParams( ParameterManagerDX11* pParamManager )
 {
 	// Set the parameters for allowing an application to use the current state
 	// as a height map via a shader resource view.
 
-	Renderer.SetShaderResourceParameter( L"CurrentWaterState", WaterState[0] );
+	Vector4f DispatchSize = Vector4f( 16.0f, 16.0f, 16.0f * 16.0f, 16.0f * 16.0f );
+	pParamManager->SetVectorParameter( std::wstring( L"DispatchSize" ), &DispatchSize );
+
+	pParamManager->SetShaderResourceParameter( L"CurrentWaterState", WaterState[0] );
 }
 //--------------------------------------------------------------------------------

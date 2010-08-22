@@ -27,7 +27,8 @@ namespace Glyph3
 		SHADER_RESOURCE,
 		UNORDERED_ACCESS,
 		CBUFFER,
-		SAMPLER
+		SAMPLER,
+		ENTITY
 	};
 
 	class RenderParameterDX11

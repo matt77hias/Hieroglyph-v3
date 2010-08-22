@@ -33,10 +33,11 @@ namespace Glyph3
 		ViewSimulation( RendererDX11& Renderer, int SizeX, int SizeY );
 
 		virtual void Update( float fTime );
-		virtual void Draw( RendererDX11& Renderer );
+		virtual void PreDraw( RendererDX11* pRenderer );
+		virtual void Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager );
 
-		virtual void SetRenderParams( RendererDX11& Renderer );
-		virtual void SetUsageParams( RendererDX11& Renderer );
+		virtual void SetRenderParams( ParameterManagerDX11* pParamManager );
+		virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
 
 
 		virtual ~ViewSimulation();

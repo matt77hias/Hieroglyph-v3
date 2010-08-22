@@ -22,21 +22,21 @@ Node3D::~Node3D()
 {
 }
 //--------------------------------------------------------------------------------
-void Node3D::PreRender( RendererDX11& Renderer, VIEWTYPE view )
+void Node3D::PreRender( RendererDX11* pRenderer, VIEWTYPE view )
 {
 	for ( int i = 0; i < m_vChildren.count(); i++ )
 	{
 		if ( m_vChildren[i] != NULL )
-            m_vChildren[i]->PreRender( Renderer, view );
+            m_vChildren[i]->PreRender( pRenderer, view );
 	}
 }
 //--------------------------------------------------------------------------------
-void Node3D::Render( RendererDX11& Renderer, VIEWTYPE view )
+void Node3D::Render( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager, VIEWTYPE view )
 {
 	for ( int i = 0; i < m_vChildren.count(); i++ )
 	{
 		if ( m_vChildren[i] != NULL )
-			m_vChildren[i]->Render( Renderer, view );
+			m_vChildren[i]->Render( pPipelineManager, pParamManager, view );
 	}
 }
 //--------------------------------------------------------------------------------

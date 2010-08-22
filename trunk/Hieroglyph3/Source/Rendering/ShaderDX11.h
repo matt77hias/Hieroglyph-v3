@@ -235,6 +235,8 @@ namespace Glyph3
 	};
 
 	class RendererDX11;
+	class PipelineManagerDX11;
+	class ParameterManagerDX11;
 
 	class ShaderDX11
 	{
@@ -244,8 +246,8 @@ namespace Glyph3
 
 		virtual ShaderType GetType() = 0;
 		
-		void UpdateParameters( RendererDX11* pRenderer );
-		void BindParameters( RendererDX11* pRenderer );
+		void UpdateParameters( PipelineManagerDX11* pPipeline, ParameterManagerDX11* pParamManager );
+		void BindParameters( PipelineManagerDX11* pPipeline, ParameterManagerDX11* pParamManager );
 
 		void PrintShaderDetails();
 

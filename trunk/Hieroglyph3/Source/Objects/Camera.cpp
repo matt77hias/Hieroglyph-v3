@@ -34,7 +34,7 @@ Camera::~Camera()
 	SAFE_DELETE( m_pCameraView );
 }
 //--------------------------------------------------------------------------------
-void Camera::RenderFrame( RendererDX11& Renderer )
+void Camera::RenderFrame( RendererDX11* pRenderer )
 {
 	if ( m_pCameraView )
 	{
@@ -43,9 +43,16 @@ void Camera::RenderFrame( RendererDX11& Renderer )
 		if ( m_pScene )
 			m_pCameraView->SetRoot( m_pScene->GetRoot() );
 
-		// Execute the render view
+		// Execute the render view, which performs a pre-draw pass followed by 
+		// the execution of the renderer's view queue.  Here we set the camera's
+		// usage parameters before hand, since all of the further views will use
+		// this camera to setup the frame (i.e. the view and projection matrices).
 
-		m_pCameraView->Draw( Renderer );
+		// TODO: Possibly add the view's update method here...
+
+		//m_pCameraView->SetRenderParams( pRenderer->m_pParamMgr );
+		m_pCameraView->PreDraw( pRenderer );
+		pRenderer->ProcessRenderViewQueue();
 	}
 }
 //--------------------------------------------------------------------------------
@@ -69,9 +76,13 @@ void Camera::SetProjectionParams( float zn, float zf, float aspect, float fov )
 
 	if ( m_pCameraView )
 	{
+		Matrix4f proj;
+
 		// Calculate and set the projection matrix for the view.
-		D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&m_pCameraView->ProjMatrix, m_fFov, 
+		D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&proj, m_fFov, 
 			m_fAspect, m_fNear, m_fFar );
+
+		m_pCameraView->SetProjMatrix( proj );
 	}
 }
 //--------------------------------------------------------------------------------

@@ -13,6 +13,7 @@
 //
 //--------------------------------------------------------------------------------
 #include "ResourceViewDX11.h"
+#include "PipelineManagerDx11.h"
 //--------------------------------------------------------------------------------
 #ifndef RenderTargetViewDX11_h
 #define RenderTargetViewDX11_h
@@ -27,7 +28,8 @@ namespace Glyph3
 
 	protected:
 		ID3D11RenderTargetView*			m_pRenderTargetView;
-		friend RendererDX11;
+		
+		friend PipelineManagerDX11;
 	};
 };
 //--------------------------------------------------------------------------------

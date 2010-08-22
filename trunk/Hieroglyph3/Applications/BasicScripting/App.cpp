@@ -25,6 +25,8 @@
 #include "ScriptIntfActor.h"
 #include "ConsoleWindow.h"
 
+#include "ParameterManagerDX11.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
@@ -111,7 +113,7 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 
-	m_pRenderer11->SetViewPort( m_pRenderer11->CreateViewPort( viewport ) );
+	m_pRenderer11->m_pPipeMgr->SetViewPort( m_pRenderer11->CreateViewPort( viewport ) );
 
 	
 	// Create an instance of the script manager
@@ -145,10 +147,10 @@ void App::Initialize()
 {
 	// Create the parameters for use with this effect
 	Vector4f LightParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
-	m_pRenderer11->SetVectorParameter( std::wstring( L"LightColor" ), &LightParams );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"LightColor" ), &LightParams );
 
 	Vector4f LightPosition = Vector4f( 20.0f, 20.0f, -20.0f, 0.0f );
-	m_pRenderer11->SetVectorParameter( std::wstring( L"LightPositionWS" ), &LightPosition );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"LightPositionWS" ), &LightPosition );
 
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
@@ -213,7 +215,7 @@ void App::Update()
 	// Update the scene, and then render all cameras within the scene.
 
 	m_pScene->Update( m_pTimer->Elapsed() );
-	m_pScene->Render( *m_pRenderer11 );
+	m_pScene->Render( m_pRenderer11 );
 
 
 	// Perform the rendering and presentation for the window.
@@ -228,7 +230,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"BasicScripting_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->m_pPipeMgr->SaveTextureScreenShot( 0, std::wstring( L"BasicScripting_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------

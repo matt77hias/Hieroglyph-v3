@@ -38,8 +38,8 @@ namespace Glyph3
 		MaterialDX11();
 		virtual ~MaterialDX11();
 
-		void PreRender( RendererDX11& Renderer, VIEWTYPE type );
-		void SetRenderParams( RendererDX11& Renderer, VIEWTYPE type );
+		void PreRender( RendererDX11* pRenderer, VIEWTYPE type );
+		void SetRenderParams( ParameterManagerDX11*, VIEWTYPE type );
 		void SetEntity( Entity3D* pEntity );
 
 		void AddRenderParameter( RenderParameterDX11* pParameter );

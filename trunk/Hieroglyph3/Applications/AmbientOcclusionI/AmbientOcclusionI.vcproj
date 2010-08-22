@@ -190,14 +190,6 @@
 				RelativePath=".\App.h"
 				>
 			</File>
-			<File
-				RelativePath=".\ViewAmbientOcclusion.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ViewAmbientOcclusion.h"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>

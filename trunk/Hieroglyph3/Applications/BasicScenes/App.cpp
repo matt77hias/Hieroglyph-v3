@@ -18,6 +18,8 @@
 #include "BufferConfigDX11.h"
 #include "MaterialGeneratorDX11.h"
 
+#include "ParameterManagerDX11.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
@@ -92,10 +94,10 @@ bool App::ConfigureEngineComponents()
 	// Bind the swap chain render target and the depth buffer for use in 
 	// rendering.  
 
-	m_pRenderer11->ClearRenderTargets();
-	m_pRenderer11->BindRenderTargets( 0, m_RenderTarget );
-	m_pRenderer11->BindDepthTarget( m_DepthTarget );
-	m_pRenderer11->ApplyRenderTargets();
+	m_pRenderer11->m_pPipeMgr->ClearRenderTargets();
+	m_pRenderer11->m_pPipeMgr->BindRenderTargets( 0, m_RenderTarget );
+	m_pRenderer11->m_pPipeMgr->BindDepthTarget( m_DepthTarget );
+	m_pRenderer11->m_pPipeMgr->ApplyRenderTargets();
 
 
 	// Create a view port to use on the scene.  This basically selects the 
@@ -110,7 +112,7 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftY = 0;
 
 	int ViewPort = m_pRenderer11->CreateViewPort( viewport );
-	m_pRenderer11->SetViewPort( ViewPort );
+	m_pRenderer11->m_pPipeMgr->SetViewPort( ViewPort );
 	
 	return( true );
 }
@@ -156,7 +158,7 @@ void App::Initialize()
 	// Create the parameters for use with this effect
 
 	m_TessParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
-	m_pRenderer11->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
 
 
 	// Create the material for use by the entities.
@@ -217,7 +219,7 @@ void App::Update()
 	// Update the scene, and then render all cameras within the scene.
 
 	m_pScene->Update( m_pTimer->Elapsed() );
-	m_pScene->Render( *m_pRenderer11 );
+	m_pScene->Render( m_pRenderer11 );
 
 	// Present the results of the rendering to the output window.
 
@@ -230,7 +232,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"BasicScenes_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->m_pPipeMgr->SaveTextureScreenShot( 0, std::wstring( L"BasicScenes_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------

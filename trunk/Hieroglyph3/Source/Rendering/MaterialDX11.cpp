@@ -10,6 +10,8 @@
 
 //--------------------------------------------------------------------------------
 #include "MaterialDX11.h"
+#include "ParameterManagerDX11.h"
+#include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -51,14 +53,15 @@ MaterialDX11::~MaterialDX11()
 		SAFE_DELETE( m_RenderParameters[i] );
 }
 //--------------------------------------------------------------------------------
-void MaterialDX11::PreRender( RendererDX11& Renderer, VIEWTYPE type )
+void MaterialDX11::PreRender( RendererDX11* pRenderer, VIEWTYPE type )
 {
 	// Update the render views that are needed before a view of 'type' can be
 	// processed.  We will always try to update the view, but it may limit if it
 	// is updated based on the maximum recurrence allowed. 
 
 	for ( int i = 0; i < Params[type].vViews.count(); i++ )
-		Params[type].vViews[i]->Draw( Renderer );
+		//Params[type].vViews[i]->Draw( pPipelineManager, pParamManager );
+		Params[type].vViews[i]->PreDraw( pRenderer );
 }
 //--------------------------------------------------------------------------------
 void MaterialDX11::AddRenderParameter( RenderParameterDX11* pParameter )
@@ -94,7 +97,7 @@ void MaterialDX11::AddRenderParameter( RenderParameterDX11* pParameter )
 	}
 }
 //--------------------------------------------------------------------------------
-void MaterialDX11::SetRenderParams( RendererDX11& Renderer, VIEWTYPE type )
+void MaterialDX11::SetRenderParams( ParameterManagerDX11* pParamManager, VIEWTYPE type )
 {
 	if ( m_pEntity )
 	{
@@ -107,12 +110,12 @@ void MaterialDX11::SetRenderParams( RendererDX11& Renderer, VIEWTYPE type )
 	// to use the results of the render view in its rendering pass.
 
 	for ( int i = 0; i < Params[type].vViews.count(); i++ )
-		Params[type].vViews[i]->SetUsageParams( Renderer );
+		Params[type].vViews[i]->SetUsageParams( pParamManager);
 
 	// Set the additional render parameters that have been added to the material.
 
 	for ( int i = 0; i < m_RenderParameters.count(); i++ )
-		Renderer.SetParameter( m_RenderParameters[i] );
+		pParamManager->SetParameter( m_RenderParameters[i] );
 }
 //--------------------------------------------------------------------------------
 void MaterialDX11::SetEntity( Entity3D* pEntity )

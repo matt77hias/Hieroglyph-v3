@@ -13,6 +13,7 @@
 #include "GeometryLoaderDX11.h"
 #include "MaterialGeneratorDX11.h"
 #include "ShaderResourceParameterDX11.h"
+#include "ParameterManagerDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -96,7 +97,7 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 	state.MipLODBias = 0;
 	
 	int sampler = Renderer.CreateSamplerState( &state );
-	Renderer.SetSamplerParameter( std::wstring( L"LinearSampler" ), &sampler ); 
+	Renderer.m_pParamMgr->SetSamplerParameter( std::wstring( L"LinearSampler" ), &sampler ); 
 
 	return( pActor );
 }

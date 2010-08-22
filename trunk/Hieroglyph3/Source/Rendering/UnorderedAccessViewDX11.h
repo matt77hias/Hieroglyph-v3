@@ -13,6 +13,7 @@
 //
 //--------------------------------------------------------------------------------
 #include "ResourceViewDX11.h"
+#include "PipelineManagerDx11.h"
 //--------------------------------------------------------------------------------
 #ifndef UnorderedAccessViewDX11_h
 #define UnorderedAccessViewDX11_h
@@ -27,7 +28,8 @@ namespace Glyph3
 
 	protected:
 		ID3D11UnorderedAccessView*			m_pUnorderedAccessView;
-		friend RendererDX11;
+		
+		friend PipelineManagerDX11;
 	};
 };
 //--------------------------------------------------------------------------------

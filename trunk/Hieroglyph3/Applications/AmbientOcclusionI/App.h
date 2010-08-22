@@ -6,6 +6,10 @@
 #include "RendererDX11.h"
 
 #include "ViewPerspective.h"
+#include "ViewAmbientOcclusion.h"
+//#include "ViewDepthNormal.h"
+//#include "ViewPerspective.h"
+
 #include "GeometryDX11.h"
 #include "MaterialDX11.h"
 #include "Camera.h"
@@ -39,6 +43,7 @@ protected:
 	ResourcePtr				m_DepthTarget;
 
 	ViewPerspective*		m_pRenderView;
+
 	Node3D*					m_pNode;
 	Entity3D*				m_pEntity;
 	

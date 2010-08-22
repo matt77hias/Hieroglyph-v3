@@ -13,6 +13,7 @@
 //
 //--------------------------------------------------------------------------------
 #include "RendererDX11.h"
+#include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 #ifndef RasterizerStateDX11_h
 #define RasterizerStateDX11_h
@@ -28,7 +29,7 @@ namespace Glyph3
 	protected:
 		ID3D11RasterizerState*			m_pState;
 
-		friend RendererDX11;
+		friend PipelineManagerDX11;
 	};
 };
 //--------------------------------------------------------------------------------

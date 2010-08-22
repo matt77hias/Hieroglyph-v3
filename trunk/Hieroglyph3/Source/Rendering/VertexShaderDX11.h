@@ -13,6 +13,7 @@
 //
 //--------------------------------------------------------------------------------
 #include "ShaderDX11.h"
+#include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 #ifndef VertexShaderDX11_h
 #define VertexShaderDX11_h
@@ -30,7 +31,7 @@ namespace Glyph3
 	protected:
 		ID3D11VertexShader*			m_pVertexShader;
 
-		friend RendererDX11;
+		friend PipelineManagerDX11;
 	};
 };
 //--------------------------------------------------------------------------------

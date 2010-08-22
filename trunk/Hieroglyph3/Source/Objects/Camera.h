@@ -32,7 +32,7 @@ namespace Glyph3
 
 		void SetCameraView( IRenderView* pView );
 		void SetScene( Scene* pScene );
-		void RenderFrame( RendererDX11& Renderer );
+		void RenderFrame( RendererDX11* pRenderer );
 
 		void SetProjectionParams( float zn, float zf, float aspect, float fov );
 

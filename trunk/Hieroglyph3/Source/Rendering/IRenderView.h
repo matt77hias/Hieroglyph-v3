@@ -16,6 +16,8 @@
 #define IRenderView_h
 //--------------------------------------------------------------------------------
 #include "RendererDX11.h"
+#include "PipelineManagerDX11.h"
+#include "ParameterManagerDX11.h"
 #include "Timer.h"
 #include "IEventListener.h"
 #include <vector>
@@ -46,24 +48,25 @@ namespace Glyph3
 		// render states and render the geometry that is stored in the object list.
 
 		virtual void Update( float fTime ) = 0;
-		virtual void Draw( RendererDX11& Renderer ) = 0;
+		virtual void PreDraw( RendererDX11* pRenderer ) = 0;
+		virtual void Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager ) = 0;
 
 		// A reference is provided to allow views to reference it's entity's data.
 
-		void SetEntity( Entity3D* pEntity );
+		virtual void SetEntity( Entity3D* pEntity );
 
 		// A second reference is used to specify the root node of the entities that
 		// the view will be rendering from.
 
-		void SetRoot( Node3D* pRoot );
+		virtual void SetRoot( Node3D* pRoot );
 
 		// The render view must set all of its rendering parameters needed to 
 		// execute itself with the SetRenderParams function.  The SetUsageParams
 		// is used to set semantics that are needed to use the output of the 
 		// render view by other objects.
 		
-		virtual void SetRenderParams( RendererDX11& Renderer ) = 0;
-		virtual void SetUsageParams( RendererDX11& Renderer ) = 0;
+		virtual void SetRenderParams( ParameterManagerDX11* pParamManager ) = 0;
+		virtual void SetUsageParams( ParameterManagerDX11* pParamManager ) = 0;
 
 		void SetName( std::wstring& name );
 
@@ -75,8 +78,10 @@ namespace Glyph3
 		void SetMaxRecurrence( int max );
 		int GetMaxRecurrence( );
 
-		Matrix4f ViewMatrix;
-		Matrix4f ProjMatrix;
+		virtual void SetViewMatrix( Matrix4f& matrix );
+		Matrix4f GetViewMatrix( );
+		virtual void SetProjMatrix( Matrix4f& matrix );
+		Matrix4f GetProjMatrix( );
 
 	protected:
 
@@ -85,6 +90,9 @@ namespace Glyph3
 
 		Entity3D* m_pEntity;
 		Node3D* m_pRoot;
+
+		Matrix4f ViewMatrix;
+		Matrix4f ProjMatrix;
 
 		int		m_iMaxRecurrence;
 		int		m_iCurrRecurrence;

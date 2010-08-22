@@ -13,6 +13,7 @@
 //
 //--------------------------------------------------------------------------------
 #include "RendererDX11.h"
+#include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 #ifndef ViewPortDX11_h
 #define ViewPortDX11_h
@@ -28,7 +29,7 @@ namespace Glyph3
 	protected:
 		D3D11_VIEWPORT			m_ViewPort;
 
-		friend RendererDX11;
+		friend PipelineManagerDX11;
 	};
 };
 //--------------------------------------------------------------------------------

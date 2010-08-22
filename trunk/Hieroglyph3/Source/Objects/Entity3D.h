@@ -49,8 +49,8 @@ namespace Glyph3
 		virtual void UpdateLocal( float time );
 		virtual void UpdateWorld( );
 
-		virtual void PreRender( RendererDX11& Renderer, VIEWTYPE view );
-		virtual void Render( RendererDX11& Renderer, VIEWTYPE view );
+		virtual void PreRender( RendererDX11* pRenderer, VIEWTYPE view );
+		virtual void Render( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager, VIEWTYPE view );
 
 		Matrix4f& LocalMatrix( );
 		Matrix4f& WorldMatrix( );
@@ -62,7 +62,7 @@ namespace Glyph3
 		void SetGeometry( GeometryDX11* pGeometry );
 
 		void AddRenderParameter( RenderParameterDX11* pParameter );
-		void SetRenderParams( RendererDX11& Renderer );
+		void SetRenderParams( ParameterManagerDX11* pParamManager );
 		
 
 		// Various entity properties are accessed here.

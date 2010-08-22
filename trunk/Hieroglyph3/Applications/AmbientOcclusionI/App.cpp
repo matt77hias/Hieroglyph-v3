@@ -22,6 +22,8 @@
 
 #include "ViewAmbientOcclusion.h"
 
+#include "ParameterManagerDX11.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
@@ -108,7 +110,7 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 
-	m_pRenderer11->SetViewPort( m_pRenderer11->CreateViewPort( viewport ) );
+	//m_pRenderer11->m_pPipeMgr->SetViewPort( m_pRenderer11->CreateViewPort( viewport ) );
 	
 	return( true );
 }
@@ -164,8 +166,8 @@ void App::Initialize()
 		std::wstring( L"ps_5_0" ) );
 
 	// Enable the material to render the given view type, and set its effect.
-	pMaterial->Params[VT_LINEAR_DEPTH_NORMALS].bRender = true;
-	pMaterial->Params[VT_LINEAR_DEPTH_NORMALS].pEffect = pDepthEffect;
+	pMaterial->Params[VT_LINEAR_DEPTH_NORMAL].bRender = true;
+	pMaterial->Params[VT_LINEAR_DEPTH_NORMAL].pEffect = pDepthEffect;
 
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
@@ -187,7 +189,7 @@ void App::Initialize()
 
 
 	Vector4f FinalColor = Vector4f( 0.5f, 1.0f, 0.5f, 1.0f );
-	m_pRenderer11->SetVectorParameter( std::wstring( L"FinalColor" ), &FinalColor );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"FinalColor" ), &FinalColor );
 
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
@@ -195,8 +197,11 @@ void App::Initialize()
 	m_pCamera = new Camera();
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.407f, -0.707f, 0.0f ) );
 	m_pCamera->GetNode()->Position() = Vector3f( 4.0f, 4.5f, -4.0f );
+
 	m_pRenderView = new ViewAmbientOcclusion( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );
+
+
 	m_pCamera->SetCameraView( m_pRenderView );
 	m_pCamera->SetProjectionParams( 0.1f, 500.0f, (float)D3DX_PI / 2.0f, (float)ResolutionX / (float)ResolutionY );
 
@@ -234,7 +239,7 @@ void App::Update()
 	Vector4f TimeFactors = Vector4f( m_pTimer->Elapsed(), (float)m_pTimer->Framerate(), 
 		m_pTimer->Runtime(), (float)m_pTimer->FrameCount() );
 
-	m_pRenderer11->SetVectorParameter( std::wstring( L"TimeFactors" ), &TimeFactors );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"TimeFactors" ), &TimeFactors );
 
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.
@@ -255,7 +260,7 @@ void App::Update()
 	//m_pRenderer11->StartPipelineStatistics();
 
 	m_pScene->Update( m_pTimer->Elapsed() );
-	m_pScene->Render( *m_pRenderer11 );
+	m_pScene->Render( m_pRenderer11 );
 
 	//m_pRenderer11->EndPipelineStatistics();
 	//Log::Get().Write( m_pRenderer11->PrintPipelineStatistics() );
@@ -272,7 +277,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"AmbientOcclusion_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->m_pPipeMgr->SaveTextureScreenShot( 0, std::wstring( L"AmbientOcclusion_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------

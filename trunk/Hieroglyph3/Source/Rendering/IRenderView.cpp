@@ -54,7 +54,7 @@ int IRenderView::GetRTID( int index )
 		return( 0 );
 }
 //--------------------------------------------------------------------------------
-void IRenderView::SetRenderParams( RendererDX11& Renderer )
+void IRenderView::SetRenderParams( ParameterManagerDX11* pParamManager )
 {
 	// Set the render parameters for this view.  Note that the view and projection
 	// matrices are not set, since this will vary depending on the render view
@@ -119,5 +119,25 @@ int IRenderView::GetMaxRecurrence( )
 void IRenderView::SetRoot( Node3D* pRoot )
 {
 	m_pRoot = pRoot;
+}
+//--------------------------------------------------------------------------------
+void IRenderView::SetViewMatrix( Matrix4f& matrix )
+{
+	ViewMatrix = matrix;
+}
+//--------------------------------------------------------------------------------
+Matrix4f IRenderView::GetViewMatrix( )
+{
+	return( ViewMatrix );
+}
+//--------------------------------------------------------------------------------
+void IRenderView::SetProjMatrix( Matrix4f& matrix )
+{
+	ProjMatrix = matrix;
+}
+//--------------------------------------------------------------------------------
+Matrix4f IRenderView::GetProjMatrix( )
+{
+	return( ProjMatrix );
 }
 //--------------------------------------------------------------------------------

@@ -21,6 +21,8 @@
 #include "RenderEffectDX11.h"
 #include "RasterizerStateConfigDX11.h"
 
+#include "ParameterManagerDX11.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
@@ -103,10 +105,10 @@ bool App::ConfigureEngineComponents()
 	// Bind the swap chain render target and the depth buffer for use in 
 	// rendering.  
 
-	m_pRenderer11->ClearRenderTargets();
-	m_pRenderer11->BindRenderTargets( 0, m_RenderTarget );
-	m_pRenderer11->BindDepthTarget( m_DepthTarget );
-	m_pRenderer11->ApplyRenderTargets();
+	m_pRenderer11->m_pPipeMgr->ClearRenderTargets();
+	m_pRenderer11->m_pPipeMgr->BindRenderTargets( 0, m_RenderTarget );
+	m_pRenderer11->m_pPipeMgr->BindDepthTarget( m_DepthTarget );
+	m_pRenderer11->m_pPipeMgr->ApplyRenderTargets();
 
 
 
@@ -122,7 +124,7 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftY = 0;
 
 	int ViewPort = m_pRenderer11->CreateViewPort( viewport );
-	m_pRenderer11->SetViewPort( ViewPort );
+	m_pRenderer11->m_pPipeMgr->SetViewPort( ViewPort );
 	
 	return( true );
 }
@@ -208,14 +210,14 @@ void App::Initialize()
 	// Concatenate the view and projection matrices
 	m_ViewProjMatrix = m_ViewMatrix * m_ProjMatrix;
 
-	m_pRenderer11->SetMatrixParameter( std::wstring( L"WorldMatrix" ), &m_WorldMatrix );
-	m_pRenderer11->SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &m_ViewProjMatrix );
+	m_pRenderer11->m_pParamMgr->SetMatrixParameter( std::wstring( L"WorldMatrix" ), &m_WorldMatrix );
+	m_pRenderer11->m_pParamMgr->SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &m_ViewProjMatrix );
 
 	m_TessParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
-	m_pRenderer11->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
 
 	Vector4f Color = Vector4f ( 0.0f, 0.0f, 0.0f, 0.0f );
-	m_pRenderer11->SetVectorParameter( std::wstring( L"FinalColor" ), &Color );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"FinalColor" ), &Color );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -240,13 +242,13 @@ void App::Update()
 
 	float factor = sinf( fTessellation ) * 6.0f + 7.0f;
 	m_TessParams = Vector4f( factor, factor, factor, factor );
-	m_pRenderer11->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
 
 	m_WorldMatrix.RotationY( fRotation );
-	m_pRenderer11->SetMatrixParameter( std::wstring( L"WorldMatrix" ), &m_WorldMatrix );
+	m_pRenderer11->m_pParamMgr->SetMatrixParameter( std::wstring( L"WorldMatrix" ), &m_WorldMatrix );
 
 
-	m_pRenderer11->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ), 1.0f );
+	m_pRenderer11->m_pPipeMgr->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ), 1.0f );
 
 	const float fSeparation = 0.5f;
 
@@ -254,20 +256,20 @@ void App::Update()
 	Matrix4f OffsetMatrix;
 	OffsetMatrix.Translate( -fSeparation, 0.0f, 0.0f );
 	Matrix4f ViewProj = m_ViewMatrix * OffsetMatrix * m_ProjMatrix;
-	m_pRenderer11->SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &ViewProj );
+	m_pRenderer11->m_pParamMgr->SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &ViewProj );
 	Vector4f Color = Vector4f( 1.0f, 0.0f, 0.0f, 0.0f );
-	m_pRenderer11->SetVectorParameter( std::wstring( L"FinalColor" ), &Color );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"FinalColor" ), &Color );
 
-	m_pRenderer11->Draw( *m_pTessellationEffect, *m_pGeometry ); 
+	m_pRenderer11->m_pPipeMgr->Draw( *m_pTessellationEffect, *m_pGeometry, m_pRenderer11->m_pParamMgr ); 
 
 	// Draw the right eye view in one color
 	OffsetMatrix.Translate( fSeparation, 0.0f, 0.0f );
 	ViewProj = m_ViewMatrix * OffsetMatrix * m_ProjMatrix;
-	m_pRenderer11->SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &ViewProj );
+	m_pRenderer11->m_pParamMgr->SetMatrixParameter( std::wstring( L"ViewProjMatrix" ), &ViewProj );
 	Color = Vector4f( 0.75f, 0.75f, 0.0f, 0.0f );
-	m_pRenderer11->SetVectorParameter( std::wstring( L"FinalColor" ), &Color );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"FinalColor" ), &Color );
 	
-	m_pRenderer11->Draw( *m_pTessellationEffect, *m_pGeometry ); 
+	m_pRenderer11->m_pPipeMgr->Draw( *m_pTessellationEffect, *m_pGeometry, m_pRenderer11->m_pParamMgr ); 
 
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
 
@@ -278,7 +280,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->SaveTextureScreenShot( 0, std::wstring( L"BasicHolographicRendering_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->m_pPipeMgr->SaveTextureScreenShot( 0, std::wstring( L"BasicHolographicRendering_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------

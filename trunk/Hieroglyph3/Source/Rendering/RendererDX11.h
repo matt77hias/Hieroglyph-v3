@@ -77,6 +77,7 @@ namespace Glyph3
 	class Texture3dConfigDX11;
 	class SwapChainConfigDX11;
 
+	class CommandListDX11;
 	class GeometryDX11;
 
 	class ShaderResourceViewDX11;
@@ -104,7 +105,12 @@ namespace Glyph3
 	class RenderEffectDX11;
 
 	class RenderParameterDX11;
-	
+
+	class ParameterManagerDX11;
+	class PipelineManagerDX11;
+
+	class IRenderView;
+
 	enum ResourceType
 	{
 		RT_VERTEXBUFFER = 0x010000,
@@ -117,6 +123,19 @@ namespace Glyph3
 		RT_TEXTURE3D = 0x080000
 	};
 	
+	struct ThreadPayLoad
+	{
+		int id;
+		bool bComplete;
+		PipelineManagerDX11* pPipeline;
+		ParameterManagerDX11* pParamManager;
+		IRenderView* pRenderView;
+		CommandListDX11* pList;
+	};
+
+
+
+
 	class RendererDX11 : public IRenderer
 	{
 	public:
@@ -144,11 +163,10 @@ namespace Glyph3
 		// related to the API for sequencing rendering batches.
 
 		virtual void Present( HWND hWnd = 0, int SwapChain = -1 );
-		virtual void ClearBuffers( Vector4f color, float depth = 1.0f );
 
 		// Allow the application to create swap chains
 
-		int CreateSwapChain( SwapChainConfigDX11* pConfig );
+		int CreateSwapChain( SwapChainConfigDX11* pConfig );// ResourceManagerDX11
 
 		// The create buffer method provides a way to create any of the buffer
 		// structures - vertex, index, and constant buffers.  These all utilize the
@@ -190,12 +208,6 @@ namespace Glyph3
 		int CreateSamplerState( D3D11_SAMPLER_DESC* pDesc );
 		int CreateViewPort( D3D11_VIEWPORT viewport );
 
-		// The individual state blocks can be set for use in rendering.
-
-		void SetBlendState( int ID );
-		void SetDepthStencilState( int ID );
-		void SetRasterizerState( int ID );
-		void SetViewPort( int ID );
 
 		// Each programmable shader stage can be loaded from file, and stored in a list for
 		// later use.  Either an application can directly set these values or a render effect
@@ -204,106 +216,6 @@ namespace Glyph3
 		int LoadShader( ShaderType type, std::wstring& filename, std::wstring& function, 
 			std::wstring& model, bool enablelogging = true );
 
-		// Here we allow rendering parameters to be registered and set by name.  These 
-		// parameters are then available for setting their value and subsequent use 
-		// during rendering.
-
-		void SetVectorParameter( std::wstring name, Vector4f* pVector );
-		void SetMatrixParameter( std::wstring name, Matrix4f* pMatrix );
-		void SetSamplerParameter( std::wstring name, int* pID );
-		void SetShaderResourceParameter( std::wstring name, ResourcePtr resource );
-		void SetUnorderedAccessParameter( std::wstring name, ResourcePtr resource );
-		void SetConstantBufferParameter( std::wstring name, ResourcePtr resource );
-		void SetMatrixArrayParameter( std::wstring name, int count, Matrix4f* pMatrices );
-		void SetParameter( RenderParameterDX11* pParameter );
-
-		// Each of the parameter types can also be accessed to inspect their current
-		// value prior to setting them.
-
-		Vector4f GetVectorParameter( std::wstring name );
-		Matrix4f GetMatrixParameter( std::wstring name );
-		int GetShaderResourceParameter( std::wstring name );
-		int GetUnorderedAccessParameter( std::wstring name );
-		int GetConstantBufferParameter( std::wstring name );
-		int GetSamplerStateParameter( std::wstring name );
-		Matrix4f* GetMatrixArrayParameter( std::wstring name, int count );
-
-
-		// The following matrix parameters are set with specialized functions to allow
-		// the renderer to calculate the concatenated matrices.
-		
-		void SetWorldMatrixParameter( Matrix4f* pMatrix );
-		void SetViewMatrixParameter( Matrix4f* pMatrix );
-		void SetProjMatrixParameter( Matrix4f* pMatrix );
-
-		// All of the 'Bind/Unbind' functions below are used to bind various resources to the
-		// pipeline.  Currently only the CS can accept unordered access views.  A method is
-		// provided to apply the resource changes as an optimization, which allows for the
-		// renderer to cache resource changes between rendering calls if appropriate.
-
-		void BindConstantBufferParameter( ShaderType type, std::wstring name, UINT slot );
-		void BindShaderResourceParameter( ShaderType type, std::wstring name, UINT slot );
-		void BindUnorderedAccessParameter( ShaderType type, std::wstring name, UINT slot );
-		void BindSamplerStateParameter( ShaderType type, std::wstring name, UINT slot );
-		
-		// The changes made to the pipeline resources with the Bind calls are cached and 
-		// applied or cleared all at once with the following calls.  This reduces the number 
-		// of API function calls needed to configure the pipeline.
-
-		void ApplyPipelineResources( );
-		void ClearPipelineResources( );
-
-		void BindInputLayout( int ID );
-		void UnbindInputLayout( );
-
-		void BindVertexBuffer( ResourcePtr resource, UINT stride );
-		void UnbindVertexBuffer( );
-
-		void BindIndexBuffer( ResourcePtr resource );
-		void UnbindIndexBuffer( );
-
-		// TODO: Create objects to represent each of the fixed function stages, and 
-		//       utilize this 'Clear', 'Bind', and 'Apply' paradigm.
-
-		// Render targets are bound to the output merger stage, which is represented
-		// internally as a seperate class.  The array of render targets is cached on
-		// the CPU side prior to actual binding with the API.  This allows a series of
-		// changes to be made to several render targerts prior to actually binding.
-
-		void BindRenderTargets( int index, ResourcePtr RenderID );
-		void BindDepthTarget( ResourcePtr DepthID );
-		void ClearRenderTargets( );	
-		void ApplyRenderTargets( );
-
-		void BindShader( ShaderType type, int ID );
-		void UnbindShader( ShaderType type );
-
-
-		// Resources can be mapped in order to manually modify or read their
-		// contents.  The returned structure provides information about the
-		// resource including the pitch and width to be used in accessing it.
-
-		D3D11_MAPPED_SUBRESOURCE	MapResource( int index, UINT subresource, D3D11_MAP actions, UINT flags );
-		void						UnMapResource( int index, UINT subresource );
-
-		
-		// Pipeline execution calls - these are the methods for executing the 
-		// pipeline with the given configuration (supplied by the render effect).
-		// With the dispatch call, the same configuration is used except that you
-		// specify the dimensions of the thread groups to instantiate.
-
-		void Draw( RenderEffectDX11& effect, GeometryDX11& chunk );
-		void Dispatch( RenderEffectDX11& effect, UINT x, UINT y, UINT z );
-
-		// Pipeline statistics are available through the query objects in D3D11.
-		// Call start, do some rendering, call end, and then print the results to
-		// a string and either log them or display them.
-
-		void StartPipelineStatistics( );
-		void EndPipelineStatistics( );
-		std::wstring PrintPipelineStatistics( );
-
-		void SaveTextureScreenShot( int ID, std::wstring filename, D3DX11_IMAGE_FILE_FORMAT format = D3DX11_IFF_PNG );
 		
 		ResourcePtr GetSwapChainResource( int ID );
 		
@@ -311,12 +223,6 @@ namespace Glyph3
 		// adapter output resolution.
 
 		Vector2f GetDesktopResolution();
-
-		// Copy from one resource to another resource.
-
-		void CopySubresourceRegion( ResourcePtr DestResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ,
-			ResourcePtr SrcResource, UINT SrcSubresource, D3D11_BOX* pSrcBox );
-
 
 		ResourcePtr LoadTexture( std::wstring filename );
 
@@ -339,14 +245,33 @@ namespace Glyph3
 		static std::wstring Print_D3D11_TESSELLATOR_PARTITIONING( D3D11_TESSELLATOR_PARTITIONING partitioning );
 		static std::wstring Print_D3D11_TESSELLATOR_DOMAIN( D3D11_TESSELLATOR_DOMAIN domain );
 
+		// Provide access to the pipeline states.
+		boost::shared_ptr<BlendStateDX11>				GetBlendState( int index );
+		boost::shared_ptr<DepthStencilStateDX11>		GetDepthState( int index );
+		boost::shared_ptr<RasterizerStateDX11>			GetRasterizerState( int index );
+		ViewPortDX11*									GetViewPort( int index );
+		ResourceDX11*									GetResource( int index );
+
+		ShaderResourceViewDX11*							GetShaderResourceView( int index );
+		RenderTargetViewDX11*							GetRenderTargetView( int index );
+		DepthStencilViewDX11*							GetDepthStencilView( int index );
+		UnorderedAccessViewDX11*						GetUnorderedAccessView( int index );
+
+		InputLayoutDX11*								GetInputLayout( int index );
+		SamplerStateDX11*								GetSamplerState( int index );
+
+		ShaderDX11*										GetShader( int index );
+
+		// Here is the caching API functions
+		void QueueRenderView( IRenderView* pRenderView );
+		void ProcessRenderViewQueue( );
+
 	private:
 
 		// The main API interfaces used in the renderer.
 		ID3D11Device*				m_pDevice;
 		ID3D11Debug*				m_pDebugger;
 		D3D_DRIVER_TYPE				m_driverType;
-		ID3D11DeviceContext*		m_pContext;
-		ID3D11Query*				m_pQuery;
 
 		// Static renderer access - used for accessing the renderer when no reference
 		// is already available.
@@ -390,39 +315,32 @@ namespace Glyph3
 		TArray<SamplerStateDX11*>								m_vSamplerStates;
 		TArray<ViewPortDX11*>									m_vViewPorts;
 
-		// All rendering parameters are stored in a map and are accessed by name.  This may
-		// be modified to allow faster random access in the future, possibly using a hash 
-		// table to reference an array.
-
-		std::map< std::wstring, RenderParameterDX11* >	m_Parameters;
+	public:
+		ParameterManagerDX11*									m_pParamMgr;
+		PipelineManagerDX11*									m_pPipeMgr;
+		PipelineManagerDX11*									m_pDeferredPipeline;
 
 	protected:
 
-		// The shader stage resources are managed by these classes.
-
-		VertexStageDX11		VertexShaderStage;
-		HullStageDX11		HullShaderStage;
-		DomainStageDX11		DomainShaderStage;
-		GeometryStageDX11	GeometryShaderStage;
-		PixelStageDX11		PixelShaderStage;
-		ComputeStageDX11	ComputeShaderStage;
-
-		// Each of the shader stages are stored in array that is indexed by the shader
-		// type enumeration for fast access.
-
-		ShaderStageDX11*	ShaderStages[6];
-
-
-		OutputMergerStageDX11	OutputMergerStage;
-		
+		TArray<IRenderView*>									m_vQueuedViews;
 
 		// Internal API for friends to use - only the rendering system should use these!
 		
 		VertexBufferDX11* GetVertexBuffer( int index );
 		IndexBufferDX11* GetIndexBuffer( int index );
 
+
 		friend GeometryDX11;
 	};
 };
+
+unsigned int WINAPI _RenderViewThreadProc( void* lpParameter );
+
+// Multithreading support objects
+#define NUM_THREADS 4
+extern HANDLE						g_aThreadHandles[NUM_THREADS];
+extern Glyph3::ThreadPayLoad		g_aPayload[NUM_THREADS];
+extern HANDLE						g_aBeginEventHandle[NUM_THREADS];
+extern HANDLE						g_aEndEventHandle[NUM_THREADS];
 
 #endif // RendererDX11_h
