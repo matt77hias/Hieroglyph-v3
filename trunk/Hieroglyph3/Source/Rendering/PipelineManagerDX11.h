@@ -42,6 +42,9 @@ namespace Glyph3
 		void SetRasterizerState( int ID );
 		void SetViewPort( int ID );
 
+		// State accessors
+		D3D11_VIEWPORT GetCurrentViewport( );
+
 		// All of the 'Bind/Unbind' functions below are used to bind various resources to the
 		// pipeline.  Currently only the CS can accept unordered access views.  A method is
 		// provided to apply the resource changes as an optimization, which allows for the
@@ -78,8 +81,11 @@ namespace Glyph3
 		void BindInputLayout( int ID );
 		void UnbindInputLayout( );
 
-		void BindVertexBuffer( ResourcePtr resource, UINT stride );
+		void BindVertexBuffer( ResourcePtr resource, UINT stride, UINT offset = 0 );
+		void BindVertexBuffers( const ResourcePtr* resources, const UINT* strides,
+								const UINT* offsets, UINT startSlot, UINT numBuffers );
 		void UnbindVertexBuffer( );
+		void UnbindAllVertexBuffers( );
 
 		void BindIndexBuffer( ResourcePtr resource );
 		void UnbindIndexBuffer( );
@@ -90,6 +96,18 @@ namespace Glyph3
 		// specify the dimensions of the thread groups to instantiate.
 
 		void Draw( RenderEffectDX11& effect, GeometryDX11& chunk, ParameterManagerDX11* pParamManager );
+		void Draw( RenderEffectDX11& effect, ResourcePtr vb, ResourcePtr ib,
+					int inputLayout, D3D11_PRIMITIVE_TOPOLOGY primType,
+					UINT vertexStride, UINT numIndices, ParameterManagerDX11* pParamManager);
+		void DrawInstanced( RenderEffectDX11& effect, GeometryDX11& chunk,
+							ResourcePtr instanceData, UINT instanceDataStride,
+							UINT numInstances, ParameterManagerDX11* pParamManager );
+		void DrawInstanced( RenderEffectDX11& effect, ResourcePtr vb,
+							D3D11_PRIMITIVE_TOPOLOGY primType, ResourcePtr ib,
+							int inputLayout, UINT vertexStride, UINT numIndices,
+							ResourcePtr instanceData, UINT instanceDataStride,
+							UINT numInstances, ParameterManagerDX11* pParamManager );
+		
 		void Dispatch( RenderEffectDX11& effect, UINT x, UINT y, UINT z, ParameterManagerDX11* pParamManager );
 
 		// The pipeline state can be modified with command lists.  This allows

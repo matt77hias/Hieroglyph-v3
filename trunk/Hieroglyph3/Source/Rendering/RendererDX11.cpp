@@ -1,11 +1,11 @@
 //--------------------------------------------------------------------------------
 // This file is a portion of the Hieroglyph 3 Rendering Engine.  It is distributed
-// under the MIT License, available in the root of this distribution and 
+// under the MIT License, available in the root of this distribution and
 // at the following URL:
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) 2003-2010 Jason Zink
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 RendererDX11* RendererDX11::m_spRenderer = 0;
 //--------------------------------------------------------------------------------
-RendererDX11::RendererDX11() 
+RendererDX11::RendererDX11()
 {
 	if ( m_spRenderer == 0 )
 		m_spRenderer = this;
@@ -121,7 +121,7 @@ D3D_FEATURE_LEVEL RendererDX11::GetAvailableFeatureLevel( D3D_DRIVER_TYPE Driver
 	}
 	else
 	{
-		hr = D3D11CreateDevice( 
+		hr = D3D11CreateDevice(
 			NULL,
 			DriverType,
 			NULL,
@@ -153,22 +153,22 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	hr = CreateDXGIFactory( __uuidof(IDXGIFactory), (void**)(&pFactory) );
 
 
-	// Enumerate all of the adapters in the current system.  This includes all 
+	// Enumerate all of the adapters in the current system.  This includes all
 	// adapters, even the ones that don't support the ID3D11Device interface.
 
 	IDXGIAdapter1* pAdapter;
 	TArray<DXGIAdapter*> vAdapters;
 	TArray<DXGIOutput*> vOutputs;
 
-	while( pFactory->EnumAdapters1( vAdapters.count(), &pAdapter ) != DXGI_ERROR_NOT_FOUND ) 
-	{ 
-		vAdapters.add( new DXGIAdapter( pAdapter ) ); 
+	while( pFactory->EnumAdapters1( vAdapters.count(), &pAdapter ) != DXGI_ERROR_NOT_FOUND )
+	{
+		vAdapters.add( new DXGIAdapter( pAdapter ) );
 
 		DXGI_ADAPTER_DESC1 desc;
 		pAdapter->GetDesc1( &desc );
 
 		Log::Get().Write( desc.Description );
-	} 
+	}
 
 	// Specify debug
     //UINT CreateDeviceFlags = D3D11_CREATE_DEVICE_SINGLETHREADED; // not interested in multi-threading for now
@@ -180,7 +180,7 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	ID3D11DeviceContext* pContext = 0;
 
 	D3D_FEATURE_LEVEL level[] = { FeatureLevel };
-	hr = D3D11CreateDevice( 
+	hr = D3D11CreateDevice(
 				0, //vAdapters[0]->m_pAdapter,
 				DriverType,
 				0,
@@ -208,7 +208,7 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 
 	m_pDebugger = 0;
 	hr = m_pDevice->QueryInterface( __uuidof(ID3D11Debug), (void **)&m_pDebugger );
-	
+
 	if ( FAILED( hr ) )
 	{
 		Log::Get().Write( L"Unable to acquire the ID3D11Debug interface from the device!" );
@@ -411,7 +411,7 @@ void RendererDX11::Present( HWND hWnd, int SwapChain )
 	//	presentResult = m_vSC[SwapChain]->m_pSwapChain->Present( NULL, NULL, hWnd, NULL, 0 );
 
 	//if ( presentResult == D3DERR_DEVICELOST )
-	//	OnLostDevice(); 
+	//	OnLostDevice();
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateSwapChain( SwapChainConfigDX11* pConfig )
@@ -420,7 +420,7 @@ int RendererDX11::CreateSwapChain( SwapChainConfigDX11* pConfig )
 
 	IDXGIDevice * pDXGIDevice;
 	HRESULT hr = m_pDevice->QueryInterface(__uuidof(IDXGIDevice), (void **)&pDXGIDevice);
-	      
+
 	IDXGIAdapter * pDXGIAdapter;
 	hr = pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), (void **)&pDXGIAdapter);
 
@@ -473,10 +473,8 @@ int RendererDX11::CreateSwapChain( SwapChainConfigDX11* pConfig )
 	pSwapChainBuffer->GetDesc( &TextureConfig.m_State );
 
 	ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, &TextureConfig, this ) );
-	
-	
 	// With the resource proxy created, create the swap chain wrapper and store it.
-	// The resource proxy can then be used later on by the application to get the 
+	// The resource proxy can then be used later on by the application to get the
 	// RTV or texture ID if needed.
 
 	m_vSwapChains.add( new SwapChainDX11( pSwapChain, Proxy ) );
@@ -487,7 +485,6 @@ int RendererDX11::CreateSwapChain( SwapChainConfigDX11* pConfig )
 ResourcePtr RendererDX11::CreateVertexBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData )
 {
 	// Create the buffer with the specified configuration.
-	
 	ID3D11Buffer* pBuffer = 0;
 	HRESULT hr = m_pDevice->CreateBuffer( &pConfig->m_State, pData, &pBuffer );
 
@@ -600,7 +597,6 @@ ResourcePtr RendererDX11::CreateConstantBuffer( BufferConfigDX11* pConfig,  D3D1
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-	
 		int ResourceID = ( m_vResources.count() - 1 ) + RT_CONSTANTBUFFER;
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
 
@@ -623,7 +619,6 @@ ResourcePtr RendererDX11::CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_S
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		
 		int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE1D;
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
 
@@ -646,7 +641,6 @@ ResourcePtr RendererDX11::CreateTexture2D( Texture2dConfigDX11* pConfig, D3D11_S
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		
 		int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE2D;
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
 
@@ -669,7 +663,6 @@ ResourcePtr RendererDX11::CreateTexture3D( Texture3dConfigDX11* pConfig, D3D11_S
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		
 		int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE3D;
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
 
@@ -798,15 +791,15 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 	char AsciiModel[1024];
 	WideCharToMultiByte(CP_ACP, 0, function.c_str(), -1, AsciiFunction, 1024, NULL, NULL);
 	WideCharToMultiByte(CP_ACP, 0, model.c_str(), -1, AsciiModel, 1024, NULL, NULL);
- 
 
-	if ( FAILED( hr = D3DX11CompileFromFile( 
+
+	if ( FAILED( hr = D3DX11CompileFromFile(
 		filename.c_str(),
 		0,
 		0,
 		AsciiFunction,
 		AsciiModel,
-		D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, 
+		D3D10_SHADER_PACK_MATRIX_ROW_MAJOR,
 		0,//UINT Flags2,
 		0,
 		&pCompiledShader,
@@ -835,11 +828,11 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 		{
 			ID3D11VertexShader* pShader = 0;
 
-			hr = m_pDevice->CreateVertexShader( 
+			hr = m_pDevice->CreateVertexShader(
 				pCompiledShader->GetBufferPointer(),
 				pCompiledShader->GetBufferSize(),
 				0, &pShader );
-			
+
 			pShaderWrapper = new VertexShaderDX11( pShader );
 			break;
 		}
@@ -848,7 +841,7 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 		{
 			ID3D11HullShader* pShader = 0;
 
-			hr = m_pDevice->CreateHullShader( 
+			hr = m_pDevice->CreateHullShader(
 				pCompiledShader->GetBufferPointer(),
 				pCompiledShader->GetBufferSize(),
 				0, &pShader );
@@ -861,7 +854,7 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 		{
 			ID3D11DomainShader* pShader = 0;
 
-			hr = m_pDevice->CreateDomainShader( 
+			hr = m_pDevice->CreateDomainShader(
 				pCompiledShader->GetBufferPointer(),
 				pCompiledShader->GetBufferSize(),
 				0, &pShader );
@@ -874,7 +867,7 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 		{
 			ID3D11GeometryShader* pShader = 0;
 
-			hr = m_pDevice->CreateGeometryShader( 
+			hr = m_pDevice->CreateGeometryShader(
 				pCompiledShader->GetBufferPointer(),
 				pCompiledShader->GetBufferSize(),
 				0, &pShader );
@@ -887,7 +880,7 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 		{
 			ID3D11PixelShader* pShader = 0;
 
-			hr = m_pDevice->CreatePixelShader( 
+			hr = m_pDevice->CreatePixelShader(
 				pCompiledShader->GetBufferPointer(),
 				pCompiledShader->GetBufferSize(),
 				0, &pShader );
@@ -900,11 +893,10 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 		{
 			ID3D11ComputeShader* pShader = 0;
 
-			hr = m_pDevice->CreateComputeShader( 
+			hr = m_pDevice->CreateComputeShader(
 				pCompiledShader->GetBufferPointer(),
 				pCompiledShader->GetBufferSize(),
 				0, &pShader );
-			
 			pShaderWrapper = new ComputeShaderDX11( pShader );
 			break;
 		}
@@ -913,10 +905,8 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 	if ( FAILED( hr ) )
 	{
 		Log::Get().Write( L"Failed to create shader!" );
-		
 		pCompiledShader->Release();
 		delete pShaderWrapper;
-		
 		return( -1 );
 	}
 
@@ -976,7 +966,6 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 		D3D11_SHADER_BUFFER_DESC desc;
 		pConstBuffer->GetDesc( &desc );
 		BufferLayout.Description = ShaderBufferDesc( desc );
-		
 		// Load the description of each variable for use later on when binding a buffer
 		for ( UINT j = 0; j < BufferLayout.Description.Variables; j++ )
 		{
@@ -987,7 +976,6 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 			ShaderVariableDesc variabledesc( var_desc );
 
 			BufferLayout.Variables.add( variabledesc );
-			
 			// Get the variable type description and store it
 			ID3D11ShaderReflectionType* pType = pVariable->GetType();
 			D3D11_SHADER_TYPE_DESC type_desc;
@@ -1001,7 +989,7 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 	}
 
 
-	// Get the overall resource binding information for this shader.  This includes 
+	// Get the overall resource binding information for this shader.  This includes
 	// the constant buffers, plus all of the other objects that can be bound to the
 	// pipeline with resource views.
 
@@ -1016,11 +1004,9 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 
 	// Release the shader reflection interface
 	pReflector->Release();
-	
 
 	// Store the compiled shader in the shader wrapper for use later on in creating
 	// and checking input and output signatures.
-	
 	pShaderWrapper->pCompiledShader = pCompiledShader;
 
 
@@ -1163,11 +1149,11 @@ const char* RendererDX11::TranslateSystemVariableName( D3D10_NAME name )
 		return( "SAMPLE_INDEX" );
 	case D3D11_NAME_FINAL_QUAD_EDGE_TESSFACTOR:
 		return( "FINAL_QUAD_EDGE_TESSFACTOR" );
-	case D3D11_NAME_FINAL_QUAD_INSIDE_TESSFACTOR: 
+	case D3D11_NAME_FINAL_QUAD_INSIDE_TESSFACTOR:
 		return( "FINAL_QUAD_INSIDE_TESSFACTOR" );
-	case D3D11_NAME_FINAL_TRI_EDGE_TESSFACTOR: 
+	case D3D11_NAME_FINAL_TRI_EDGE_TESSFACTOR:
 		return( "FINAL_TRI_EDGE_TESSFACTOR" );
-	case D3D11_NAME_FINAL_TRI_INSIDE_TESSFACTOR: 
+	case D3D11_NAME_FINAL_TRI_INSIDE_TESSFACTOR:
 		return( "FINAL_TRI_INSIDE_TESSFACTOR" );
 	case D3D11_NAME_FINAL_LINE_DETAIL_TESSFACTOR:
 		return( "FINAL_LINE_DETAIL_TESSFACTOR" );
@@ -1286,43 +1272,32 @@ const char* RendererDX11::TranslateResourceReturnType( D3D11_RESOURCE_RETURN_TYP
 int RendererDX11::CreateInputLayout( TArray<D3D11_INPUT_ELEMENT_DESC>& elements, int ShaderID  )
 {
 	// Create array of elements here for the API call.
-
 	D3D11_INPUT_ELEMENT_DESC* pElements = new D3D11_INPUT_ELEMENT_DESC[elements.count()];
 	for ( int i = 0; i < elements.count(); i++ )
 		pElements[i] = elements[i];
-
 	
 	// Attempt to create the input layout from the input information.
-
 	ID3DBlob* pCompiledShader = m_vShaders[ShaderID]->pCompiledShader;
 	ID3D11InputLayout* pLayout = 0;
 
 	HRESULT hr = m_pDevice->CreateInputLayout( pElements, elements.count(), 
 		pCompiledShader->GetBufferPointer(), pCompiledShader->GetBufferSize(), &pLayout );
 
-	
 	// Release the input elements array.
-
 	delete[] pElements;
 
-
 	// On failure, log the error and return an invalid index.
-
 	if ( FAILED( hr ) )
 	{
 		Log::Get().Write( L"Failed to create input layout!" );
 		return( -1 );
 	}
 
-
 	// Create the input layout wrapper instance and store it in the renderer's list.
-
 	InputLayoutDX11* pLayoutWrapper = new InputLayoutDX11( pLayout );
 	m_vInputLayouts.add( pLayoutWrapper );
 
-
 	// Return the index for referencing later on.
-
 	return( m_vInputLayouts.count() - 1 );
 }
 //--------------------------------------------------------------------------------
@@ -1528,7 +1503,6 @@ ResourcePtr RendererDX11::GetSwapChainResource( int ID )
 {
 	if ( ( ID >= 0 ) && ( m_vSwapChains.count() ) )
 		return( m_vSwapChains[ID]->m_Resource );
-	
 	Log::Get().Write( L"Tried to get an invalid swap buffer index texture ID!" );
 
 	return( ResourcePtr( new ResourceProxyDX11() ) );
@@ -1867,7 +1841,6 @@ Vector2f RendererDX11::GetDesktopResolution()
 
 	IDXGIDevice * pDXGIDevice;
 	HRESULT hr = m_pDevice->QueryInterface(__uuidof(IDXGIDevice), (void **)&pDXGIDevice);
-	      
 	IDXGIAdapter * pDXGIAdapter;
 	hr = pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), (void **)&pDXGIAdapter);
 
@@ -2011,11 +1984,17 @@ void RendererDX11::ProcessRenderViewQueue( )
 	}
 
 	m_vQueuedViews.empty();
-
 }
 //--------------------------------------------------------------------------------
-
-
+void RendererDX11::PIXBeginEvent( const wchar_t* name )
+{
+	D3DPERF_BeginEvent( 0xFFFFFFFF, name );
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::PIXEndEvent( )
+{
+	D3DPERF_EndEvent();
+}
 //--------------------------------------------------------------------------------
 // Here is the render view process for each thread.  The intention here is to 
 // have a thread perform a single render view's rendering commands to generate

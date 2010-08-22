@@ -1,11 +1,11 @@
 //--------------------------------------------------------------------------------
 // This file is a portion of the Hieroglyph 3 Rendering Engine.  It is distributed
-// under the MIT License, available in the root of this distribution and 
+// under the MIT License, available in the root of this distribution and
 // at the following URL:
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) 2003-2010 Jason Zink
 //--------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
@@ -34,7 +34,6 @@ namespace Glyph3
 				   float fM21, float fM22, float fM23, float fM24,
 				   float fM31, float fM32, float fM33, float fM34,
 				   float fM41, float fM42, float fM43, float fM44 );
-		
 		Matrix4f Inverse() const;
 
 		void RotationX( float fRadians );
@@ -63,8 +62,8 @@ namespace Glyph3
 		void MakeIdentity( );
 		void MakeTranspose( );
 
-		Matrix4f Zero();
-		Matrix4f Identity();
+		static Matrix4f Zero();
+		static Matrix4f Identity();
 		Matrix4f Transpose();
 
 		// Operators

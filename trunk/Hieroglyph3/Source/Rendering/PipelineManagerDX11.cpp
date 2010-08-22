@@ -134,6 +134,13 @@ void PipelineManagerDX11::SetViewPort( int ID )
 		Log::Get().Write( L"Tried to set an invalid view port index!" );
 }
 //--------------------------------------------------------------------------------
+D3D11_VIEWPORT PipelineManagerDX11::GetCurrentViewport( ) {
+	D3D11_VIEWPORT vp;
+	UINT numVP = 1;
+	m_pContext->RSGetViewports( &numVP, &vp );
+	return vp;
+}
+//--------------------------------------------------------------------------------
 void PipelineManagerDX11::BindConstantBufferParameter( ShaderType type, std::wstring name, UINT slot, ParameterManagerDX11* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
@@ -363,13 +370,22 @@ void PipelineManagerDX11::UnbindInputLayout( )
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::UnbindVertexBuffer( )
-{
-	// TODO: Add the ability to unbind multiple vertex buffers at once!
-	ID3D11Buffer* Buffers = { 0 };
-	UINT Strides = { 0 };
-	UINT Offsets = { 0 };
+{	
+	ID3D11Buffer* Buffers[] = { 0 };
+	UINT Strides[] = { 0 };
+	UINT Offsets[] = { 0 };
 
-	m_pContext->IASetVertexBuffers( 0, 1, &Buffers, &Strides, &Offsets );
+	m_pContext->IASetVertexBuffers( 0, 1, Buffers, Strides, Offsets );
+}
+//--------------------------------------------------------------------------------
+void PipelineManagerDX11::UnbindAllVertexBuffers( )
+{
+	ID3D11Buffer* Buffers[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
+	UINT Strides [D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = { 0 };
+	UINT Offsets [D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = { 0 };
+
+	m_pContext->IASetVertexBuffers( 0, D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT,
+		Buffers, Strides, Offsets );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::UnbindIndexBuffer( )
@@ -388,7 +404,7 @@ void PipelineManagerDX11::BindInputLayout( int ID )
 		Log::Get().Write( L"Tried to bind an invalid input layout ID!" );
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::BindVertexBuffer( ResourcePtr resource, UINT stride )
+void PipelineManagerDX11::BindVertexBuffer( ResourcePtr resource, UINT stride, UINT offset )
 {
 	// TODO: Add the ability to set multiple vertex buffers at once, and to 
 	//       provide an offset to the data contained in the buffers.
@@ -402,16 +418,38 @@ void PipelineManagerDX11::BindVertexBuffer( ResourcePtr resource, UINT stride )
 	RendererDX11* pRenderer = RendererDX11::Get();
 	ID3D11Buffer* pBuffer = (ID3D11Buffer*)pRenderer->GetResource( ID )->GetResource();
 	
-	ID3D11Buffer* Buffers = { pBuffer };
-	UINT Strides = { stride };
-	UINT Offsets = { 0 };
+	ID3D11Buffer* Buffers[] = { pBuffer };
+	UINT Strides[] = { stride };
+	UINT Offsets[] = { offset };
 
 	if ( pBuffer )
 	{
-		m_pContext->IASetVertexBuffers( 0, 1, &Buffers, &Strides, &Offsets );
+		m_pContext->IASetVertexBuffers( 0, 1, Buffers, Strides, Offsets );
 	}
 	else
 		Log::Get().Write( L"Tried to bind an invalid vertex buffer ID!" );
+}
+//--------------------------------------------------------------------------------
+void PipelineManagerDX11::BindVertexBuffers( const ResourcePtr* resources, const UINT* strides,
+									 const UINT* offsets, UINT startSlot, UINT numBuffers )
+{
+	ID3D11Buffer* Buffers[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
+	RendererDX11* pRenderer = RendererDX11::Get();
+
+	for ( UINT i = 0; i < numBuffers; ++i )
+	{
+		int index = resources[i]->m_iResource;
+
+		// Select only the index portion of the handle.
+		int TYPE	= index & 0x00FF0000;
+		int ID		= index & 0x0000FFFF;
+
+		Buffers[i] = reinterpret_cast<ID3D11Buffer*>( pRenderer->GetResource( ID )->GetResource() );
+		if ( !Buffers[i] )					
+			Log::Get().Write( L"Tried to bind an invalid vertex buffer ID!" );
+	}
+
+	m_pContext->IASetVertexBuffers( startSlot, numBuffers, Buffers, strides, offsets );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::BindIndexBuffer( ResourcePtr resource )
@@ -457,21 +495,67 @@ void PipelineManagerDX11::ClearPipelineResources( )
 	ComputeShaderStage.UnbindResources( m_pContext );
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::Draw( RenderEffectDX11& effect, GeometryDX11& geometry, ParameterManagerDX11* pParamManager )
+void PipelineManagerDX11::Draw( RenderEffectDX11& effect, GeometryDX11& geometry, 
+										ParameterManagerDX11* pParamManager )
+{
+	Draw( effect, geometry.m_VB, geometry.m_IB,
+		geometry.GetInputLayout( effect.m_iVertexShader ), geometry.m_ePrimType,
+		geometry.GetVertexSize(), geometry.GetIndexCount(), pParamManager );
+}
+//--------------------------------------------------------------------------------
+void PipelineManagerDX11::Draw( RenderEffectDX11& effect, ResourcePtr vb, ResourcePtr ib,
+						int inputLayput, D3D11_PRIMITIVE_TOPOLOGY primType,
+						UINT vertexStride, UINT numIndices, ParameterManagerDX11* pParamManager )
+{
+	// Specify the type of geometry that we will be dealing with.
+	m_pContext->IASetPrimitiveTopology( primType );
+
+	// Bind the vertex and index buffers.
+	BindVertexBuffer( vb, vertexStride );
+	BindIndexBuffer( ib );
+
+	// Bind the input layout.
+	BindInputLayout( inputLayput );
+
+	// Use the effect to load all of the pipeline stages here.
+	ClearPipelineResources();
+	effect.ConfigurePipeline( this, pParamManager );
+	ApplyPipelineResources();
+	
+	m_pContext->DrawIndexed( numIndices, 0, 0 );
+}
+//--------------------------------------------------------------------------------
+void PipelineManagerDX11::DrawInstanced( RenderEffectDX11& effect, GeometryDX11& geometry,
+								 ResourcePtr instanceData, UINT instanceDataStride,
+								 UINT numInstances, ParameterManagerDX11* pParamManager )
+{
+	DrawInstanced( effect, geometry.m_VB, geometry.m_ePrimType, geometry.m_IB,
+		geometry.GetInputLayout( effect.m_iVertexShader ),
+		geometry.GetVertexSize(), geometry.GetIndexCount(),
+		instanceData, instanceDataStride, numInstances, pParamManager );
+}
+//--------------------------------------------------------------------------------
+void PipelineManagerDX11::DrawInstanced( RenderEffectDX11& effect, ResourcePtr vb,
+								 D3D11_PRIMITIVE_TOPOLOGY primType, ResourcePtr ib,
+								 int inputLayout, UINT vertexStride, UINT numIndices,
+								 ResourcePtr instanceData, UINT instanceDataStride,
+								 UINT numInstances, ParameterManagerDX11* pParamManager )
 {
 	// Specify the type of geometry that we will be dealing with.
 
-	m_pContext->IASetPrimitiveTopology( geometry.GetPrimitiveType() );
+	m_pContext->IASetPrimitiveTopology( primType );
 
 	// Bind the vertex and index buffers.
+	ResourcePtr vertexBuffers[2] = { vb, instanceData };
+	UINT strides[2] = { vertexStride, instanceDataStride };
+	UINT offsets[2] = { 0, 0 };
+	BindVertexBuffers( vertexBuffers, strides, offsets, 0, 2 );
+	BindIndexBuffer( ib );
 
-	BindVertexBuffer( geometry.m_VB, geometry.GetVertexSize() );
-	BindIndexBuffer( geometry.m_IB );
 
 	// Bind the input layout.  The layout will be automatically generated if it
 	// doesn't already exist.
-
-	BindInputLayout( geometry.GetInputLayout( effect.m_iVertexShader ) );
+	BindInputLayout( inputLayout );
 
 	// Use the effect to load all of the pipeline stages here.
 
@@ -479,9 +563,7 @@ void PipelineManagerDX11::Draw( RenderEffectDX11& effect, GeometryDX11& geometry
 	effect.ConfigurePipeline( this, pParamManager );
 	ApplyPipelineResources();
 
-	// TODO: comprehend the last two parameters here and how they can be used...
-
-	m_pContext->DrawIndexed( geometry.GetIndexCount(), 0, 0 );
+	m_pContext->DrawIndexedInstanced( numIndices, numInstances, 0, 0, 0 );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::Dispatch( RenderEffectDX11& effect, UINT x, UINT y, UINT z, ParameterManagerDX11* pParamManager )

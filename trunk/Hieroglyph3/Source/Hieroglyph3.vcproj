@@ -1207,16 +1207,36 @@
 			<Filter
 				Name="Renderer Components"
 				>
-			</Filter>
-			<Filter
-				Name="Multithreading"
-				>
+				<Filter
+					Name="Multithreading"
+					>
 				<File
 					RelativePath=".\Rendering\CommandListDX11.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\Rendering\CommandListDX11.h"
+					>
+				</File>
+				</Filter>
+			</Filter>			
+			<Filter
+				Name="Sprites"
+				>
+				<File
+					RelativePath=".\Rendering\SpriteFontDX11.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Rendering\SpriteFontDX11.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Rendering\SpriteRendererDX11.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Rendering\SpriteRendererDX11.h"
 					>
 				</File>
 			</Filter>
@@ -1458,6 +1478,14 @@
 			</File>
 			<File
 				RelativePath=".\Animation\AnimationStream.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Shaders"
+			>
+			<File
+				RelativePath=".\Shaders\Sprite.hlsl"
 				>
 			</File>
 		</Filter>

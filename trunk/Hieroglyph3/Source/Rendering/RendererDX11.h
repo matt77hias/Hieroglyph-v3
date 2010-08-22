@@ -1,16 +1,16 @@
 //--------------------------------------------------------------------------------
 // This file is a portion of the Hieroglyph 3 Rendering Engine.  It is distributed
-// under the MIT License, available in the root of this distribution and 
+// under the MIT License, available in the root of this distribution and
 // at the following URL:
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) 2003-2010 Jason Zink
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
 // RendererDX11
-// 
+//
 //--------------------------------------------------------------------------------
 #ifndef RendererDX11_h
 #define RendererDX11_h
@@ -27,6 +27,7 @@
 #pragma comment( lib, "d3dx11.lib" )
 #pragma comment( lib, "d3dx10.lib" )
 #pragma comment( lib, "DXGI.lib" )
+#pragma comment( lib, "d3d9.lib" )
 
 #include <dxgi.h>
 #include <d3d11.h>
@@ -34,6 +35,7 @@
 #include <d3dx11.h>
 #include <D3DX10core.h>
 #include <D3D11Shader.h>
+#include <d3d9.h>
 
 #include "Vector2f.h"
 #include "Vector3f.h"
@@ -122,7 +124,6 @@ namespace Glyph3
 		RT_TEXTURE2D = 0x070000,
 		RT_TEXTURE3D = 0x080000
 	};
-	
 	struct ThreadPayLoad
 	{
 		int id;
@@ -147,7 +148,7 @@ namespace Glyph3
 
 		static RendererDX11* Get();
 
-		// Provide the feature level of the current machine.  This can be 
+		// Provide the feature level of the current machine.  This can be
 		// called before or after the device has been created.
 
 		D3D_FEATURE_LEVEL GetAvailableFeatureLevel( D3D_DRIVER_TYPE DriverType );
@@ -178,12 +179,12 @@ namespace Glyph3
 		ResourcePtr CreateStructuredBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
 		ResourcePtr CreateByteAddressBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
 
-		ResourcePtr CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData ); 
-		ResourcePtr CreateTexture2D( Texture2dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData ); 
-		ResourcePtr CreateTexture3D( Texture3dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData ); 
+		ResourcePtr CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData );
+		ResourcePtr CreateTexture2D( Texture2dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData );
+		ResourcePtr CreateTexture3D( Texture3dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData );
 
 		// The resources created in the above function calls can only be accessed by
-		// the rendering pipeline when they are bound with resource views.  The following 
+		// the rendering pipeline when they are bound with resource views.  The following
 		// functions provide the interface for creating the views, and returns an index
 		// for the application to use during rendering setup.
 
@@ -213,13 +214,12 @@ namespace Glyph3
 		// later use.  Either an application can directly set these values or a render effect
 		// can encapsulate the entire pipeline configuration.
 
-		int LoadShader( ShaderType type, std::wstring& filename, std::wstring& function, 
+		int LoadShader( ShaderType type, std::wstring& filename, std::wstring& function,
 			std::wstring& model, bool enablelogging = true );
 
 		
 		ResourcePtr GetSwapChainResource( int ID );
-		
-		// This is an interim solution to get the resolution of the current 
+		// This is an interim solution to get the resolution of the current
 		// adapter output resolution.
 
 		Vector2f GetDesktopResolution();
@@ -265,6 +265,10 @@ namespace Glyph3
 		// Here is the caching API functions
 		void QueueRenderView( IRenderView* pRenderView );
 		void ProcessRenderViewQueue( );
+
+		// PIX marker and event functions
+		static void PIXBeginEvent( const wchar_t* name );
+		static void PIXEndEvent();
 
 	private:
 
@@ -325,7 +329,6 @@ namespace Glyph3
 		TArray<IRenderView*>									m_vQueuedViews;
 
 		// Internal API for friends to use - only the rendering system should use these!
-		
 		VertexBufferDX11* GetVertexBuffer( int index );
 		IndexBufferDX11* GetIndexBuffer( int index );
 

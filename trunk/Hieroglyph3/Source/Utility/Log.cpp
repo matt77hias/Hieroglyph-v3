@@ -1,16 +1,17 @@
 //--------------------------------------------------------------------------------
 // This file is a portion of the Hieroglyph 3 Rendering Engine.  It is distributed
-// under the MIT License, available in the root of this distribution and 
+// under the MIT License, available in the root of this distribution and
 // at the following URL:
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) 2003-2010 Jason Zink
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
 #include "Log.h"
 #include "FileSystem.h"
+#include <windows.h>
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -39,6 +40,10 @@ bool Log::Open()
 bool Log::Write( const wchar_t *cTextString )
 {
 	AppLog << cTextString << "\n";
+#if _DEBUG
+	::OutputDebugStringW( cTextString );
+	::OutputDebugStringW( L"\n" );
+#endif
 	return( true );
 }
 //--------------------------------------------------------------------------------
