@@ -224,6 +224,9 @@ void Entity3D::Render( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
 //--------------------------------------------------------------------------------
 void Entity3D::AddRenderParameter( RenderParameterDX11* pParameter )
 {
+	// Add render parameter will take the pointer passed in and add it to the
+	// entity's internal list.  Therefore, this must not be from the stack!
+
 	if ( pParameter )
 	{
 
@@ -241,10 +244,37 @@ void Entity3D::AddRenderParameter( RenderParameterDX11* pParameter )
 
 		if ( !pCurr )
 		{
-			// Add the parameter to the list.  We make a copy since we don't know
-			// who created the input object and can't take ownership of it.  It 
-			// may even be created on the stack, leading to disaster at the first
-			// use if we just took a copy of the pointer...
+			m_RenderParameters.add( pParameter );
+		}
+		else
+		{
+			pCurr->UpdateValue( pParameter ); 
+		}
+	}
+}
+//--------------------------------------------------------------------------------
+void Entity3D::UpdateRenderParameter( RenderParameterDX11* pParameter )
+{
+	// Update render parameter will attempt to set the value of an existing
+	// render parameter that is already stored in the entity.  If it is not there
+	// already, then it creates one and then sets the value by copying it.
+
+	if ( pParameter )
+	{
+		// Search the list to see if this parameter is already there
+		RenderParameterDX11* pCurr = 0;
+
+		for ( int i = 0; i < m_RenderParameters.count(); i++ )
+		{
+			if ( pParameter->GetName() == m_RenderParameters[i]->GetName() )
+			{
+				pCurr = m_RenderParameters[i];
+				break;
+			}
+		}
+
+		if ( !pCurr )
+		{
 			RenderParameterDX11* pCopy = pParameter->CreateCopy();
 			m_RenderParameters.add( pCopy );
 		}

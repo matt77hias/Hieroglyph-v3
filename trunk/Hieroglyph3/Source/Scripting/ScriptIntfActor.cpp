@@ -141,7 +141,7 @@ int ScriptIntfActor::SetEntityVectorParameter( lua_State* pLuaState )
 		VectorParameterDX11 Vector;
 		Vector.SetName( name );
 		Vector.SetVector( Vector4f( x,y,z,w ) );
-		pActor->GetBody()->AddRenderParameter( &Vector );
+		pActor->GetBody()->UpdateRenderParameter( &Vector );
 		return( 0 );
 	}
 
@@ -170,7 +170,7 @@ int ScriptIntfActor::SetMaterialVectorParameter( lua_State* pLuaState )
 		VectorParameterDX11 Vector;
 		Vector.SetName( name );
 		Vector.SetVector( Vector4f( x,y,z,w ) );
-		pActor->GetBody()->GetMaterial()->AddRenderParameter( &Vector );
+		pActor->GetBody()->GetMaterial()->UpdateRenderParameter( &Vector );
 		return( 0 );
 	}
 

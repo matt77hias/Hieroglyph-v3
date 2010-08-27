@@ -62,6 +62,7 @@ namespace Glyph3
 		void SetGeometry( GeometryDX11* pGeometry );
 
 		void AddRenderParameter( RenderParameterDX11* pParameter );
+		void UpdateRenderParameter( RenderParameterDX11* pParameter );
 		void SetRenderParams( ParameterManagerDX11* pParamManager );
 		
 

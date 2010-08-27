@@ -681,15 +681,15 @@ GeometryDX11* GeometryLoaderDX11::loadMS3DFileWithAnimation( std::wstring filena
 			fin.read((char*)&(pMS3DJoints[i].keyFramesTrans[j].position), 3 * sizeof(float));
 		}
 
-		std::wstringstream s;
-		s << GlyphString::ToUnicode( std::string( pMS3DJoints[i].name ) ) << std::endl;
-		for ( int z = 0; z < pMS3DJoints[i].numKeyFramesRot; z++ )
-			s << L"rotation: " << pMS3DJoints[i].keyFramesRot[z].time << L" " <<pMS3DJoints[i].keyFramesRot[z].rotation[0] << L" " << pMS3DJoints[i].keyFramesRot[z].rotation[1] << L" " << pMS3DJoints[i].keyFramesRot[z].rotation[2] << std::endl;
+		//std::wstringstream s;
+		//s << GlyphString::ToUnicode( std::string( pMS3DJoints[i].name ) ) << std::endl;
+		//for ( int z = 0; z < pMS3DJoints[i].numKeyFramesRot; z++ )
+		//	s << L"rotation: " << pMS3DJoints[i].keyFramesRot[z].time << L" " <<pMS3DJoints[i].keyFramesRot[z].rotation[0] << L" " << pMS3DJoints[i].keyFramesRot[z].rotation[1] << L" " << pMS3DJoints[i].keyFramesRot[z].rotation[2] << std::endl;
 
-		for ( int z = 0; z < pMS3DJoints[i].numKeyFramesTrans; z++ )
-			s << L"position: " << pMS3DJoints[i].keyFramesTrans[z].time << L" " <<pMS3DJoints[i].keyFramesTrans[z].position[0] << L" " << pMS3DJoints[i].keyFramesTrans[z].position[1] << L" " << pMS3DJoints[i].keyFramesTrans[z].position[2] << std::endl;
+		//for ( int z = 0; z < pMS3DJoints[i].numKeyFramesTrans; z++ )
+		//	s << L"position: " << pMS3DJoints[i].keyFramesTrans[z].time << L" " <<pMS3DJoints[i].keyFramesTrans[z].position[0] << L" " << pMS3DJoints[i].keyFramesTrans[z].position[1] << L" " << pMS3DJoints[i].keyFramesTrans[z].position[2] << std::endl;
 
-		Log::Get().Write( s.str() );
+		//Log::Get().Write( s.str() );
 	}
 
 

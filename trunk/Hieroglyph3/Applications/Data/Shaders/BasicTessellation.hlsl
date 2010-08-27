@@ -56,7 +56,7 @@ struct DS_OUTPUT
 //--------------------------------------------------------------------------------
 HS_CONTROL_POINT_INPUT VSMAIN( in VS_INPUT input )
 {
-	HS_CONTROL_POINT_OUTPUT output;
+	HS_CONTROL_POINT_INPUT output;
 	
 	output.WorldPosition = mul( float4( input.position, 1.0f ), WorldMatrix ).xyz;
 
@@ -64,7 +64,7 @@ HS_CONTROL_POINT_INPUT VSMAIN( in VS_INPUT input )
 }
 //--------------------------------------------------------------------------------
 HS_CONSTANT_DATA_OUTPUT PassThroughConstantHS( 
-	InputPatch<HS_CONTROL_POINT_OUTPUT, 3> ip, 
+	InputPatch<HS_CONTROL_POINT_INPUT, 3> ip, 
     uint PatchID : SV_PrimitiveID )
 {	
     HS_CONSTANT_DATA_OUTPUT output;

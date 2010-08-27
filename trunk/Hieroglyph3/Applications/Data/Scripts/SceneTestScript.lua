@@ -21,7 +21,7 @@ end
 
 
 function Update( time )
-	App.Log( tostring( time ) );
+	--App.Log( tostring( time ) );
 end
 
 

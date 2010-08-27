@@ -93,6 +93,8 @@ RendererDX11::RendererDX11()
 	m_pParamMgr = 0;
 	m_pPipeMgr = 0;
 	m_pDeferredPipeline = 0;
+
+	m_bMultiThreadActive = true;
 }
 //--------------------------------------------------------------------------------
 RendererDX11::~RendererDX11()
@@ -1935,55 +1937,41 @@ void RendererDX11::QueueRenderView( IRenderView* pRenderView )
 //--------------------------------------------------------------------------------
 void RendererDX11::ProcessRenderViewQueue( )
 {
-	//for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
-	//	m_vQueuedViews[i]->Draw( m_pPipeMgr, g_aPayload[i].pParamManager );
-	//	//m_vQueuedViews[i]->Draw( m_pPipeMgr, m_pParamMgr );
-
-	//m_vQueuedViews.empty();
-
-
-	//for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
-	//{
-	//	g_aPayload[i].pRenderView = m_vQueuedViews[i];
-	//	SetEvent( g_aBeginEventHandle[i] );
-	//}
-
-	//WaitForMultipleObjects( (DWORD)m_vQueuedViews.count(), g_aEndEventHandle, true, INFINITE );
-	//
-	//for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
-	//{
-	//	g_aPayload[i].pPipeline->m_pContext->ClearState();
-	//	m_pPipeMgr->ExecuteCommandList( g_aPayload[i].pList );
-	//	g_aPayload[i].pList->ReleaseList();
-	//}
-
-	//m_vQueuedViews.empty();
-
-
-	// While processed count > 0
-	//   Execute NUM_THREADS work loads
-	//   WFMO
-	//   Execute command lists
-	//   Update processed count and loop
-
-
-
-	for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
+	if ( !m_bMultiThreadActive )
 	{
-		g_aPayload[i].pRenderView = m_vQueuedViews[i];
-		SetEvent( g_aBeginEventHandle[i] );
-	}
+		for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
+			m_vQueuedViews[i]->Draw( m_pPipeMgr, g_aPayload[i].pParamManager );
+			//m_vQueuedViews[i]->Draw( m_pPipeMgr, m_pParamMgr );
 
-	WaitForMultipleObjects( (DWORD)m_vQueuedViews.count(), g_aEndEventHandle, true, INFINITE );
-	
-	for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
+		m_vQueuedViews.empty();
+	}
+	else
 	{
-		g_aPayload[i].pPipeline->m_pContext->ClearState();
-		m_pPipeMgr->ExecuteCommandList( g_aPayload[i].pList );
-		g_aPayload[i].pList->ReleaseList();
-	}
 
-	m_vQueuedViews.empty();
+		// While processed count > 0
+		//   Execute NUM_THREADS work loads
+		//   WFMO
+		//   Execute command lists
+		//   Update processed count and loop
+
+		for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
+		{
+			g_aPayload[i].pRenderView = m_vQueuedViews[i];
+			SetEvent( g_aBeginEventHandle[i] );
+		}
+
+		WaitForMultipleObjects( (DWORD)m_vQueuedViews.count(), g_aEndEventHandle, true, INFINITE );
+		
+		for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
+		{
+			g_aPayload[i].pPipeline->m_pContext->ClearState();
+			m_pPipeMgr->ExecuteCommandList( g_aPayload[i].pList );
+			g_aPayload[i].pList->ReleaseList();
+		}
+
+		m_vQueuedViews.empty();
+
+	}
 }
 //--------------------------------------------------------------------------------
 void RendererDX11::PIXBeginEvent( const wchar_t* name )
@@ -1995,6 +1983,13 @@ void RendererDX11::PIXEndEvent( )
 {
 	D3DPERF_EndEvent();
 }
+//--------------------------------------------------------------------------------
+void RendererDX11::SetMultiThreadingState( bool enable )
+{
+	m_bMultiThreadActive = enable;
+}
+//--------------------------------------------------------------------------------
+
 //--------------------------------------------------------------------------------
 // Here is the render view process for each thread.  The intention here is to 
 // have a thread perform a single render view's rendering commands to generate

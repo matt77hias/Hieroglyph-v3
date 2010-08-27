@@ -190,6 +190,8 @@ void App::Initialize()
 	m_pActor->SetSkinningMatrices( *m_pRenderer11 );
 
 	m_pActor->PlayAllAnimations();
+
+	m_pRenderer11->SetMultiThreadingState( false );
 }
 //--------------------------------------------------------------------------------
 void App::Update()

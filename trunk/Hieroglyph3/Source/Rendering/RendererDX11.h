@@ -270,6 +270,9 @@ namespace Glyph3
 		static void PIXBeginEvent( const wchar_t* name );
 		static void PIXEndEvent();
 
+		// Basic controls over the threading system
+		void SetMultiThreadingState( bool enable );
+
 	private:
 
 		// The main API interfaces used in the renderer.
@@ -326,12 +329,13 @@ namespace Glyph3
 
 	protected:
 
+		bool													m_bMultiThreadActive;
+
 		TArray<IRenderView*>									m_vQueuedViews;
 
 		// Internal API for friends to use - only the rendering system should use these!
 		VertexBufferDX11* GetVertexBuffer( int index );
 		IndexBufferDX11* GetIndexBuffer( int index );
-
 
 		friend GeometryDX11;
 	};
