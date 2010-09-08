@@ -73,6 +73,24 @@ PipelineManagerDX11::~PipelineManagerDX11()
 	SAFE_RELEASE( m_pQuery );
 }
 //--------------------------------------------------------------------------------
+void PipelineManagerDX11::SetDeviceContext( ID3D11DeviceContext* pContext, D3D_FEATURE_LEVEL level )
+{
+	m_pContext = pContext;
+	m_FeatureLevel = level;
+
+	// For each pipeline stage object, set its feature level here so they know
+	// what they can do and what they can't do.
+
+	ShaderStages[VERTEX_SHADER]->SetFeatureLevel( level );
+	ShaderStages[HULL_SHADER]->SetFeatureLevel( level );
+	ShaderStages[DOMAIN_SHADER]->SetFeatureLevel( level );
+	ShaderStages[GEOMETRY_SHADER]->SetFeatureLevel( level );
+	ShaderStages[PIXEL_SHADER]->SetFeatureLevel( level );
+	ShaderStages[COMPUTE_SHADER]->SetFeatureLevel( level );
+
+	OutputMergerStage.SetFeautureLevel( level );
+}
+//--------------------------------------------------------------------------------
 void PipelineManagerDX11::SetBlendState( int ID )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
@@ -611,8 +629,6 @@ void PipelineManagerDX11::BindShader( ShaderType type, int ID, ParameterManagerD
 	{
 		// Before binding the shader, have it update its required parameters.  These
 		// parameters will then be bound to the pipeline after the shader is bound.
-
-		// TODO: Update this to use the new renderer interface components!
 
 		pShaderDX11->UpdateParameters( this, pParamManager );
 

@@ -110,14 +110,24 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 
-//	m_pRenderer11->m_pPipeMgr->SetViewPort( m_pRenderer11->CreateViewPort( viewport ) );
+//	m_pRenderer11->pImmPipeline->SetViewPort( m_pRenderer11->CreateViewPort( viewport ) );
 //	m_pRenderer11->m_pDeferredPipeline->SetViewPort( 0 );
 	
+	m_pFont = new SpriteFontDX11();
+	m_pFont->Initialize( L"Consolas", 16.0f, 0, false );
+	
+	m_pSpriteRenderer = new SpriteRendererDX11();
+	m_pSpriteRenderer->Initialize();
+
+
 	return( true );
 }
 //--------------------------------------------------------------------------------
 void App::ShutdownEngineComponents()
 {
+	SAFE_DELETE( m_pFont );
+	SAFE_DELETE( m_pSpriteRenderer );
+
 	if ( m_pRenderer11 )
 	{
 		m_pRenderer11->Shutdown();
@@ -207,6 +217,7 @@ void App::Initialize()
 	m_pScene->AddEntity( m_pNode );
 	m_pScene->AddCamera( m_pCamera );
 
+	m_pRenderer11->SetMultiThreadingState( false );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -256,6 +267,11 @@ void App::Update()
 	//m_pRenderer11->EndPipelineStatistics();
 	//Log::Get().Write( m_pRenderer11->PrintPipelineStatistics() );
 
+	std::wstringstream out;
+	out << L"Hieroglyph 3 : Water Simulation\nFPS: " << m_pTimer->Framerate();
+
+	m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, *m_pFont, out.str().c_str(), Matrix4f::Identity() );
+
 	// Perform the rendering and presentation for the window.
 
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
@@ -268,7 +284,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->m_pPipeMgr->SaveTextureScreenShot( 0, std::wstring( L"WaterSimulation_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"WaterSimulation_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------

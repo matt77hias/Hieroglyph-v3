@@ -11,6 +11,9 @@
 #include "Camera.h"
 #include "Scene.h"
 
+#include "SpriteRendererDX11.h"
+#include "SpriteFontDX11.h"
+
 using namespace Glyph3;
 
 class App : public Application, public IEventListener
@@ -43,6 +46,9 @@ protected:
 	Entity3D*				m_pEntity;
 	
 	Camera*					m_pCamera;
+
+	SpriteFontDX11*			m_pFont;
+	SpriteRendererDX11*		m_pSpriteRenderer;
 
 	bool					m_bSaveScreenshot;
 };

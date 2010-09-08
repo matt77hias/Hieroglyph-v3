@@ -173,6 +173,7 @@ void CSMAIN( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThr
 	LoadedDepths[ThreadLocation.x][ThreadLocation.y+1] = fDepths.x;
 #endif // USE_GATHER
 
+	//GroupMemoryBarrier();
 	GroupMemoryBarrierWithGroupSync();
 #endif // USE_GSM
 

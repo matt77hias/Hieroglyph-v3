@@ -25,6 +25,8 @@ namespace Glyph3
 		ShaderStageDX11();
 		virtual ~ShaderStageDX11();
 
+		void SetFeatureLevel( D3D_FEATURE_LEVEL level );
+
 		void SetConstantBuffer( int index, ID3D11Buffer* pBuffer );
 		void SetSamplerState( int index, ID3D11SamplerState* pState );
 		void SetShaderResourceView( int index, ID3D11ShaderResourceView* pSRV );
@@ -41,6 +43,8 @@ namespace Glyph3
 
 
 	protected:
+
+		D3D_FEATURE_LEVEL			m_FeatureLevel;
 
 		// TODO: Set up some way to selectively record the current state of the 
 		//       pipeline, then only set the needed shader slots instead of always

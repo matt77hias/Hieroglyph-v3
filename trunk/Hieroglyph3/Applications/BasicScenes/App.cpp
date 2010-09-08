@@ -94,10 +94,10 @@ bool App::ConfigureEngineComponents()
 	// Bind the swap chain render target and the depth buffer for use in 
 	// rendering.  
 
-	m_pRenderer11->m_pPipeMgr->ClearRenderTargets();
-	m_pRenderer11->m_pPipeMgr->BindRenderTargets( 0, m_RenderTarget );
-	m_pRenderer11->m_pPipeMgr->BindDepthTarget( m_DepthTarget );
-	m_pRenderer11->m_pPipeMgr->ApplyRenderTargets();
+	m_pRenderer11->pImmPipeline->ClearRenderTargets();
+	m_pRenderer11->pImmPipeline->BindRenderTargets( 0, m_RenderTarget );
+	m_pRenderer11->pImmPipeline->BindDepthTarget( m_DepthTarget );
+	m_pRenderer11->pImmPipeline->ApplyRenderTargets();
 
 
 	// Create a view port to use on the scene.  This basically selects the 
@@ -112,7 +112,7 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftY = 0;
 
 	int ViewPort = m_pRenderer11->CreateViewPort( viewport );
-	m_pRenderer11->m_pPipeMgr->SetViewPort( ViewPort );
+	m_pRenderer11->pImmPipeline->SetViewPort( ViewPort );
 	
 	return( true );
 }
@@ -232,7 +232,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->m_pPipeMgr->SaveTextureScreenShot( 0, std::wstring( L"BasicScenes_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"BasicScenes_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------

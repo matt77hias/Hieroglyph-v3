@@ -15,6 +15,8 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ShaderStageDX11::ShaderStageDX11()
 {
+	m_FeatureLevel = D3D_FEATURE_LEVEL_9_1;
+
 	for ( int i = 0; i < D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT; i++ ) ConstantBuffers[i] = 0;
 	for ( int i = 0; i < D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT; i++ ) SamplerStates[i] = 0;
 	for ( int i = 0; i < D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT; i++ ) ShaderResourceViews[i] = 0;
@@ -38,6 +40,11 @@ ShaderStageDX11::ShaderStageDX11()
 ShaderStageDX11::~ShaderStageDX11()
 {
 	
+}
+//--------------------------------------------------------------------------------
+void ShaderStageDX11::SetFeatureLevel( D3D_FEATURE_LEVEL level )
+{
+	m_FeatureLevel = level;
 }
 //--------------------------------------------------------------------------------
 void ShaderStageDX11::SetConstantBuffer( int index, ID3D11Buffer* pBuffer )
@@ -142,6 +149,9 @@ void ShaderStageDX11::BindResources( ID3D11DeviceContext* pContext )
 
 	if ( index >= 0 )
 	{
+		if ( m_FeatureLevel != D3D_FEATURE_LEVEL_11_0 )
+			index = 0;
+
 		BindUnorderedAccessViews( pContext, index + 1 );
 
 		// Update the current indices to the 'next' ones, even though you may have

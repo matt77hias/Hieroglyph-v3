@@ -124,7 +124,7 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftY = 0;
 
 	int ViewPort = m_pRenderer11->CreateViewPort( viewport );
-	m_pRenderer11->m_pPipeMgr->SetViewPort( ViewPort );
+	m_pRenderer11->pImmPipeline->SetViewPort( ViewPort );
 	
 	return( true );
 }
@@ -256,7 +256,7 @@ void App::Update()
 		if ( box.top < 0 ) box.top = 0;
 		if ( box.bottom > (unsigned int)m_DesktopRes.y - 1 ) box.bottom = (unsigned int)m_DesktopRes.y - 1;
 
-		m_pRenderer11->m_pPipeMgr->CopySubresourceRegion( m_RenderTarget[i], 0, 0, 0, 0, m_OffscreenTexture, 0, &box );
+		m_pRenderer11->pImmPipeline->CopySubresourceRegion( m_RenderTarget[i], 0, 0, 0, 0, m_OffscreenTexture, 0, &box );
 		m_pRenderer11->Present( m_pWindow[i]->GetHandle(), m_pWindow[i]->GetSwapChain() );
 	}
 
@@ -268,7 +268,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->m_pPipeMgr->SaveTextureScreenShot( 0, std::wstring( L"BasicApplication_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"BasicApplication_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------

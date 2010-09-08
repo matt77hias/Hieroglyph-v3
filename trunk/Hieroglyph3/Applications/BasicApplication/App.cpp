@@ -89,10 +89,10 @@ bool App::ConfigureEngineComponents()
 	// Bind the swap chain render target and the depth buffer for use in 
 	// rendering.  
 
-	m_pRenderer11->m_pPipeMgr->ClearRenderTargets();
-	m_pRenderer11->m_pPipeMgr->BindRenderTargets( 0, m_RenderTarget );
-	m_pRenderer11->m_pPipeMgr->BindDepthTarget( m_DepthTarget );
-	m_pRenderer11->m_pPipeMgr->ApplyRenderTargets();
+	m_pRenderer11->pImmPipeline->ClearRenderTargets();
+	m_pRenderer11->pImmPipeline->BindRenderTargets( 0, m_RenderTarget );
+	m_pRenderer11->pImmPipeline->BindDepthTarget( m_DepthTarget );
+	m_pRenderer11->pImmPipeline->ApplyRenderTargets();
 
 
 	// Create a view port to use on the scene.  This basically selects the 
@@ -107,7 +107,7 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftY = 0;
 
 	int ViewPort = m_pRenderer11->CreateViewPort( viewport );
-	m_pRenderer11->m_pPipeMgr->SetViewPort( ViewPort );
+	m_pRenderer11->pImmPipeline->SetViewPort( ViewPort );
 	
 	return( true );
 }
@@ -159,7 +159,7 @@ void App::Update()
 
 	float fBlue = sinf( m_pTimer->Runtime() * m_pTimer->Runtime() ) * 0.25f + 0.5f;
 
-	m_pRenderer11->m_pPipeMgr->ClearBuffers( Vector4f( 0.0f, 0.0f, fBlue, 0.0f ), 1.0f );
+	m_pRenderer11->pImmPipeline->ClearBuffers( Vector4f( 0.0f, 0.0f, fBlue, 0.0f ), 1.0f );
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
 
 	// Save a screenshot if desired.  This is done by pressing the 's' key, which
@@ -169,7 +169,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->m_pPipeMgr->SaveTextureScreenShot( 0, std::wstring( L"BasicApplication_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"BasicApplication_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------

@@ -25,6 +25,8 @@ namespace Glyph3
 		OutputMergerStageDX11();
 		virtual ~OutputMergerStageDX11();
 
+		void SetFeautureLevel( D3D_FEATURE_LEVEL level );
+
 		void SetRenderTargetView( int index, ID3D11RenderTargetView* pBuffer );
 		void SetDepthStencilView( ID3D11DepthStencilView* pState );
 		void SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV );
@@ -34,6 +36,8 @@ namespace Glyph3
 		void UnbindResources( ID3D11DeviceContext* pContext );
 
 	protected:
+
+		D3D_FEATURE_LEVEL				m_FeatureLevel;
 
 		ID3D11RenderTargetView*			RenderTargetViews[8];
 		ID3D11RenderTargetView*			APIRenderTargetViews[8];

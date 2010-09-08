@@ -87,6 +87,7 @@ void CSMAIN( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThr
 	// Synchronize all threads before moving on to ensure everyone has loaded their state
 	// into the group shared memory.
 	GroupMemoryBarrierWithGroupSync();
+	//GroupMemoryBarrier();
 
 	//----------------------------------------
 	// Update all flow calculations
@@ -143,6 +144,7 @@ void CSMAIN( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThr
 
 	// Synchronize all threads before moving on
 	GroupMemoryBarrierWithGroupSync();
+	//GroupMemoryBarrier();
 
 	//----------------------------------------
 

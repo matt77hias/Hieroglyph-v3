@@ -91,10 +91,11 @@ RendererDX11::RendererDX11()
 
 
 	m_pParamMgr = 0;
-	m_pPipeMgr = 0;
+	pImmPipeline = 0;
 	m_pDeferredPipeline = 0;
 
-	m_bMultiThreadActive = true;
+	m_bMultiThreadActive = true;			// Initialize this to always use MT!
+	m_FeatureLevel = D3D_FEATURE_LEVEL_9_1; // Initialize this to only support 9.1...
 }
 //--------------------------------------------------------------------------------
 RendererDX11::~RendererDX11()
@@ -142,6 +143,11 @@ D3D_FEATURE_LEVEL RendererDX11::GetAvailableFeatureLevel( D3D_DRIVER_TYPE Driver
 	}
 
 	return( FeatureLevel );
+}
+//--------------------------------------------------------------------------------
+D3D_FEATURE_LEVEL RendererDX11::GetCurrentFeatureLevel()
+{
+	return( m_FeatureLevel );
 }
 //--------------------------------------------------------------------------------
 bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL FeatureLevel )
@@ -195,7 +201,6 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 				&pContext
 			);
 
-
 	// Release the adapters and the factory for now...
 
 	for ( int i = 0; i < vAdapters.count(); i++ )
@@ -216,39 +221,43 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 		Log::Get().Write( L"Unable to acquire the ID3D11Debug interface from the device!" );
 	}
 
+	// Grab a copy of the feature level for use by the rest of the rendering system.
+
+	m_FeatureLevel = m_pDevice->GetFeatureLevel();
+
 	// Create the renderer components here, including the parameter manager, 
 	// pipeline manager, and resource manager.
 
 	m_pParamMgr = new ParameterManagerDX11();
-	m_pPipeMgr = new PipelineManagerDX11();
-	m_pPipeMgr->m_pContext = pContext;
+	pImmPipeline = new PipelineManagerDX11();
+	pImmPipeline->SetDeviceContext( pContext, m_FeatureLevel );
 
 	// Create deferred contexts if desired...
 	ID3D11DeviceContext* pDeferred = 0;
 	m_pDevice->CreateDeferredContext( 0, &pDeferred );
 
 	m_pDeferredPipeline = new PipelineManagerDX11();
-	m_pDeferredPipeline->m_pContext = pDeferred;
+	m_pDeferredPipeline->SetDeviceContext( pDeferred, m_FeatureLevel );
 
 	// Rasterizer State (RS) - the first state will be index zero, so no need
 	// to keep a copy of it here.
 
 	RasterizerStateConfigDX11 RasterizerState;
-	m_pPipeMgr->SetRasterizerState( CreateRasterizerState( &RasterizerState ) );
+	pImmPipeline->SetRasterizerState( CreateRasterizerState( &RasterizerState ) );
 	m_pDeferredPipeline->SetRasterizerState( 0 );
 
 	// Depth Stencil State (DS) - the first state will be index zero, so no need
 	// to keep a copy of it here.
 
 	DepthStencilStateConfigDX11 DepthStencilState;
-	m_pPipeMgr->SetDepthStencilState( CreateDepthStencilState( &DepthStencilState ) );
+	pImmPipeline->SetDepthStencilState( CreateDepthStencilState( &DepthStencilState ) );
 	m_pDeferredPipeline->SetDepthStencilState( 0 );
 
 	// Output Merger State (OM) - the first state will be index zero, so no need
 	// to keep a copy of it here.
 
 	BlendStateConfigDX11 BlendState;
-	m_pPipeMgr->SetBlendState( CreateBlendState( &BlendState ) );
+	pImmPipeline->SetBlendState( CreateBlendState( &BlendState ) );
 	m_pDeferredPipeline->SetBlendState( 0 );
 
 	// Create a query object to be used to gather statistics on the pipeline.
@@ -348,7 +357,7 @@ void RendererDX11::Shutdown()
 
 
 	SAFE_DELETE( m_pParamMgr );
-	SAFE_DELETE( m_pPipeMgr );
+	SAFE_DELETE( pImmPipeline );
 	SAFE_DELETE( m_pDeferredPipeline );
 
 	// Since these are all managed with smart pointers, we just empty the
@@ -1940,8 +1949,8 @@ void RendererDX11::ProcessRenderViewQueue( )
 	if ( !m_bMultiThreadActive )
 	{
 		for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
-			m_vQueuedViews[i]->Draw( m_pPipeMgr, g_aPayload[i].pParamManager );
-			//m_vQueuedViews[i]->Draw( m_pPipeMgr, m_pParamMgr );
+			m_vQueuedViews[i]->Draw( pImmPipeline, g_aPayload[i].pParamManager );
+			//m_vQueuedViews[i]->Draw( pImmPipeline, m_pParamMgr );
 
 		m_vQueuedViews.empty();
 	}
@@ -1965,7 +1974,7 @@ void RendererDX11::ProcessRenderViewQueue( )
 		for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
 		{
 			g_aPayload[i].pPipeline->m_pContext->ClearState();
-			m_pPipeMgr->ExecuteCommandList( g_aPayload[i].pList );
+			pImmPipeline->ExecuteCommandList( g_aPayload[i].pList );
 			g_aPayload[i].pList->ReleaseList();
 		}
 

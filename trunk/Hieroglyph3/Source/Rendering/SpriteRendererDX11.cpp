@@ -42,7 +42,7 @@ bool SpriteRendererDX11::Initialize()
 
 	// Load the shaders
 	m_effect.m_iVertexShader = renderer->LoadShader( VERTEX_SHADER,
-		std::wstring( L"..\\..\\Source\\Shaders\\Sprite.hlsl" ),
+		std::wstring( L"../Data/Shaders/Sprite.hlsl" ),
 		std::wstring( L"SpriteVS" ),
 		std::wstring( L"vs_4_0" ) );
 
@@ -53,7 +53,7 @@ bool SpriteRendererDX11::Initialize()
 	}
 
 	m_effect.m_iPixelShader = renderer->LoadShader( PIXEL_SHADER,
-		std::wstring( L"..\\..\\Source\\Shaders\\Sprite.hlsl" ),
+		std::wstring( L"../Data/Shaders/Sprite.hlsl" ),
 		std::wstring( L"SpritePS" ),
 		std::wstring( L"ps_4_0" ) );
 

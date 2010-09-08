@@ -95,10 +95,10 @@ bool App::ConfigureEngineComponents()
 	// Bind the swap chain render target and the depth buffer for use in 
 	// rendering.  
 
-	m_pRenderer11->m_pPipeMgr->ClearRenderTargets();
-	m_pRenderer11->m_pPipeMgr->BindRenderTargets( 0, m_RenderTarget );
-	m_pRenderer11->m_pPipeMgr->BindDepthTarget( m_DepthTarget );
-	m_pRenderer11->m_pPipeMgr->ApplyRenderTargets();
+	m_pRenderer11->pImmPipeline->ClearRenderTargets();
+	m_pRenderer11->pImmPipeline->BindRenderTargets( 0, m_RenderTarget );
+	m_pRenderer11->pImmPipeline->BindDepthTarget( m_DepthTarget );
+	m_pRenderer11->pImmPipeline->ApplyRenderTargets();
 
 
 	// Create a view port to use on the scene.  This basically selects the 
@@ -113,7 +113,7 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftY = 0;
 
 	int ViewPort = m_pRenderer11->CreateViewPort( viewport );
-	m_pRenderer11->m_pPipeMgr->SetViewPort( ViewPort );
+	m_pRenderer11->pImmPipeline->SetViewPort( ViewPort );
 	
 	return( true );
 }
@@ -219,12 +219,12 @@ void App::Update()
 	// is that the texture is 640x480 - if there is a different size then the 
 	// dispatch call can be modified accordingly.
 
-	m_pRenderer11->m_pPipeMgr->Dispatch( *m_pFilterEffect, 32, 24, 1, m_pRenderer11->m_pParamMgr );
+	m_pRenderer11->pImmPipeline->Dispatch( *m_pFilterEffect, 32, 24, 1, m_pRenderer11->m_pParamMgr );
 
 	// Render the texture to the backbuffer.
 
-	m_pRenderer11->m_pPipeMgr->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ), 1.0f );
-	m_pRenderer11->m_pPipeMgr->Draw( *m_pTextureEffect, *m_pFullScreen, m_pRenderer11->m_pParamMgr );
+	m_pRenderer11->pImmPipeline->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ), 1.0f );
+	m_pRenderer11->pImmPipeline->Draw( *m_pTextureEffect, *m_pFullScreen, m_pRenderer11->m_pParamMgr );
 
 	// Present the results to the window.
 
@@ -237,7 +237,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->m_pPipeMgr->SaveTextureScreenShot( 0, std::wstring( L"BasicApplication_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"BasicApplication_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------

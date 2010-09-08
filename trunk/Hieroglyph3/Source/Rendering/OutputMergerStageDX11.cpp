@@ -30,6 +30,11 @@ OutputMergerStageDX11::~OutputMergerStageDX11()
 	
 }
 //--------------------------------------------------------------------------------
+void OutputMergerStageDX11::SetFeautureLevel( D3D_FEATURE_LEVEL level )
+{
+	m_FeatureLevel = level;
+}
+//--------------------------------------------------------------------------------
 void OutputMergerStageDX11::SetRenderTargetView( int index, ID3D11RenderTargetView* pView )
 {
 	if ( ( index >= 0 ) && ( index < 8 ) )

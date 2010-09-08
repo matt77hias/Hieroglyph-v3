@@ -34,6 +34,9 @@ namespace Glyph3
 		PipelineManagerDX11();
 		~PipelineManagerDX11();
 
+		// Allow the creator to set the context and feature level
+
+		void SetDeviceContext( ID3D11DeviceContext* pContext, D3D_FEATURE_LEVEL level );
 
 		// The individual state blocks can be set for use in rendering.
 
@@ -142,6 +145,7 @@ namespace Glyph3
 			ResourcePtr SrcResource, UINT SrcSubresource, D3D11_BOX* pSrcBox );
 
 
+		D3D_FEATURE_LEVEL			m_FeatureLevel;
 
 		ID3D11DeviceContext*		m_pContext;
 		ID3D11Query*				m_pQuery;

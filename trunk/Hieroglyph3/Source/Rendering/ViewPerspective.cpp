@@ -98,6 +98,10 @@ void ViewPerspective::Draw( PipelineManagerDX11* pPipelineManager, ParameterMana
 
 		pPipelineManager->SetViewPort( m_iViewport );
 
+		// Set default states for these stages
+		pPipelineManager->SetRasterizerState( 0 );
+		pPipelineManager->SetDepthStencilState( 0 );
+		pPipelineManager->SetBlendState( 0 );
 
 		pPipelineManager->ClearBuffers( m_vColor, 1.0f );
 

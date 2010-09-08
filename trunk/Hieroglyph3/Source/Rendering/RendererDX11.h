@@ -152,6 +152,7 @@ namespace Glyph3
 		// called before or after the device has been created.
 
 		D3D_FEATURE_LEVEL GetAvailableFeatureLevel( D3D_DRIVER_TYPE DriverType );
+		D3D_FEATURE_LEVEL GetCurrentFeatureLevel();
 
 		// Renderer initialization and shutdown methods.  These methods
 		// obtain and release all of the hardware specific resources that
@@ -324,12 +325,13 @@ namespace Glyph3
 
 	public:
 		ParameterManagerDX11*									m_pParamMgr;
-		PipelineManagerDX11*									m_pPipeMgr;
+		PipelineManagerDX11*									pImmPipeline;
 		PipelineManagerDX11*									m_pDeferredPipeline;
 
 	protected:
 
 		bool													m_bMultiThreadActive;
+		D3D_FEATURE_LEVEL										m_FeatureLevel;
 
 		TArray<IRenderView*>									m_vQueuedViews;
 
