@@ -15,6 +15,8 @@
 #include "SwapChainConfigDX11.h"
 #include "Texture2dConfigDX11.h"
 
+#include "RasterizerStateConfigDX11.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
@@ -47,11 +49,11 @@ bool App::ConfigureEngineComponents()
 
 	m_pRenderer11 = new RendererDX11();
 
-	if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_HARDWARE, D3D_FEATURE_LEVEL_10_0 ) )
+	if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_HARDWARE, D3D_FEATURE_LEVEL_11_0 ) )
 	{
 		Log::Get().Write( L"Could not create hardware device, trying to create the reference device..." );
 
-		if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_REFERENCE, D3D_FEATURE_LEVEL_10_0 ) )
+		if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_REFERENCE, D3D_FEATURE_LEVEL_11_0 ) )
 		{
 			ShowWindow( m_pWindow->GetHandle(), SW_HIDE );
 			MessageBox( m_pWindow->GetHandle(), L"Could not create a hardware or software Direct3D 11 device - the program will now abort!", L"Hieroglyph 3 Rendering", MB_ICONEXCLAMATION | MB_SYSTEMMODAL );
@@ -89,10 +91,10 @@ bool App::ConfigureEngineComponents()
 	// Bind the swap chain render target and the depth buffer for use in 
 	// rendering.  
 
-	m_pRenderer11->m_pPipeMgr->ClearRenderTargets();
-	m_pRenderer11->m_pPipeMgr->BindRenderTargets( 0, m_RenderTarget );
-	m_pRenderer11->m_pPipeMgr->BindDepthTarget( m_DepthTarget );
-	m_pRenderer11->m_pPipeMgr->ApplyRenderTargets();
+	m_pRenderer11->pImmPipeline->ClearRenderTargets();
+	m_pRenderer11->pImmPipeline->BindRenderTargets( 0, m_RenderTarget );
+	m_pRenderer11->pImmPipeline->BindDepthTarget( m_DepthTarget );
+	m_pRenderer11->pImmPipeline->ApplyRenderTargets();
 
 
 	// Create a view port to use on the scene.  This basically selects the 
@@ -107,7 +109,7 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftY = 0;
 
 	int ViewPort = m_pRenderer11->CreateViewPort( viewport );
-	m_pRenderer11->m_pPipeMgr->SetViewPort( ViewPort );
+	m_pRenderer11->pImmPipeline->SetViewPort( ViewPort );
 	
 	return( true );
 }
@@ -141,6 +143,34 @@ void App::Initialize()
 	pEventManager->AddEventListener( SYSTEM_KEYBOARD_KEYUP, this );
 	pEventManager->AddEventListener( SYSTEM_KEYBOARD_KEYDOWN, this );
 	pEventManager->AddEventListener( SYSTEM_KEYBOARD_CHAR, this );
+
+	// Create the necessary resources
+	CreateQuadResources();
+	CreateTriangleResources();
+
+	// We'll be using a static view for this sample; animation/viewpoints aren't
+	// the focus of this demo. Initialize and store these variables here.
+
+	Matrix4f mView;
+	D3DXVECTOR3 vLookAt = D3DXVECTOR3( 0.0f, 0.0f, 0.0f );
+	D3DXVECTOR3 vLookFrom = D3DXVECTOR3( -2.0f, 2.0f, -2.0f );
+	D3DXVECTOR3 vLookUp = D3DXVECTOR3( 0.0f, 1.0f, 0.0f );
+	D3DXMatrixLookAtLH( reinterpret_cast<D3DXMATRIX*>(&mView), &vLookFrom, &vLookAt, &vLookUp );
+
+	Matrix4f mWorld;
+	D3DXMatrixIdentity( reinterpret_cast<D3DXMATRIX*>(&mWorld) );
+
+	Matrix4f mProj;
+	D3DXMatrixPerspectiveFovLH( reinterpret_cast<D3DXMATRIX*>(&mProj), static_cast< float >(D3DX_PI) / 4.0f, 320.0f /  240.0f, 0.1f, 50.0f );
+
+	// Composite together for the final transform
+	Matrix4f mViewProj = mView * mProj;
+	D3DXMatrixTranspose( reinterpret_cast<D3DXMATRIX*>(&mViewProj), reinterpret_cast<D3DXMATRIX*>(&mViewProj) );
+
+	D3DXMatrixTranspose( reinterpret_cast<D3DXMATRIX*>(&mWorld), reinterpret_cast<D3DXMATRIX*>(&mWorld) );
+
+	m_pRenderer11->m_pParamMgr->SetMatrixParameter( std::wstring( L"mWorld" ), &mWorld );
+	m_pRenderer11->m_pParamMgr->SetMatrixParameter( std::wstring( L"mViewProj" ), &mViewProj );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -155,11 +185,25 @@ void App::Update()
 
 	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
 
-	// Clear the window to a time varying color.
+	// Clear the window to white
+	m_pRenderer11->pImmPipeline->ClearBuffers( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ), 1.0f );
 
-	float fBlue = sinf( m_pTimer->Runtime() * m_pTimer->Runtime() ) * 0.25f + 0.5f;
+	// Set up the pipeline configuration
 
-	m_pRenderer11->m_pPipeMgr->ClearBuffers( Vector4f( 0.0f, 0.0f, fBlue, 0.0f ), 1.0f );
+		// Primitive Type
+
+		// Wireframe
+
+		// Transformations
+
+		// Shader Params
+
+	// Draw the main geometry
+	m_pRenderer11->pImmPipeline->Draw( *m_pQuadEffect, *m_pQuadGeometry, m_pRenderer11->m_pParamMgr ); 
+
+	// Draw the UI text
+
+	// Present the final image to the screen
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
 
 	// Save a screenshot if desired.  This is done by pressing the 's' key, which
@@ -169,12 +213,19 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->m_pPipeMgr->SaveTextureScreenShot( 0, std::wstring( L"TessParamsDemo_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"TessParamsDemo_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
+	// Safely dispose of our rendering resource
+	SAFE_RELEASE( m_pQuadGeometry );
+	SAFE_DELETE( m_pQuadEffect );
+
+	SAFE_RELEASE( m_pTriangleGeometry );
+	SAFE_DELETE( m_pTriangleEffect );
+
 	// Print the framerate out for the log before shutting down.
 
 	std::wstringstream out;
@@ -223,5 +274,189 @@ bool App::HandleEvent( IEvent* pEvent )
 std::wstring App::GetName( )
 {
 	return( std::wstring( L"Direct3D 11 Tessellation Parameters Demo" ) );
+}
+//--------------------------------------------------------------------------------
+void App::CreateQuadResources()
+{
+	SAFE_RELEASE( m_pQuadGeometry );
+	m_pQuadGeometry = new GeometryDX11();
+
+	// Create only four vertices and no index buffer
+
+	// Position Data
+	VertexElementDX11 *pPositions = new VertexElementDX11( 3 /* components - xyz */, 4 /* elements */ );
+
+	pPositions->m_SemanticName = "CONTROL_POINT_POSITION";
+	pPositions->m_uiSemanticIndex = 0;
+	pPositions->m_Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	pPositions->m_uiInputSlot = 0;
+	pPositions->m_uiAlignedByteOffset = 0;
+	pPositions->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	pPositions->m_uiInstanceDataStepRate = 0;
+
+	Vector3f *pPositionData = pPositions->Get3f( 0 );
+
+	pPositionData[0] = Vector3f( -1.0f, 0.0f, -1.0f );
+	pPositionData[1] = Vector3f( -1.0f, 0.0f,  1.0f );
+	pPositionData[2] = Vector3f(  1.0f, 0.0f, -1.0f );
+	pPositionData[3] = Vector3f(  1.0f, 0.0f,  1.0f );
+
+	// Colour Data
+	VertexElementDX11 *pColours = new VertexElementDX11( 4 /* components - argb */, 4 /* elements */ );
+
+	pColours->m_SemanticName = "COLOUR";
+	pColours->m_uiSemanticIndex = 0;
+	pColours->m_Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	pColours->m_uiInputSlot = 0;
+	pColours->m_uiAlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	pColours->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	pColours->m_uiInstanceDataStepRate = 0;
+
+	Vector4f *pColourData = pColours->Get4f( 0 );
+
+	pColourData[0] = Vector4f( 0.0f, 0.0f, 0.0f, 1.0f );
+	pColourData[1] = Vector4f( 0.0f, 0.0f, 0.0f, 1.0f );
+	pColourData[2] = Vector4f( 0.0f, 0.0f, 0.0f, 1.0f );
+	pColourData[3] = Vector4f( 0.0f, 0.0f, 0.0f, 1.0f );
+
+	// Finally build the actual geometry buffer
+	m_pQuadGeometry->AddElement( pPositions );
+	m_pQuadGeometry->AddElement( pColours );
+
+	m_pQuadGeometry->AddIndex( 0 );
+	m_pQuadGeometry->AddIndex( 1 );
+	m_pQuadGeometry->AddIndex( 2 );
+	m_pQuadGeometry->AddIndex( 3 );
+
+	m_pQuadGeometry->LoadToBuffers();
+	m_pQuadGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST );
+
+
+	Log::Get().Write( L"Created quad geometry" );
+
+	// Create the appropriate shaders
+	SAFE_DELETE( m_pQuadEffect );
+	m_pQuadEffect = new RenderEffectDX11();
+	m_pQuadEffect->m_iVertexShader = 
+		m_pRenderer11->LoadShader( VERTEX_SHADER,
+		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
+		std::wstring( L"vsMain" ),
+		std::wstring( L"vs_5_0" ) );
+	m_pQuadEffect->m_iHullShader =
+		m_pRenderer11->LoadShader( HULL_SHADER,
+		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
+		std::wstring( L"hsQuadMain" ),
+		std::wstring( L"hs_5_0" ) );
+	m_pQuadEffect->m_iDomainShader =
+		m_pRenderer11->LoadShader( DOMAIN_SHADER,
+		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
+		std::wstring( L"dsQuadMain" ),
+		std::wstring( L"ds_5_0" ) );
+	m_pQuadEffect->m_iGeometryShader =
+		m_pRenderer11->LoadShader( GEOMETRY_SHADER,
+		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
+		std::wstring( L"gsMain" ),
+		std::wstring( L"gs_5_0" ) );
+	m_pQuadEffect->m_iPixelShader = 
+		m_pRenderer11->LoadShader( PIXEL_SHADER,
+		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
+		std::wstring( L"psMain" ),
+		std::wstring( L"ps_5_0" ) );
+
+	RasterizerStateConfigDX11 RS;
+	RS.FillMode = D3D11_FILL_WIREFRAME;
+	m_pQuadEffect->m_iRasterizerState = m_pRenderer11->CreateRasterizerState( &RS );
+
+	Log::Get().Write( L"Created quad shaders" );
+}
+//--------------------------------------------------------------------------------
+void App::CreateTriangleResources()
+{
+	SAFE_RELEASE( m_pTriangleGeometry );
+	m_pTriangleGeometry = new GeometryDX11();
+
+	// Create only three vertices and no index buffer
+
+	// Position Data
+	VertexElementDX11 *pPositions = new VertexElementDX11( 3 /* components - xyz */, 3 /* elements */ );
+
+	pPositions->m_SemanticName = "CONTROL_POINT_POSITION";
+	pPositions->m_uiSemanticIndex = 0;
+	pPositions->m_Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	pPositions->m_uiInputSlot = 0;
+	pPositions->m_uiAlignedByteOffset = 0;
+	pPositions->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	pPositions->m_uiInstanceDataStepRate = 0;
+
+	Vector3f *pPositionData = pPositions->Get3f( 0 );
+
+	pPositionData[0] = Vector3f( -1.0f, 0.0f, -1.0f );
+	pPositionData[1] = Vector3f( -1.0f, 0.0f,  1.0f );
+	pPositionData[2] = Vector3f(  1.0f, 0.0f, -1.0f );
+
+	// Colour Data
+	VertexElementDX11 *pColours = new VertexElementDX11( 4 /* components - argb */, 3 /* elements */ );
+
+	pColours->m_SemanticName = "COLOUR";
+	pColours->m_uiSemanticIndex = 0;
+	pColours->m_Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	pColours->m_uiInputSlot = 0;
+	pColours->m_uiAlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	pColours->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	pColours->m_uiInstanceDataStepRate = 0;
+
+	Vector4f *pColourData = pColours->Get4f( 0 );
+
+	pColourData[0] = Vector4f( 0.0f, 0.0f, 0.0f, 1.0f );
+	pColourData[1] = Vector4f( 0.0f, 0.0f, 0.0f, 1.0f );
+	pColourData[2] = Vector4f( 0.0f, 0.0f, 0.0f, 1.0f );
+
+	// Finally build the actual geometry buffer
+	m_pTriangleGeometry->AddElement( pPositions );
+	m_pTriangleGeometry->AddElement( pColours );
+
+	m_pTriangleGeometry->AddIndex( 0 );
+	m_pTriangleGeometry->AddIndex( 1 );
+	m_pTriangleGeometry->AddIndex( 2 );
+
+	m_pTriangleGeometry->LoadToBuffers();
+	m_pTriangleGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
+
+	Log::Get().Write( L"Created triangle geometry" );
+
+	// Create the appropriate shaders
+	SAFE_DELETE( m_pTriangleEffect );
+	m_pTriangleEffect = new RenderEffectDX11();
+	m_pTriangleEffect->m_iVertexShader = 
+		m_pRenderer11->LoadShader( VERTEX_SHADER,
+		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
+		std::wstring( L"vsMain" ),
+		std::wstring( L"vs_5_0" ) );
+	m_pTriangleEffect->m_iHullShader =
+		m_pRenderer11->LoadShader( HULL_SHADER,
+		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
+		std::wstring( L"hsTriangleMain" ),
+		std::wstring( L"hs_5_0" ) );
+	m_pTriangleEffect->m_iDomainShader =
+		m_pRenderer11->LoadShader( DOMAIN_SHADER,
+		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
+		std::wstring( L"dsTriangleMain" ),
+		std::wstring( L"ds_5_0" ) );
+	m_pTriangleEffect->m_iGeometryShader =
+		m_pRenderer11->LoadShader( GEOMETRY_SHADER,
+		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
+		std::wstring( L"gsMain" ),
+		std::wstring( L"gs_5_0" ) );
+	m_pTriangleEffect->m_iPixelShader = 
+		m_pRenderer11->LoadShader( PIXEL_SHADER,
+		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
+		std::wstring( L"psMain" ),
+		std::wstring( L"ps_5_0" ) );
+
+	RasterizerStateConfigDX11 RS;
+	RS.FillMode = D3D11_FILL_WIREFRAME;
+	m_pTriangleEffect->m_iRasterizerState = m_pRenderer11->CreateRasterizerState( &RS );
+
+	Log::Get().Write( L"Created triangle shaders" );
 }
 //--------------------------------------------------------------------------------

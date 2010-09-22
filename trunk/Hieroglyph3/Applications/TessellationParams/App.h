@@ -5,6 +5,10 @@
 #include "Win32RenderWindow.h"
 #include "RendererDX11.h"
 
+#include "VertexElementDX11.h"
+#include "GeometryDX11.h"
+#include "RenderEffectDX11.h"
+
 using namespace Glyph3;
 
 class App : public Application, public IEventListener
@@ -33,5 +37,14 @@ protected:
 	ResourcePtr				m_RenderTarget;
 	ResourcePtr				m_DepthTarget;
 
+	GeometryDX11*			m_pQuadGeometry;
+	RenderEffectDX11*		m_pQuadEffect;
+
+	GeometryDX11*			m_pTriangleGeometry;
+	RenderEffectDX11*		m_pTriangleEffect;
+
 	bool					m_bSaveScreenshot;
+
+	virtual void CreateQuadResources();
+	virtual void CreateTriangleResources();
 };
