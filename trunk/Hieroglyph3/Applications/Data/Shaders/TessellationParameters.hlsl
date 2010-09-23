@@ -78,9 +78,9 @@ HS_PER_TRI_PATCH_OUTPUT hsPerTriPatch( InputPatch<VS_OUTPUT, 3> ip, uint PatchID
     o.edgeTesselation[0]
 		= o.edgeTesselation[1]
 		= o.edgeTesselation[2]
-		= 1.0f;
+		= 5.0f;
 		
-	o.insideTesselation[0] = 12.0f; // how much to scale internal factors auto-derived from edge factors
+	o.insideTesselation[0] = 6.0f; // how much to scale internal factors auto-derived from edge factors
     
     return o;
 }

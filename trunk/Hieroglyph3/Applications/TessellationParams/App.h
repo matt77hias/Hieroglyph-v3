@@ -37,6 +37,10 @@ protected:
 	ResourcePtr				m_RenderTarget;
 	ResourcePtr				m_DepthTarget;
 
+	bool					m_bGeometryMode;
+	const bool				TRI_MODE = true;
+	const bool				QUAD_MODE = false;
+
 	GeometryDX11*			m_pQuadGeometry;
 	RenderEffectDX11*		m_pQuadEffect;
 

@@ -27,6 +27,7 @@ App AppInstance; // Provides an instance of the application
 App::App()
 {
 	m_bSaveScreenshot = false;
+	m_bGeometryMode = QUAD_MODE;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
@@ -165,9 +166,8 @@ void App::Initialize()
 
 	// Composite together for the final transform
 	Matrix4f mViewProj = mView * mProj;
-	D3DXMatrixTranspose( reinterpret_cast<D3DXMATRIX*>(&mViewProj), reinterpret_cast<D3DXMATRIX*>(&mViewProj) );
 
-	D3DXMatrixTranspose( reinterpret_cast<D3DXMATRIX*>(&mWorld), reinterpret_cast<D3DXMATRIX*>(&mWorld) );
+	// H3 engine requires no transposing of matrices...
 
 	m_pRenderer11->m_pParamMgr->SetMatrixParameter( std::wstring( L"mWorld" ), &mWorld );
 	m_pRenderer11->m_pParamMgr->SetMatrixParameter( std::wstring( L"mViewProj" ), &mViewProj );
@@ -188,18 +188,11 @@ void App::Update()
 	// Clear the window to white
 	m_pRenderer11->pImmPipeline->ClearBuffers( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ), 1.0f );
 
-	// Set up the pipeline configuration
-
-		// Primitive Type
-
-		// Wireframe
-
-		// Transformations
-
-		// Shader Params
-
 	// Draw the main geometry
-	m_pRenderer11->pImmPipeline->Draw( *m_pQuadEffect, *m_pQuadGeometry, m_pRenderer11->m_pParamMgr ); 
+	if( QUAD_MODE == m_bGeometryMode )
+		m_pRenderer11->pImmPipeline->Draw( *m_pQuadEffect, *m_pQuadGeometry, m_pRenderer11->m_pParamMgr ); 
+	else if( TRI_MODE == m_bGeometryMode )
+		m_pRenderer11->pImmPipeline->Draw( *m_pTriangleEffect, *m_pTriangleGeometry, m_pRenderer11->m_pParamMgr ); 
 
 	// Draw the UI text
 
@@ -260,6 +253,10 @@ bool App::HandleEvent( IEvent* pEvent )
 		{
 			m_bSaveScreenshot = true;
 			return( true );
+		}
+		else if ( 'G' == key  )
+		{
+			m_bGeometryMode = !m_bGeometryMode;
 		}
 		else
 		{
