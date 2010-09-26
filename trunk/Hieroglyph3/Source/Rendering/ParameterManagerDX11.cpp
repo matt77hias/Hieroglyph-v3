@@ -9,6 +9,7 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "ParameterManagerDX11.h"
 #include "VectorParameterDX11.h"
 #include "MatrixParameterDX11.h"

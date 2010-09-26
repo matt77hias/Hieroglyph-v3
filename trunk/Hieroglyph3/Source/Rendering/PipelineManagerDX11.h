@@ -120,7 +120,7 @@ namespace Glyph3
 		void GenerateCommandList( CommandListDX11* pList );
 		void ExecuteCommandList( CommandListDX11* pList );
 
-		void ClearBuffers( Vector4f color, float depth = 1.0f );
+		void ClearBuffers( Vector4f color, float depth = 1.0f, UINT stencil = 0 );
 
 		// Resources can be mapped in order to manually modify or read their
 		// contents.  The returned structure provides information about the

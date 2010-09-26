@@ -1,4 +1,5 @@
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "ScriptIntfApp.h"
 #include "Log.h"
 #include "GlyphString.h"

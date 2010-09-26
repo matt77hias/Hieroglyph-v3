@@ -15,27 +15,10 @@
 #ifndef RendererDX11_h
 #define RendererDX11_h
 //--------------------------------------------------------------------------------
+#include "PCH.h"
+
 #include "IRenderer.h"
 #include "TArray.h"
-#include <boost/smart_ptr/shared_ptr.hpp>
-
-#include <initguid.h>
-#include <string>
-#include <map>
-
-#pragma comment( lib, "d3d11.lib" )
-#pragma comment( lib, "d3dx11.lib" )
-#pragma comment( lib, "d3dx10.lib" )
-#pragma comment( lib, "DXGI.lib" )
-#pragma comment( lib, "d3d9.lib" )
-
-#include <dxgi.h>
-#include <d3d11.h>
-#include <d3dCompiler.h>
-#include <d3dx11.h>
-#include <D3DX10core.h>
-#include <D3D11Shader.h>
-#include <d3d9.h>
 
 #include "Vector2f.h"
 #include "Vector3f.h"

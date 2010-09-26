@@ -27,8 +27,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 //--------------------------------------------------------------------------------
-#include <windows.h>
-#include <stdio.h>
+#include "PCH.h"
 
 #include "Log.h"
 #include "Timer.h"

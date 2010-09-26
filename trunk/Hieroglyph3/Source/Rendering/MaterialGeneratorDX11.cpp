@@ -9,6 +9,7 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "MaterialGeneratorDX11.h"
 #include "RasterizerStateConfigDX11.h"
 #include "DepthStencilStateConfigDX11.h"

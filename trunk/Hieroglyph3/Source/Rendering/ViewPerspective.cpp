@@ -9,12 +9,12 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "ViewPerspective.h"
 #include "Entity3D.h"
 #include "Node3D.h"
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
-#include <sstream>
 #include "ParameterManagerDX11.h"
 #include "PipelineManagerDX11.h"
 #include "Texture2dDX11.h"

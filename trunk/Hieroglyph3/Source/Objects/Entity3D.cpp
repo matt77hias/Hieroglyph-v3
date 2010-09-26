@@ -9,13 +9,12 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "Entity3D.h"
 #include "Log.h"
 #include "GeometryDX11.h"
 #include "IntrRay3fSphere3f.h"
 #include "RenderParameterDX11.h"
-#include <sstream>
-#include <algorithm>
 #include "ParameterManagerDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;

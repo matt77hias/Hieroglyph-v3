@@ -9,14 +9,12 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "GeometryLoaderDX11.h"
 #include "VertexElementDX11.h"
 #include "ms3dspec.h"
 #include "Vector2f.h"
 #include "Vector3f.h"
-#include <fstream>
-#include <sstream>
-#include <map>
 #include "Log.h"
 #include "GlyphString.h"
 //--------------------------------------------------------------------------------

@@ -5,10 +5,9 @@
 #ifndef ConsoleWindow_h
 #define ConsoleWindow_h
 //--------------------------------------------------------------------------------
-#include "windows.h"
+#include "PCH.h"
 #include "ScriptManager.h"
-#include <string>
-#include <list>
+
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

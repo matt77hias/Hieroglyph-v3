@@ -9,12 +9,12 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "ViewOcclusion.h"
 #include "Entity3D.h"
 #include "Node3D.h"
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
-#include <sstream>
 #include "ActorGenerator.h"
 #include "ParameterManagerDX11.h"
 //--------------------------------------------------------------------------------

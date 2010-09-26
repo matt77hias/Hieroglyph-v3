@@ -9,11 +9,11 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "ShaderDX11.h"
 #include "BufferConfigDX11.h"
 #include "Log.h"
 #include "GlyphString.h"
-#include <sstream>
 #include "ParameterManagerDX11.h"
 #include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------

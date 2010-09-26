@@ -14,11 +14,7 @@
 // This interface class provides the basis of which all of the renderer classes
 // are built upon.  
 //--------------------------------------------------------------------------------
-#ifndef STRICT
-#define STRICT
-#endif
-
-#include "windows.h"
+#include "PCH.h"
 //--------------------------------------------------------------------------------
 #ifndef IRenderer_h
 #define IRenderer_h

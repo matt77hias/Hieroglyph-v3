@@ -14,9 +14,9 @@
 #ifndef AnimationStream_h
 #define AnimationStream_h
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "TArray.h"
 #include "Vector3f.h"
-#include <string>
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

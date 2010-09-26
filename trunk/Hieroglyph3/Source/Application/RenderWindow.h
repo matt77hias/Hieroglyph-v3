@@ -13,11 +13,7 @@
 #ifndef RenderWindow_h
 #define RenderWindow_h
 //--------------------------------------------------------------------------------
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include "windows.h"
-#include <string>
+#include "PCH.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

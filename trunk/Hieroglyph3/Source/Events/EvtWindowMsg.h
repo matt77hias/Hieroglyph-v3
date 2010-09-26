@@ -15,8 +15,8 @@
 #ifndef EvtWindowMsg_h
 #define EvtWindowMsg_h
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "IEvent.h"
-#include "windows.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

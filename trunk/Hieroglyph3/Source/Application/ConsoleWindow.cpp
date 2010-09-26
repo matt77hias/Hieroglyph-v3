@@ -1,4 +1,5 @@
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "ConsoleWindow.h"
 #include "ScriptManager.h"
 #include "GlyphString.h"

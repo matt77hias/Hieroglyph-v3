@@ -7,6 +7,7 @@
 //
 // Copyright (c) 2003-2010 Jason Zink 
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "PipelineManagerDX11.h"
 #include "Log.h"
 #include "BlendStateDX11.h"
@@ -595,7 +596,7 @@ void PipelineManagerDX11::Dispatch( RenderEffectDX11& effect, UINT x, UINT y, UI
 	m_pContext->Dispatch( x, y, z );
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth )
+void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth, UINT stencil )
 {
 	// Get the current render target view and depth stencil view from the OM stage.
 	ID3D11RenderTargetView* pRenderTargetView = 0;
@@ -611,7 +612,7 @@ void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth )
 
 	if ( pDepthStencilView )
 	{
-		m_pContext->ClearDepthStencilView( pDepthStencilView, D3D11_CLEAR_DEPTH, depth, 0 );
+		m_pContext->ClearDepthStencilView( pDepthStencilView, D3D11_CLEAR_DEPTH, depth, stencil );
 	}
 
 	// Release the two views

@@ -13,7 +13,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 //--------------------------------------------------------------------------------
-#include <windows.h>
+#include "PCH.h"
 #include "Application.h"
 #include "ScriptManager.h"
 
