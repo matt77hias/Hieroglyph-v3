@@ -18,11 +18,14 @@
 //----------------------------------------------------------------------------------------------------
 namespace Glyph3
 {
+    class Vector3f;
+
 	class Vector4f
 	{
 	public:
 		Vector4f( );
 		Vector4f( float x, float y, float z, float w );
+        Vector4f( const Vector3f& vector, float w );
 		Vector4f( const Vector4f& Vector );
 
 		// vector operations

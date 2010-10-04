@@ -1,0 +1,84 @@
+//--------------------------------------------------------------------------------
+// GBuffer
+//
+// Vertex shader and pixel shader for filling the G-Buffer of a classic
+// deferred renderer
+//--------------------------------------------------------------------------------
+
+cbuffer Transforms
+{
+	matrix WorldViewProjMatrix;
+	matrix WorldMatrix;
+};
+
+struct VSInput
+{
+	float4 Position : POSITION;
+	float2 TexCoord : TEXCOORDS0;
+	float3 Normal	: NORMAL;
+};
+
+struct VSOutput
+{
+	float4 PositionCS	: SV_Position;
+	float2 TexCoord		: TEXCOORD;
+	float3 NormalWS		: NORMALWS;
+	float3 PositionWS	: POSITIONWS;
+};
+
+struct PSOutput
+{
+	float4 Normal			: SV_Target0;
+	float4 DiffuseAlbedo 	: SV_Target1;
+	float4 SpecularAlbedo 	: SV_Target2;
+	float4 Position			: SV_Target3;
+};
+
+//-------------------------------------------------------------------------------------------------
+// Textures 
+//-------------------------------------------------------------------------------------------------
+Texture2D       DiffuseMap : register( t0 );
+Texture2D		NormalMap : register( t1 );
+
+SamplerState    AnisoSampler : register( s0 );
+
+//-------------------------------------------------------------------------------------------------
+// Basic vertex shader, no optimizations
+//-------------------------------------------------------------------------------------------------
+VSOutput VSMain( in VSInput input )
+{
+	VSOutput output;
+
+	// Convert position and normals to world space
+	output.PositionWS = mul( input.Position, WorldMatrix ).xyz;
+	output.NormalWS = mul( input.Normal, (float3x3)WorldMatrix );
+
+	// Calculate the clip-space position
+	output.PositionCS = mul( input.Position, WorldViewProjMatrix );
+
+	// Pass along the texture coordinate
+	output.TexCoord = input.TexCoord;
+
+	return output;
+}
+
+//-------------------------------------------------------------------------------------------------
+// Basic pixel shader, no optimizations
+//-------------------------------------------------------------------------------------------------
+PSOutput PSMain( in VSOutput input )
+{
+	PSOutput output;
+
+	// Normalize the normal after interpolation
+	output.Normal = float4( normalize( input.NormalWS ), 1.0f );
+
+	output.Position = float4( input.PositionWS, 1.0f );
+	
+	output.DiffuseAlbedo = DiffuseMap.Sample( AnisoSampler, input.TexCoord );
+	output.SpecularAlbedo = float4( 1.0f, 1.0f, 1.0f, 32.0f );
+	
+	return output;
+}
+
+
+

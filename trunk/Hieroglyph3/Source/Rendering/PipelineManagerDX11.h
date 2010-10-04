@@ -41,7 +41,7 @@ namespace Glyph3
 		// The individual state blocks can be set for use in rendering.
 
 		void SetBlendState( int ID );
-		void SetDepthStencilState( int ID );
+		void SetDepthStencilState( int ID, UINT stencilRef = 0 );
 		void SetRasterizerState( int ID );
 		void SetViewPort( int ID );
 

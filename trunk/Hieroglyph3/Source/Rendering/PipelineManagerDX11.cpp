@@ -109,7 +109,7 @@ void PipelineManagerDX11::SetBlendState( int ID )
 	}
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::SetDepthStencilState( int ID )
+void PipelineManagerDX11::SetDepthStencilState( int ID, UINT stencilRef )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
 
@@ -117,7 +117,7 @@ void PipelineManagerDX11::SetDepthStencilState( int ID )
 
 	if ( pDepthState )
 	{
-		m_pContext->OMSetDepthStencilState( pDepthState, 0 );
+		m_pContext->OMSetDepthStencilState( pDepthState, stencilRef );
 	}
 	else
 	{
@@ -599,15 +599,19 @@ void PipelineManagerDX11::Dispatch( RenderEffectDX11& effect, UINT x, UINT y, UI
 void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth, UINT stencil )
 {
 	// Get the current render target view and depth stencil view from the OM stage.
-	ID3D11RenderTargetView* pRenderTargetView = 0;
+    ID3D11RenderTargetView* pRenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { NULL };
 	ID3D11DepthStencilView* pDepthStencilView = 0;
 
-	m_pContext->OMGetRenderTargets( 1, &pRenderTargetView, &pDepthStencilView );
+	m_pContext->OMGetRenderTargets( D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, pRenderTargetViews, &pDepthStencilView );
 
-	if ( pRenderTargetView )
+	for( UINT i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i )
 	{
-		float clearColours[] = { color.x, color.y, color.z, color.w }; // RGBA
-		m_pContext->ClearRenderTargetView( pRenderTargetView, clearColours );
+        if( pRenderTargetViews[i] != NULL )
+        {
+		    float clearColours[] = { color.x, color.y, color.z, color.w }; // RGBA
+		    m_pContext->ClearRenderTargetView( pRenderTargetViews[i], clearColours );
+            SAFE_RELEASE( pRenderTargetViews[i] );
+        }
 	}
 
 	if ( pDepthStencilView )
@@ -615,8 +619,7 @@ void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth, UINT stenci
 		m_pContext->ClearDepthStencilView( pDepthStencilView, D3D11_CLEAR_DEPTH, depth, stencil );
 	}
 
-	// Release the two views
-	SAFE_RELEASE( pRenderTargetView );
+	// Release the two views	
 	SAFE_RELEASE( pDepthStencilView );
 }
 //--------------------------------------------------------------------------------

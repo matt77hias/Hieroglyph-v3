@@ -14,6 +14,12 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
+static void SetToNull( void* pArray, int num )
+{
+    const int ptrSize = sizeof( void* );
+    memset( pArray, 0, num * ptrSize );
+}
+//--------------------------------------------------------------------------------
 ShaderStageDX11::ShaderStageDX11()
 {
 	m_FeatureLevel = D3D_FEATURE_LEVEL_9_1;
@@ -110,7 +116,7 @@ void ShaderStageDX11::BindResources( ID3D11DeviceContext* pContext )
 
 		iCurrMaxCB = iNextMaxCB;	
 		iNextMaxCB = -1;
-		memset( ConstantBuffers, 0, sizeof( ConstantBuffers[index + 1] ) );
+        SetToNull( ConstantBuffers, index + 1 );		
 	}
 
 	index = iNextMaxSS;
@@ -126,7 +132,7 @@ void ShaderStageDX11::BindResources( ID3D11DeviceContext* pContext )
 
 		iCurrMaxSS = iNextMaxSS;
 		iNextMaxSS = -1;
-		memset( SamplerStates, 0, sizeof( SamplerStates[index + 1] ) );
+        SetToNull( SamplerStates, index + 1 );		
 	}
 
 	index = iNextMaxSRV;
@@ -142,7 +148,7 @@ void ShaderStageDX11::BindResources( ID3D11DeviceContext* pContext )
 
 		iCurrMaxSRV = iNextMaxSRV;
 		iNextMaxSRV = -1;
-		memset( ShaderResourceViews, 0, sizeof( ShaderResourceViews[index + 1] ) );
+        SetToNull( ShaderResourceViews, index + 1 );		
 	}
 
 	index = iNextMaxUAV;
@@ -161,7 +167,7 @@ void ShaderStageDX11::BindResources( ID3D11DeviceContext* pContext )
 
 		iCurrMaxUAV = iNextMaxUAV;
 		iNextMaxUAV = -1;
-		memset( UnorderedAccessViews, 0, sizeof( UnorderedAccessViews[index + 1] ) );
+        SetToNull( UnorderedAccessViews, index + 1 );		
 	}
 }
 //--------------------------------------------------------------------------------
@@ -170,10 +176,10 @@ void ShaderStageDX11::UnbindResources( ID3D11DeviceContext* pContext )
 	// Clear out all array elements in our cached arrays.  This will be used to 
 	// write nulls into the context later on.
 
-	memset( ConstantBuffers, 0, sizeof( ConstantBuffers[iCurrMaxCB + 1] ) );
-	memset( SamplerStates, 0, sizeof( SamplerStates[iCurrMaxSS + 1] ) );
-	memset( ShaderResourceViews, 0, sizeof( ShaderResourceViews[iCurrMaxSRV + 1] ) );
-	memset( UnorderedAccessViews, 0, sizeof( UnorderedAccessViews[iCurrMaxUAV + 1] ) );
+    SetToNull( ConstantBuffers, iCurrMaxCB + 1 );
+	SetToNull( SamplerStates, iCurrMaxSS + 1 );
+    SetToNull( ShaderResourceViews, iCurrMaxSRV + 1 );
+    SetToNull( UnorderedAccessViews, iCurrMaxUAV + 1 );
 
 	// When all indices are set to null, you only need to set as many elements as 
 	// the current settings have (i.e. to clear out all of the currently filled

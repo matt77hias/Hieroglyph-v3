@@ -618,7 +618,10 @@ ResourcePtr RendererDX11::CreateConstantBuffer( BufferConfigDX11* pConfig,  D3D1
 	return( ResourcePtr( new ResourceProxyDX11() ) );
 }
 //--------------------------------------------------------------------------------
-ResourcePtr RendererDX11::CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData )
+ResourcePtr RendererDX11::CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData,
+                                          ShaderResourceViewConfigDX11* pSRVConfig,
+                                          RenderTargetViewConfigDX11* pRTVConfig,
+                                          UnorderedAccessViewConfigDX11* pUAVConfig )
 {
 	ID3D11Texture1D* pTexture = 0;
 	HRESULT hr = m_pDevice->CreateTexture1D( &pConfig->m_State, pData, &pTexture );
@@ -632,7 +635,7 @@ ResourcePtr RendererDX11::CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_S
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
 		int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE1D;
-		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
+		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this, pSRVConfig, pRTVConfig, pUAVConfig ) );
 
 		return( Proxy );
 	}
@@ -640,7 +643,11 @@ ResourcePtr RendererDX11::CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_S
 	return( ResourcePtr( new ResourceProxyDX11() ) );
 }
 //--------------------------------------------------------------------------------
-ResourcePtr RendererDX11::CreateTexture2D( Texture2dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData )
+ResourcePtr RendererDX11::CreateTexture2D( Texture2dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData,
+                                          ShaderResourceViewConfigDX11* pSRVConfig,
+                                          RenderTargetViewConfigDX11* pRTVConfig,
+                                          UnorderedAccessViewConfigDX11* pUAVConfig,
+                                          DepthStencilViewConfigDX11* pDSVConfig )
 {
 	ID3D11Texture2D* pTexture = 0;
 	HRESULT hr = m_pDevice->CreateTexture2D( &pConfig->m_State, pData, &pTexture );
@@ -654,7 +661,7 @@ ResourcePtr RendererDX11::CreateTexture2D( Texture2dConfigDX11* pConfig, D3D11_S
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
 		int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE2D;
-		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
+		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this, pSRVConfig, pRTVConfig, pUAVConfig, pDSVConfig ) );
 
 		return( Proxy );
 	}
@@ -662,7 +669,10 @@ ResourcePtr RendererDX11::CreateTexture2D( Texture2dConfigDX11* pConfig, D3D11_S
 	return( ResourcePtr( new ResourceProxyDX11() ) );
 }
 //--------------------------------------------------------------------------------
-ResourcePtr RendererDX11::CreateTexture3D( Texture3dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData )
+ResourcePtr RendererDX11::CreateTexture3D( Texture3dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData,
+                                          ShaderResourceViewConfigDX11* pSRVConfig,
+                                          RenderTargetViewConfigDX11* pRTVConfig,
+                                          UnorderedAccessViewConfigDX11* pUAVConfig )
 {
 	ID3D11Texture3D* pTexture = 0;
 	HRESULT hr = m_pDevice->CreateTexture3D( &pConfig->m_State, pData, &pTexture );
@@ -676,7 +686,7 @@ ResourcePtr RendererDX11::CreateTexture3D( Texture3dConfigDX11* pConfig, D3D11_S
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
 		int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE3D;
-		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
+		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this, pSRVConfig, pRTVConfig, pUAVConfig ) );
 
 		return( Proxy );
 	}
@@ -792,7 +802,14 @@ int RendererDX11::CreateUnorderedAccessView( int ResourceID, D3D11_UNORDERED_ACC
 	return( -1 );
 }
 //--------------------------------------------------------------------------------
-int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstring& function, std::wstring& model, bool enablelogging )
+int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstring& function, 
+                             std::wstring& model, bool enablelogging )
+{
+    return LoadShader( type, filename, function, model, NULL, enablelogging );
+}
+//--------------------------------------------------------------------------------
+int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstring& function, 
+                                std::wstring& model, const D3D10_SHADER_MACRO* pDefines, bool enablelogging )
 {
 	HRESULT hr = S_OK;
 
@@ -804,14 +821,18 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 	WideCharToMultiByte(CP_ACP, 0, function.c_str(), -1, AsciiFunction, 1024, NULL, NULL);
 	WideCharToMultiByte(CP_ACP, 0, model.c_str(), -1, AsciiModel, 1024, NULL, NULL);
 
+    UINT flags = D3D10_SHADER_PACK_MATRIX_ROW_MAJOR;
+#ifdef _DEBUG
+    flags |= D3D10_SHADER_DEBUG | D3D10_SHADER_SKIP_OPTIMIZATION | D3D10_SHADER_WARNINGS_ARE_ERRORS;
+#endif
 
 	if ( FAILED( hr = D3DX11CompileFromFile(
 		filename.c_str(),
-		0,
+		pDefines,
 		0,
 		AsciiFunction,
 		AsciiModel,
-		D3D10_SHADER_PACK_MATRIX_ROW_MAJOR,
+		flags,
 		0,//UINT Flags2,
 		0,
 		&pCompiledShader,
@@ -1950,8 +1971,14 @@ void RendererDX11::ProcessRenderViewQueue( )
 	if ( !m_bMultiThreadActive )
 	{
 		for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
+        {
+            std::string viewName = ViewRenderParams::ViewIndexToName( m_vQueuedViews[i]->GetType() );
+            PIXBeginEvent( GlyphString::ToUnicode( "View Draw: " + viewName ).c_str() );
+
 			m_vQueuedViews[i]->Draw( pImmPipeline, g_aPayload[i].pParamManager );
-			//m_vQueuedViews[i]->Draw( pImmPipeline, m_pParamMgr );
+
+            PIXEndEvent();
+        }
 
 		m_vQueuedViews.empty();
 	}

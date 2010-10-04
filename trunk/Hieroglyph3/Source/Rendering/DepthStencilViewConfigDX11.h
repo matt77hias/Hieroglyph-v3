@@ -38,7 +38,7 @@ namespace Glyph3
         void SetTexture2DMS( D3D11_TEX2DMS_DSV state );
         void SetTexture2DMSArray( D3D11_TEX2DMS_ARRAY_DSV state );
 		
-		D3D11_DEPTH_STENCIL_VIEW_DESC GetDepthStencilDesc();
+		D3D11_DEPTH_STENCIL_VIEW_DESC& GetDSVDesc();
 
 	protected:
 		D3D11_DEPTH_STENCIL_VIEW_DESC 		m_State;

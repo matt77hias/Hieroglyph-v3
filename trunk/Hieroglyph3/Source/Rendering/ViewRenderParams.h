@@ -50,13 +50,14 @@ namespace Glyph3
 		VT_GBUFFER,
 		VT_LIGHTS,
 		VT_NUM_VIEW_TYPES
-	};
+	};    
 
 	class ViewRenderParams
 	{
 	public:
 		ViewRenderParams();
 		static VIEWTYPE ViewNameToIndex( std::string& name );
+        static std::string ViewIndexToName( VIEWTYPE index );
 
 	public:
 		VIEWTYPE		iViewType;

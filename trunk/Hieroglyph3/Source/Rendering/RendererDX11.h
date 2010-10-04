@@ -163,9 +163,19 @@ namespace Glyph3
 		ResourcePtr CreateStructuredBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
 		ResourcePtr CreateByteAddressBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
 
-		ResourcePtr CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData );
-		ResourcePtr CreateTexture2D( Texture2dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData );
-		ResourcePtr CreateTexture3D( Texture3dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData );
+		ResourcePtr CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData,
+                                        ShaderResourceViewConfigDX11* pSRVConfig = NULL,
+                                        RenderTargetViewConfigDX11* pRTVConfig = NULL,
+                                        UnorderedAccessViewConfigDX11* pUAVConfig = NULL );
+		ResourcePtr CreateTexture2D( Texture2dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData,
+                                        ShaderResourceViewConfigDX11* pSRVConfig = NULL,
+                                        RenderTargetViewConfigDX11* pRTVConfig = NULL,
+                                        UnorderedAccessViewConfigDX11* pUAVConfig = NULL,
+                                        DepthStencilViewConfigDX11* pDSVConfig = NULL );
+		ResourcePtr CreateTexture3D( Texture3dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData,
+                                        ShaderResourceViewConfigDX11* pSRVConfig = NULL,
+                                        RenderTargetViewConfigDX11* pRTVConfig = NULL,
+                                        UnorderedAccessViewConfigDX11* pUAVConfig = NULL );
 
 		// The resources created in the above function calls can only be accessed by
 		// the rendering pipeline when they are bound with resource views.  The following
@@ -201,6 +211,8 @@ namespace Glyph3
 		int LoadShader( ShaderType type, std::wstring& filename, std::wstring& function,
 			std::wstring& model, bool enablelogging = true );
 
+        int LoadShader( ShaderType type, std::wstring& filename, std::wstring& function,
+            std::wstring& model, const D3D10_SHADER_MACRO* pDefines, bool enablelogging = true );
 		
 		ResourcePtr GetSwapChainResource( int ID );
 		// This is an interim solution to get the resolution of the current

@@ -65,6 +65,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicScripting", "Applicati
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TessellationParams", "Applications\TessellationParams\TessellationParams.vcproj", "{0D13C5FC-2967-49FD-B762-5004CF824254}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DeferredRendering", "Applications\DeferredRendering\DeferredRendering.vcproj", "{815673AC-FD51-44A8-B498-C0398DC85B41}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -127,6 +129,10 @@ Global
 		{0D13C5FC-2967-49FD-B762-5004CF824254}.Debug|Win32.Build.0 = Debug|Win32
 		{0D13C5FC-2967-49FD-B762-5004CF824254}.Release|Win32.ActiveCfg = Release|Win32
 		{0D13C5FC-2967-49FD-B762-5004CF824254}.Release|Win32.Build.0 = Release|Win32
+		{815673AC-FD51-44A8-B498-C0398DC85B41}.Debug|Win32.ActiveCfg = Debug|Win32
+		{815673AC-FD51-44A8-B498-C0398DC85B41}.Debug|Win32.Build.0 = Debug|Win32
+		{815673AC-FD51-44A8-B498-C0398DC85B41}.Release|Win32.ActiveCfg = Release|Win32
+		{815673AC-FD51-44A8-B498-C0398DC85B41}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

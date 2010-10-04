@@ -30,7 +30,7 @@ void SwapChainConfigDX11::SetDefaults()
 
 	m_State.BufferDesc.Width = 1;
 	m_State.BufferDesc.Height = 1;
-    m_State.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    m_State.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	m_State.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
     m_State.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	m_State.BufferDesc.RefreshRate.Numerator = 60;

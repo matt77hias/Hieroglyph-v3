@@ -84,7 +84,7 @@ void DepthStencilViewConfigDX11::SetTexture2DMSArray( D3D11_TEX2DMS_ARRAY_DSV st
 	m_State.Texture2DMSArray = state;
 }
 //--------------------------------------------------------------------------------
-D3D11_DEPTH_STENCIL_VIEW_DESC DepthStencilViewConfigDX11::GetDepthStencilDesc()
+D3D11_DEPTH_STENCIL_VIEW_DESC& DepthStencilViewConfigDX11::GetDSVDesc()
 {
 	return( m_State );
 }
