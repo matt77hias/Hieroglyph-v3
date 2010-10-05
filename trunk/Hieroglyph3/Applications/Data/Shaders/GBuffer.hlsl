@@ -16,6 +16,7 @@ struct VSInput
 	float4 Position : POSITION;
 	float2 TexCoord : TEXCOORDS0;
 	float3 Normal	: NORMAL;
+	float4 Tangent	: TANGENT;
 };
 
 struct VSOutput
@@ -24,6 +25,8 @@ struct VSOutput
 	float2 TexCoord		: TEXCOORD;
 	float3 NormalWS		: NORMALWS;
 	float3 PositionWS	: POSITIONWS;
+	float3 TangentWS	: TANGENTWS;
+	float3 BitangentWS	: BITANGENTWS;
 };
 
 struct PSOutput
@@ -51,8 +54,16 @@ VSOutput VSMain( in VSInput input )
 
 	// Convert position and normals to world space
 	output.PositionWS = mul( input.Position, WorldMatrix ).xyz;
-	output.NormalWS = mul( input.Normal, (float3x3)WorldMatrix );
+	float3 normalWS = normalize( mul( input.Normal, (float3x3)WorldMatrix ) );
+	output.NormalWS = normalWS;
+	
+	// Reconstruct the rest of the tangent frame
+	float3 tangentWS = normalize( mul( input.Tangent.xyz, (float3x3)WorldMatrix ) );
+	float3 bitangentWS = normalize( cross( normalWS, tangentWS ) ) * input.Tangent.w;
 
+	output.TangentWS = tangentWS;
+	output.BitangentWS = bitangentWS;
+	
 	// Calculate the clip-space position
 	output.PositionCS = mul( input.Position, WorldViewProjMatrix );
 
@@ -69,13 +80,25 @@ PSOutput PSMain( in VSOutput input )
 {
 	PSOutput output;
 
-	// Normalize the normal after interpolation
-	output.Normal = float4( normalize( input.NormalWS ), 1.0f );
-
-	output.Position = float4( input.PositionWS, 1.0f );
+	// Sample the diffuse map
+	float3 diffuseAlbedo = DiffuseMap.Sample( AnisoSampler, input.TexCoord ).rgb;
 	
-	output.DiffuseAlbedo = DiffuseMap.Sample( AnisoSampler, input.TexCoord );
-	output.SpecularAlbedo = float4( 1.0f, 1.0f, 1.0f, 32.0f );
+	// Normalize the tangent frame after interpolation
+	float3x3 tangentFrameWS = float3x3( normalize( input.TangentWS ),
+										normalize( input.BitangentWS ),
+										normalize( input.NormalWS ) );
+
+	// Sample the tangent-space normal map and decompress
+	float3 normalTS = normalize( NormalMap.Sample( AnisoSampler, input.TexCoord ).rgb * 2.0f - 1.0f );
+	
+	// Convert to world space
+	float3 normalWS = mul( normalTS, tangentFrameWS );
+
+	// Output our G-Buffer values
+	output.Normal = float4( normalWS, 1.0f );
+	output.Position = float4( input.PositionWS, 1.0f );	
+	output.DiffuseAlbedo = float4( diffuseAlbedo, 1.0f );
+	output.SpecularAlbedo = float4( 1.0f, 1.0f, 1.0f, 64.0f );
 	
 	return output;
 }

@@ -14,6 +14,13 @@
 #include "Log.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
+
+std::string VertexElementDX11::PositionSemantic = "POSITION";
+std::string VertexElementDX11::NormalSemantic = "NORMAL";
+std::string VertexElementDX11::TexCoordSemantic = "TEXCOORDS";
+std::string VertexElementDX11::BoneIDSemantic = "BONEIDS";
+std::string VertexElementDX11::TangentSemantic = "TANGENT";
+
 //--------------------------------------------------------------------------------
 VertexElementDX11::VertexElementDX11( int float_tuple, int elementCount )
 {

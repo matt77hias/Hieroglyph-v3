@@ -84,13 +84,21 @@ PSOutput PSMain( in VSOutput input, in float4 screenPos : SV_Position )
 		L = LightPos - position;
 	
 		// Calculate attenuation based on distance from the light source
-		float dist = length( L );
-		attenuation = 1.0f / dist;
+		float dist = length( L );		
+		static const float LightRange = 2.0f;
+		attenuation = max( 0, ( LightRange - dist ) / LightRange );
 	
 		L /= dist;
 	#elif DIRECTIONALLIGHT
 		// Light direction is explicit for directional lights
 		L = -LightDirection;
+	#endif
+	
+	#if SPOTLIGHT
+		// Also add in the spotlight attenuation factor		
+		float3 L2 = LightDirection;
+		float rho = dot( -L, L2 );
+		attenuation *= saturate( ( rho - SpotlightAngles.y ) / ( SpotlightAngles.x - SpotlightAngles.y ) );
 	#endif
 	
 	float3 diffuse = saturate( dot( normal, L ) ) * LightColor * diffuseAlbedo;

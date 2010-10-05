@@ -20,6 +20,7 @@
 #include "DepthStencilStateConfigDX11.h"
 #include "ViewGBuffer.h"
 #include "GeometryGeneratorDX11.h"
+#include "BlendStateConfigDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -71,6 +72,27 @@ ViewLights::ViewLights( RendererDX11& Renderer, ResourcePtr pRenderTarget, Resou
 
     if ( m_iDepthStencilState == -1 )	
         Log::Get().Write( L"Failed to create light depth stencil state" );
+
+    // Create a blend state for additive blending
+    BlendStateConfigDX11 blendConfig;
+    blendConfig.AlphaToCoverageEnable = false;
+    blendConfig.IndependentBlendEnable = false;
+    for ( int i = 0; i < 8; ++i )
+    {
+        blendConfig.RenderTarget[i].BlendEnable = true;
+        blendConfig.RenderTarget[i].BlendOp = D3D11_BLEND_OP_ADD;
+        blendConfig.RenderTarget[i].SrcBlend = D3D11_BLEND_ONE;
+        blendConfig.RenderTarget[i].DestBlend = D3D11_BLEND_ONE;
+        blendConfig.RenderTarget[i].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+        blendConfig.RenderTarget[i].SrcBlendAlpha = D3D11_BLEND_ONE;
+        blendConfig.RenderTarget[i].DestBlendAlpha = D3D11_BLEND_ONE;
+        blendConfig.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    }
+
+    m_iBlendState = Renderer.CreateBlendState( &blendConfig );
+
+    if ( m_iBlendState == -1 )    
+        Log::Get().Write( L"Failed to create sprite blend state" );     
 
     // Generate geometry for a full screen quad
     GeometryGeneratorDX11::GenerateFullScreenQuad( &m_QuadGeometry );
@@ -167,7 +189,9 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
 
     // Set default states for these stages
     pPipelineManager->SetRasterizerState( 0 );
-    pPipelineManager->SetBlendState( 0 );
+
+    // Set our blend state
+    pPipelineManager->SetBlendState( m_iBlendState );
 
     // Set our depth stencil state, using the same reference value used in the G-Buffer pass
     pPipelineManager->SetDepthStencilState( m_iDepthStencilState, ViewGBuffer::StencilRef );

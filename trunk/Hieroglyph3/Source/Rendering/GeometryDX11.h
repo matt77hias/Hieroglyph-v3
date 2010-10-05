@@ -46,6 +46,7 @@ namespace Glyph3
 		void AddPoint( PointIndices& point );
 		void AddIndex( UINT index );
 
+        VertexElementDX11* GetElement( std::string name );
 		VertexElementDX11* GetElement( std::wstring name );
 		VertexElementDX11* GetElement( int index );
 
@@ -68,6 +69,11 @@ namespace Glyph3
 		int GetInputLayout( int ShaderID );
 
 		void LoadToBuffers( );
+
+        bool ComputeTangentFrame( std::string positionSemantic = VertexElementDX11::PositionSemantic,
+                                  std::string normalSemantic = VertexElementDX11::NormalSemantic,
+                                  std::string texCoordSemantic = VertexElementDX11::TexCoordSemantic, 
+                                  std::string tangentSemantic = VertexElementDX11::TangentSemantic );
 
 		TArray<VertexElementDX11*> m_vElements;
 		TArray<UINT> m_vIndices;

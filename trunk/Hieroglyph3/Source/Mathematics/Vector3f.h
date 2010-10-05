@@ -33,6 +33,12 @@ namespace Glyph3
 		float Magnitude( );
 		void Normalize( );
 
+        // static vector ops
+        static Vector3f Clamp( Vector3f& A );
+        static Vector3f Cross( Vector3f& A, Vector3f& B );
+        static float Dot( Vector3f& A, Vector3f& B );
+        static Vector3f Normalize( Vector3f& A );
+
 		// assignment
 		Vector3f& operator= (const Vector3f& Vector);
 

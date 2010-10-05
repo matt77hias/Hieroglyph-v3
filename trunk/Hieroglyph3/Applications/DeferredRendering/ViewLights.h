@@ -65,6 +65,7 @@ namespace Glyph3
 
         int					m_iViewport;
         int					m_iDepthStencilState;
+        int                 m_iBlendState;
 
         ResourcePtr	            m_pRenderTarget;
         ResourcePtr			    m_DepthTarget;

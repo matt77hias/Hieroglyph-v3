@@ -108,7 +108,7 @@ bool App::ConfigureEngineComponents()
 	RTConfig.SetFormat( DXGI_FORMAT_R32G32B32A32_FLOAT );
     RTConfig.SetBindFlags( D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET );
 	for(int i = 0; i < 4; ++i)
-		m_GBufferTargets.add( m_pRenderer11->CreateTexture2D( &RTConfig, NULL ) );    
+		m_GBufferTargets.add( m_pRenderer11->CreateTexture2D( &RTConfig, NULL ) );
 
 	// Next we create a depth buffer for depth/stencil testing, and for depth readback
 	Texture2dConfigDX11 DepthTexConfig;
@@ -172,6 +172,7 @@ void App::Initialize()
 	// Create and initialize the geometry to be rendered.  
 	GeometryDX11* pGeometry = new GeometryDX11();
 	pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Sample_Scene.ms3d" ) );
+    _ASSERT( pGeometry->ComputeTangentFrame() );
 	pGeometry->LoadToBuffers();	
 	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
@@ -248,9 +249,24 @@ void App::Initialize()
 
     // Add some lights
     Light light;
-    light.Position = Vector3f( 0.0f, 1.0f, 0.0f );
-    light.Color = Vector3f( 0.4f, 0.9f, 1.4f );
-    m_pLightsView->AddLight( light );
+    light.Type = Point;
+
+    for ( int x = -6; x <= 6; x += 3 ) 
+    {
+        for ( int y = 1; y <= 11; y += 3 )
+        {
+            for ( int z = -6; z <= 6; z += 3 )
+            {
+                light.Position = Vector3f( static_cast<float>( x ), static_cast<float>( y ), static_cast<float>( z ) );
+
+                float r = ( x + 6.0f ) / 11.0f;
+                float g = ( y - 1.0f ) / 9.0f;
+                float b = ( z + 6.0f ) / 11.0f;
+                light.Color = Vector3f( r, g, b ) * 1.5f;
+                m_pLightsView->AddLight( light );
+            }
+        }
+    }
 
     // Bind the light view to the camera entity
     m_pLightsView->SetRoot( m_pCamera->GetNode() );

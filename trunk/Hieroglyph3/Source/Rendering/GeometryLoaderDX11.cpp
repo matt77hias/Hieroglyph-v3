@@ -11,6 +11,7 @@
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "GeometryLoaderDX11.h"
+#include "GeometryDX11.h"
 #include "VertexElementDX11.h"
 #include "ms3dspec.h"
 #include "Vector2f.h"
@@ -423,7 +424,7 @@ GeometryDX11* GeometryLoaderDX11::loadMS3DFile2( std::wstring filename )
 
 	// create the vertex element streams
 	VertexElementDX11* pPositions = new VertexElementDX11( 3, usTriangleCount*3 );
-	pPositions->m_SemanticName = "POSITION";
+    pPositions->m_SemanticName = VertexElementDX11::PositionSemantic;
 	pPositions->m_uiSemanticIndex = 0;
 	pPositions->m_Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	pPositions->m_uiInputSlot = 0;
@@ -432,7 +433,7 @@ GeometryDX11* GeometryLoaderDX11::loadMS3DFile2( std::wstring filename )
 	pPositions->m_uiInstanceDataStepRate = 0;
 
 	VertexElementDX11* pTexcoords = new VertexElementDX11( 2, usTriangleCount*3 );
-	pTexcoords->m_SemanticName = "TEXCOORDS";
+	pTexcoords->m_SemanticName = VertexElementDX11::TexCoordSemantic;
 	pTexcoords->m_uiSemanticIndex = 0;
 	pTexcoords->m_Format = DXGI_FORMAT_R32G32_FLOAT;
 	pTexcoords->m_uiInputSlot = 0;
@@ -441,7 +442,7 @@ GeometryDX11* GeometryLoaderDX11::loadMS3DFile2( std::wstring filename )
 	pTexcoords->m_uiInstanceDataStepRate = 0;
 
 	VertexElementDX11* pNormals = new VertexElementDX11( 3, usTriangleCount*3 );
-	pNormals->m_SemanticName = "NORMAL";
+	pNormals->m_SemanticName = VertexElementDX11::NormalSemantic;
 	pNormals->m_uiSemanticIndex = 0;
 	pNormals->m_Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	pNormals->m_uiInputSlot = 0;
@@ -698,7 +699,7 @@ GeometryDX11* GeometryLoaderDX11::loadMS3DFileWithAnimation( std::wstring filena
 
 	// create the vertex element streams
 	VertexElementDX11* pPositions = new VertexElementDX11( 3, usTriangleCount*3 );
-	pPositions->m_SemanticName = "POSITION";
+	pPositions->m_SemanticName = VertexElementDX11::PositionSemantic;
 	pPositions->m_uiSemanticIndex = 0;
 	pPositions->m_Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	pPositions->m_uiInputSlot = 0;
@@ -707,7 +708,7 @@ GeometryDX11* GeometryLoaderDX11::loadMS3DFileWithAnimation( std::wstring filena
 	pPositions->m_uiInstanceDataStepRate = 0;
 
 	VertexElementDX11* pBoneIDs = new VertexElementDX11( 1, usTriangleCount*3 );
-	pBoneIDs->m_SemanticName = "BONEIDS";
+	pBoneIDs->m_SemanticName = VertexElementDX11::BoneIDSemantic;
 	pBoneIDs->m_uiSemanticIndex = 0;
 	pBoneIDs->m_Format = DXGI_FORMAT_R32_SINT;
 	pBoneIDs->m_uiInputSlot = 0;
@@ -716,7 +717,7 @@ GeometryDX11* GeometryLoaderDX11::loadMS3DFileWithAnimation( std::wstring filena
 	pBoneIDs->m_uiInstanceDataStepRate = 0;
 
 	VertexElementDX11* pTexcoords = new VertexElementDX11( 2, usTriangleCount*3 );
-	pTexcoords->m_SemanticName = "TEXCOORDS";
+	pTexcoords->m_SemanticName = VertexElementDX11::TexCoordSemantic;
 	pTexcoords->m_uiSemanticIndex = 0;
 	pTexcoords->m_Format = DXGI_FORMAT_R32G32_FLOAT;
 	pTexcoords->m_uiInputSlot = 0;
@@ -725,7 +726,7 @@ GeometryDX11* GeometryLoaderDX11::loadMS3DFileWithAnimation( std::wstring filena
 	pTexcoords->m_uiInstanceDataStepRate = 0;
 
 	VertexElementDX11* pNormals = new VertexElementDX11( 3, usTriangleCount*3 );
-	pNormals->m_SemanticName = "NORMAL";
+	pNormals->m_SemanticName = VertexElementDX11::NormalSemantic;
 	pNormals->m_uiSemanticIndex = 0;
 	pNormals->m_Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	pNormals->m_uiInputSlot = 0;

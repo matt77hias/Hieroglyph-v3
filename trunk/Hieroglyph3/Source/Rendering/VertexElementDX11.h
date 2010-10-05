@@ -23,7 +23,7 @@
 #ifndef VertexElementDX11_h
 #define VertexElementDX11_h
 //--------------------------------------------------------------------------------
-#include <string>
+#include "PCH.h"
 #include "RendererDX11.h"
 #include "Vector2f.h"
 #include "Vector3f.h"
@@ -33,6 +33,15 @@ namespace Glyph3
 {
 	class VertexElementDX11
 	{
+
+    public:
+
+        // Standard semantic names
+        static std::string PositionSemantic;
+        static std::string NormalSemantic;
+        static std::string TexCoordSemantic;
+        static std::string BoneIDSemantic;
+        static std::string TangentSemantic;
 
 	public:
 		VertexElementDX11( int tuple, int elementCount );

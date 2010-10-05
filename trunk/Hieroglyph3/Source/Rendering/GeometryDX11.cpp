@@ -79,21 +79,22 @@ void GeometryDX11::AddIndex( UINT index )
 	m_vIndices.add( index );
 }
 //--------------------------------------------------------------------------------
+VertexElementDX11* GeometryDX11::GetElement( std::string name )
+{
+    VertexElementDX11* pElement = NULL;
+    for ( int i = 0; i < m_vElements.count(); i++ )
+    {
+        if ( m_vElements[i]->m_SemanticName == name )
+            pElement = m_vElements[i];
+    }
+
+    return pElement;
+}
+//--------------------------------------------------------------------------------
 VertexElementDX11* GeometryDX11::GetElement( std::wstring name )
 {
-	char AsciiName[1024];
-	//wchar_t SomeUnicodeStr[] = L"Unicode!";
-	WideCharToMultiByte(CP_ACP, 0, name.c_str(), -1, AsciiName, 1024, NULL, NULL);
- 
-
-	VertexElementDX11* pElement = NULL;
-	for ( int i = 0; i < m_vElements.count(); i++ )
-	{
-		if ( m_vElements[i]->m_SemanticName == AsciiName )
-			pElement = m_vElements[i];
-	}
-
-	return pElement;
+    std::string asciiName = GlyphString::ToAscii( name );
+    return GetElement( asciiName );
 }
 //--------------------------------------------------------------------------------
 VertexElementDX11* GeometryDX11::GetElement( int index )
@@ -362,5 +363,132 @@ void GeometryDX11::LoadToBuffers()
 UINT GeometryDX11::GetIndexCount()
 {
 	return( m_vIndices.count() );
+}
+//--------------------------------------------------------------------------------
+bool GeometryDX11::ComputeTangentFrame( std::string positionSemantic,
+                                        std::string normalSemantic, 
+                                        std::string texCoordSemantic,
+                                        std::string tangentSemantic )
+{
+    // Only works for triangle lists    
+    if ( m_ePrimType != D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST )
+    {
+        Log::Get().Write( L"Tangent frame computation failed, geometry wasn't a triangle list" );
+        return false;
+    }
+
+    // Needs to be indexed
+    if ( m_vIndices.count() == 0 )
+    {
+        Log::Get().Write( L"Tangent frame computation failed, geometry wasn't indexed" );
+        return false;
+    }
+
+    // Look for our vertex elements
+    VertexElementDX11* pPositionElement = GetElement( positionSemantic );
+    if ( pPositionElement == NULL )
+    {
+        Log::Get().Write( L"Tangent frame computation failed, unable to find position vertex element" );
+        return false;
+    }
+
+    VertexElementDX11* pNormalElement = GetElement( normalSemantic );
+    if ( pNormalElement == NULL )
+    {
+        Log::Get().Write( L"Tangent frame computation failed, unable to find normal vertex element" );
+        return false;
+    }
+
+    VertexElementDX11* pTexCoordElement = GetElement( texCoordSemantic );
+    if ( pTexCoordElement == NULL )
+    {
+        Log::Get().Write( L"Tangent frame computation failed, unable to find texture coordinate vertex element" );
+        return false;
+    }
+
+    // Add the new element for the tangent
+    VertexElementDX11* pTangentElement = new VertexElementDX11( 4, CalculateVertexCount() );
+    pTangentElement->m_SemanticName = VertexElementDX11::TangentSemantic;
+    pTangentElement->m_uiSemanticIndex = 0;
+    pTangentElement->m_Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+    pTangentElement->m_uiInputSlot = 0;
+    pTangentElement->m_uiAlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+    pTangentElement->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+    pTangentElement->m_uiInstanceDataStepRate = 0;
+
+    // Compute the tangent frame for each vertex. The following code is based on 
+    // "Computing Tangent Space Basis Vectors for an Arbitrary Mesh", by Eric Lengyel
+    // http://www.terathon.com/code/tangent.html
+
+    // Make temporary arrays for the tangent and the bitangent
+    Vector3f* tangents = new Vector3f[m_iVertexCount];
+    Vector3f* bitangents = new Vector3f[m_iVertexCount];
+    ZeroMemory( tangents, m_iVertexCount * sizeof( Vector3f ) );
+    ZeroMemory( bitangents, m_iVertexCount * sizeof( Vector3f ) );
+
+    // Loop through each triangle    
+    for ( int i = 0; i < m_vIndices.count(); i += 3 )
+    {
+        UINT i1 = m_vIndices[i + 0];
+        UINT i2 = m_vIndices[i + 1];
+        UINT i3 = m_vIndices[i + 2];
+
+        const Vector3f& v1 = *pPositionElement->Get3f( i1 );
+        const Vector3f& v2 = *pPositionElement->Get3f( i2 );
+        const Vector3f& v3 = *pPositionElement->Get3f( i3 );
+
+        const Vector2f& w1 = *pTexCoordElement->Get2f( i1 );
+        const Vector2f& w2 = *pTexCoordElement->Get2f( i2 );
+        const Vector2f& w3 = *pTexCoordElement->Get2f( i3 );
+
+        float x1 = v2.x - v1.x;
+        float x2 = v3.x - v1.x;
+        float y1 = v2.y - v1.y;
+        float y2 = v3.y - v1.y;
+        float z1 = v2.z - v1.z;
+        float z2 = v3.z - v1.z;
+
+        float s1 = w2.x - w1.x;
+        float s2 = w3.x - w1.x;
+        float t1 = w2.y - w1.y;
+        float t2 = w3.y - w1.y;
+
+        float r = 1.0f / ( s1 * t2 - s2 * t1 );
+        Vector3f sDir( ( t2 * x1 - t1 * x2) * r, ( t2 * y1 - t1 * y2 ) * r,
+            ( t2 * z1 - t1 * z2 ) * r );
+        Vector3f tDir( ( s1 * x2 - s2 * x1) * r, ( s1 * y2 - s2 * y1 ) * r,
+            ( s1 * z2 - s2 * z1 ) * r );
+
+        tangents[i1] += sDir;
+        tangents[i2] += sDir;
+        tangents[i3] += sDir;
+
+        bitangents[i1] += tDir;
+        bitangents[i2] += tDir;
+        bitangents[i3] += tDir;        
+    }
+
+    for ( int i = 0; i < m_iVertexCount; ++i )
+    {
+        Vector3f& n = *pNormalElement->Get3f( i );
+        Vector3f& t = tangents[i];
+
+        // Gram-Schmidt orthogonalize
+        Vector3f tangent = Vector3f::Normalize( ( t - n * Vector3f::Dot( n, t ) ) );                
+
+        // Calculate handedness
+        float sign = ( Vector3f::Dot( Vector3f::Cross( n, t ), bitangents[i] ) < 0.0f ) ? -1.0f : 1.0f;
+
+        Vector4f& finalTangent = *pTangentElement->Get4f( i );
+        finalTangent = Vector4f( tangent, sign );
+    }
+
+    // Clean up our temporary arrays
+    delete[] tangents;
+    delete[] bitangents;
+    
+    AddElement( pTangentElement );
+
+    return true;
 }
 //--------------------------------------------------------------------------------
