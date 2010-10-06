@@ -983,7 +983,7 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 	for ( UINT i = 0; i < desc.OutputParameters; i++ )
 	{
 		D3D11_SIGNATURE_PARAMETER_DESC output_desc;
-		pReflector->GetInputParameterDesc( i, &output_desc );
+		pReflector->GetOutputParameterDesc( i, &output_desc );
 		SignatureParameterDesc d(output_desc);
 		pShaderWrapper->OutputSignatureParameters.add( d );
 	}

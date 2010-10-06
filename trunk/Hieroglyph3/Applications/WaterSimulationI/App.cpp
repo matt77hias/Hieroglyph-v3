@@ -270,6 +270,7 @@ void App::Update()
 	std::wstringstream out;
 	out << L"Hieroglyph 3 : Water Simulation\nFPS: " << m_pTimer->Framerate();
 
+
 	m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, *m_pFont, out.str().c_str(), Matrix4f::Identity() );
 
 	// Perform the rendering and presentation for the window.
