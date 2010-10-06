@@ -16,7 +16,7 @@ struct VS_INPUT
 
 struct VS_OUTPUT
 {
-	float4 position : WORLD_SPACE_CONTROL_POINT_POSITION;
+	float3 position : WORLD_SPACE_CONTROL_POINT_POSITION;
 	float3 colour : COLOUR;
 };
 
@@ -60,7 +60,7 @@ VS_OUTPUT vsMain( in VS_INPUT v )
 {
 	VS_OUTPUT o = (VS_OUTPUT)0;
 	
-	o.position = mul( float4( v.position, 1.0f ), mWorld );
+	o.position = mul( float4( v.position, 1.0f ), mWorld ).xyz;
 	
 	o.colour = v.colour.rgb;
 		
@@ -113,7 +113,7 @@ HS_PER_QUAD_PATCH_OUTPUT hsPerQuadPatch( InputPatch<VS_OUTPUT, 4> ip, uint Patch
 	float2 inner;
 	float2 unrounded_inner;
     
-    Process2DQuadTessFactorsAvg( float4(5.f, 5.f, 5.f, 5.f), float2(5.f,5.f), edges, inner, unrounded_inner );
+    Process2DQuadTessFactorsAvg( float4(1.f, 1.f, 1.f, 1.f), float2(1.f, 1.f), edges, inner, unrounded_inner );
     
     o.edgeTesselation[0] = edges.x;
     o.edgeTesselation[1] = edges.y;
@@ -171,7 +171,7 @@ DS_OUTPUT dsTriangleMain( HS_PER_TRI_PATCH_OUTPUT input,
     
     // Store some debugging information
     o.uvw = uvw;
-    o.wPos = float4( finalVertexCoord, 1.0f );
+    o.wPos = finalVertexCoord;
     o.edges = float4( input.edgeTesselation[0], input.edgeTesselation[1], input.edgeTesselation[2], 0.0f );
     o.inside = float2( input.insideTesselation[0], 0.0f );
     
@@ -231,7 +231,7 @@ DS_OUTPUT dsQuadMain( HS_PER_QUAD_PATCH_OUTPUT input,
     
     // Store some debugging information
     o.uvw = float3(uv,0.0f);
-    o.wPos = float4( finalVertexCoord, 1.0f );
+    o.wPos = finalVertexCoord;
     o.edges = float4( input.edgeTesselation[0], input.edgeTesselation[1], input.edgeTesselation[2], input.edgeTesselation[3] );
     o.inside = float2( input.insideTesselation[0], input.insideTesselation[1] );
     

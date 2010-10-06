@@ -9,6 +9,9 @@
 #include "GeometryDX11.h"
 #include "RenderEffectDX11.h"
 
+#include "SpriteRendererDX11.h"
+#include "SpriteFontDX11.h"
+
 using namespace Glyph3;
 
 class App : public Application, public IEventListener
@@ -46,6 +49,9 @@ protected:
 
 	GeometryDX11*			m_pTriangleGeometry;
 	RenderEffectDX11*		m_pTriangleEffect;
+
+	SpriteFontDX11*			m_pFont;
+	SpriteRendererDX11*		m_pSpriteRenderer;
 
 	bool					m_bSaveScreenshot;
 

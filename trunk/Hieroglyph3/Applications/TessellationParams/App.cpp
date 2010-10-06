@@ -171,6 +171,13 @@ void App::Initialize()
 
 	m_pRenderer11->m_pParamMgr->SetMatrixParameter( std::wstring( L"mWorld" ), &mWorld );
 	m_pRenderer11->m_pParamMgr->SetMatrixParameter( std::wstring( L"mViewProj" ), &mViewProj );
+
+	// Create the text rendering
+	m_pFont = new SpriteFontDX11();
+	m_pFont->Initialize( L"Consolas", 12.0f, 0, true );
+	
+	m_pSpriteRenderer = new SpriteRendererDX11();
+	m_pSpriteRenderer->Initialize();
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -195,6 +202,46 @@ void App::Update()
 		m_pRenderer11->pImmPipeline->Draw( *m_pTriangleEffect, *m_pTriangleGeometry, m_pRenderer11->m_pParamMgr ); 
 
 	// Draw the UI text
+	if( !m_bSaveScreenshot )
+	{
+		// Don't draw text if we're taking a screenshot - don't want the images
+		// cluttered with UI text!
+		std::wstringstream out;
+		out << L"Hieroglyph 3 : Tessellation Parameters\nFPS: " << m_pTimer->Framerate();
+
+		// Screenshot
+		out << L"\nS : Take Screenshot";
+
+		// Geometry toggle
+		out << L"\nG : Toggle Geometry";
+
+		// Edge weights
+			// 3 of 4
+		if( QUAD_MODE == m_bGeometryMode )
+			out << L"\nEdge Weights: [1.2, 3.4, 5.6, 7.8]";
+		else if( TRI_MODE == m_bGeometryMode )
+			out << L"\nEdge Weights: [1.2, 3.4, 5.6]";
+
+		out << L"\n[1-4] Current Edge: 1";
+
+		// Inside weights
+			// 1 or 2
+		if( QUAD_MODE == m_bGeometryMode )
+			out << L"\nInside Weights: [1.2, 3.4]";
+		else if( TRI_MODE == m_bGeometryMode )
+			out << L"\nInside Weight: [1.2]";
+
+		out << L"\n[5-6] Current Inner Weight: 1";
+
+		// Partitioning mode
+			// int
+			// pow2
+			// fractional_odd
+			// fractional_even
+		out << L"\nP : Change Partitioning Mode ('pow2')";
+
+		m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, *m_pFont, out.str().c_str(), Matrix4f::Identity(), Vector4f( 1.f, 0.f, 0.f, 1.f ) );
+	}
 
 	// Present the final image to the screen
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
@@ -219,8 +266,10 @@ void App::Shutdown()
 	SAFE_RELEASE( m_pTriangleGeometry );
 	SAFE_DELETE( m_pTriangleEffect );
 
-	// Print the framerate out for the log before shutting down.
+	SAFE_DELETE( m_pFont );
+	SAFE_DELETE( m_pSpriteRenderer );
 
+	// Print the framerate out for the log before shutting down.
 	std::wstringstream out;
 	out << L"Max FPS: " << m_pTimer->MaxFramerate();
 	Log::Get().Write( out.str() );
