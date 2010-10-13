@@ -6,6 +6,8 @@ cbuffer main
 {
 	matrix mWorld;
 	matrix mViewProj;
+	float4 vEdgeWeights;
+	float2 vInsideWeights;
 };
 
 struct VS_INPUT
@@ -75,18 +77,25 @@ HS_PER_TRI_PATCH_OUTPUT hsPerTriPatch( InputPatch<VS_OUTPUT, 3> ip, uint PatchID
 {	
     HS_PER_TRI_PATCH_OUTPUT o = (HS_PER_TRI_PATCH_OUTPUT)0;
     
-    o.edgeTesselation[0]
-		= o.edgeTesselation[1]
-		= o.edgeTesselation[2]
-		= 5.0f;
+    o.edgeTesselation[0] = vEdgeWeights.x;
+    o.edgeTesselation[1] = vEdgeWeights.y;
+    o.edgeTesselation[2] = vEdgeWeights.z;
 		
-	o.insideTesselation[0] = 6.0f; // how much to scale internal factors auto-derived from edge factors
+	o.insideTesselation[0] = vInsideWeights.x;
     
     return o;
 }
 
 [domain("tri")]
+#if defined(POW2_PARTITIONING)
+[partitioning("pow2")]
+#elif defined(FRAC_ODD_PARTITIONING)
+[partitioning("fractional_odd")]
+#elif defined(FRAC_EVEN_PARTITIONING)
+[partitioning("fractional_even")]
+#else
 [partitioning("integer")]
+#endif
 [outputtopology("triangle_cw")]
 [outputcontrolpoints(3)]
 [patchconstantfunc("hsPerTriPatch")]
@@ -113,7 +122,7 @@ HS_PER_QUAD_PATCH_OUTPUT hsPerQuadPatch( InputPatch<VS_OUTPUT, 4> ip, uint Patch
 	float2 inner;
 	float2 unrounded_inner;
     
-    Process2DQuadTessFactorsAvg( float4(1.f, 1.f, 1.f, 1.f), float2(1.f, 1.f), edges, inner, unrounded_inner );
+    Process2DQuadTessFactorsAvg( vEdgeWeights, vInsideWeights, edges, inner, unrounded_inner );
     
     o.edgeTesselation[0] = edges.x;
     o.edgeTesselation[1] = edges.y;
@@ -127,7 +136,15 @@ HS_PER_QUAD_PATCH_OUTPUT hsPerQuadPatch( InputPatch<VS_OUTPUT, 4> ip, uint Patch
 }
 
 [domain("quad")]
+#if defined(POW2_PARTITIONING)
 [partitioning("pow2")]
+#elif defined(FRAC_ODD_PARTITIONING)
+[partitioning("fractional_odd")]
+#elif defined(FRAC_EVEN_PARTITIONING)
+[partitioning("fractional_even")]
+#else
+[partitioning("integer")]
+#endif
 [outputtopology("triangle_cw")]
 [outputcontrolpoints(4)]
 [patchconstantfunc("hsPerQuadPatch")]

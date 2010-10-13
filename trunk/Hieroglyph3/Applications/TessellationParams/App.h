@@ -55,6 +55,33 @@ protected:
 
 	bool					m_bSaveScreenshot;
 
+	bool					m_bEdgeOrInsideMode;
+	static const bool		EDGE_MODE = true;
+	static const bool		INSIDE_MODE = false;
+
+	float					m_fEdgeWeights[4];
+	unsigned int			m_iEdgeIndex;
+
+	float					m_fInsideWeights[2];
+	unsigned int			m_iInsideIndex;
+
+	enum PartitioningMode
+	{
+		Power2,
+		Integer,
+		FractionalOdd,
+		FractionalEven
+	};
+
+	PartitioningMode		m_pmPartitioningMode;
+	std::map<PartitioningMode, int> m_QuadHullShaders;
+	std::map<PartitioningMode, int> m_TriangleHullShaders;
+
 	virtual void CreateQuadResources();
 	virtual void CreateTriangleResources();
+
+	virtual void SetEdgeWeight(unsigned int index, float weight);
+	virtual void SetInsideWeight(unsigned int index, float weight);
+
+	virtual void SetPartitioningMode( const PartitioningMode& mode );
 };

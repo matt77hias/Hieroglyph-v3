@@ -28,6 +28,8 @@ App::App()
 {
 	m_bSaveScreenshot = false;
 	m_bGeometryMode = QUAD_MODE;
+
+	m_bEdgeOrInsideMode = EDGE_MODE;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
@@ -172,6 +174,17 @@ void App::Initialize()
 	m_pRenderer11->m_pParamMgr->SetMatrixParameter( std::wstring( L"mWorld" ), &mWorld );
 	m_pRenderer11->m_pParamMgr->SetMatrixParameter( std::wstring( L"mViewProj" ), &mViewProj );
 
+	// Set up the default tessellation params
+	SetEdgeWeight( 0, 1.0f );
+	SetEdgeWeight( 1, 1.0f );
+	SetEdgeWeight( 2, 1.0f );
+	SetEdgeWeight( 3, 1.0f );
+
+	SetInsideWeight( 0, 1.0f );
+	SetInsideWeight( 1, 1.0f );
+
+	SetPartitioningMode(Integer);
+
 	// Create the text rendering
 	m_pFont = new SpriteFontDX11();
 	m_pFont->Initialize( L"Consolas", 12.0f, 0, true );
@@ -197,9 +210,15 @@ void App::Update()
 
 	// Draw the main geometry
 	if( QUAD_MODE == m_bGeometryMode )
+	{
+		m_pQuadEffect->ConfigurePipeline( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr );
 		m_pRenderer11->pImmPipeline->Draw( *m_pQuadEffect, *m_pQuadGeometry, m_pRenderer11->m_pParamMgr ); 
+	}
 	else if( TRI_MODE == m_bGeometryMode )
+	{
+		m_pTriangleEffect->ConfigurePipeline( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr );
 		m_pRenderer11->pImmPipeline->Draw( *m_pTriangleEffect, *m_pTriangleGeometry, m_pRenderer11->m_pParamMgr ); 
+	}
 
 	// Draw the UI text
 	if( !m_bSaveScreenshot )
@@ -218,27 +237,41 @@ void App::Update()
 		// Edge weights
 			// 3 of 4
 		if( QUAD_MODE == m_bGeometryMode )
-			out << L"\nEdge Weights: [1.2, 3.4, 5.6, 7.8]";
+			out << L"\nEdge Weights: [" << m_fEdgeWeights[0] << ", " << m_fEdgeWeights[1] << ", " << m_fEdgeWeights[2] << ", " << m_fEdgeWeights[3] << "]";
 		else if( TRI_MODE == m_bGeometryMode )
-			out << L"\nEdge Weights: [1.2, 3.4, 5.6]";
+			out << L"\nEdge Weights: [" << m_fEdgeWeights[0] << ", " << m_fEdgeWeights[1] << ", " << m_fEdgeWeights[2] << "]";
 
-		out << L"\n[1-4] Current Edge: 1";
+		out << L"\nE : Toggle Edge";
 
 		// Inside weights
 			// 1 or 2
 		if( QUAD_MODE == m_bGeometryMode )
-			out << L"\nInside Weights: [1.2, 3.4]";
+			out << L"\nInside Weights: [" << m_fInsideWeights[0] << ", " << m_fInsideWeights[1] << "]";
 		else if( TRI_MODE == m_bGeometryMode )
-			out << L"\nInside Weight: [1.2]";
+			out << L"\nInside Weight: [" << m_fInsideWeights[0] << "]";
 
-		out << L"\n[5-6] Current Inner Weight: 1";
+		out << L"\nI : Toggle Inner Weight";
+
+		out << L"\n+/- : Change Weight of ";
+		if(EDGE_MODE == m_bEdgeOrInsideMode)
+			out << L"Edge " << m_iEdgeIndex;
+		else
+			out << L"Inside " << m_iInsideIndex;
+
 
 		// Partitioning mode
 			// int
 			// pow2
 			// fractional_odd
 			// fractional_even
-		out << L"\nP : Change Partitioning Mode ('pow2')";
+		out << L"\nP : Change Partitioning Mode ";
+		switch(m_pmPartitioningMode)
+		{
+			case Power2:			out << L"('pow2')"; break;
+			case Integer:			out << L"('integer')"; break;
+			case FractionalOdd:		out << L"('fractional_odd')"; break;
+			case FractionalEven:	out << L"('fractional_even')"; break;
+		}
 
 		m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, *m_pFont, out.str().c_str(), Matrix4f::Identity(), Vector4f( 1.f, 0.f, 0.f, 1.f ) );
 	}
@@ -306,6 +339,67 @@ bool App::HandleEvent( IEvent* pEvent )
 		else if ( 'G' == key  )
 		{
 			m_bGeometryMode = !m_bGeometryMode;
+		}
+		else if ( 'P' == key )
+		{
+			// Change partitioning mode
+			switch(m_pmPartitioningMode)
+			{
+				case Power2:			SetPartitioningMode( Integer ); break;
+				case Integer:			SetPartitioningMode( FractionalOdd ); break;
+				case FractionalOdd:		SetPartitioningMode( FractionalEven ); break;
+				case FractionalEven:	SetPartitioningMode( Power2 ); break;
+			}
+		}
+		else if ( 'E' == key )
+		{
+			// Set to 'edge' mode
+			// if already in mode, toggle which to use
+			if(EDGE_MODE == m_bEdgeOrInsideMode)
+			{
+				m_iEdgeIndex = (m_iEdgeIndex + 1) % (TRI_MODE == m_bGeometryMode ? 3 : 4);
+			}
+			else
+			{
+				m_bEdgeOrInsideMode = EDGE_MODE;
+			}
+		}
+		else if ( 'I' == key )
+		{
+			// Set to 'inside' mode
+			// if already in mode, toggle which to use (if quad)
+			if(INSIDE_MODE == m_bEdgeOrInsideMode)
+			{
+				m_iInsideIndex = (m_iInsideIndex + 1) % (TRI_MODE == m_bGeometryMode ? 1 : 2);
+			}
+			else
+			{
+				m_bEdgeOrInsideMode = INSIDE_MODE;
+			}
+		}
+		else if ( VK_ADD == key )
+		{
+			// Increase weight
+			if(EDGE_MODE == m_bEdgeOrInsideMode)
+			{
+				SetEdgeWeight( m_iEdgeIndex, m_fEdgeWeights[m_iEdgeIndex] + 0.1f );
+			}
+			else
+			{
+				SetInsideWeight( m_iInsideIndex, m_fInsideWeights[m_iInsideIndex] + 0.1f );
+			}
+		}
+		else if ( VK_SUBTRACT == key )
+		{
+			// Decrease weight
+			if(EDGE_MODE == m_bEdgeOrInsideMode)
+			{
+				SetEdgeWeight( m_iEdgeIndex, m_fEdgeWeights[m_iEdgeIndex] - 0.1f );
+			}
+			else
+			{
+				SetInsideWeight( m_iInsideIndex, m_fInsideWeights[m_iInsideIndex] - 0.1f );
+			}
 		}
 		else
 		{
@@ -383,26 +477,42 @@ void App::CreateQuadResources()
 	// Create the appropriate shaders
 	SAFE_DELETE( m_pQuadEffect );
 	m_pQuadEffect = new RenderEffectDX11();
+
 	m_pQuadEffect->m_iVertexShader = 
 		m_pRenderer11->LoadShader( VERTEX_SHADER,
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"vsMain" ),
 		std::wstring( L"vs_5_0" ) );
-	m_pQuadEffect->m_iHullShader =
+
+	/*m_pQuadEffect->m_iHullShader =
 		m_pRenderer11->LoadShader( HULL_SHADER,
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"hsQuadMain" ),
-		std::wstring( L"hs_5_0" ) );
+		std::wstring( L"hs_5_0" ) );*/
+	D3D10_SHADER_MACRO hsPow2Mode[1] = { "POW2_PARTITIONING", "1" };
+	m_QuadHullShaders[Power2] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsQuadMain" ), std::wstring( L"hs_5_0" ), &hsPow2Mode );
+
+	D3D10_SHADER_MACRO hsIntMode[1] = { "INTEGER_PARTITIONING", "1" };
+	m_QuadHullShaders[Integer] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsQuadMain" ), std::wstring( L"hs_5_0" ), &hsIntMode );
+
+	D3D10_SHADER_MACRO hsFracOddMode[1] = { "FRAC_ODD_PARTITIONING", "1" };
+	m_QuadHullShaders[FractionalOdd] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsQuadMain" ), std::wstring( L"hs_5_0" ), &hsFracOddMode );
+
+	D3D10_SHADER_MACRO hsFracEvenMode[1] = { "FRAC_EVEN_PARTITIONING", "1" };
+	m_QuadHullShaders[FractionalEven] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsQuadMain" ), std::wstring( L"hs_5_0" ), &hsFracEvenMode );
+
 	m_pQuadEffect->m_iDomainShader =
 		m_pRenderer11->LoadShader( DOMAIN_SHADER,
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"dsQuadMain" ),
 		std::wstring( L"ds_5_0" ) );
+
 	m_pQuadEffect->m_iGeometryShader =
 		m_pRenderer11->LoadShader( GEOMETRY_SHADER,
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"gsMain" ),
 		std::wstring( L"gs_5_0" ) );
+
 	m_pQuadEffect->m_iPixelShader = 
 		m_pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
@@ -473,26 +583,43 @@ void App::CreateTriangleResources()
 	// Create the appropriate shaders
 	SAFE_DELETE( m_pTriangleEffect );
 	m_pTriangleEffect = new RenderEffectDX11();
+	
 	m_pTriangleEffect->m_iVertexShader = 
 		m_pRenderer11->LoadShader( VERTEX_SHADER,
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"vsMain" ),
 		std::wstring( L"vs_5_0" ) );
-	m_pTriangleEffect->m_iHullShader =
+
+	/*m_pTriangleEffect->m_iHullShader =
 		m_pRenderer11->LoadShader( HULL_SHADER,
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"hsTriangleMain" ),
-		std::wstring( L"hs_5_0" ) );
+		std::wstring( L"hs_5_0" ) );*/
+
+	D3D10_SHADER_MACRO hsPow2Mode[1] = { "POW2_PARTITIONING", "1" };
+	m_TriangleHullShaders[Power2] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsTriangleMain" ), std::wstring( L"hs_5_0" ), &hsPow2Mode );
+
+	D3D10_SHADER_MACRO hsIntMode[1] = { "INTEGER_PARTITIONING", "1" };
+	m_TriangleHullShaders[Integer] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsTriangleMain" ), std::wstring( L"hs_5_0" ), &hsIntMode );
+
+	D3D10_SHADER_MACRO hsFracOddMode[1] = { "FRAC_ODD_PARTITIONING", "1" };
+	m_TriangleHullShaders[FractionalOdd] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsTriangleMain" ), std::wstring( L"hs_5_0" ), &hsFracOddMode );
+
+	D3D10_SHADER_MACRO hsFracEvenMode[1] = { "FRAC_EVEN_PARTITIONING", "1" };
+	m_TriangleHullShaders[FractionalEven] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsTriangleMain" ), std::wstring( L"hs_5_0" ), &hsFracEvenMode );
+
 	m_pTriangleEffect->m_iDomainShader =
 		m_pRenderer11->LoadShader( DOMAIN_SHADER,
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"dsTriangleMain" ),
 		std::wstring( L"ds_5_0" ) );
+
 	m_pTriangleEffect->m_iGeometryShader =
 		m_pRenderer11->LoadShader( GEOMETRY_SHADER,
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"gsMain" ),
 		std::wstring( L"gs_5_0" ) );
+
 	m_pTriangleEffect->m_iPixelShader = 
 		m_pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
@@ -504,5 +631,52 @@ void App::CreateTriangleResources()
 	m_pTriangleEffect->m_iRasterizerState = m_pRenderer11->CreateRasterizerState( &RS );
 
 	Log::Get().Write( L"Created triangle shaders" );
+}
+//--------------------------------------------------------------------------------
+void App::SetEdgeWeight(unsigned int index, float weight)
+{
+	// Check index is in range
+	if(index > (unsigned)(TRI_MODE == m_bGeometryMode ? 2 : 3))
+		return;
+
+	// Check weight is in range
+	if( (weight < 1.0f) || (weight > 64.0f) )
+		return;
+
+	// Store internal state
+	m_fEdgeWeights[ index ] = weight;
+
+	// Update shader state
+	Vector4f v = Vector4f( m_fEdgeWeights[0], m_fEdgeWeights[1], m_fEdgeWeights[2], m_fEdgeWeights[3] );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"vEdgeWeights" ), &v );
+}
+//--------------------------------------------------------------------------------
+void App::SetInsideWeight(unsigned int index, float weight)
+{
+	// Check index is in range
+	if(index > (unsigned)(TRI_MODE == m_bGeometryMode ? 0 : 1))
+		return;
+
+	// Check weight is in range
+	if( (weight < 1.0f) || (weight > 64.0f) )
+		return;
+
+	// Store internal state
+	m_fInsideWeights[ index ] = weight;
+
+	// Update shader state
+	Vector4f v = Vector4f( m_fInsideWeights[0], m_fInsideWeights[1], 0.0f, 0.0f );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"vInsideWeights" ), &v );
+}
+//--------------------------------------------------------------------------------
+void App::SetPartitioningMode( const PartitioningMode& mode )
+{
+	m_pmPartitioningMode = mode;
+
+	// Update the tri HS
+	m_pTriangleEffect->m_iHullShader = m_TriangleHullShaders[ m_pmPartitioningMode ];
+
+	// Update the quad HS
+	m_pQuadEffect->m_iHullShader = m_QuadHullShaders[ m_pmPartitioningMode ];
 }
 //--------------------------------------------------------------------------------
