@@ -489,17 +489,17 @@ void App::CreateQuadResources()
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"hsQuadMain" ),
 		std::wstring( L"hs_5_0" ) );*/
-	D3D10_SHADER_MACRO hsPow2Mode[1] = { "POW2_PARTITIONING", "1" };
-	m_QuadHullShaders[Power2] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsQuadMain" ), std::wstring( L"hs_5_0" ), &hsPow2Mode );
+	D3D10_SHADER_MACRO hsPow2Mode[2] = { "POW2_PARTITIONING", "1", NULL, NULL };
+	m_QuadHullShaders[Power2] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsQuadMain" ), std::wstring( L"hs_5_0" ), hsPow2Mode );
 
-	D3D10_SHADER_MACRO hsIntMode[1] = { "INTEGER_PARTITIONING", "1" };
-	m_QuadHullShaders[Integer] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsQuadMain" ), std::wstring( L"hs_5_0" ), &hsIntMode );
+	D3D10_SHADER_MACRO hsIntMode[2] = { "INTEGER_PARTITIONING", "1", NULL, NULL };
+	m_QuadHullShaders[Integer] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsQuadMain" ), std::wstring( L"hs_5_0" ), hsIntMode );
 
-	D3D10_SHADER_MACRO hsFracOddMode[1] = { "FRAC_ODD_PARTITIONING", "1" };
-	m_QuadHullShaders[FractionalOdd] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsQuadMain" ), std::wstring( L"hs_5_0" ), &hsFracOddMode );
+	D3D10_SHADER_MACRO hsFracOddMode[2] = { "FRAC_ODD_PARTITIONING", "1", NULL, NULL };
+	m_QuadHullShaders[FractionalOdd] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsQuadMain" ), std::wstring( L"hs_5_0" ), hsFracOddMode );
 
-	D3D10_SHADER_MACRO hsFracEvenMode[1] = { "FRAC_EVEN_PARTITIONING", "1" };
-	m_QuadHullShaders[FractionalEven] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsQuadMain" ), std::wstring( L"hs_5_0" ), &hsFracEvenMode );
+	D3D10_SHADER_MACRO hsFracEvenMode[2] = { "FRAC_EVEN_PARTITIONING", "1", NULL, NULL };
+	m_QuadHullShaders[FractionalEven] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsQuadMain" ), std::wstring( L"hs_5_0" ), hsFracEvenMode );
 
 	m_pQuadEffect->m_iDomainShader =
 		m_pRenderer11->LoadShader( DOMAIN_SHADER,
@@ -596,17 +596,17 @@ void App::CreateTriangleResources()
 		std::wstring( L"hsTriangleMain" ),
 		std::wstring( L"hs_5_0" ) );*/
 
-	D3D10_SHADER_MACRO hsPow2Mode[1] = { "POW2_PARTITIONING", "1" };
-	m_TriangleHullShaders[Power2] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsTriangleMain" ), std::wstring( L"hs_5_0" ), &hsPow2Mode );
+	D3D10_SHADER_MACRO hsPow2Mode[2] = { "POW2_PARTITIONING", "1", NULL, NULL };
+	m_TriangleHullShaders[Power2] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsTriangleMain" ), std::wstring( L"hs_5_0" ), hsPow2Mode );
 
-	D3D10_SHADER_MACRO hsIntMode[1] = { "INTEGER_PARTITIONING", "1" };
-	m_TriangleHullShaders[Integer] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsTriangleMain" ), std::wstring( L"hs_5_0" ), &hsIntMode );
+	D3D10_SHADER_MACRO hsIntMode[2] = { "INTEGER_PARTITIONING", "1", NULL, NULL };
+	m_TriangleHullShaders[Integer] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsTriangleMain" ), std::wstring( L"hs_5_0" ), hsIntMode );
 
-	D3D10_SHADER_MACRO hsFracOddMode[1] = { "FRAC_ODD_PARTITIONING", "1" };
-	m_TriangleHullShaders[FractionalOdd] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsTriangleMain" ), std::wstring( L"hs_5_0" ), &hsFracOddMode );
+	D3D10_SHADER_MACRO hsFracOddMode[2] = { "FRAC_ODD_PARTITIONING", "1", NULL, NULL };
+	m_TriangleHullShaders[FractionalOdd] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsTriangleMain" ), std::wstring( L"hs_5_0" ), hsFracOddMode );
 
-	D3D10_SHADER_MACRO hsFracEvenMode[1] = { "FRAC_EVEN_PARTITIONING", "1" };
-	m_TriangleHullShaders[FractionalEven] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsTriangleMain" ), std::wstring( L"hs_5_0" ), &hsFracEvenMode );
+	D3D10_SHADER_MACRO hsFracEvenMode[2] = { "FRAC_EVEN_PARTITIONING", "1", NULL, NULL };
+	m_TriangleHullShaders[FractionalEven] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsTriangleMain" ), std::wstring( L"hs_5_0" ), hsFracEvenMode );
 
 	m_pTriangleEffect->m_iDomainShader =
 		m_pRenderer11->LoadShader( DOMAIN_SHADER,
