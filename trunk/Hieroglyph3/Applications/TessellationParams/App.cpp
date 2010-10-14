@@ -484,11 +484,6 @@ void App::CreateQuadResources()
 		std::wstring( L"vsMain" ),
 		std::wstring( L"vs_5_0" ) );
 
-	/*m_pQuadEffect->m_iHullShader =
-		m_pRenderer11->LoadShader( HULL_SHADER,
-		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
-		std::wstring( L"hsQuadMain" ),
-		std::wstring( L"hs_5_0" ) );*/
 	D3D10_SHADER_MACRO hsPow2Mode[2] = { "POW2_PARTITIONING", "1", NULL, NULL };
 	m_QuadHullShaders[Power2] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsQuadMain" ), std::wstring( L"hs_5_0" ), hsPow2Mode );
 
@@ -589,12 +584,6 @@ void App::CreateTriangleResources()
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"vsMain" ),
 		std::wstring( L"vs_5_0" ) );
-
-	/*m_pTriangleEffect->m_iHullShader =
-		m_pRenderer11->LoadShader( HULL_SHADER,
-		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
-		std::wstring( L"hsTriangleMain" ),
-		std::wstring( L"hs_5_0" ) );*/
 
 	D3D10_SHADER_MACRO hsPow2Mode[2] = { "POW2_PARTITIONING", "1", NULL, NULL };
 	m_TriangleHullShaders[Power2] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsTriangleMain" ), std::wstring( L"hs_5_0" ), hsPow2Mode );

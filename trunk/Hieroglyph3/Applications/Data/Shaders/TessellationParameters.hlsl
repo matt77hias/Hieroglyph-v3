@@ -93,7 +93,7 @@ HS_PER_TRI_PATCH_OUTPUT hsPerTriPatch( InputPatch<VS_OUTPUT, 3> ip, uint PatchID
 [partitioning("fractional_odd")]
 #elif defined(FRAC_EVEN_PARTITIONING)
 [partitioning("fractional_even")]
-#else
+#elif defined(INTEGER_PARTITIONING)
 [partitioning("integer")]
 #endif
 [outputtopology("triangle_cw")]
@@ -142,7 +142,7 @@ HS_PER_QUAD_PATCH_OUTPUT hsPerQuadPatch( InputPatch<VS_OUTPUT, 4> ip, uint Patch
 [partitioning("fractional_odd")]
 #elif defined(FRAC_EVEN_PARTITIONING)
 [partitioning("fractional_even")]
-#else
+#elif defined(INTEGER_PARTITIONING)
 [partitioning("integer")]
 #endif
 [outputtopology("triangle_cw")]
