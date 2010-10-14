@@ -35,8 +35,8 @@ App::App()
 bool App::ConfigureEngineComponents()
 {
 	// The application currently supplies the 
-	int width = 320;
-	int height = 240;
+	int width = 640;
+	int height = 480;
 	bool windowed = true;
 
 	// Set the render window parameters and initialize the window
@@ -164,7 +164,7 @@ void App::Initialize()
 	D3DXMatrixIdentity( reinterpret_cast<D3DXMATRIX*>(&mWorld) );
 
 	Matrix4f mProj;
-	D3DXMatrixPerspectiveFovLH( reinterpret_cast<D3DXMATRIX*>(&mProj), static_cast< float >(D3DX_PI) / 4.0f, 320.0f /  240.0f, 0.1f, 50.0f );
+	D3DXMatrixPerspectiveFovLH( reinterpret_cast<D3DXMATRIX*>(&mProj), static_cast< float >(D3DX_PI) / 4.0f, 640.0f /  480.0f, 0.1f, 50.0f );
 
 	// Composite together for the final transform
 	Matrix4f mViewProj = mView * mProj;
