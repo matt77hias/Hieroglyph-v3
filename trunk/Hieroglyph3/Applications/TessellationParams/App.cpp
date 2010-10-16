@@ -483,36 +483,44 @@ void App::CreateQuadResources()
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"vsMain" ),
 		std::wstring( L"vs_5_0" ) );
+	_ASSERT( -1 != m_pQuadEffect->m_iVertexShader );
 
 	D3D10_SHADER_MACRO hsPow2Mode[2] = { "POW2_PARTITIONING", "1", NULL, NULL };
 	m_QuadHullShaders[Power2] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsQuadMain" ), std::wstring( L"hs_5_0" ), hsPow2Mode );
+	_ASSERT( -1 != m_QuadHullShaders[Power2] );
 
 	D3D10_SHADER_MACRO hsIntMode[2] = { "INTEGER_PARTITIONING", "1", NULL, NULL };
 	m_QuadHullShaders[Integer] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsQuadMain" ), std::wstring( L"hs_5_0" ), hsIntMode );
+	_ASSERT( -1 != m_QuadHullShaders[Integer] );
 
 	D3D10_SHADER_MACRO hsFracOddMode[2] = { "FRAC_ODD_PARTITIONING", "1", NULL, NULL };
 	m_QuadHullShaders[FractionalOdd] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsQuadMain" ), std::wstring( L"hs_5_0" ), hsFracOddMode );
+	_ASSERT( -1 != m_QuadHullShaders[FractionalOdd] );
 
 	D3D10_SHADER_MACRO hsFracEvenMode[2] = { "FRAC_EVEN_PARTITIONING", "1", NULL, NULL };
 	m_QuadHullShaders[FractionalEven] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsQuadMain" ), std::wstring( L"hs_5_0" ), hsFracEvenMode );
+	_ASSERT( -1 != m_QuadHullShaders[FractionalEven] );
 
 	m_pQuadEffect->m_iDomainShader =
 		m_pRenderer11->LoadShader( DOMAIN_SHADER,
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"dsQuadMain" ),
 		std::wstring( L"ds_5_0" ) );
+	_ASSERT( -1 != m_pQuadEffect->m_iDomainShader );
 
 	m_pQuadEffect->m_iGeometryShader =
 		m_pRenderer11->LoadShader( GEOMETRY_SHADER,
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"gsMain" ),
 		std::wstring( L"gs_5_0" ) );
+	_ASSERT( -1 != m_pQuadEffect->m_iGeometryShader );
 
 	m_pQuadEffect->m_iPixelShader = 
 		m_pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"psMain" ),
 		std::wstring( L"ps_5_0" ) );
+	_ASSERT( -1 != m_pQuadEffect->m_iPixelShader );
 
 	RasterizerStateConfigDX11 RS;
 	RS.FillMode = D3D11_FILL_WIREFRAME;
@@ -584,36 +592,44 @@ void App::CreateTriangleResources()
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"vsMain" ),
 		std::wstring( L"vs_5_0" ) );
+	_ASSERT( -1 != m_pTriangleEffect->m_iVertexShader );
 
 	D3D10_SHADER_MACRO hsPow2Mode[2] = { "POW2_PARTITIONING", "1", NULL, NULL };
 	m_TriangleHullShaders[Power2] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsTriangleMain" ), std::wstring( L"hs_5_0" ), hsPow2Mode );
+	_ASSERT( -1 != m_TriangleHullShaders[Power2] );
 
 	D3D10_SHADER_MACRO hsIntMode[2] = { "INTEGER_PARTITIONING", "1", NULL, NULL };
 	m_TriangleHullShaders[Integer] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsTriangleMain" ), std::wstring( L"hs_5_0" ), hsIntMode );
+	_ASSERT( -1 != m_TriangleHullShaders[Integer] );
 
 	D3D10_SHADER_MACRO hsFracOddMode[2] = { "FRAC_ODD_PARTITIONING", "1", NULL, NULL };
 	m_TriangleHullShaders[FractionalOdd] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsTriangleMain" ), std::wstring( L"hs_5_0" ), hsFracOddMode );
+	_ASSERT( -1 != m_TriangleHullShaders[FractionalOdd] );
 
 	D3D10_SHADER_MACRO hsFracEvenMode[2] = { "FRAC_EVEN_PARTITIONING", "1", NULL, NULL };
 	m_TriangleHullShaders[FractionalEven] = m_pRenderer11->LoadShader( HULL_SHADER, std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ), std::wstring( L"hsTriangleMain" ), std::wstring( L"hs_5_0" ), hsFracEvenMode );
+	_ASSERT( -1 != m_TriangleHullShaders[FractionalEven] );
 
 	m_pTriangleEffect->m_iDomainShader =
 		m_pRenderer11->LoadShader( DOMAIN_SHADER,
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"dsTriangleMain" ),
 		std::wstring( L"ds_5_0" ) );
+	_ASSERT( -1 != m_pTriangleEffect->m_iDomainShader );
 
 	m_pTriangleEffect->m_iGeometryShader =
 		m_pRenderer11->LoadShader( GEOMETRY_SHADER,
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"gsMain" ),
 		std::wstring( L"gs_5_0" ) );
+	_ASSERT( -1 != m_pTriangleEffect->m_iGeometryShader );
 
 	m_pTriangleEffect->m_iPixelShader = 
 		m_pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"../Data/Shaders/TessellationParameters.hlsl" ),
 		std::wstring( L"psMain" ),
 		std::wstring( L"ps_5_0" ) );
+	_ASSERT( -1 != m_pTriangleEffect->m_iPixelShader );
 
 	RasterizerStateConfigDX11 RS;
 	RS.FillMode = D3D11_FILL_WIREFRAME;

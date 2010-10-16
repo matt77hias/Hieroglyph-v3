@@ -16,6 +16,9 @@
 #include "Texture2dConfigDX11.h"
 
 #include "RasterizerStateConfigDX11.h"
+#include "ParameterManagerDX11.h"
+#include "SamplerParameterDX11.h"
+#include "ShaderResourceParameterDX11.h"
 
 #define clamp(value,minimum,maximum) (max(min((value),(maximum)),(minimum)))
 
@@ -29,20 +32,22 @@ App AppInstance; // Provides an instance of the application
 App::App()
 {
 	m_bSaveScreenshot = false;
+	m_bViewPointInAutoMode = true;
+	m_bSolidRender = false;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
 {
 	// The application currently supplies the 
-	int width = 640;
-	int height = 480;
+	int width = 400;
+	int height = 300;
 	bool windowed = true;
 
 	// Set the render window parameters and initialize the window
 	m_pWindow = new Win32RenderWindow();
 	m_pWindow->SetPosition( 25, 25 );
 	m_pWindow->SetSize( width, height );
-	m_pWindow->SetCaption( std::wstring( L"Direct3D 11 Tessellation Parameters Demo" ) );
+	m_pWindow->SetCaption( GetName( ) );
 	m_pWindow->Initialize();
 
 	
@@ -151,6 +156,13 @@ void App::Initialize()
 	CreateTerrainShaders();
 	CreateTerrainTextures();
 
+	// Set initial shader values
+	Vector4f vMinMaxDist = Vector4f( 0.25f, 8.0f, /* unused */ 0.0f, /* unused */ 0.0f );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( L"minMaxDistance", &vMinMaxDist );
+
+	Vector4f vMinMaxLod = Vector4f( 1.0f, 8.0f, /* unused */ 0.0f, /* unused */ 0.0f );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( L"minMaxLOD", &vMinMaxLod );
+
 	// Create the text rendering
 	m_pFont = new SpriteFontDX11();
 	m_pFont->Initialize( L"Consolas", 12.0f, 0, true );
@@ -176,6 +188,8 @@ void App::Update()
 	m_pRenderer11->pImmPipeline->ClearBuffers( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ), 1.0f );
 
 	// Draw the main geometry
+	m_pTerrainEffect->ConfigurePipeline( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr );
+	m_pRenderer11->pImmPipeline->Draw( *m_pTerrainEffect, *m_pTerrainGeometry, m_pRenderer11->m_pParamMgr );
 
 	// Draw the UI text
 	if( !m_bSaveScreenshot )
@@ -186,13 +200,16 @@ void App::Update()
 		out << L"Hieroglyph 3 : Interlocking Terrain Tiles\nFPS: " << m_pTimer->Framerate();
 
 		// Screenshot
-		out << L"\nS : Take Screenshot";
+		out << L"\n S : Take Screenshot";
 
 		// Rasterizer State
-		out << L"\nW : Toggle Wireframe Display";
+		out << L"\n W : Toggle Wireframe Display";
 
 		// Advanced LoD
-		out << L"\nL : Toggle LoD Complexity";
+		out << L"\n L : Toggle LoD Complexity";
+
+		// Automatic Rotation
+		out << L"\n A : Toggle Automated Camera";
 
 		m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, *m_pFont, out.str().c_str(), Matrix4f::Identity(), Vector4f( 1.f, 0.f, 0.f, 1.f ) );
 	}
@@ -251,6 +268,21 @@ bool App::HandleEvent( IEvent* pEvent )
 			m_bSaveScreenshot = true;
 			return( true );
 		}
+		else if ( 'W' == key )
+		{
+			// Toggle Wireframe
+			m_bSolidRender = !m_bSolidRender;
+			m_pTerrainEffect->m_iRasterizerState = m_bSolidRender ? m_rsSolid : m_rsWireframe;
+		}
+		else if ( 'L' == key )
+		{
+			// Toggle between simple and CS-based LOD
+		}
+		else if ( 'A' == key )
+		{
+			// Toggle automated camera
+			m_bViewPointInAutoMode = !m_bViewPointInAutoMode;
+		}
 		else
 		{
 			return( false );
@@ -289,7 +321,7 @@ void App::CreateTerrainGeometry()
 		pTexCoords->m_uiSemanticIndex = 0;
 		pTexCoords->m_Format = DXGI_FORMAT_R32G32_FLOAT;
 		pTexCoords->m_uiInputSlot = 0;
-		pTexCoords->m_uiAlignedByteOffset = 0;
+		pTexCoords->m_uiAlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 		pTexCoords->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		pTexCoords->m_uiInstanceDataStepRate = 0;
 
@@ -365,6 +397,7 @@ void App::CreateTerrainShaders()
 		std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ),
 		std::wstring( L"vsMain" ),
 		std::wstring( L"vs_5_0" ) );
+	_ASSERT( -1 != m_pTerrainEffect->m_iVertexShader );
 	
 	Log::Get().Write( L"... vertex shader created" );
 
@@ -374,6 +407,7 @@ void App::CreateTerrainShaders()
 		std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ),
 		std::wstring( L"hsMain" ),
 		std::wstring( L"hs_5_0" ) );
+	_ASSERT( -1 != m_pTerrainEffect->m_iHullShader );
 
 	Log::Get().Write( L"... hull shader created" );
 
@@ -383,6 +417,7 @@ void App::CreateTerrainShaders()
 		std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ),
 		std::wstring( L"dsMain" ),
 		std::wstring( L"ds_5_0" ) );
+	_ASSERT( -1 != m_pTerrainEffect->m_iDomainShader );
 
 	Log::Get().Write( L"... domain shader created" );
 
@@ -392,6 +427,7 @@ void App::CreateTerrainShaders()
 		std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ),
 		std::wstring( L"gsMain" ),
 		std::wstring( L"gs_5_0" ) );
+	_ASSERT( -1 != m_pTerrainEffect->m_iGeometryShader );
 
 	Log::Get().Write( L"... geometry shader created" );
 
@@ -401,6 +437,7 @@ void App::CreateTerrainShaders()
 		std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ),
 		std::wstring( L"psMain" ),
 		std::wstring( L"ps_5_0" ) );
+	_ASSERT( -1 != m_pTerrainEffect->m_iPixelShader );
 
 	Log::Get().Write( L"... pixel shader created" );
 
@@ -408,13 +445,15 @@ void App::CreateTerrainShaders()
 	RasterizerStateConfigDX11 RS;
 	
 	RS.FillMode = D3D11_FILL_WIREFRAME;
+	RS.CullMode = D3D11_CULL_FRONT;
 	m_rsWireframe = m_pRenderer11->CreateRasterizerState( &RS );
 
 	RS.FillMode = D3D11_FILL_SOLID;
+	RS.CullMode = D3D11_CULL_FRONT;
 	m_rsSolid = m_pRenderer11->CreateRasterizerState( &RS );
 
 	// Assign default state
-	m_pTerrainEffect->m_iRasterizerState = m_rsWireframe;
+	m_pTerrainEffect->m_iRasterizerState = m_bSolidRender ? m_rsSolid : m_rsWireframe;
 
 	Log::Get().Write( L"Created all shaders" );
 }
@@ -423,14 +462,101 @@ void App::CreateTerrainTextures()
 {
 	Log::Get().Write( L"Creating textures" );
 
+	// Load the texture
+	m_pHeightMapTexture = m_pRenderer11->LoadTexture( std::wstring( L"../Data/Textures/TerrainHeightMap.png" ) );
+
+	// Create the SRV
+	ShaderResourceParameterDX11* pHeightMapTexParam = new ShaderResourceParameterDX11();
+    pHeightMapTexParam->SetParameterData( &m_pHeightMapTexture->m_iResourceSRV );
+    pHeightMapTexParam->SetName( std::wstring( L"texHeightMap" ) );
+	
+	// Map it to the param manager
+	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"texHeightMap", m_pHeightMapTexture );
+
+	// Create a sampler
+	D3D11_SAMPLER_DESC sampDesc;
+    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.BorderColor[0] = sampDesc.BorderColor[1] = sampDesc.BorderColor[2] = sampDesc.BorderColor[3] = 0;
+    sampDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+    sampDesc.MaxAnisotropy = 16;
+    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+    sampDesc.MinLOD = 0.0f;
+    sampDesc.MipLODBias = 0.0f;
+    int samplerState = m_pRenderer11->CreateSamplerState( &sampDesc );
+
+	// Set it to the param manager
+	m_pRenderer11->m_pParamMgr->SetSamplerParameter( L"smpHeightMap", &samplerState );
+
 	Log::Get().Write( L"Created textures" );
 }
 //--------------------------------------------------------------------------------
 void App::UpdateViewState()
 {
-	// If in 'auto' mode then simply keep rotating
+	if( m_bViewPointInAutoMode )
+	{
+		// If in 'auto' mode then simply keep rotating
+		float time = m_pTimer->Runtime();
 
-	// Else, if in 'manual' mode then update according to the
-	// current user's input
+		// Create the world matrix
+		Matrix4f mWorld, mWorldScale, mWorldRotation;
+		
+		D3DXMatrixIdentity( reinterpret_cast<D3DXMATRIX*>(&mWorld) );
+		
+		// Geometry is defined in the [-0.5,+0.5] range on the XZ plane
+
+		D3DXMatrixScaling( reinterpret_cast<D3DXMATRIX*>(&mWorldScale), 15.0f, 1.0f, 15.0f ); // Domain Shader controls Y scale, not here!
+		D3DXMatrixMultiply( reinterpret_cast<D3DXMATRIX*>(&mWorld), reinterpret_cast<D3DXMATRIX*>(&mWorld), reinterpret_cast<D3DXMATRIX*>(&mWorldScale) );
+
+		// Create the inverse transpose world matrix
+		Matrix4f mInvTPoseWorld;
+
+		D3DXMatrixInverse( reinterpret_cast<D3DXMATRIX*>(&mInvTPoseWorld), NULL, reinterpret_cast<D3DXMATRIX*>(&mWorld) );
+		D3DXMatrixTranspose( reinterpret_cast<D3DXMATRIX*>(&mInvTPoseWorld), reinterpret_cast<D3DXMATRIX*>(&mInvTPoseWorld) );
+
+		
+		D3DXVECTOR3 vLookAt = D3DXVECTOR3( 0.0f, 0.0f, 0.0f );
+		D3DXVECTOR3 vLookFrom = D3DXVECTOR3( 0.0f, 0.0f, 0.0f );
+		D3DXVECTOR3 vLookUp = D3DXVECTOR3( 0.0f, 1.0f, 0.0f );
+
+		// based on time, determine where the camera is at and where it should look to
+		float distance = time / 30.0f; // 30 seconds to do a single circuit
+		float fromAngle = fmodf( distance * 2.0f * D3DX_PI, 2.0f * D3DX_PI);
+		float toAngle = fmodf( (distance + 0.08f) * 2.0f * D3DX_PI, 2.0f * D3DX_PI); // ~30 degrees in front
+
+		vLookFrom.x = sinf(fromAngle) * 10.0f;
+		vLookFrom.y = 3.f;
+		vLookFrom.z = cosf(fromAngle) * 10.0f;
+
+		vLookAt.x = sinf(toAngle) * 3.0f;
+		vLookAt.y = 0.3f;
+		vLookAt.z = cosf(toAngle) * 3.0f;
+
+		// Create the view matrix
+		Matrix4f mView;
+		D3DXMatrixLookAtLH( reinterpret_cast<D3DXMATRIX*>(&mView), &vLookFrom, &vLookAt, &vLookUp );
+
+		// Create the projection matrix
+		Matrix4f mProj;
+		D3DXMatrixPerspectiveFovLH( reinterpret_cast<D3DXMATRIX*>(&mProj), static_cast< float >(D3DX_PI) / 3.0f, static_cast<float>(m_pWindow->GetWidth()) /  static_cast<float>(m_pWindow->GetHeight()), 0.1f, 50.0f );
+
+		// Composite together for the final transform
+		Matrix4f mViewProj = mView * mProj;
+
+		// Set the various values to the parameter manager
+		m_pRenderer11->m_pParamMgr->SetMatrixParameter( L"mWorld", &mWorld );
+		m_pRenderer11->m_pParamMgr->SetMatrixParameter( L"mViewProj", &mViewProj );
+		m_pRenderer11->m_pParamMgr->SetMatrixParameter( L"mInvTposeWorld", &mInvTPoseWorld );
+
+		Vector4f vCam = Vector4f( vLookFrom.x, vLookFrom.y, vLookFrom.z, /* unused */ 0.0f );
+		m_pRenderer11->m_pParamMgr->SetVectorParameter( L"cameraPosition", &vCam );
+	}
+	else
+	{
+		// Else, if in 'manual' mode then update according to the
+		// current user's input
+	}
 }
 //--------------------------------------------------------------------------------

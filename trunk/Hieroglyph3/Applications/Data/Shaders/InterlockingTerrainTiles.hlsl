@@ -14,11 +14,9 @@ SamplerState smpHeightMap : register( s0 );
 
 cbuffer patch
 {
-	float3 cameraPosition;
-	float minDistance;
-	float maxDistance;
-	float minLOD;
-	float maxLOD;
+	float4 cameraPosition;	//  w unused
+	float4 minMaxDistance;	// zw unused
+	float4 minMaxLOD;		// zw unused
 }
 
 struct VS_INPUT
@@ -66,7 +64,7 @@ float3 ComputePatchMidPoint(float3 cp0, float3 cp1, float3 cp2, float3 cp3)
 
 float ComputePatchLOD(float3 midPoint)
 {
-	return lerp(minLOD, maxLOD, (1.0f - (saturate(distance(cameraPosition, midPoint) / maxDistance))));
+	return lerp(minMaxLOD.x, minMaxLOD.y, (1.0f - (saturate(distance(cameraPosition.xyz, midPoint) / minMaxDistance.y))));
 }
 
 float SampleHeightMap(float2 uv)
@@ -76,8 +74,7 @@ float SampleHeightMap(float2 uv)
 	
 	// bias so that it varies between above/below the origin...
 	const float SCALE = 1.0f;
-	//return SCALE * (2.0f * (texHeightMap.SampleLevel( smpHeightMap, uv, 0.0f ).r - 0.5f));
-	return texHeightMap.SampleLevel( smpHeightMap, uv, 0.0f ).r;
+	return SCALE * texHeightMap.SampleLevel( smpHeightMap, uv, 0.0f ).r;
 }
 
 float3 Sobel( float2 tc )
@@ -286,36 +283,12 @@ DS_OUTPUT dsMain( HS_PER_PATCH_OUTPUT input,
     // normal vector
     float3 normal = Sobel( texcoord );
     
-    normal = normalize( mul( float4(normal,1.0f), mInvTposeWorld ).xyz );
+    normal = normalize( mul( float4(normal, 1.0f), mInvTposeWorld ).xyz );
     
     o.colour.rg = float2( 0.25f, 0.25f );
-    o.colour.b = max(0.25f, dot( normal, normalize( cameraPosition ) ) );
-    /*
-    float lod = (input.insideTesselation[0] - minLOD) / (maxLOD - minLOD) + 0.15f;
+    o.colour.b = max(0.25f, dot( normal, normalize( cameraPosition.xyz ) ) );
     
-    if( lod > (2.0f / 3.0f) )
-    {
-		// High Detail
-		lod -= (2.0f / 3.0f);
-		lod /= (1.0f / 3.0f);
-		o.colour = lerp( float3(0.0f, 1.0f, 0.0f), float3(1.0f, 0.0f, 0.0f), lod);
-    }
-    else if( lod > (1.0f / 3.0f) )
-    {
-		// Medium Detail
-		lod -= (1.0f / 3.0f);
-		lod /= (1.0f / 3.0f);
-		o.colour = lerp( float3(0.0f, 0.0f, 1.0f), float3(0.0f, 1.0f, 0.0f), lod);
-    }
-    else
-    {
-		// Low Detail
-		lod /= (1.0f / 3.0f);
-		o.colour = lerp( float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 1.0f), lod);
-    }
-    */
-    
-    float lod = finalVertexCoord.y; //(input.insideTesselation[0] - minLOD) / (maxLOD - minLOD) + 0.15f;
+    float lod = finalVertexCoord.y;
     
     if( lod > 0.5f )
     {
@@ -344,7 +317,7 @@ DS_OUTPUT dsMain( HS_PER_PATCH_OUTPUT input,
 		o.colour = lerp( float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 1.0f), lod);
     }
     
-    o.colour *= max(0.25f, dot( normal, normalize( cameraPosition ) ) );
+    o.colour *= max(0.25f, dot( normal, float3( 0.0f, 1.0f, 0.0f ) ) );
     
     return o;    
 }

@@ -37,6 +37,8 @@ protected:
 	Win32RenderWindow*			m_pWindow;
 
 	bool						m_bSaveScreenshot;
+	bool						m_bViewPointInAutoMode;
+	bool						m_bSolidRender;
 	
 	int							m_iSwapChain;
 	ResourcePtr					m_RenderTarget;
@@ -47,12 +49,13 @@ protected:
 
 	GeometryDX11*				m_pTerrainGeometry;
 	RenderEffectDX11*			m_pTerrainEffect;
+	ResourcePtr					m_pHeightMapTexture;
 
 	int							m_rsWireframe;
 	int							m_rsSolid;
 
-	static const int			TERRAIN_X_LEN = 16;
-	static const int			TERRAIN_Z_LEN = 16;
+	static const int			TERRAIN_X_LEN = 8;
+	static const int			TERRAIN_Z_LEN = 8;
 
 	virtual void CreateTerrainGeometry();
 	virtual void CreateTerrainShaders();
