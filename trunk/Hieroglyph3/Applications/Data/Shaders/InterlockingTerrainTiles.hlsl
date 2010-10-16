@@ -19,6 +19,11 @@ cbuffer patch
 	float4 minMaxLOD;		// zw unused
 }
 
+cbuffer sampleparams
+{
+	float4 heightMapDimensions; // zw unused
+}
+
 struct VS_INPUT
 {
 	float3 position : CONTROL_POINT_POSITION;
@@ -73,25 +78,25 @@ float SampleHeightMap(float2 uv)
 	//   gradient information it can use to derive this detail...
 	
 	// bias so that it varies between above/below the origin...
-	const float SCALE = 1.0f;
+	const float SCALE = 3.0f;
 	return SCALE * texHeightMap.SampleLevel( smpHeightMap, uv, 0.0f ).r;
 }
 
 float3 Sobel( float2 tc )
 {
 	// Constants (hack)
-	float2 pxSz = float2( 1.0f / 1024.0f, 1.0f / 1024.0f );
+	float2 pxSz = float2( 1.0f / heightMapDimensions.x, 1.0f / heightMapDimensions.y );
 	
 	// Compute the necessary offsets:
 	float2 o00 = tc + float2( -pxSz.x, -pxSz.y );
-	float2 o10 = tc + float2(          0.0f, -pxSz.y );
+	float2 o10 = tc + float2(    0.0f, -pxSz.y );
 	float2 o20 = tc + float2(  pxSz.x, -pxSz.y );
 
-	float2 o01 = tc + float2( -pxSz.x, 0.0f          );
-	float2 o21 = tc + float2(  pxSz.x, 0.0f          );
+	float2 o01 = tc + float2( -pxSz.x, 0.0f    );
+	float2 o21 = tc + float2(  pxSz.x, 0.0f    );
 
 	float2 o02 = tc + float2( -pxSz.x,  pxSz.y );
-	float2 o12 = tc + float2(          0.0f,  pxSz.y );
+	float2 o12 = tc + float2(    0.0f,  pxSz.y );
 	float2 o22 = tc + float2(  pxSz.x,  pxSz.y );
 
 	// Use of the sobel filter requires the eight samples
@@ -112,7 +117,7 @@ float3 Sobel( float2 tc )
 	float Gy = h00 + 2.0f * h10 + h20 - h02 - 2.0f * h12 - h22;
 
 	// Generate the missing Z
-	float Gz = 0.5f * sqrt( max(0.0f, 1.0f - Gx * Gx - Gy * Gy ) );
+	float Gz = 0.01f * sqrt( max(0.0f, 1.0f - Gx * Gx - Gy * Gy ) );
 
 	// Make sure the returned normal is of unit length
 	return normalize( float3( 2.0f * Gx, Gz, 2.0f * Gy ) );
@@ -288,36 +293,37 @@ DS_OUTPUT dsMain( HS_PER_PATCH_OUTPUT input,
     o.colour.rg = float2( 0.25f, 0.25f );
     o.colour.b = max(0.25f, dot( normal, normalize( cameraPosition.xyz ) ) );
     
-    float lod = finalVertexCoord.y;
+    //float lod = finalVertexCoord.y;
+    float lod = (input.insideTesselation[0] - minMaxLOD.x) / (minMaxLOD.y - minMaxLOD.x);
     
-    if( lod > 0.5f )
+    if( lod > 0.75f )
     {
-		lod -= 0.5f;
-		lod /= 0.5f;
-		o.colour = lerp( float3(1.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f), lod);
+		lod -= 0.75f;
+		lod /= 0.25f;
+		o.colour = lerp( float3(1.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 0.0f), lod);
     }
-    else if( lod > 0.35f )
+    else if( lod > 0.5f )
     {
 		// High Detail
-		lod -= 0.35f;
-		lod /= (0.5f - 0.35f);
+		lod -= 0.5f;
+		lod /= 0.25f;
 		o.colour = lerp( float3(0.0f, 1.0f, 0.0f), float3(1.0f, 0.0f, 0.0f), lod);
     }
-    else if( lod > 0.1f )
+    else if( lod > 0.25f )
     {
 		// Medium Detail
-		lod -= 0.1f;
-		lod /= (0.35f - 0.1f);
+		lod -= 0.25f;
+		lod /= 0.25f;
 		o.colour = lerp( float3(0.0f, 0.0f, 1.0f), float3(0.0f, 1.0f, 0.0f), lod);
     }
     else
     {
 		// Low Detail
-		lod /= 0.1f;
+		lod /= 0.25f;
 		o.colour = lerp( float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 1.0f), lod);
     }
     
-    o.colour *= max(0.25f, dot( normal, float3( 0.0f, 1.0f, 0.0f ) ) );
+    o.colour = min(0.75f, max(0.0f, dot( normal, float3( 0.0f, 1.0f, 0.0f ) ) ) );
     
     return o;    
 }

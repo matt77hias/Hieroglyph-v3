@@ -465,6 +465,11 @@ void App::CreateTerrainTextures()
 	// Load the texture
 	m_pHeightMapTexture = m_pRenderer11->LoadTexture( std::wstring( L"../Data/Textures/TerrainHeightMap.png" ) );
 
+	// Store the height/width to the param manager
+	D3D11_TEXTURE2D_DESC d = m_pHeightMapTexture->m_pTexture2dConfig->GetTextureDesc();
+	Vector4f vTexDim = Vector4f( static_cast<float>(d.Width), static_cast<float>(d.Height), /* unused */ 0.0f, /* unused */ 0.0f );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( L"heightMapDimensions", &vTexDim );
+
 	// Create the SRV
 	ShaderResourceParameterDX11* pHeightMapTexParam = new ShaderResourceParameterDX11();
     pHeightMapTexParam->SetParameterData( &m_pHeightMapTexture->m_iResourceSRV );
