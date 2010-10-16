@@ -73,6 +73,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DeferredRendering", "Applic
 		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InterlockingTerrainTiles", "Applications\InterlockingTerrainTiles\InterlockingTerrainTiles.vcproj", "{92ED8783-D45A-48FD-9B94-DD1FD7DAB7F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -139,6 +141,10 @@ Global
 		{815673AC-FD51-44A8-B498-C0398DC85B41}.Debug|Win32.Build.0 = Debug|Win32
 		{815673AC-FD51-44A8-B498-C0398DC85B41}.Release|Win32.ActiveCfg = Release|Win32
 		{815673AC-FD51-44A8-B498-C0398DC85B41}.Release|Win32.Build.0 = Release|Win32
+		{92ED8783-D45A-48FD-9B94-DD1FD7DAB7F9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{92ED8783-D45A-48FD-9B94-DD1FD7DAB7F9}.Debug|Win32.Build.0 = Debug|Win32
+		{92ED8783-D45A-48FD-9B94-DD1FD7DAB7F9}.Release|Win32.ActiveCfg = Release|Win32
+		{92ED8783-D45A-48FD-9B94-DD1FD7DAB7F9}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
