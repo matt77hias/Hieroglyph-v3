@@ -463,10 +463,6 @@ void App::CreateTerrainShaders()
 	// Assign default state
 	m_pTerrainEffect->m_iRasterizerState = m_bSolidRender ? m_rsSolid : m_rsWireframe;
 
-	// Create default depth/stencil state
-	DepthStencilStateConfigDX11 dsConfig;
-	m_pTerrainEffect->m_iDepthStencilState = m_pRenderer11->CreateDepthStencilState( &dsConfig );
-
 	Log::Get().Write( L"Created all shaders" );
 }
 //--------------------------------------------------------------------------------

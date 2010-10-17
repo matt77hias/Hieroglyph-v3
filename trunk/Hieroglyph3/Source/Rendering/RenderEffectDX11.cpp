@@ -42,12 +42,18 @@ void RenderEffectDX11::ConfigurePipeline( PipelineManagerDX11* pPipeline, Parame
 
 	if ( m_iBlendState != -1 )
 		pPipeline->SetBlendState( m_iBlendState );
+	else
+		pPipeline->SetBlendState( 0 );
 
 	if ( m_iDepthStencilState != -1 )
 		pPipeline->SetDepthStencilState( m_iDepthStencilState );
+	else
+		pPipeline->SetDepthStencilState( 0 );
 
 	if ( m_iRasterizerState != -1 )
 		pPipeline->SetRasterizerState( m_iRasterizerState );
+	else
+		pPipeline->SetRasterizerState( 0 );
 
 	// For the shaders, we bind each one even if the shader is not valid in this
 	// render effect.  This allows for various pipeline stages to be disabled when
