@@ -16,6 +16,7 @@
 #include "Texture2dConfigDX11.h"
 
 #include "RasterizerStateConfigDX11.h"
+#include "DepthStencilStateConfigDX11.h"
 #include "ParameterManagerDX11.h"
 #include "SamplerParameterDX11.h"
 #include "ShaderResourceParameterDX11.h"
@@ -157,7 +158,7 @@ void App::Initialize()
 	CreateTerrainTextures();
 
 	// Set initial shader values
-	Vector4f vMinMaxDist = Vector4f( 0.25f, 8.0f, /* unused */ 0.0f, /* unused */ 0.0f );
+	Vector4f vMinMaxDist = Vector4f( 2.0f, 15.0f, /* unused */ 0.0f, /* unused */ 0.0f );
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( L"minMaxDistance", &vMinMaxDist );
 
 	Vector4f vMinMaxLod = Vector4f( 1.0f, 8.0f, /* unused */ 0.0f, /* unused */ 0.0f );
@@ -204,6 +205,9 @@ void App::Update()
 
 		// Rasterizer State
 		out << L"\n W : Toggle Wireframe Display";
+
+		// Show LOD or Shading?
+		out << L"\n D : Toggle Debug Colour Display";
 
 		// Advanced LoD
 		out << L"\n L : Toggle LoD Complexity";
@@ -273,6 +277,10 @@ bool App::HandleEvent( IEvent* pEvent )
 			// Toggle Wireframe
 			m_bSolidRender = !m_bSolidRender;
 			m_pTerrainEffect->m_iRasterizerState = m_bSolidRender ? m_rsSolid : m_rsWireframe;
+		}
+		else if ( 'D' == key )
+		{
+			// Debug colours - show LOD or N-dot-L shading
 		}
 		else if ( 'L' == key )
 		{
@@ -445,7 +453,7 @@ void App::CreateTerrainShaders()
 	RasterizerStateConfigDX11 RS;
 	
 	RS.FillMode = D3D11_FILL_WIREFRAME;
-	RS.CullMode = D3D11_CULL_FRONT;
+	RS.CullMode = D3D11_CULL_NONE;
 	m_rsWireframe = m_pRenderer11->CreateRasterizerState( &RS );
 
 	RS.FillMode = D3D11_FILL_SOLID;
@@ -454,6 +462,10 @@ void App::CreateTerrainShaders()
 
 	// Assign default state
 	m_pTerrainEffect->m_iRasterizerState = m_bSolidRender ? m_rsSolid : m_rsWireframe;
+
+	// Create default depth/stencil state
+	DepthStencilStateConfigDX11 dsConfig;
+	m_pTerrainEffect->m_iDepthStencilState = m_pRenderer11->CreateDepthStencilState( &dsConfig );
 
 	Log::Get().Write( L"Created all shaders" );
 }
@@ -532,7 +544,7 @@ void App::UpdateViewState()
 		float toAngle = fmodf( (distance + 0.08f) * 2.0f * D3DX_PI, 2.0f * D3DX_PI); // ~30 degrees in front
 
 		vLookFrom.x = sinf(fromAngle) * 10.0f;
-		vLookFrom.y = 3.f;
+		vLookFrom.y = 5.f;
 		vLookFrom.z = cosf(fromAngle) * 10.0f;
 
 		vLookAt.x = sinf(toAngle) * 3.0f;
@@ -545,7 +557,7 @@ void App::UpdateViewState()
 
 		// Create the projection matrix
 		Matrix4f mProj;
-		D3DXMatrixPerspectiveFovLH( reinterpret_cast<D3DXMATRIX*>(&mProj), static_cast< float >(D3DX_PI) / 3.0f, static_cast<float>(m_pWindow->GetWidth()) /  static_cast<float>(m_pWindow->GetHeight()), 0.1f, 50.0f );
+		D3DXMatrixPerspectiveFovLH( reinterpret_cast<D3DXMATRIX*>(&mProj), static_cast< float >(D3DX_PI) / 3.0f, static_cast<float>(m_pWindow->GetWidth()) /  static_cast<float>(m_pWindow->GetHeight()), 1.0f, 25.0f );
 
 		// Composite together for the final transform
 		Matrix4f mViewProj = mView * mProj;
