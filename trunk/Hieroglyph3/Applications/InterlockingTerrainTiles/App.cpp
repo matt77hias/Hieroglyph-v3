@@ -35,13 +35,15 @@ App::App()
 	m_bSaveScreenshot = false;
 	m_bViewPointInAutoMode = true;
 	m_bSolidRender = false;
+	m_smCurrentShading = SolidColour; // best for wireframe
+	m_bSimpleComplexity = true;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
 {
 	// The application currently supplies the 
-	int width = 400;
-	int height = 300;
+	int width = 800;
+	int height = 600;
 	bool windowed = true;
 
 	// Set the render window parameters and initialize the window
@@ -156,9 +158,11 @@ void App::Initialize()
 	CreateTerrainGeometry();
 	CreateTerrainShaders();
 	CreateTerrainTextures();
+	CreateComputeShaderResources();
+	RunComputeShader();
 
 	// Set initial shader values
-	Vector4f vMinMaxDist = Vector4f( 2.0f, 15.0f, /* unused */ 0.0f, /* unused */ 0.0f );
+	Vector4f vMinMaxDist = Vector4f( 4.0f, 14.0f, /* unused */ 0.0f, /* unused */ 0.0f );
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( L"minMaxDistance", &vMinMaxDist );
 
 	Vector4f vMinMaxLod = Vector4f( 1.0f, 8.0f, /* unused */ 0.0f, /* unused */ 0.0f );
@@ -237,6 +241,7 @@ void App::Shutdown()
 	// Safely dispose of our rendering resource
 	SAFE_RELEASE( m_pTerrainGeometry );
 	SAFE_DELETE( m_pTerrainEffect );
+	SAFE_DELETE( m_pComputeShaderEffect );
 
 	// Print the framerate out for the log before shutting down.
 	std::wstringstream out;
@@ -281,10 +286,21 @@ bool App::HandleEvent( IEvent* pEvent )
 		else if ( 'D' == key )
 		{
 			// Debug colours - show LOD or N-dot-L shading
+			switch( m_smCurrentShading )
+			{
+				case SolidColour:	m_smCurrentShading = SimpleShading; break;
+				case SimpleShading: m_smCurrentShading = LodDebugView; break;
+				case LodDebugView:	m_smCurrentShading = SolidColour; break;
+			}
+
+			m_pTerrainEffect->m_iDomainShader = m_TerrainDomainShaders[ m_smCurrentShading ];
 		}
 		else if ( 'L' == key )
 		{
 			// Toggle between simple and CS-based LOD
+			m_bSimpleComplexity = !m_bSimpleComplexity;
+
+			m_pTerrainEffect->m_iHullShader = m_bSimpleComplexity ? m_iSimpleHullShader : m_iComplexHullShader;
 		}
 		else if ( 'A' == key )
 		{
@@ -410,24 +426,39 @@ void App::CreateTerrainShaders()
 	Log::Get().Write( L"... vertex shader created" );
 
 	// Create the hull shader
-	m_pTerrainEffect->m_iHullShader = 
-		m_pRenderer11->LoadShader( HULL_SHADER,
-		std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ),
-		std::wstring( L"hsMain" ),
-		std::wstring( L"hs_5_0" ) );
-	_ASSERT( -1 != m_pTerrainEffect->m_iHullShader );
+	m_iSimpleHullShader = m_pRenderer11->LoadShader( HULL_SHADER,
+							std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ),
+							std::wstring( L"hsSimple" ),
+							std::wstring( L"hs_5_0" ) );
+	_ASSERT( -1 != m_iSimpleHullShader );
+
+	m_iComplexHullShader = m_pRenderer11->LoadShader( HULL_SHADER,
+							std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ),
+							std::wstring( L"hsComplex" ),
+							std::wstring( L"hs_5_0" ) );
+	_ASSERT( -1 != m_iComplexHullShader );
+
+	m_pTerrainEffect->m_iHullShader = m_bSimpleComplexity ? m_iSimpleHullShader : m_iComplexHullShader;
 
 	Log::Get().Write( L"... hull shader created" );
 
-	// Create the domain shader
-	m_pTerrainEffect->m_iDomainShader = 
-		m_pRenderer11->LoadShader( DOMAIN_SHADER,
-		std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ),
-		std::wstring( L"dsMain" ),
-		std::wstring( L"ds_5_0" ) );
-	_ASSERT( -1 != m_pTerrainEffect->m_iDomainShader );
+	// Create the domain shaders
 
-	Log::Get().Write( L"... domain shader created" );
+	D3D10_SHADER_MACRO dsSolid[2] = { "SHADING_SOLID", "1", NULL, NULL };
+	m_TerrainDomainShaders[SolidColour] = m_pRenderer11->LoadShader( DOMAIN_SHADER, std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ), std::wstring( L"dsMain" ), std::wstring( L"ds_5_0" ), dsSolid );
+	_ASSERT( -1 != m_TerrainDomainShaders[SolidColour] );
+
+	D3D10_SHADER_MACRO dsShaded[2] = { "SHADING_SIMPLE", "1", NULL, NULL };
+	m_TerrainDomainShaders[SimpleShading] = m_pRenderer11->LoadShader( DOMAIN_SHADER, std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ), std::wstring( L"dsMain" ), std::wstring( L"ds_5_0" ), dsShaded );
+	_ASSERT( -1 != m_TerrainDomainShaders[SimpleShading] );
+
+	D3D10_SHADER_MACRO dsDebug[2] = { "SHADING_DEBUG_LOD", "1", NULL, NULL };
+	m_TerrainDomainShaders[LodDebugView] = m_pRenderer11->LoadShader( DOMAIN_SHADER, std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ), std::wstring( L"dsMain" ), std::wstring( L"ds_5_0" ), dsDebug );
+	_ASSERT( -1 != m_TerrainDomainShaders[LodDebugView] );
+
+	m_pTerrainEffect->m_iDomainShader = m_TerrainDomainShaders[ m_smCurrentShading ];
+
+	Log::Get().Write( L"... domain shaders created" );
 
 	// Create the geometry shader
 	m_pTerrainEffect->m_iGeometryShader = 
@@ -536,11 +567,11 @@ void App::UpdateViewState()
 
 		// based on time, determine where the camera is at and where it should look to
 		float distance = time / 30.0f; // 30 seconds to do a single circuit
-		float fromAngle = fmodf( distance * 2.0f * D3DX_PI, 2.0f * D3DX_PI);
-		float toAngle = fmodf( (distance + 0.08f) * 2.0f * D3DX_PI, 2.0f * D3DX_PI); // ~30 degrees in front
+		float fromAngle = fmodf( distance * 2.0f * static_cast<float>(D3DX_PI), 2.0f * static_cast<float>(D3DX_PI));
+		float toAngle = fmodf( (distance + 0.08f) * 2.0f * static_cast<float>(D3DX_PI), 2.0f * static_cast<float>(D3DX_PI)); // ~30 degrees in front
 
 		vLookFrom.x = sinf(fromAngle) * 10.0f;
-		vLookFrom.y = 5.f;
+		vLookFrom.y = 4.f;
 		vLookFrom.z = cosf(fromAngle) * 10.0f;
 
 		vLookAt.x = sinf(toAngle) * 3.0f;
@@ -571,5 +602,57 @@ void App::UpdateViewState()
 		// Else, if in 'manual' mode then update according to the
 		// current user's input
 	}
+}
+//--------------------------------------------------------------------------------
+void App::CreateComputeShaderResources()
+{
+	Log::Get().Write( L"Creating compute shader resources" );
+
+	// Assert on the input texture dimensions
+	D3D11_TEXTURE2D_DESC d = m_pHeightMapTexture->m_pTexture2dConfig->GetTextureDesc();
+	_ASSERT( 0 == (d.Width % 16) );
+	_ASSERT( 0 == (d.Height % 16) );
+
+	// Create the output texture
+	Texture2dConfigDX11 LookupTextureConfig;
+	LookupTextureConfig.SetFormat( DXGI_FORMAT_R32G32B32A32_FLOAT );
+	LookupTextureConfig.SetColorBuffer( TERRAIN_X_LEN, TERRAIN_Z_LEN ); 
+	LookupTextureConfig.SetBindFlags( D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE );
+
+	m_pLodLookupTexture = m_pRenderer11->CreateTexture2D( &LookupTextureConfig, 0 );
+
+	// Create the effect
+	SAFE_DELETE( m_pComputeShaderEffect );
+	m_pComputeShaderEffect = new RenderEffectDX11( );
+
+	// Compile the compute shader
+	m_pComputeShaderEffect->m_iComputeShader = 
+		m_pRenderer11->LoadShader( COMPUTE_SHADER,
+		std::wstring( L"../Data/Shaders/InterlockingTerrainTilesComputeShader.hlsl" ),
+		std::wstring( L"csMain" ),
+		std::wstring( L"cs_5_0" ) );
+	_ASSERT( -1 != m_pComputeShaderEffect->m_iComputeShader );
+
+	Log::Get().Write( L"Compute Shader Resources Created" );
+}
+//--------------------------------------------------------------------------------
+void App::RunComputeShader()
+{
+	Log::Get().Write( L"Running Compute Shader Pre-Pass" );
+
+	// Bind the resources
+	m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"bufferResults", m_pLodLookupTexture );
+	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"texHeightMap", m_pHeightMapTexture );
+
+	// Determine number of threads
+	D3D11_TEXTURE2D_DESC d = m_pHeightMapTexture->m_pTexture2dConfig->GetTextureDesc();
+
+	// Run the compute shader
+	m_pRenderer11->pImmPipeline->Dispatch( *m_pComputeShaderEffect, d.Width / 16, d.Height / 16, 1, m_pRenderer11->m_pParamMgr );
+
+	// Bind the output to the hull shader
+	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"texLODLookup", m_pLodLookupTexture );
+
+	Log::Get().Write( L"Compute Shader Pre-Pass Complete" );
 }
 //--------------------------------------------------------------------------------

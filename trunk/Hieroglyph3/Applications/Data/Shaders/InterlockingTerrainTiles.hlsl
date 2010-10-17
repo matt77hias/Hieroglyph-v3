@@ -9,8 +9,9 @@ cbuffer main
 	matrix mInvTposeWorld;
 };
 
-Texture2D	texHeightMap : register( t0 );
-SamplerState smpHeightMap : register( s0 );
+Texture2D				texHeightMap	: register( t0 );
+Texture2D				texLODLookup	: register( t1 );
+SamplerState			smpHeightMap	: register( s0 );
 
 cbuffer patch
 {
@@ -123,6 +124,49 @@ float3 Sobel( float2 tc )
 	return normalize( float3( 2.0f * Gx, Gz, 2.0f * Gy ) );
 }
 
+float4 ReadLookup(uint2 idx)
+{
+	return texLODLookup.Load( uint3( idx, 0 ) );
+}
+
+uint2 ComputeLookupIndex(uint patch, int xOffset, int zOffset)
+{
+	// For a 64x64 grid there will be 4096 patches
+	// thus 'patch' is 0-4095, we need to decode
+	// this into an XY coordinate
+	uint2 p;
+	
+	p.x = patch % 64;
+	p.y = (uint)floor((float)patch / 64.0f);
+	
+	// With the XY coordinate for the patch being rendered we
+	// then need to offset it according to the parameters
+	p.x = clamp(p.x + xOffset, 0, 63);
+	p.y = clamp(p.y + zOffset, 0, 63);
+	
+	return p;
+}
+
+float ComputePatchLODUsingLookup(float3 midpoint, float4 lookup)
+{
+	float lod;
+	
+	// Compute the distance coefficient.
+	// will be 0.0 when at the camera, 1.0 when furthest away
+	float d = clamp( distance( cameraPosition.xyz, midpoint ), minMaxLOD.x, minMaxLOD.y );
+	d = (d - minMaxLOD.x) / (minMaxLOD.y - minMaxLOD.x);
+	
+	// lookup:
+	//	x,y,z = patch normal
+	//	w = standard deviation from patch plane
+	
+	lod = dot( float2( 1.0f - d, lookup.w ), float2( 0.2f, 0.8f ) );
+	
+	lod = lerp( minMaxLOD.x, minMaxLOD.y, lod );
+	
+	return clamp( lod, minMaxLOD.x, minMaxLOD.y );
+}
+
 // ---------------------------
 // V E R T E X   S H A D E R S
 // ---------------------------
@@ -212,7 +256,118 @@ HS_PER_PATCH_OUTPUT hsPerPatch( InputPatch<VS_OUTPUT, 12> ip, uint PatchID : SV_
 [outputtopology("triangle_cw")]
 [outputcontrolpoints(4)]
 [patchconstantfunc("hsPerPatch")]
-HS_OUTPUT hsMain( InputPatch<VS_OUTPUT, 12> p, 
+HS_OUTPUT hsSimple( InputPatch<VS_OUTPUT, 12> p, 
+                                     uint i : SV_OutputControlPointID,
+                                     uint PatchID : SV_PrimitiveID )
+{
+	// NOTE: This code is executed for each control point
+	//		 so must index on 'i'
+	HS_OUTPUT o = (HS_OUTPUT)0;
+	
+	// Simply pass through the value for now
+	o.position = p[i].position;
+	o.texCoord = p[i].texCoord;
+	
+	return o;
+}
+
+HS_PER_PATCH_OUTPUT hsPerPatchWithLookup( InputPatch<VS_OUTPUT, 12> ip, uint PatchID : SV_PrimitiveID )
+{	
+    HS_PER_PATCH_OUTPUT o = (HS_PER_PATCH_OUTPUT)0;
+    
+    // Grab the lookup values for these patches
+    float4 tileLookup[] = 
+    {
+		// Main quad
+		ReadLookup( ComputeLookupIndex( PatchID, 0, 0 ) )
+		
+		// +x neighbour
+		, ReadLookup( ComputeLookupIndex( PatchID, 0, 1 ) )
+		
+		// +z neighbour
+		, ReadLookup( ComputeLookupIndex( PatchID, 1, 0 ) )
+		
+		// -x neighbour
+		, ReadLookup( ComputeLookupIndex( PatchID, 0, -1 ) )
+		
+		// -z neighbour
+		, ReadLookup( ComputeLookupIndex( PatchID, -1, 0 ) )
+    };
+    
+    // Determine the mid-point of this patch
+    float3 midPoints[] =
+    {
+		// Main quad
+		ComputePatchMidPoint( ip[0].position, ip[1].position, ip[2].position, ip[3].position )
+		
+		// +x neighbour
+		, ComputePatchMidPoint( ip[2].position, ip[3].position, ip[4].position, ip[5].position )
+		
+		// +z neighbour
+		, ComputePatchMidPoint( ip[1].position, ip[3].position, ip[6].position, ip[7].position )
+		
+		// -x neighbour
+		, ComputePatchMidPoint( ip[0].position, ip[1].position, ip[8].position, ip[9].position )
+		
+		// -z neighbour
+		, ComputePatchMidPoint( ip[0].position, ip[2].position, ip[10].position, ip[11].position )
+    };
+    
+    // Determine the LOD for each patch
+    float detail[] = 
+    {
+		// Main quad
+		ComputePatchLODUsingLookup( midPoints[0], tileLookup[0] )
+		
+		// +x neighbour
+		, ComputePatchLODUsingLookup( midPoints[1], tileLookup[1] )
+		
+		// +z neighbour
+		, ComputePatchLODUsingLookup( midPoints[2], tileLookup[2] )
+		
+		// -x neighbour
+		, ComputePatchLODUsingLookup( midPoints[3], tileLookup[3] )
+		
+		// -z neighbour
+		, ComputePatchLODUsingLookup( midPoints[4], tileLookup[4] )
+    };
+    
+    // Set it up so that this patch always has an interior matching
+    // the patch LOD.
+    o.insideTesselation[0] = 
+		o.insideTesselation[1] = detail[0];
+        
+    // For the edges its more complex as we have to match
+    // the neighbouring patches. The rule in this case is:
+    //
+    // - If the neighbour patch is of a lower LOD we
+    //   pick that LOD as the edge for this patch.
+    //
+    // - If the neighbour patch is a higher LOD then 
+    //   we stick with our LOD and expect them to blend down
+    //   towards us
+    
+    /*
+    o.edgeTesselation[0] = min( detail[0], detail[3] );
+    o.edgeTesselation[1] = min( detail[0], detail[4] );    
+    o.edgeTesselation[2] = min( detail[0], detail[1] );
+	o.edgeTesselation[3] = min( detail[0], detail[2] );
+	*/
+	
+	o.edgeTesselation[0] = min( detail[0], detail[4] );    
+    o.edgeTesselation[1] = min( detail[0], detail[3] );
+	o.edgeTesselation[2] = min( detail[0], detail[2] );
+	o.edgeTesselation[3] = min( detail[0], detail[1] );
+	
+    return o;
+}
+
+[domain("quad")]
+[partitioning("fractional_odd")]
+[outputtopology("triangle_cw")]
+[outputcontrolpoints(4)]
+[patchconstantfunc("hsPerPatchWithLookup")]
+HS_OUTPUT hsComplex( InputPatch<VS_OUTPUT, 12> p, 
                                      uint i : SV_OutputControlPointID,
                                      uint PatchID : SV_PrimitiveID )
 {
@@ -284,46 +439,50 @@ DS_OUTPUT dsMain( HS_PER_PATCH_OUTPUT input,
     // to the GS, but no need this time!
     o.position = mul( float4( o.wPos, 1.0f ), mViewProj );
     
-    // Perform a sobel filter on the heightmap to determine an appropriate
-    // normal vector
-    float3 normal = Sobel( texcoord );
+    #if defined( SHADING_SOLID )
     
-    normal = normalize( mul( float4(normal, 1.0f), mInvTposeWorld ).xyz );
+		o.colour = float3( 0.0f, 0.0f, 0.0f );
     
-    o.colour.rg = float2( 0.25f, 0.25f );
-    o.colour.b = max(0.25f, dot( normal, normalize( cameraPosition.xyz ) ) );
+    #elif defined( SHADING_SIMPLE )
     
-    //float lod = finalVertexCoord.y;
-    float lod = (input.insideTesselation[0] - minMaxLOD.x) / (minMaxLOD.y - minMaxLOD.x);
+		// Perform a sobel filter on the heightmap to determine an appropriate
+		// normal vector
+		float3 normal = Sobel( texcoord );
+		normal = normalize( mul( float4(normal, 1.0f), mInvTposeWorld ).xyz );
+		o.colour = min(0.75f, max(0.0f, dot( normal, float3( 0.0f, 1.0f, 0.0f ) ) ) );
     
-    if( lod > 0.75f )
-    {
-		lod -= 0.75f;
-		lod /= 0.25f;
-		o.colour = lerp( float3(1.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 0.0f), lod);
-    }
-    else if( lod > 0.5f )
-    {
-		// High Detail
-		lod -= 0.5f;
-		lod /= 0.25f;
-		o.colour = lerp( float3(0.0f, 1.0f, 0.0f), float3(1.0f, 0.0f, 0.0f), lod);
-    }
-    else if( lod > 0.25f )
-    {
-		// Medium Detail
-		lod -= 0.25f;
-		lod /= 0.25f;
-		o.colour = lerp( float3(0.0f, 0.0f, 1.0f), float3(0.0f, 1.0f, 0.0f), lod);
-    }
-    else
-    {
-		// Low Detail
-		lod /= 0.25f;
-		o.colour = lerp( float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 1.0f), lod);
-    }
+    #elif defined( SHADING_DEBUG_LOD )
     
-    o.colour = min(0.75f, max(0.0f, dot( normal, float3( 0.0f, 1.0f, 0.0f ) ) ) );
+		float lod = (input.insideTesselation[0] - minMaxLOD.x) / (minMaxLOD.y - minMaxLOD.x);
+    
+		if( lod > 0.75f )
+		{
+			lod -= 0.75f;
+			lod /= 0.25f;
+			o.colour = lerp( float3(1.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 0.0f), lod);
+		}
+		else if( lod > 0.5f )
+		{
+			// High Detail
+			lod -= 0.5f;
+			lod /= 0.25f;
+			o.colour = lerp( float3(0.0f, 1.0f, 0.0f), float3(1.0f, 0.0f, 0.0f), lod);
+		}
+		else if( lod > 0.25f )
+		{
+			// Medium Detail
+			lod -= 0.25f;
+			lod /= 0.25f;
+			o.colour = lerp( float3(0.0f, 0.0f, 1.0f), float3(0.0f, 1.0f, 0.0f), lod);
+		}
+		else
+		{
+			// Low Detail
+			lod /= 0.25f;
+			o.colour = lerp( float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 1.0f), lod);
+		}
+    
+    #endif
     
     return o;    
 }

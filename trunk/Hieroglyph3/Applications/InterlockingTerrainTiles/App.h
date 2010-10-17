@@ -39,6 +39,7 @@ protected:
 	bool						m_bSaveScreenshot;
 	bool						m_bViewPointInAutoMode;
 	bool						m_bSolidRender;
+	bool						m_bSimpleComplexity;
 	
 	int							m_iSwapChain;
 	ResourcePtr					m_RenderTarget;
@@ -50,15 +51,32 @@ protected:
 	GeometryDX11*				m_pTerrainGeometry;
 	RenderEffectDX11*			m_pTerrainEffect;
 	ResourcePtr					m_pHeightMapTexture;
+	RenderEffectDX11*			m_pComputeShaderEffect;
+	ResourcePtr					m_pLodLookupTexture;
 
 	int							m_rsWireframe;
 	int							m_rsSolid;
 
-	static const int			TERRAIN_X_LEN = 8;
-	static const int			TERRAIN_Z_LEN = 8;
+	static const int			TERRAIN_X_LEN = 32;
+	static const int			TERRAIN_Z_LEN = 32;
+
+	enum ShadingMode
+	{
+		SolidColour,
+		SimpleShading,
+		LodDebugView
+	};
+
+	ShadingMode					m_smCurrentShading;
+	std::map<ShadingMode, int>	m_TerrainDomainShaders;
+
+	int							m_iComplexHullShader;
+	int							m_iSimpleHullShader;
 
 	virtual void CreateTerrainGeometry();
 	virtual void CreateTerrainShaders();
 	virtual void CreateTerrainTextures();
 	virtual void UpdateViewState();
+	virtual void CreateComputeShaderResources();
+	virtual void RunComputeShader();
 };
