@@ -220,7 +220,7 @@ namespace Glyph3
 
 		Vector2f GetDesktopResolution();
 
-		ResourcePtr LoadTexture( std::wstring filename );
+		ResourcePtr LoadTexture( std::wstring filename, D3DX11_IMAGE_LOAD_INFO* pLoadInfo = NULL );
 
 		// These functions are used to convert the enumerated values to human readable text.
 		// This is convenient for logging or displaying various states.

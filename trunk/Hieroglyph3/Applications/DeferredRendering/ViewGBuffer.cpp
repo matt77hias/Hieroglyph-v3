@@ -21,34 +21,13 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-ViewGBuffer::ViewGBuffer( RendererDX11& Renderer, TArray<ResourcePtr>& GBufferTargets, ResourcePtr DepthTarget )
-	: m_GBufferTargets( GBufferTargets ), m_DepthTarget( DepthTarget )
+ViewGBuffer::ViewGBuffer( RendererDX11& Renderer, ResourcePtr DepthTarget )
+    : m_Renderer( Renderer ) , m_DepthTarget( DepthTarget )
 {
 	m_sParams.iViewType = VT_GBUFFER;
 
 	ViewMatrix.MakeIdentity();
-	ProjMatrix.MakeIdentity();	
-
-	// Create the viewport based on the first render target
-	ResourceDX11* pResource = Renderer.GetResource( m_GBufferTargets[0]->m_iResource & 0x0000ffff );
-
-	if ( pResource->GetType() == D3D11_RESOURCE_DIMENSION_TEXTURE2D )
-	{
-		Texture2dDX11* pTexture = (Texture2dDX11*)pResource;
-		D3D11_TEXTURE2D_DESC desc = pTexture->GetActualDescription();
-
-		// Create a view port to use on the scene.  This basically selects the 
-		// entire floating point area of the render target.
-		D3D11_VIEWPORT viewport;
-		viewport.Width = static_cast< float >( desc.Width );
-		viewport.Height = static_cast< float >( desc.Height );
-		viewport.MinDepth = 0.0f;
-		viewport.MaxDepth = 1.0f;
-		viewport.TopLeftX = 0;
-		viewport.TopLeftY = 0;
-
-		m_iViewport = Renderer.CreateViewPort( viewport );
-	}
+	ProjMatrix.MakeIdentity();		
 
 	// Create the depth stencil view. We'll enable stencil writes and depth writes
 	DepthStencilStateConfigDX11 dsConfig;
@@ -139,3 +118,28 @@ void ViewGBuffer::SetUsageParams( ParameterManagerDX11* pParamManager )
 
 }
 //--------------------------------------------------------------------------------
+void ViewGBuffer::SetGBufferTargets( TArray<ResourcePtr>& GBufferTargets )
+{
+    m_GBufferTargets = GBufferTargets;    
+
+    // Create the viewport based on the first render target
+    ResourceDX11* pResource = m_Renderer.GetResource( m_GBufferTargets[0]->m_iResource & 0x0000ffff );
+
+    if ( pResource->GetType() == D3D11_RESOURCE_DIMENSION_TEXTURE2D )
+    {
+        Texture2dDX11* pTexture = (Texture2dDX11*)pResource;
+        D3D11_TEXTURE2D_DESC desc = pTexture->GetActualDescription();
+
+        // Create a view port to use on the scene.  This basically selects the 
+        // entire floating point area of the render target.
+        D3D11_VIEWPORT viewport;
+        viewport.Width = static_cast< float >( desc.Width );
+        viewport.Height = static_cast< float >( desc.Height );
+        viewport.MinDepth = 0.0f;
+        viewport.MaxDepth = 1.0f;
+        viewport.TopLeftX = 0;
+        viewport.TopLeftY = 0;
+
+        m_iViewport = m_Renderer.CreateViewPort( viewport );
+    }
+}

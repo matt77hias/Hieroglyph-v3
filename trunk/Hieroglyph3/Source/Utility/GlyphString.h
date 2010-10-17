@@ -15,7 +15,7 @@
 #ifndef GlyphString_h
 #define GlyphString_h
 //--------------------------------------------------------------------------------
-#include <string>
+#include "PCH.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -23,12 +23,21 @@ namespace Glyph3
 	{
 	public:
 		static std::string ToAscii( std::wstring& input );
-		static std::wstring ToUnicode( std::string& input );
+		static std::wstring ToUnicode( std::string& input );            
 
 	private:
 		GlyphString();
 		
 	};
+
+    // Converts a number to a string
+    template<typename T> inline std::wstring ToString(const T& val)
+    {
+        std::wostringstream stream;
+        if (!(stream << val))
+            return L"";
+        return stream.str();
+    }
 };
 #endif // GlyphString_h
 

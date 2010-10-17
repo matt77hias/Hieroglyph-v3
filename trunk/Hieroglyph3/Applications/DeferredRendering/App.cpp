@@ -36,10 +36,17 @@ void ChangeParameter( T& parameter, int maxValue )
     parameter = static_cast<T>( val );
 }
 //--------------------------------------------------------------------------------
+Vector3f Lerp( const Vector3f& x, const Vector3f& y, const Vector3f& s )
+{
+    return x + s * ( y - x );
+}
+//--------------------------------------------------------------------------------
 App::App()
 {
 	m_bSaveScreenshot = false;
     m_DisplayMode = Final;
+    m_LightMode = Lights3x3x3;
+    m_bEnableGBufferOpt = false;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
@@ -102,13 +109,28 @@ bool App::ConfigureEngineComponents()
 	// use later.
 	m_BackBuffer = m_pRenderer11->GetSwapChainResource( m_pWindow->GetSwapChain() );
 
-	// Create the render targets for our G-Buffer
+	// Create the render targets for our unoptimized G-Buffer, which just uses 
+    // 32-bit floats for everything
 	Texture2dConfigDX11 RTConfig;
 	RTConfig.SetColorBuffer( width, height );
 	RTConfig.SetFormat( DXGI_FORMAT_R32G32B32A32_FLOAT );
     RTConfig.SetBindFlags( D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET );
 	for(int i = 0; i < 4; ++i)
-		m_GBufferTargets.add( m_pRenderer11->CreateTexture2D( &RTConfig, NULL ) );
+		m_GBuffer.add( m_pRenderer11->CreateTexture2D( &RTConfig, NULL ) );
+
+    // Create the render targets for our optimized G-Buffer
+
+    // 2-component signed normalized format for spheremap-encoded normals
+    RTConfig.SetFormat( DXGI_FORMAT_R16G16_SNORM );
+    m_OptimizedGBuffer.add( m_pRenderer11->CreateTexture2D( &RTConfig, NULL ) );
+
+    // 3-component 10-bit unsigned normalized format for diffuse albedo
+    RTConfig.SetFormat( DXGI_FORMAT_R10G10B10A2_UNORM );
+    m_OptimizedGBuffer.add( m_pRenderer11->CreateTexture2D( &RTConfig, NULL ) );
+
+    // 4-component 8-bit unsigned normalized format for specular albedo and power
+    RTConfig.SetFormat( DXGI_FORMAT_R8G8B8A8_UNORM );
+    m_OptimizedGBuffer.add( m_pRenderer11->CreateTexture2D( &RTConfig, NULL ) );
 
 	// Next we create a depth buffer for depth/stencil testing, and for depth readback
 	Texture2dConfigDX11 DepthTexConfig;
@@ -164,7 +186,7 @@ void App::Initialize()
 {
 	// Get some information about the render target before initializing.
 
-	D3D11_TEXTURE2D_DESC desc = m_GBufferTargets[0]->m_pTexture2dConfig->GetTextureDesc();
+	D3D11_TEXTURE2D_DESC desc = m_GBuffer[0]->m_pTexture2dConfig->GetTextureDesc();
 
 	unsigned int ResolutionX = desc.Width;
 	unsigned int ResolutionY = desc.Height;
@@ -176,39 +198,57 @@ void App::Initialize()
 	pGeometry->LoadToBuffers();	
 	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
-	// Create the material for use by the entity.
-	MaterialDX11* pMaterial = new MaterialDX11();
-
-	// Create and fill the effect that will be used for this view type
-	RenderEffectDX11* pGBufferEffect = new RenderEffectDX11();
-
-	pGBufferEffect->m_iVertexShader = 
+	// We'll make 2 effects for filling the G-Buffer: one without optimizations, and one with
+    m_pGBufferEffect = new RenderEffectDX11();
+	m_pGBufferEffect->m_iVertexShader = 
 		m_pRenderer11->LoadShader( VERTEX_SHADER,
 		std::wstring( L"../Data/Shaders/GBuffer.hlsl" ),
 		std::wstring( L"VSMain" ),
 		std::wstring( L"vs_5_0" ) );
-    _ASSERT( pGBufferEffect->m_iVertexShader != -1 );
-	pGBufferEffect->m_iPixelShader = 
+    _ASSERT( m_pGBufferEffect->m_iVertexShader != -1 );
+	m_pGBufferEffect->m_iPixelShader = 
 		m_pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"../Data/Shaders/GBuffer.hlsl" ),
 		std::wstring( L"PSMain" ),
 		std::wstring( L"ps_5_0" ) );
-    _ASSERT( pGBufferEffect->m_iPixelShader != -1 );
+    _ASSERT( m_pGBufferEffect->m_iPixelShader != -1 );
 
-    // Load textures
-    m_DiffuseTexture = m_pRenderer11->LoadTexture( std::wstring( L"../Data/Textures/Hex.png" ) );
+    m_pOptGBufferEffect = new RenderEffectDX11();
+    m_pOptGBufferEffect->m_iVertexShader = 
+        m_pRenderer11->LoadShader( VERTEX_SHADER,
+        std::wstring( L"../Data/Shaders/GBuffer.hlsl" ),
+        std::wstring( L"VSMainOptimized" ),
+        std::wstring( L"vs_5_0" ) );
+    _ASSERT( m_pOptGBufferEffect->m_iVertexShader != -1 );
+    m_pOptGBufferEffect->m_iPixelShader = 
+        m_pRenderer11->LoadShader( PIXEL_SHADER,
+        std::wstring( L"../Data/Shaders/GBuffer.hlsl" ),
+        std::wstring( L"PSMainOptimized" ),
+        std::wstring( L"ps_5_0" ) );
+    _ASSERT( m_pOptGBufferEffect->m_iPixelShader != -1 );
+
+    m_pMaterial = new MaterialDX11();
+
+    // Load textures. For the diffuse map, we'll specify that we want an sRGB format so that
+    // the texture data is gamma-corrected when sampled in the shader
+    D3DX11_IMAGE_LOAD_INFO loadInfo;
+    loadInfo.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    m_DiffuseTexture = m_pRenderer11->LoadTexture( std::wstring( L"../Data/Textures/Hex.png" ), &loadInfo );
     m_NormalMap = m_pRenderer11->LoadTexture( std::wstring( L"../Data/Textures/Hex_Normal.png" ) );
+
+    _ASSERT( m_DiffuseTexture->m_iResource != -1 );
+    _ASSERT( m_NormalMap->m_iResource != -1 );
     
     // Set the texture parameters
     ShaderResourceParameterDX11* pDiffuseParam = new ShaderResourceParameterDX11();
     pDiffuseParam->SetParameterData( &m_DiffuseTexture->m_iResourceSRV );
     pDiffuseParam->SetName( std::wstring( L"DiffuseMap" ) );
-    pMaterial->AddRenderParameter( pDiffuseParam );
+    m_pMaterial->AddRenderParameter( pDiffuseParam );
 
     ShaderResourceParameterDX11* pNormalMapParam = new ShaderResourceParameterDX11();
     pNormalMapParam->SetParameterData( &m_NormalMap->m_iResourceSRV );
     pNormalMapParam->SetName( std::wstring( L"NormalMap" ) );
-    pMaterial->AddRenderParameter( pNormalMapParam );
+    m_pMaterial->AddRenderParameter( pNormalMapParam );
 
     // Create a sampler state
     D3D11_SAMPLER_DESC sampDesc;
@@ -228,11 +268,11 @@ void App::Initialize()
     SamplerParameterDX11* pSamplerParam = new SamplerParameterDX11();
     pSamplerParam->SetParameterData( &samplerState );
     pSamplerParam->SetName( std::wstring( L"AnisoSampler" ) );
-    pMaterial->AddRenderParameter( pSamplerParam );
+    m_pMaterial->AddRenderParameter( pSamplerParam );
 
 	// Enable the material to render the given view type, and set its effect.
-	pMaterial->Params[VT_GBUFFER].bRender = true;
-	pMaterial->Params[VT_GBUFFER].pEffect = pGBufferEffect;    
+	m_pMaterial->Params[VT_GBUFFER].bRender = true;
+	m_pMaterial->Params[VT_GBUFFER].pEffect = m_pGBufferEffect;    
 
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
@@ -240,36 +280,17 @@ void App::Initialize()
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.407f, -0.707f, 0.0f ) );
 	m_pCamera->GetNode()->Position() = Vector3f( 4.0f, 4.5f, -4.0f );
 
-	m_pGBufferView = new ViewGBuffer( *m_pRenderer11, m_GBufferTargets, m_DepthTarget );
+	m_pGBufferView = new ViewGBuffer( *m_pRenderer11, m_DepthTarget );    
 
 	m_pCamera->SetCameraView( m_pGBufferView );
-	m_pCamera->SetProjectionParams( 0.1f, 500.0f, (float)D3DX_PI / 2.0f, (float)ResolutionX / (float)ResolutionY );
+	m_pCamera->SetProjectionParams( 1.0f, 15.0f, (float)D3DX_PI / 2.0f, (float)ResolutionX / (float)ResolutionY );
 
-    m_pLightsView = new ViewLights( *m_pRenderer11, m_BackBuffer, m_DepthTarget, m_GBufferTargets );
-
-    // Add some lights
-    Light light;
-    light.Type = Point;
-
-    for ( int x = -6; x <= 6; x += 3 ) 
-    {
-        for ( int y = 1; y <= 11; y += 3 )
-        {
-            for ( int z = -6; z <= 6; z += 3 )
-            {
-                light.Position = Vector3f( static_cast<float>( x ), static_cast<float>( y ), static_cast<float>( z ) );
-
-                float r = ( x + 6.0f ) / 11.0f;
-                float g = ( y - 1.0f ) / 9.0f;
-                float b = ( z + 6.0f ) / 11.0f;
-                light.Color = Vector3f( r, g, b ) * 1.5f;
-                m_pLightsView->AddLight( light );
-            }
-        }
-    }
+    m_pLightsView = new ViewLights( *m_pRenderer11, m_BackBuffer, m_DepthTarget );    
 
     // Bind the light view to the camera entity
+    m_pLightsView->SetEntity( m_pCamera->GetBody() );
     m_pLightsView->SetRoot( m_pCamera->GetNode() );
+    m_pLightsView->SetProjMatrix( m_pGBufferView->GetProjMatrix() );
 
 	// Create the scene and add the entities to it.  Then add the camera to the
 	// scene so that it will be updated via the scene interface instead of 
@@ -278,7 +299,7 @@ void App::Initialize()
 	m_pNode = new Node3D();
 	m_pEntity = new Entity3D();
 	m_pEntity->SetGeometry( pGeometry );
-	m_pEntity->SetMaterial( pMaterial, false );
+	m_pEntity->SetMaterial( m_pMaterial, false );
 	m_pEntity->Position() = Vector3f( 0.0f, 0.0f, 0.0f );  
 
 	m_pNode->AttachChild( m_pEntity );
@@ -287,6 +308,7 @@ void App::Initialize()
 	m_pScene->AddCamera( m_pCamera );
 
     m_SpriteRenderer.Initialize();
+    m_Font.Initialize( L"Arial", 14, 0, true );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -307,6 +329,8 @@ void App::Update()
 		m_pTimer->Runtime(), (float)m_pTimer->FrameCount() );
 
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"TimeFactors" ), &TimeFactors );
+
+    SetupViews();
 
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.
@@ -338,29 +362,40 @@ void App::Update()
         pImmPipeline->ApplyRenderTargets();
         pImmPipeline->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 
+        TArray<ResourcePtr>& gBuffer = m_bEnableGBufferOpt ? m_OptimizedGBuffer : m_GBuffer;
+
         ResourcePtr target;
         if ( m_DisplayMode == GBuffer )
         {
             Matrix4f mat = Matrix4f::Identity();
             mat = Matrix4f::ScaleMatrix( 0.5f ) *  Matrix4f::TranslationMatrix(0, 0, 0);
-            m_SpriteRenderer.Render( pImmPipeline, pParams, m_GBufferTargets[0], mat );
+            m_SpriteRenderer.Render( pImmPipeline, pParams, gBuffer[0], mat );
 
             mat = Matrix4f::ScaleMatrix( 0.5f ) *  Matrix4f::TranslationMatrix(640, 0, 0);
-            m_SpriteRenderer.Render( pImmPipeline, pParams, m_GBufferTargets[1], mat );
+            m_SpriteRenderer.Render( pImmPipeline, pParams, gBuffer[1], mat );
 
             mat = Matrix4f::ScaleMatrix( 0.5f ) *  Matrix4f::TranslationMatrix(0, 360, 0);
-            m_SpriteRenderer.Render( pImmPipeline, pParams, m_GBufferTargets[2], mat );
+            m_SpriteRenderer.Render( pImmPipeline, pParams, gBuffer[2], mat );
 
             mat = Matrix4f::ScaleMatrix( 0.5f ) *  Matrix4f::TranslationMatrix(640, 360, 0);
-            m_SpriteRenderer.Render( pImmPipeline, pParams, m_GBufferTargets[3], mat );
+
+            if ( m_bEnableGBufferOpt )
+                m_SpriteRenderer.Render( pImmPipeline, pParams, m_DepthTarget, mat );
+            else
+                m_SpriteRenderer.Render( pImmPipeline, pParams, gBuffer[3], mat );
         }
         else
         {
-            ResourcePtr target = m_GBufferTargets[ m_DisplayMode - Normals ];
+            ResourcePtr target;
+            if ( m_bEnableGBufferOpt && m_DisplayMode == Position )
+                target = m_DepthTarget;
+            else
+                target = gBuffer[ m_DisplayMode - Normals ];
             m_SpriteRenderer.Render( pImmPipeline, pParams, target, Matrix4f::Identity() );
-        }
-        
+        }        
     }
+
+    DrawHUD( );
 
 	// Perform the rendering and presentation for the window.
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
@@ -407,6 +442,18 @@ bool App::HandleEvent( IEvent* pEvent )
             return true;
         }
 
+        if ( key == 'N' )
+        {
+            ChangeParameter( m_LightMode, NumLightModes );
+            return true;
+        }
+
+        if ( key == 'K' )
+        {
+            m_bEnableGBufferOpt = !m_bEnableGBufferOpt;
+            return true;
+        }
+
 		return( true );
 	}
 	else if ( e == SYSTEM_KEYBOARD_KEYUP )
@@ -438,5 +485,104 @@ bool App::HandleEvent( IEvent* pEvent )
 std::wstring App::GetName( )
 {
 	return( std::wstring( L"BasicApplication" ) );
+}
+//--------------------------------------------------------------------------------
+void App::DrawHUD( )
+{
+    PipelineManagerDX11* pImmPipeline = m_pRenderer11->pImmPipeline;
+    ParameterManagerDX11* pParams = m_pRenderer11->m_pParamMgr;
+
+    static const std::wstring DisplayModeNames[NumDisplayModes] = 
+    {
+        L"Final", 
+        L"G-Buffer", 
+        L"Normals",        
+        L"Diffuse Albedo",
+        L"Specular Albedo",
+        L"Position/Depth"
+    };
+
+    static const std::wstring LightModeNames[NumLightModes] = 
+    {        
+        L"3x3x3",
+        L"5x5x5",
+        L"7x7x7"
+    };
+
+    Matrix4f transform = Matrix4f::Identity();
+    transform.SetTranslation( Vector3f( 30.0f, 30.0f, 0.0f ) );
+    std::wstring text = L"FPS: " + ToString( m_pTimer->Framerate() );
+    m_SpriteRenderer.RenderText( pImmPipeline, pParams, m_Font, text.c_str(), transform );
+
+
+    float x = 30.0f;
+    float y = 600.0f;
+    transform.SetTranslation( Vector3f( x, y, 0.0f ) );
+
+    text = L"Display mode (V): " + DisplayModeNames[m_DisplayMode];
+    m_SpriteRenderer.RenderText( pImmPipeline, pParams, m_Font, text.c_str(), transform );
+
+    y += 20.0f;
+    transform.SetTranslation( Vector3f( x, y, 0.0f ) );
+    text = L"Number of lights (N): " + LightModeNames[m_LightMode];
+    m_SpriteRenderer.RenderText( pImmPipeline, pParams, m_Font, text.c_str(), transform );
+
+    y += 20.0f;
+    transform.SetTranslation( Vector3f( x, y, 0.0f ) );
+    text = L"G-Buffer Optimizations (K): ";
+    text += m_bEnableGBufferOpt ? L"Enabled" : L"Disabled";
+    m_SpriteRenderer.RenderText( pImmPipeline, pParams, m_Font, text.c_str(), transform );
+}
+//--------------------------------------------------------------------------------
+void App::SetupViews( )
+{
+    // Set the lights to render    
+    Light light;
+    light.Type = Point;
+
+    const int cubeSize = 3 + m_LightMode * 2;
+    const int cubeMin = -(cubeSize / 2);
+    const int cubeMax = cubeSize / 2;
+
+    const Vector3f minExtents ( -4.0f, 1.0f, -4.0f );
+    const Vector3f maxExtents ( 4.0f, 11.0f, 4.0f );
+    const Vector3f minColor ( 1.0f, 0.0f, 0.0f );
+    const Vector3f maxColor ( 0.0f, 1.0f, 1.0f );
+
+    for ( int x = cubeMin; x <= cubeMax; x++ ) 
+    {
+        for ( int y = cubeMin; y <= cubeMax; y++ )
+        {
+            for ( int z = cubeMin; z <= cubeMax; z++ )
+            {
+                Vector3f lerp;
+                lerp.x = static_cast<float>( x - cubeMin ) / ( cubeSize - 1 ); 
+                lerp.y = static_cast<float>( y - cubeMin ) / ( cubeSize - 1 );
+                lerp.z = static_cast<float>( z - cubeMin ) / ( cubeSize - 1 );
+
+                light.Position = Lerp( minExtents, maxExtents, lerp );
+                light.Color = Lerp( minColor, maxColor, lerp ) * 1.5f;
+                m_pLightsView->AddLight( light );
+            }
+        }
+    }
+
+    // Set the GBuffer targets, and the material effect
+    if( m_bEnableGBufferOpt )
+    {
+        m_pGBufferView->SetGBufferTargets( m_OptimizedGBuffer );
+        m_pLightsView->SetGBufferTargets( m_OptimizedGBuffer );
+
+        m_pMaterial->Params[VT_GBUFFER].pEffect = m_pOptGBufferEffect;
+    }
+    else
+    {
+        m_pGBufferView->SetGBufferTargets( m_GBuffer );
+        m_pLightsView->SetGBufferTargets( m_GBuffer );
+
+        m_pMaterial->Params[VT_GBUFFER].pEffect = m_pGBufferEffect;
+    }
+
+    m_pLightsView->EnableGBufferOptimizations( m_bEnableGBufferOpt );
 }
 //--------------------------------------------------------------------------------

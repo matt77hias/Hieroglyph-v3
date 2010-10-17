@@ -242,7 +242,7 @@ bool SpriteRendererDX11::Initialize()
 	}
 
 	// Point filtering sampler state
-	samplerConfig.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT;
+	samplerConfig.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
 
 	m_iPointSamplerState = renderer->CreateSamplerState( &samplerConfig );
 
@@ -385,7 +385,7 @@ void SpriteRendererDX11::RenderText( PipelineManagerDX11* pipeline,
 	}
 
 	// Submit a batch
-	Render( pipeline, parameters, font.TextureResource(), m_TextDrawData, currentDraw );
+	Render( pipeline, parameters, font.TextureResource(), m_TextDrawData, currentDraw, Point );
 
 	RendererDX11::PIXEndEvent();
 

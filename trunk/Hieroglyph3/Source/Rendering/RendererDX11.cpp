@@ -1334,14 +1334,14 @@ int RendererDX11::CreateInputLayout( TArray<D3D11_INPUT_ELEMENT_DESC>& elements,
 	return( m_vInputLayouts.count() - 1 );
 }
 //--------------------------------------------------------------------------------
-ResourcePtr RendererDX11::LoadTexture( std::wstring filename )
+ResourcePtr RendererDX11::LoadTexture( std::wstring filename, D3DX11_IMAGE_LOAD_INFO* pLoadInfo )
 {
 	ID3D11Resource* pTexture = 0;
 
 	HRESULT hr = D3DX11CreateTextureFromFile(
 		m_pDevice,
 		filename.c_str(),
-		0,
+		pLoadInfo,
 		0,
 		&pTexture,
 		0

@@ -24,9 +24,8 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-ViewLights::ViewLights( RendererDX11& Renderer, ResourcePtr pRenderTarget, ResourcePtr DepthTarget, 
-                        TArray<ResourcePtr>& GBufferTargets )
-    : m_pRenderTarget( pRenderTarget ), m_DepthTarget( DepthTarget ), m_GBufferTargets( GBufferTargets )
+ViewLights::ViewLights( RendererDX11& Renderer, ResourcePtr pRenderTarget, ResourcePtr DepthTarget )
+    : m_pRenderTarget( pRenderTarget ), m_DepthTarget( DepthTarget ), m_bEnableGBufferOpt ( false )
 {
     m_sParams.iViewType = VT_LIGHTS;
 
@@ -59,7 +58,7 @@ ViewLights::ViewLights( RendererDX11& Renderer, ResourcePtr pRenderTarget, Resou
     dsConfig.DepthEnable = false;
     dsConfig.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
     dsConfig.DepthFunc = D3D11_COMPARISON_LESS;
-    dsConfig.StencilEnable = true;
+    dsConfig.StencilEnable = false;
     dsConfig.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
     dsConfig.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
     dsConfig.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
@@ -98,55 +97,61 @@ ViewLights::ViewLights( RendererDX11& Renderer, ResourcePtr pRenderTarget, Resou
     GeometryGeneratorDX11::GenerateFullScreenQuad( &m_QuadGeometry );
     m_QuadGeometry.LoadToBuffers();
 
-    // Load our common vertex shader
-    m_PointLightEffect.m_iVertexShader =
-        Renderer.LoadShader( VERTEX_SHADER,
-        std::wstring( L"../Data/Shaders/Lights.hlsl" ),
-        std::wstring( L"VSQuad" ),
-        std::wstring( L"vs_5_0" ) );        
-    _ASSERT( m_PointLightEffect.m_iVertexShader != -1 );
+    for ( int gBufferOptMode = 0; gBufferOptMode < 2; ++gBufferOptMode )
+    {
 
-    m_SpotLightEffect.m_iVertexShader = m_PointLightEffect.m_iVertexShader;
-    m_DirectionalLightEffect.m_iVertexShader = m_PointLightEffect.m_iVertexShader;
+        // Load our common vertex shader
+        int commonVS = Renderer.LoadShader( VERTEX_SHADER,
+            std::wstring( L"../Data/Shaders/Lights.hlsl" ),
+            std::wstring( L"VSQuad" ),
+            std::wstring( L"vs_5_0" ) );        
+        _ASSERT( commonVS != -1 );
 
-    // Load our permutations of the pixel shader
-    D3D10_SHADER_MACRO defines[4];
-    defines[0].Name = "POINTLIGHT";
-    defines[0].Definition = "1";
-    defines[1].Name = "SPOTLIGHT";
-    defines[1].Definition = "0";
-    defines[2].Name = "DIRECTIONALLIGHT";
-    defines[2].Definition = "0";
-    defines[3].Name = NULL;
-    defines[3].Definition = NULL;
+        m_PointLightEffect[gBufferOptMode].m_iVertexShader = commonVS;
+        m_SpotLightEffect[gBufferOptMode].m_iVertexShader = commonVS;
+        m_DirectionalLightEffect[gBufferOptMode].m_iVertexShader = commonVS;
 
-    m_PointLightEffect.m_iPixelShader =
-        Renderer.LoadShader( PIXEL_SHADER,
-        std::wstring( L"../Data/Shaders/Lights.hlsl" ),
-        std::wstring( L"PSMain" ),
-        std::wstring( L"ps_5_0" ),
-        defines );        
-    _ASSERT( m_PointLightEffect.m_iPixelShader != -1 );
+        // Load our permutations of the pixel shader
+        D3D10_SHADER_MACRO defines[5];
+        defines[0].Name = "POINTLIGHT";
+        defines[0].Definition = "1";
+        defines[1].Name = "SPOTLIGHT";
+        defines[1].Definition = "0";
+        defines[2].Name = "DIRECTIONALLIGHT";
+        defines[2].Definition = "0";
+        defines[3].Name = "GBUFFEROPTIMIZATIONS";
+        defines[3].Definition = gBufferOptMode == 1 ? "1" : "0";
+        defines[4].Name = NULL;
+        defines[4].Definition = NULL;
 
-    defines[0].Definition = "0";
-    defines[1].Definition = "1";
-    m_SpotLightEffect.m_iPixelShader =
-        Renderer.LoadShader( PIXEL_SHADER,
-        std::wstring( L"../Data/Shaders/Lights.hlsl" ),
-        std::wstring( L"PSMain" ),
-        std::wstring( L"ps_5_0" ),
-        defines );        
-    _ASSERT( m_SpotLightEffect.m_iPixelShader != -1 );
+        m_PointLightEffect[gBufferOptMode].m_iPixelShader =
+            Renderer.LoadShader( PIXEL_SHADER,
+            std::wstring( L"../Data/Shaders/Lights.hlsl" ),
+            std::wstring( L"PSMain" ),
+            std::wstring( L"ps_5_0" ),
+            defines );        
+        _ASSERT( m_PointLightEffect[gBufferOptMode].m_iPixelShader != -1 );
 
-    defines[1].Definition = "0";
-    defines[2].Definition = "1";
-    m_DirectionalLightEffect.m_iPixelShader =
-        Renderer.LoadShader( PIXEL_SHADER,
-        std::wstring( L"../Data/Shaders/Lights.hlsl" ),
-        std::wstring( L"PSMain" ),
-        std::wstring( L"ps_5_0" ),
-        defines );        
-    _ASSERT( m_DirectionalLightEffect.m_iPixelShader != -1 );
+        defines[0].Definition = "0";
+        defines[1].Definition = "1";
+        m_SpotLightEffect[gBufferOptMode].m_iPixelShader =
+            Renderer.LoadShader( PIXEL_SHADER,
+            std::wstring( L"../Data/Shaders/Lights.hlsl" ),
+            std::wstring( L"PSMain" ),
+            std::wstring( L"ps_5_0" ),
+            defines );        
+        _ASSERT( m_SpotLightEffect[gBufferOptMode].m_iPixelShader != -1 );
+
+        defines[1].Definition = "0";
+        defines[2].Definition = "1";
+        m_DirectionalLightEffect[gBufferOptMode].m_iPixelShader =
+            Renderer.LoadShader( PIXEL_SHADER,
+            std::wstring( L"../Data/Shaders/Lights.hlsl" ),
+            std::wstring( L"PSMain" ),
+            std::wstring( L"ps_5_0" ),
+            defines );        
+        _ASSERT( m_DirectionalLightEffect[gBufferOptMode].m_iPixelShader != -1 );
+    }
 
 }
 //--------------------------------------------------------------------------------
@@ -182,7 +187,7 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
     pPipelineManager->ClearBuffers( color, 1.0f, 0 );
 
     // Bind the depth buffer
-    pPipelineManager->BindDepthTarget( m_DepthTarget );
+    // pPipelineManager->BindDepthTarget( m_DepthTarget );
     pPipelineManager->ApplyRenderTargets();
 
     pPipelineManager->SetViewPort( m_iViewport );
@@ -194,9 +199,7 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
     pPipelineManager->SetBlendState( m_iBlendState );
 
     // Set our depth stencil state, using the same reference value used in the G-Buffer pass
-    pPipelineManager->SetDepthStencilState( m_iDepthStencilState, ViewGBuffer::StencilRef );
-
-    
+    pPipelineManager->SetDepthStencilState( m_iDepthStencilState, ViewGBuffer::StencilRef );    
 
     // Set this view's render parameters
     SetRenderParams( pParamManager );
@@ -209,16 +212,25 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
         // Pick the effect based on the shader
         RenderEffectDX11* pEffect = NULL;
         if ( light.Type == Point )
-            pEffect = &m_PointLightEffect;
+            pEffect = &m_PointLightEffect[m_bEnableGBufferOpt];
         else if ( light.Type == Spot )
-            pEffect = &m_SpotLightEffect;
+            pEffect = &m_SpotLightEffect[m_bEnableGBufferOpt];
         else if ( light.Type == Directional )
-            pEffect = &m_DirectionalLightEffect;
+            pEffect = &m_DirectionalLightEffect[m_bEnableGBufferOpt];
 
         // Set the light params
-        pParamManager->SetVectorParameter( L"LightPos", &Vector4f( light.Position, 1.0f ) );
+        Vector4f pos = Vector4f( light.Position, 1.0f );
+        Vector4f direction = Vector4f( light.Direction, 0.0f );
+        if ( m_bEnableGBufferOpt )
+        {
+            // Light position/direction needs to be in view space
+            pos = ViewMatrix * pos;
+            direction = ViewMatrix * direction;
+        }
+
+        pParamManager->SetVectorParameter( L"LightPos", &pos );
         pParamManager->SetVectorParameter( L"LightColor", &Vector4f( light.Color, 1.0f ) );
-        pParamManager->SetVectorParameter( L"LightDirection", &Vector4f( light.Direction, 1.0f ) );
+        pParamManager->SetVectorParameter( L"LightDirection", &direction );
         pParamManager->SetVectorParameter( L"SpotlightAngles", &Vector4f( light.SpotInnerAngle, light.SpotOuterAngle, 0.0f, 0.0f ) );
 
         // Draw the geometry
@@ -226,6 +238,11 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
     }
 
     pPipelineManager->ClearPipelineResources();
+
+    // Clear the lights
+    int numLights = m_Lights.count();
+    for ( int i = numLights - 1; i >= 0; --i )
+        m_Lights.remove( i );
 }
 //--------------------------------------------------------------------------------
 void ViewLights::SetRenderParams( ParameterManagerDX11* pParamManager )
@@ -233,11 +250,15 @@ void ViewLights::SetRenderParams( ParameterManagerDX11* pParamManager )
     pParamManager->SetViewMatrixParameter( &ViewMatrix );
     pParamManager->SetProjMatrixParameter( &ProjMatrix );
 
+    Matrix4f invProj = ProjMatrix.Inverse();
+    pParamManager->SetMatrixParameter( L"InvProjMatrix", &invProj );
+    pParamManager->SetMatrixParameter( L"ProjMatrix", &ProjMatrix );
+
     if ( m_pRoot != NULL ) 
     {
-        Vector4f cameraPos( m_pRoot->Position(), 1.0f );
+        Vector4f cameraPos( m_pRoot->Position(), 1.0f );        
         pParamManager->SetVectorParameter( L"CameraPos", &cameraPos );
-    }    
+    }
 
     // Set the G-Buffer textures
     static const std::wstring TextureNames[4] = 
@@ -248,8 +269,12 @@ void ViewLights::SetRenderParams( ParameterManagerDX11* pParamManager )
         L"PositionTexture",
     };
 
-    for( UINT i = 0; i < 4; ++i )    
-        pParamManager->SetShaderResourceParameter( TextureNames[i], m_GBufferTargets[i] );    
+    for ( int i = 0; i < m_GBufferTargets.count(); ++i )    
+        pParamManager->SetShaderResourceParameter( TextureNames[i], m_GBufferTargets[i] );
+
+    // Bind depth if optimizations are enabled
+    if ( m_bEnableGBufferOpt )
+        pParamManager->SetShaderResourceParameter( L"DepthTexture", m_DepthTarget );
 }
 //--------------------------------------------------------------------------------
 void ViewLights::SetUsageParams( ParameterManagerDX11* pParamManager )
@@ -261,3 +286,14 @@ void ViewLights::AddLight( const Light& light )
 {
     m_Lights.add( light );
 }
+//--------------------------------------------------------------------------------
+void ViewLights::SetGBufferTargets( TArray<ResourcePtr>& GBufferTargets )
+{
+    m_GBufferTargets = GBufferTargets;
+}
+//--------------------------------------------------------------------------------
+void ViewLights::EnableGBufferOptimizations( bool enable )
+{
+    m_bEnableGBufferOpt = enable;
+}
+//--------------------------------------------------------------------------------

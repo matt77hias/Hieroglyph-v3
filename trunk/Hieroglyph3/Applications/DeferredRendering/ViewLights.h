@@ -48,7 +48,7 @@ namespace Glyph3
     class ViewLights : public IRenderView
     {    
     public:		
-        ViewLights( RendererDX11& Renderer, ResourcePtr pRenderTarget, ResourcePtr DepthTarget, TArray<ResourcePtr>& GBufferTargets );
+        ViewLights( RendererDX11& Renderer, ResourcePtr pRenderTarget, ResourcePtr DepthTarget );
 
         virtual void Update( float fTime );
         virtual void PreDraw( RendererDX11* pRenderer );
@@ -58,6 +58,8 @@ namespace Glyph3
         virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
 
         void AddLight( const Light& light );
+        void SetGBufferTargets( TArray<ResourcePtr>& GBufferTargets );
+        void EnableGBufferOptimizations( bool enable );
 
         virtual ~ViewLights();
 
@@ -65,19 +67,20 @@ namespace Glyph3
 
         int					m_iViewport;
         int					m_iDepthStencilState;
-        int                 m_iBlendState;
+        int                 m_iBlendState;        
 
         ResourcePtr	            m_pRenderTarget;
         ResourcePtr			    m_DepthTarget;
-        TArray<ResourcePtr>&    m_GBufferTargets;
+        TArray<ResourcePtr>     m_GBufferTargets;
 
         GeometryDX11			m_QuadGeometry;
 
-        RenderEffectDX11		m_PointLightEffect;
-        RenderEffectDX11		m_SpotLightEffect;
-        RenderEffectDX11		m_DirectionalLightEffect;
+        RenderEffectDX11		m_PointLightEffect[2];
+        RenderEffectDX11		m_SpotLightEffect[2];
+        RenderEffectDX11		m_DirectionalLightEffect[2];
 
         TArray<Light>           m_Lights;
+        bool                    m_bEnableGBufferOpt;
     };
 }
 //--------------------------------------------------------------------------------

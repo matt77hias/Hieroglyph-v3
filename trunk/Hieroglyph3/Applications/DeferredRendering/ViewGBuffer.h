@@ -26,7 +26,7 @@ namespace Glyph3
         static const UINT StencilRef = 0;
 
 	public:		
-		ViewGBuffer( RendererDX11& Renderer, TArray<ResourcePtr>& GBufferTargets, ResourcePtr DepthTarget );
+		ViewGBuffer( RendererDX11& Renderer, ResourcePtr DepthTarget );
 
 		virtual void Update( float fTime );
 		virtual void PreDraw( RendererDX11* pRenderer );
@@ -35,6 +35,8 @@ namespace Glyph3
 		virtual void SetRenderParams( ParameterManagerDX11* pParamManager );
 		virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
 
+        void SetGBufferTargets( TArray<ResourcePtr>& GBufferTargets );
+
 		virtual ~ViewGBuffer();
 
 	protected:
@@ -42,8 +44,10 @@ namespace Glyph3
 		int					m_iViewport;
 		int					m_iDepthStencilState;
 
-		TArray<ResourcePtr>&	m_GBufferTargets;
+        RendererDX11&           m_Renderer;
+		TArray<ResourcePtr> 	m_GBufferTargets;
 		ResourcePtr				m_DepthTarget;
+        ResourcePtr				m_DepthTargetCopy;
 	};
 }
 //--------------------------------------------------------------------------------

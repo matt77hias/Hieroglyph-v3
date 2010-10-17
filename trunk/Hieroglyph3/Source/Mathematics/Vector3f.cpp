@@ -167,6 +167,17 @@ Vector3f Vector3f::operator* ( float fScalar ) const
 	return( prod );
 }
 //----------------------------------------------------------------------------------------------------
+Vector3f Vector3f::operator* ( const Vector3f& Vector ) const
+{
+    Vector3f prod;
+
+    prod.x = x * Vector.x;
+    prod.y = y * Vector.y;
+    prod.z = z * Vector.z;
+
+    return( prod );
+}
+//----------------------------------------------------------------------------------------------------
 Vector3f Vector3f::operator/ ( float fScalar ) const
 {
 	Vector3f quot;
@@ -183,6 +194,16 @@ Vector3f Vector3f::operator/ ( float fScalar ) const
 	}
 
 	return( quot );
+}
+//----------------------------------------------------------------------------------------------------
+Vector3f Vector3f::operator/ ( const Vector3f& Vector ) const
+{
+    Vector3f quot;
+    quot.x = Vector.x != 0.0f ? x / Vector.x : 0.0f;
+    quot.y = Vector.y != 0.0f ? y / Vector.y : 0.0f;
+    quot.z = Vector.z != 0.0f ? z / Vector.z : 0.0f;
+
+    return( quot );
 }
 //----------------------------------------------------------------------------------------------------
 Vector3f Vector3f::operator- ( ) const
@@ -223,6 +244,15 @@ Vector3f& Vector3f::operator*= ( float fScalar )
 	return( *this );
 }
 //----------------------------------------------------------------------------------------------------
+Vector3f& Vector3f::operator*= ( const Vector3f& Vector )
+{
+    x *= Vector.x;
+    y *= Vector.y;
+    z *= Vector.z;
+
+    return( *this );
+}
+//----------------------------------------------------------------------------------------------------
 Vector3f& Vector3f::operator/= ( float fScalar )
 {
 	if ( fScalar != 0.0f )
@@ -238,6 +268,15 @@ Vector3f& Vector3f::operator/= ( float fScalar )
 	}
 
 	return( *this );
+}
+//----------------------------------------------------------------------------------------------------
+Vector3f& Vector3f::operator/= ( const Vector3f& Vector )
+{
+    x = Vector.x != 0.0f ? x / Vector.x : 0.0f;
+    y = Vector.y != 0.0f ? y / Vector.y : 0.0f;
+    z = Vector.z != 0.0f ? z / Vector.z : 0.0f;
+
+    return( *this );
 }
 //----------------------------------------------------------------------------------------------------
 Vector3f Vector3f::Clamp( Vector3f& A )
