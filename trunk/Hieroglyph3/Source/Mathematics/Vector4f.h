@@ -49,15 +49,19 @@ namespace Glyph3
 		// arithmetic operations
 		Vector4f operator+ ( const Vector4f& Vector ) const;
 		Vector4f operator- ( const Vector4f& Vector ) const;
-		Vector4f operator* ( float fScalar) const;
-		Vector4f operator/ ( float fScalar) const;
+		Vector4f operator* ( float fScalar ) const;
+        Vector4f operator* ( const Vector4f& Vector ) const;
+		Vector4f operator/ ( float fScalar ) const;
+        Vector4f operator/ ( const Vector4f& Vector ) const;
 		Vector4f operator- ( ) const;
 
 		// arithmetic updates
 		Vector4f& operator+= ( const Vector4f& Vector );
 		Vector4f& operator-= ( const Vector4f& Vector );
 		Vector4f& operator*= ( float fScalar );
+        Vector4f& operator*= ( const Vector4f& Vectorr );
 		Vector4f& operator/= ( float fScalar );
+        Vector4f& operator/= ( const Vector4f& Vectorr );
 
 		unsigned int toARGB( );
 		unsigned int toRGBA( );

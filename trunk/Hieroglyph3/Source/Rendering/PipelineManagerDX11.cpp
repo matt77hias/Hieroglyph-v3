@@ -153,6 +153,13 @@ void PipelineManagerDX11::SetViewPort( int ID )
 		Log::Get().Write( L"Tried to set an invalid view port index!" );
 }
 //--------------------------------------------------------------------------------
+void PipelineManagerDX11::SetScissorRects( UINT NumRects, const D3D11_RECT* pRects )
+{
+    RendererDX11* pRenderer = RendererDX11::Get();
+    
+    m_pContext->RSSetScissorRects( NumRects, pRects );
+}
+//--------------------------------------------------------------------------------
 D3D11_VIEWPORT PipelineManagerDX11::GetCurrentViewport( ) {
 	D3D11_VIEWPORT vp;
 	UINT numVP = 1;

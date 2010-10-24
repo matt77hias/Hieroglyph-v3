@@ -17,7 +17,6 @@
 #include "ParameterManagerDX11.h"
 #include "PipelineManagerDX11.h"
 #include "Texture2dDX11.h"
-#include "DepthStencilStateConfigDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -27,26 +26,7 @@ ViewGBuffer::ViewGBuffer( RendererDX11& Renderer, ResourcePtr DepthTarget )
 	m_sParams.iViewType = VT_GBUFFER;
 
 	ViewMatrix.MakeIdentity();
-	ProjMatrix.MakeIdentity();		
-
-	// Create the depth stencil view. We'll enable stencil writes and depth writes
-	DepthStencilStateConfigDX11 dsConfig;
-	dsConfig.DepthEnable = true;
-	dsConfig.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	dsConfig.DepthFunc = D3D11_COMPARISON_LESS;
-	dsConfig.StencilEnable = true;
-	dsConfig.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
-	dsConfig.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
-	dsConfig.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-	dsConfig.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	dsConfig.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
-	dsConfig.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-	dsConfig.BackFace = dsConfig.FrontFace;
-
-	m_iDepthStencilState = Renderer.CreateDepthStencilState( &dsConfig );
-
-	if ( m_iDepthStencilState == -1 )	
-		Log::Get().Write( L"Failed to create G-Buffer depth stencil state" );			
+	ProjMatrix.MakeIdentity();					
 }
 //--------------------------------------------------------------------------------
 ViewGBuffer::~ViewGBuffer()
@@ -86,14 +66,7 @@ void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerD
 		pPipelineManager->BindDepthTarget( m_DepthTarget );
 		pPipelineManager->ApplyRenderTargets();
 
-		pPipelineManager->SetViewPort( m_iViewport );
-
-		// Set default states for these stages
-		pPipelineManager->SetRasterizerState( 0 );		
-		pPipelineManager->SetBlendState( 0 );
-
-		// Set our depth stencil state
-		pPipelineManager->SetDepthStencilState( m_iDepthStencilState, StencilRef );
+		pPipelineManager->SetViewPort( m_iViewport );		
 
 		// Clear the G-Buffer targets
 		Vector4f color(0.0f, 0.0f, 0.0f, 0.0f);

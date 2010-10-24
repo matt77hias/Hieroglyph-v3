@@ -37,6 +37,10 @@ namespace Glyph3
 		static void GenerateTexturedPlane( GeometryDX11* pGeometry, int SizeX, int SizeY );
 		static void GenerateSkinnedBiped( GeometryDX11* pGeometry );
 		static void GenerateAxisGeometry( GeometryDX11* pGeometry );
+        static void GenerateSphere( GeometryDX11* pGeometry, unsigned int URes, 
+                                    unsigned int VRes, float Radius );
+        static void GenerateCone( GeometryDX11* pGeometry, unsigned int URes, 
+                                    unsigned int VRes, float Radius, float Height );
 
 	private:
 		GeometryGeneratorDX11();

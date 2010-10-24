@@ -59,7 +59,22 @@ float Vector3f::Magnitude( )
 	return( sqrt( fLength ) );
 }
 //----------------------------------------------------------------------------------------------------
-Vector3f Vector3f::Cross( Vector3f& Vector )
+Vector3f Vector3f::Perpendicular( )
+{
+    float xAbs = fabs( x );
+    float yAbs = fabs( y );
+    float zAbs = fabs( z );
+    float minVal = min( min( xAbs, yAbs ), zAbs );
+
+    if ( xAbs == minVal )
+        return Cross( Vector3f( 1.0f, 0.0f, 0.0f ) );
+    else if ( yAbs == minVal )
+        return Cross( Vector3f( 0.0f, 1.0f, 0.0f ) );
+    else
+        return Cross( Vector3f( 0.0f, 0.0f, 1.0f ) );
+}
+//----------------------------------------------------------------------------------------------------
+Vector3f Vector3f::Cross( const Vector3f& Vector ) const
 {
 	Vector3f vRet; 
 	
@@ -70,7 +85,7 @@ Vector3f Vector3f::Cross( Vector3f& Vector )
 	return( vRet );
 }
 //----------------------------------------------------------------------------------------------------
-float Vector3f::Dot( Vector3f& Vector )
+float Vector3f::Dot( const Vector3f& Vector ) const
 {
 	float ret = 0.0f;
 	
@@ -279,25 +294,33 @@ Vector3f& Vector3f::operator/= ( const Vector3f& Vector )
     return( *this );
 }
 //----------------------------------------------------------------------------------------------------
-Vector3f Vector3f::Clamp( Vector3f& A )
+Vector3f Vector3f::Clamp( const Vector3f& A )
 {
-    A.Clamp();
-    return A;
+    Vector3f vec = A;
+    vec.Clamp();
+    return vec;
 }
 //----------------------------------------------------------------------------------------------------
-Vector3f Vector3f::Cross( Vector3f& A, Vector3f& B )
-{
+Vector3f Vector3f::Cross( const Vector3f& A, const Vector3f& B )
+{    
     return A.Cross( B );
 }
 //----------------------------------------------------------------------------------------------------
-float Vector3f::Dot( Vector3f& A, Vector3f& B )
-{
+float Vector3f::Dot( const Vector3f& A, const Vector3f& B )
+{    
     return A.Dot( B );
 }
 //----------------------------------------------------------------------------------------------------
-Vector3f Vector3f::Normalize( Vector3f& A )
+Vector3f Vector3f::Normalize( const Vector3f& A )
 {
-    A.Normalize();
-    return A;
+    Vector3f vec = A;
+    vec.Normalize();
+    return vec;
+}
+//----------------------------------------------------------------------------------------------------
+Vector3f Vector3f::Perpendicular( const Vector3f& A )
+{
+    Vector3f vec = A;
+    return vec.Perpendicular();    
 }
 //----------------------------------------------------------------------------------------------------

@@ -23,18 +23,11 @@
 #include "ParameterManagerDX11.h"
 #include "SamplerParameterDX11.h"
 #include "ShaderResourceParameterDX11.h"
+#include "DepthStencilStateConfigDX11.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
-//--------------------------------------------------------------------------------
-template <typename T>
-void ChangeParameter( T& parameter, int maxValue )
-{
-    int val = static_cast<int>( parameter );
-    val = ( val + 1 ) % maxValue;
-    parameter = static_cast<T>( val );
-}
 //--------------------------------------------------------------------------------
 Vector3f Lerp( const Vector3f& x, const Vector3f& y, const Vector3f& s )
 {
@@ -43,10 +36,7 @@ Vector3f Lerp( const Vector3f& x, const Vector3f& y, const Vector3f& s )
 //--------------------------------------------------------------------------------
 App::App()
 {
-	m_bSaveScreenshot = false;
-    m_DisplayMode = Final;
-    m_LightMode = Lights3x3x3;
-    m_bEnableGBufferOpt = false;
+	m_bSaveScreenshot = false;    
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
@@ -194,7 +184,8 @@ void App::Initialize()
 	// Create and initialize the geometry to be rendered.  
 	GeometryDX11* pGeometry = new GeometryDX11();
 	pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Sample_Scene.ms3d" ) );
-    _ASSERT( pGeometry->ComputeTangentFrame() );
+    bool success = pGeometry->ComputeTangentFrame();
+    _ASSERT( success );
 	pGeometry->LoadToBuffers();	
 	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
@@ -226,6 +217,31 @@ void App::Initialize()
         std::wstring( L"PSMainOptimized" ),
         std::wstring( L"ps_5_0" ) );
     _ASSERT( m_pOptGBufferEffect->m_iPixelShader != -1 );
+
+    // Create a depth stencil state for the G-Buffer material
+    // Create the depth stencil view. We'll enable depth writes and depth tests.
+    // We'll also enable stencil writes, and set the stencil buffer to 1 for each pixel rendered.
+    DepthStencilStateConfigDX11 dsConfig;
+    dsConfig.DepthEnable = true;
+    dsConfig.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+    dsConfig.DepthFunc = D3D11_COMPARISON_LESS;
+    dsConfig.StencilEnable = true;
+    dsConfig.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+    dsConfig.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+    dsConfig.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+    dsConfig.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+    dsConfig.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
+    dsConfig.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+    dsConfig.BackFace = dsConfig.FrontFace;
+
+    m_iGBufferDSState = m_pRenderer11->CreateDepthStencilState( &dsConfig );
+
+    if ( m_iGBufferDSState == -1 )	
+        Log::Get().Write( L"Failed to create G-Buffer depth stencil state" );
+    m_pGBufferEffect->m_iDepthStencilState = m_iGBufferDSState;
+    m_pGBufferEffect->m_uStencilRef = 1;
+    m_pOptGBufferEffect->m_iDepthStencilState = m_iGBufferDSState;
+    m_pOptGBufferEffect->m_uStencilRef = 1;
 
     m_pMaterial = new MaterialDX11();
 
@@ -283,7 +299,10 @@ void App::Initialize()
 	m_pGBufferView = new ViewGBuffer( *m_pRenderer11, m_DepthTarget );    
 
 	m_pCamera->SetCameraView( m_pGBufferView );
-	m_pCamera->SetProjectionParams( 1.0f, 15.0f, (float)D3DX_PI / 2.0f, (float)ResolutionX / (float)ResolutionY );
+
+    const float nearClip = 1.0f;
+    const float farClip = 15.0f;
+	m_pCamera->SetProjectionParams( nearClip, farClip, (float)D3DX_PI / 2.0f, (float)ResolutionX / (float)ResolutionY );
 
     m_pLightsView = new ViewLights( *m_pRenderer11, m_BackBuffer, m_DepthTarget );    
 
@@ -291,6 +310,7 @@ void App::Initialize()
     m_pLightsView->SetEntity( m_pCamera->GetBody() );
     m_pLightsView->SetRoot( m_pCamera->GetNode() );
     m_pLightsView->SetProjMatrix( m_pGBufferView->GetProjMatrix() );
+    m_pLightsView->SetClipPlanes( nearClip, farClip );
 
 	// Create the scene and add the entities to it.  Then add the camera to the
 	// scene so that it will be updated via the scene interface instead of 
@@ -353,7 +373,7 @@ void App::Update()
     m_pLightsView->PreDraw( m_pRenderer11 );
     m_pRenderer11->ProcessRenderViewQueue();
 
-    if ( m_DisplayMode != Final )
+    if ( DisplayMode::Value != DisplayMode::Final )
     {
 	    PipelineManagerDX11* pImmPipeline = m_pRenderer11->pImmPipeline;
         ParameterManagerDX11* pParams = m_pRenderer11->m_pParamMgr;
@@ -362,10 +382,10 @@ void App::Update()
         pImmPipeline->ApplyRenderTargets();
         pImmPipeline->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 
-        TArray<ResourcePtr>& gBuffer = m_bEnableGBufferOpt ? m_OptimizedGBuffer : m_GBuffer;
+        TArray<ResourcePtr>& gBuffer = GBufferOptMode::Enabled() ? m_OptimizedGBuffer : m_GBuffer;
 
         ResourcePtr target;
-        if ( m_DisplayMode == GBuffer )
+        if ( DisplayMode::Value == DisplayMode::GBuffer )
         {
             Matrix4f mat = Matrix4f::Identity();
             mat = Matrix4f::ScaleMatrix( 0.5f ) *  Matrix4f::TranslationMatrix(0, 0, 0);
@@ -379,7 +399,7 @@ void App::Update()
 
             mat = Matrix4f::ScaleMatrix( 0.5f ) *  Matrix4f::TranslationMatrix(640, 360, 0);
 
-            if ( m_bEnableGBufferOpt )
+            if ( GBufferOptMode::Enabled() )
                 m_SpriteRenderer.Render( pImmPipeline, pParams, m_DepthTarget, mat );
             else
                 m_SpriteRenderer.Render( pImmPipeline, pParams, gBuffer[3], mat );
@@ -387,10 +407,10 @@ void App::Update()
         else
         {
             ResourcePtr target;
-            if ( m_bEnableGBufferOpt && m_DisplayMode == Position )
+            if ( GBufferOptMode::Enabled() && DisplayMode::Value == DisplayMode::Position )
                 target = m_DepthTarget;
             else
-                target = gBuffer[ m_DisplayMode - Normals ];
+                target = gBuffer[ DisplayMode::Value - DisplayMode::Normals ];
             m_SpriteRenderer.Render( pImmPipeline, pParams, target, Matrix4f::Identity() );
         }        
     }
@@ -436,21 +456,27 @@ bool App::HandleEvent( IEvent* pEvent )
 
 		unsigned int key = pKeyDown->GetCharacterCode();
 
-        if ( key == 'V' )
+        if ( key == LightOptMode::Key )
         {
-            ChangeParameter( m_DisplayMode, NumDisplayModes );
+            LightOptMode::Increment();
             return true;
         }
 
-        if ( key == 'N' )
+        if ( key == GBufferOptMode::Key )
         {
-            ChangeParameter( m_LightMode, NumLightModes );
+            GBufferOptMode::Increment();
             return true;
         }
 
-        if ( key == 'K' )
+        if ( key == LightMode::Key )
         {
-            m_bEnableGBufferOpt = !m_bEnableGBufferOpt;
+            LightMode::Increment();
+            return true;
+        }
+
+        if ( key == DisplayMode::Key )
+        {
+            DisplayMode::Increment();
             return true;
         }
 
@@ -490,47 +516,32 @@ std::wstring App::GetName( )
 void App::DrawHUD( )
 {
     PipelineManagerDX11* pImmPipeline = m_pRenderer11->pImmPipeline;
-    ParameterManagerDX11* pParams = m_pRenderer11->m_pParamMgr;
-
-    static const std::wstring DisplayModeNames[NumDisplayModes] = 
-    {
-        L"Final", 
-        L"G-Buffer", 
-        L"Normals",        
-        L"Diffuse Albedo",
-        L"Specular Albedo",
-        L"Position/Depth"
-    };
-
-    static const std::wstring LightModeNames[NumLightModes] = 
-    {        
-        L"3x3x3",
-        L"5x5x5",
-        L"7x7x7"
-    };
+    ParameterManagerDX11* pParams = m_pRenderer11->m_pParamMgr;        
 
     Matrix4f transform = Matrix4f::Identity();
     transform.SetTranslation( Vector3f( 30.0f, 30.0f, 0.0f ) );
     std::wstring text = L"FPS: " + ToString( m_pTimer->Framerate() );
     m_SpriteRenderer.RenderText( pImmPipeline, pParams, m_Font, text.c_str(), transform );
 
-
     float x = 30.0f;
     float y = 600.0f;
     transform.SetTranslation( Vector3f( x, y, 0.0f ) );
-
-    text = L"Display mode (V): " + DisplayModeNames[m_DisplayMode];
+    text = DisplayMode::ToString();
     m_SpriteRenderer.RenderText( pImmPipeline, pParams, m_Font, text.c_str(), transform );
 
     y += 20.0f;
     transform.SetTranslation( Vector3f( x, y, 0.0f ) );
-    text = L"Number of lights (N): " + LightModeNames[m_LightMode];
+    text = LightMode::ToString();
     m_SpriteRenderer.RenderText( pImmPipeline, pParams, m_Font, text.c_str(), transform );
 
     y += 20.0f;
     transform.SetTranslation( Vector3f( x, y, 0.0f ) );
-    text = L"G-Buffer Optimizations (K): ";
-    text += m_bEnableGBufferOpt ? L"Enabled" : L"Disabled";
+    text = GBufferOptMode::ToString();
+    m_SpriteRenderer.RenderText( pImmPipeline, pParams, m_Font, text.c_str(), transform );
+
+    y += 20.0f;
+    transform.SetTranslation( Vector3f( x, y, 0.0f ) );    
+    text = LightOptMode::ToString();
     m_SpriteRenderer.RenderText( pImmPipeline, pParams, m_Font, text.c_str(), transform );
 }
 //--------------------------------------------------------------------------------
@@ -540,7 +551,7 @@ void App::SetupViews( )
     Light light;
     light.Type = Point;
 
-    const int cubeSize = 3 + m_LightMode * 2;
+    const int cubeSize = 3 + LightMode::Value * 2;
     const int cubeMin = -(cubeSize / 2);
     const int cubeMax = cubeSize / 2;
 
@@ -562,13 +573,17 @@ void App::SetupViews( )
 
                 light.Position = Lerp( minExtents, maxExtents, lerp );
                 light.Color = Lerp( minColor, maxColor, lerp ) * 1.5f;
+                // light.Type = Spot;
+                light.Direction = Vector3f( -1.0f, 0.0f, 0.0f );
+                light.SpotInnerAngle = 3.14159f / 4.0f;
+                light.SpotOuterAngle = light.SpotInnerAngle + 0.5f;
                 m_pLightsView->AddLight( light );
             }
         }
     }
 
     // Set the GBuffer targets, and the material effect
-    if( m_bEnableGBufferOpt )
+    if( GBufferOptMode::Enabled() )
     {
         m_pGBufferView->SetGBufferTargets( m_OptimizedGBuffer );
         m_pLightsView->SetGBufferTargets( m_OptimizedGBuffer );
@@ -582,7 +597,5 @@ void App::SetupViews( )
 
         m_pMaterial->Params[VT_GBUFFER].pEffect = m_pGBufferEffect;
     }
-
-    m_pLightsView->EnableGBufferOptimizations( m_bEnableGBufferOpt );
 }
 //--------------------------------------------------------------------------------

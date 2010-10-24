@@ -13,15 +13,26 @@ cbuffer LightParams
 	float3 LightPos;
 	float3 LightColor;
 	float3 LightDirection;
-	float2 SpotlightAngles;	
+	float2 SpotlightAngles;
+	float4 LightRange;
 };
 
 cbuffer CameraParams
 {
 	float3 CameraPos;
 	matrix ProjMatrix;
-	matrix InvProjMatrix;	
+	matrix InvProjMatrix;
 }
+
+cbuffer Transforms
+{
+	matrix WorldMatrix;
+	matrix WorldViewMatrix;
+	matrix WorldViewProjMatrix;
+};
+
+// This macro indicates whether we're currently rendering a volume
+#define VOLUMERENDERING ( ( POINTLIGHT || SPOTLIGHT ) && LIGHTVOLUMES )
 
 //-------------------------------------------------------------------------------------------------
 // Input/output structs
@@ -52,19 +63,28 @@ Texture2D		PositionTexture : register( t3 );
 Texture2D		DepthTexture : register( t3 );
 
 //-------------------------------------------------------------------------------------------------
-// Vertex shader for when a full screen quad is used for rendering lights
+// Vertex shader entry point
 //-------------------------------------------------------------------------------------------------
-VSOutput VSQuad( in VSInput input )
+VSOutput VSMain( in VSInput input )
 {
 	VSOutput output;
 
-	// Just copy the position
-	output.PositionCS = input.Position;
+	#if VOLUMERENDERING
+		// Apply the world * view * projection
+		output.PositionCS = mul( input.Position, WorldViewProjMatrix );
 	
-	// Compute the view ray
-	float3 positionVS = mul( input.Position, InvProjMatrix ).xyz;
-	output.ViewRay = float3( positionVS.xy / positionVS.z, 1.0f );
-
+		// Calculate the view space vertex position, and output that as the view ray
+		float3 positionVS = mul( input.Position, WorldViewMatrix ).xyz;
+		output.ViewRay = positionVS;
+	#else
+		// Just copy the position
+		output.PositionCS = input.Position;
+	
+		// For a quad we can clamp in the vertex shader, since we only interpolate in the XY direction
+		float3 positionVS = mul( input.Position, InvProjMatrix ).xyz;
+		output.ViewRay = float3( positionVS.xy / positionVS.z, 1.0f );
+	#endif
+	
 	return output;
 }
 
@@ -83,9 +103,18 @@ float3 SpheremapDecode( float2 encoded )
 //-------------------------------------------------------------------------------------------------
 // Converts a depth buffer value to view-space position
 //-------------------------------------------------------------------------------------------------
-float3 PositionFromDepth( float zBufferDepth, float3 viewRay )
+float3 PositionFromDepth( in float zBufferDepth, in float3 viewRay )
 {
-	float linearDepth = ProjMatrix[3][2] / ( zBufferDepth - ProjMatrix[2][2] );
+	#if VOLUMERENDERING
+		// Clamp the view space position to the plane at Z = 1
+		viewRay = float3( viewRay.xy / viewRay.z, 1.0f );
+	#else
+		// For a quad we already clamped in the vertex shader
+		viewRay = viewRay.xyz;
+	#endif
+
+	// Convert to a linear depth value using the projection matrix
+	float linearDepth = ProjMatrix[3][2] / ( zBufferDepth - ProjMatrix[2][2] );	
 	return viewRay * linearDepth;
 }
 
@@ -139,9 +168,8 @@ PSOutput PSMain( in VSOutput input, in float4 screenPos : SV_Position )
 		L = LightPos - position;
 	
 		// Calculate attenuation based on distance from the light source
-		float dist = length( L );		
-		static const float LightRange = 2.0f;
-		attenuation = max( 0, ( LightRange - dist ) / LightRange );
+		float dist = length( L );				
+		attenuation = max( 0, 1.0f - ( dist / LightRange.x ) );
 	
 		L /= dist;
 	#elif DIRECTIONALLIGHT
@@ -156,7 +184,8 @@ PSOutput PSMain( in VSOutput input, in float4 screenPos : SV_Position )
 		attenuation *= saturate( ( rho - SpotlightAngles.y ) / ( SpotlightAngles.x - SpotlightAngles.y ) );
 	#endif
 	
-	float3 diffuse = saturate( dot( normal, L ) ) * LightColor * diffuseAlbedo;
+	float diffuseNormalizationFactor = 1.0f / 3.14159265f;
+	float3 diffuse = saturate( dot( normal, L ) ) * LightColor * diffuseAlbedo * diffuseNormalizationFactor;
 	
 	#if GBUFFEROPTIMIZATIONS
 		// In view space camera position is (0, 0, 0)
@@ -168,8 +197,8 @@ PSOutput PSMain( in VSOutput input, in float4 screenPos : SV_Position )
 	// Calculate the specular term
 	float3 V = camPos - position;
 	float3 H = normalize( L + V );
-	float normalizationFactor = ( ( specularPower + 8.0f ) / ( 8.0f * 3.14159265f ) );
-	float3 specular = pow( saturate( dot( normal, H ) ), specularPower ) * normalizationFactor * LightColor * specularAlbedo.xyz;
+	float specNormalizationFactor = ( ( specularPower + 8.0f ) / ( 8.0f * 3.14159265f ) );
+	float3 specular = pow( saturate( dot( normal, H ) ), specularPower ) * specNormalizationFactor * LightColor * specularAlbedo.xyz;
 	
 	// Final output is the sum of the albedo and diffuse with attenuation applied
 	output.Color = float4( ( diffuse + specular ) * attenuation, 1.0f );

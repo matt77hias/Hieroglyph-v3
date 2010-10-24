@@ -372,3 +372,209 @@ void GeometryGeneratorDX11::GenerateAxisGeometry( GeometryDX11* pGeometry )
 	}	
 }
 //--------------------------------------------------------------------------------
+void GeometryGeneratorDX11::GenerateSphere( GeometryDX11* pGeometry, unsigned int URes, 
+                                            unsigned int VRes, float Radius )
+{
+    _ASSERT( VRes >= 3 );
+    _ASSERT( URes >= 4 );
+    _ASSERT( Radius > 0.0f );
+
+    if ( pGeometry )
+    {        
+        const unsigned int NumVertexRings = VRes - 1;
+        const unsigned int NumVerts = NumVertexRings * URes + 2;
+        const unsigned int NumTriangleRings = VRes - 2;
+        const unsigned int NumTriangles = ( NumTriangleRings + 1 ) * URes * 2;
+        const unsigned int NumIndices = NumTriangles * 3;  
+
+        VertexElementDX11* pPositions = new VertexElementDX11( 3, NumVerts );
+        pPositions->m_SemanticName = "POSITION";
+        pPositions->m_uiSemanticIndex = 0;
+        pPositions->m_Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        pPositions->m_uiInputSlot = 0;
+        pPositions->m_uiAlignedByteOffset = 0;
+        pPositions->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        pPositions->m_uiInstanceDataStepRate = 0;
+
+        // Calculate all of the vertex positions
+        Vector3f* pVerts = pPositions->Get3f( 0 );
+        int currVert = 0;
+
+        // First vertex will be at the top pole
+        pVerts[currVert++] = Vector3f( 0.0f, Radius, 0.0f );
+
+        // Add in the vertical rings of vertices
+        for ( unsigned int v = 1; v <= NumVertexRings; ++v )
+        {
+            for ( unsigned int u = 0; u < URes; ++u )
+            {
+                float uAngle = u / static_cast<float>( URes ) * 3.14159f * 2.0f;
+                float vAngle = v / static_cast<float>( VRes - 1 ) * 3.14159f;
+
+                float x = sinf( vAngle ) * cosf( uAngle ) * Radius;
+                float y = cosf( vAngle ) * Radius;
+                float z = -sinf( vAngle ) * sinf( uAngle ) * Radius;
+                pVerts[currVert++] = Vector3f( x, y, z );
+            }
+        }
+
+        // Last vertex is the bottom pole
+        pVerts[currVert++] = Vector3f( 0.0f, -Radius, 0.0f );
+        _ASSERT( currVert == NumVerts );
+
+        pGeometry->AddElement( pPositions );
+
+        // Now we'll add the triangles
+        TriangleIndices face;
+
+        // Top ring first
+        for ( unsigned int u = 0; u < URes; ++u )
+        {
+            const unsigned int currentU = u;
+            const unsigned int nextU = ( u + 1 ) % URes;
+            face = TriangleIndices( 0, u + 1, nextU + 1 );
+            pGeometry->AddFace( face );
+        }
+
+        // Now the middle rings
+        for ( unsigned int v = 1; v < VRes - 1; ++v )
+        {
+            const unsigned int top = 1 + ( ( v - 1 ) * URes );
+            const unsigned int bottom = top + URes;
+            for ( unsigned int u = 0; u < URes; ++u )
+            {                
+                const unsigned int currentU = u;
+                const unsigned int nextU = ( u + 1 ) % URes;
+                const unsigned int currTop = top + currentU;
+                const unsigned int nextTop = top + nextU;
+                const unsigned int currBottom = bottom + currentU;
+                const unsigned int nextBottom = bottom + nextU;
+
+                face = TriangleIndices( currTop, currBottom, nextBottom );
+                pGeometry->AddFace( face );
+
+                face = TriangleIndices( nextBottom, nextTop, currTop);
+                pGeometry->AddFace( face );
+            }
+        }
+
+        // Now the bottom ring
+        const unsigned int top = 1 + ( ( VRes - 2 ) * URes );
+        const unsigned int bottom = NumVerts - 1;
+        for ( unsigned int u = 0; u < URes; ++u )
+        {
+            const unsigned int currentU = u;
+            const unsigned int nextU = ( u + 1 ) % URes;
+            const unsigned int currTop = top + currentU;
+            const unsigned int nextTop = top + nextU;
+
+            face = TriangleIndices( currTop, bottom, nextTop );
+            pGeometry->AddFace( face );
+        }
+    }
+}
+//--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+void GeometryGeneratorDX11::GenerateCone( GeometryDX11* pGeometry, unsigned int URes, 
+                                        unsigned int VRes, float Radius, float Height )
+{
+    _ASSERT( VRes >= 1 );
+    _ASSERT( URes >= 4 );
+    _ASSERT( Radius > 0.0f );
+    _ASSERT( Height > 0.0f );
+
+    if ( pGeometry )
+    {        
+        const unsigned int NumVertexRings = VRes;
+        const unsigned int NumVerts = NumVertexRings * URes + 2;
+        const unsigned int NumTriangleRings = VRes - 1;
+        const unsigned int NumTriangles = ( ( NumTriangleRings + 1 )* URes * 2 );
+        const unsigned int NumIndices = NumTriangles * 3;
+
+        VertexElementDX11* pPositions = new VertexElementDX11( 3, NumVerts );
+        pPositions->m_SemanticName = "POSITION";
+        pPositions->m_uiSemanticIndex = 0;
+        pPositions->m_Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        pPositions->m_uiInputSlot = 0;
+        pPositions->m_uiAlignedByteOffset = 0;
+        pPositions->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        pPositions->m_uiInstanceDataStepRate = 0;
+
+        // Calculate all of the vertex positions
+        Vector3f* pVerts = pPositions->Get3f( 0 );
+        int currVert = 0;
+
+        // First vertex will be at the top pole
+        pVerts[currVert++] = Vector3f( 0.0f, 0.0f, 0.0f );
+
+        // Add in the rings of vertices
+        for ( unsigned int v = 1; v <= NumVertexRings; ++v )
+        {
+            for ( unsigned int u = 0; u < URes; ++u )
+            {
+                float uAngle = u / static_cast<float>( URes ) * 3.14159f * 2.0f;                
+
+                float heightScale = v / static_cast<float>( NumVertexRings );
+                float x = cosf( uAngle ) * Radius * heightScale;
+                float y = sinf( uAngle ) * Radius * heightScale;
+                float z = heightScale * Height;
+                pVerts[currVert++] = Vector3f( x, y, z );
+            }
+        }
+
+        // First vertex will be the center of the circle
+        pVerts[currVert++] = Vector3f( 0.0f, 0.0f, Height );
+        
+        _ASSERT( currVert == NumVerts );
+        pGeometry->AddElement( pPositions );
+
+        // Now we'll add the triangles
+        TriangleIndices face;
+
+        // Top ring first
+        for ( unsigned int u = 0; u < URes; ++u )
+        {
+            const unsigned int currentU = u;
+            const unsigned int nextU = ( u + 1 ) % URes;
+            face = TriangleIndices( 0, nextU + 1, u + 1 );
+            pGeometry->AddFace( face );
+        }
+
+        // Now the other rings
+        for ( unsigned int v = 1; v < VRes; ++v )
+        {
+            const unsigned int top = 1 + ( ( v - 1 ) * URes );
+            const unsigned int bottom = top + URes;
+            for ( unsigned int u = 0; u < URes; ++u )
+            {                
+                const unsigned int currentU = u;
+                const unsigned int nextU = ( u + 1 ) % URes;
+                const unsigned int currTop = top + currentU;
+                const unsigned int nextTop = top + nextU;
+                const unsigned int currBottom = bottom + currentU;
+                const unsigned int nextBottom = bottom + nextU;
+
+                face = TriangleIndices( currTop, nextTop, nextBottom );
+                pGeometry->AddFace( face );
+
+                face = TriangleIndices( nextBottom, currBottom, currTop);
+                pGeometry->AddFace( face );
+            }
+        }
+
+        // And now the bottom
+        const unsigned int top = 1 + ( ( VRes - 1 ) * URes );
+        const unsigned int center = NumVerts - 1;
+        for ( unsigned int u = 0; u < URes; ++u )
+        {
+            const unsigned int currentU = u;
+            const unsigned int nextU = ( u + 1 ) % URes;
+            const unsigned int currTop = top + currentU;
+            const unsigned int nextTop = top + nextU;
+
+            face = TriangleIndices( nextTop, center, currTop );
+            pGeometry->AddFace( face );
+        }
+    }
+}
+//--------------------------------------------------------------------------------

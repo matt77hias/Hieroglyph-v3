@@ -43,6 +43,7 @@ namespace Glyph3
 		int		m_iBlendState;
 		int		m_iDepthStencilState;
 		int		m_iRasterizerState;
+        UINT    m_uStencilRef; 
 	};
 };
 //--------------------------------------------------------------------------------

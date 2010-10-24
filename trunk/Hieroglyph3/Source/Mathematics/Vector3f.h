@@ -27,17 +27,19 @@ namespace Glyph3
 
 		// vector operations
 		void Clamp( );
-		Vector3f Cross( Vector3f& A );
-		float Dot( Vector3f& A );
+		Vector3f Cross( const Vector3f& A ) const;
+		float Dot( const Vector3f& A ) const;
 		void MakeZero( );
 		float Magnitude( );
 		void Normalize( );
+        Vector3f Perpendicular( );
 
         // static vector ops
-        static Vector3f Clamp( Vector3f& A );
-        static Vector3f Cross( Vector3f& A, Vector3f& B );
-        static float Dot( Vector3f& A, Vector3f& B );
-        static Vector3f Normalize( Vector3f& A );
+        static Vector3f Clamp( const Vector3f& A );
+        static Vector3f Cross( const Vector3f& A, const Vector3f& B );
+        static float Dot( const Vector3f& A, const Vector3f& B );
+        static Vector3f Normalize( const Vector3f& A );
+        static Vector3f Perpendicular( const Vector3f& A );
 
 		// assignment
 		Vector3f& operator= (const Vector3f& Vector);

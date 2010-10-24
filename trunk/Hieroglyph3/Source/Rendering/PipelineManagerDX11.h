@@ -44,6 +44,7 @@ namespace Glyph3
 		void SetDepthStencilState( int ID, UINT stencilRef = 0 );
 		void SetRasterizerState( int ID );
 		void SetViewPort( int ID );
+        void SetScissorRects( UINT NumRects, const D3D11_RECT* pRects ); 
 
 		// State accessors
 		D3D11_VIEWPORT GetCurrentViewport( );

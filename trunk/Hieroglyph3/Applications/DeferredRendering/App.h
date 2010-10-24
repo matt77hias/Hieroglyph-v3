@@ -15,6 +15,7 @@
 
 #include "ViewGBuffer.h"
 #include "ViewLights.h"
+#include "AppSettings.h"
 
 using namespace Glyph3;
 
@@ -38,28 +39,7 @@ public:
 protected:
     
     void SetupViews();
-    void DrawHUD();
-
-    enum DisplayMode 
-    {
-        Final = 0, 
-        GBuffer = 1, 
-        Normals = 2,        
-        DiffuseAlbedo = 3,
-        SpecularAlbedo = 4,
-        Position = 5,
-
-        NumDisplayModes
-    };
-
-    enum LightMode
-    {       
-        Lights3x3x3 = 0,
-        Lights5x5x5,
-        Lights7x7x7,
-
-        NumLightModes
-    };    
+    void DrawHUD();    
 
 	RendererDX11*			m_pRenderer11;
 	Win32RenderWindow*		m_pWindow;
@@ -75,6 +55,7 @@ protected:
 
     int                     m_iOptGbufferVS;
     int                     m_iOptGbufferPS;
+    int					    m_iGBufferDSState;
 
     ResourcePtr             m_DiffuseTexture;
     ResourcePtr             m_NormalMap;
@@ -90,9 +71,4 @@ protected:
 	Camera*					m_pCamera;
 
 	bool					m_bSaveScreenshot;
-
-    // App Settings
-    DisplayMode             m_DisplayMode;
-    LightMode               m_LightMode;
-    bool                    m_bEnableGBufferOpt;
 };

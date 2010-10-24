@@ -6,10 +6,10 @@
 //--------------------------------------------------------------------------------
 
 cbuffer Transforms
-{
-	matrix WorldViewProjMatrix;
+{	
 	matrix WorldMatrix;
 	matrix WorldViewMatrix;
+	matrix WorldViewProjMatrix;
 };
 
 struct VSInput

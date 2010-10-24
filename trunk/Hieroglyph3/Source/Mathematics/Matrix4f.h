@@ -49,8 +49,8 @@ namespace Glyph3
 		Vector3f GetTranslation();
 		Matrix3f GetRotation();
 
-		void SetRotation( Matrix3f& Rot );
-		void SetTranslation( Vector3f& Trans );
+		void SetRotation( const Matrix3f& Rot );
+		void SetTranslation( const Vector3f& Trans );
 
 		static Matrix4f RotationMatrixX( float fRadians );
 		static Matrix4f RotationMatrixY( float fRadians );
@@ -76,7 +76,8 @@ namespace Glyph3
 		float& operator[] ( int iPos );
 
 		void SetRow( int iRow, const Vector4f& Vector );
-		Vector4f GetRow( int iRow) const;
+        void SetRow( int iRow, const Vector3f& Vector );		
+        Vector4f GetRow( int iRow ) const;        
 		void SetColumn( int iCol, const Vector4f& Vector );
 		Vector4f GetColumn( int iCol ) const;
 

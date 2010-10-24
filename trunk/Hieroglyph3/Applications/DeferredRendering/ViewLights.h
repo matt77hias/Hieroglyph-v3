@@ -18,6 +18,7 @@
 #include "IRenderView.h"
 #include "GeometryDX11.h"
 #include "RenderEffectDX11.h"
+#include "AppSettings.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -29,7 +30,7 @@ namespace Glyph3
         Directional = 2,
 
         NumLightTypes
-    };
+    };    
 
     // Light parameters
     struct Light
@@ -37,12 +38,13 @@ namespace Glyph3
         Vector3f Position;        
         Vector3f Color;
         Vector3f Direction;
+        float Range;
         float SpotInnerAngle;
-        float SpotOuterAngle;
+        float SpotOuterAngle;        
         LightType Type;
 
         Light() : Position( 0.0f, 0.0f, 0.0f ), Color( 1.0f, 1.0f, 1.0f ), Direction( -1.0f, -1.0f, 1.0f ), 
-                SpotInnerAngle( 0 ), SpotOuterAngle ( 0 ), Type ( Point ) {}
+                Range( 2.0f ), SpotInnerAngle( 0 ), SpotOuterAngle ( 0 ), Type ( Point ) {}
     };
 
     class ViewLights : public IRenderView
@@ -58,29 +60,46 @@ namespace Glyph3
         virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
 
         void AddLight( const Light& light );
-        void SetGBufferTargets( TArray<ResourcePtr>& GBufferTargets );
-        void EnableGBufferOptimizations( bool enable );
+        void SetGBufferTargets( TArray<ResourcePtr>& GBufferTargets );       
+        void SetClipPlanes( float NearClip, float FarClip );
 
         virtual ~ViewLights();
 
     protected:
 
+        D3D11_RECT CalcScissorRect( const Vector3f& lightPos, float lightRange );
+
+    protected:
+
         int					m_iViewport;
-        int					m_iDepthStencilState;
+        int					m_iDisabledDSState;
+        int                 m_iLessThanDSState;
+        int                 m_iGreaterThanDSState;
         int                 m_iBlendState;        
+        int                 m_iScissorRSState;
+        int                 m_iBackFaceCullRSState;
+        int                 m_iFrontFaceCullRSState;
+
+        UINT                m_uVPWidth;
+        UINT                m_uVPHeight;
+
+        float               m_fNearClip;
+        float               m_fFarClip;
 
         ResourcePtr	            m_pRenderTarget;
         ResourcePtr			    m_DepthTarget;
         TArray<ResourcePtr>     m_GBufferTargets;
 
         GeometryDX11			m_QuadGeometry;
+        GeometryDX11            m_SphereGeometry;
+        GeometryDX11            m_ConeGeometry;
 
-        RenderEffectDX11		m_PointLightEffect[2];
-        RenderEffectDX11		m_SpotLightEffect[2];
-        RenderEffectDX11		m_DirectionalLightEffect[2];
+        RenderEffectDX11		m_PointLightEffect[GBufferOptMode::NumSettings][LightOptMode::NumSettings];
+        RenderEffectDX11		m_SpotLightEffect[GBufferOptMode::NumSettings][LightOptMode::NumSettings];
+        RenderEffectDX11		m_DirectionalLightEffect[GBufferOptMode::NumSettings][LightOptMode::NumSettings];
 
         TArray<Light>           m_Lights;
-        bool                    m_bEnableGBufferOpt;
+        Matrix4f                m_WorldMatrix;
     };
 }
 //--------------------------------------------------------------------------------

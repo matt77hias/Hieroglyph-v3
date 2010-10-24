@@ -167,6 +167,18 @@ Vector4f Vector4f::operator* ( float fScalar ) const
 	return( prod );
 }
 //----------------------------------------------------------------------------------------------------
+Vector4f Vector4f::operator* ( const Vector4f& Vector ) const
+{
+    Vector4f prod;
+
+    prod.x = x * Vector.x;
+    prod.y = y * Vector.y;
+    prod.z = z * Vector.z;
+    prod.w = w * Vector.w;
+
+    return( prod );
+}
+//----------------------------------------------------------------------------------------------------
 Vector4f Vector4f::operator/ ( float fScalar ) const
 {
 	Vector4f quot;
@@ -184,6 +196,17 @@ Vector4f Vector4f::operator/ ( float fScalar ) const
 	}
 
 	return( quot );
+}
+//----------------------------------------------------------------------------------------------------
+Vector4f Vector4f::operator/ ( const Vector4f& Vector ) const
+{
+    Vector4f quot;
+    quot.x = Vector.x != 0.0f ? x / Vector.x : 0.0f;
+    quot.y = Vector.y != 0.0f ? y / Vector.y : 0.0f;
+    quot.z = Vector.z != 0.0f ? z / Vector.z : 0.0f;
+    quot.w = Vector.w != 0.0f ? z / Vector.z : 0.0f;
+
+    return( quot );
 }
 //----------------------------------------------------------------------------------------------------
 Vector4f Vector4f::operator- ( ) const
@@ -228,6 +251,16 @@ Vector4f& Vector4f::operator*= ( float fScalar )
 	return( *this );
 }
 //----------------------------------------------------------------------------------------------------
+Vector4f& Vector4f::operator*= ( const Vector4f& Vector )
+{
+    x *= Vector.x;
+    y *= Vector.y;
+    z *= Vector.z;
+    w *= Vector.w;
+
+    return( *this );
+}
+//----------------------------------------------------------------------------------------------------
 Vector4f& Vector4f::operator/= ( float fScalar )
 {
 	if ( fScalar != 0.0f )
@@ -244,6 +277,16 @@ Vector4f& Vector4f::operator/= ( float fScalar )
 	}
 
 	return( *this );
+}
+//----------------------------------------------------------------------------------------------------
+Vector4f& Vector4f::operator/= ( const Vector4f& Vector )
+{
+    x = Vector.x != 0.0f ? x / Vector.x : 0.0f;
+    y = Vector.y != 0.0f ? y / Vector.y : 0.0f;
+    z = Vector.z != 0.0f ? z / Vector.z : 0.0f;
+    w = Vector.w != 0.0f ? w / Vector.w : 0.0f;
+
+    return( *this );
 }
 //----------------------------------------------------------------------------------------------------
 void Vector4f::Clamp()

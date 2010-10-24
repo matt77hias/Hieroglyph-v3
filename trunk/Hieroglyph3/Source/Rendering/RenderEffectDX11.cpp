@@ -27,6 +27,7 @@ RenderEffectDX11::RenderEffectDX11()
 	m_iBlendState = -1;
 	m_iDepthStencilState = -1;
 	m_iRasterizerState = -1;
+    m_uStencilRef = 0;
 }
 //--------------------------------------------------------------------------------
 RenderEffectDX11::~RenderEffectDX11()
@@ -46,7 +47,7 @@ void RenderEffectDX11::ConfigurePipeline( PipelineManagerDX11* pPipeline, Parame
 		pPipeline->SetBlendState( 0 );
 
 	if ( m_iDepthStencilState != -1 )
-		pPipeline->SetDepthStencilState( m_iDepthStencilState );
+		pPipeline->SetDepthStencilState( m_iDepthStencilState, m_uStencilRef );
 	else
 		pPipeline->SetDepthStencilState( 0 );
 

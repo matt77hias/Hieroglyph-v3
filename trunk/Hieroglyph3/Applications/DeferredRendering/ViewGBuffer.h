@@ -20,11 +20,7 @@
 namespace Glyph3
 {
 	class ViewGBuffer : public IRenderView
-	{
-    public:
-        // Constants
-        static const UINT StencilRef = 0;
-
+	{    
 	public:		
 		ViewGBuffer( RendererDX11& Renderer, ResourcePtr DepthTarget );
 
@@ -41,8 +37,7 @@ namespace Glyph3
 
 	protected:
 
-		int					m_iViewport;
-		int					m_iDepthStencilState;
+		int					m_iViewport;		
 
         RendererDX11&           m_Renderer;
 		TArray<ResourcePtr> 	m_GBufferTargets;

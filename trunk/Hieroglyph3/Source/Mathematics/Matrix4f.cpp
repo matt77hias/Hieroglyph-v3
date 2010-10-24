@@ -272,7 +272,7 @@ Vector3f Matrix4f::GetTranslation()
 	return( Pos );
 }
 //----------------------------------------------------------------------------------------------------
-void Matrix4f::SetTranslation( Vector3f& Trans )
+void Matrix4f::SetTranslation( const Vector3f& Trans )
 {
 	for (int i = 0; i < 3; i++)
 		m_afEntry[I(3,i)] = Trans[i];
@@ -289,7 +289,7 @@ Matrix3f Matrix4f::GetRotation()
 	return( mRet );
 }
 //----------------------------------------------------------------------------------------------------
-void Matrix4f::SetRotation( Matrix3f& Rot )
+void Matrix4f::SetRotation( const Matrix3f& Rot )
 {
 	for (int i = 0; i < 3; i++)
 		for (int j = 0; j < 3; j++)
@@ -591,6 +591,12 @@ Vector4f Matrix4f::operator* ( const Vector4f& Vector ) const
 void Matrix4f::SetRow( int iRow, const Vector4f& Vector )
 {
 	for ( int iCol = 0; iCol < 4; iCol++ )
+        m_afEntry[I(iRow,iCol)] = Vector[iCol];
+}
+//----------------------------------------------------------------------------------------------------
+void Matrix4f::SetRow( int iRow, const Vector3f& Vector )
+{
+    for ( int iCol = 0; iCol < 3; iCol++ )
         m_afEntry[I(iRow,iCol)] = Vector[iCol];
 }
 //----------------------------------------------------------------------------------------------------
