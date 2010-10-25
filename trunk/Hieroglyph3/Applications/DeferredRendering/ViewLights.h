@@ -50,7 +50,7 @@ namespace Glyph3
     class ViewLights : public IRenderView
     {    
     public:		
-        ViewLights( RendererDX11& Renderer, ResourcePtr pRenderTarget, ResourcePtr DepthTarget );
+        ViewLights( RendererDX11& Renderer );
 
         virtual void Update( float fTime );
         virtual void PreDraw( RendererDX11* pRenderer );
@@ -60,7 +60,9 @@ namespace Glyph3
         virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
 
         void AddLight( const Light& light );
-        void SetGBufferTargets( TArray<ResourcePtr>& GBufferTargets );       
+        void SetTargets( TArray<ResourcePtr>& GBufferTargets, ResourcePtr pRenderTarget, 
+                            ResourcePtr DepthTarget, ResourcePtr DepthTargetCopy,
+                            int Viewport, int vpWidth, int vpHeight );       
         void SetClipPlanes( float NearClip, float FarClip );
 
         virtual ~ViewLights();
@@ -88,15 +90,16 @@ namespace Glyph3
 
         ResourcePtr	            m_pRenderTarget;
         ResourcePtr			    m_DepthTarget;
+        ResourcePtr			    m_DepthTargetCopy;
         TArray<ResourcePtr>     m_GBufferTargets;
 
         GeometryDX11			m_QuadGeometry;
         GeometryDX11            m_SphereGeometry;
         GeometryDX11            m_ConeGeometry;
 
-        RenderEffectDX11		m_PointLightEffect[GBufferOptMode::NumSettings][LightOptMode::NumSettings];
-        RenderEffectDX11		m_SpotLightEffect[GBufferOptMode::NumSettings][LightOptMode::NumSettings];
-        RenderEffectDX11		m_DirectionalLightEffect[GBufferOptMode::NumSettings][LightOptMode::NumSettings];
+        RenderEffectDX11		m_PointLightEffect[GBufferOptMode::NumSettings][LightOptMode::NumSettings][AAMode::NumSettings];
+        RenderEffectDX11		m_SpotLightEffect[GBufferOptMode::NumSettings][LightOptMode::NumSettings][AAMode::NumSettings];
+        RenderEffectDX11		m_DirectionalLightEffect[GBufferOptMode::NumSettings][LightOptMode::NumSettings][AAMode::NumSettings];
 
         TArray<Light>           m_Lights;
         Matrix4f                m_WorldMatrix;

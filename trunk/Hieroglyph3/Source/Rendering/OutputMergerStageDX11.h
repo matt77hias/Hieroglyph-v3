@@ -42,6 +42,7 @@ namespace Glyph3
 		ID3D11RenderTargetView*			RenderTargetViews[8];
 		ID3D11RenderTargetView*			APIRenderTargetViews[8];
 		ID3D11DepthStencilView*			DepthTargetViews;
+        ID3D11DepthStencilView*			APIDepthTargetViews;
 		ID3D11UnorderedAccessView*		UnorderedAccessViews[D3D11_PS_CS_UAV_REGISTER_COUNT];
 
 		friend RendererDX11;

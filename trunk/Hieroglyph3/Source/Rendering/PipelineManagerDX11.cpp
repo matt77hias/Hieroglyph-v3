@@ -893,3 +893,18 @@ void PipelineManagerDX11::ExecuteCommandList( CommandListDX11* pList )
 		m_pContext->ExecuteCommandList( pList->m_pList, true );
 }
 //--------------------------------------------------------------------------------
+void PipelineManagerDX11::ResolveSubresource( ResourcePtr DestResource, UINT DstSubresource, 
+                                              ResourcePtr SrcResource, UINT SrcSubresource, 
+                                              DXGI_FORMAT format )
+{
+    int DestType = DestResource->m_iResource & 0x00FF0000;
+    int DestID = DestResource->m_iResource & 0x0000FFFF;
+    ID3D11Resource* pDestResource = RendererDX11::Get()->GetResource(DestID)->GetResource();
+
+    int SrcType = SrcResource->m_iResource & 0x00FF0000;
+    int SrcID = SrcResource->m_iResource & 0x0000FFFF;
+    ID3D11Resource* pSrcResource = RendererDX11::Get()->GetResource(SrcID)->GetResource();
+ 
+    m_pContext->ResolveSubresource( pDestResource, DstSubresource, pSrcResource, SrcSubresource, format );
+}
+//--------------------------------------------------------------------------------

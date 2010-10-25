@@ -44,17 +44,16 @@ protected:
 	RendererDX11*			m_pRenderer11;
 	Win32RenderWindow*		m_pWindow;
 
-	TArray<ResourcePtr>		m_GBuffer;    
-    TArray<ResourcePtr>     m_OptimizedGBuffer;
-	ResourcePtr				m_DepthTarget;
-	ResourcePtr				m_BackBuffer;
+    TArray<ResourcePtr>		m_GBuffer[GBufferOptMode::NumSettings][AAMode::NumSettings]; 
+	ResourcePtr				m_DepthTarget[AAMode::NumSettings];
+    ResourcePtr             m_DepthTargetCopy[AAMode::NumSettings];
+    ResourcePtr             m_FinalTarget[AAMode::NumSettings];
+    int                     m_iViewport[AAMode::NumSettings];
+    ResourcePtr             m_ResolveTarget;
+	ResourcePtr				m_BackBuffer;        
 
     MaterialDX11*           m_pMaterial;
-    RenderEffectDX11*       m_pGBufferEffect;
-    RenderEffectDX11*       m_pOptGBufferEffect;
-
-    int                     m_iOptGbufferVS;
-    int                     m_iOptGbufferPS;
+    RenderEffectDX11*       m_pGBufferEffect[GBufferOptMode::NumSettings];    
     int					    m_iGBufferDSState;
 
     ResourcePtr             m_DiffuseTexture;
@@ -69,6 +68,9 @@ protected:
 	Entity3D*				m_pEntity;
 
 	Camera*					m_pCamera;
+
+    int                     m_vpWidth;
+    int                     m_vpHeight;
 
 	bool					m_bSaveScreenshot;
 };

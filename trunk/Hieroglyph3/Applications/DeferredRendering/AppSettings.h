@@ -190,4 +190,43 @@ public:
     }
 };
 //--------------------------------------------------------------------------------
+// Antialiasing modes
+class AAMode
+{
+public:
+
+    enum Settings
+    {        
+        None = 0,
+        SSAA,
+        MSAA,
+
+        NumSettings
+    };
+
+    static const wchar_t Key = 'M';
+
+    static Settings Value; 
+
+    static std::wstring ToString()
+    {
+        static const std::wstring Names[NumSettings] = 
+        {
+            L"None",
+            L"Supersampling",
+            L"Multisampling"
+        };
+
+        std::wstring text = L"Antialiasing Mode(M): ";
+        text += Names[Value];
+
+        return text;
+    }
+
+    static void Increment()
+    {
+        IncrementSetting( Value, NumSettings );
+    }
+};
+//--------------------------------------------------------------------------------
 #endif // AppSettings_h

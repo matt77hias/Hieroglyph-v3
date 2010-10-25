@@ -24,6 +24,7 @@ OutputMergerStageDX11::OutputMergerStageDX11()
 
 	DepthTargetViews = 0;
 	for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) UnorderedAccessViews[i] = 0;
+    APIDepthTargetViews = NULL;
 }
 //--------------------------------------------------------------------------------
 OutputMergerStageDX11::~OutputMergerStageDX11()
@@ -74,6 +75,9 @@ void OutputMergerStageDX11::BindResources( ID3D11DeviceContext* pContext )
 		}
 	}
 
+    if ( DepthTargetViews != APIDepthTargetViews )
+        max++;
+
 	// If any targets are different then copy them over.
 	if ( max > 0 )
 		pContext->OMSetRenderTargets( 7, RenderTargetViews, DepthTargetViews );
@@ -81,6 +85,7 @@ void OutputMergerStageDX11::BindResources( ID3D11DeviceContext* pContext )
 	// Update the API views to know what to update next time.
 	for ( int i = 0; i < 8; i++ )
 		APIRenderTargetViews[i] = RenderTargetViews[i];
+    APIDepthTargetViews = DepthTargetViews;
 }
 //--------------------------------------------------------------------------------
 void OutputMergerStageDX11::ClearResources( ID3D11DeviceContext* pContext )

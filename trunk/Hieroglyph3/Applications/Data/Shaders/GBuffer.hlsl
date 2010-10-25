@@ -39,12 +39,31 @@ struct VSOutputOptimized
 	float3 BitangentVS	: BITANGENTVS;
 };
 
+struct PSInput
+{	
+	float4 PositionSS	: SV_Position;
+	float2 TexCoord		: TEXCOORD;
+	float3 NormalWS		: NORMALWS;
+	float3 PositionWS	: POSITIONWS;
+	float3 TangentWS	: TANGENTWS;
+	float3 BitangentWS	: BITANGENTWS;
+};
+
 struct PSOutput
 {
 	float4 Normal			: SV_Target0;
 	float4 DiffuseAlbedo 	: SV_Target1;
 	float4 SpecularAlbedo 	: SV_Target2;
 	float4 Position			: SV_Target3;
+};
+
+struct PSInputOptimized
+{	
+	centroid float4 PositionSS 	: SV_Position;
+	float2 TexCoord				: TEXCOORD;
+	float3 NormalVS				: NORMALVS;	
+	float3 TangentVS			: TANGENTVS;
+	float3 BitangentVS			: BITANGENTVS;
 };
 
 struct PSOutputOptimized
@@ -120,7 +139,7 @@ VSOutputOptimized VSMainOptimized( in VSInput input )
 //-------------------------------------------------------------------------------------------------
 // Basic pixel shader, no optimizations
 //-------------------------------------------------------------------------------------------------
-PSOutput PSMain( in VSOutput input )
+PSOutput PSMain( in PSInput input )
 {
 	PSOutput output;
 
@@ -158,7 +177,7 @@ float2 SpheremapEncode( float3 normalVS )
 //-------------------------------------------------------------------------------------------------
 // Pixel shader, with optimizations
 //-------------------------------------------------------------------------------------------------
-PSOutputOptimized PSMainOptimized( in VSOutputOptimized input )
+PSOutputOptimized PSMainOptimized( in PSInputOptimized input )
 {
 	PSOutputOptimized output;
 
@@ -175,10 +194,13 @@ PSOutputOptimized PSMainOptimized( in VSOutputOptimized input )
 	
 	// Convert to view space
 	float3 normalVS = mul( normalTS, tangentFrameVS );
+	
+	// Output a mask value indicating whether the current pixel is an edge pixel
+	float msaaMask = dot( abs( frac( input.PositionSS.xy ) - 0.5 ), 1000.0 );
 
 	// Output our G-Buffer values
 	output.Normal = float4( SpheremapEncode( normalVS ), 1.0f, 1.0f );
-	output.DiffuseAlbedo = float4( diffuseAlbedo, 1.0f );
+	output.DiffuseAlbedo = float4( diffuseAlbedo, msaaMask );
 	output.SpecularAlbedo = float4( 0.7f, 0.7f, 0.7f, 64.0f / 255.0f );	
 	
 	return output;

@@ -35,37 +35,13 @@ static float Clamp( float x, float low, float high )
     return x;
 }
 //--------------------------------------------------------------------------------
-ViewLights::ViewLights( RendererDX11& Renderer, ResourcePtr pRenderTarget, ResourcePtr DepthTarget )
-    : m_pRenderTarget( pRenderTarget ), m_DepthTarget( DepthTarget )
+ViewLights::ViewLights( RendererDX11& Renderer)    
 {
     m_sParams.iViewType = VT_LIGHTS;
 
     ViewMatrix.MakeIdentity();
     ProjMatrix.MakeIdentity();	
-
-    // Create the viewport based on the first render target
-    ResourceDX11* pResource = Renderer.GetResource( m_pRenderTarget->m_iResource & 0x0000ffff );
-
-    if ( pResource->GetType() == D3D11_RESOURCE_DIMENSION_TEXTURE2D )
-    {
-        Texture2dDX11* pTexture = (Texture2dDX11*)pResource;
-        D3D11_TEXTURE2D_DESC desc = pTexture->GetActualDescription();
-
-        m_uVPWidth = desc.Width;
-        m_uVPHeight = desc.Height;
-
-        // Create a view port to use on the scene.  This basically selects the 
-        // entire floating point area of the render target.
-        D3D11_VIEWPORT viewport;
-        viewport.Width = static_cast< float >( desc.Width );
-        viewport.Height = static_cast< float >( desc.Height );
-        viewport.MinDepth = 0.0f;
-        viewport.MaxDepth = 1.0f;
-        viewport.TopLeftX = 0;
-        viewport.TopLeftY = 0;
-
-        m_iViewport = Renderer.CreateViewPort( viewport );
-    }
+ 
 
     // Create a depth stencil state with no depth testing, and with stencil testing
     // enabled to make sure we only light pixels where we rendered to the G-Buffer
@@ -157,92 +133,98 @@ ViewLights::ViewLights( RendererDX11& Renderer, ResourcePtr pRenderTarget, Resou
     {
         for ( int lightOptMode = 0; lightOptMode < LightOptMode::NumSettings; ++lightOptMode )
         {
-            // We'll create permutations of our shaders bases on optimization mods
-            D3D10_SHADER_MACRO defines[6];
-            defines[0].Name = "POINTLIGHT";
-            defines[0].Definition = "1";
-            defines[1].Name = "SPOTLIGHT";
-            defines[1].Definition = "0";
-            defines[2].Name = "DIRECTIONALLIGHT";
-            defines[2].Definition = "0";
-            defines[3].Name = "GBUFFEROPTIMIZATIONS";
-            defines[3].Definition = gBufferOptMode == GBufferOptMode::OptEnabled ? "1" : "0";
-            defines[4].Name = "LIGHTVOLUMES";
-            defines[4].Definition = lightOptMode == LightOptMode::Volumes ? "1" : "0";
-            defines[5].Name = NULL;
-            defines[5].Definition = NULL;                       
+            for ( int aaMode = 0; aaMode < AAMode::NumSettings; ++aaMode )
+            {
 
-            // Point light shaders
-            m_PointLightEffect[gBufferOptMode][lightOptMode].m_iVertexShader = 
-                Renderer.LoadShader( VERTEX_SHADER,
-                std::wstring( L"../Data/Shaders/Lights.hlsl" ),
-                std::wstring( L"VSMain" ),
-                std::wstring( L"vs_5_0" ),
-                defines );
-            _ASSERT( m_PointLightEffect[gBufferOptMode][lightOptMode].m_iVertexShader != -1 );
+                // We'll create permutations of our shaders bases on optimization mods
+                D3D10_SHADER_MACRO defines[7];
+                defines[0].Name = "POINTLIGHT";
+                defines[0].Definition = "1";
+                defines[1].Name = "SPOTLIGHT";
+                defines[1].Definition = "0";
+                defines[2].Name = "DIRECTIONALLIGHT";
+                defines[2].Definition = "0";
+                defines[3].Name = "GBUFFEROPTIMIZATIONS";
+                defines[3].Definition = gBufferOptMode == GBufferOptMode::OptEnabled ? "1" : "0";
+                defines[4].Name = "LIGHTVOLUMES";
+                defines[4].Definition = lightOptMode == LightOptMode::Volumes ? "1" : "0";
+                defines[5].Name = "MSAA";
+                defines[5].Definition = aaMode == AAMode::MSAA ? "1" : "0";
+                defines[6].Name = NULL;
+                defines[6].Definition = NULL;                       
 
-            m_PointLightEffect[gBufferOptMode][lightOptMode].m_iPixelShader =
-                Renderer.LoadShader( PIXEL_SHADER,
-                std::wstring( L"../Data/Shaders/Lights.hlsl" ),
-                std::wstring( L"PSMain" ),
-                std::wstring( L"ps_5_0" ),
-                defines );        
-            _ASSERT( m_PointLightEffect[gBufferOptMode][lightOptMode].m_iPixelShader != -1 );
+                // Point light shaders
+                m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader = 
+                    Renderer.LoadShader( VERTEX_SHADER,
+                    std::wstring( L"../Data/Shaders/Lights.hlsl" ),
+                    std::wstring( L"VSMain" ),
+                    std::wstring( L"vs_5_0" ),
+                    defines );
+                _ASSERT( m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader != -1 );
 
-            m_PointLightEffect[gBufferOptMode][lightOptMode].m_iBlendState = m_iBlendState;
-            m_PointLightEffect[gBufferOptMode][lightOptMode].m_iDepthStencilState = m_iDisabledDSState;
-            m_PointLightEffect[gBufferOptMode][lightOptMode].m_iRasterizerState = m_iBackFaceCullRSState;
-            m_PointLightEffect[gBufferOptMode][lightOptMode].m_uStencilRef = 1;
+                m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iPixelShader =
+                    Renderer.LoadShader( PIXEL_SHADER,
+                    std::wstring( L"../Data/Shaders/Lights.hlsl" ),
+                    std::wstring( L"PSMain" ),
+                    std::wstring( L"ps_5_0" ),
+                    defines );        
+                _ASSERT( m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iPixelShader != -1 );
 
-            // Spot light shaders
-            defines[0].Definition = "0";
-            defines[1].Definition = "1";
+                m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iBlendState = m_iBlendState;
+                m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iDepthStencilState = m_iDisabledDSState;
+                m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iRasterizerState = m_iBackFaceCullRSState;
+                m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_uStencilRef = 1;
 
-            m_SpotLightEffect[gBufferOptMode][lightOptMode].m_iVertexShader = 
-                Renderer.LoadShader( VERTEX_SHADER,
-                std::wstring( L"../Data/Shaders/Lights.hlsl" ),
-                std::wstring( L"VSMain" ),
-                std::wstring( L"vs_5_0" ),
-                defines );
-            _ASSERT( m_SpotLightEffect[gBufferOptMode][lightOptMode].m_iVertexShader != -1 );
+                // Spot light shaders
+                defines[0].Definition = "0";
+                defines[1].Definition = "1";
 
-            m_SpotLightEffect[gBufferOptMode][lightOptMode].m_iPixelShader =
-                Renderer.LoadShader( PIXEL_SHADER,
-                std::wstring( L"../Data/Shaders/Lights.hlsl" ),
-                std::wstring( L"PSMain" ),
-                std::wstring( L"ps_5_0" ),
-                defines );        
-            _ASSERT( m_SpotLightEffect[gBufferOptMode][lightOptMode].m_iPixelShader != -1 );
+                m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader = 
+                    Renderer.LoadShader( VERTEX_SHADER,
+                    std::wstring( L"../Data/Shaders/Lights.hlsl" ),
+                    std::wstring( L"VSMain" ),
+                    std::wstring( L"vs_5_0" ),
+                    defines );
+                _ASSERT( m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader != -1 );
 
-            m_SpotLightEffect[gBufferOptMode][lightOptMode].m_iBlendState = m_iBlendState;
-            m_SpotLightEffect[gBufferOptMode][lightOptMode].m_iDepthStencilState = m_iDisabledDSState;
-            m_SpotLightEffect[gBufferOptMode][lightOptMode].m_iRasterizerState = m_iBackFaceCullRSState;
-            m_SpotLightEffect[gBufferOptMode][lightOptMode].m_uStencilRef = 1;
+                m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iPixelShader =
+                    Renderer.LoadShader( PIXEL_SHADER,
+                    std::wstring( L"../Data/Shaders/Lights.hlsl" ),
+                    std::wstring( L"PSMain" ),
+                    std::wstring( L"ps_5_0" ),
+                    defines );        
+                _ASSERT( m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iPixelShader != -1 );
 
-            // Directional light shaders
-            defines[1].Definition = "0";
-            defines[2].Definition = "1";
+                m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iBlendState = m_iBlendState;
+                m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iDepthStencilState = m_iDisabledDSState;
+                m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iRasterizerState = m_iBackFaceCullRSState;
+                m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_uStencilRef = 1;
 
-            m_DirectionalLightEffect[gBufferOptMode][lightOptMode].m_iVertexShader = 
-                Renderer.LoadShader( VERTEX_SHADER,
-                std::wstring( L"../Data/Shaders/Lights.hlsl" ),
-                std::wstring( L"VSMain" ),
-                std::wstring( L"vs_5_0" ),
-                defines );
-            _ASSERT( m_DirectionalLightEffect[gBufferOptMode][lightOptMode].m_iVertexShader != -1 );
+                // Directional light shaders
+                defines[1].Definition = "0";
+                defines[2].Definition = "1";
 
-            m_DirectionalLightEffect[gBufferOptMode][lightOptMode].m_iPixelShader =
-                Renderer.LoadShader( PIXEL_SHADER,
-                std::wstring( L"../Data/Shaders/Lights.hlsl" ),
-                std::wstring( L"PSMain" ),
-                std::wstring( L"ps_5_0" ),
-                defines );        
-            _ASSERT( m_DirectionalLightEffect[gBufferOptMode][lightOptMode].m_iPixelShader != -1 );
+                m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader = 
+                    Renderer.LoadShader( VERTEX_SHADER,
+                    std::wstring( L"../Data/Shaders/Lights.hlsl" ),
+                    std::wstring( L"VSMain" ),
+                    std::wstring( L"vs_5_0" ),
+                    defines );
+                _ASSERT( m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader != -1 );
 
-            m_DirectionalLightEffect[gBufferOptMode][lightOptMode].m_iBlendState = m_iBlendState;
-            m_DirectionalLightEffect[gBufferOptMode][lightOptMode].m_iDepthStencilState = m_iDisabledDSState;
-            m_DirectionalLightEffect[gBufferOptMode][lightOptMode].m_iRasterizerState = m_iBackFaceCullRSState;
-            m_DirectionalLightEffect[gBufferOptMode][lightOptMode].m_uStencilRef = 1;
+                m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iPixelShader =
+                    Renderer.LoadShader( PIXEL_SHADER,
+                    std::wstring( L"../Data/Shaders/Lights.hlsl" ),
+                    std::wstring( L"PSMain" ),
+                    std::wstring( L"ps_5_0" ),
+                    defines );
+                _ASSERT( m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iPixelShader != -1 );
+
+                m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iBlendState = m_iBlendState;
+                m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iDepthStencilState = m_iDisabledDSState;
+                m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iRasterizerState = m_iBackFaceCullRSState;
+                m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_uStencilRef = 1;
+            }
         }
     }
 
@@ -280,15 +262,18 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
     pPipelineManager->ClearBuffers( color, 1.0f, 0 );
 
     // Bind the depth buffer
-    // pPipelineManager->BindDepthTarget( m_DepthTarget );
+    pPipelineManager->BindDepthTarget( m_DepthTarget );
     pPipelineManager->ApplyRenderTargets();
 
     pPipelineManager->SetViewPort( m_iViewport );
 
+    // Copy the depth buffer
+    pPipelineManager->CopySubresourceRegion( m_DepthTargetCopy, 0, 0, 0, 0, m_DepthTarget, 0, NULL );
+
     // Set this view's render parameters
     SetRenderParams( pParamManager );
 
-    // Loop through the lights    
+    // Loop through the lights        
     for ( int i = 0; i < m_Lights.count(); ++i )   
     {
         const Light& light = m_Lights[i];
@@ -296,11 +281,11 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
         // Pick the effect based on the shader
         RenderEffectDX11* pEffect = NULL;
         if ( light.Type == Point )
-            pEffect = &m_PointLightEffect[GBufferOptMode::Value][LightOptMode::Value];
+            pEffect = &m_PointLightEffect[GBufferOptMode::Value][LightOptMode::Value][AAMode::Value];
         else if ( light.Type == Spot )
-            pEffect = &m_SpotLightEffect[GBufferOptMode::Value][LightOptMode::Value];
+            pEffect = &m_SpotLightEffect[GBufferOptMode::Value][LightOptMode::Value][AAMode::Value];
         else if ( light.Type == Directional )
-            pEffect = &m_DirectionalLightEffect[GBufferOptMode::Value][LightOptMode::Value];
+            pEffect = &m_DirectionalLightEffect[GBufferOptMode::Value][LightOptMode::Value][AAMode::Value];
 
         // Set the light params
         Vector4f pos = Vector4f( light.Position, 1.0f );
@@ -454,7 +439,7 @@ void ViewLights::SetRenderParams( ParameterManagerDX11* pParamManager )
 
     // Bind depth if optimizations are enabled
     if ( GBufferOptMode::Enabled() )
-        pParamManager->SetShaderResourceParameter( L"DepthTexture", m_DepthTarget );
+        pParamManager->SetShaderResourceParameter( L"DepthTexture", m_DepthTargetCopy );
 }
 //--------------------------------------------------------------------------------
 void ViewLights::SetUsageParams( ParameterManagerDX11* pParamManager )
@@ -467,16 +452,22 @@ void ViewLights::AddLight( const Light& light )
     m_Lights.add( light );
 }
 //--------------------------------------------------------------------------------
-void ViewLights::SetGBufferTargets( TArray<ResourcePtr>& GBufferTargets )
+void ViewLights::SetTargets( TArray<ResourcePtr>& GBufferTargets, ResourcePtr pRenderTarget, 
+                            ResourcePtr DepthTarget, ResourcePtr DepthTargetCopy, 
+                            int Viewport, int vpWidth, int vpHeight )
 {
     m_GBufferTargets = GBufferTargets;
+    m_pRenderTarget = pRenderTarget;
+    m_DepthTarget = DepthTarget;
+    m_DepthTargetCopy = DepthTargetCopy;
+    m_iViewport = Viewport;
+    m_uVPWidth = vpWidth;
+    m_uVPHeight = vpHeight;
 }
 //--------------------------------------------------------------------------------
 D3D11_RECT ViewLights::CalcScissorRect( const Vector3f& lightPos, float lightRange )
 {    
-    // Create a bounding sphere for the light.
-    // In this sample the distance attenuation is fixed, in real-world
-    // cases the radius should be based on the attenuation factors used.
+    // Create a bounding sphere for the light, based on the position and range
     Vector4f centerWS = Vector4f( lightPos, 1.0f );
     float radius = lightRange;
 
@@ -496,22 +487,18 @@ D3D11_RECT ViewLights::CalcScissorRect( const Vector3f& lightPos, float lightRan
     topVS.z = topVS.y < 0.0f ? topVS.z + radius : topVS.z - radius;
     bottomVS.z = bottomVS.y < 0.0f ? bottomVS.z - radius : bottomVS.z + radius;
 
-    // Transform the four points into clip-space by applying the projection
-    // matrix, and performing homogeneous divide-by-w    
-    Vector4f topCS = ProjMatrix * topVS;
-    Vector4f bottomCS = ProjMatrix * bottomVS;
-    Vector4f leftCS = ProjMatrix * leftVS;
-    Vector4f rightCS = ProjMatrix * rightVS;    
-    topCS /= topCS.w;
-    bottomCS /= bottomCS.w;
-    leftCS /= leftCS.w;
-    rightCS /= rightCS.w;
+    // Clamp the z coordinate to the clip planes
+    leftVS.z = Clamp( leftVS.z, m_fNearClip, m_fFarClip );
+    rightVS.z = Clamp( rightVS.z, m_fNearClip, m_fFarClip );
+    topVS.z = Clamp( topVS.z, m_fNearClip, m_fFarClip );
+    bottomVS.z = Clamp( bottomVS.z, m_fNearClip, m_fFarClip );
 
-    // Figure out the rectangle in clip-space
-    float rectTopCS = topCS.y;
-    float rectBottomCS = bottomCS.y;
-    float rectLeftCS = leftCS.x;
-    float rectRightCS = rightCS.x;
+    // Figure out the rectangle in clip-space by applying the perspective transform.
+    // We assume that the perspective transform is symmetrical with respect to X and Y.
+    float rectLeftCS = leftVS.x * ProjMatrix( 0, 0 ) / leftVS.z;
+    float rectRightCS = rightVS.x * ProjMatrix( 0, 0 ) / rightVS.z;
+    float rectTopCS = topVS.y * ProjMatrix( 1, 1 ) / topVS.z;
+    float rectBottomCS = bottomVS.y * ProjMatrix( 1, 1 ) / bottomVS.z;    
 
     // Clamp the rectangle to the screen extents
     rectTopCS = Clamp( rectTopCS, -1.0f, 1.0f );
@@ -540,122 +527,7 @@ D3D11_RECT ViewLights::CalcScissorRect( const Vector3f& lightPos, float lightRan
     rect.top = static_cast<LONG>( rectTopSS );
     rect.bottom = static_cast<LONG>( rectBottomSS );
 
-    rect.left = max( rect.left, 0 );
-    rect.top = max( rect.top, 0 );
-    rect.right = min( rect.right, static_cast<LONG>( m_uVPWidth ) );
-    rect.bottom = min( rect.bottom, static_cast<LONG>( m_uVPHeight ) );
-
     return rect;
-
-    /*D3D11_RECT d3dRect;
-    d3dRect.left = 0;
-    d3dRect.right = m_uVPWidth;
-    d3dRect.top = 0;
-    d3dRect.bottom = m_uVPHeight;
-
-    // The following code is based on "Deferred Shading Tutorial", by Fabio Policarpo and Francisco Fonseca.
-    // http://www710.univ-lyon1.fr/~jciehl/Public/educ/GAMA/2007/Deferred_Shading_Tutorial_SBGAMES2005.pdf
-    // Also see "The Mechanics of Robust Stencil Shadows" by Eric Lengyel
-    // http://www.gamasutra.com/view/feature/2942/the_mechanics_of_robust_stencil_.php
-
-    int rect[4] = { 0, 0, m_uVPWidth, m_uVPHeight };
-    float d;
-
-    float radius = lightRange;
-    float radius2 = radius * radius;
-
-    Vector4f l = ViewMatrix * Vector4f( lightPos, 1.0f );
-
-    // Flip z around, since we use left-handed coordinates
-    l.z = -l.z;
-
-    Vector4f l2 = l * l;
-    float aspect = m_uVPWidth / static_cast<float>( m_uVPHeight );
-    float e = m_fNearClip;
-    float a = aspect;
-
-    d = radius2 * l2.x - ( l2.x + l2.z ) * ( radius2 - l2.z );
-    if ( d >=0 )
-    {
-        d = sqrtf( d );
-
-        float nx1 = ( radius * l.x + d )/( l2.x + l2.z );
-        float nx2 = ( radius * l.x - d )/( l2.x + l2.z );
-
-        float nz1 = ( radius - nx1 * l.x ) / l.z;
-        float nz2 = ( radius - nx2 * l.x ) / l.z;
-        
-        float pz1 = ( l2.x + l2.z - radius2 )/( l.z - ( nz1 / nx1 ) * l.x );
-        float pz2 = ( l2.x + l2.z - radius2 )/( l.z - ( nz2 / nx2 ) * l.x );
-
-        if ( pz1 < 0 )
-        {
-            float fx = nz1 * e / nx1;
-            int ix = (int)( ( fx + 1.0f )* m_uVPWidth * 0.5f );
-
-            float px = -pz1 * nz1 / nx1;
-            if ( px < l.x )
-                rect[0] = max( rect[0], ix );
-            else
-                rect[2] = min( rect[2], ix );
-        }
-
-        if ( pz2 < 0 )
-        {
-            float fx = nz2 * e / nx2;
-            int ix =(int)(( fx + 1.0f ) * m_uVPWidth * 0.5f);
-            float px = -pz2* nz2 / nx2 ;
-            if ( px < l.x )
-                rect[0] = max( rect[0], ix );
-            else
-                rect[2] = min( rect[2], ix );
-        }
-    }
-
-    d = radius2 * l2.y - ( l2.y + l2.z ) * ( radius2 - l2.z );
-    if ( d >= 0 )
-    {
-        d = sqrtf( d );
-
-        float ny1 = ( radius * l.y + d )/( l2.y + l2.z );
-        float ny2 = ( radius * l.y - d )/( l2.y + l2.z );
-        float nz1 = ( radius - ny1 * l.y  ) / l.z;
-        float nz2 = ( radius - ny2 * l.y ) / l.z;
-
-        float pz1 = ( l2.y + l2.z - radius2 ) / ( l.z - ( nz1 / ny1 ) * l.y );
-        float pz2 = ( l2.y + l2.z - radius2 ) / ( l.z - ( nz2 / ny2 ) * l.y) ;
-
-        if ( pz1 < 0 )
-        {
-            float fy = ( nz1 * e ) / ( ny1 * a );
-            int iy = (int)( ( fy + 1.0f ) * m_uVPHeight * 0.5f );
-
-            float py = -pz1 * nz1 / ny1;
-            if ( py < l.y )
-                rect[1] = max( rect[1], iy );
-            else
-                rect[3] = min( rect[3], iy );
-        }
-
-        if ( pz2 < 0 )
-        {
-            float fy = ( nz2 * e ) / ( ny2 * a );
-            int iy = (int)( ( fy + 1.0f ) * m_uVPHeight * 0.5f );
-
-            float py = -pz2 * nz2 / ny2;
-            if ( py < l.y )
-                rect[1] = max( rect[1], iy );
-            else
-                rect[3] = min( rect[3], iy );
-        }
-
-        d3dRect.left = rect[0];
-        d3dRect.top = rect[1];
-        d3dRect.right = rect[2];
-        d3dRect.bottom = rect[3];
-    }
-
-    return d3dRect;*/
 }
 //--------------------------------------------------------------------------------
 void ViewLights::SetClipPlanes( float NearClip, float FarClip )

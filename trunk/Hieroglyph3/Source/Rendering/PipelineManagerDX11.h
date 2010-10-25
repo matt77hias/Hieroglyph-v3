@@ -146,6 +146,12 @@ namespace Glyph3
 			ResourcePtr SrcResource, UINT SrcSubresource, D3D11_BOX* pSrcBox );
 
 
+        // Resolve a subresource
+        
+        void ResolveSubresource ( ResourcePtr DestResource, UINT DstSubresource, 
+                                    ResourcePtr SrcResource, UINT SrcSubresource,
+                                    DXGI_FORMAT format );
+
 		D3D_FEATURE_LEVEL			m_FeatureLevel;
 
 		ID3D11DeviceContext*		m_pContext;

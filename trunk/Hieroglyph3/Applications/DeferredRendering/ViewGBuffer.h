@@ -22,7 +22,7 @@ namespace Glyph3
 	class ViewGBuffer : public IRenderView
 	{    
 	public:		
-		ViewGBuffer( RendererDX11& Renderer, ResourcePtr DepthTarget );
+		ViewGBuffer( RendererDX11& Renderer );
 
 		virtual void Update( float fTime );
 		virtual void PreDraw( RendererDX11* pRenderer );
@@ -31,7 +31,8 @@ namespace Glyph3
 		virtual void SetRenderParams( ParameterManagerDX11* pParamManager );
 		virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
 
-        void SetGBufferTargets( TArray<ResourcePtr>& GBufferTargets );
+        void SetTargets( TArray<ResourcePtr>& GBufferTargets, ResourcePtr DepthTarget,
+                          int Viewport );
 
 		virtual ~ViewGBuffer();
 

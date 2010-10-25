@@ -18,4 +18,5 @@ DisplayMode::Settings DisplayMode::Value = DisplayMode::Final;
 GBufferOptMode::Settings GBufferOptMode::Value = GBufferOptMode::OptEnabled;
 LightOptMode::Settings LightOptMode::Value = LightOptMode::Volumes;
 LightMode::Settings LightMode::Value = LightMode::Lights3x3x3;
+AAMode::Settings AAMode::Value = AAMode::None;
 //--------------------------------------------------------------------------------
