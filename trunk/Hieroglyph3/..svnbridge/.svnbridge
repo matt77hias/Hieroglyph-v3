@@ -3,4 +3,8 @@
 </Value></Property><Property><Name>svn:ignore</Name><Value>*.ncb
 *.suo
 DeferredRendering.sln
+</Value></Property><Property><Name>svn:ignore</Name><Value>*.ncb
+*.suo
+DeferredRendering.sln
+LightPrepass.sln
 </Value></Property></Properties></ItemProperties>

@@ -49,6 +49,7 @@ namespace Glyph3
 		VT_GUI_SKIN,
 		VT_GBUFFER,
 		VT_LIGHTS,
+        VT_FINALPASS,
 		VT_NUM_VIEW_TYPES
 	};    
 

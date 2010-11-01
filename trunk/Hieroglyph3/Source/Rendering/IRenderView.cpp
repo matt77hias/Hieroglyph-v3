@@ -122,7 +122,7 @@ void IRenderView::SetRoot( Node3D* pRoot )
 	m_pRoot = pRoot;
 }
 //--------------------------------------------------------------------------------
-void IRenderView::SetViewMatrix( Matrix4f& matrix )
+void IRenderView::SetViewMatrix( const Matrix4f& matrix )
 {
 	ViewMatrix = matrix;
 }
@@ -132,7 +132,7 @@ Matrix4f IRenderView::GetViewMatrix( )
 	return( ViewMatrix );
 }
 //--------------------------------------------------------------------------------
-void IRenderView::SetProjMatrix( Matrix4f& matrix )
+void IRenderView::SetProjMatrix( const Matrix4f& matrix )
 {
 	ProjMatrix = matrix;
 }

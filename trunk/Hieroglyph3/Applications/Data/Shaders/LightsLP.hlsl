@@ -1,8 +1,8 @@
 //--------------------------------------------------------------------------------
-// Lights
+// LightsLP
 //
 // Vertex shaders and pixel shaders for performing the lighting pass of a
-// classic deferred renderer
+// light prepass deferred renderer
 //--------------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------------------------------
@@ -18,8 +18,7 @@ cbuffer LightParams
 };
 
 cbuffer CameraParams
-{
-	float3 CameraPos;
+{	
 	matrix ProjMatrix;
 	matrix InvProjMatrix;
 }
@@ -32,14 +31,10 @@ cbuffer Transforms
 };
 
 // This macro indicates whether we're currently rendering a volume
-#define VOLUMERENDERING ( ( POINTLIGHT || SPOTLIGHT ) && LIGHTVOLUMES )
+#define VOLUMERENDERING ( POINTLIGHT || SPOTLIGHT )
 
 // This indicates the number of MSAA samples
-#if MSAA
-	#define NUMSUBSAMPLES 4
-#else
-	#define NUMSUBSAMPLES 1
-#endif
+#define NUMSUBSAMPLES 4
 
 //-------------------------------------------------------------------------------------------------
 // Input/output structs
@@ -55,27 +50,11 @@ struct VSOutput
 	float3 ViewRay 		: VIEWRAY;
 };
 
-struct PSOutput
-{
-	float4 Color : SV_Target0;
-};
-
 //-------------------------------------------------------------------------------------------------
 // Textures
 //-------------------------------------------------------------------------------------------------
-#if MSAA
-	Texture2DMS<float4, 4> NormalTexture : register( t0 );
-	Texture2DMS<float4, 4> DiffuseAlbedoTexture : register( t1 );
-	Texture2DMS<float4, 4> SpecularAlbedoTexture : register( t2 );
-	Texture2DMS<float4, 4> PositionTexture : register( t3 );
-	Texture2DMS<float, 4> DepthTexture : register( t3 );
-#else
-	Texture2D       NormalTexture : register( t0 );
-	Texture2D		DiffuseAlbedoTexture : register( t1 );
-	Texture2D		SpecularAlbedoTexture : register( t2 );
-	Texture2D		PositionTexture : register( t3 );
-	Texture2D		DepthTexture : register( t3 );
-#endif
+Texture2DMS<float4, 4> GBufferTexture : register( t0 );
+Texture2DMS<float, 4> DepthTexture : register( t1 );
 
 //-------------------------------------------------------------------------------------------------
 // Vertex shader entry point
@@ -136,52 +115,22 @@ float3 PositionFromDepth( in float zBufferDepth, in float3 viewRay )
 //-------------------------------------------------------------------------------------------------
 // Helper function for extracting G-Buffer attributes
 //-------------------------------------------------------------------------------------------------
-void GetGBufferAttributes( in float2 screenPos, in float3 viewRay, in int subSampleIndex, out float3 normal,
-							out float3 position, out float3 diffuseAlbedo, out float3 specularAlbedo,
-							out float specularPower )
+void GetGBufferAttributes( in float2 screenPos, in float3 viewRay, in uint subSampleIndex, 
+							out float3 normal, out float3 position, out float specularPower )
 {
 	// Determine our indices for sampling the texture based on the current screen position
-	int3 sampleIndices = int3( screenPos.xy, 0 );
+	int2 sampleIndices = int2( screenPos.xy );
 
-	#if GBUFFEROPTIMIZATIONS
-		#if MSAA
-			normal = SpheremapDecode( NormalTexture.Load( sampleIndices.xy, subSampleIndex ).xy );
-			diffuseAlbedo = DiffuseAlbedoTexture.Load( sampleIndices.xy, subSampleIndex ).xyz;			
-			float4 spec = SpecularAlbedoTexture.Load( sampleIndices.xy, subSampleIndex );
-			position = PositionFromDepth( DepthTexture.Load( sampleIndices.xy, subSampleIndex ).x, viewRay );
-		#else
-			normal = SpheremapDecode( NormalTexture.Load( sampleIndices ).xy );
-			diffuseAlbedo = DiffuseAlbedoTexture.Load( sampleIndices ).xyz;			
-			float4 spec = SpecularAlbedoTexture.Load( sampleIndices );
-			position = PositionFromDepth( DepthTexture.Load( sampleIndices ).x, viewRay );
-		#endif
-
-		specularAlbedo = spec.xyz;
-		specularPower = spec.w * 255.0f;
-
-	#else
-		#if MSAA
-			normal = NormalTexture.Load( sampleIndices.xy, subSampleIndex ).xyz;
-			position = PositionTexture.Load( sampleIndices.xy, subSampleIndex ).xyz;
-			diffuseAlbedo = DiffuseAlbedoTexture.Load( sampleIndices.xy, subSampleIndex ).xyz;
-			float4 spec = SpecularAlbedoTexture.Load( sampleIndices.xy, subSampleIndex );
-		#else
-			normal = NormalTexture.Load( sampleIndices ).xyz;
-			position = PositionTexture.Load( sampleIndices ).xyz;
-			diffuseAlbedo = DiffuseAlbedoTexture.Load( sampleIndices ).xyz;
-			float4 spec = SpecularAlbedoTexture.Load( sampleIndices );
-		#endif
-
-		specularAlbedo = spec.xyz;
-		specularPower = spec.w;		
-	#endif
+	float4 gBuffer = GBufferTexture.Load( sampleIndices, subSampleIndex );
+	normal = SpheremapDecode( gBuffer.xy );
+	position = PositionFromDepth( DepthTexture.Load( sampleIndices, subSampleIndex ).x, viewRay );
+	specularPower = gBuffer.z;
 }
 
 //-------------------------------------------------------------------------------------------------
 // Calculates the lighting term for a single G-Buffer texel
 //-------------------------------------------------------------------------------------------------
-float3 CalcLighting( in float3 normal, in float3 position, in float3 diffuseAlbedo,
-				     in float3 specularAlbedo, in float specularPower )
+float4 CalcLighting( in float3 normal, in float3 position, in float specularPower )
 {
 	// Calculate the diffuse term
 	float3 L = 0;
@@ -207,79 +156,51 @@ float3 CalcLighting( in float3 normal, in float3 position, in float3 diffuseAlbe
 		attenuation *= saturate( ( rho - SpotlightAngles.y ) / ( SpotlightAngles.x - SpotlightAngles.y ) );
 	#endif
 
-	float diffuseNormalizationFactor = 1.0f / 3.14159265f;
-	float3 diffuse = saturate( dot( normal, L ) ) * LightColor * diffuseAlbedo * diffuseNormalizationFactor;
+	float diffuseNormalizationFactor = 1.0f / 3.14159265f;	
+	float3 diffuse = saturate( dot( normal, L ) ) * LightColor * diffuseNormalizationFactor * attenuation;
 
-	#if GBUFFEROPTIMIZATIONS
-		// In view space camera position is (0, 0, 0)
-		float3 camPos = 0.0f;
-	#else
-		float3 camPos = CameraPos;
-	#endif
+	// In view space camera position is (0, 0, 0)
+	float3 camPos = float3(0.0f, 0.0f, 0.0f);
 
 	// Calculate the specular term
 	float3 V = camPos - position;
 	float3 H = normalize( L + V );
 	float specNormalizationFactor = ( ( specularPower + 8.0f ) / ( 8.0f * 3.14159265f ) );
-	float3 specular = pow( saturate( dot( normal, H ) ), specularPower ) * specNormalizationFactor * LightColor * specularAlbedo.xyz;
+	float specular = pow( saturate( dot( normal, H ) ), specularPower ) * specNormalizationFactor * attenuation;	
 
-	// Final value is the sum of the albedo and diffuse with attenuation applied
-	return ( diffuse + specular ) * attenuation;
+	// Final value is diffuse RGB + mono specular
+	return float4( diffuse, specular );
 }
 
 //-------------------------------------------------------------------------------------------------
-// Light pixel shader
+// Pixel shader entry point. This shader runs per-pixel.
 //-------------------------------------------------------------------------------------------------
-PSOutput PSMain( in VSOutput input, in float4 screenPos : SV_Position )
-{
-	PSOutput output;
-	float3 lighting = 0;
+float4 PSMain( in float4 screenPos : SV_Position, in float3 ViewRay : VIEWRAY ) : SV_Target0
+{	
 	float3 normal;
-	float3 position;
-	float3 diffuseAlbedo;
-	float3 specularAlbedo;
+	float3 position;	
 	float specularPower;
-		
-	// Do the first sub-sample	
-	GetGBufferAttributes( screenPos.xy, input.ViewRay, 0, normal, position, diffuseAlbedo,
-								specularAlbedo, specularPower );
-	lighting += CalcLighting( normal, position, diffuseAlbedo, specularAlbedo, specularPower );
 
-	// Do the rest of the subsamples
-	#if MSAA		
-		float numSubSamples = 1.0f;
-		
-		#if GBUFFEROPTIMIZATIONS
-			int2 sampleIndices = int2( screenPos.xy );
-			float msaaMask = 0;
-			msaaMask += DiffuseAlbedoTexture.Load( sampleIndices.xy, 0 ).w;
-			msaaMask += DiffuseAlbedoTexture.Load( sampleIndices.xy, 1 ).w;
-			msaaMask += DiffuseAlbedoTexture.Load( sampleIndices.xy, 2 ).w;
-			msaaMask += DiffuseAlbedoTexture.Load( sampleIndices.xy, 3 ).w;
-		
-			// Check if we need to sample more subsamples
-			[branch]
-			if ( msaaMask > 0.0f )
-			{
-		#endif
-				numSubSamples = 4.0f;
-				for ( int i = 1; i < NUMSUBSAMPLES; ++i )
-				{
-					GetGBufferAttributes( screenPos.xy, input.ViewRay, i, normal, position, diffuseAlbedo,
-											specularAlbedo, specularPower );
-					lighting += CalcLighting( normal, position, diffuseAlbedo, specularAlbedo, specularPower );
-				}
+	// Get the G-Buffer values for the first sub-sample, and calculate the lighting
+	GetGBufferAttributes( screenPos.xy, ViewRay, 0, normal, position, specularPower );
+								
+	return CalcLighting( normal, position, specularPower );	
+}
 
-		#if GBUFFEROPTIMIZATIONS 
-			}
-		#endif
-		
-		lighting /= numSubSamples;
-	#endif
+//-------------------------------------------------------------------------------------------------
+// Pixel shader entry point. This shader runs per-sample.
+//-------------------------------------------------------------------------------------------------
+float4 PSMainPerSample( in float4 screenPos : SV_Position, in float3 ViewRay : VIEWRAY,
+							in uint subSampleIndex : SV_SampleIndex )  : SV_Target0
+{
+	float3 normal;
+	float3 position;	
+	float specularPower;
 
-	output.Color = float4( lighting, 1.0f );
-
-	return output;
+	// Get the G-Buffer values for the current sub-sample, and calculate the lighting
+	GetGBufferAttributes( screenPos.xy, ViewRay, subSampleIndex, normal, position, specularPower );
+								
+	return CalcLighting( normal, position, specularPower );	
 }
 
 

@@ -36,6 +36,8 @@ namespace Glyph3
 
 		void SetProjectionParams( float zn, float zf, float aspect, float fov );
 
+        const Matrix4f& ProjMatrix();
+
 	protected:
 		IRenderView* m_pCameraView;
 		Scene* m_pScene;
@@ -44,6 +46,8 @@ namespace Glyph3
 		float m_fFar;
 		float m_fAspect;
 		float m_fFov;
+
+        Matrix4f m_ProjMatrix;
 	};
 };
 //--------------------------------------------------------------------------------

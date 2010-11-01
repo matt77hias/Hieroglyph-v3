@@ -9,41 +9,41 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// ViewGBuffer
+// ViewFinalPass
 //
 //--------------------------------------------------------------------------------
-#ifndef ViewGBuffer_h
-#define ViewGBuffer_h
+#ifndef ViewFinalPass_h
+#define ViewFinalPass_h
 //--------------------------------------------------------------------------------
 #include "IRenderView.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class ViewGBuffer : public IRenderView
-	{    
-	public:		
-		ViewGBuffer( RendererDX11& Renderer );
+    class ViewFinalPass : public IRenderView
+    {    
+    public:		
+        ViewFinalPass( RendererDX11& Renderer );
 
-		virtual void Update( float fTime );
-		virtual void PreDraw( RendererDX11* pRenderer );
-		virtual void Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager );
+        virtual void Update( float fTime );
+        virtual void PreDraw( RendererDX11* pRenderer );
+        virtual void Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager );
 
-		virtual void SetRenderParams( ParameterManagerDX11* pParamManager );
-		virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
+        virtual void SetRenderParams( ParameterManagerDX11* pParamManager );
+        virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
 
-        void SetTargets( TArray<ResourcePtr>& GBufferTargets, ResourcePtr DepthTarget,
-                          int Viewport );
+        void SetTargets( ResourcePtr LightTarget, ResourcePtr RenderTarget, ResourcePtr DepthTarget, int Viewport );
 
-		virtual ~ViewGBuffer();
+        virtual ~ViewFinalPass();
 
-	protected:
+    protected:
 
-		int					m_iViewport;		
+        int					    m_iViewport;		
 
         RendererDX11&           m_Renderer;
-		TArray<ResourcePtr> 	m_GBufferTargets;
-		ResourcePtr				m_DepthTarget;        
-	};
+        ResourcePtr 	        m_LightTarget;
+        ResourcePtr 	        m_RenderTarget;
+        ResourcePtr				m_DepthTarget;        
+    };
 }
 //--------------------------------------------------------------------------------
-#endif // ViewGBuffer_h
+#endif // ViewFinalPass_h

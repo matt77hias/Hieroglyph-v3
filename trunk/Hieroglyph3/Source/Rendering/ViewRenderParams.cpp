@@ -27,6 +27,7 @@ static const std::string ViewNames[VT_NUM_VIEW_TYPES] =
     "gui_skin",
     "g_buffer",
     "lights",
+    "final_pass"
 };
 //--------------------------------------------------------------------------------
 ViewRenderParams::ViewRenderParams()

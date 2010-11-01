@@ -16,6 +16,8 @@
 #define ViewGBuffer_h
 //--------------------------------------------------------------------------------
 #include "IRenderView.h"
+#include "RenderEffectDX11.h"
+#include "GeometryDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -31,18 +33,22 @@ namespace Glyph3
 		virtual void SetRenderParams( ParameterManagerDX11* pParamManager );
 		virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
 
-        void SetTargets( TArray<ResourcePtr>& GBufferTargets, ResourcePtr DepthTarget,
+        void SetTargets( ResourcePtr GBufferTargets, ResourcePtr DepthTarget,
                           int Viewport );
 
 		virtual ~ViewGBuffer();
 
 	protected:
 
-		int					m_iViewport;		
+		int					    m_iViewport;		
 
         RendererDX11&           m_Renderer;
-		TArray<ResourcePtr> 	m_GBufferTargets;
-		ResourcePtr				m_DepthTarget;        
+		ResourcePtr 	        m_GBufferTarget;
+		ResourcePtr				m_DepthTarget;
+
+        int                     m_iMaskDSState;
+        RenderEffectDX11		m_MaskEffect;
+        GeometryDX11			m_QuadGeometry;
 	};
 }
 //--------------------------------------------------------------------------------

@@ -24,6 +24,8 @@ Camera::Camera()
 	m_fFar = 100.0f;
 	m_fAspect = 1280.0f / 800.0f;
 	m_fFov = static_cast<float>( D3DX_PI ) / 4.0f;
+
+    m_ProjMatrix.MakeIdentity();
 }
 //--------------------------------------------------------------------------------
 Camera::~Camera()
@@ -74,15 +76,15 @@ void Camera::SetProjectionParams( float zn, float zf, float aspect, float fov )
 	m_fAspect = aspect;
 	m_fFov = fov;
 
+    // Calculate and set the projection matrix for the view.
+    D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&m_ProjMatrix, m_fFov, 
+        m_fAspect, m_fNear, m_fFar );
+
 	if ( m_pCameraView )
-	{
-		Matrix4f proj;
-
-		// Calculate and set the projection matrix for the view.
-		D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&proj, m_fFov, 
-			m_fAspect, m_fNear, m_fFar );
-
-		m_pCameraView->SetProjMatrix( proj );
-	}
+		m_pCameraView->SetProjMatrix( m_ProjMatrix );	
 }
 //--------------------------------------------------------------------------------
+const Matrix4f& Camera::ProjMatrix()
+{
+    return m_ProjMatrix;
+}
