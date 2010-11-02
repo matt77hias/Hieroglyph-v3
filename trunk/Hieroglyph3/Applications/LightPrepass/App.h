@@ -60,6 +60,7 @@ protected:
     RenderEffectDX11*       m_pFinalPassPerSampleEffect;
     int					    m_iGBufferDSState;
     int                     m_iFinalPassDSState;
+    int                     m_iRSState;
 
     ResourcePtr             m_DiffuseTexture;
     ResourcePtr             m_NormalMap;

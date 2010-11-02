@@ -157,7 +157,8 @@ float4 CalcLighting( in float3 normal, in float3 position, in float specularPowe
 	#endif
 
 	float diffuseNormalizationFactor = 1.0f / 3.14159265f;	
-	float3 diffuse = saturate( dot( normal, L ) ) * LightColor * diffuseNormalizationFactor * attenuation;
+	float nDotL = saturate( dot( normal, L ) );
+	float3 diffuse = nDotL * LightColor * diffuseNormalizationFactor * attenuation;
 
 	// In view space camera position is (0, 0, 0)
 	float3 camPos = float3(0.0f, 0.0f, 0.0f);
@@ -166,7 +167,7 @@ float4 CalcLighting( in float3 normal, in float3 position, in float specularPowe
 	float3 V = camPos - position;
 	float3 H = normalize( L + V );
 	float specNormalizationFactor = ( ( specularPower + 8.0f ) / ( 8.0f * 3.14159265f ) );
-	float specular = pow( saturate( dot( normal, H ) ), specularPower ) * specNormalizationFactor * attenuation;	
+	float specular = pow( saturate( dot( normal, H ) ), specularPower ) * specNormalizationFactor * attenuation * nDotL;	
 
 	// Final value is diffuse RGB + mono specular
 	return float4( diffuse, specular );

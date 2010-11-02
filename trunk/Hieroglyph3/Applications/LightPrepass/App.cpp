@@ -286,7 +286,20 @@ void App::Initialize()
     m_pFinalPassPerSampleEffect->m_uStencilRef = 2;
 
     if ( m_iFinalPassDSState == -1 )	
-        Log::Get().Write( L"Failed to create final pass depth stencil state" );    
+        Log::Get().Write( L"Failed to create final pass depth stencil state" );
+
+    // Create a rasterizer state with back-face culling enabled
+    RasterizerStateConfigDX11 rsConfig;
+    rsConfig.MultisampleEnable = TRUE;    
+    rsConfig.CullMode = D3D11_CULL_BACK;
+    m_iRSState = m_pRenderer11->CreateRasterizerState( &rsConfig );
+
+    m_pGBufferEffect->m_iRasterizerState = m_iRSState;    
+    m_pFinalPassEffect->m_iRasterizerState = m_iRSState;
+    m_pFinalPassPerSampleEffect->m_iRasterizerState = m_iRSState;
+
+    if ( m_iRSState == -1 )
+        Log::Get().Write( L"Failed to create rasterizer state" );
 
     // Create the material for rendering the geometry to the G-Buffer and the final pass
     m_pMaterial = new MaterialDX11();

@@ -274,10 +274,23 @@ void App::Initialize()
 
     if ( m_iGBufferDSState == -1 )	
         Log::Get().Write( L"Failed to create G-Buffer depth stencil state" );
+
+
+    // Create a rasterizer state with back-face culling enabled
+    RasterizerStateConfigDX11 rsConfig;
+    rsConfig.MultisampleEnable = TRUE;    
+    rsConfig.CullMode = D3D11_CULL_BACK;
+    m_iGBufferRSState = m_pRenderer11->CreateRasterizerState( &rsConfig );
+
+    if ( m_iGBufferRSState == -1 )	
+        Log::Get().Write( L"Failed to create G-Buffer rasterizer state" );
+
     m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_iDepthStencilState = m_iGBufferDSState;
     m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_uStencilRef = 1;
+    m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_iRasterizerState = m_iGBufferRSState;
     m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_iDepthStencilState = m_iGBufferDSState;
     m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_uStencilRef = 1;
+    m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_iRasterizerState = m_iGBufferRSState;
 
     m_pMaterial = new MaterialDX11();
 
@@ -643,6 +656,7 @@ void App::SetupViews( )
 
                 light.Position = Lerp( minExtents, maxExtents, lerp );
                 light.Color = Lerp( minColor, maxColor, lerp ) * 1.5f;
+                m_pLightsView->AddLight(light);
             }
         }
     }
