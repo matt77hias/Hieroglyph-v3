@@ -54,10 +54,10 @@ namespace Glyph3
 		// provided to apply the resource changes as an optimization, which allows for the
 		// renderer to cache resource changes between rendering calls if appropriate.
 
-		void BindConstantBufferParameter( ShaderType type, std::wstring name, UINT slot, ParameterManagerDX11* pParamManager );
-		void BindShaderResourceParameter( ShaderType type, std::wstring name, UINT slot, ParameterManagerDX11* pParamManager );
-		void BindUnorderedAccessParameter( ShaderType type, std::wstring name, UINT slot, ParameterManagerDX11* pParamManager );
-		void BindSamplerStateParameter( ShaderType type, std::wstring name, UINT slot, ParameterManagerDX11* pParamManager );
+		void BindConstantBufferParameter( ShaderType type, const std::wstring& name, UINT slot, ParameterManagerDX11* pParamManager );
+		void BindShaderResourceParameter( ShaderType type, const std::wstring& name, UINT slot, ParameterManagerDX11* pParamManager );
+		void BindUnorderedAccessParameter( ShaderType type, const std::wstring& name, UINT slot, ParameterManagerDX11* pParamManager );
+		void BindSamplerStateParameter( ShaderType type, const std::wstring& name, UINT slot, ParameterManagerDX11* pParamManager );
 
 		// TODO: Create objects to represent each of the fixed function stages, and 
 		//       utilize this 'Clear', 'Bind', and 'Apply' paradigm.

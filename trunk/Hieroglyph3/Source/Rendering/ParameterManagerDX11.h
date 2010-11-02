@@ -31,25 +31,25 @@ namespace Glyph3
 		// during rendering.
 
 		void SetParameter( RenderParameterDX11* pParameter );
-		void SetVectorParameter( std::wstring name, Vector4f* pVector );
-		void SetMatrixParameter( std::wstring name, Matrix4f* pMatrix );
-		void SetSamplerParameter( std::wstring name, int* pID );
-		void SetShaderResourceParameter( std::wstring name, ResourcePtr resource );
-		void SetUnorderedAccessParameter( std::wstring name, ResourcePtr resource );
-		void SetConstantBufferParameter( std::wstring name, ResourcePtr resource );
-		void SetMatrixArrayParameter( std::wstring name, int count, Matrix4f* pMatrices );
+		void SetVectorParameter( const std::wstring& name, Vector4f* pVector );
+		void SetMatrixParameter( const std::wstring& name, Matrix4f* pMatrix );
+		void SetSamplerParameter( const std::wstring& name, int* pID );
+		void SetShaderResourceParameter( const std::wstring& name, ResourcePtr resource );
+		void SetUnorderedAccessParameter( const std::wstring& name, ResourcePtr resource );
+		void SetConstantBufferParameter( const std::wstring& name, ResourcePtr resource );
+		void SetMatrixArrayParameter( const std::wstring& name, int count, Matrix4f* pMatrices );
 		
 		// Each of the parameter types can also be accessed to inspect their current
 		// value prior to setting them.
 
-		RenderParameterDX11* GetParameter( std::wstring name );
-		Vector4f GetVectorParameter( std::wstring name );
-		Matrix4f GetMatrixParameter( std::wstring name );
-		int GetShaderResourceParameter( std::wstring name );
-		int GetUnorderedAccessParameter( std::wstring name );
-		int GetConstantBufferParameter( std::wstring name );
-		int GetSamplerStateParameter( std::wstring name );
-		Matrix4f* GetMatrixArrayParameter( std::wstring name, int count );
+		RenderParameterDX11* GetParameter( const std::wstring& name );
+		Vector4f GetVectorParameter( const std::wstring& name );
+		Matrix4f GetMatrixParameter( const std::wstring& name );
+		int GetShaderResourceParameter( const std::wstring& name );
+		int GetUnorderedAccessParameter( const std::wstring& name );
+		int GetConstantBufferParameter( const std::wstring& name );
+		int GetSamplerStateParameter( const std::wstring& name );
+		Matrix4f* GetMatrixArrayParameter( const std::wstring& name, int count );
 
 		// The following matrix parameters are set with specialized functions to allow
 		// the renderer to calculate the concatenated matrices.

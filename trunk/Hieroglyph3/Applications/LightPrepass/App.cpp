@@ -32,7 +32,7 @@ Vector3f Lerp( const Vector3f& x, const Vector3f& y, const Vector3f& s )
     return x + s * ( y - x );
 }
 //--------------------------------------------------------------------------------
-App::App() : m_vpWidth( 1280 ), m_vpHeight( 720 )
+App::App() : m_vpWidth( 1024 ), m_vpHeight( 576 )
 {
 	m_bSaveScreenshot = false;    
 }
@@ -581,7 +581,7 @@ void App::DrawHUD( )
     m_SpriteRenderer.RenderText( pImmPipeline, pParams, m_Font, text.c_str(), transform );
 
     float x = 30.0f;
-    float y = 600.0f;
+    float y = m_vpHeight - 100.0f;
     transform.SetTranslation( Vector3f( x, y, 0.0f ) );
     text = LightMode::ToString();
     m_SpriteRenderer.RenderText( pImmPipeline, pParams, m_Font, text.c_str(), transform );
@@ -591,7 +591,8 @@ void App::SetupLights( )
 {
     // Set the lights to render    
     Light light;
-    light.Type = Point;    
+    light.Type = Point;
+    light.Range = 2.0f;
 
     const int cubeSize = 3 + LightMode::Value * 2;
     const int cubeMin = -(cubeSize / 2);

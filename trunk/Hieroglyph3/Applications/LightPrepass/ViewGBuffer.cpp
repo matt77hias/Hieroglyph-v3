@@ -19,6 +19,7 @@
 #include "Texture2dDX11.h"
 #include "DepthStencilStateConfigDX11.h"
 #include "GeometryGeneratorDX11.h"
+#include "RasterizerStateConfigDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -49,8 +50,15 @@ ViewGBuffer::ViewGBuffer( RendererDX11& Renderer )
     if ( m_iMaskDSState == -1 )	
         Log::Get().Write( L"Failed to create mask depth stencil state" );
 
+    // Create a rasterizer state with multisampling enabled
+    RasterizerStateConfigDX11 rsConfig;
+    rsConfig.MultisampleEnable = TRUE;    
+    rsConfig.CullMode = D3D11_CULL_BACK;
+    m_iMaskRSState = Renderer.CreateRasterizerState( &rsConfig );
+
     m_MaskEffect.m_iDepthStencilState = m_iMaskDSState;
     m_MaskEffect.m_uStencilRef = 1;
+    m_MaskEffect.m_iRasterizerState = m_iMaskRSState;
 
     // Generate geometry for a full screen quad
     GeometryGeneratorDX11::GenerateFullScreenQuad( &m_QuadGeometry );

@@ -39,7 +39,7 @@ std::wstring& RenderParameterDX11::GetName()
 	return( m_sParameterName );
 }
 //--------------------------------------------------------------------------------
-void RenderParameterDX11::SetName( std::wstring& name )
+void RenderParameterDX11::SetName( const std::wstring& name )
 {
 	m_sParameterName = name;
 }

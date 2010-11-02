@@ -47,6 +47,7 @@ namespace Glyph3
 		ResourcePtr				m_DepthTarget;
 
         int                     m_iMaskDSState;
+        int                     m_iMaskRSState;
         RenderEffectDX11		m_MaskEffect;
         GeometryDX11			m_QuadGeometry;
 	};

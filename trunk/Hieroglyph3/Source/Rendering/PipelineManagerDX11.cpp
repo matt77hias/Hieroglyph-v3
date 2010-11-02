@@ -167,7 +167,8 @@ D3D11_VIEWPORT PipelineManagerDX11::GetCurrentViewport( ) {
 	return vp;
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::BindConstantBufferParameter( ShaderType type, std::wstring name, UINT slot, ParameterManagerDX11* pParamManager )
+void PipelineManagerDX11::BindConstantBufferParameter( ShaderType type, const std::wstring& name, UINT slot, 
+                                                      ParameterManagerDX11* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
 	RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
@@ -210,7 +211,8 @@ void PipelineManagerDX11::BindConstantBufferParameter( ShaderType type, std::wst
 	}
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::BindShaderResourceParameter( ShaderType type, std::wstring name, UINT slot, ParameterManagerDX11* pParamManager )
+void PipelineManagerDX11::BindShaderResourceParameter( ShaderType type, const std::wstring& name, UINT slot, 
+                                                      ParameterManagerDX11* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
 	RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
@@ -255,7 +257,8 @@ void PipelineManagerDX11::BindShaderResourceParameter( ShaderType type, std::wst
 	}
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::BindUnorderedAccessParameter( ShaderType type, std::wstring name, UINT slot, ParameterManagerDX11* pParamManager )
+void PipelineManagerDX11::BindUnorderedAccessParameter( ShaderType type, const std::wstring& name, UINT slot, 
+                                                       ParameterManagerDX11* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
 	RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
@@ -299,7 +302,8 @@ void PipelineManagerDX11::BindUnorderedAccessParameter( ShaderType type, std::ws
 	}
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::BindSamplerStateParameter( ShaderType type, std::wstring name, UINT slot, ParameterManagerDX11* pParamManager )
+void PipelineManagerDX11::BindSamplerStateParameter( ShaderType type, const std::wstring& name, UINT slot, 
+                                                    ParameterManagerDX11* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
 	RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];

@@ -76,7 +76,7 @@ void ShaderDX11::UpdateParameters( PipelineManagerDX11* pPipeline, ParameterMana
 
 			for ( int j = 0; j < ConstantBuffers[i].Variables.count(); j++ )
 			{
-				std::wstring name = ConstantBuffers[i].Variables[j].Name;
+				const std::wstring& name = ConstantBuffers[i].Variables[j].Name;
 				int offset = ConstantBuffers[i].Variables[j].StartOffset;
 				UINT size = ConstantBuffers[i].Variables[j].Size;
 				
@@ -126,7 +126,7 @@ void ShaderDX11::BindParameters( PipelineManagerDX11* pPipeline, ParameterManage
 
 	for ( int i = 0; i < ResourceBindings.count(); i++ )
 	{
-		std::wstring name = ResourceBindings[i].Name;
+		const std::wstring& name = ResourceBindings[i].Name;
 		UINT slot = ResourceBindings[i].BindPoint;
 
 		switch ( ResourceBindings[i].Type )

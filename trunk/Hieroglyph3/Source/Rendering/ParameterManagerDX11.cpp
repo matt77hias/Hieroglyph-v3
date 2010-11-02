@@ -32,7 +32,7 @@ ParameterManagerDX11::~ParameterManagerDX11()
 	
 }
 //--------------------------------------------------------------------------------
-void ParameterManagerDX11::SetVectorParameter( std::wstring name, Vector4f* pVector )
+void ParameterManagerDX11::SetVectorParameter( const std::wstring& name, Vector4f* pVector )
 {
 	RenderParameterDX11* pParameter = m_Parameters[name];
 
@@ -50,7 +50,7 @@ void ParameterManagerDX11::SetVectorParameter( std::wstring name, Vector4f* pVec
 		Log::Get().Write( L"Vector parameter name collision!" );
 }
 //--------------------------------------------------------------------------------
-void ParameterManagerDX11::SetMatrixParameter( std::wstring name, Matrix4f* pMatrix )
+void ParameterManagerDX11::SetMatrixParameter( const std::wstring& name, Matrix4f* pMatrix )
 {
 	RenderParameterDX11* pParameter = m_Parameters[name];
 
@@ -69,7 +69,7 @@ void ParameterManagerDX11::SetMatrixParameter( std::wstring name, Matrix4f* pMat
 		Log::Get().Write( L"Matrix parameter name collision!" );
 }
 //--------------------------------------------------------------------------------
-void ParameterManagerDX11::SetMatrixArrayParameter( std::wstring name, int count, Matrix4f* pMatrix )
+void ParameterManagerDX11::SetMatrixArrayParameter( const std::wstring& name, int count, Matrix4f* pMatrix )
 {
 	RenderParameterDX11* pParameter = m_Parameters[name];
 
@@ -89,7 +89,7 @@ void ParameterManagerDX11::SetMatrixArrayParameter( std::wstring name, int count
 //--------------------------------------------------------------------------------
 void ParameterManagerDX11::SetParameter( RenderParameterDX11* pParameter )
 {
-	std::wstring name = pParameter->GetName();
+	const std::wstring& name = pParameter->GetName();
 	RenderParameterDX11* pCurrent = m_Parameters[name];
 
 	if ( pParameter )
@@ -189,7 +189,7 @@ void ParameterManagerDX11::SetParameter( RenderParameterDX11* pParameter )
 	}
 }
 //--------------------------------------------------------------------------------
-void ParameterManagerDX11::SetShaderResourceParameter( std::wstring name, ResourcePtr resource )
+void ParameterManagerDX11::SetShaderResourceParameter( const std::wstring& name, ResourcePtr resource )
 {
 	RenderParameterDX11* pParameter = m_Parameters[name];
 
@@ -207,7 +207,7 @@ void ParameterManagerDX11::SetShaderResourceParameter( std::wstring name, Resour
 		Log::Get().Write( L"Shader resource view parameter name collision!" );
 }
 //--------------------------------------------------------------------------------
-void ParameterManagerDX11::SetUnorderedAccessParameter( std::wstring name, ResourcePtr resource )
+void ParameterManagerDX11::SetUnorderedAccessParameter( const std::wstring& name, ResourcePtr resource )
 {
 	RenderParameterDX11* pParameter = m_Parameters[name];
 
@@ -225,7 +225,7 @@ void ParameterManagerDX11::SetUnorderedAccessParameter( std::wstring name, Resou
 		Log::Get().Write( L"Unordered access view parameter name collision!" );
 }
 //--------------------------------------------------------------------------------
-void ParameterManagerDX11::SetConstantBufferParameter( std::wstring name, ResourcePtr resource )
+void ParameterManagerDX11::SetConstantBufferParameter( const std::wstring& name, ResourcePtr resource )
 {
 	RenderParameterDX11* pParameter = m_Parameters[name];
 
@@ -243,7 +243,7 @@ void ParameterManagerDX11::SetConstantBufferParameter( std::wstring name, Resour
 		Log::Get().Write( L"Constant buffer parameter name collision!" );
 }
 //--------------------------------------------------------------------------------
-void ParameterManagerDX11::SetSamplerParameter( std::wstring name, int* pID )
+void ParameterManagerDX11::SetSamplerParameter( const std::wstring& name, int* pID )
 {
 	RenderParameterDX11* pParameter = m_Parameters[name];
 
@@ -261,7 +261,7 @@ void ParameterManagerDX11::SetSamplerParameter( std::wstring name, int* pID )
 		Log::Get().Write( L"Sampler parameter name collision!" );
 }
 //--------------------------------------------------------------------------------
-Vector4f ParameterManagerDX11::GetVectorParameter( std::wstring name )
+Vector4f ParameterManagerDX11::GetVectorParameter( const std::wstring& name )
 {
 	Vector4f result;
 	result.MakeZero();
@@ -288,7 +288,7 @@ Vector4f ParameterManagerDX11::GetVectorParameter( std::wstring name )
 	return( result );
 }
 //--------------------------------------------------------------------------------
-Matrix4f ParameterManagerDX11::GetMatrixParameter( std::wstring name )
+Matrix4f ParameterManagerDX11::GetMatrixParameter( const std::wstring& name )
 {
 	Matrix4f result;
 	result.MakeZero();
@@ -315,7 +315,7 @@ Matrix4f ParameterManagerDX11::GetMatrixParameter( std::wstring name )
 	return( result );
 }
 //--------------------------------------------------------------------------------
-Matrix4f* ParameterManagerDX11::GetMatrixArrayParameter( std::wstring name, int count )
+Matrix4f* ParameterManagerDX11::GetMatrixArrayParameter( const std::wstring& name, int count )
 {
 	Matrix4f* pResult = 0;
 
@@ -343,7 +343,7 @@ Matrix4f* ParameterManagerDX11::GetMatrixArrayParameter( std::wstring name, int 
 	return( pResult );
 }
 //--------------------------------------------------------------------------------
-int ParameterManagerDX11::GetShaderResourceParameter( std::wstring name )
+int ParameterManagerDX11::GetShaderResourceParameter( const std::wstring& name )
 {
 	int result;
 	result = -1;
@@ -370,7 +370,7 @@ int ParameterManagerDX11::GetShaderResourceParameter( std::wstring name )
 	return( result );
 }
 //--------------------------------------------------------------------------------
-int ParameterManagerDX11::GetUnorderedAccessParameter( std::wstring name )
+int ParameterManagerDX11::GetUnorderedAccessParameter( const std::wstring& name )
 {
 	int result;
 	result = -1;
@@ -397,7 +397,7 @@ int ParameterManagerDX11::GetUnorderedAccessParameter( std::wstring name )
 	return( result );
 }
 //--------------------------------------------------------------------------------
-int ParameterManagerDX11::GetConstantBufferParameter( std::wstring name )
+int ParameterManagerDX11::GetConstantBufferParameter( const std::wstring& name )
 {
 	int result;
 	result = -1;
@@ -424,7 +424,7 @@ int ParameterManagerDX11::GetConstantBufferParameter( std::wstring name )
 	return( result );
 }
 //--------------------------------------------------------------------------------
-int ParameterManagerDX11::GetSamplerStateParameter( std::wstring name )
+int ParameterManagerDX11::GetSamplerStateParameter( const std::wstring& name )
 {
 	int result;
 	result = -1;
@@ -512,7 +512,7 @@ void ParameterManagerDX11::DetachParent( )
 	m_pParent = 0;
 }
 //--------------------------------------------------------------------------------
-RenderParameterDX11* ParameterManagerDX11::GetParameter( std::wstring name )
+RenderParameterDX11* ParameterManagerDX11::GetParameter( const std::wstring& name )
 {
 	// First check this parameter manager
 	RenderParameterDX11* pParam = m_Parameters[name];
