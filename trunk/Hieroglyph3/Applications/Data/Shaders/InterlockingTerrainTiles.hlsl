@@ -136,13 +136,13 @@ uint2 ComputeLookupIndex(uint patch, int xOffset, int zOffset)
 	// this into an XY coordinate
 	uint2 p;
 	
-	p.x = patch % 64;
-	p.y = (uint)floor((float)patch / 64.0f);
+	p.x = patch % 32;
+	p.y = (uint)floor((float)patch / 32.0f);
 	
 	// With the XY coordinate for the patch being rendered we
 	// then need to offset it according to the parameters
-	p.x = clamp(p.x + xOffset, 0, 63);
-	p.y = clamp(p.y + zOffset, 0, 63);
+	p.x = clamp(p.x + xOffset, 0, 31);
+	p.y = clamp(p.y + zOffset, 0, 31);
 	
 	return p;
 }

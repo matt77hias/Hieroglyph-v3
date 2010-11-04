@@ -74,8 +74,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DeferredRendering", "Applic
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InterlockingTerrainTiles", "Applications\InterlockingTerrainTiles\InterlockingTerrainTiles.vcproj", "{92ED8783-D45A-48FD-9B94-DD1FD7DAB7F9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LightPrepass", "Applications\LightPrepass\LightPrepass.vcproj", "{DB0736EE-C788-44A3-BACA-79C041E23F1D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
