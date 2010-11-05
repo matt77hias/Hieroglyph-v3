@@ -42,8 +42,8 @@ App::App()
 bool App::ConfigureEngineComponents()
 {
 	// The application currently supplies the 
-	int width = 800;
-	int height = 600;
+	int width = 400;
+	int height = 300;
 	bool windowed = true;
 
 	// Set the render window parameters and initialize the window
@@ -165,7 +165,7 @@ void App::Initialize()
 	Vector4f vMinMaxDist = Vector4f( 4.0f, 14.0f, /* unused */ 0.0f, /* unused */ 0.0f );
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( L"minMaxDistance", &vMinMaxDist );
 
-	Vector4f vMinMaxLod = Vector4f( 1.0f, 8.0f, /* unused */ 0.0f, /* unused */ 0.0f );
+	Vector4f vMinMaxLod = Vector4f( 1.0f, 5.0f, /* unused */ 0.0f, /* unused */ 0.0f );
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( L"minMaxLOD", &vMinMaxLod );
 
 	// Create the text rendering
@@ -194,7 +194,12 @@ void App::Update()
 
 	// Draw the main geometry
 	m_pTerrainEffect->ConfigurePipeline( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr );
-	m_pRenderer11->pImmPipeline->Draw( *m_pTerrainEffect, *m_pTerrainGeometry, m_pRenderer11->m_pParamMgr );
+
+	m_pRenderer11->pImmPipeline->StartPipelineStatistics();
+	{
+		m_pRenderer11->pImmPipeline->Draw( *m_pTerrainEffect, *m_pTerrainGeometry, m_pRenderer11->m_pParamMgr );
+	}
+	m_pRenderer11->pImmPipeline->EndPipelineStatistics();
 
 	// Draw the UI text
 	if( !m_bSaveScreenshot )
@@ -224,6 +229,8 @@ void App::Update()
 
 	// Present the final image to the screen
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
+
+	Log::Get().Write( m_pRenderer11->pImmPipeline->PrintPipelineStatistics() );
 
 	// Save a screenshot if desired.  This is done by pressing the 's' key, which
 	// demonstrates how an event is sent and handled by an event listener (which
@@ -506,7 +513,7 @@ void App::CreateTerrainTextures()
 
 	// Store the height/width to the param manager
 	D3D11_TEXTURE2D_DESC d = m_pHeightMapTexture->m_pTexture2dConfig->GetTextureDesc();
-	Vector4f vTexDim = Vector4f( static_cast<float>(d.Width), static_cast<float>(d.Height), /* unused */ 0.0f, /* unused */ 0.0f );
+	Vector4f vTexDim = Vector4f( static_cast<float>(d.Width), static_cast<float>(d.Height), static_cast<float>(TERRAIN_X_LEN), static_cast<float>(TERRAIN_Z_LEN) );
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( L"heightMapDimensions", &vTexDim );
 
 	// Create the SRV

@@ -22,7 +22,9 @@ cbuffer patch
 
 cbuffer sampleparams
 {
-	float4 heightMapDimensions; // zw unused
+	// xy = pixel dimensions
+	// zw = geometry dimensions
+	float4 heightMapDimensions;
 }
 
 struct VS_INPUT
@@ -131,18 +133,18 @@ float4 ReadLookup(uint2 idx)
 
 uint2 ComputeLookupIndex(uint patch, int xOffset, int zOffset)
 {
-	// For a 64x64 grid there will be 4096 patches
-	// thus 'patch' is 0-4095, we need to decode
+	// For a 32x32 grid there will be 1024 patches
+	// thus 'patch' is 0-1023, we need to decode
 	// this into an XY coordinate
 	uint2 p;
 	
-	p.x = patch % 32;
-	p.y = (uint)floor((float)patch / 32.0f);
+	p.x = patch % (uint)heightMapDimensions.z;
+	p.y = patch / (uint)heightMapDimensions.w;
 	
 	// With the XY coordinate for the patch being rendered we
 	// then need to offset it according to the parameters
-	p.x = clamp(p.x + xOffset, 0, 31);
-	p.y = clamp(p.y + zOffset, 0, 31);
+	p.x = clamp(p.x + xOffset, 0, ((uint)heightMapDimensions.z) - 1);
+	p.y = clamp(p.y + zOffset, 0, ((uint)heightMapDimensions.w) - 1);
 	
 	return p;
 }

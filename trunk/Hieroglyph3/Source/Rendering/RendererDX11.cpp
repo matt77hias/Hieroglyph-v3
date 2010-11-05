@@ -267,15 +267,14 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	queryDesc.Query = D3D11_QUERY_PIPELINE_STATISTICS;
 	queryDesc.MiscFlags = 0;
 
-	//hr = m_pDevice->CreateQuery( &queryDesc, &m_pQuery );
+	hr = m_pDevice->CreateQuery( &queryDesc, &pImmPipeline->m_pQuery );
 
-	//if ( FAILED( hr ) )
-	//{
-	//	Log::Get().Write( L"Unable to create a query object!" );
-	//	Shutdown();
-	//	return( false );
-	//}
-
+	if ( FAILED( hr ) )
+	{
+		Log::Get().Write( L"Unable to create a query object!" );
+		Shutdown();
+		return( false );
+	}
 
     D3D11_FEATURE_DATA_D3D10_X_HARDWARE_OPTIONS Options;
     m_pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D10_X_HARDWARE_OPTIONS, &Options, sizeof(Options));

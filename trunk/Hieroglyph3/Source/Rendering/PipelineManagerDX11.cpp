@@ -760,7 +760,7 @@ std::wstring PipelineManagerDX11::PrintPipelineStatistics( )
 {
 	D3D11_QUERY_DATA_PIPELINE_STATISTICS QueryData; // This data type is different depending on the query type
 
-	if ( S_OK == m_pContext->GetData( m_pQuery, &QueryData, sizeof(QueryData), 0) )
+	if ( m_pQuery && (S_OK == m_pContext->GetData( m_pQuery, &QueryData, sizeof(QueryData), 0)) )
 	{
 		std::wstringstream s;
 		s << "Pipeline Statistics:" << std::endl;
