@@ -162,7 +162,8 @@ void App::Initialize()
 	RunComputeShader();
 
 	// Set initial shader values
-	Vector4f vMinMaxDist = Vector4f( 4.0f, 14.0f, /* unused */ 0.0f, /* unused */ 0.0f );
+	// (computed off camera pos + geometry matrix)
+	Vector4f vMinMaxDist = Vector4f( 4.0f, 18.0f, /* unused */ 0.0f, /* unused */ 0.0f );
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( L"minMaxDistance", &vMinMaxDist );
 
 	Vector4f vMinMaxLod = Vector4f( 1.0f, 5.0f, /* unused */ 0.0f, /* unused */ 0.0f );

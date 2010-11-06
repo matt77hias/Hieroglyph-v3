@@ -70,9 +70,23 @@ float3 ComputePatchMidPoint(float3 cp0, float3 cp1, float3 cp2, float3 cp3)
 	return (cp0 + cp1 + cp2 + cp3) / 4.0f;
 }
 
-float ComputePatchLOD(float3 midPoint)
+float ComputeScaledDistance(float3 from, float3 to)
 {
-	return lerp(minMaxLOD.x, minMaxLOD.y, (1.0f - (saturate(distance(cameraPosition.xyz, midPoint) / minMaxDistance.y))));
+	// Compute the raw distance from the camera to the mid-point of this patch
+	float d = distance( from, to );
+	
+	// Scale this to be 0.0 (at the min dist) and 1.0 (at the max dist)
+	return (d - minMaxDistance.x) / (minMaxDistance.y - minMaxDistance.x);
+}
+
+float ComputePatchLOD(float3 midPoint)
+{	
+	// Compute the scaled distance
+	float d = ComputeScaledDistance( cameraPosition.xyz, midPoint );
+	
+	// Transform this 0.0-1.0 distance scale into the desired LOD's
+	// note: invert the distance so that close = high detail, far = low detail
+	return lerp( minMaxLOD.x, minMaxLOD.y, 1.0f - d );
 }
 
 float SampleHeightMap(float2 uv)
@@ -149,24 +163,30 @@ uint2 ComputeLookupIndex(uint patch, int xOffset, int zOffset)
 	return p;
 }
 
-float ComputePatchLODUsingLookup(float3 midpoint, float4 lookup)
+float ComputePatchLODUsingLookup(float3 midPoint, float4 lookup)
 {
-	float lod;
-	
-	// Compute the distance coefficient.
-	// will be 0.0 when at the camera, 1.0 when furthest away
-	float d = clamp( distance( cameraPosition.xyz, midpoint ), minMaxLOD.x, minMaxLOD.y );
-	d = (d - minMaxLOD.x) / (minMaxLOD.y - minMaxLOD.x);
+	// Compute the scaled distance
+	float d = ComputeScaledDistance( cameraPosition.xyz, midPoint );
 	
 	// lookup:
 	//	x,y,z = patch normal
 	//	w = standard deviation from patch plane
 	
-	lod = dot( float2( 1.0f - d, lookup.w ), float2( 0.2f, 0.8f ) );
+	// It's quite rare to get a std.dev of 1.0, or much above 0.75
+	// so we apply a small fudge-factor here. Can be tweaked or removed
+	// according to your chosen dataset...
+	float sd = lookup.w / 0.75; 
 	
-	lod = lerp( minMaxLOD.x, minMaxLOD.y, lod );
+	// The final LOD is the per-patch Std.Dev. scaled by the distance
+	// from the viewer.
+	// -> This computation won't ever increase LOD *above* that of the
+	//    naieve linear form (see ComputePatchLOD) but it will work
+	//    to ensure extra triangles aren't generated for patches that
+	//    don't need them.
+	float lod = sd * (1.0f - d);
 	
-	return clamp( lod, minMaxLOD.x, minMaxLOD.y );
+	// Finally, transform this value into an actual LOD
+	return lerp( minMaxLOD.x, minMaxLOD.y, clamp(lod, 0.0f, 1.0f) );
 }
 
 // ---------------------------
@@ -456,31 +476,29 @@ DS_OUTPUT dsMain( HS_PER_PATCH_OUTPUT input,
     #elif defined( SHADING_DEBUG_LOD )
     
 		float lod = (input.insideTesselation[0] - minMaxLOD.x) / (minMaxLOD.y - minMaxLOD.x);
+		
+		// 0% = black
+		// 33% = blue
+		// 66% = green
+		// 100% = red
     
-		if( lod > 0.75f )
+		if( lod > 0.66f )
 		{
-			lod -= 0.75f;
-			lod /= 0.25f;
-			o.colour = lerp( float3(1.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 0.0f), lod);
-		}
-		else if( lod > 0.5f )
-		{
-			// High Detail
-			lod -= 0.5f;
-			lod /= 0.25f;
+			lod -= 0.66f;
+			lod /= 0.34f;
 			o.colour = lerp( float3(0.0f, 1.0f, 0.0f), float3(1.0f, 0.0f, 0.0f), lod);
 		}
-		else if( lod > 0.25f )
+		else if( lod > 0.33f )
 		{
-			// Medium Detail
-			lod -= 0.25f;
-			lod /= 0.25f;
+			// High Detail
+			lod -= 0.33f;
+			lod /= 0.33f;
 			o.colour = lerp( float3(0.0f, 0.0f, 1.0f), float3(0.0f, 1.0f, 0.0f), lod);
 		}
 		else
 		{
 			// Low Detail
-			lod /= 0.25f;
+			lod /= 0.33f;
 			o.colour = lerp( float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 1.0f), lod);
 		}
     
