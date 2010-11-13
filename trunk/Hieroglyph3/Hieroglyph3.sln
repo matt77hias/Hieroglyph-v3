@@ -83,6 +83,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LightPrepass", "Application
 		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CurvedPointNormalTriangles", "Applications\CurvedPointNormalTriangles\CurvedPointNormalTriangles.vcproj", "{A074582D-4AFA-4EC2-8CBE-7B37D0EFFA37}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -157,6 +162,10 @@ Global
 		{DB0736EE-C788-44A3-BACA-79C041E23F1D}.Debug|Win32.Build.0 = Debug|Win32
 		{DB0736EE-C788-44A3-BACA-79C041E23F1D}.Release|Win32.ActiveCfg = Release|Win32
 		{DB0736EE-C788-44A3-BACA-79C041E23F1D}.Release|Win32.Build.0 = Release|Win32
+		{A074582D-4AFA-4EC2-8CBE-7B37D0EFFA37}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A074582D-4AFA-4EC2-8CBE-7B37D0EFFA37}.Debug|Win32.Build.0 = Debug|Win32
+		{A074582D-4AFA-4EC2-8CBE-7B37D0EFFA37}.Release|Win32.ActiveCfg = Release|Win32
+		{A074582D-4AFA-4EC2-8CBE-7B37D0EFFA37}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

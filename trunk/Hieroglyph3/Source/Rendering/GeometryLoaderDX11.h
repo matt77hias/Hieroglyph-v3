@@ -18,6 +18,7 @@
 #include "GeometryDX11.h"
 #include "SkinnedActor.h"
 #include <string>
+#include <boost/tokenizer.hpp> 
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -32,9 +33,44 @@ namespace Glyph3
 		//static void removeWhiteSpace( std::wstring& s );
 		//static std::wstring getElementName( int usage, int index );
 
+		static GeometryDX11* loadStanfordPlyFile( std::wstring filename );
+
 	private:
 		GeometryLoaderDX11();
-		
+
+		struct PlyElementPropertyDeclaration
+		{
+			std::string name;
+			bool isList;
+			std::string type;
+			std::string listLengthType;
+		};
+
+		struct PlyElementDesc
+		{
+			std::string name;
+			int elementCount;
+			std::vector< PlyElementPropertyDeclaration > dataFormat;
+			std::vector< void** > data;
+		};
+
+		template<typename T>
+		struct PlyDataArray
+		{
+			unsigned int length;
+			T* data;
+		};
+
+		static PlyElementDesc ParsePLYElementHeader(std::string headerLine, std::ifstream& input);
+		static PlyElementPropertyDeclaration ParsePLYElementProperty(std::string desc);
+		static PlyElementPropertyDeclaration ParsePLYElementPropertyList(std::string desc);
+		static std::vector<void**> ReadPLYElementData(std::ifstream& input, const PlyElementDesc& desc);
+		static void** ParsePLYElementData(std::string text, const std::vector<PlyElementPropertyDeclaration>& desc);
+		template<typename T> static T* ExtractDataPtr(std::string input);
+		template<typename T> static T ExtractDataVal(std::string input);
+		template<typename T> static PlyDataArray<T>* ExtractDataPtrArray(int length, boost::tokenizer<boost::char_separator<char>>::iterator iterator);
+		static int FindPlyElementIndex(std::vector<PlyElementDesc> elems, std::string name);
+		static int FindPlyElementPropertyIndex(std::vector<PlyElementPropertyDeclaration> elems, std::string name);
 	};
 };
 #endif // GeometryLoaderDX11_h

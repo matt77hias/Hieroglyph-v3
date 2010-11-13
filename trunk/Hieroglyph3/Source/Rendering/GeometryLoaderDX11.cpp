@@ -18,6 +18,9 @@
 #include "Vector3f.h"
 #include "Log.h"
 #include "GlyphString.h"
+
+#include <boost/tokenizer.hpp> 
+
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -1139,4 +1142,444 @@ GeometryDX11* GeometryLoaderDX11::loadMS3DFileWithAnimation( std::wstring filena
 //}
 
 
+GeometryDX11* GeometryLoaderDX11::loadStanfordPlyFile( std::wstring filename )
+{
+	// Load the contents of the file
+	std::ifstream fin;
 
+	// Open the file and read the MS3D header data
+	fin.open( filename.c_str(), std::ios::in );
+
+	if(!fin.is_open())
+	{
+		// signal error - bad filename?
+		throw new std::exception( "Could not open file" );
+	}
+
+	// Parse the input
+	std::string txt;
+
+	// Read in header
+	std::getline(fin, txt);
+
+	if( 0 != txt.compare( "ply" ) )
+	{
+		// signal error - not a PLY format file
+		throw new std::exception( "File does not contain the correct header - 'PLY' expected." );
+	}
+
+	std::getline(fin, txt);
+
+	if( 0 != txt.compare( "format ascii 1.0" ) )
+	{
+		// signal error - not a format of PLY that this code supports
+		throw new std::exception( "File is not correct format - ASCII 1.0 expected." );
+	}
+
+	std::vector< PlyElementDesc > elements;
+
+	// Read in the rest of the header
+	while(fin.is_open() && !fin.eof())
+	{
+		// Grab the next line of the header
+		std::getline(fin, txt);
+
+		// If we're at the end then stop processing
+		if(0 == txt.compare("end_header"))
+		{
+			break;
+		}
+		// If this line is a comment, skip to the next line
+		else if(0 == txt.compare(0, 7, "comment"))
+		{
+			continue;
+		}
+		// If this line is an element, process it
+		else if(0 == txt.compare(0, 7, "element"))
+		{
+			elements.push_back(ParsePLYElementHeader( txt, fin ));
+		}
+		// Otherwise, wtf?
+		else
+		{
+			throw new std::exception("File header contains unexpected line beginning");
+		}
+	}
+
+	// Read all the raw data
+	for( std::vector< PlyElementDesc >::iterator it = elements.begin(); it != elements.end(); ++it)
+	{
+		(*it).data = ReadPLYElementData(fin, *it);
+	}
+
+	// Create a resource to contain the geometry
+	GeometryDX11* pMesh = new GeometryDX11();
+
+	// Convert data to D3D11 format
+	int elemIdx = -1;
+
+	// Pull out all the vertex data
+	if(-1 < (elemIdx = FindPlyElementIndex(elements, "vertex")))
+	{
+		PlyElementDesc d = elements.at( elemIdx );
+		
+		// Has positions?
+		int xIdx = FindPlyElementPropertyIndex( d.dataFormat, "x" );
+		int yIdx = FindPlyElementPropertyIndex( d.dataFormat, "y" );
+		int zIdx = FindPlyElementPropertyIndex( d.dataFormat, "z" );
+
+		if ((-1 != xIdx) && (-1 != yIdx) && (-1 != zIdx))
+		{
+			VertexElementDX11 *pPositions = new VertexElementDX11( 3, d.elementCount );
+			pPositions->m_SemanticName = VertexElementDX11::PositionSemantic;
+			pPositions->m_uiSemanticIndex = 0;
+			pPositions->m_Format = DXGI_FORMAT_R32G32B32_FLOAT;
+			pPositions->m_uiInputSlot = 0;
+			pPositions->m_uiAlignedByteOffset = 0;
+			pPositions->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+			pPositions->m_uiInstanceDataStepRate = 0;
+
+			Vector3f* pRawPos = pPositions->Get3f( 0 );
+
+			for(int v = 0; v < d.elementCount; ++v)
+			{
+				void** raw = d.data.at(v);
+
+				float x = *reinterpret_cast<float*>(raw[xIdx]);
+				float y = *reinterpret_cast<float*>(raw[yIdx]);
+				float z = *reinterpret_cast<float*>(raw[zIdx]);
+
+				pRawPos[v] = Vector3f( x, y, z );
+			}
+
+			pMesh->AddElement( pPositions );
+		}
+
+		// Has normals?
+	}
+	else
+	{
+		throw new std::exception("Expected a 'vertex' element, but not found");
+	}
+
+	// Pull out all the face index data
+	if(-1 < (elemIdx = FindPlyElementIndex(elements, "face")))
+	{
+		PlyElementDesc d = elements.at( elemIdx );
+
+		// Firstly, assert that the format is correct
+		if((1 != d.dataFormat.size()) && d.dataFormat.at(0).isList && (0 == d.dataFormat.at(0).type.compare("uint")))
+		{
+			// Expect a single list of integers
+			throw new std::exception("Expected 'face' to be a single list of integers per-face");
+		}
+
+		// Secondly, assert that each list is of the same dimension
+		int faceSize = -1;
+		for(int f = 0; f < d.elementCount; ++f)
+		{
+			void** raw = d.data.at(f);
+			PlyDataArray<int>* idxs = reinterpret_cast<PlyDataArray<int>*>(raw[0]);
+			
+			if( -1 == faceSize)
+				faceSize = idxs->length;
+			else if(faceSize != idxs->length)
+				throw new std::exception("Expected each face to have the same number of indexes");
+		}
+
+		// Thirdly, can now set the appropriate topology
+		pMesh->SetPrimitiveType( (D3D11_PRIMITIVE_TOPOLOGY)(D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST + (faceSize - 1)) );
+
+		// Finally, extract this data
+		for(int f = 0; f < d.elementCount; ++f)
+		{
+			void** raw = d.data.at(f);
+			PlyDataArray<int>* idxs = reinterpret_cast<PlyDataArray<int>*>(raw[0]);
+
+			for(int fi = 0; fi < idxs->length; ++fi)
+				pMesh->AddIndex( idxs->data[fi] );
+		}
+	}
+	else
+	{
+		throw new std::exception("Expected a 'face' element, but not found");
+	}
+
+	// Push into renderable resource
+	pMesh->LoadToBuffers( );
+
+	// Release all intermediary memory
+	for( std::vector< PlyElementDesc >::iterator it = elements.begin(); it != elements.end(); ++it)
+	{
+		PlyElementDesc d = *it;
+		for(int e = 0; e < d.elementCount; ++e)
+		{
+			void** raw = d.data.at(e);
+
+			if(d.dataFormat.at(0).isList)
+			{
+				PlyDataArray<void*>* rawArray = reinterpret_cast<PlyDataArray<void*>*>(raw[0]);
+				SAFE_DELETE_ARRAY( rawArray->data );
+				SAFE_DELETE(raw[0]);
+			}
+			else
+			{
+				SAFE_DELETE(raw[0]);
+			}
+		}
+	}
+
+	// Return to caller
+	return pMesh;
+}
+
+GeometryLoaderDX11::PlyElementDesc GeometryLoaderDX11::ParsePLYElementHeader(std::string headerLine, std::ifstream& input)
+{
+	GeometryLoaderDX11::PlyElementDesc desc;
+	std::string txt;
+
+	// Parse the header line
+	// "element <name> <count>"
+	int split = headerLine.find_first_of(' ', 8);
+	desc.name = headerLine.substr(8, split - 8);
+		
+	split = headerLine.rfind( ' ' );
+	std::istringstream elemCount(headerLine.substr(split, headerLine.length() - split));
+	elemCount >> desc.elementCount;
+
+	// Parse any attached properties
+	while(input.is_open() && !input.eof())
+	{
+		std::getline( input, txt );
+
+		if(0 == txt.compare(0, 13, "property list"))
+		{
+			// Parse this property list declaration
+			desc.dataFormat.push_back(ParsePLYElementPropertyList(txt.substr(14, txt.length() - 14)));
+		}
+		else if(0 == txt.compare(0, 8, "property"))
+		{
+			// Parse this property declaration
+			desc.dataFormat.push_back(ParsePLYElementProperty(txt.substr(9, txt.length() - 9)));
+		}
+		else
+		{
+			// At this point we'll also have read a line too far so
+			// need to "unread" it to avoid breaking remaining parsing.
+			input.putback('\n');
+			for(int i = -1 + txt.length(); i >= 0; i--)
+				input.putback(txt.at(i));
+			// (there must be a better way, no?!?)
+			break;
+		}
+	}
+
+	return desc;
+}
+
+GeometryLoaderDX11::PlyElementPropertyDeclaration GeometryLoaderDX11::ParsePLYElementProperty(std::string desc)
+{
+	// <type> <name>
+	GeometryLoaderDX11::PlyElementPropertyDeclaration decl;
+	decl.isList = false;
+
+	int split = desc.find(' ');
+
+	decl.type = desc.substr(0, split);
+	decl.name = desc.substr(split + 1, desc.length() - (split + 1));
+
+	return decl;
+}
+
+GeometryLoaderDX11::PlyElementPropertyDeclaration GeometryLoaderDX11::ParsePLYElementPropertyList(std::string desc)
+{
+	// <length_type> <element_type> <name>
+	GeometryLoaderDX11::PlyElementPropertyDeclaration decl;
+	decl.isList = true;
+
+	int split = desc.find(' ');
+	decl.listLengthType = desc.substr(0, split);
+
+	decl.type = desc.substr(split + 1, desc.rfind(' ') - (split + 1));
+
+	split = desc.rfind(' ') + 1;
+	decl.name = desc.substr(split, desc.length() - split);
+
+	return decl;
+}
+
+std::vector<void**> GeometryLoaderDX11::ReadPLYElementData(std::ifstream& input, const GeometryLoaderDX11::PlyElementDesc& desc)
+{
+	std::vector<void**> raw;
+
+	for(int i = 0; i < desc.elementCount; ++i)
+	{
+		std::string txt;
+		std::getline(input, txt);
+
+		raw.push_back(ParsePLYElementData(txt, desc.dataFormat));
+	}
+
+	return raw;
+}
+
+void** GeometryLoaderDX11::ParsePLYElementData(std::string text, const std::vector<PlyElementPropertyDeclaration>& desc)
+{
+	void** parsed;
+
+	parsed = new void*[desc.size()];
+
+	boost::char_separator<char> sep(" ");
+	boost::tokenizer<boost::char_separator<char>> tok(text, sep);
+
+	int e = 0;
+	for(boost::tokenizer<boost::char_separator<char>>::iterator it = tok.begin(); it != tok.end(); ++it)
+	{
+		if( e >= desc.size())
+			break;
+
+		if(desc[e].isList)
+		{
+			// Read this as length
+			int arrLen = 0;
+
+			arrLen = ExtractDataVal<int>(*it);
+
+			// Size up the type
+			if(0 == desc[e].type.compare("char"))
+			{
+				parsed[e] = ExtractDataPtrArray<char>(arrLen, it);
+			}
+			else if(0 == desc[e].type.compare("uchar"))
+			{
+				parsed[e] = ExtractDataPtrArray<unsigned char>(arrLen, it);
+			}
+			else if(0 == desc[e].type.compare("short"))
+			{
+				parsed[e] = ExtractDataPtrArray<short>(arrLen, it);
+			}
+			else if(0 == desc[e].type.compare("ushort"))
+			{
+				parsed[e] = ExtractDataPtrArray<unsigned short>(arrLen, it);
+			}
+			else if(0 == desc[e].type.compare("int"))
+			{
+				parsed[e] = ExtractDataPtrArray<int>(arrLen, it);
+			}
+			else if(0 == desc[e].type.compare("uint"))
+			{
+				parsed[e] = ExtractDataPtrArray<unsigned int>(arrLen, it);
+			}
+			else if(0 == desc[e].type.compare("float"))
+			{
+				parsed[e] = ExtractDataPtrArray<float>(arrLen, it);
+			}
+			else if(0 == desc[e].type.compare("double"))
+			{
+				parsed[e] = ExtractDataPtrArray<double>(arrLen, it);
+			}
+			else
+			{
+				// wtf?
+			}
+		}
+		else
+		{
+			if(0 == desc[e].type.compare("char"))
+			{
+				parsed[e] = ExtractDataPtr<char>(*it);
+			}
+			else if(0 == desc[e].type.compare("uchar"))
+			{
+				parsed[e] = ExtractDataPtr<unsigned char>(*it);
+			}
+			else if(0 == desc[e].type.compare("short"))
+			{
+				parsed[e] = ExtractDataPtr<short>(*it);
+			}
+			else if(0 == desc[e].type.compare("ushort"))
+			{
+				parsed[e] = ExtractDataPtr<unsigned short>(*it);
+			}
+			else if(0 == desc[e].type.compare("int"))
+			{
+				parsed[e] = ExtractDataPtr<int>(*it);
+			}
+			else if(0 == desc[e].type.compare("uint"))
+			{
+				parsed[e] = ExtractDataPtr<unsigned int>(*it);
+			}
+			else if(0 == desc[e].type.compare("float"))
+			{
+				parsed[e] = ExtractDataPtr<float>(*it);
+			}
+			else if(0 == desc[e].type.compare("double"))
+			{
+				parsed[e] = ExtractDataPtr<double>(*it);
+			}
+			else
+			{
+				// wtf?
+			}
+		}
+
+		++e;
+	}
+
+	return parsed;
+}
+
+template<typename T> T* GeometryLoaderDX11::ExtractDataPtr(std::string input)
+{
+	T* t = new T;
+
+	std::istringstream iss(input);
+
+	iss >> *t;
+
+	return t;
+}
+
+template<typename T> T GeometryLoaderDX11::ExtractDataVal(std::string input)
+{
+	T t;
+
+	std::istringstream iss(input);
+
+	iss >> t;
+
+	return t;
+}
+
+template<typename T> GeometryLoaderDX11::PlyDataArray<T>* GeometryLoaderDX11::ExtractDataPtrArray(int length, boost::tokenizer<boost::char_separator<char>>::iterator iterator)
+{
+	PlyDataArray<T>* t = new PlyDataArray<T>;
+	t->length = length;
+	t->data = new T[length];
+
+	for(int i = 0; i < length; ++i)
+	{
+		std::istringstream iss(*(++iterator));
+		iss >> t->data[i];
+	}
+
+	return t;
+}
+
+int GeometryLoaderDX11::FindPlyElementIndex(std::vector<PlyElementDesc> elems, std::string name)
+{
+	for(int idx = 0; idx < elems.size(); ++idx)
+		if(0 == elems.at(idx).name.compare(name))
+			return idx;
+
+	return -1;
+}
+
+int GeometryLoaderDX11::FindPlyElementPropertyIndex(std::vector<PlyElementPropertyDeclaration> elems, std::string name)
+{
+	for(int idx = 0; idx < elems.size(); ++idx)
+		if(0 == elems.at(idx).name.compare(name))
+			return idx;
+
+	return -1;
+}
