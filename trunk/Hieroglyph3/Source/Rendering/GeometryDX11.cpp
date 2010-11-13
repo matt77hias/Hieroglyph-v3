@@ -265,7 +265,7 @@ void GeometryDX11::GenerateInputLayout( int ShaderID )
 	// Check the number of vertices to be created
 	CalculateVertexCount();
 
-	// Allocate the necesary number of element descriptions
+	// Allocate the necessary number of element descriptions
 	TArray<D3D11_INPUT_ELEMENT_DESC> elements;
 
 	// Fill in the vertex element descriptions based on each element

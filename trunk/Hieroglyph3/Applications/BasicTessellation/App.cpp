@@ -68,7 +68,7 @@ bool App::ConfigureEngineComponents()
 		}
 
 		// If using the reference device, utilize a fixed time step for any animations.
-		m_pTimer->SetFixedTimeStep( 1.0f / 10.0f );
+		m_pTimer->SetFixedTimeStep( 1.0f / 20.0f );
 	}
 
 	// Create a swap chain for the window that we started out with.  This
@@ -185,9 +185,11 @@ void App::Initialize()
 		m_pRenderer11->CreateRasterizerState( &RS );
 
 	// Set up the geometry to be rendered
-	m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
+	//m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
+	m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/hedra.ms3d" ) );
 	m_pGeometry->LoadToBuffers();
 	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
+	//m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
 	// Build the world, view, and projection matrices
 
@@ -212,6 +214,8 @@ void App::Initialize()
 
 	m_TessParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
+
+	m_pRenderer11->SetMultiThreadingState( true );
 }
 //--------------------------------------------------------------------------------
 void App::Update()

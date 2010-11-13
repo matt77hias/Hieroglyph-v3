@@ -47,7 +47,7 @@ VS_OUTPUT VSMAIN( in VS_INPUT input )
 	output.position = mul( float4( input.position, 1.0f ), SkinMatrices[input.bone] );
 	//output.position = mul( output.position, WorldMatrix );
 	output.position = mul( output.position, ViewProjMatrix );
-	output.color.rgb = LightColor;
+	output.color.rgb = LightColor.rgb;
 	output.color.a = 1.0f;
 
 	return output;

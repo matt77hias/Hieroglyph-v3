@@ -70,17 +70,17 @@ HS_CONSTANT_DATA_OUTPUT PassThroughConstantHS(
     HS_CONSTANT_DATA_OUTPUT output;
 
  //   // Insert code to compute Output here
-	//output.Edges[0] = EdgeFactors.x; //2.0f;
-	//output.Edges[1] = EdgeFactors.y; //2.0f;
-	//output.Edges[2] = EdgeFactors.z; //2.0f;
+	output.Edges[0] = EdgeFactors.x; //2.0f;
+	output.Edges[1] = EdgeFactors.y; //2.0f;
+	output.Edges[2] = EdgeFactors.z; //2.0f;
+	
+	output.Inside = EdgeFactors.w; //2.0f;
 
-	//output.Inside = EdgeFactors.w; //2.0f;
+	//output.Edges[0] = 2.0f;
+	//output.Edges[1] = 2.0f;
+	//output.Edges[2] = 2.0f;
 
-	output.Edges[0] = 2.0f;
-	output.Edges[1] = 2.0f;
-	output.Edges[2] = 2.0f;
-
-	output.Inside = 2.0f;
+	//output.Inside = 2.0f;
 
     return output;
 }
@@ -105,8 +105,9 @@ HS_CONTROL_POINT_OUTPUT HSMAIN(
 }
 //--------------------------------------------------------------------------------
 [domain("tri")]
-DS_OUTPUT DSMAIN( HS_CONSTANT_DATA_OUTPUT input, float3 BarycentricCoordinates : SV_DomainLocation, 
-			 const OutputPatch<HS_CONTROL_POINT_OUTPUT, 3> TrianglePatch )
+DS_OUTPUT DSMAIN( const OutputPatch<HS_CONTROL_POINT_OUTPUT, 3> TrianglePatch,
+				        float3 BarycentricCoordinates : SV_DomainLocation, 
+				        HS_CONSTANT_DATA_OUTPUT input )
 {
 	DS_OUTPUT output;
 
