@@ -1,11 +1,11 @@
 //--------------------------------------------------------------------------------
 // This file is a portion of the Hieroglyph 3 Rendering Engine.  It is distributed
-// under the MIT License, available in the root of this distribution and 
+// under the MIT License, available in the root of this distribution and
 // at the following URL:
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) 2003-2010 Jason Zink
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -30,26 +30,26 @@ namespace Glyph3
         Directional = 2,
 
         NumLightTypes
-    };    
+    };
 
     // Light parameters
     struct Light
     {
-        Vector3f Position;        
+        Vector3f Position;
         Vector3f Color;
         Vector3f Direction;
         float Range;
         float SpotInnerAngle;
-        float SpotOuterAngle;        
+        float SpotOuterAngle;
         LightType Type;
 
-        Light() : Position( 0.0f, 0.0f, 0.0f ), Color( 1.0f, 1.0f, 1.0f ), Direction( -1.0f, -1.0f, 1.0f ), 
+        Light() : Position( 0.0f, 0.0f, 0.0f ), Color( 1.0f, 1.0f, 1.0f ), Direction( -1.0f, -1.0f, 1.0f ),
                 Range( 2.0f ), SpotInnerAngle( 0 ), SpotOuterAngle ( 0 ), Type ( Point ) {}
     };
 
     class ViewLights : public IRenderView
-    {    
-    public:		
+    {
+    public:
         ViewLights( RendererDX11& Renderer );
 
         virtual void Update( float fTime );
@@ -60,9 +60,8 @@ namespace Glyph3
         virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
 
         void AddLight( const Light& light );
-        void SetTargets( TArray<ResourcePtr>& GBufferTargets, ResourcePtr pRenderTarget, 
-                            ResourcePtr DepthTarget, ResourcePtr DepthTargetCopy,
-                            int Viewport, int vpWidth, int vpHeight );       
+        void SetTargets( TArray<ResourcePtr>& GBufferTargets, ResourcePtr pRenderTarget,
+                            ResourcePtr DepthTarget, int Viewport, int vpWidth, int vpHeight );
         void SetClipPlanes( float NearClip, float FarClip );
 
         virtual ~ViewLights();
@@ -77,7 +76,7 @@ namespace Glyph3
         int					m_iDisabledDSState;
         int                 m_iLessThanDSState;
         int                 m_iGreaterThanDSState;
-        int                 m_iBlendState;        
+        int                 m_iBlendState;
         int                 m_iScissorRSState;
         int                 m_iBackFaceCullRSState;
         int                 m_iFrontFaceCullRSState;
@@ -90,7 +89,7 @@ namespace Glyph3
 
         ResourcePtr	            m_pRenderTarget;
         ResourcePtr			    m_DepthTarget;
-        ResourcePtr			    m_DepthTargetCopy;
+        ResourcePtr			    m_ReadOnlyDepthTarget;
         TArray<ResourcePtr>     m_GBufferTargets;
 
         GeometryDX11			m_QuadGeometry;

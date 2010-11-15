@@ -1,11 +1,11 @@
 //--------------------------------------------------------------------------------
 // This file is a portion of the Hieroglyph 3 Rendering Engine.  It is distributed
-// under the MIT License, available in the root of this distribution and 
+// under the MIT License, available in the root of this distribution and
 // at the following URL:
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) 2003-2010 Jason Zink
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -58,9 +58,9 @@ void ViewFinalPass::PreDraw( RendererDX11* pRenderer )
 void ViewFinalPass::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager )
 {
     if ( m_pRoot )
-    {        
+    {
         pPipelineManager->SetViewPort( m_iViewport );
-        
+
         // Set this view's render parameters
         SetRenderParams( pParamManager );
 
@@ -75,7 +75,7 @@ void ViewFinalPass::SetRenderParams( ParameterManagerDX11* pParamManager )
     pParamManager->SetProjMatrixParameter( &ProjMatrix );
 
     // Set the light texture
-    pParamManager->SetShaderResourceParameter( L"LightTexture", m_LightTarget);    
+    pParamManager->SetShaderResourceParameter( L"LightTexture", m_LightTarget);
 }
 //--------------------------------------------------------------------------------
 void ViewFinalPass::SetUsageParams( ParameterManagerDX11* pParamManager )
@@ -83,11 +83,11 @@ void ViewFinalPass::SetUsageParams( ParameterManagerDX11* pParamManager )
 
 }
 //--------------------------------------------------------------------------------
-void ViewFinalPass::SetTargets( ResourcePtr LightTarget, ResourcePtr RenderTarget, 
+void ViewFinalPass::SetTargets( ResourcePtr LightTarget, ResourcePtr RenderTarget,
                                 ResourcePtr DepthTarget, int Viewport )
 {
     m_LightTarget = LightTarget;
     m_RenderTarget = RenderTarget;
     m_iViewport = Viewport;
-    m_DepthTarget = DepthTarget;    
+    m_DepthTarget = DepthTarget;
 }

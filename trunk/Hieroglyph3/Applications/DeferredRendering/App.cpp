@@ -36,18 +36,18 @@ Vector3f Lerp( const Vector3f& x, const Vector3f& y, const Vector3f& s )
 //--------------------------------------------------------------------------------
 App::App() : m_vpWidth( 1024 ), m_vpHeight( 576 )
 {
-	m_bSaveScreenshot = false;    
+	m_bSaveScreenshot = false;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
 {
-	// Basic event handling is supported with the EventManager class.  This is a 
+	// Basic event handling is supported with the EventManager class.  This is a
 	// singleton class that allows an EventListener to register which events it
 	// wants to receive.
 
 	EventManager* pEventManager = EventManager::Get( );
 
-	// The application object wants to know about these three events, so it 
+	// The application object wants to know about these three events, so it
 	// registers itself with the appropriate event IDs.
 
 	pEventManager->AddEventListener( SYSTEM_KEYBOARD_KEYUP, this );
@@ -67,7 +67,7 @@ bool App::ConfigureEngineComponents()
 		if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_REFERENCE, D3D_FEATURE_LEVEL_11_0 ) )
 		{
 			MessageBox( m_pWindow->GetHandle(), L"Could not create a hardware or software Direct3D 11 device - the program will now abort!", L"Hieroglyph 3 Rendering", MB_ICONEXCLAMATION | MB_SYSTEMMODAL );
-			RequestTermination();			
+			RequestTermination();
 			return( false );
 		}
 
@@ -87,11 +87,11 @@ bool App::ConfigureEngineComponents()
 	// Create a swap chain for the window.
 	SwapChainConfigDX11 Config;
 	Config.SetWidth( m_pWindow->GetWidth() );
-	Config.SetHeight( m_pWindow->GetHeight() );    
+	Config.SetHeight( m_pWindow->GetHeight() );
 	Config.SetOutputWindow( m_pWindow->GetHandle() );
 	m_pWindow->SetSwapChain( m_pRenderer11->CreateSwapChain( &Config ) );
 
-	// We'll keep a copy of the swap chain's render target index to 
+	// We'll keep a copy of the swap chain's render target index to
 	// use later.
 	m_BackBuffer = m_pRenderer11->GetSwapChainResource( m_pWindow->GetSwapChain() );
 
@@ -110,7 +110,7 @@ bool App::ConfigureEngineComponents()
         sampleDesc.Count = aaMode == AAMode::MSAA ? 4 : 1;
         sampleDesc.Quality = 0;
 
-	    // Create the render targets for our unoptimized G-Buffer, which just uses 
+	    // Create the render targets for our unoptimized G-Buffer, which just uses
         // 32-bit floats for everything
 	    Texture2dConfigDX11 RTConfig;
 	    RTConfig.SetColorBuffer( rtWidth, rtHeight );
@@ -138,46 +138,51 @@ bool App::ConfigureEngineComponents()
         RTConfig.SetFormat( DXGI_FORMAT_R10G10B10A2_UNORM );
         m_FinalTarget[aaMode] = m_pRenderer11->CreateTexture2D( &RTConfig, NULL );
 
-	    // Next we create a depth buffer for depth/stencil testing
+	    // Next we create a depth buffer for depth/stencil testing. Typeless formats let us
+        // write depth with one format, and later interpret that depth as a color value using
+        // a shader resource view.
 	    Texture2dConfigDX11 DepthTexConfig;
-	    DepthTexConfig.SetDepthBuffer( rtWidth, rtHeight );	
-        DepthTexConfig.SetFormat( DXGI_FORMAT_D24_UNORM_S8_UINT );	
-        DepthTexConfig.SetBindFlags( D3D11_BIND_DEPTH_STENCIL );
+	    DepthTexConfig.SetDepthBuffer( rtWidth, rtHeight );
+        DepthTexConfig.SetFormat( DXGI_FORMAT_R24G8_TYPELESS );
+        DepthTexConfig.SetBindFlags( D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE );
         DepthTexConfig.SetSampleDesc( sampleDesc );
-    	
+
         DepthStencilViewConfigDX11 DepthDSVConfig;
         D3D11_TEX2D_DSV DSVTex2D;
         DSVTex2D.MipSlice = 0;
         DepthDSVConfig.SetTexture2D( DSVTex2D );
-        DepthDSVConfig.SetFormat( DXGI_FORMAT_D24_UNORM_S8_UINT );                
-
-        if ( aaMode == AAMode::MSAA )         
-            DepthDSVConfig.SetViewDimensions( D3D11_DSV_DIMENSION_TEXTURE2DMS );
-        else
-            DepthDSVConfig.SetViewDimensions( D3D11_DSV_DIMENSION_TEXTURE2D );           
-        
-        m_DepthTarget[aaMode] = m_pRenderer11->CreateTexture2D( &DepthTexConfig, NULL, NULL, NULL, NULL, &DepthDSVConfig );
-
-        // Now we need to create a another depth-stencil buffer that we can copy to,
-        // for depth readback
-        DepthTexConfig.SetBindFlags( D3D11_BIND_SHADER_RESOURCE );
-        DepthTexConfig.SetFormat( DXGI_FORMAT_R24G8_TYPELESS );
+        DepthDSVConfig.SetFormat( DXGI_FORMAT_D24_UNORM_S8_UINT );
 
         ShaderResourceViewConfigDX11 DepthSRVConfig;
         D3D11_TEX2D_SRV SRVTex2D;
         SRVTex2D.MipLevels = 1;
-        SRVTex2D.MostDetailedMip = 0;    
+        SRVTex2D.MostDetailedMip = 0;
         DepthSRVConfig.SetTexture2D( SRVTex2D );
         DepthSRVConfig.SetFormat( DXGI_FORMAT_R24_UNORM_X8_TYPELESS );
 
-        if ( aaMode == AAMode::MSAA )         
+        if ( aaMode == AAMode::MSAA )
+        {
             DepthSRVConfig.SetViewDimensions( D3D11_SRV_DIMENSION_TEXTURE2DMS );
+            DepthDSVConfig.SetViewDimensions( D3D11_DSV_DIMENSION_TEXTURE2DMS );
+        }
         else
-            DepthSRVConfig.SetViewDimensions( D3D11_SRV_DIMENSION_TEXTURE2D ); 
+        {
+            DepthSRVConfig.SetViewDimensions( D3D11_SRV_DIMENSION_TEXTURE2D );
+            DepthDSVConfig.SetViewDimensions( D3D11_DSV_DIMENSION_TEXTURE2D );
+        }
 
-        m_DepthTargetCopy[aaMode] = m_pRenderer11->CreateTexture2D( &DepthTexConfig, NULL, &DepthSRVConfig, NULL, NULL, NULL );
+        m_DepthTarget[aaMode] = m_pRenderer11->CreateTexture2D( &DepthTexConfig, NULL, &DepthSRVConfig, NULL, NULL, &DepthDSVConfig );
 
-        // Create a view port to use on the scene.  This basically selects the 
+        // Now we need to create a depth stencil view with read-only flags set, so
+        // that we can have the same buffer set as both a shader resource view and as
+        // a depth stencil view
+        DepthDSVConfig.SetFlags( D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL );
+        m_ReadOnlyDepthTarget[aaMode] = ResourcePtr( new ResourceProxyDX11( m_DepthTarget[aaMode]->m_iResource,
+                                                                            &DepthTexConfig, m_pRenderer11,
+                                                                            &DepthSRVConfig, NULL, NULL,
+                                                                            &DepthDSVConfig ) );
+
+        // Create a view port to use on the scene.  This basically selects the
         // entire floating point area of the render target.
         D3D11_VIEWPORT viewport;
         viewport.Width = static_cast< float >( rtWidth );
@@ -216,24 +221,24 @@ void App::ShutdownEngineComponents()
 }
 //--------------------------------------------------------------------------------
 void App::Initialize()
-{	
-	// Create and initialize the geometry to be rendered.  
+{
+	// Create and initialize the geometry to be rendered.
 	GeometryDX11* pGeometry = new GeometryDX11();
 	pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Sample_Scene.ms3d" ) );
     bool success = pGeometry->ComputeTangentFrame();
     _ASSERT( success );
-	pGeometry->LoadToBuffers();	
+	pGeometry->LoadToBuffers();
 	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
 	// We'll make 2 effects for filling the G-Buffer: one without optimizations, and one with
     m_pGBufferEffect[GBufferOptMode::OptDisabled] = new RenderEffectDX11();
-	m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_iVertexShader = 
+	m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_iVertexShader =
 		m_pRenderer11->LoadShader( VERTEX_SHADER,
 		std::wstring( L"../Data/Shaders/GBuffer.hlsl" ),
 		std::wstring( L"VSMain" ),
 		std::wstring( L"vs_5_0" ) );
     _ASSERT( m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_iVertexShader != -1 );
-	m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_iPixelShader = 
+	m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_iPixelShader =
 		m_pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"../Data/Shaders/GBuffer.hlsl" ),
 		std::wstring( L"PSMain" ),
@@ -241,13 +246,13 @@ void App::Initialize()
     _ASSERT( m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_iPixelShader != -1 );
 
     m_pGBufferEffect[GBufferOptMode::OptEnabled] = new RenderEffectDX11();
-    m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_iVertexShader = 
+    m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_iVertexShader =
         m_pRenderer11->LoadShader( VERTEX_SHADER,
         std::wstring( L"../Data/Shaders/GBuffer.hlsl" ),
         std::wstring( L"VSMainOptimized" ),
         std::wstring( L"vs_5_0" ) );
     _ASSERT( m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_iVertexShader != -1 );
-    m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_iPixelShader = 
+    m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_iPixelShader =
         m_pRenderer11->LoadShader( PIXEL_SHADER,
         std::wstring( L"../Data/Shaders/GBuffer.hlsl" ),
         std::wstring( L"PSMainOptimized" ),
@@ -272,17 +277,17 @@ void App::Initialize()
 
     m_iGBufferDSState = m_pRenderer11->CreateDepthStencilState( &dsConfig );
 
-    if ( m_iGBufferDSState == -1 )	
+    if ( m_iGBufferDSState == -1 )
         Log::Get().Write( L"Failed to create G-Buffer depth stencil state" );
 
 
     // Create a rasterizer state with back-face culling enabled
     RasterizerStateConfigDX11 rsConfig;
-    rsConfig.MultisampleEnable = TRUE;    
+    rsConfig.MultisampleEnable = TRUE;
     rsConfig.CullMode = D3D11_CULL_BACK;
     m_iGBufferRSState = m_pRenderer11->CreateRasterizerState( &rsConfig );
 
-    if ( m_iGBufferRSState == -1 )	
+    if ( m_iGBufferRSState == -1 )
         Log::Get().Write( L"Failed to create G-Buffer rasterizer state" );
 
     m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_iDepthStencilState = m_iGBufferDSState;
@@ -303,7 +308,7 @@ void App::Initialize()
 
     _ASSERT( m_DiffuseTexture->m_iResource != -1 );
     _ASSERT( m_NormalMap->m_iResource != -1 );
-    
+
     // Set the texture parameters
     ShaderResourceParameterDX11* pDiffuseParam = new ShaderResourceParameterDX11();
     pDiffuseParam->SetParameterData( &m_DiffuseTexture->m_iResourceSRV );
@@ -336,9 +341,9 @@ void App::Initialize()
     m_pMaterial->AddRenderParameter( pSamplerParam );
 
 	// Enable the material to render the given view type
-	m_pMaterial->Params[VT_GBUFFER].bRender = true;	
+	m_pMaterial->Params[VT_GBUFFER].bRender = true;
 
-	// Create the camera, and the render view that will produce an image of the 
+	// Create the camera, and the render view that will produce an image of the
 	// from the camera's point of view of the scene.
 	m_pCamera = new Camera();
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.407f, -0.707f, 0.0f ) );
@@ -352,7 +357,7 @@ void App::Initialize()
     const float farClip = 15.0f;
 	m_pCamera->SetProjectionParams( nearClip, farClip, (float)D3DX_PI / 2.0f, (float)m_vpWidth / (float)m_vpHeight );
 
-    m_pLightsView = new ViewLights( *m_pRenderer11 );    
+    m_pLightsView = new ViewLights( *m_pRenderer11 );
 
     // Bind the light view to the camera entity
     m_pLightsView->SetEntity( m_pCamera->GetBody() );
@@ -361,14 +366,14 @@ void App::Initialize()
     m_pLightsView->SetClipPlanes( nearClip, farClip );
 
 	// Create the scene and add the entities to it.  Then add the camera to the
-	// scene so that it will be updated via the scene interface instead of 
+	// scene so that it will be updated via the scene interface instead of
 	// manually manipulating it.
 
 	m_pNode = new Node3D();
 	m_pEntity = new Entity3D();
 	m_pEntity->SetGeometry( pGeometry );
 	m_pEntity->SetMaterial( m_pMaterial, false );
-	m_pEntity->Position() = Vector3f( 0.0f, 0.0f, 0.0f );  
+	m_pEntity->Position() = Vector3f( 0.0f, 0.0f, 0.0f );
 
 	m_pNode->AttachChild( m_pEntity );
 
@@ -381,19 +386,19 @@ void App::Initialize()
 //--------------------------------------------------------------------------------
 void App::Update()
 {
-	// Update the timer to determine the elapsed time since last frame.  This can 
+	// Update the timer to determine the elapsed time since last frame.  This can
 	// then used for animation during the frame.
 
 	m_pTimer->Update();
 
-	// Create a series of time factors for use in the simulation.  The factors 
+	// Create a series of time factors for use in the simulation.  The factors
 	// are as follows:
 	// x: Time in seconds since the last frame.
 	// y: Current framerate, which is updated once per second.
 	// z: Time in seconds since application startup.
 	// w: Current frame number since application startup.
 
-	Vector4f TimeFactors = Vector4f( m_pTimer->Elapsed(), (float)m_pTimer->Framerate(), 
+	Vector4f TimeFactors = Vector4f( m_pTimer->Elapsed(), (float)m_pTimer->Framerate(),
 		m_pTimer->Runtime(), (float)m_pTimer->FrameCount() );
 
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"TimeFactors" ), &TimeFactors );
@@ -413,7 +418,7 @@ void App::Update()
 	rotation.RotationY( m_pTimer->Elapsed() * 0.2f );
 	m_pNode->Rotation() *= rotation;
 
-	// Update the scene, and then render all cameras within the scene.	
+	// Update the scene, and then render all cameras within the scene.
 	m_pScene->Update( m_pTimer->Elapsed() );
 	m_pScene->Render( m_pRenderer11 );
 
@@ -425,13 +430,13 @@ void App::Update()
     PipelineManagerDX11* pImmPipeline = m_pRenderer11->pImmPipeline;
     ParameterManagerDX11* pParams = m_pRenderer11->m_pParamMgr;
     pImmPipeline->ClearRenderTargets();
-    pImmPipeline->BindRenderTargets( 0, m_BackBuffer );    
+    pImmPipeline->BindRenderTargets( 0, m_BackBuffer );
     pImmPipeline->ApplyRenderTargets();
     pImmPipeline->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 
     TArray<ResourcePtr>& gBuffer = m_GBuffer[GBufferOptMode::Value][AAMode::Value];
     float scaleFactor = AAMode::Value == AAMode::SSAA ? 0.5f : 1.0f;
-              
+
     if ( DisplayMode::Value == DisplayMode::Final )
     {
         ResourcePtr target = m_FinalTarget[AAMode::Value];
@@ -441,7 +446,7 @@ void App::Update()
             pImmPipeline->ResolveSubresource( m_ResolveTarget, 0, target, 0, DXGI_FORMAT_R10G10B10A2_UNORM );
             target = m_ResolveTarget;
         }
-        
+
         m_SpriteRenderer.Render( pImmPipeline, pParams, target, Matrix4f::ScaleMatrix( scaleFactor ) );
     }
     else
@@ -476,16 +481,16 @@ void App::Update()
             }
             else
             {
-                ResourcePtr target;                
+                ResourcePtr target;
                 if ( GBufferOptMode::Enabled() && DisplayMode::Value == DisplayMode::Position )
                     target = m_DepthTarget[AAMode::Value];
                 else
                     target = gBuffer[ DisplayMode::Value - DisplayMode::Normals ];
-                
+
                 m_SpriteRenderer.Render( pImmPipeline, pParams, target, Matrix4f::ScaleMatrix( scaleFactor ) );
             }
         }
-    }            
+    }
 
     DrawHUD( );
 
@@ -551,7 +556,7 @@ bool App::HandleEvent( IEvent* pEvent )
             DisplayMode::Increment();
             return true;
         }
-        
+
         if ( key == AAMode::Key )
         {
             AAMode::Increment();
@@ -594,7 +599,7 @@ std::wstring App::GetName( )
 void App::DrawHUD( )
 {
     PipelineManagerDX11* pImmPipeline = m_pRenderer11->pImmPipeline;
-    ParameterManagerDX11* pParams = m_pRenderer11->m_pParamMgr;        
+    ParameterManagerDX11* pParams = m_pRenderer11->m_pParamMgr;
 
     Matrix4f transform = Matrix4f::Identity();
     transform.SetTranslation( Vector3f( 30.0f, 30.0f, 0.0f ) );
@@ -618,19 +623,20 @@ void App::DrawHUD( )
     m_SpriteRenderer.RenderText( pImmPipeline, pParams, m_Font, text.c_str(), transform );
 
     y += 20.0f;
-    transform.SetTranslation( Vector3f( x, y, 0.0f ) );    
+    transform.SetTranslation( Vector3f( x, y, 0.0f ) );
     text = LightOptMode::ToString();
     m_SpriteRenderer.RenderText( pImmPipeline, pParams, m_Font, text.c_str(), transform );
 
     y += 20.0f;
-    transform.SetTranslation( Vector3f( x, y, 0.0f ) );    
+    transform.SetTranslation( Vector3f( x, y, 0.0f ) );
     text = AAMode::ToString();
     m_SpriteRenderer.RenderText( pImmPipeline, pParams, m_Font, text.c_str(), transform );
 }
 //--------------------------------------------------------------------------------
 void App::SetupViews( )
 {
-    // Set the lights to render    
+    // Set the lights to render. We'll create a 3D grid of point lights
+    // with different colors.
     Light light;
     light.Type = Point;
 
@@ -643,14 +649,14 @@ void App::SetupViews( )
     const Vector3f minColor ( 1.0f, 0.0f, 0.0f );
     const Vector3f maxColor ( 0.0f, 1.0f, 1.0f );
 
-    for ( int x = cubeMin; x <= cubeMax; x++ ) 
+    for ( int x = cubeMin; x <= cubeMax; x++ )
     {
         for ( int y = cubeMin; y <= cubeMax; y++ )
         {
             for ( int z = cubeMin; z <= cubeMax; z++ )
             {
                 Vector3f lerp;
-                lerp.x = static_cast<float>( x - cubeMin ) / ( cubeSize - 1 ); 
+                lerp.x = static_cast<float>( x - cubeMin ) / ( cubeSize - 1 );
                 lerp.y = static_cast<float>( y - cubeMin ) / ( cubeSize - 1 );
                 lerp.z = static_cast<float>( z - cubeMin ) / ( cubeSize - 1 );
 
@@ -670,13 +676,12 @@ void App::SetupViews( )
     }
 
     // Set the GBuffer targets, and the material effect
-    m_pGBufferView->SetTargets( m_GBuffer[GBufferOptMode::Value][AAMode::Value], 
+    m_pGBufferView->SetTargets( m_GBuffer[GBufferOptMode::Value][AAMode::Value],
                                 m_DepthTarget[AAMode::Value],
                                 m_iViewport[AAMode::Value] );
-    m_pLightsView->SetTargets( m_GBuffer[GBufferOptMode::Value][AAMode::Value], 
+    m_pLightsView->SetTargets( m_GBuffer[GBufferOptMode::Value][AAMode::Value],
                                m_FinalTarget[AAMode::Value],
-                               m_DepthTarget[AAMode::Value], 
-                               m_DepthTargetCopy[AAMode::Value],
+                               m_ReadOnlyDepthTarget[AAMode::Value],
                                m_iViewport[AAMode::Value], vpWidth, vpHeight );
 
     m_pMaterial->Params[VT_GBUFFER].pEffect = m_pGBufferEffect[GBufferOptMode::Value];

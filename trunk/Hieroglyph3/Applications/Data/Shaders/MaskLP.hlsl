@@ -28,10 +28,11 @@ float4 PSMain( in float4 screenPos : SV_Position ) : SV_Target0
 	// then we clip the pixel so that the stencil buffer doesn't get incremented.
 	int2 sampleIndices = int2( screenPos.xy );
 	float mask = 0.0f;
-	
-	for ( uint i = 0; i < 4; ++i )
+
+	const uint NumMSAASamples = 4;
+	for ( uint i = 0; i < NumMSAASamples; ++i )
 		mask += GBufferTexture.Load( sampleIndices, i ).w;
-	
+
 	if ( mask == 0.0f )
 		clip( -1.0f );
 

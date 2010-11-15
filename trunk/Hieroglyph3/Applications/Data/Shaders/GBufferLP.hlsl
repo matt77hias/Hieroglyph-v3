@@ -31,7 +31,7 @@ struct VSOutput
 
 struct PSInput
 {
-	centroid float4 PositionSS 	: SV_Position;
+	float4 PositionSS 			: SV_Position;
 	float2 TexCoord				: TEXCOORD;
 	float3 NormalVS				: NORMALVS;
 	float3 TangentVS			: TANGENTVS;
@@ -82,8 +82,8 @@ float2 SpheremapEncode( float3 normalVS )
 //-------------------------------------------------------------------------------------------------
 // Pixel shader entry point
 //-------------------------------------------------------------------------------------------------
-float4 PSMain( in PSInput input ) : SV_Target0
-{	
+float4 PSMain( in PSInput input, in uint coverageMask : SV_Coverage ) : SV_Target0
+{
 	// Normalize the tangent frame after interpolation
 	float3x3 tangentFrameVS = float3x3( normalize( input.TangentVS ),
 										normalize( input.BitangentVS ),
@@ -95,12 +95,16 @@ float4 PSMain( in PSInput input ) : SV_Target0
 	// Convert to view space
 	float3 normalVS = mul( normalTS, tangentFrameVS );
 
-	// Output a mask value indicating whether the current pixel is an edge pixel
-	float msaaMask = dot( abs( frac( input.PositionSS.xy ) - 0.5 ), 1000.0 );
+	// The coverage mask tells which which MSAA sample points passed the triangle coverage
+	// test. We can use this to determine if we're currently shading an edge pixel, which
+	// is a pixel where the triangle doesn't fully cover all of the sample points
+	const uint NumMSAASamples = 4;
+	const uint FullMask = ( 1 << NumMSAASamples ) - 1; // 0xF
+	float edgePixel = coverageMask != FullMask ? 1.0f : 0.0f;
 
 	// Output our G-Buffer values
 	float2 normalEncoded  = SpheremapEncode( normalVS );
-	return float4( normalEncoded, 64.0f, msaaMask );	
+	return float4( normalEncoded, 64.0f, edgePixel );
 }
 
 

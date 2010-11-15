@@ -1,11 +1,11 @@
 //--------------------------------------------------------------------------------
 // This file is a portion of the Hieroglyph 3 Rendering Engine.  It is distributed
-// under the MIT License, available in the root of this distribution and 
+// under the MIT License, available in the root of this distribution and
 // at the following URL:
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) 2003-2010 Jason Zink
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -26,7 +26,7 @@ ViewGBuffer::ViewGBuffer( RendererDX11& Renderer )
 	m_sParams.iViewType = VT_GBUFFER;
 
 	ViewMatrix.MakeIdentity();
-	ProjMatrix.MakeIdentity();					
+	ProjMatrix.MakeIdentity();
 }
 //--------------------------------------------------------------------------------
 ViewGBuffer::~ViewGBuffer()
@@ -66,7 +66,7 @@ void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerD
 		pPipelineManager->BindDepthTarget( m_DepthTarget );
 		pPipelineManager->ApplyRenderTargets();
 
-		pPipelineManager->SetViewPort( m_iViewport );		
+		pPipelineManager->SetViewPort( m_iViewport );
 
 		// Clear the G-Buffer targets
 		Vector4f color(0.0f, 0.0f, 0.0f, 0.0f);
@@ -91,10 +91,10 @@ void ViewGBuffer::SetUsageParams( ParameterManagerDX11* pParamManager )
 
 }
 //--------------------------------------------------------------------------------
-void ViewGBuffer::SetTargets( TArray<ResourcePtr>& GBufferTargets, 
+void ViewGBuffer::SetTargets( TArray<ResourcePtr>& GBufferTargets,
                                 ResourcePtr DepthTarget, int Viewport )
 {
-    m_GBufferTargets = GBufferTargets;    
+    m_GBufferTargets = GBufferTargets;
 
     m_iViewport = Viewport;
     m_DepthTarget = DepthTarget;

@@ -35,12 +35,12 @@ public:
 	virtual void ShutdownEngineComponents();
 
 	virtual bool HandleEvent( IEvent* pEvent );
-	virtual std::wstring GetName( );    
+	virtual std::wstring GetName( );
 
 protected:
-        
+
     void SetupLights();
-    void DrawHUD();    
+    void DrawHUD();
 
 	RendererDX11*			m_pRenderer11;
 	Win32RenderWindow*		m_pWindow;
@@ -48,16 +48,15 @@ protected:
     ResourcePtr     		m_GBufferTarget;
     ResourcePtr             m_LightTarget;
 	ResourcePtr				m_DepthTarget;
-    ResourcePtr             m_DepthTargetCopy;
+    ResourcePtr             m_ReadOnlyDepthTarget;
     ResourcePtr             m_FinalTarget;
     int                     m_iViewport;
     ResourcePtr             m_ResolveTarget;
-	ResourcePtr				m_BackBuffer;        
+	ResourcePtr				m_BackBuffer;
 
     MaterialDX11*           m_pMaterial;
     RenderEffectDX11*       m_pGBufferEffect;
     RenderEffectDX11*       m_pFinalPassEffect;
-    RenderEffectDX11*       m_pFinalPassPerSampleEffect;
     int					    m_iGBufferDSState;
     int                     m_iFinalPassDSState;
     int                     m_iRSState;

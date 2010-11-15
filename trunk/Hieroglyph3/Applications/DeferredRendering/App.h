@@ -34,26 +34,26 @@ public:
 	virtual void ShutdownEngineComponents();
 
 	virtual bool HandleEvent( IEvent* pEvent );
-	virtual std::wstring GetName( );    
+	virtual std::wstring GetName( );
 
 protected:
-    
+
     void SetupViews();
-    void DrawHUD();    
+    void DrawHUD();
 
 	RendererDX11*			m_pRenderer11;
 	Win32RenderWindow*		m_pWindow;
 
-    TArray<ResourcePtr>		m_GBuffer[GBufferOptMode::NumSettings][AAMode::NumSettings]; 
+    TArray<ResourcePtr>		m_GBuffer[GBufferOptMode::NumSettings][AAMode::NumSettings];
 	ResourcePtr				m_DepthTarget[AAMode::NumSettings];
-    ResourcePtr             m_DepthTargetCopy[AAMode::NumSettings];
+    ResourcePtr             m_ReadOnlyDepthTarget[AAMode::NumSettings];
     ResourcePtr             m_FinalTarget[AAMode::NumSettings];
     int                     m_iViewport[AAMode::NumSettings];
     ResourcePtr             m_ResolveTarget;
-	ResourcePtr				m_BackBuffer;        
+	ResourcePtr				m_BackBuffer;
 
     MaterialDX11*           m_pMaterial;
-    RenderEffectDX11*       m_pGBufferEffect[GBufferOptMode::NumSettings];    
+    RenderEffectDX11*       m_pGBufferEffect[GBufferOptMode::NumSettings];
     int					    m_iGBufferDSState;
     int                     m_iGBufferRSState;
 

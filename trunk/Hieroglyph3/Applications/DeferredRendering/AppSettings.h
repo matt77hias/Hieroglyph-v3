@@ -1,11 +1,11 @@
 //--------------------------------------------------------------------------------
 // This file is a portion of the Hieroglyph 3 Rendering Engine.  It is distributed
-// under the MIT License, available in the root of this distribution and 
+// under the MIT License, available in the root of this distribution and
 // at the following URL:
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) 2003-2010 Jason Zink
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -40,15 +40,15 @@ public:
     };
 
     static const wchar_t Key = 'O';
-    
-    static Settings Value;    
+
+    static Settings Value;
 
     static std::wstring ToString()
     {
-        static const std::wstring Names[NumSettings] = 
+        static const std::wstring Names[NumSettings] =
         {
-            L"No Optimizations", 
-            L"Scissor Rectangle", 
+            L"No Optimizations",
+            L"Scissor Rectangle",
             L"Light Volumes"
         };
 
@@ -83,15 +83,15 @@ public:
 
     static const wchar_t Key = 'V';
 
-    static Settings Value;    
+    static Settings Value;
 
     static std::wstring ToString()
     {
-        static const std::wstring Names[NumSettings] = 
+        static const std::wstring Names[NumSettings] =
         {
-            L"Final", 
-            L"G-Buffer", 
-            L"Normals",        
+            L"Final",
+            L"G-Buffer",
+            L"Normals",
             L"Diffuse Albedo",
             L"Specular Albedo",
             L"Position/Depth"
@@ -115,7 +115,7 @@ class LightMode
 public:
 
     enum Settings
-    {        
+    {
         Lights3x3x3 = 0,
         Lights5x5x5,
         Lights7x7x7,
@@ -125,11 +125,11 @@ public:
 
     static const wchar_t Key = 'N';
 
-    static Settings Value;    
+    static Settings Value;
 
     static std::wstring ToString()
     {
-        static const std::wstring Names[NumSettings] = 
+        static const std::wstring Names[NumSettings] =
         {
             L"3x3x3",
             L"5x5x5",
@@ -154,7 +154,7 @@ class GBufferOptMode
 public:
 
     enum Settings
-    {        
+    {
         OptDisabled = 0,
         OptEnabled,
 
@@ -163,11 +163,11 @@ public:
 
     static const wchar_t Key = 'K';
 
-    static Settings Value; 
+    static Settings Value;
 
     static std::wstring ToString()
     {
-        static const std::wstring Names[NumSettings] = 
+        static const std::wstring Names[NumSettings] =
         {
             L"Disabled",
             L"Enabled"
@@ -196,7 +196,7 @@ class AAMode
 public:
 
     enum Settings
-    {        
+    {
         None = 0,
         SSAA,
         MSAA,
@@ -206,11 +206,11 @@ public:
 
     static const wchar_t Key = 'M';
 
-    static Settings Value; 
+    static Settings Value;
 
     static std::wstring ToString()
     {
-        static const std::wstring Names[NumSettings] = 
+        static const std::wstring Names[NumSettings] =
         {
             L"None",
             L"Supersampling",

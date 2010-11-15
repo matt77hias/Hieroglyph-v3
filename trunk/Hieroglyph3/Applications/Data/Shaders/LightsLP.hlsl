@@ -18,7 +18,7 @@ cbuffer LightParams
 };
 
 cbuffer CameraParams
-{	
+{
 	matrix ProjMatrix;
 	matrix InvProjMatrix;
 }
@@ -53,8 +53,8 @@ struct VSOutput
 //-------------------------------------------------------------------------------------------------
 // Textures
 //-------------------------------------------------------------------------------------------------
-Texture2DMS<float4, 4> GBufferTexture : register( t0 );
-Texture2DMS<float, 4> DepthTexture : register( t1 );
+Texture2DMS<float4> GBufferTexture : register( t0 );
+Texture2DMS<float> DepthTexture : register( t1 );
 
 //-------------------------------------------------------------------------------------------------
 // Vertex shader entry point
@@ -115,15 +115,15 @@ float3 PositionFromDepth( in float zBufferDepth, in float3 viewRay )
 //-------------------------------------------------------------------------------------------------
 // Helper function for extracting G-Buffer attributes
 //-------------------------------------------------------------------------------------------------
-void GetGBufferAttributes( in float2 screenPos, in float3 viewRay, in uint subSampleIndex, 
+void GetGBufferAttributes( in float2 screenPos, in float3 viewRay, in uint subSampleIndex,
 							out float3 normal, out float3 position, out float specularPower )
 {
-	// Determine our indices for sampling the texture based on the current screen position
-	int2 sampleIndices = int2( screenPos.xy );
+	// Determine our coordinate for sampling the texture based on the current screen position
+	int2 sampleCoord = int2( screenPos.xy );
 
-	float4 gBuffer = GBufferTexture.Load( sampleIndices, subSampleIndex );
+	float4 gBuffer = GBufferTexture.Load( sampleCoord, subSampleIndex );
 	normal = SpheremapDecode( gBuffer.xy );
-	position = PositionFromDepth( DepthTexture.Load( sampleIndices, subSampleIndex ).x, viewRay );
+	position = PositionFromDepth( DepthTexture.Load( sampleCoord, subSampleIndex ).x, viewRay );
 	specularPower = gBuffer.z;
 }
 
@@ -156,9 +156,8 @@ float4 CalcLighting( in float3 normal, in float3 position, in float specularPowe
 		attenuation *= saturate( ( rho - SpotlightAngles.y ) / ( SpotlightAngles.x - SpotlightAngles.y ) );
 	#endif
 
-	float diffuseNormalizationFactor = 1.0f / 3.14159265f;	
 	float nDotL = saturate( dot( normal, L ) );
-	float3 diffuse = nDotL * LightColor * diffuseNormalizationFactor * attenuation;
+	float3 diffuse = nDotL * LightColor * attenuation;
 
 	// In view space camera position is (0, 0, 0)
 	float3 camPos = float3(0.0f, 0.0f, 0.0f);
@@ -167,7 +166,7 @@ float4 CalcLighting( in float3 normal, in float3 position, in float specularPowe
 	float3 V = camPos - position;
 	float3 H = normalize( L + V );
 	float specNormalizationFactor = ( ( specularPower + 8.0f ) / ( 8.0f * 3.14159265f ) );
-	float specular = pow( saturate( dot( normal, H ) ), specularPower ) * specNormalizationFactor * attenuation * nDotL;	
+	float specular = pow( saturate( dot( normal, H ) ), specularPower ) * specNormalizationFactor * nDotL * attenuation;
 
 	// Final value is diffuse RGB + mono specular
 	return float4( diffuse, specular );
@@ -177,31 +176,36 @@ float4 CalcLighting( in float3 normal, in float3 position, in float specularPowe
 // Pixel shader entry point. This shader runs per-pixel.
 //-------------------------------------------------------------------------------------------------
 float4 PSMain( in float4 screenPos : SV_Position, in float3 ViewRay : VIEWRAY ) : SV_Target0
-{	
+{
 	float3 normal;
-	float3 position;	
+	float3 position;
 	float specularPower;
 
 	// Get the G-Buffer values for the first sub-sample, and calculate the lighting
 	GetGBufferAttributes( screenPos.xy, ViewRay, 0, normal, position, specularPower );
-								
-	return CalcLighting( normal, position, specularPower );	
+
+	return CalcLighting( normal, position, specularPower );
 }
 
 //-------------------------------------------------------------------------------------------------
-// Pixel shader entry point. This shader runs per-sample.
+// Pixel shader entry point. This shader runs per-sample. Note that this shader doesn't need to
+// use SV_Coverage to determine if the light volume is covering a particular subsample, because
+// the shader is running per-sample. So if a subsample isn't covered or doesn't pass the
+// depth/stencil test, then the shader simply won't execute at all for that sample.
+// Also running at per-sample frequency means that the lighting values are stored individually
+// for each sample, so that the final pass can decide per-sample which values to use.
 //-------------------------------------------------------------------------------------------------
 float4 PSMainPerSample( in float4 screenPos : SV_Position, in float3 ViewRay : VIEWRAY,
 							in uint subSampleIndex : SV_SampleIndex )  : SV_Target0
 {
 	float3 normal;
-	float3 position;	
+	float3 position;
 	float specularPower;
 
 	// Get the G-Buffer values for the current sub-sample, and calculate the lighting
 	GetGBufferAttributes( screenPos.xy, ViewRay, subSampleIndex, normal, position, specularPower );
-								
-	return CalcLighting( normal, position, specularPower );	
+
+	return CalcLighting( normal, position, specularPower );
 }
 
 

@@ -1,11 +1,11 @@
 //--------------------------------------------------------------------------------
 // This file is a portion of the Hieroglyph 3 Rendering Engine.  It is distributed
-// under the MIT License, available in the root of this distribution and 
+// under the MIT License, available in the root of this distribution and
 // at the following URL:
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) 2003-2010 Jason Zink
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -35,13 +35,12 @@ static float Clamp( float x, float low, float high )
     return x;
 }
 //--------------------------------------------------------------------------------
-ViewLights::ViewLights( RendererDX11& Renderer)    
+ViewLights::ViewLights( RendererDX11& Renderer)
 {
     m_sParams.iViewType = VT_LIGHTS;
 
     ViewMatrix.MakeIdentity();
-    ProjMatrix.MakeIdentity();	
- 
+    ProjMatrix.MakeIdentity();
 
     // Create a depth stencil state with no depth testing, and with stencil testing
     // enabled to make sure we only light pixels where we rendered to the G-Buffer
@@ -60,7 +59,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
 
     m_iDisabledDSState = Renderer.CreateDepthStencilState( &dsConfig );
 
-    if ( m_iDisabledDSState == -1 )	
+    if ( m_iDisabledDSState == -1 )
         Log::Get().Write( L"Failed to create light depth stencil state" );
 
     // Create a depth stencil state with less-than-equal depth testing
@@ -68,14 +67,14 @@ ViewLights::ViewLights( RendererDX11& Renderer)
     dsConfig.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
     m_iLessThanDSState = Renderer.CreateDepthStencilState( &dsConfig );
 
-    if ( m_iLessThanDSState == -1 )	
+    if ( m_iLessThanDSState == -1 )
         Log::Get().Write( L"Failed to create light depth stencil state" );
 
     // Create a depth stencil state with greater-than-equal depth testing
     dsConfig.DepthFunc = D3D11_COMPARISON_GREATER_EQUAL;
     m_iGreaterThanDSState = Renderer.CreateDepthStencilState( &dsConfig );
 
-    if ( m_iGreaterThanDSState == -1 )	
+    if ( m_iGreaterThanDSState == -1 )
         Log::Get().Write( L"Failed to create light depth stencil state" );
 
     // Create a blend state for additive blending
@@ -96,13 +95,13 @@ ViewLights::ViewLights( RendererDX11& Renderer)
 
     m_iBlendState = Renderer.CreateBlendState( &blendConfig );
 
-    if ( m_iBlendState == -1 )    
-        Log::Get().Write( L"Failed to create light blend state" );    
+    if ( m_iBlendState == -1 )
+        Log::Get().Write( L"Failed to create light blend state" );
 
     // Create a rasterizer state with scissoring enabled
     RasterizerStateConfigDX11 rsConfig;
     rsConfig.MultisampleEnable = TRUE;
-    rsConfig.ScissorEnable = TRUE;        
+    rsConfig.ScissorEnable = TRUE;
     m_iScissorRSState = Renderer.CreateRasterizerState( &rsConfig );
 
     // Create a rasterizer state with back-face culling enabled
@@ -151,10 +150,10 @@ ViewLights::ViewLights( RendererDX11& Renderer)
                 defines[5].Name = "MSAA";
                 defines[5].Definition = aaMode == AAMode::MSAA ? "1" : "0";
                 defines[6].Name = NULL;
-                defines[6].Definition = NULL;                       
+                defines[6].Definition = NULL;
 
                 // Point light shaders
-                m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader = 
+                m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader =
                     Renderer.LoadShader( VERTEX_SHADER,
                     std::wstring( L"../Data/Shaders/Lights.hlsl" ),
                     std::wstring( L"VSMain" ),
@@ -167,7 +166,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
                     std::wstring( L"../Data/Shaders/Lights.hlsl" ),
                     std::wstring( L"PSMain" ),
                     std::wstring( L"ps_5_0" ),
-                    defines );        
+                    defines );
                 _ASSERT( m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iPixelShader != -1 );
 
                 m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iBlendState = m_iBlendState;
@@ -179,7 +178,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
                 defines[0].Definition = "0";
                 defines[1].Definition = "1";
 
-                m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader = 
+                m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader =
                     Renderer.LoadShader( VERTEX_SHADER,
                     std::wstring( L"../Data/Shaders/Lights.hlsl" ),
                     std::wstring( L"VSMain" ),
@@ -192,7 +191,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
                     std::wstring( L"../Data/Shaders/Lights.hlsl" ),
                     std::wstring( L"PSMain" ),
                     std::wstring( L"ps_5_0" ),
-                    defines );        
+                    defines );
                 _ASSERT( m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iPixelShader != -1 );
 
                 m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iBlendState = m_iBlendState;
@@ -204,7 +203,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
                 defines[1].Definition = "0";
                 defines[2].Definition = "1";
 
-                m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader = 
+                m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader =
                     Renderer.LoadShader( VERTEX_SHADER,
                     std::wstring( L"../Data/Shaders/Lights.hlsl" ),
                     std::wstring( L"VSMain" ),
@@ -243,7 +242,7 @@ void ViewLights::PreDraw( RendererDX11* pRenderer )
     if ( m_pEntity != NULL )
     {
         Matrix4f view = m_pEntity->GetView();
-        SetViewMatrix( view );        
+        SetViewMatrix( view );
     }
 
     // Queue this view into the renderer for processing.
@@ -254,27 +253,24 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
 {
     // Bind the render target
     pPipelineManager->ClearRenderTargets();
-    pPipelineManager->BindRenderTargets( 0, m_pRenderTarget );    
+    pPipelineManager->BindRenderTargets( 0, m_pRenderTarget );
     pPipelineManager->ApplyRenderTargets();
 
     // Clear the render target
     Vector4f color(0.0f, 0.0f, 0.0f, 0.0f);
     pPipelineManager->ClearBuffers( color, 1.0f, 0 );
 
-    // Bind the depth buffer
+    // Bind the read-only depth buffer
     pPipelineManager->BindDepthTarget( m_DepthTarget );
     pPipelineManager->ApplyRenderTargets();
 
     pPipelineManager->SetViewPort( m_iViewport );
 
-    // Copy the depth buffer
-    pPipelineManager->CopySubresourceRegion( m_DepthTargetCopy, 0, 0, 0, 0, m_DepthTarget, 0, NULL );
-
     // Set this view's render parameters
     SetRenderParams( pParamManager );
 
-    // Loop through the lights        
-    for ( int i = 0; i < m_Lights.count(); ++i )   
+    // Loop through the lights
+    for ( int i = 0; i < m_Lights.count(); ++i )
     {
         const Light& light = m_Lights[i];
 
@@ -302,7 +298,7 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
         pParamManager->SetVectorParameter( L"LightDirection", &direction );
         pParamManager->SetVectorParameter( L"LightRange", &Vector4f( light.Range, 1.0f, 1.0f, 1.0f ) );
         pParamManager->SetVectorParameter( L"SpotlightAngles", &Vector4f( cosf( light.SpotInnerAngle / 2.0f ),
-                                                                          cosf( light.SpotOuterAngle / 2.0f ), 
+                                                                          cosf( light.SpotOuterAngle / 2.0f ),
                                                                           0.0f, 0.0f ) );
 
         // Set the rasterizer and depth-stencil state, and draw
@@ -313,7 +309,7 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
             pPipelineManager->Draw( *pEffect, m_QuadGeometry, pParamManager );
         }
         else if ( LightOptMode::Value == LightOptMode::ScissorRect )
-        {            
+        {
             if ( light.Type == Directional )
             {
                 // Scissor is pointless for directional lights
@@ -325,7 +321,7 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
 
                 // Set the scissor rectangle
                 D3D11_RECT rect = CalcScissorRect( light.Position, light.Range );
-                
+
                 // Set it
                 pPipelineManager->SetScissorRects( 1, &rect );
             }
@@ -335,7 +331,7 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
         }
         else if ( LightOptMode::Value == LightOptMode::Volumes )
         {
-            
+
             bool intersectsNearPlane = true;
             bool intersectsFarPlane = true;
             if( light.Type != Directional )
@@ -378,7 +374,7 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
                     const float scaleXYZ = light.Range * 1.1f;
                     m_WorldMatrix.Scale( scaleXYZ );
                 }
-                
+
                 m_WorldMatrix.SetTranslation( light.Position );
                 pParamManager->SetWorldMatrixParameter( &m_WorldMatrix );
 
@@ -419,27 +415,27 @@ void ViewLights::SetRenderParams( ParameterManagerDX11* pParamManager )
     pParamManager->SetMatrixParameter( L"InvProjMatrix", &invProj );
     pParamManager->SetMatrixParameter( L"ProjMatrix", &ProjMatrix );
 
-    if ( m_pRoot != NULL ) 
+    if ( m_pRoot != NULL )
     {
-        Vector4f cameraPos( m_pRoot->Position(), 1.0f );        
+        Vector4f cameraPos( m_pRoot->Position(), 1.0f );
         pParamManager->SetVectorParameter( L"CameraPos", &cameraPos );
     }
 
     // Set the G-Buffer textures
-    static const std::wstring TextureNames[4] = 
-    { 
-        L"NormalTexture",  
+    static const std::wstring TextureNames[4] =
+    {
+        L"NormalTexture",
         L"DiffuseAlbedoTexture",
         L"SpecularAlbedoTexture",
         L"PositionTexture",
     };
 
-    for ( int i = 0; i < m_GBufferTargets.count(); ++i )    
+    for ( int i = 0; i < m_GBufferTargets.count(); ++i )
         pParamManager->SetShaderResourceParameter( TextureNames[i], m_GBufferTargets[i] );
 
     // Bind depth if optimizations are enabled
     if ( GBufferOptMode::Enabled() )
-        pParamManager->SetShaderResourceParameter( L"DepthTexture", m_DepthTargetCopy );
+        pParamManager->SetShaderResourceParameter( L"DepthTexture", m_DepthTarget );
 }
 //--------------------------------------------------------------------------------
 void ViewLights::SetUsageParams( ParameterManagerDX11* pParamManager )
@@ -452,27 +448,25 @@ void ViewLights::AddLight( const Light& light )
     m_Lights.add( light );
 }
 //--------------------------------------------------------------------------------
-void ViewLights::SetTargets( TArray<ResourcePtr>& GBufferTargets, ResourcePtr pRenderTarget, 
-                            ResourcePtr DepthTarget, ResourcePtr DepthTargetCopy, 
-                            int Viewport, int vpWidth, int vpHeight )
+void ViewLights::SetTargets( TArray<ResourcePtr>& GBufferTargets, ResourcePtr pRenderTarget,
+                            ResourcePtr DepthTarget, int Viewport, int vpWidth, int vpHeight )
 {
     m_GBufferTargets = GBufferTargets;
     m_pRenderTarget = pRenderTarget;
     m_DepthTarget = DepthTarget;
-    m_DepthTargetCopy = DepthTargetCopy;
     m_iViewport = Viewport;
     m_uVPWidth = vpWidth;
     m_uVPHeight = vpHeight;
 }
 //--------------------------------------------------------------------------------
 D3D11_RECT ViewLights::CalcScissorRect( const Vector3f& lightPos, float lightRange )
-{    
+{
     // Create a bounding sphere for the light, based on the position and range
     Vector4f centerWS = Vector4f( lightPos, 1.0f );
     float radius = lightRange;
 
     // Transform the sphere center to view space
-    Vector4f centerVS = ViewMatrix * centerWS;    
+    Vector4f centerVS = ViewMatrix * centerWS;
 
     // Figure out the four points at the top, bottom, left, and right of the sphere
     Vector4f topVS = centerVS + Vector4f( 0.0f, radius, 0.0f, 0.0f );
@@ -498,7 +492,7 @@ D3D11_RECT ViewLights::CalcScissorRect( const Vector3f& lightPos, float lightRan
     float rectLeftCS = leftVS.x * ProjMatrix( 0, 0 ) / leftVS.z;
     float rectRightCS = rightVS.x * ProjMatrix( 0, 0 ) / rightVS.z;
     float rectTopCS = topVS.y * ProjMatrix( 1, 1 ) / topVS.z;
-    float rectBottomCS = bottomVS.y * ProjMatrix( 1, 1 ) / bottomVS.z;    
+    float rectBottomCS = bottomVS.y * ProjMatrix( 1, 1 ) / bottomVS.z;
 
     // Clamp the rectangle to the screen extents
     rectTopCS = Clamp( rectTopCS, -1.0f, 1.0f );

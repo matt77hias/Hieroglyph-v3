@@ -140,40 +140,39 @@ void GetGBufferAttributes( in float2 screenPos, in float3 viewRay, in int subSam
 							out float3 position, out float3 diffuseAlbedo, out float3 specularAlbedo,
 							out float specularPower )
 {
-	// Determine our indices for sampling the texture based on the current screen position
-	int3 sampleIndices = int3( screenPos.xy, 0 );
+	// Determine our coordinate for sampling the texture based on the current screen position
+	int3 sampleCoord = int3( screenPos.xy, 0 );
 
 	#if GBUFFEROPTIMIZATIONS
 		#if MSAA
-			normal = SpheremapDecode( NormalTexture.Load( sampleIndices.xy, subSampleIndex ).xy );
-			diffuseAlbedo = DiffuseAlbedoTexture.Load( sampleIndices.xy, subSampleIndex ).xyz;			
-			float4 spec = SpecularAlbedoTexture.Load( sampleIndices.xy, subSampleIndex );
-			position = PositionFromDepth( DepthTexture.Load( sampleIndices.xy, subSampleIndex ).x, viewRay );
+			diffuseAlbedo = DiffuseAlbedoTexture.Load( sampleCoord.xy, subSampleIndex ).xyz;
+			normal = SpheremapDecode( NormalTexture.Load( sampleCoord.xy, subSampleIndex ).xy );
+			float4 spec = SpecularAlbedoTexture.Load( sampleCoord.xy, subSampleIndex );
+			position = PositionFromDepth( DepthTexture.Load( sampleCoord.xy, subSampleIndex ).x, viewRay );
 		#else
-			normal = SpheremapDecode( NormalTexture.Load( sampleIndices ).xy );
-			diffuseAlbedo = DiffuseAlbedoTexture.Load( sampleIndices ).xyz;			
-			float4 spec = SpecularAlbedoTexture.Load( sampleIndices );
-			position = PositionFromDepth( DepthTexture.Load( sampleIndices ).x, viewRay );
+			normal = SpheremapDecode( NormalTexture.Load( sampleCoord ).xy );
+			diffuseAlbedo = DiffuseAlbedoTexture.Load( sampleCoord ).xyz;
+			float4 spec = SpecularAlbedoTexture.Load( sampleCoord );
+			position = PositionFromDepth( DepthTexture.Load( sampleCoord ).x, viewRay );
 		#endif
 
 		specularAlbedo = spec.xyz;
 		specularPower = spec.w * 255.0f;
-
 	#else
 		#if MSAA
-			normal = NormalTexture.Load( sampleIndices.xy, subSampleIndex ).xyz;
-			position = PositionTexture.Load( sampleIndices.xy, subSampleIndex ).xyz;
-			diffuseAlbedo = DiffuseAlbedoTexture.Load( sampleIndices.xy, subSampleIndex ).xyz;
-			float4 spec = SpecularAlbedoTexture.Load( sampleIndices.xy, subSampleIndex );
+			normal = NormalTexture.Load( sampleCoord.xy, subSampleIndex ).xyz;
+			position = PositionTexture.Load( sampleCoord.xy, subSampleIndex ).xyz;
+			diffuseAlbedo = DiffuseAlbedoTexture.Load( sampleCoord.xy, subSampleIndex ).xyz;
+			float4 spec = SpecularAlbedoTexture.Load( sampleCoord.xy, subSampleIndex );
 		#else
-			normal = NormalTexture.Load( sampleIndices ).xyz;
-			position = PositionTexture.Load( sampleIndices ).xyz;
-			diffuseAlbedo = DiffuseAlbedoTexture.Load( sampleIndices ).xyz;
-			float4 spec = SpecularAlbedoTexture.Load( sampleIndices );
+			normal = NormalTexture.Load( sampleCoord ).xyz;
+			position = PositionTexture.Load( sampleCoord ).xyz;
+			diffuseAlbedo = DiffuseAlbedoTexture.Load( sampleCoord ).xyz;
+			float4 spec = SpecularAlbedoTexture.Load( sampleCoord );
 		#endif
 
 		specularAlbedo = spec.xyz;
-		specularPower = spec.w;		
+		specularPower = spec.w;
 	#endif
 }
 
@@ -207,9 +206,9 @@ float3 CalcLighting( in float3 normal, in float3 position, in float3 diffuseAlbe
 		attenuation *= saturate( ( rho - SpotlightAngles.y ) / ( SpotlightAngles.x - SpotlightAngles.y ) );
 	#endif
 
-	float diffuseNormalizationFactor = 1.0f / 3.14159265f;
+	const float DiffuseNormalizationFactor = 1.0f / 3.14159265f;
 	float nDotL = saturate( dot( normal, L ) );
-	float3 diffuse = nDotL * LightColor * diffuseAlbedo * diffuseNormalizationFactor;
+	float3 diffuse = nDotL * LightColor * diffuseAlbedo * DiffuseNormalizationFactor;
 
 	#if GBUFFEROPTIMIZATIONS
 		// In view space camera position is (0, 0, 0)
@@ -231,7 +230,7 @@ float3 CalcLighting( in float3 normal, in float3 position, in float3 diffuseAlbe
 //-------------------------------------------------------------------------------------------------
 // Light pixel shader
 //-------------------------------------------------------------------------------------------------
-PSOutput PSMain( in VSOutput input, in float4 screenPos : SV_Position )
+PSOutput PSMain( in VSOutput input, in float4 screenPos : SV_Position, in uint coverage : SV_Coverage )
 {
 	PSOutput output;
 	float3 lighting = 0;
@@ -240,42 +239,29 @@ PSOutput PSMain( in VSOutput input, in float4 screenPos : SV_Position )
 	float3 diffuseAlbedo;
 	float3 specularAlbedo;
 	float specularPower;
-		
-	// Do the first sub-sample	
-	GetGBufferAttributes( screenPos.xy, input.ViewRay, 0, normal, position, diffuseAlbedo,
-								specularAlbedo, specularPower );
-	lighting += CalcLighting( normal, position, diffuseAlbedo, specularAlbedo, specularPower );
 
-	// Do the rest of the subsamples
-	#if MSAA		
-		float numSubSamples = 1.0f;
-		
-		#if GBUFFEROPTIMIZATIONS
-			int2 sampleIndices = int2( screenPos.xy );
-			float msaaMask = 0;
-			msaaMask += DiffuseAlbedoTexture.Load( sampleIndices.xy, 0 ).w;
-			msaaMask += DiffuseAlbedoTexture.Load( sampleIndices.xy, 1 ).w;
-			msaaMask += DiffuseAlbedoTexture.Load( sampleIndices.xy, 2 ).w;
-			msaaMask += DiffuseAlbedoTexture.Load( sampleIndices.xy, 3 ).w;
-		
-			// Check if we need to sample more subsamples
-			[branch]
-			if ( msaaMask > 0.0f )
+	#if MSAA
+		// Calculate lighting for MSAA samples
+		float numSamplesApplied = 0.0f;
+		for ( int i = 0; i < NUMSUBSAMPLES; ++i )
+		{
+			// We only want to calculate lighting for a sample if the light volume is covered.
+			// We determine this using the input coverage mask.
+			if ( coverage & ( 1 << i ) )
 			{
-		#endif
-				numSubSamples = 4.0f;
-				for ( int i = 1; i < NUMSUBSAMPLES; ++i )
-				{
-					GetGBufferAttributes( screenPos.xy, input.ViewRay, i, normal, position, diffuseAlbedo,
-											specularAlbedo, specularPower );
-					lighting += CalcLighting( normal, position, diffuseAlbedo, specularAlbedo, specularPower );
-				}
-
-		#if GBUFFEROPTIMIZATIONS 
+				GetGBufferAttributes( screenPos.xy, input.ViewRay, i, normal, position, diffuseAlbedo,
+									specularAlbedo, specularPower );
+				lighting += CalcLighting( normal, position, diffuseAlbedo, specularAlbedo, specularPower );
+				++numSamplesApplied;
 			}
-		#endif
-		
-		lighting /= numSubSamples;
+		}
+
+		lighting /= numSamplesApplied;
+	#else
+		// Calculate lighting for a single G-Buffer sample
+		GetGBufferAttributes( screenPos.xy, input.ViewRay, 0, normal, position, diffuseAlbedo,
+								specularAlbedo, specularPower );
+		lighting = CalcLighting( normal, position, diffuseAlbedo, specularAlbedo, specularPower );
 	#endif
 
 	output.Color = float4( lighting, 1.0f );

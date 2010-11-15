@@ -1,11 +1,11 @@
 //--------------------------------------------------------------------------------
 // This file is a portion of the Hieroglyph 3 Rendering Engine.  It is distributed
-// under the MIT License, available in the root of this distribution and 
+// under the MIT License, available in the root of this distribution and
 // at the following URL:
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) 2003-2010 Jason Zink
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ ViewGBuffer::ViewGBuffer( RendererDX11& Renderer )
 	ViewMatrix.MakeIdentity();
 	ProjMatrix.MakeIdentity();
 
-    // Make a depth-stencil state used for generating the MSAA mask. 
+    // Make a depth-stencil state used for generating the MSAA mask.
     DepthStencilStateConfigDX11 dsConfig;
     dsConfig.DepthEnable = FALSE;
     dsConfig.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
@@ -47,12 +47,12 @@ ViewGBuffer::ViewGBuffer( RendererDX11& Renderer )
 
     m_iMaskDSState = Renderer.CreateDepthStencilState( &dsConfig );
 
-    if ( m_iMaskDSState == -1 )	
+    if ( m_iMaskDSState == -1 )
         Log::Get().Write( L"Failed to create mask depth stencil state" );
 
     // Create a rasterizer state with multisampling enabled
     RasterizerStateConfigDX11 rsConfig;
-    rsConfig.MultisampleEnable = TRUE;    
+    rsConfig.MultisampleEnable = TRUE;
     rsConfig.CullMode = D3D11_CULL_BACK;
     m_iMaskRSState = Renderer.CreateRasterizerState( &rsConfig );
 
@@ -65,7 +65,7 @@ ViewGBuffer::ViewGBuffer( RendererDX11& Renderer )
     m_QuadGeometry.LoadToBuffers();
 
     // Load shaders for generating the mask
-    m_MaskEffect.m_iVertexShader = 
+    m_MaskEffect.m_iVertexShader =
         Renderer.LoadShader( VERTEX_SHADER,
         std::wstring( L"../Data/Shaders/MaskLP.hlsl" ),
         std::wstring( L"VSMain" ),
@@ -76,9 +76,9 @@ ViewGBuffer::ViewGBuffer( RendererDX11& Renderer )
         Renderer.LoadShader( PIXEL_SHADER,
         std::wstring( L"../Data/Shaders/MaskLP.hlsl" ),
         std::wstring( L"PSMain" ),
-        std::wstring( L"ps_5_0" ) );        
+        std::wstring( L"ps_5_0" ) );
     _ASSERT( m_MaskEffect.m_iPixelShader != -1 );
-    
+
 }
 //--------------------------------------------------------------------------------
 ViewGBuffer::~ViewGBuffer()
@@ -130,7 +130,7 @@ void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerD
 		m_pRoot->Render( pPipelineManager, pParamManager, GetType() );
 
         // Now that we've filled the G-Buffer, we'll generate a stencil mask
-        // that masks out all pixels where the individual sub-samples aren't 
+        // that masks out all pixels where the individual sub-samples aren't
         // identical due to a triangle edge lying on that pixel. At this point the
         // stencil buffer already has a value of 1 for all pixels where geometry was
         // rendered, and this pass will increment that value for all edge pixels
