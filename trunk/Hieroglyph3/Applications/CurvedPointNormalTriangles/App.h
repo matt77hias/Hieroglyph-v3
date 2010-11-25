@@ -15,6 +15,9 @@
 #include "GeometryLoaderDX11.h"
 #include "GeometryDX11.h"
 
+#include "SpriteRendererDX11.h"
+#include "SpriteFontDX11.h"
+
 using namespace Glyph3;
 
 class App : public Application, public IEventListener
@@ -42,6 +45,9 @@ protected:
 	int						m_iSwapChain;
 	ResourcePtr				m_RenderTarget;
 	ResourcePtr				m_DepthTarget;
+
+	SpriteFontDX11*			m_pFont;
+	SpriteRendererDX11*		m_pSpriteRenderer;
 
 	bool					m_bSaveScreenshot;
 

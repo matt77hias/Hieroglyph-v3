@@ -150,25 +150,33 @@ void App::Initialize()
 
 	// Load and initialize the geometry to be rendered.
 
-	m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"C:\\Users\\Jack\\AppData\\Roaming\\Blender Foundation\\Blender\\.blender\\suzanne.ply" ) );
+	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/suzanne.ply" ) );
 
-
-	// Create the parameters for use with this effect
-
-	m_TessParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
-
-
+	m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/spring.ms3d" ) );
+	m_pGeometry->LoadToBuffers();
+	
 	// Create the material for use by the entities.
 
-	m_pMaterial = MaterialGeneratorDX11::GenerateWireFrame( *m_pRenderer11 );
+	// Create the parameters for use with this effect
+	//m_pMaterial = MaterialGeneratorDX11::GenerateWireFrame( *m_pRenderer11 );
+	//m_TessParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
+	//m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
+	//m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
 
+	m_pMaterial = MaterialGeneratorDX11::GeneratePhong( *m_pRenderer11 );
+	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+
+	Vector4f vLPos = Vector4f( 0.0f, 0.0f, -15.0f, 0.0f );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"LightPositionWS" ), &vLPos );
+
+	Vector4f vLCol = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"LightColor" ), &vLCol );
 
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
 
 	m_pCamera = new Camera();
-	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 0.0f, -5.0f );
+	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 0.0f, -15.0f );
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
@@ -189,6 +197,13 @@ void App::Initialize()
 
 	m_pScene->AddEntity( m_pNode );
 	m_pScene->AddCamera( m_pCamera );
+
+	// Create the text rendering
+	m_pFont = new SpriteFontDX11();
+	m_pFont->Initialize( L"Consolas", 12.0f, 0, true );
+	
+	m_pSpriteRenderer = new SpriteRendererDX11();
+	m_pSpriteRenderer->Initialize();
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -215,8 +230,30 @@ void App::Update()
 	m_pScene->Update( m_pTimer->Elapsed() );
 	m_pScene->Render( m_pRenderer11 );
 
-	// Present the results of the rendering to the output window.
+	// Draw the UI text
+	if( !m_bSaveScreenshot )
+	{
+		// Don't draw text if we're taking a screenshot - don't want the images
+		// cluttered with UI text!
+		std::wstringstream out;
+		out << L"Hieroglyph 3 : Curved Point Normal Triangles\nFPS: " << m_pTimer->Framerate();
 
+		// Screenshot
+		out << L"\n S : Take Screenshot";
+
+		// Rasterizer State
+		out << L"\n W : Toggle Wireframe Display";
+
+		// Advanced LoD
+		out << L"\n +/- : Increase or Decrease Tessellation";
+
+		// Automatic Rotation
+		out << L"\n A : Toggle Adaptive Sillhouette Tessellation";
+
+		m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, *m_pFont, out.str().c_str(), Matrix4f::Identity(), Vector4f( 1.f, 0.f, 0.f, 1.f ) );
+	}
+
+	// Present the results of the rendering to the output window.
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
 
 	// Save a screenshot if desired.  This is done by pressing the 's' key, which
