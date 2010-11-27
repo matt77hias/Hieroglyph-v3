@@ -54,6 +54,7 @@ PipelineManagerDX11::PipelineManagerDX11()
 {
 	m_pContext = 0;
 	m_pQuery = 0;
+	m_pPipelineStatsData = 0;
 
 	// Reference the shader stages for use in the binding process.
 
@@ -72,6 +73,7 @@ PipelineManagerDX11::~PipelineManagerDX11()
 
 	SAFE_RELEASE( m_pContext );
 	SAFE_RELEASE( m_pQuery );
+	SAFE_DELETE( m_pPipelineStatsData );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::SetDeviceContext( ID3D11DeviceContext* pContext, D3D_FEATURE_LEVEL level )
@@ -751,29 +753,37 @@ void PipelineManagerDX11::StartPipelineStatistics( )
 void PipelineManagerDX11::EndPipelineStatistics( )
 {
 	if ( m_pQuery )
+	{
 		m_pContext->End( m_pQuery );
+		
+		SAFE_DELETE(m_pPipelineStatsData);
+		m_pPipelineStatsData = new D3D11_QUERY_DATA_PIPELINE_STATISTICS;
+
+		if ( S_OK != m_pContext->GetData( m_pQuery, m_pPipelineStatsData, sizeof(D3D11_QUERY_DATA_PIPELINE_STATISTICS), 0) )
+		{
+			SAFE_DELETE(m_pPipelineStatsData);
+		}
+	}
 	else
 		Log::Get().Write( L"Tried to end pipeline statistics without a valid query object!" );
 }
 //--------------------------------------------------------------------------------
 std::wstring PipelineManagerDX11::PrintPipelineStatistics( )
 {
-	D3D11_QUERY_DATA_PIPELINE_STATISTICS QueryData; // This data type is different depending on the query type
-
-	if ( m_pQuery && (S_OK == m_pContext->GetData( m_pQuery, &QueryData, sizeof(QueryData), 0)) )
+	if ( NULL != m_pPipelineStatsData )
 	{
 		std::wstringstream s;
 		s << "Pipeline Statistics:" << std::endl;
-		s << "Number of vertices read by the IA: " << QueryData.IAVertices << std::endl;
-		s << "Number of primitives read by the IA: " << QueryData.IAPrimitives << std::endl;
-		s << "Number of vertex shader invocations: " << QueryData.VSInvocations << std::endl;
-		s << "Number of hull shader invocations: " << QueryData.HSInvocations << std::endl;
-		s << "Number of domain shader invocations: " << QueryData.DSInvocations << std::endl;
-		s << "Number of geometry shader invocations: " << QueryData.GSInvocations << std::endl;
-		s << "Number of primitives output by the geometry shader: " << QueryData.GSPrimitives << std::endl;
-		s << "Number of primitives sent to the rasterizer: " << QueryData.CInvocations << std::endl;
-		s << "Number of primitives rendered: " << QueryData.CPrimitives << std::endl;
-		s << "Number of pixel shader invocations: " << QueryData.PSInvocations << std::endl;
+		s << "Number of vertices read by the IA: " << m_pPipelineStatsData->IAVertices << std::endl;
+		s << "Number of primitives read by the IA: " << m_pPipelineStatsData->IAPrimitives << std::endl;
+		s << "Number of vertex shader invocations: " << m_pPipelineStatsData->VSInvocations << std::endl;
+		s << "Number of hull shader invocations: " << m_pPipelineStatsData->HSInvocations << std::endl;
+		s << "Number of domain shader invocations: " << m_pPipelineStatsData->DSInvocations << std::endl;
+		s << "Number of geometry shader invocations: " << m_pPipelineStatsData->GSInvocations << std::endl;
+		s << "Number of primitives output by the geometry shader: " << m_pPipelineStatsData->GSPrimitives << std::endl;
+		s << "Number of primitives sent to the rasterizer: " << m_pPipelineStatsData->CInvocations << std::endl;
+		s << "Number of primitives rendered: " << m_pPipelineStatsData->CPrimitives << std::endl;
+		s << "Number of pixel shader invocations: " << m_pPipelineStatsData->PSInvocations << std::endl;
 
 		return( s.str() );
 	}

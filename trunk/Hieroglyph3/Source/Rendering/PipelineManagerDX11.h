@@ -156,6 +156,7 @@ namespace Glyph3
 
 		ID3D11DeviceContext*		m_pContext;
 		ID3D11Query*				m_pQuery;
+		D3D11_QUERY_DATA_PIPELINE_STATISTICS*	m_pPipelineStatsData;
 
 		// The shader stage resources are managed by these classes.
 

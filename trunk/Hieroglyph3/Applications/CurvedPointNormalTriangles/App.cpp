@@ -29,7 +29,9 @@ App AppInstance; // Provides an instance of the application
 //--------------------------------------------------------------------------------
 App::App()
 {
-	m_bSaveScreenshot = false;
+	m_bSaveScreenshot			= false;
+	m_bSolidRender				= false;
+	m_bDefaultComplexity		= true;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
@@ -152,51 +154,17 @@ void App::Initialize()
 
 	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/suzanne.ply" ) );
 
-	m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/spring.ms3d" ) );
+	m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/hedra.ms3d" ) );
+	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
 	m_pGeometry->LoadToBuffers();
 	
 	// Create the material for use by the entities.
+	CreateShaders();
 
 	// Create the parameters for use with this effect
-	//m_pMaterial = MaterialGeneratorDX11::GenerateWireFrame( *m_pRenderer11 );
-	//m_TessParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
-	//m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
-	//m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
+	Vector4f tessParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EdgeFactors" ), &tessParams );
 
-	m_pMaterial = MaterialGeneratorDX11::GeneratePhong( *m_pRenderer11 );
-	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-
-	Vector4f vLPos = Vector4f( 0.0f, 0.0f, -15.0f, 0.0f );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"LightPositionWS" ), &vLPos );
-
-	Vector4f vLCol = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"LightColor" ), &vLCol );
-
-	// Create the camera, and the render view that will produce an image of the 
-	// from the camera's point of view of the scene.
-
-	m_pCamera = new Camera();
-	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 0.0f, -15.0f );
-	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
-	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );
-	m_pCamera->SetCameraView( m_pRenderView );
-	m_pCamera->SetProjectionParams( 0.1f, 100.0f, static_cast<float>( D3DX_PI ) / 2.0f, 640.0f / 480.0f );
-
-	// Create the scene and add the entities to it.  Then add the camera to the
-	// scene so that it will be updated via the scene interface instead of 
-	// manually manipulating it.
-
-	m_pNode = new Node3D();
-
-	m_pMeshEntity = new Entity3D();
-	m_pMeshEntity->SetGeometry( m_pGeometry );
-	m_pMeshEntity->SetMaterial( m_pMaterial );
-	m_pMeshEntity->Position() = Vector3f( 0.0f, 0.0f, 0.0f );
-
-	m_pNode->AttachChild( m_pMeshEntity );
-
-	m_pScene->AddEntity( m_pNode );
-	m_pScene->AddCamera( m_pCamera );
 
 	// Create the text rendering
 	m_pFont = new SpriteFontDX11();
@@ -218,17 +186,20 @@ void App::Update()
 
 	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
 
-	// Manipulate the scene here - simply rotate the root of the scene in this
-	// example.
+	// Update any animation/camera config
+	UpdateViewState();
 
-	Matrix3f rotation;
-	rotation.RotationY( m_pTimer->Elapsed() );
-	m_pNode->Rotation() *= rotation;
+	// Clear the window to white
+	m_pRenderer11->pImmPipeline->ClearBuffers( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ), 1.0f );
 
-	// Update the scene, and then render all cameras within the scene.
+	// Draw the main geometry
+	m_pEffect->ConfigurePipeline( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr );
 
-	m_pScene->Update( m_pTimer->Elapsed() );
-	m_pScene->Render( m_pRenderer11 );
+	m_pRenderer11->pImmPipeline->StartPipelineStatistics();
+	{
+		m_pRenderer11->pImmPipeline->Draw( *m_pEffect, *m_pGeometry, m_pRenderer11->m_pParamMgr );
+	}
+	m_pRenderer11->pImmPipeline->EndPipelineStatistics();
 
 	// Draw the UI text
 	if( !m_bSaveScreenshot )
@@ -237,6 +208,22 @@ void App::Update()
 		// cluttered with UI text!
 		std::wstringstream out;
 		out << L"Hieroglyph 3 : Curved Point Normal Triangles\nFPS: " << m_pTimer->Framerate();
+
+		D3D11_QUERY_DATA_PIPELINE_STATISTICS* stats = m_pRenderer11->pImmPipeline->m_pPipelineStatsData;
+		int trisSent;
+		int trisRasterized;
+		float rasterPerc;
+		if(NULL != stats)
+		{
+			trisSent = static_cast<int>(stats->IAPrimitives);
+			trisRasterized = static_cast<int>(stats->CPrimitives);
+			rasterPerc = 0.0f;
+			if(0!=trisSent)
+				rasterPerc = 100.0f * (static_cast<float>(trisRasterized) / static_cast<float>(trisSent));
+		}
+
+		// Stats
+		out << L"\nTriangles: " << trisSent << " sent, " << trisRasterized << " rasterized (" << rasterPerc << "%)";
 
 		// Screenshot
 		out << L"\n S : Take Screenshot";
@@ -256,6 +243,11 @@ void App::Update()
 	// Present the results of the rendering to the output window.
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
 
+#ifdef _DEBUG
+	Log::Get().Write( m_pRenderer11->pImmPipeline->PrintPipelineStatistics() );
+#endif
+	
+
 	// Save a screenshot if desired.  This is done by pressing the 's' key, which
 	// demonstrates how an event is sent and handled by an event listener (which
 	// in this case is the application object itself).
@@ -269,10 +261,9 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pMeshEntity );
-
-	SAFE_DELETE( m_pNode );
-
+	SAFE_RELEASE( m_pGeometry );
+	
+	SAFE_DELETE( m_pEffect );
 	SAFE_DELETE( m_pCamera );
 
 	// Print the framerate out for the log before shutting down.
@@ -310,6 +301,12 @@ bool App::HandleEvent( IEvent* pEvent )
 			m_bSaveScreenshot = true;
 			return( true );
 		}
+		else if ( 'W' == key )
+		{
+			// Toggle Wireframe
+			m_bSolidRender = !m_bSolidRender;
+			m_pEffect->m_iRasterizerState = m_bSolidRender ? m_rsSolid : m_rsWireframe;
+		}
 		else
 		{
 			return( false );
@@ -323,5 +320,147 @@ bool App::HandleEvent( IEvent* pEvent )
 std::wstring App::GetName( )
 {
 	return( std::wstring( L"Direct3D 11 Curved Point Normal Triangles Demo" ) );
+}
+//--------------------------------------------------------------------------------
+void App::CreateShaders()
+{
+	Log::Get().Write( L"Creating shaders" );
+
+	SAFE_DELETE( m_pEffect );
+	m_pEffect = new RenderEffectDX11();
+
+	// Create the vertex shader
+	m_pEffect->m_iVertexShader = 
+		m_pRenderer11->LoadShader( VERTEX_SHADER,
+		std::wstring( L"../Data/Shaders/CurvedPointNormalTriangles.hlsl" ),
+		std::wstring( L"vsMain" ),
+		std::wstring( L"vs_5_0" ) );
+	_ASSERT( -1 != m_pEffect->m_iVertexShader );
+	
+	Log::Get().Write( L"... vertex shader created" );
+
+	// Create the hull shader
+	m_iDefaultHullShader = m_pRenderer11->LoadShader( HULL_SHADER,
+							std::wstring( L"../Data/Shaders/CurvedPointNormalTriangles.hlsl" ),
+							std::wstring( L"hsDefault" ),
+							std::wstring( L"hs_5_0" ) );
+	_ASSERT( -1 != m_iDefaultHullShader );
+
+	m_iSilhouetteHullShader = m_pRenderer11->LoadShader( HULL_SHADER,
+							std::wstring( L"../Data/Shaders/CurvedPointNormalTriangles.hlsl" ),
+							std::wstring( L"hsSilhouette" ),
+							std::wstring( L"hs_5_0" ) );
+	_ASSERT( -1 != m_iSilhouetteHullShader );
+
+	m_pEffect->m_iHullShader = m_bDefaultComplexity ? m_iDefaultHullShader : m_iSilhouetteHullShader;
+
+	Log::Get().Write( L"... hull shader created" );
+
+	// Create the domain shader
+	m_pEffect->m_iDomainShader = 
+		m_pRenderer11->LoadShader( DOMAIN_SHADER,
+		std::wstring( L"../Data/Shaders/CurvedPointNormalTriangles.hlsl" ),
+		std::wstring( L"dsMain" ),
+		std::wstring( L"ds_5_0" ) );
+	_ASSERT( -1 != m_pEffect->m_iDomainShader );
+
+	Log::Get().Write( L"... domain shader created" );
+
+	// Create the geometry shader
+	m_pEffect->m_iGeometryShader = 
+		m_pRenderer11->LoadShader( GEOMETRY_SHADER,
+		std::wstring( L"../Data/Shaders/CurvedPointNormalTriangles.hlsl" ),
+		std::wstring( L"gsMain" ),
+		std::wstring( L"gs_5_0" ) );
+	_ASSERT( -1 != m_pEffect->m_iGeometryShader );
+
+	Log::Get().Write( L"... geometry shader created" );
+
+	// Create the pixel shader
+	m_pEffect->m_iPixelShader = 
+		m_pRenderer11->LoadShader( PIXEL_SHADER,
+		std::wstring( L"../Data/Shaders/CurvedPointNormalTriangles.hlsl" ),
+		std::wstring( L"psMain" ),
+		std::wstring( L"ps_5_0" ) );
+	_ASSERT( -1 != m_pEffect->m_iPixelShader );
+
+	Log::Get().Write( L"... pixel shader created" );
+
+	// Create rasterizer states
+	RasterizerStateConfigDX11 RS;
+	
+	RS.FillMode = D3D11_FILL_WIREFRAME;
+	RS.CullMode = D3D11_CULL_NONE;
+	m_rsWireframe = m_pRenderer11->CreateRasterizerState( &RS );
+
+	RS.FillMode = D3D11_FILL_SOLID;
+	RS.CullMode = D3D11_CULL_BACK;
+	m_rsSolid = m_pRenderer11->CreateRasterizerState( &RS );
+
+	// Assign default state
+	m_pEffect->m_iRasterizerState = m_bSolidRender ? m_rsSolid : m_rsWireframe;
+
+	Log::Get().Write( L"Created all shaders" );
+}
+//--------------------------------------------------------------------------------
+void App::UpdateViewState()
+{
+	// If in 'auto' mode then simply keep rotating
+	float time = m_pTimer->Runtime();
+
+	// Create the world matrix
+	Matrix4f mWorld, mWorldScale, mWorldRotation;
+	
+	D3DXMatrixIdentity( reinterpret_cast<D3DXMATRIX*>(&mWorld) );
+	
+	// Geometry is defined in the [-0.5,+0.5] range on the XZ plane
+
+	//D3DXMatrixScaling( reinterpret_cast<D3DXMATRIX*>(&mWorldScale), 15.0f, 1.0f, 15.0f ); // Domain Shader controls Y scale, not here!
+	//D3DXMatrixMultiply( reinterpret_cast<D3DXMATRIX*>(&mWorld), reinterpret_cast<D3DXMATRIX*>(&mWorld), reinterpret_cast<D3DXMATRIX*>(&mWorldScale) );
+
+	// Create the inverse transpose world matrix
+	Matrix4f mInvTPoseWorld;
+
+	D3DXMatrixInverse( reinterpret_cast<D3DXMATRIX*>(&mInvTPoseWorld), NULL, reinterpret_cast<D3DXMATRIX*>(&mWorld) );
+	D3DXMatrixTranspose( reinterpret_cast<D3DXMATRIX*>(&mInvTPoseWorld), reinterpret_cast<D3DXMATRIX*>(&mInvTPoseWorld) );
+
+	
+	D3DXVECTOR3 vLookAt = D3DXVECTOR3( 0.0f, 0.0f, 0.0f );
+	D3DXVECTOR3 vLookFrom = D3DXVECTOR3( 0.0f, 0.0f, 0.0f );
+	D3DXVECTOR3 vLookUp = D3DXVECTOR3( 0.0f, 1.0f, 0.0f );
+
+	// based on time, determine where the camera is at and where it should look to
+	float distance = time / 30.0f; // 30 seconds to do a single circuit
+	float fromAngle = fmodf( distance * 2.0f * static_cast<float>(D3DX_PI), 2.0f * static_cast<float>(D3DX_PI));
+	//float toAngle = fmodf( (distance + 0.08f) * 2.0f * static_cast<float>(D3DX_PI), 2.0f * static_cast<float>(D3DX_PI)); // ~30 degrees in front
+
+	vLookFrom.x = sinf(fromAngle) * 13.0f;
+	vLookFrom.y = 4.f;
+	vLookFrom.z = cosf(fromAngle) * 13.0f;
+
+	/*
+	vLookAt.x = sinf(toAngle) * 3.0f;
+	vLookAt.y = 0.3f;
+	vLookAt.z = cosf(toAngle) * 3.0f;
+	*/
+
+	// Create the view matrix
+	Matrix4f mView;
+	D3DXMatrixLookAtLH( reinterpret_cast<D3DXMATRIX*>(&mView), &vLookFrom, &vLookAt, &vLookUp );
+
+	// Create the projection matrix
+	Matrix4f mProj;
+	D3DXMatrixPerspectiveFovLH( reinterpret_cast<D3DXMATRIX*>(&mProj), static_cast< float >(D3DX_PI) / 3.0f, static_cast<float>(m_pWindow->GetWidth()) /  static_cast<float>(m_pWindow->GetHeight()), 1.0f, 25.0f );
+
+	// Composite together for the final transform
+	Matrix4f mViewProj = mView * mProj;
+
+	// Set the various values to the parameter manager
+	m_pRenderer11->m_pParamMgr->SetMatrixParameter( L"mWorld", &mWorld );
+	m_pRenderer11->m_pParamMgr->SetMatrixParameter( L"mViewProj", &mViewProj );
+	m_pRenderer11->m_pParamMgr->SetMatrixParameter( L"mInvTposeWorld", &mInvTPoseWorld );
+
+	Vector4f vCam = Vector4f( vLookFrom.x, vLookFrom.y, vLookFrom.z, /* unused */ 0.0f );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( L"cameraPosition", &vCam );
 }
 //--------------------------------------------------------------------------------

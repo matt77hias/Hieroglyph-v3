@@ -50,15 +50,19 @@ protected:
 	SpriteRendererDX11*		m_pSpriteRenderer;
 
 	bool					m_bSaveScreenshot;
-
-	ViewPerspective*		m_pRenderView;
-	Node3D*					m_pNode;
-	Entity3D*				m_pMeshEntity;
+	bool					m_bSolidRender;
+	bool					m_bDefaultComplexity;
 	
 	GeometryDX11*			m_pGeometry;
-	MaterialDX11*			m_pMaterial;
-	
-	Vector4f				m_TessParams;
+	RenderEffectDX11*		m_pEffect;
+
+	int						m_iDefaultHullShader;
+	int						m_iSilhouetteHullShader;
+	int						m_rsWireframe;
+	int						m_rsSolid;
 
 	Camera*		m_pCamera;
+
+	virtual void CreateShaders();
+	virtual void UpdateViewState();
 };
