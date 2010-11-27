@@ -1256,6 +1256,36 @@ GeometryDX11* GeometryLoaderDX11::loadStanfordPlyFile( std::wstring filename )
 		}
 
 		// Has normals?
+		int nxIdx = FindPlyElementPropertyIndex( d.dataFormat, "nx" );
+		int nyIdx = FindPlyElementPropertyIndex( d.dataFormat, "ny" );
+		int nzIdx = FindPlyElementPropertyIndex( d.dataFormat, "nz" );
+
+		if ((-1 != nxIdx) && (-1 != nyIdx) && (-1 != nzIdx))
+		{
+			VertexElementDX11 *pNormals = new VertexElementDX11( 3, d.elementCount );
+			pNormals->m_SemanticName = VertexElementDX11::NormalSemantic;
+			pNormals->m_uiSemanticIndex = 0;
+			pNormals->m_Format = DXGI_FORMAT_R32G32B32_FLOAT;
+			pNormals->m_uiInputSlot = 0;
+			pNormals->m_uiAlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+			pNormals->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+			pNormals->m_uiInstanceDataStepRate = 0;
+
+			Vector3f* pRawNorms = pNormals->Get3f( 0 );
+
+			for(int v = 0; v < d.elementCount; ++v)
+			{
+				void** raw = d.data.at(v);
+
+				float x = *reinterpret_cast<float*>(raw[nxIdx]);
+				float y = *reinterpret_cast<float*>(raw[nyIdx]);
+				float z = *reinterpret_cast<float*>(raw[nzIdx]);
+
+				pRawNorms[v] = Vector3f( x, y, z );
+			}
+
+			pMesh->AddElement( pNormals );
+		}
 	}
 	else
 	{

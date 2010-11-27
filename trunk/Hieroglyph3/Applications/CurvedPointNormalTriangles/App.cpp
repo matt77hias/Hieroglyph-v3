@@ -152,11 +152,12 @@ void App::Initialize()
 
 	// Load and initialize the geometry to be rendered.
 
-	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/suzanne.ply" ) );
+	m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/suzanne.ply" ) );
 
-	m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/hedra.ms3d" ) );
-	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
-	m_pGeometry->LoadToBuffers();
+	//m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/hedra.ms3d" ) );
+	//m_pGeometry->LoadToBuffers();
+
+	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );	
 	
 	// Create the material for use by the entities.
 	CreateShaders();
@@ -434,9 +435,9 @@ void App::UpdateViewState()
 	float fromAngle = fmodf( distance * 2.0f * static_cast<float>(D3DX_PI), 2.0f * static_cast<float>(D3DX_PI));
 	//float toAngle = fmodf( (distance + 0.08f) * 2.0f * static_cast<float>(D3DX_PI), 2.0f * static_cast<float>(D3DX_PI)); // ~30 degrees in front
 
-	vLookFrom.x = sinf(fromAngle) * 13.0f;
-	vLookFrom.y = 4.f;
-	vLookFrom.z = cosf(fromAngle) * 13.0f;
+	vLookFrom.x = sinf(fromAngle) * 5.0f;
+	vLookFrom.y = 2.f;
+	vLookFrom.z = cosf(fromAngle) * 5.0f;
 
 	/*
 	vLookAt.x = sinf(toAngle) * 3.0f;

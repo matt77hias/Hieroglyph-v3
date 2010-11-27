@@ -81,8 +81,6 @@ HS_CONSTANT_DATA_OUTPUT hsConstantFunc( InputPatch<VS_OUTPUT, 3> ip, uint PatchI
 	
 	output.Inside = EdgeFactors.w;
 
-	//output.Inside = 2.0f;
-
     return output;
 }
 //--------------------------------------------------------------------------------
@@ -133,8 +131,10 @@ DS_OUTPUT dsMain( const OutputPatch<HS_OUTPUT, 3> TrianglePatch, float3 Barycent
 	float3 vWorldNorm = BarycentricCoordinates.x * TrianglePatch[0].normal + BarycentricCoordinates.y * TrianglePatch[1].normal + BarycentricCoordinates.z * TrianglePatch[2].normal;
 	vWorldNorm = normalize( vWorldNorm );
 	
-	float3 toCamera = normalize( cameraPosition );
+	float3 toCamera = -normalize( cameraPosition );
 	output.Colour = saturate( dot(vWorldNorm, toCamera) );
+	
+	//output.Colour = (vWorldNorm + 1.0f) / 2.0f;
 	
 	return output;
 }
