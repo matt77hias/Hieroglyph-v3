@@ -35,6 +35,30 @@ static float Clamp( float x, float low, float high )
     return x;
 }
 //--------------------------------------------------------------------------------
+static void DrawLightType( const TArray<Light>& lights, RenderEffectDX11 effects[2], 
+                            ResourcePtr vb, int inputLayout, PipelineManagerDX11* pPipelineManager,
+                            ParameterManagerDX11* pParamManager )
+{
+    if ( lights.count() > 0 )
+    {
+        // Copy in the light data for each vertex
+        D3D11_MAPPED_SUBRESOURCE mapped;
+        mapped = pPipelineManager->MapResource( vb->m_iResource, 0, D3D11_MAP_WRITE_DISCARD, 0 );
+        memcpy( mapped.pData, &lights[0], sizeof( Light ) * lights.count() );
+        pPipelineManager->UnMapResource( vb->m_iResource, 0 );
+
+        // Render the lights for non-edge pixels. We'll render as a point list.
+        pPipelineManager->DrawNonIndexed( effects[0], vb, inputLayout,
+                                            D3D11_PRIMITIVE_TOPOLOGY_POINTLIST, sizeof( Light ),
+                                            lights.count(), 0, pParamManager );
+
+        // Render the lights for edge pixels. We'll render as a point list.
+        pPipelineManager->DrawNonIndexed( effects[1], vb, inputLayout, 
+                                            D3D11_PRIMITIVE_TOPOLOGY_POINTLIST, sizeof( Light ),
+                                            lights.count(), 0, pParamManager );
+    }
+}
+//--------------------------------------------------------------------------------
 ViewLights::ViewLights( RendererDX11& Renderer)
 {
     m_sParams.iViewType = VT_LIGHTS;
@@ -42,11 +66,10 @@ ViewLights::ViewLights( RendererDX11& Renderer)
     ViewMatrix.MakeIdentity();
     ProjMatrix.MakeIdentity();
 
-
     // Create a depth stencil state with no depth testing, and with stencil testing
     // enabled to make sure we only light pixels where we rendered to the G-Buffer
     DepthStencilStateConfigDX11 dsConfig;
-    dsConfig.DepthEnable = TRUE;
+    dsConfig.DepthEnable = FALSE;
     dsConfig.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
     dsConfig.DepthFunc = D3D11_COMPARISON_LESS;
     dsConfig.StencilEnable = TRUE;
@@ -64,7 +87,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
         Log::Get().Write( L"Failed to create light depth stencil state" );
 
     // Create a depth stencil state with less-than-equal depth testing
-    dsConfig.DepthEnable = FALSE;
+    dsConfig.DepthEnable = TRUE;
     dsConfig.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
     m_iLessThanDSState = Renderer.CreateDepthStencilState( &dsConfig );
 
@@ -105,24 +128,19 @@ ViewLights::ViewLights( RendererDX11& Renderer)
     rsConfig.CullMode = D3D11_CULL_BACK;
     m_iBackFaceCullRSState = Renderer.CreateRasterizerState( &rsConfig );
 
-    // Create a rasterizer state with front-face culling enabled
-    rsConfig.CullMode = D3D11_CULL_FRONT;
-    m_iFrontFaceCullRSState = Renderer.CreateRasterizerState( &rsConfig );
-
-    if ( m_iBackFaceCullRSState == -1 || m_iFrontFaceCullRSState == -1 )
+    if ( m_iBackFaceCullRSState == -1 )
         Log::Get().Write( L"Failed to create light rasterizer state" );
 
-    // Generate geometry for a full screen quad
-    GeometryGeneratorDX11::GenerateFullScreenQuad( &m_QuadGeometry );
-    m_QuadGeometry.LoadToBuffers();
+    // Create a dynamic vertex buffer full of points, where each point is a single light source
+    BufferConfigDX11 vbConfig;
+    vbConfig.SetBindFlags( D3D11_BIND_VERTEX_BUFFER );
+    vbConfig.SetByteWidth( MaxNumLights * sizeof(Light) );
+    vbConfig.SetCPUAccessFlags( D3D11_CPU_ACCESS_WRITE );
+    vbConfig.SetUsage( D3D11_USAGE_DYNAMIC );
+    m_pVertexBuffer = Renderer.CreateVertexBuffer( &vbConfig, NULL );
 
-    // Generate geometry for a sphere
-    GeometryGeneratorDX11::GenerateSphere( &m_SphereGeometry, 8, 7, 1.0f );
-    m_SphereGeometry.LoadToBuffers();
-
-    // Generate geometry for a cone
-    GeometryGeneratorDX11::GenerateCone( &m_ConeGeometry, 8, 2, 1.0f, 1.0f );
-    m_ConeGeometry.LoadToBuffers();
+    if( m_pVertexBuffer->m_iResource == -1 )
+        Log::Get().Write( L"Failed to create light vertex buffer" );   
 
     // We need two versions of each effect, one with a pixel shader that runs
     // per-pixel and one with a pixel shader that runs per-sample
@@ -151,6 +169,14 @@ ViewLights::ViewLights( RendererDX11& Renderer)
             defines );
         _ASSERT( m_PointLightEffect[i].m_iVertexShader != -1 );
 
+        m_PointLightEffect[i].m_iGeometryShader =
+            Renderer.LoadShader( GEOMETRY_SHADER,
+            std::wstring( L"../Data/Shaders/LightsLP.hlsl" ),
+            std::wstring( L"GSMain" ),
+            std::wstring( L"gs_5_0" ),
+            defines );
+        _ASSERT( m_PointLightEffect[i].m_iVertexShader != -1 );
+
         m_PointLightEffect[i].m_iPixelShader =
             Renderer.LoadShader( PIXEL_SHADER,
             std::wstring( L"../Data/Shaders/LightsLP.hlsl" ),
@@ -160,7 +186,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
         _ASSERT( m_PointLightEffect[i].m_iPixelShader != -1 );
 
         m_PointLightEffect[i].m_iBlendState = m_iBlendState;
-        m_PointLightEffect[i].m_iDepthStencilState = m_iLessThanDSState;
+        m_PointLightEffect[i].m_iDepthStencilState = m_iGreaterThanDSState;
         m_PointLightEffect[i].m_iRasterizerState = m_iBackFaceCullRSState;
         m_PointLightEffect[i].m_uStencilRef = stencilRef;
 
@@ -176,6 +202,14 @@ ViewLights::ViewLights( RendererDX11& Renderer)
             defines );
         _ASSERT( m_SpotLightEffect[i].m_iVertexShader != -1 );
 
+        m_SpotLightEffect[i].m_iGeometryShader =
+            Renderer.LoadShader( GEOMETRY_SHADER,
+            std::wstring( L"../Data/Shaders/LightsLP.hlsl" ),
+            std::wstring( L"GSMain" ),
+            std::wstring( L"gs_5_0" ),
+            defines );
+        _ASSERT( m_SpotLightEffect[i].m_iVertexShader != -1 );
+
         m_SpotLightEffect[i].m_iPixelShader =
             Renderer.LoadShader( PIXEL_SHADER,
             std::wstring( L"../Data/Shaders/LightsLP.hlsl" ),
@@ -185,7 +219,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
         _ASSERT( m_SpotLightEffect[i].m_iPixelShader != -1 );
 
         m_SpotLightEffect[i].m_iBlendState = m_iBlendState;
-        m_SpotLightEffect[i].m_iDepthStencilState = m_iLessThanDSState;
+        m_SpotLightEffect[i].m_iDepthStencilState = m_iGreaterThanDSState;
         m_SpotLightEffect[i].m_iRasterizerState = m_iBackFaceCullRSState;
         m_SpotLightEffect[i].m_uStencilRef = stencilRef;
 
@@ -198,6 +232,14 @@ ViewLights::ViewLights( RendererDX11& Renderer)
             std::wstring( L"../Data/Shaders/LightsLP.hlsl" ),
             std::wstring( L"VSMain" ),
             std::wstring( L"vs_5_0" ),
+            defines );
+        _ASSERT( m_DirectionalLightEffect[i].m_iVertexShader != -1 );
+
+        m_DirectionalLightEffect[i].m_iGeometryShader =
+            Renderer.LoadShader( GEOMETRY_SHADER,
+            std::wstring( L"../Data/Shaders/LightsLP.hlsl" ),
+            std::wstring( L"GSMain" ),
+            std::wstring( L"gs_5_0" ),
             defines );
         _ASSERT( m_DirectionalLightEffect[i].m_iVertexShader != -1 );
 
@@ -214,6 +256,46 @@ ViewLights::ViewLights( RendererDX11& Renderer)
         m_DirectionalLightEffect[i].m_iRasterizerState = m_iBackFaceCullRSState;
         m_DirectionalLightEffect[i].m_uStencilRef = stencilRef;
     }
+
+    // Create the input layouts
+    // Create the input layout
+    TArray<D3D11_INPUT_ELEMENT_DESC> inputElements;
+    D3D11_INPUT_ELEMENT_DESC element;
+
+    // Position
+    element.SemanticName = "POSITION";
+    element.SemanticIndex = 0;
+    element.Format = DXGI_FORMAT_R32G32B32_FLOAT;
+    element.InputSlot = 0;
+    element.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+    element.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+    element.InstanceDataStepRate = 0;
+    inputElements.add( element);
+
+    // Color
+    element.SemanticName = "COLOR";
+    inputElements.add( element );
+
+    // Direction
+    element.SemanticName = "DIRECTION";
+    inputElements.add( element );
+
+    // Range
+    element.SemanticName = "RANGE";
+    element.Format = DXGI_FORMAT_R32_FLOAT;
+    inputElements.add( element );
+
+    // Spotlight angles
+    element.SemanticName = "SPOTANGLES";
+    element.Format = DXGI_FORMAT_R32G32_FLOAT;
+    inputElements.add( element) ; 
+
+    m_iPointLightIL = Renderer.CreateInputLayout( inputElements, m_PointLightEffect[0].m_iVertexShader );
+    m_iSpotLightIL = Renderer.CreateInputLayout( inputElements, m_SpotLightEffect[0].m_iVertexShader );
+    m_iDirectionalLightIL = Renderer.CreateInputLayout( inputElements, m_DirectionalLightEffect[0].m_iVertexShader );
+
+    if( m_iPointLightIL == -1 || m_iSpotLightIL == -1 || m_iDirectionalLightIL == -1 )
+        Log::Get().Write( L"Failed to create light input layout" );
 }
 //--------------------------------------------------------------------------------
 ViewLights::~ViewLights()
@@ -248,119 +330,30 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
     pPipelineManager->ClearBuffers( color, 1.0f, 0 );
 
     // Bind the depth buffer
-    pPipelineManager->BindDepthTarget( m_DepthTarget );
+    pPipelineManager->BindDepthTarget( m_pDepthTarget );
     pPipelineManager->ApplyRenderTargets();
 
     pPipelineManager->SetViewPort( m_iViewport );
 
     // Set this view's render parameters
     SetRenderParams( pParamManager );
+    
+    // Render each light type
+    DrawLightType( m_PointLights, m_PointLightEffect, m_pVertexBuffer, 
+                        m_iPointLightIL, pPipelineManager, pParamManager );
 
-    // Loop through the lights
-    for ( int i = 0; i < m_Lights.count(); ++i )
-    {
-        const Light& light = m_Lights[i];
+    DrawLightType( m_SpotLights, m_SpotLightEffect, m_pVertexBuffer, 
+                        m_iSpotLightIL, pPipelineManager, pParamManager );
 
-        // Pick the effect based on the shader
-        RenderEffectDX11* pEffect = NULL;
-        if ( light.Type == Point )
-            pEffect = m_PointLightEffect;
-        else if ( light.Type == Spot )
-            pEffect = m_SpotLightEffect;
-        else if ( light.Type == Directional )
-            pEffect = m_DirectionalLightEffect;
-
-        // Set the light params
-        Vector4f pos = Vector4f( light.Position, 1.0f );
-        Vector4f direction = Vector4f( Vector3f::Normalize( light.Direction ), 0.0f );
-
-        // Light position/direction needs to be in view space
-        pos = ViewMatrix * pos;
-        direction = ViewMatrix * direction;
-
-        pParamManager->SetVectorParameter( L"LightPos", &pos );
-        pParamManager->SetVectorParameter( L"LightColor", &Vector4f( light.Color, 1.0f ) );
-        pParamManager->SetVectorParameter( L"LightDirection", &direction );
-        pParamManager->SetVectorParameter( L"LightRange", &Vector4f( light.Range, 1.0f, 1.0f, 1.0f ) );
-        pParamManager->SetVectorParameter( L"SpotlightAngles", &Vector4f( cosf( light.SpotInnerAngle / 2.0f ),
-                                                                          cosf( light.SpotOuterAngle / 2.0f ),
-                                                                          0.0f, 0.0f ) );
-
-        // Set the rasterizer and depth-stencil state, and draw
-        bool intersectsNearPlane = true;
-        bool intersectsFarPlane = true;
-        if( light.Type != Directional )
-        {
-            // Try to determine whether the bounding sphere intersects with the clip planes
-            Vector4f lightPosVS = ViewMatrix * Vector4f( light.Position, 1.0f );
-            intersectsNearPlane = lightPosVS.z - light.Range <= m_fNearClip;
-            intersectsFarPlane = lightPosVS.z + light.Range >= m_fFarClip;
-        }
-
-        if ( light.Type == Directional || ( intersectsNearPlane && intersectsFarPlane ) )
-        {
-            // Draw twice, first to shade non-edge pixels and then shade the edge-pixels
-            pPipelineManager->Draw( m_DirectionalLightEffect[0], m_QuadGeometry, pParamManager );
-            pPipelineManager->Draw( m_DirectionalLightEffect[1], m_QuadGeometry, pParamManager );
-        }
-        else
-        {
-            // Set an appropriate world matrix for the volume
-            m_WorldMatrix.MakeIdentity();
-
-            if ( light.Type == Spot )
-            {
-                // Determine the scaling factors based on the attenuation
-                const float scaleZ = light.Range * 1.1f;
-                const float scaleXY = scaleZ * tanf( light.SpotOuterAngle / 2.0f );
-
-                // Set the orientation based on the light direction
-                Vector3f zAxis = Vector3f::Normalize( light.Direction );
-                Vector3f yAxis = zAxis.Perpendicular();
-                Vector3f xAxis = Vector3f::Cross( yAxis, zAxis );
-                m_WorldMatrix.SetRow( 0, xAxis * scaleXY );
-                m_WorldMatrix.SetRow( 1, yAxis * scaleXY );
-                m_WorldMatrix.SetRow( 2, zAxis * scaleZ );
-            }
-            else if ( light.Type == Point )
-            {
-                // Determine the scaling factor based on the attenuation
-                const float scaleXYZ = light.Range * 1.1f;
-                m_WorldMatrix.Scale( scaleXYZ );
-            }
-
-            m_WorldMatrix.SetTranslation( light.Position );
-            pParamManager->SetWorldMatrixParameter( &m_WorldMatrix );
-
-            // Draw twice, first to shade non-edge pixels and then shade the edge-pixels
-            for ( int i = 0; i < 2; ++i )
-            {
-                // Render back-faces, unless we intersect with the far clip plane
-                if ( intersectsFarPlane )
-                {
-                    pEffect[i].m_iRasterizerState = m_iBackFaceCullRSState;
-                    pEffect[i].m_iDepthStencilState = m_iLessThanDSState;
-                }
-                else
-                {
-                    pEffect[i].m_iRasterizerState = m_iFrontFaceCullRSState;
-                    pEffect[i].m_iDepthStencilState = m_iGreaterThanDSState;
-                }
-
-                if ( light.Type == Spot )
-                    pPipelineManager->Draw( pEffect[i], m_ConeGeometry, pParamManager );
-                else if ( light.Type == Point )
-                    pPipelineManager->Draw( pEffect[i], m_SphereGeometry, pParamManager );
-            }
-        }
-    }
+    DrawLightType( m_DirectionalLights, m_DirectionalLightEffect, m_pVertexBuffer, 
+                        m_iDirectionalLightIL, pPipelineManager, pParamManager );
 
     pPipelineManager->ClearPipelineResources();
 
     // Clear the lights
-    int numLights = m_Lights.count();
-    for ( int i = numLights - 1; i >= 0; --i )
-        m_Lights.remove( i );
+    m_PointLights.empty();
+    m_SpotLights.empty();
+    m_DirectionalLights.empty();
 }
 //--------------------------------------------------------------------------------
 void ViewLights::SetRenderParams( ParameterManagerDX11* pParamManager )
@@ -372,11 +365,13 @@ void ViewLights::SetRenderParams( ParameterManagerDX11* pParamManager )
     pParamManager->SetMatrixParameter( L"InvProjMatrix", &invProj );
     pParamManager->SetMatrixParameter( L"ProjMatrix", &ProjMatrix );
 
+    pParamManager->SetVectorParameter( L"ClipPlanes", &Vector4f( m_fNearClip, m_fFarClip, 1.0f, 1.0f ) );    
+
     // Set the G-Buffer texture
-    pParamManager->SetShaderResourceParameter( L"GBufferTexture", m_GBufferTarget );
+    pParamManager->SetShaderResourceParameter( L"GBufferTexture", m_pGBufferTarget );
 
     // Bind depth
-    pParamManager->SetShaderResourceParameter( L"DepthTexture", m_DepthTarget );
+    pParamManager->SetShaderResourceParameter( L"DepthTexture", m_pDepthTarget );
 }
 //--------------------------------------------------------------------------------
 void ViewLights::SetUsageParams( ParameterManagerDX11* pParamManager )
@@ -386,15 +381,20 @@ void ViewLights::SetUsageParams( ParameterManagerDX11* pParamManager )
 //--------------------------------------------------------------------------------
 void ViewLights::AddLight( const Light& light )
 {
-    m_Lights.add( light );
+    if ( light.Type == Point )
+        m_PointLights.add( light );
+    else if ( light.Type == Spot )
+        m_SpotLights.add( light );
+    else if ( light.Type == Directional )
+        m_DirectionalLights.add( light );    
 }
 //--------------------------------------------------------------------------------
 void ViewLights::SetTargets( ResourcePtr GBufferTarget, ResourcePtr pRenderTarget,
                             ResourcePtr DepthTarget, int Viewport )
 {
-    m_GBufferTarget = GBufferTarget;
+    m_pGBufferTarget = GBufferTarget;
     m_pRenderTarget = pRenderTarget;
-    m_DepthTarget = DepthTarget;
+    m_pDepthTarget = DepthTarget;
     m_iViewport = Viewport;
 }
 //--------------------------------------------------------------------------------

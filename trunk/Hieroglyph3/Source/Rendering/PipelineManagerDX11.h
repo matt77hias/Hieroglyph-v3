@@ -103,6 +103,9 @@ namespace Glyph3
 		void Draw( RenderEffectDX11& effect, ResourcePtr vb, ResourcePtr ib,
 					int inputLayout, D3D11_PRIMITIVE_TOPOLOGY primType,
 					UINT vertexStride, UINT numIndices, ParameterManagerDX11* pParamManager);
+        void DrawNonIndexed( RenderEffectDX11& effect, ResourcePtr vb, int inputLayout, 
+                    D3D11_PRIMITIVE_TOPOLOGY primType, UINT vertexStride, UINT vertexCount, 
+                    UINT startVertexLocation, ParameterManagerDX11* pParamManager);
 		void DrawInstanced( RenderEffectDX11& effect, GeometryDX11& chunk,
 							ResourcePtr instanceData, UINT instanceDataStride,
 							UINT numInstances, ParameterManagerDX11* pParamManager );

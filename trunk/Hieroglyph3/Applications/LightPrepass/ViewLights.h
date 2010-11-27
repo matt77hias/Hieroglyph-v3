@@ -50,6 +50,11 @@ namespace Glyph3
     class ViewLights : public IRenderView
     {
     public:
+
+        // Maximum number of lights supported
+        static const int MaxNumLights = 1000;
+
+    public:
         ViewLights( RendererDX11& Renderer );
 
         virtual void Update( float fTime );
@@ -74,24 +79,27 @@ namespace Glyph3
         int                 m_iGreaterThanDSState;
         int                 m_iBlendState;
         int                 m_iBackFaceCullRSState;
-        int                 m_iFrontFaceCullRSState;
 
         float               m_fNearClip;
         float               m_fFarClip;
 
         ResourcePtr	            m_pRenderTarget;
-        ResourcePtr			    m_DepthTarget;
-        ResourcePtr             m_GBufferTarget;
+        ResourcePtr			    m_pDepthTarget;
+        ResourcePtr             m_pGBufferTarget;
 
-        GeometryDX11			m_QuadGeometry;
-        GeometryDX11            m_SphereGeometry;
-        GeometryDX11            m_ConeGeometry;
+        ResourcePtr             m_pVertexBuffer;        
 
         RenderEffectDX11		m_PointLightEffect[2];
         RenderEffectDX11		m_SpotLightEffect[2];
         RenderEffectDX11		m_DirectionalLightEffect[2];
 
-        TArray<Light>           m_Lights;
+        int                     m_iPointLightIL;
+        int                     m_iSpotLightIL;
+        int                     m_iDirectionalLightIL;
+
+        TArray<Light>           m_PointLights;
+        TArray<Light>           m_SpotLights;
+        TArray<Light>           m_DirectionalLights;
         Matrix4f                m_WorldMatrix;
     };
 }

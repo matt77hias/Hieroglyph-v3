@@ -1326,7 +1326,7 @@ GeometryDX11* GeometryLoaderDX11::loadStanfordPlyFile( std::wstring filename )
 			void** raw = d.data.at(f);
 			PlyDataArray<int>* idxs = reinterpret_cast<PlyDataArray<int>*>(raw[0]);
 
-			for(int fi = 0; fi < idxs->length; ++fi)
+			for(unsigned int fi = 0; fi < idxs->length; ++fi)
 				pMesh->AddIndex( idxs->data[fi] );
 		}
 	}
@@ -1462,7 +1462,7 @@ void** GeometryLoaderDX11::ParsePLYElementData(std::string text, const std::vect
 	boost::char_separator<char> sep(" ");
 	boost::tokenizer<boost::char_separator<char>> tok(text, sep);
 
-	int e = 0;
+	unsigned int e = 0;
 	for(boost::tokenizer<boost::char_separator<char>>::iterator it = tok.begin(); it != tok.end(); ++it)
 	{
 		if( e >= desc.size())
@@ -1598,7 +1598,7 @@ template<typename T> GeometryLoaderDX11::PlyDataArray<T>* GeometryLoaderDX11::Ex
 
 int GeometryLoaderDX11::FindPlyElementIndex(std::vector<PlyElementDesc> elems, std::string name)
 {
-	for(int idx = 0; idx < elems.size(); ++idx)
+	for(unsigned int idx = 0; idx < elems.size(); ++idx)
 		if(0 == elems.at(idx).name.compare(name))
 			return idx;
 
@@ -1607,7 +1607,7 @@ int GeometryLoaderDX11::FindPlyElementIndex(std::vector<PlyElementDesc> elems, s
 
 int GeometryLoaderDX11::FindPlyElementPropertyIndex(std::vector<PlyElementPropertyDeclaration> elems, std::string name)
 {
-	for(int idx = 0; idx < elems.size(); ++idx)
+	for(unsigned int idx = 0; idx < elems.size(); ++idx)
 		if(0 == elems.at(idx).name.compare(name))
 			return idx;
 

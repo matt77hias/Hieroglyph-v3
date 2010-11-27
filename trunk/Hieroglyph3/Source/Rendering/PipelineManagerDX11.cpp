@@ -557,6 +557,31 @@ void PipelineManagerDX11::Draw( RenderEffectDX11& effect, ResourcePtr vb, Resour
 	m_pContext->DrawIndexed( numIndices, 0, 0 );
 }
 //--------------------------------------------------------------------------------
+void PipelineManagerDX11::DrawNonIndexed( RenderEffectDX11& effect, ResourcePtr vb, 
+                                           int inputLayput, D3D11_PRIMITIVE_TOPOLOGY primType,
+                                           UINT vertexStride, UINT vertexCount, UINT startVertexLocation,
+                                           ParameterManagerDX11* pParamManager )
+{
+    // Specify the type of geometry that we will be dealing with.
+    m_pContext->IASetPrimitiveTopology( primType );
+
+    // Bind the vertex bufffer.
+    BindVertexBuffer( vb, vertexStride );
+
+    // Set NULL as the index buffer
+    m_pContext->IASetIndexBuffer( NULL, DXGI_FORMAT_R32_UINT, 0 );
+
+    // Bind the input layout.
+    BindInputLayout( inputLayput );
+
+    // Use the effect to load all of the pipeline stages here.
+    ClearPipelineResources();
+    effect.ConfigurePipeline( this, pParamManager );
+    ApplyPipelineResources();
+
+    m_pContext->Draw( vertexCount, startVertexLocation );
+}
+//--------------------------------------------------------------------------------
 void PipelineManagerDX11::DrawInstanced( RenderEffectDX11& effect, GeometryDX11& geometry,
 								 ResourcePtr instanceData, UINT instanceDataStride,
 								 UINT numInstances, ParameterManagerDX11* pParamManager )

@@ -59,21 +59,21 @@ namespace Glyph3
 		
 		// Returns the number of elements currently in the array.
 
-		int count();
+		int count() const;
 		
 		// Returns true if the input element has been previously added to the
 		// array, and false otherwise.
 
-		bool contains( const T& element );
+		bool contains( const T& element ) const;
 		
 		// Returns the index of the input element if it has been previously 
 		// added to the array, and -1 otherwise.
 
-		int find( const T& element );
+		int find( const T& element ) const;
 
 		// Helper method for quickly checking if an index is within bounds.
 		
-		bool inrange( int index );
+		bool inrange( int index ) const;
 
 		// Array style access
 	    T& operator[] (int i);

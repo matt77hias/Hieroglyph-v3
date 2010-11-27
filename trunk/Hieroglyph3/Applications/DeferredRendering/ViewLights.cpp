@@ -401,9 +401,7 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
     pPipelineManager->ClearPipelineResources();
 
     // Clear the lights
-    int numLights = m_Lights.count();
-    for ( int i = numLights - 1; i >= 0; --i )
-        m_Lights.remove( i );
+    m_Lights.empty();
 }
 //--------------------------------------------------------------------------------
 void ViewLights::SetRenderParams( ParameterManagerDX11* pParamManager )

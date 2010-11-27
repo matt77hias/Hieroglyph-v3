@@ -88,13 +88,13 @@ void TArray<T>::empty( )
 }
 //--------------------------------------------------------------------------------
 template <class T>
-int TArray<T>::count()
+int TArray<T>::count() const
 {
 	return( m_iQuantity );
 }
 //--------------------------------------------------------------------------------
 template <class T>
-bool TArray<T>::contains( const T& element )
+bool TArray<T>::contains( const T& element ) const
 {
 	for ( int i = 0; i < m_iQuantity; i++ )
 	{
@@ -106,7 +106,7 @@ bool TArray<T>::contains( const T& element )
 }
 //--------------------------------------------------------------------------------
 template <class T>
-int TArray<T>::find( const T& element )
+int TArray<T>::find( const T& element ) const
 {
 	for ( int i = 0; i < m_iQuantity; i++ )
 	{
@@ -118,7 +118,7 @@ int TArray<T>::find( const T& element )
 }
 //--------------------------------------------------------------------------------
 template <class T>
-bool TArray<T>::inrange( int index )
+bool TArray<T>::inrange( int index ) const
 {
 	return( ( index >= 0 ) && ( index < m_iQuantity ) );
 }
