@@ -29,7 +29,7 @@ namespace Glyph3
 
 		void SetRenderTargetView( int index, ID3D11RenderTargetView* pBuffer );
 		void SetDepthStencilView( ID3D11DepthStencilView* pState );
-		void SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV );
+		void SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV, unsigned int initial = -1 );
 
 		void BindResources( ID3D11DeviceContext* pContext );
 		void ClearResources( ID3D11DeviceContext* pContext );
@@ -44,6 +44,7 @@ namespace Glyph3
 		ID3D11DepthStencilView*			DepthTargetViews;
         ID3D11DepthStencilView*			APIDepthTargetViews;
 		ID3D11UnorderedAccessView*		UnorderedAccessViews[D3D11_PS_CS_UAV_REGISTER_COUNT];
+		unsigned int					UAVInitialCounts[D3D11_PS_CS_UAV_REGISTER_COUNT];
 
 		friend RendererDX11;
 	};

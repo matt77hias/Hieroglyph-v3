@@ -28,6 +28,7 @@ ShaderStageDX11::ShaderStageDX11()
 	for ( int i = 0; i < D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT; i++ ) SamplerStates[i] = 0;
 	for ( int i = 0; i < D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT; i++ ) ShaderResourceViews[i] = 0;
 	for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) UnorderedAccessViews[i] = 0;
+	for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) UAVInitCounts[i] = -1;
 
 	iCurrMaxCB = D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT - 1;
 	iNextMaxCB = 0;
@@ -84,7 +85,7 @@ void ShaderStageDX11::SetShaderResourceView( int index, ID3D11ShaderResourceView
 	}
 }
 //--------------------------------------------------------------------------------
-void ShaderStageDX11::SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV )
+void ShaderStageDX11::SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV, unsigned int initial )
 {
 	// TODO: Add some member variable to the renderer to indicate the current 
 	//       feature level of the device.  This can then be used to limit the
@@ -94,6 +95,7 @@ void ShaderStageDX11::SetUnorderedAccessView( int index, ID3D11UnorderedAccessVi
 	if ( ( index >= 0 ) && ( index < D3D11_PS_CS_UAV_REGISTER_COUNT ) )
 	{
 		UnorderedAccessViews[index] = pUAV;
+		UAVInitCounts[index] = initial;
 		if ( index > iNextMaxUAV ) iNextMaxUAV = index;
 		bUnorderedAccessViewsDirty = true;
 	}

@@ -30,7 +30,7 @@ namespace Glyph3
 		void SetConstantBuffer( int index, ID3D11Buffer* pBuffer );
 		void SetSamplerState( int index, ID3D11SamplerState* pState );
 		void SetShaderResourceView( int index, ID3D11ShaderResourceView* pSRV );
-		void SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV );
+		void SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV, unsigned int initial = -1 );
 
 		virtual ShaderType GetType() = 0;
 		void BindResources( ID3D11DeviceContext* pContext );
@@ -54,6 +54,7 @@ namespace Glyph3
 		ID3D11SamplerState*			SamplerStates[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT];
 		ID3D11ShaderResourceView*	ShaderResourceViews[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT];
 		ID3D11UnorderedAccessView*	UnorderedAccessViews[D3D11_PS_CS_UAV_REGISTER_COUNT];
+		unsigned int				UAVInitCounts[D3D11_PS_CS_UAV_REGISTER_COUNT];
 
 		int iCurrMaxCB, iNextMaxCB;
 		int iCurrMaxSS, iNextMaxSS;

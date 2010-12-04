@@ -114,7 +114,7 @@ namespace Glyph3
 							int inputLayout, UINT vertexStride, UINT numIndices,
 							ResourcePtr instanceData, UINT instanceDataStride,
 							UINT numInstances, ParameterManagerDX11* pParamManager );
-		
+
 		void Dispatch( RenderEffectDX11& effect, UINT x, UINT y, UINT z, ParameterManagerDX11* pParamManager );
 
 		// The pipeline state can be modified with command lists.  This allows

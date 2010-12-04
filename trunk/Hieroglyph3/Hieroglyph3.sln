@@ -88,6 +88,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CurvedPointNormalTriangles"
 		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ParticleStorm", "Applications\ParticleStorm\ParticleStorm.vcproj", "{9C8C4C20-EFB0-44A7-8321-0754C06B05C4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -166,6 +171,10 @@ Global
 		{A074582D-4AFA-4EC2-8CBE-7B37D0EFFA37}.Debug|Win32.Build.0 = Debug|Win32
 		{A074582D-4AFA-4EC2-8CBE-7B37D0EFFA37}.Release|Win32.ActiveCfg = Release|Win32
 		{A074582D-4AFA-4EC2-8CBE-7B37D0EFFA37}.Release|Win32.Build.0 = Release|Win32
+		{9C8C4C20-EFB0-44A7-8321-0754C06B05C4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9C8C4C20-EFB0-44A7-8321-0754C06B05C4}.Debug|Win32.Build.0 = Debug|Win32
+		{9C8C4C20-EFB0-44A7-8321-0754C06B05C4}.Release|Win32.ActiveCfg = Release|Win32
+		{9C8C4C20-EFB0-44A7-8321-0754C06B05C4}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

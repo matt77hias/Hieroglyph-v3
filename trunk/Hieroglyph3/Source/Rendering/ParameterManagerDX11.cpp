@@ -207,7 +207,7 @@ void ParameterManagerDX11::SetShaderResourceParameter( const std::wstring& name,
 		Log::Get().Write( L"Shader resource view parameter name collision!" );
 }
 //--------------------------------------------------------------------------------
-void ParameterManagerDX11::SetUnorderedAccessParameter( const std::wstring& name, ResourcePtr resource )
+void ParameterManagerDX11::SetUnorderedAccessParameter( const std::wstring& name, ResourcePtr resource, unsigned int initial )
 {
 	RenderParameterDX11* pParameter = m_Parameters[name];
 
@@ -220,7 +220,12 @@ void ParameterManagerDX11::SetUnorderedAccessParameter( const std::wstring& name
 	}
 
 	if ( pParameter->GetParameterType() == UNORDERED_ACCESS )
-		pParameter->SetParameterData( reinterpret_cast<void*>( &resource->m_iResourceUAV ) );
+	{
+		UAVParameterData data; 
+		data.m_iUnorderedAccessView = resource->m_iResourceUAV; 
+		data.m_iInitialCount = initial;
+		pParameter->SetParameterData( reinterpret_cast<void*>( &data ) );
+	}
 	else
 		Log::Get().Write( L"Unordered access view parameter name collision!" );
 }

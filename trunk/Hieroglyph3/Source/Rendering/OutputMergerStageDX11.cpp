@@ -24,6 +24,7 @@ OutputMergerStageDX11::OutputMergerStageDX11()
 
 	DepthTargetViews = 0;
 	for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) UnorderedAccessViews[i] = 0;
+	for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) UAVInitialCounts[i] = -1;
     APIDepthTargetViews = NULL;
 }
 //--------------------------------------------------------------------------------
@@ -50,11 +51,12 @@ void OutputMergerStageDX11::SetDepthStencilView( ID3D11DepthStencilView* pView )
 	DepthTargetViews = pView;
 }
 //--------------------------------------------------------------------------------
-void OutputMergerStageDX11::SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV )
+void OutputMergerStageDX11::SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV, unsigned int initial )
 {
 	if ( ( index >= 0 ) && ( index < D3D11_PS_CS_UAV_REGISTER_COUNT ) )
 	{
 		UnorderedAccessViews[index] = pUAV;
+		UAVInitialCounts[index] = initial;
 	}
 }
 //--------------------------------------------------------------------------------
@@ -96,6 +98,7 @@ void OutputMergerStageDX11::ClearResources( ID3D11DeviceContext* pContext )
 	memset( RenderTargetViews, 0, 8 * sizeof( RenderTargetViews[0] ) );
 	DepthTargetViews = 0;
 	memset( UnorderedAccessViews, 0, sizeof( UnorderedAccessViews[0] ) * D3D11_PS_CS_UAV_REGISTER_COUNT );
+	for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) UAVInitialCounts[i] = -1;
 }
 //--------------------------------------------------------------------------------
 void OutputMergerStageDX11::UnbindResources( ID3D11DeviceContext* pContext )

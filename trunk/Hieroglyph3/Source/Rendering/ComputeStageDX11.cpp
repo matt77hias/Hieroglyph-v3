@@ -44,7 +44,7 @@ void ComputeStageDX11::BindShaderResourceViews( ID3D11DeviceContext* pContext, i
 //--------------------------------------------------------------------------------
 void ComputeStageDX11::BindUnorderedAccessViews( ID3D11DeviceContext* pContext, int count )
 {
-	pContext->CSSetUnorderedAccessViews( 0, count, UnorderedAccessViews, (UINT*)&UnorderedAccessViews );
+	pContext->CSSetUnorderedAccessViews( 0, count, UnorderedAccessViews, UAVInitCounts /*(UINT*)&UnorderedAccessViews*/ );
 }
 //--------------------------------------------------------------------------------
 

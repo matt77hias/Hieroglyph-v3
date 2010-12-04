@@ -274,6 +274,8 @@ void PipelineManagerDX11::BindUnorderedAccessParameter( ShaderType type, const s
 				reinterpret_cast<UnorderedAccessParameterDX11*>( pParameter );
 
 			int ID = pResource->GetIndex(); 
+			unsigned int initial = pResource->GetInitialCount();
+
 			UnorderedAccessViewDX11* pView = pRenderer->GetUnorderedAccessView( ID );
 
 			// Allow a range including -1 up to the number of resources views
@@ -286,16 +288,16 @@ void PipelineManagerDX11::BindUnorderedAccessParameter( ShaderType type, const s
 				if ( ID >= 0 )
 					pResourceView = pView->m_pUnorderedAccessView;
 
-				ShaderStages[type]->SetUnorderedAccessView( slot, pResourceView );
+				ShaderStages[type]->SetUnorderedAccessView( slot, pResourceView, initial );
 			}
 			else
 			{
-				Log::Get().Write( L"Tried to set an invalid shader resource ID!" );
+				Log::Get().Write( L"Tried to set an invalid unordered access ID!" );
 			}
 		}
 		else
 		{
-			Log::Get().Write( L"Tried to set a non-shader resource ID as a shader resource!" );
+			Log::Get().Write( L"Tried to set a non-unordered access view ID as a unordered access view!" );
 		}
 	}
 	else
@@ -543,8 +545,15 @@ void PipelineManagerDX11::Draw( RenderEffectDX11& effect, ResourcePtr vb, Resour
 	m_pContext->IASetPrimitiveTopology( primType );
 
 	// Bind the vertex and index buffers.
-	BindVertexBuffer( vb, vertexStride );
-	BindIndexBuffer( ib );
+	if ( vb != NULL )
+		BindVertexBuffer( vb, vertexStride );
+	else
+		UnbindVertexBuffer();
+
+	if ( ib != NULL )
+		BindIndexBuffer( ib );
+	else
+		UnbindIndexBuffer();
 
 	// Bind the input layout.
 	BindInputLayout( inputLayput );

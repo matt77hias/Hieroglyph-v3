@@ -250,7 +250,10 @@ int GeometryDX11::CalculateVertexCount()
 	// Record the number of vertices as the number of vertices in the 
 	// first element.  This could select the minimum number from all 
 	// elements, but the user should have all the same size elements...
-	m_iVertexCount = m_vElements[0]->Count();
+	if ( m_vElements.count() > 0 )
+		m_iVertexCount = m_vElements[0]->Count();
+	else
+		m_iVertexCount = 0;
 
 	return( m_iVertexCount );
 }
@@ -260,37 +263,58 @@ void GeometryDX11::GenerateInputLayout( int ShaderID )
 	int iElems = m_vElements.count();
 
 	if ( iElems == 0 )
-		return;
-
-	// Check the number of vertices to be created
-	CalculateVertexCount();
-
-	// Allocate the necessary number of element descriptions
-	TArray<D3D11_INPUT_ELEMENT_DESC> elements;
-
-	// Fill in the vertex element descriptions based on each element
-	for ( int i = 0; i < m_vElements.count(); i++ )
 	{
-		D3D11_INPUT_ELEMENT_DESC e;
-		e.SemanticName = m_vElements[i]->m_SemanticName.c_str();
-		e.SemanticIndex = m_vElements[i]->m_uiSemanticIndex;
-		e.Format = m_vElements[i]->m_Format;
-		e.InputSlot = m_vElements[i]->m_uiInputSlot;
-		e.AlignedByteOffset = m_vElements[i]->m_uiAlignedByteOffset;
-		e.InputSlotClass = m_vElements[i]->m_InputSlotClass;
-		e.InstanceDataStepRate = m_vElements[i]->m_uiInstanceDataStepRate;
+		// If no vertex elements exist in the geometry, then we can assume the 
+		// vertex data will be generated in the shader itself.  In this case, the
+		// number of vertices will be determined by the number of primitives.
+
+		m_iVertexCount = GetPrimitiveCount();
 		
-		elements.add( e );
-	}
+		// Allocate the necessary number of element descriptions
+		TArray<D3D11_INPUT_ELEMENT_DESC> elements;
 
-	// Create the input layout for the given shader index
-	RendererDX11* pRenderer = RendererDX11::Get();
-	if ( m_InputLayouts[ShaderID] == 0 )
+		// Create the input layout for the given shader index
+		RendererDX11* pRenderer = RendererDX11::Get();
+		if ( m_InputLayouts[ShaderID] == 0 )
+		{
+			InputLayoutKey* pKey = new InputLayoutKey();
+			pKey->shader = ShaderID;
+			pKey->layout = pRenderer->CreateInputLayout( elements, ShaderID );
+			m_InputLayouts[ShaderID] = pKey;
+		}
+	}
+	else
 	{
-		InputLayoutKey* pKey = new InputLayoutKey();
-		pKey->shader = ShaderID;
-		pKey->layout = pRenderer->CreateInputLayout( elements, ShaderID );
-		m_InputLayouts[ShaderID] = pKey;
+		// Check the number of vertices to be created
+		CalculateVertexCount();
+
+		// Allocate the necessary number of element descriptions
+		TArray<D3D11_INPUT_ELEMENT_DESC> elements;
+
+		// Fill in the vertex element descriptions based on each element
+		for ( int i = 0; i < m_vElements.count(); i++ )
+		{
+			D3D11_INPUT_ELEMENT_DESC e;
+			e.SemanticName = m_vElements[i]->m_SemanticName.c_str();
+			e.SemanticIndex = m_vElements[i]->m_uiSemanticIndex;
+			e.Format = m_vElements[i]->m_Format;
+			e.InputSlot = m_vElements[i]->m_uiInputSlot;
+			e.AlignedByteOffset = m_vElements[i]->m_uiAlignedByteOffset;
+			e.InputSlotClass = m_vElements[i]->m_InputSlotClass;
+			e.InstanceDataStepRate = m_vElements[i]->m_uiInstanceDataStepRate;
+			
+			elements.add( e );
+		}
+
+		// Create the input layout for the given shader index
+		RendererDX11* pRenderer = RendererDX11::Get();
+		if ( m_InputLayouts[ShaderID] == 0 )
+		{
+			InputLayoutKey* pKey = new InputLayoutKey();
+			pKey->shader = ShaderID;
+			pKey->layout = pRenderer->CreateInputLayout( elements, ShaderID );
+			m_InputLayouts[ShaderID] = pKey;
+		}
 	}
 }
 //--------------------------------------------------------------------------------
@@ -317,40 +341,42 @@ void GeometryDX11::LoadToBuffers()
 	// Check the size of the assembled vertices
 	CalculateVertexSize();
 
-	// Load the vertex buffer first by calculating the required size
-	unsigned int vertices_length = GetVertexSize() * GetVertexCount();
-
-	char* pBytes = new char[vertices_length];
-
-	for ( int j = 0; j < m_iVertexCount; j++ )
+	if ( GetVertexSize() > 0 )
 	{
-		int iElemOffset = 0;
-		for ( int i = 0; i < m_vElements.count(); i++ )
+		// Load the vertex buffer first by calculating the required size
+		unsigned int vertices_length = GetVertexSize() * GetVertexCount();
+
+		char* pBytes = new char[vertices_length];
+
+		for ( int j = 0; j < m_iVertexCount; j++ )
 		{
-			memcpy( pBytes + j * m_iVertexSize + iElemOffset, m_vElements[i]->GetPtr(j), m_vElements[i]->SizeInBytes() );
-			iElemOffset += m_vElements[i]->SizeInBytes();
+			int iElemOffset = 0;
+			for ( int i = 0; i < m_vElements.count(); i++ )
+			{
+				memcpy( pBytes + j * m_iVertexSize + iElemOffset, m_vElements[i]->GetPtr(j), m_vElements[i]->SizeInBytes() );
+				iElemOffset += m_vElements[i]->SizeInBytes();
+			}
 		}
+
+		// TODO: Change this to check the current buffer size, and allow releasing of the resources.
+		//       This may take some reference counting to change the way it works...
+
+		D3D11_SUBRESOURCE_DATA data;
+		data.pSysMem = reinterpret_cast<void*>( pBytes );
+		data.SysMemPitch = 0;
+		data.SysMemSlicePitch = 0;
+
+		BufferConfigDX11 vbuffer;
+		vbuffer.SetDefaultVertexBuffer( vertices_length, false );
+		m_VB = RendererDX11::Get()->CreateVertexBuffer( &vbuffer, &data );
+
+		delete [] pBytes; 
+		// TODO: add error checking here!
 	}
-
-	// TODO: Change this to check the current buffer size, and allow releasing of the resources.
-	//       This may take some reference counting to change the way it works...
-
-	D3D11_SUBRESOURCE_DATA data;
-	data.pSysMem = reinterpret_cast<void*>( pBytes );
-	data.SysMemPitch = 0;
-	data.SysMemSlicePitch = 0;
-
-	BufferConfigDX11 vbuffer;
-	vbuffer.SetDefaultVertexBuffer( vertices_length, false );
-	m_VB = RendererDX11::Get()->CreateVertexBuffer( &vbuffer, &data );
-
-	delete [] pBytes; 
-	// TODO: add error checking here!
-
 	
 	// Load the index buffer by calculating the required size
 	// based on the number of indices.
-
+	D3D11_SUBRESOURCE_DATA data;
 	data.pSysMem = reinterpret_cast<void*>( &m_vIndices[0] );
 	data.SysMemPitch = 0;
 	data.SysMemSlicePitch = 0;

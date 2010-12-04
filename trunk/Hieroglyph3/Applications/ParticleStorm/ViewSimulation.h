@@ -9,41 +9,47 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// UnorderedAccessParameterDX11
+// ViewSimulation
 //
 //--------------------------------------------------------------------------------
-#include "RenderParameterDX11.h"
+#ifndef ViewSimulation_h
+#define ViewSimulation_h
 //--------------------------------------------------------------------------------
-#ifndef UnorderedAccessParameterDX11_h
-#define UnorderedAccessParameterDX11_h
+#include "IRenderView.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	struct UAVParameterData
+	class Entity3D;
+
+	struct Particle
 	{
-		int				m_iUnorderedAccessView;
-		unsigned int	m_iInitialCount;
+		Vector3f position;
+		Vector3f direction;
+		Vector4f status;
 	};
 
-	class UnorderedAccessParameterDX11 : public RenderParameterDX11
+	class ViewSimulation : public IRenderView
 	{
 	public:
-		UnorderedAccessParameterDX11();
-		UnorderedAccessParameterDX11( UnorderedAccessParameterDX11& copy );
-		virtual ~UnorderedAccessParameterDX11();
+		ViewSimulation( RendererDX11& Renderer, int SizeX );
 
-		virtual void SetParameterData( void* pData );
-		virtual ParameterType GetParameterType();
-		int GetIndex();
-		unsigned int GetInitialCount();
+		virtual void Update( float fTime );
+		virtual void PreDraw( RendererDX11* pRenderer );
+		virtual void Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager );
 
-		void UpdateValue( RenderParameterDX11* pParameter );
+		virtual void SetRenderParams( ParameterManagerDX11* pParamManager );
+		virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
+
+
+		virtual ~ViewSimulation();
 
 	protected:
-		UAVParameterData m_ParameterData;
+
+		int m_iParticleCount;
+		ResourcePtr ParticleStateBuffers[2];
+		RenderEffectDX11*	pParticleUpdate;
+		bool bOneTimeInit;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // UnorderedAccessParameterDX11_h
-//--------------------------------------------------------------------------------
-
+#endif // ViewSimulation_h

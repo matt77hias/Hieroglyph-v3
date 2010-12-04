@@ -35,7 +35,7 @@ namespace Glyph3
 		void SetMatrixParameter( const std::wstring& name, Matrix4f* pMatrix );
 		void SetSamplerParameter( const std::wstring& name, int* pID );
 		void SetShaderResourceParameter( const std::wstring& name, ResourcePtr resource );
-		void SetUnorderedAccessParameter( const std::wstring& name, ResourcePtr resource );
+		void SetUnorderedAccessParameter( const std::wstring& name, ResourcePtr resource, unsigned int initial = -1 );
 		void SetConstantBufferParameter( const std::wstring& name, ResourcePtr resource );
 		void SetMatrixArrayParameter( const std::wstring& name, int count, Matrix4f* pMatrices );
 		
