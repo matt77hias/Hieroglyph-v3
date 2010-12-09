@@ -163,7 +163,7 @@ void App::Initialize()
 	CreateShaders();
 
 	// Create the parameters for use with this effect
-	Vector4f tessParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
+	Vector4f tessParams = Vector4f( 3.0f, 3.0f, 3.0f, 3.0f );
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EdgeFactors" ), &tessParams );
 
 
@@ -435,9 +435,9 @@ void App::UpdateViewState()
 	float fromAngle = fmodf( distance * 2.0f * static_cast<float>(D3DX_PI), 2.0f * static_cast<float>(D3DX_PI));
 	//float toAngle = fmodf( (distance + 0.08f) * 2.0f * static_cast<float>(D3DX_PI), 2.0f * static_cast<float>(D3DX_PI)); // ~30 degrees in front
 
-	vLookFrom.x = sinf(fromAngle) * 5.0f;
-	vLookFrom.y = 2.f;
-	vLookFrom.z = cosf(fromAngle) * 5.0f;
+	vLookFrom.x = sinf(fromAngle) * 2.5f;
+	vLookFrom.y = 1.f;
+	vLookFrom.z = cosf(fromAngle) * 2.5f;
 
 	/*
 	vLookAt.x = sinf(toAngle) * 3.0f;
