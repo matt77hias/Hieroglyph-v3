@@ -16,6 +16,12 @@ cbuffer Transforms
 	matrix ProjMatrix;
 };
 
+cbuffer ParticleParameters
+{
+	float4 EmitterLocation;
+	float4 ConsumerLocation;
+};
+
 static const float4 g_positions[4] =
 {
     float4( -1, 1, 0, 0 ),
@@ -79,7 +85,7 @@ void GSMAIN( point GS_INPUT input[1], inout TriangleStream<PS_INPUT> SpriteStrea
 {
 	PS_INPUT output;
 
-	float dist = length( input[0].position ) / 100.0f;
+	float dist = length( input[0].position - ConsumerLocation.xyz ) / 100.0f;
 
 	// Transform to view space
 	float4 viewposition = mul( float4( input[0].position, 1.0f ), WorldViewMatrix );

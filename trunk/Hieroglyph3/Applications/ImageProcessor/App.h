@@ -38,9 +38,21 @@ protected:
 	ResourcePtr				m_RenderTarget;
 	ResourcePtr				m_DepthTarget;
 
+	// Texture Resources
+	ResourcePtr				m_Texture;
+	ResourcePtr				m_Intermediate;
+	ResourcePtr				m_Output;
+
+
 	ViewPerspective*		m_pRenderView;
 	Node3D*					m_pNode;
 	Entity3D*				m_pEntity;
+
+	RenderEffectDX11*		m_pBruteForceGaussian;
+	RenderEffectDX11*		m_pSeparableGaussianX;
+	RenderEffectDX11*		m_pSeparableGaussianY;
+	RenderEffectDX11*		m_pCachedGaussianX;
+	RenderEffectDX11*		m_pCachedGaussianY;
 	
 	Camera*					m_pCamera;
 

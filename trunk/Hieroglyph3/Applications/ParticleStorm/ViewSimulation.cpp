@@ -35,7 +35,7 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 
 	srand( 1 );
 
-	const float scale = 100.0f;
+	const float scale = 200.0f;
 	const float vel_scale = 10.0f;
 	for ( int i = 0; i < m_iParticleCount; i++ )
 	{
@@ -67,6 +67,65 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 	config.SetBindFlags( D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE );
 	config.SetMiscFlags( D3D11_RESOURCE_MISC_BUFFER_STRUCTURED );
 	
+/*
+	ResourcePtr buffer1 = Renderer.CreateStructuredBuffer( &config, &InitialData );
+	//ResourcePtr buffer2 = Renderer.CreateStructuredBuffer( &config, &InitialData );
+
+	// Release the system memory since the simulation data is now on the GPU :)
+
+	delete[] pData;
+
+
+	
+	D3D11_BUFFER_UAV uav;
+
+	// Create a UAV for the first half of the buffer
+	uav.FirstElement = 0;
+	uav.NumElements = m_iParticleCount;
+	uav.Flags = D3D11_BUFFER_UAV_FLAG_APPEND;
+
+	UnorderedAccessViewConfigDX11 firstHalfUAV;
+	firstHalfUAV.SetViewDimensions( D3D11_UAV_DIMENSION_BUFFER );
+	firstHalfUAV.SetBuffer( uav );
+
+	D3D11_BUFFER_SRV srv;
+	srv.FirstElement = 0;
+	srv.NumElements = m_iParticleCount;
+	
+	ShaderResourceViewConfigDX11 firstHalfSRV;
+	firstHalfSRV.SetViewDimensions( D3D11_SRV_DIMENSION_BUFFER );
+	firstHalfSRV.SetBuffer( srv );
+
+	ParticleStateBuffers[0] = ResourcePtr( new ResourceProxyDX11( buffer1->m_iResource, 
+																&config,
+																&Renderer,
+                                                                &firstHalfSRV, 
+																NULL,
+                                                                &firstHalfUAV ) );
+
+	// Create a UAV for the second half of the buffer
+	uav.FirstElement = 0;
+	uav.NumElements = 250;
+	uav.Flags = D3D11_BUFFER_UAV_FLAG_APPEND;
+
+	UnorderedAccessViewConfigDX11 secondHalfUAV;
+	secondHalfUAV.SetViewDimensions( D3D11_UAV_DIMENSION_BUFFER );
+	secondHalfUAV.SetBuffer( uav );
+
+	srv.FirstElement = 256;
+	srv.NumElements = 250;
+	
+	ShaderResourceViewConfigDX11 secondHalfSRV;
+	secondHalfSRV.SetViewDimensions( D3D11_SRV_DIMENSION_BUFFER );
+	secondHalfSRV.SetBuffer( srv );
+
+	ParticleStateBuffers[1] = ResourcePtr( new ResourceProxyDX11( buffer1->m_iResource, 
+																&config,
+																&Renderer,
+																&secondHalfSRV,
+																NULL,
+                                                                &secondHalfUAV ) );
+*/
 
 	ResourcePtr buffer1 = Renderer.CreateStructuredBuffer( &config, &InitialData );
 	ResourcePtr buffer2 = Renderer.CreateStructuredBuffer( &config, &InitialData );
@@ -103,7 +162,6 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 																NULL,
                                                                 &firstHalfUAV ) );
 
-
 	// Create a UAV for the second half of the buffer
 	uav.FirstElement = 0;
 	uav.NumElements = m_iParticleCount;
@@ -127,7 +185,8 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 																NULL,
                                                                 &secondHalfUAV ) );
 
-	
+
+
 
 	// Set up the render effect for actually updating the simulation.
 

@@ -55,11 +55,11 @@ bool App::ConfigureEngineComponents()
 
 	m_pRenderer11 = new RendererDX11();
 
-	if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_HARDWARE, D3D_FEATURE_LEVEL_10_0 ) )
+	if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_HARDWARE, D3D_FEATURE_LEVEL_11_0 ) )
 	{
 		Log::Get().Write( L"Could not create hardware device, trying to create the reference device..." );
 
-		if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_REFERENCE, D3D_FEATURE_LEVEL_10_0 ) )
+		if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_REFERENCE, D3D_FEATURE_LEVEL_11_0 ) )
 		{
 			MessageBox( m_pWindow->GetHandle(), L"Could not create a hardware or software Direct3D 11 device - the program will now abort!", L"Hieroglyph 3 Rendering", MB_ICONEXCLAMATION | MB_SYSTEMMODAL );
 			RequestTermination();			
@@ -72,7 +72,7 @@ bool App::ConfigureEngineComponents()
 
 	// Create the window.
 	int width = 640;
-	int height = 360;
+	int height = 480;
 
 	// Create the window wrapper class instance.
 	m_pWindow = new Win32RenderWindow();
@@ -130,51 +130,91 @@ void App::ShutdownEngineComponents()
 //--------------------------------------------------------------------------------
 void App::Initialize()
 {
-	// Create and initialize the geometry to be rendered.  This represents a 
-	// heightmap that will be tessellated modified with the water state.
 
-	const int DispatchSizeX = 16;
-	const int DispatchSizeZ = 16;
+	m_pBruteForceGaussian = new RenderEffectDX11();
+	m_pBruteForceGaussian->m_iComputeShader = 
+		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
+		std::wstring( L"../Data/Shaders/GaussianBruteForceCS.hlsl" ),
+		std::wstring( L"CSMAIN" ),
+		std::wstring( L"cs_5_0" ) );
 
-	GeometryDX11* pGeometry = new GeometryDX11();
-	GeometryGeneratorDX11::GenerateTexturedPlane( pGeometry, 16 * DispatchSizeX, 16 * DispatchSizeZ );
-	pGeometry->LoadToBuffers();
-	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-	
+	m_pSeparableGaussianX = new RenderEffectDX11();
+	m_pSeparableGaussianX->m_iComputeShader = 
+		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
+		std::wstring( L"../Data/Shaders/GaussianSeparableCS.hlsl" ),
+		std::wstring( L"CSMAINX" ),
+		std::wstring( L"cs_5_0" ) );
+
+	m_pSeparableGaussianY = new RenderEffectDX11();
+	m_pSeparableGaussianY->m_iComputeShader = 
+		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
+		std::wstring( L"../Data/Shaders/GaussianSeparableCS.hlsl" ),
+		std::wstring( L"CSMAINY" ),
+		std::wstring( L"cs_5_0" ) );
+
+	m_pCachedGaussianX = new RenderEffectDX11();
+	m_pCachedGaussianX->m_iComputeShader = 
+		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
+		std::wstring( L"../Data/Shaders/GaussianCachedCS.hlsl" ),
+		std::wstring( L"CSMAINX" ),
+		std::wstring( L"cs_5_0" ) );
+
+	m_pCachedGaussianY = new RenderEffectDX11();
+	m_pCachedGaussianY->m_iComputeShader = 
+		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
+		std::wstring( L"../Data/Shaders/GaussianCachedCS.hlsl" ),
+		std::wstring( L"CSMAINY" ),
+		std::wstring( L"cs_5_0" ) );
 
 	// Create the material for use by the entity.
 	MaterialDX11* pMaterial = new MaterialDX11();
 
-	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
-
 	pEffect->m_iVertexShader = 
 		m_pRenderer11->LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/HeightmapVisualization.hlsl" ),
+		std::wstring( L"../Data/Shaders/TextureVS.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_4_0" ) );
+		std::wstring( L"vs_5_0" ) );
 	pEffect->m_iPixelShader = 
 		m_pRenderer11->LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/HeightmapVisualization.hlsl" ),
+		std::wstring( L"../Data/Shaders/TexturePS.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_4_0" ) );
-
-	RasterizerStateConfigDX11 RS;
-	RS.FillMode = D3D11_FILL_WIREFRAME;
-
-	pEffect->m_iRasterizerState = 
-		m_pRenderer11->CreateRasterizerState( &RS );
+		std::wstring( L"ps_5_0" ) );
 
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
 	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
 
-	// Set any parameters that will be needed by the shaders used above.
-	Vector4f DispatchSize = Vector4f( (float)DispatchSizeX, (float)DispatchSizeZ, (float)DispatchSizeX * 16, (float)DispatchSizeZ * 16 );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"DispatchSize" ), &DispatchSize );
+	// Create the geometry that will fill the screen with our results
+	GeometryDX11* pGeometry = new GeometryDX11();
+	GeometryGeneratorDX11::GenerateFullScreenQuad( pGeometry );
+	pGeometry->LoadToBuffers();
 
-	Vector4f FinalColor = Vector4f( 0.5f, 1.0f, 0.5f, 1.0f );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"FinalColor" ), &FinalColor );
+
+	// Here we load our desired texture, and create a shader resource view to 
+	// use for input to the compute shader.  By specifying null for the 
+	// configuration, the view is created from the default resource configuration.
+
+	m_Texture = m_pRenderer11->LoadTexture( L"../Data/Textures/Outcrop.png" );
+
+	
+
+	// Create the texture for output of the compute shader.
+	Texture2dConfigDX11 FilteredConfig;
+	FilteredConfig.SetColorBuffer( 640, 480 ); 
+	FilteredConfig.SetBindFlags( D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE );
+
+	m_Intermediate = m_pRenderer11->CreateTexture2D( &FilteredConfig, 0 );
+	m_Output = m_pRenderer11->CreateTexture2D( &FilteredConfig, 0 );
+
+
+	// Specify the bindings for the resources.  These take as input a parameter
+	// name and a resource proxy object created above.  This will connect these
+	// resources with the appropriate shader variables at rendering time.  The
+	// resource proxy object contains the needed 'ResourceView' instances.
+
+	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"ColorMap00", m_Output );
+
 
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
@@ -195,7 +235,7 @@ void App::Initialize()
 	m_pEntity = new Entity3D();
 	m_pEntity->SetGeometry( pGeometry );
 	m_pEntity->SetMaterial( pMaterial, false );
-	m_pEntity->Position() = Vector3f( -8.0f * DispatchSizeX, 0.0f, -8.0f * DispatchSizeZ );  
+	//m_pEntity->Position() = Vector3f( -8.0f * DispatchSizeX, 0.0f, -8.0f * DispatchSizeZ );  
 
 	m_pNode->AttachChild( m_pEntity );
 
@@ -211,37 +251,40 @@ void App::Update()
 
 	m_pTimer->Update();
 
-	// Create a series of time factors for use in the simulation.  The factors 
-	// are as follows:
-	// x: Time in seconds since the last frame.
-	// y: Current framerate, which is updated once per second.
-	// z: Time in seconds since application startup.
-	// w: Current frame number since application startup.
-
-	Vector4f TimeFactors = Vector4f( m_pTimer->Elapsed(), (float)m_pTimer->Framerate(), 
-		m_pTimer->Runtime(), (float)m_pTimer->FrameCount() );
-
-	//std::wstringstream s;
-	//s << L"Frame Number: " << m_pTimer->FrameCount() << L" Elapsed Time: " << m_pTimer->Elapsed();
-	//Log::Get().Write( s.str() );
-
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"TimeFactors" ), &TimeFactors );
-
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.
 
 	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
 
 
-	// Manipulate the scene here - simply rotate the root of the scene in this
-	// example.
+	// Perform the filtering with the compute shader.  The assumption in this case
+	// is that the texture is 640x480 - if there is a different size then the 
+	// dispatch call can be modified accordingly.
 
-	Matrix3f rotation;
-	rotation.RotationY( m_pTimer->Elapsed() * 0.2f );
-	m_pNode->Rotation() *= rotation;
+	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
+	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
+	//m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceGaussian, 20, 15, 1, m_pRenderer11->m_pParamMgr );
 
 
-	// Update the scene, and then render all cameras within the scene.
+
+	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
+	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Intermediate );
+	//m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableGaussianX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
+
+	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Intermediate );
+	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
+	//m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableGaussianY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
+
+
+
+	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
+	m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Intermediate );
+	m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
+
+	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Intermediate );
+	m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
+	m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
+
 
 	//m_pRenderer11->StartPipelineStatistics();
 

@@ -173,7 +173,9 @@ void PipelineManagerDX11::BindConstantBufferParameter( ShaderType type, const st
                                                       ParameterManagerDX11* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
-	RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
+	// TODO: Verify that using GetParameter(...) here is ok for all multithreaded cases! 
+	//RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
+	RenderParameterDX11* pParameter = pParamManager->GetParameter( name );
 
 	if ( pParameter != 0 )
 	{
@@ -217,7 +219,9 @@ void PipelineManagerDX11::BindShaderResourceParameter( ShaderType type, const st
                                                       ParameterManagerDX11* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
-	RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
+	// TODO: Verify that using GetParameter(...) here is ok for all multithreaded cases! 
+	//RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
+	RenderParameterDX11* pParameter = pParamManager->GetParameter( name );
 
 	if ( pParameter != 0 )
 	{
@@ -263,7 +267,9 @@ void PipelineManagerDX11::BindUnorderedAccessParameter( ShaderType type, const s
                                                        ParameterManagerDX11* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
-	RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
+	// TODO: Verify that using GetParameter(...) here is ok for all multithreaded cases! 
+	//RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
+	RenderParameterDX11* pParameter = pParamManager->GetParameter( name );
 
 	if ( pParameter != 0 )
 	{
@@ -310,7 +316,9 @@ void PipelineManagerDX11::BindSamplerStateParameter( ShaderType type, const std:
                                                     ParameterManagerDX11* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
-	RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
+	// TODO: Verify that using GetParameter(...) here is ok for all multithreaded cases! 
+	//RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
+	RenderParameterDX11* pParameter = pParamManager->GetParameter( name );
 
 	if ( pParameter != 0 )
 	{

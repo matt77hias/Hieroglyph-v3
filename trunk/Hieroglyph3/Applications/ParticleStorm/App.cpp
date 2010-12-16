@@ -205,7 +205,7 @@ void App::Initialize()
 
 	m_pCamera = new Camera();
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.307f, 0.707f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( -70.0f, 30.5f, -75.0f );
+	m_pCamera->GetNode()->Position() = Vector3f( -200.0f, 30.5f, -200.0f );
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.2f, 0.2f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
@@ -246,11 +246,13 @@ void App::Update()
 	Vector4f TimeFactors = Vector4f( m_pTimer->Elapsed()*2.0f, (float)m_pTimer->Framerate(), 
 		m_pTimer->Runtime(), (float)m_pTimer->FrameCount() );
 
-	//std::wstringstream s;
-	//s << L"Frame Number: " << m_pTimer->FrameCount() << L" Elapsed Time: " << m_pTimer->Elapsed();
-	//Log::Get().Write( s.str() );
-
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"TimeFactors" ), &TimeFactors );
+
+	Vector4f EmitterLocation = Vector4f( -50.0f, 10.0f, 0.0f, 0.0f );
+	Vector4f ConsumerLocation = Vector4f( 50.0f, 0.0f, 0.0f, 0.0f );
+
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EmitterLocation" ), &EmitterLocation );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"ConsumerLocation" ), &ConsumerLocation );
 
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.
@@ -268,13 +270,13 @@ void App::Update()
 
 	// Update the scene, and then render all cameras within the scene.
 
-	m_pRenderer11->pImmPipeline->StartPipelineStatistics();
+	//m_pRenderer11->pImmPipeline->StartPipelineStatistics();
 
 	m_pScene->Update( m_pTimer->Elapsed() );
 	m_pScene->Render( m_pRenderer11 );
 
-	m_pRenderer11->pImmPipeline->EndPipelineStatistics();
-	Log::Get().Write( m_pRenderer11->pImmPipeline->PrintPipelineStatistics() );
+	//m_pRenderer11->pImmPipeline->EndPipelineStatistics();
+	//Log::Get().Write( m_pRenderer11->pImmPipeline->PrintPipelineStatistics() );
 
 	std::wstringstream out;
 	out << L"Hieroglyph 3 : Particle Storm\nFPS: " << m_pTimer->Framerate();

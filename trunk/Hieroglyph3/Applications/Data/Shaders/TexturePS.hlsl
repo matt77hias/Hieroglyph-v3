@@ -9,10 +9,6 @@
 
 Texture2D       ColorMap00 : register( t0 );           
 
-// The total texture size
-#define totalsize_x 640
-#define totalsize_y 480
-
 struct VS_OUTPUT
 {
 	float4 position : SV_Position;
