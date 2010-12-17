@@ -15,7 +15,6 @@ static const float filter[7] = {
 	0.001769, 0.021558, 0.096587, 0.159235, 0.096587, 0.021558, 0.001769
 };
 
-// Declare enough shared memory for the padded group size
 groupshared float4 horizontalpoints[size_x];
 
 // For the horizontal pass, use only a single row of threads

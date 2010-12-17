@@ -53,7 +53,11 @@ protected:
 	RenderEffectDX11*		m_pSeparableGaussianY;
 	RenderEffectDX11*		m_pCachedGaussianX;
 	RenderEffectDX11*		m_pCachedGaussianY;
-	
+
+	RenderEffectDX11*		m_pBruteForceBilateral;
+	RenderEffectDX11*		m_pSeparableBilateralX;
+	RenderEffectDX11*		m_pSeparableBilateralY;
+
 	Camera*					m_pCamera;
 
 	bool					m_bSaveScreenshot;

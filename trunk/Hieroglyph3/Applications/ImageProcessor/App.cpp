@@ -166,6 +166,29 @@ void App::Initialize()
 		std::wstring( L"CSMAINY" ),
 		std::wstring( L"cs_5_0" ) );
 
+
+	m_pBruteForceBilateral = new RenderEffectDX11();
+	m_pBruteForceBilateral->m_iComputeShader = 
+		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
+		std::wstring( L"../Data/Shaders/BilateralBruteForceCS.hlsl" ),
+		std::wstring( L"CSMAIN" ),
+		std::wstring( L"cs_5_0" ) );
+
+	m_pSeparableBilateralX = new RenderEffectDX11();
+	m_pSeparableBilateralX->m_iComputeShader = 
+		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
+		std::wstring( L"../Data/Shaders/BilateralSeparableCS.hlsl" ),
+		std::wstring( L"CSMAINX" ),
+		std::wstring( L"cs_5_0" ) );
+
+	m_pSeparableBilateralY = new RenderEffectDX11();
+	m_pSeparableBilateralY->m_iComputeShader = 
+		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
+		std::wstring( L"../Data/Shaders/BilateralSeparableCS.hlsl" ),
+		std::wstring( L"CSMAINY" ),
+		std::wstring( L"cs_5_0" ) );
+
+
 	// Create the material for use by the entity.
 	MaterialDX11* pMaterial = new MaterialDX11();
 
@@ -261,12 +284,13 @@ void App::Update()
 	// is that the texture is 640x480 - if there is a different size then the 
 	// dispatch call can be modified accordingly.
 
+	// Brute force Gaussian
 	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
 	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
 	//m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceGaussian, 20, 15, 1, m_pRenderer11->m_pParamMgr );
 
 
-
+	// Separable Gaussian
 	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
 	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Intermediate );
 	//m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableGaussianX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
@@ -276,14 +300,37 @@ void App::Update()
 	//m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableGaussianY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
 
 
+	// Cached Gaussian
+	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
+	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Intermediate );
+	//m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
 
+	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Intermediate );
+	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
+	//m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
+
+
+	// Brute force Bilateral
+	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
+	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
+	//m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+
+	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Output );
+	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Intermediate );
+	//m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+
+	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
+	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
+	//m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+
+	// Separable Gaussian
 	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
 	m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Intermediate );
-	m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
+	m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
 
 	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Intermediate );
 	m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
-	m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
+	m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
 
 
 	//m_pRenderer11->StartPipelineStatistics();
