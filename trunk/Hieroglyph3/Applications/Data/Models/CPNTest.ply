@@ -1,0 +1,22 @@
+ply
+format ascii 1.0
+comment Created by Jack Hoxley
+element vertex 6
+property float x
+property float y
+property float z
+property float nx
+property float ny
+property float nz
+element face 2
+property list uchar uint vertex_indices
+end_header
+-1.000000 0.000000 -1.000000 0.000000 1.000000 0.000000
+0.900000 0.000000 -1.000000 0.000000 1.000000 0.000000
+-1.000000 0.000000 0.900000 0.000000 1.000000 0.000000
+1.000000 0.000000 -0.900000 -0.5773502 0.5773502 -0.5773502
+1.000000 0.000000 1.000000 0.5773502 0.5773502 -0.5773502
+-0.900000 0.000000 1.000000 -0.5773502 0.5773502 0.5773502
+3 2 1 0
+3 5 4 3
+

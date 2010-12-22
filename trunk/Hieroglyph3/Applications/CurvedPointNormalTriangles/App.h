@@ -61,6 +61,8 @@ protected:
 	int						m_rsWireframe;
 	int						m_rsSolid;
 
+	float					m_fTessFactor;
+
 	Camera*		m_pCamera;
 
 	virtual void CreateShaders();

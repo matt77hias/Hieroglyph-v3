@@ -32,6 +32,7 @@ App::App()
 	m_bSaveScreenshot			= false;
 	m_bSolidRender				= false;
 	m_bDefaultComplexity		= true;
+	m_fTessFactor				= 3.0f;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
@@ -152,7 +153,8 @@ void App::Initialize()
 
 	// Load and initialize the geometry to be rendered.
 
-	m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/suzanne.ply" ) );
+	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/suzanne.ply" ) );
+	m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/CPNTest.ply" ) );
 
 	//m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/hedra.ms3d" ) );
 	//m_pGeometry->LoadToBuffers();
@@ -163,7 +165,7 @@ void App::Initialize()
 	CreateShaders();
 
 	// Create the parameters for use with this effect
-	Vector4f tessParams = Vector4f( 3.0f, 3.0f, 3.0f, 3.0f );
+	Vector4f tessParams = Vector4f( m_fTessFactor, m_fTessFactor, m_fTessFactor, m_fTessFactor );
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EdgeFactors" ), &tessParams );
 
 
@@ -233,7 +235,7 @@ void App::Update()
 		out << L"\n W : Toggle Wireframe Display";
 
 		// Advanced LoD
-		out << L"\n +/- : Increase or Decrease Tessellation";
+		out << L"\n +/- : Increase or Decrease Tessellation (" << m_fTessFactor << L")";
 
 		// Automatic Rotation
 		out << L"\n A : Toggle Adaptive Sillhouette Tessellation";
@@ -307,6 +309,26 @@ bool App::HandleEvent( IEvent* pEvent )
 			// Toggle Wireframe
 			m_bSolidRender = !m_bSolidRender;
 			m_pEffect->m_iRasterizerState = m_bSolidRender ? m_rsSolid : m_rsWireframe;
+		}
+		else if ( VK_ADD == key )
+		{
+			m_fTessFactor += 0.25f;
+			
+			if(m_fTessFactor > 10.0f)
+				m_fTessFactor = 10.0f;
+
+			Vector4f tessParams = Vector4f( m_fTessFactor, m_fTessFactor, m_fTessFactor, m_fTessFactor );
+			m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EdgeFactors" ), &tessParams );
+		}
+		else if ( VK_SUBTRACT == key )
+		{
+			m_fTessFactor -= 0.25f;
+			
+			if(m_fTessFactor < 1.0f)
+				m_fTessFactor = 1.0f;
+
+			Vector4f tessParams = Vector4f( m_fTessFactor, m_fTessFactor, m_fTessFactor, m_fTessFactor );
+			m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EdgeFactors" ), &tessParams );
 		}
 		else
 		{
@@ -436,7 +458,7 @@ void App::UpdateViewState()
 	//float toAngle = fmodf( (distance + 0.08f) * 2.0f * static_cast<float>(D3DX_PI), 2.0f * static_cast<float>(D3DX_PI)); // ~30 degrees in front
 
 	vLookFrom.x = sinf(fromAngle) * 2.5f;
-	vLookFrom.y = 1.f;
+	vLookFrom.y = 1.25f;
 	vLookFrom.z = cosf(fromAngle) * 2.5f;
 
 	/*

@@ -66,7 +66,7 @@ float ComputeWeight(InputPatch<VS_OUTPUT, 3> inPatch, int i, int j)
 //--------------------------------------------------------------------------------
 float3 ComputeEdgePosition(InputPatch<VS_OUTPUT, 3> inPatch, int i, int j)
 {
-	return (2.0f * inPatch[i].position + inPatch[j].position - ComputeWeight(inPatch, i, j) * inPatch[i].normal) / 3.0f;
+	return ( (2.0f * inPatch[i].position) + inPatch[j].position - (ComputeWeight(inPatch, i, j) * inPatch[i].normal)) / 3.0f;
 }
 //--------------------------------------------------------------------------------
 VS_OUTPUT vsMain( in VS_INPUT input )
@@ -75,7 +75,7 @@ VS_OUTPUT vsMain( in VS_INPUT input )
 	
 	o.position = mul( float4( input.position, 1.0f ), mWorld ).xyz;
 	
-	o.normal = normalize( mul( float4( input.normal, 1.0f ), mInvTposeWorld ) ).xyz;
+	o.normal = normalize( mul( float4( input.normal, 1.0f ), mInvTposeWorld ).xyz );
 		
 	return o;
 }
@@ -108,6 +108,82 @@ HS_OUTPUT hsDefault( InputPatch<VS_OUTPUT, 3> ip, uint i : SV_OutputControlPoint
 	output.position = float3(0.0f, 0.0f, 0.0f);
 	output.normal = float3(0.0f, 0.0f, 0.0f);
 	
+	float3 p1 = ip[0].position;
+	float3 p2 = ip[1].position;
+	float3 p3 = ip[2].position;
+	
+	float3 n1 = ip[0].normal;
+	float3 n2 = ip[1].normal;
+	float3 n3 = ip[2].normal;
+	
+	if(0 == i)
+	{
+		output.position = ip[0].position;
+		output.normal = ip[0].normal;
+	}
+	else if( 1 == i)
+	{
+		output.position = ip[1].position;
+		output.normal = ip[1].normal;
+	}
+	else if( 2 == i)
+	{
+		output.position = ip[2].position;
+		output.normal = ip[2].normal;
+	}
+	else if( 3 == i)
+	{
+		// b210
+		output.position = ((2.0f * p1) + p2 - (dot(p2 - p1, n1) * n1)) / 3.0f;
+	}
+	else if( 4 == i)
+	{
+		// b120
+		output.position = ((2.0f * p2) + p1 - (dot(p1 - p2, n2) * n2)) / 3.0f;
+	}
+	else if( 5 == i)
+	{
+		// b021
+		output.position = ((2.0f * p2) + p3 - (dot(p3 - p2, n2) * n2)) / 3.0f;
+	}
+	else if( 6 == i)
+	{
+		// b012
+		output.position = ((2.0f * p3) + p2 - (dot(p2 - p3, n3) * n3)) / 3.0f;
+	}
+	else if( 7 == i)
+	{
+		// b102
+		output.position = ((2.0f * p3) + p1 - (dot(p1 - p3, n3) * n3)) / 3.0f;
+	}
+	else if( 8 == i)
+	{
+		// b201
+		output.position = ((2.0f * p1) + p3 - (dot(p3 - p1, n1) * n1)) / 3.0f;
+	}
+	else if( 9 == i)
+	{
+		// b111
+		float3 E = 
+					(
+						(((2.0f * p1) + p2 - (dot(p2 - p1, n1) * n1)) / 3.0f)
+						+
+						(((2.0f * p2) + p1 - (dot(p1 - p2, n2) * n2)) / 3.0f)
+						+
+						(((2.0f * p2) + p3 - (dot(p3 - p2, n2) * n2)) / 3.0f)
+						+
+						(((2.0f * p3) + p2 - (dot(p2 - p3, n3) * n3)) / 3.0f)
+						+
+						(((2.0f * p3) + p1 - (dot(p1 - p3, n3) * n3)) / 3.0f)
+						+
+						(((2.0f * p1) + p3 - (dot(p3 - p1, n1) * n1)) / 3.0f)
+					) / 6.0f;
+		float3 V = (p1 + p2 + p3) / 3.0f;
+		
+		output.position = E + ( (E - V) / 2.0f );
+	}
+	
+	/*
 	// From paper:
 	switch(i)
 	{
@@ -171,11 +247,11 @@ HS_OUTPUT hsDefault( InputPatch<VS_OUTPUT, 3> ip, uint i : SV_OutputControlPoint
 						) / 6.0f;
 			float3 V = (ip[0].position + ip[1].position + ip[2].position) / 3.0f;
 			
-			output.position = E + (E - V) / 2.0f;
+			output.position = E + ( (E - V) / 2.0f );
 			
 			break;
 	}
-	
+	*/	
 
     return output;
 }
@@ -283,21 +359,23 @@ DS_OUTPUT dsMain( const OutputPatch<HS_OUTPUT, 10> TrianglePatch, float3 Barycen
 			 + (b102 * 3.0f * w * pow(v,2)) 
 			 + (b012 * 3.0f * u * pow(v,2))
 			 + (b111 * 6.0f * w * u * v);
-
-	// Interpolate world space position with barycentric coordinates
-	float3 vWorldPos = p;//BarycentricCoordinates.x * TrianglePatch[0].position + BarycentricCoordinates.y * TrianglePatch[1].position + BarycentricCoordinates.z * TrianglePatch[2].position;
 	
 	// Transform world position with viewprojection matrix
-	output.Position = mul( float4(vWorldPos.xyz, 1.0), mViewProj );
+	output.Position = mul( float4(p, 1.0), mViewProj );
 	
 	// Compute the normal
-	float3 vWorldNorm = BarycentricCoordinates.x * TrianglePatch[0].normal + BarycentricCoordinates.y * TrianglePatch[1].normal + BarycentricCoordinates.z * TrianglePatch[2].normal;
+	float3 vWorldNorm = w*TrianglePatch[0].normal + u*TrianglePatch[1].normal + v*TrianglePatch[2].normal;
 	vWorldNorm = normalize( vWorldNorm );
 	
-	float3 toCamera = -normalize( cameraPosition.xyz );
+	float3 toCamera = normalize( cameraPosition.xyz );
 	output.Colour = saturate( dot(vWorldNorm, toCamera) );
 	
+	//output.Colour = w*TrianglePatch[0].normal+u*TrianglePatch[1].normal+v*TrianglePatch[2].normal;
 	//output.Colour = (vWorldNorm + 1.0f) / 2.0f;
+	//output.Colour = float3(u,v,w);
+	
+	output.Colour = TrianglePatch[0].normal.xyz;
+	output.Colour = (1.0f + output.Colour) / 2.0f;
 	
 	return output;
 }
