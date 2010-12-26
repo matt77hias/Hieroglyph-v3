@@ -16,18 +16,20 @@ cbuffer Transforms
 	matrix ProjMatrix;
 };
 
-cbuffer ParticleParameters
+cbuffer ParticleRenderParameters
 {
 	float4 EmitterLocation;
 	float4 ConsumerLocation;
 };
 
+static const float scale = 3.0f;
+
 static const float4 g_positions[4] =
 {
-    float4( -1, 1, 0, 0 ),
-    float4( 1, 1, 0, 0 ),
-    float4( -1, -1, 0, 0 ),
-    float4( 1, -1, 0, 0 ),
+    float4( -scale, scale, 0, 0 ),
+    float4( scale, scale, 0, 0 ),
+    float4( -scale, -scale, 0, 0 ),
+    float4( scale, -scale, 0, 0 ),
 };
 
 static const float2 g_texcoords[4] = 
@@ -68,14 +70,12 @@ struct PS_INPUT
     float4 position			: SV_Position;
 	float2 texcoords		: TEXCOORD0;
 	float4 color			: Color;
-	float distance			: Distance;
 };
 //--------------------------------------------------------------------------------
 GS_INPUT VSMAIN( in VS_INPUT input )
 {
 	GS_INPUT output;
 	
-	//output.position.xyz = (float3)input.vertexid;
 	output.position.xyz = SimulationState[input.vertexid].position;
 
 	return output;
@@ -99,7 +99,6 @@ void GSMAIN( point GS_INPUT input[1], inout TriangleStream<PS_INPUT> SpriteStrea
 		output.position = mul( viewposition + g_positions[i], ProjMatrix );
 		output.texcoords = g_texcoords[i];
 		output.color = color;
-		output.distance = dist;
 
         SpriteStream.Append(output);
     }
@@ -109,7 +108,6 @@ void GSMAIN( point GS_INPUT input[1], inout TriangleStream<PS_INPUT> SpriteStrea
 //--------------------------------------------------------------------------------
 float4 PSMAIN( in PS_INPUT input ) : SV_Target
 {
-	//float4 color = float4( 0.0f, input.distance, 0.0f, 1.0f );
 	float4 color = ParticleTexture.Sample( LinearSampler, input.texcoords );
 	color = color * input.color;
 

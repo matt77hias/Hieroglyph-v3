@@ -61,69 +61,10 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 	// to the state specified above.
 
 	BufferConfigDX11 config;
-	config.SetDefaultStructuredBuffer( m_iParticleCount+10, sizeof( Particle ) );
+	config.SetDefaultStructuredBuffer( m_iParticleCount, sizeof( Particle ) );
 	config.SetBindFlags( D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE );
 	config.SetMiscFlags( D3D11_RESOURCE_MISC_BUFFER_STRUCTURED );
 	
-/*
-	ResourcePtr buffer1 = Renderer.CreateStructuredBuffer( &config, &InitialData );
-	//ResourcePtr buffer2 = Renderer.CreateStructuredBuffer( &config, &InitialData );
-
-	// Release the system memory since the simulation data is now on the GPU :)
-
-	delete[] pData;
-
-
-	
-	D3D11_BUFFER_UAV uav;
-
-	// Create a UAV for the first half of the buffer
-	uav.FirstElement = 0;
-	uav.NumElements = m_iParticleCount;
-	uav.Flags = D3D11_BUFFER_UAV_FLAG_APPEND;
-
-	UnorderedAccessViewConfigDX11 firstHalfUAV;
-	firstHalfUAV.SetViewDimensions( D3D11_UAV_DIMENSION_BUFFER );
-	firstHalfUAV.SetBuffer( uav );
-
-	D3D11_BUFFER_SRV srv;
-	srv.FirstElement = 0;
-	srv.NumElements = m_iParticleCount;
-	
-	ShaderResourceViewConfigDX11 firstHalfSRV;
-	firstHalfSRV.SetViewDimensions( D3D11_SRV_DIMENSION_BUFFER );
-	firstHalfSRV.SetBuffer( srv );
-
-	ParticleStateBuffers[0] = ResourcePtr( new ResourceProxyDX11( buffer1->m_iResource, 
-																&config,
-																&Renderer,
-                                                                &firstHalfSRV, 
-																NULL,
-                                                                &firstHalfUAV ) );
-
-	// Create a UAV for the second half of the buffer
-	uav.FirstElement = 0;
-	uav.NumElements = 250;
-	uav.Flags = D3D11_BUFFER_UAV_FLAG_APPEND;
-
-	UnorderedAccessViewConfigDX11 secondHalfUAV;
-	secondHalfUAV.SetViewDimensions( D3D11_UAV_DIMENSION_BUFFER );
-	secondHalfUAV.SetBuffer( uav );
-
-	srv.FirstElement = 256;
-	srv.NumElements = 250;
-	
-	ShaderResourceViewConfigDX11 secondHalfSRV;
-	secondHalfSRV.SetViewDimensions( D3D11_SRV_DIMENSION_BUFFER );
-	secondHalfSRV.SetBuffer( srv );
-
-	ParticleStateBuffers[1] = ResourcePtr( new ResourceProxyDX11( buffer1->m_iResource, 
-																&config,
-																&Renderer,
-																&secondHalfSRV,
-																NULL,
-                                                                &secondHalfUAV ) );
-*/
 
 	ResourcePtr buffer1 = Renderer.CreateStructuredBuffer( &config, &InitialData );
 	ResourcePtr buffer2 = Renderer.CreateStructuredBuffer( &config, &InitialData );
@@ -187,10 +128,10 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 
 	UINT* pInitArgs = new UINT[4];
 
-	pInitArgs[0] = m_iParticleCount;
-	pInitArgs[1] = 1;
-	pInitArgs[2] = 2;
-	pInitArgs[3] = 3;
+	pInitArgs[0] = 0 /*m_iParticleCount*/;
+	pInitArgs[1] = 0;
+	pInitArgs[2] = 0;
+	pInitArgs[3] = 0;
 
 	D3D11_SUBRESOURCE_DATA InitArgsData;
 	InitArgsData.pSysMem				= pInitArgs;
@@ -210,7 +151,7 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 	Renderer.m_pParamMgr->SetConstantBufferParameter( L"ParticleCount", ParticleCountCBBuffer );
 
 
-	pInitArgs[0] = m_iParticleCount;
+	pInitArgs[0] = 0 /*m_iParticleCount*/;
 	pInitArgs[1] = 1;
 	pInitArgs[2] = 0;
 	pInitArgs[3] = 0;
@@ -287,7 +228,7 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, ParameterManag
 
 	// Update the particles with a fixed number of threads, and mask off the unused threads
 	// with the particle count read out above.
-	pPipelineManager->Dispatch( *pParticleUpdate, 32, 1, 1, pParamManager );
+	pPipelineManager->Dispatch( *pParticleUpdate, 2, 1, 1, pParamManager );
 
 	// Read out the total number of particles for updating
 	pPipelineManager->CopyStructureCount( ParticleCountCBBuffer, 0, ParticleStateBuffers[1] );

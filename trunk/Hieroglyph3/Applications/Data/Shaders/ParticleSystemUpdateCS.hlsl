@@ -59,9 +59,10 @@ void CSMAIN( uint3 DispatchThreadID : SV_DispatchThreadID )
 
 		// Test to see how close the particle is to the black hole, and 
 		// don't pass it to the output list if it is too close.
-		if ( ( r > eventHorizon ) )
+		if ( r > eventHorizon )
 		{
-			if (( p.time < 10.0f ) ){
+			if ( p.time < 10.0f )
+			{
 				NewSimulationState.Append( p );
 			}
 		}
