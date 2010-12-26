@@ -4,57 +4,66 @@
 struct Particle
 {
     float3 position;
-	float3 direction;
-    float4 status;
+	float3 velocity;
+	float  time;
 };
 
 AppendStructuredBuffer<Particle>	NewSimulationState : register( u0 );
 ConsumeStructuredBuffer<Particle>   CurrentSimulationState  : register( u1 );
 
-cbuffer TimeParameters
+cbuffer SimulationParameters
 {
 	float4 TimeFactors;
-};
-
-cbuffer ParticleParameters
-{
 	float4 EmitterLocation;
 	float4 ConsumerLocation;
 };
 
-cbuffer DispatchParams
+cbuffer ParticleCount
 {
-	float4 DispatchSize;
-};
-static const float3 randomDirection[5] =
-{
-	float3( 0.0f, 1.0f, 0.0f ),
-	float3( 1.0f, 1.0f, 0.0f ),
-	float3( 0.0f, 1.0f, 1.0f ),
-	float3( 1.0f, 1.0f, 1.0f ),
-	float3( 0.5f, 1.0f, 0.8f )
+	uint4 NumParticles;
 };
 
+static const float G = 10.0f;
+static const float m1 = 1.0f;
+static const float m2 = 1000.0f;
+static const float m1m2 = m1 * m2;
+static const float eventHorizon = 5.0f;
 
 [numthreads( 512, 1, 1)]
 
-void CSMAIN( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThreadID, uint3 GroupThreadID : SV_GroupThreadID, uint GroupIndex : SV_GroupIndex )
+void CSMAIN( uint3 DispatchThreadID : SV_DispatchThreadID )
 {
-	Particle p = CurrentSimulationState.Consume();
+	// Check for if this thread should run or not.
+	uint myID = DispatchThreadID.x + DispatchThreadID.y * 512 + DispatchThreadID.z * 512 * 512;
 
-	p.direction += ( ConsumerLocation.xyz - p.position ) * 0.1f * TimeFactors.x;
-
-	p.position += p.direction * TimeFactors.x;
-
-	float dist = length( p.position - ConsumerLocation.xyz );
-
-	if ( dist < 10.0f )
+	if ( myID < NumParticles.x )
 	{
-		p.position = EmitterLocation.xyz;
-		//p.direction = -p.direction.yzx * 0.2f;
-		float fx = fmod( TimeFactors.z, 5.0f ) * 5.0f;
-		p.direction = randomDirection[(uint)fx] * 5.0f + float3( 0.0f, 10.0f, 0.0f );
-	}
+		// Get the current particle
+		Particle p = CurrentSimulationState.Consume();
 
-	NewSimulationState.Append( p );
+		// Calculate the current gravitational force applied to it
+		float3 d = ConsumerLocation.xyz - p.position;
+		float r = length( d );
+		float3 Force = ( G * m1m2 / (r*r) ) * normalize( d );
+
+		// Calculate the new velocity, accounting for the acceleration from
+		// the gravitational force over the current time step.
+		p.velocity = p.velocity + ( Force / m1 ) * TimeFactors.x;
+
+		// Calculate the new position, accounting for the new velocity value
+		// over the current time step.
+		p.position += p.velocity * TimeFactors.x;
+
+		// Update the life time left for the particle.
+		p.time = p.time + TimeFactors.x;
+
+		// Test to see how close the particle is to the black hole, and 
+		// don't pass it to the output list if it is too close.
+		if ( ( r > eventHorizon ) )
+		{
+			if (( p.time < 10.0f ) ){
+				NewSimulationState.Append( p );
+			}
+		}
+	}
 }

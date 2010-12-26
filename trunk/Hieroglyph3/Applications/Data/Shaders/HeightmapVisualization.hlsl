@@ -26,7 +26,7 @@ struct VS_INPUT
 struct VS_OUTPUT
 {
 	float4 position : SV_POSITION;
-	float4 color : COLOR;
+	/*nointerpolation*/ float4 color : COLOR ;
 };
 //-----------------------------------------------------------------------------
 VS_OUTPUT VSMAIN( in VS_INPUT v )

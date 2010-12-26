@@ -16,6 +16,7 @@
 #include "GlyphString.h"
 #include "ParameterManagerDX11.h"
 #include "PipelineManagerDX11.h"
+#include "ConstantBufferDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -63,56 +64,70 @@ void ShaderDX11::UpdateParameters( PipelineManagerDX11* pPipeline, ParameterMana
 				pParamManager->SetConstantBufferParameter( ConstantBuffers[i].Description.Name, resource );
 			}
 
-			// Map the constant buffer into system memory.  We map the buffer 
-			// with the discard write flag since we don't care what was in the
-			// buffer already.
-
-			D3D11_MAPPED_SUBRESOURCE resource = 
-				pPipeline->MapResource( index, 0, D3D11_MAP_WRITE_DISCARD, 0 );
-
-			// Update each variable in the constant buffer.  These variables are identified
-			// by their type, and are currently allowed to be Vector4f, Matrix4f, or Matrix4f
-			// arrays.  Additional types will be added as they are needed...
-
-			for ( int j = 0; j < ConstantBuffers[i].Variables.count(); j++ )
+			// Test the index to ensure that it is a constant buffer
+			if ( (index & 0x00FF0000) == RT_CONSTANTBUFFER ) 
 			{
-				const std::wstring& name = ConstantBuffers[i].Variables[j].Name;
-				int offset = ConstantBuffers[i].Variables[j].StartOffset;
-				UINT size = ConstantBuffers[i].Variables[j].Size;
+				// TODO: Check if the resource is a constant buffer before accessing it!
+				ConstantBufferDX11* pBuffer = (ConstantBufferDX11*)RendererDX11::Get()->GetResource( index & 0x0000FFFF );
 				
-				if ( ConstantBuffers[i].Types[j].Class == D3D10_SVC_VECTOR )
+				if ( pBuffer->GetAutoUpdate() )
 				{
-					Vector4f vector = pParamManager->GetVectorParameter( name );
-					Vector4f* pBuf = (Vector4f*)((char*)resource.pData + offset);
-					*pBuf = vector;
-				}
-				else if ( ( ConstantBuffers[i].Types[j].Class == D3D10_SVC_MATRIX_ROWS ) ||
-					( ConstantBuffers[i].Types[j].Class == D3D10_SVC_MATRIX_COLUMNS ) )
-				{
-					// Check if it is an array of matrices first...
-					unsigned int count = ConstantBuffers[i].Types[j].Elements;
-					if ( count == 0 ) 
+					// Map the constant buffer into system memory.  We map the buffer 
+					// with the discard write flag since we don't care what was in the
+					// buffer already.
+
+					D3D11_MAPPED_SUBRESOURCE resource = 
+						pPipeline->MapResource( index, 0, D3D11_MAP_WRITE_DISCARD, 0 );
+
+					// Update each variable in the constant buffer.  These variables are identified
+					// by their type, and are currently allowed to be Vector4f, Matrix4f, or Matrix4f
+					// arrays.  Additional types will be added as they are needed...
+
+					for ( int j = 0; j < ConstantBuffers[i].Variables.count(); j++ )
 					{
-						Matrix4f matrix = pParamManager->GetMatrixParameter( name );
-						Matrix4f* pBuf = (Matrix4f*)((char*)resource.pData + offset);
-						*pBuf = matrix;
+						const std::wstring& name = ConstantBuffers[i].Variables[j].Name;
+						int offset = ConstantBuffers[i].Variables[j].StartOffset;
+						UINT size = ConstantBuffers[i].Variables[j].Size;
+						
+						if ( ConstantBuffers[i].Types[j].Class == D3D10_SVC_VECTOR )
+						{
+							Vector4f vector = pParamManager->GetVectorParameter( name );
+							Vector4f* pBuf = (Vector4f*)((char*)resource.pData + offset);
+							*pBuf = vector;
+						}
+						else if ( ( ConstantBuffers[i].Types[j].Class == D3D10_SVC_MATRIX_ROWS ) ||
+							( ConstantBuffers[i].Types[j].Class == D3D10_SVC_MATRIX_COLUMNS ) )
+						{
+							// Check if it is an array of matrices first...
+							unsigned int count = ConstantBuffers[i].Types[j].Elements;
+							if ( count == 0 ) 
+							{
+								Matrix4f matrix = pParamManager->GetMatrixParameter( name );
+								Matrix4f* pBuf = (Matrix4f*)((char*)resource.pData + offset);
+								*pBuf = matrix;
+							}
+							else 
+							{
+								// If a matrix array, then use the corresponding parameter type.
+								// TODO: If the shader expects a different number of matrices than are present
+								//       from the matrix array parameter, then this causes an exception!
+								Matrix4f* pMatrices = pParamManager->GetMatrixArrayParameter( name, count );
+								memcpy( ((char*)resource.pData + offset), (char*)pMatrices, ConstantBuffers[i].Variables[j].Size );
+							}
+						}
+						else
+						{
+							Log::Get().Write( L"Non vector or matrix parameter specified in a constant buffer!  This will not be updated!" );
+						}
 					}
-					else 
-					{
-						// If a matrix array, then use the corresponding parameter type.
-						// TODO: If the shader expects a different number of matrices than are present
-						//       from the matrix array parameter, then this causes an exception!
-						Matrix4f* pMatrices = pParamManager->GetMatrixArrayParameter( name, count );
-						memcpy( ((char*)resource.pData + offset), (char*)pMatrices, ConstantBuffers[i].Variables[j].Size );
-					}
-				}
-				else
-				{
-					Log::Get().Write( L"Non vector or matrix parameter specified in a constant buffer!  This will not be updated!" );
+
+					pPipeline->UnMapResource( index, 0 );
 				}
 			}
-
-			pPipeline->UnMapResource( index, 0 );
+			else
+			{
+				Log::Get().Write( L"Trying to update a constant buffer that isn't a constant buffer!" );
+			}
 		}
 	}
 }

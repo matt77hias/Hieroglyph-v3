@@ -11,22 +11,21 @@
 // Copyright (C) 2003-2010 Jason Zink.  All rights reserved.
 //-----------------------------------------------------------------------------
 
+// Declare the structure that represents one fluid column's state
 struct GridPoint
 {
     float  Height;
     float4 Flow;
 };
 
-RWStructuredBuffer<GridPoint> NewWaterState : register( u0 );
-StructuredBuffer<GridPoint>   CurrentWaterState  : register( t0 );
+// Declare the input and output resources
+RWStructuredBuffer<GridPoint> NewWaterState		: register( u0 );
+StructuredBuffer<GridPoint>   CurrentWaterState : register( t0 );
 
+// Declare the constant buffer parameters
 cbuffer TimeParameters
 {
 	float4 TimeFactors;
-};
-
-cbuffer DispatchParams
-{
 	float4 DispatchSize;
 };
 
@@ -79,15 +78,11 @@ void CSMAIN( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThr
 	int textureindex = texturelocation.x + texturelocation.y * totalsize_x;
 
 	// Test the texture location here, and if within the texture then load the data
-	if ( ( texturelocation.x >= 0 ) && ( texturelocation.x < totalsize_x ) && ( texturelocation.y >= 0 ) && ( texturelocation.y < totalsize_y ) )
-	{
-		loadedpoints[GroupIndex] = CurrentWaterState[textureindex];
-	}
+	loadedpoints[GroupIndex] = CurrentWaterState[textureindex];
 
 	// Synchronize all threads before moving on to ensure everyone has loaded their state
 	// into the group shared memory.
 	GroupMemoryBarrierWithGroupSync();
-	//GroupMemoryBarrier();
 
 	//----------------------------------------
 	// Update all flow calculations
@@ -144,7 +139,6 @@ void CSMAIN( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThr
 
 	// Synchronize all threads before moving on
 	GroupMemoryBarrierWithGroupSync();
-	//GroupMemoryBarrier();
 
 	//----------------------------------------
 
@@ -154,31 +148,17 @@ void CSMAIN( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThr
 	// Out of the current column...
 	loadedpoints[GroupIndex].Height = loadedpoints[GroupIndex].Height + NewFlow.x + NewFlow.y + NewFlow.z + NewFlow.w;
 
-	//GroupMemoryBarrierWithGroupSync();
-
 	// From left columns
-	if ( ( GroupThreadID.x > 0 ) && ( texturelocation.x > 0 ) )
-	{
-		loadedpoints[GroupIndex].Height = loadedpoints[GroupIndex].Height - loadedpoints[GroupIndex-1].Flow.x;
+	loadedpoints[GroupIndex].Height = loadedpoints[GroupIndex].Height - loadedpoints[GroupIndex-1].Flow.x;
 
-		// From upper left columns
-		if ( ( GroupThreadID.y > 0 ) && ( texturelocation.y > 0 ) )
-		{
-			loadedpoints[GroupIndex].Height = loadedpoints[GroupIndex].Height - loadedpoints[GroupIndex-padded_x-1].Flow.y;
-		}
-	}
+	// From upper left columns
+	loadedpoints[GroupIndex].Height = loadedpoints[GroupIndex].Height - loadedpoints[GroupIndex-padded_x-1].Flow.y;
 
 	// From top columns
-	if ( ( GroupThreadID.y > 0 ) && ( texturelocation.y > 0 ) )
-	{
-		loadedpoints[GroupIndex].Height = loadedpoints[GroupIndex].Height - loadedpoints[GroupIndex-padded_x].Flow.z;
+	loadedpoints[GroupIndex].Height = loadedpoints[GroupIndex].Height - loadedpoints[GroupIndex-padded_x].Flow.z;
 
-		// From top right columns
-		if ( ( GroupThreadID.x < padded_x-1 ) && ( texturelocation.x < totalsize_x ) )
-		{
-			loadedpoints[GroupIndex].Height = loadedpoints[GroupIndex].Height - loadedpoints[GroupIndex-padded_x+1].Flow.w;
-		}
-	}
+	// From top right columns
+	loadedpoints[GroupIndex].Height = loadedpoints[GroupIndex].Height - loadedpoints[GroupIndex-padded_x+1].Flow.w;
 
 	// Finally store the updated height and flow values only for the threads within the
 	// actual group (i.e. excluding the perimeter).  Otherwise there would be a double

@@ -564,7 +564,10 @@ void PipelineManagerDX11::Draw( RenderEffectDX11& effect, ResourcePtr vb, Resour
 		UnbindIndexBuffer();
 
 	// Bind the input layout.
-	BindInputLayout( inputLayput );
+	if ( vb != NULL )
+		BindInputLayout( inputLayput );
+	else
+		UnbindInputLayout();
 
 	// Use the effect to load all of the pipeline stages here.
 	ClearPipelineResources();
@@ -640,6 +643,71 @@ void PipelineManagerDX11::DrawInstanced( RenderEffectDX11& effect, ResourcePtr v
 	m_pContext->DrawIndexedInstanced( numIndices, numInstances, 0, 0, 0 );
 }
 //--------------------------------------------------------------------------------
+void PipelineManagerDX11::DispatchIndirect( RenderEffectDX11& effect,
+										    ResourcePtr args,
+											UINT offset,
+											ParameterManagerDX11* pParamManager )
+{
+	// Use the effect to load all of the pipeline stages here.
+
+	int Type = args->m_iResource & 0x00FF0000;
+	int ID = args->m_iResource & 0x0000FFFF;
+
+	if ( Type =! RT_INDIRECTARGSBUFFER )
+	{
+		Log::Get().Write( L"Tried to use the wrong resource type for an indirect dispatch!" );
+		return;
+	}
+
+	ID3D11Buffer* pArgsBuffer = (ID3D11Buffer*)RendererDX11::Get()->GetResource( ID )->GetResource();
+
+
+	ClearPipelineResources();
+	effect.ConfigurePipeline( this, pParamManager );
+	ApplyPipelineResources();
+
+	m_pContext->DispatchIndirect( pArgsBuffer, offset );
+
+}
+//--------------------------------------------------------------------------------
+void PipelineManagerDX11::DrawIndirect( RenderEffectDX11& effect,
+									    ResourcePtr args,
+										UINT offset,
+										int inputLayout,
+										D3D11_PRIMITIVE_TOPOLOGY primType,
+										UINT vertexStride,
+										ParameterManagerDX11* pParamManager )
+{
+	int Type = args->m_iResource & 0x00FF0000;
+	int ID = args->m_iResource & 0x0000FFFF;
+
+	if ( Type =! RT_INDIRECTARGSBUFFER )
+	{
+		Log::Get().Write( L"Tried to use the wrong resource type for an indirect drawing!" );
+		return;
+	}
+
+	ID3D11Buffer* pArgsBuffer = (ID3D11Buffer*)RendererDX11::Get()->GetResource( ID )->GetResource();
+
+
+	// Specify the type of geometry that we will be dealing with.
+	m_pContext->IASetPrimitiveTopology( primType );
+
+	UnbindVertexBuffer();
+	UnbindIndexBuffer();
+
+	// Bind the input layout.
+	BindInputLayout( inputLayout );
+
+	// Use the effect to load all of the pipeline stages here.
+	ClearPipelineResources();
+	effect.ConfigurePipeline( this, pParamManager );
+	ApplyPipelineResources();
+	
+	m_pContext->DrawInstancedIndirect( pArgsBuffer, offset );
+
+}
+//--------------------------------------------------------------------------------
 void PipelineManagerDX11::Dispatch( RenderEffectDX11& effect, UINT x, UINT y, UINT z, ParameterManagerDX11* pParamManager )
 {
 	// Use the effect to load all of the pipeline stages here.
@@ -649,6 +717,27 @@ void PipelineManagerDX11::Dispatch( RenderEffectDX11& effect, UINT x, UINT y, UI
 	ApplyPipelineResources();
 
 	m_pContext->Dispatch( x, y, z );
+}
+//--------------------------------------------------------------------------------
+void PipelineManagerDX11::CopyStructureCount( ResourcePtr dest, UINT offset, ResourcePtr uav )
+{
+	int Type = dest->m_iResource & 0x00FF0000;
+	int ID = dest->m_iResource & 0x0000FFFF;
+
+	if ( Type =! RT_INDIRECTARGSBUFFER )
+	{
+		Log::Get().Write( L"Tried to use the wrong resource type for an indirect drawing!" );
+		return;
+	}
+
+	ID3D11Buffer* pArgsBuffer = (ID3D11Buffer*)RendererDX11::Get()->GetResource( ID )->GetResource();
+
+	UnorderedAccessViewDX11* pView = RendererDX11::Get()->GetUnorderedAccessView( uav->m_iResourceUAV );
+
+	ID3D11UnorderedAccessView* pSrcView = pView->m_pUnorderedAccessView;
+
+	m_pContext->CopyStructureCount( pArgsBuffer, offset, pSrcView );
+
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth, UINT stencil )

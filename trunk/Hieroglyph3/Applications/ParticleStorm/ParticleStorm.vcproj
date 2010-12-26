@@ -191,6 +191,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ParticleSystemEntity.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ParticleSystemEntity.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ViewSimulation.cpp"
 				>
 			</File>

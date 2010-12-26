@@ -23,6 +23,7 @@
 #include "ViewSimulation.h"
 
 #include "ParameterManagerDX11.h"
+#include "ParticleSystemEntity.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -149,65 +150,15 @@ void App::Initialize()
 	const int DispatchSizeX = 1;
 	const int DispatchSizeZ = 16;
 
-	// Create a geometry object *WITHOUT* any vertex data
-	GeometryDX11* pGeometry = new GeometryDX11();
-
-	for ( int i = 0; i<512; i++ )
-		pGeometry->AddPoint( PointIndices( i ) );
-
-	pGeometry->LoadToBuffers();
-	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_POINTLIST );
-	
-
-	// Create the material for use by the entity.
-	MaterialDX11* pMaterial = new MaterialDX11();
-
-	// Create and fill the effect that will be used for this view type
-	RenderEffectDX11* pEffect = new RenderEffectDX11();
-
-	pEffect->m_iVertexShader = 
-		m_pRenderer11->LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/ParticleSystemRender.hlsl" ),
-		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	pEffect->m_iGeometryShader = 
-		m_pRenderer11->LoadShader( GEOMETRY_SHADER,
-		std::wstring( L"../Data/Shaders/ParticleSystemRender.hlsl" ),
-		std::wstring( L"GSMAIN" ),
-		std::wstring( L"gs_5_0" ) );
-	pEffect->m_iPixelShader = 
-		m_pRenderer11->LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/ParticleSystemRender.hlsl" ),
-		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
-
-	RasterizerStateConfigDX11 RS;
-	RS.FillMode = D3D11_FILL_WIREFRAME;
-
-	pEffect->m_iRasterizerState = 
-		m_pRenderer11->CreateRasterizerState( &RS );
-
-	// Enable the material to render the given view type, and set its effect.
-	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
-	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
-	pMaterial->Params[VT_PERSPECTIVE].vViews.add( new ViewSimulation( *m_pRenderer11, 512 ) );
-
-	// Set any parameters that will be needed by the shaders used above.
-	
-	Vector4f DispatchSize = Vector4f( (float)DispatchSizeX, (float)DispatchSizeZ, (float)DispatchSizeX * 16, (float)DispatchSizeZ * 16 );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"DispatchSize" ), &DispatchSize );
-
-	Vector4f FinalColor = Vector4f( 0.5f, 1.0f, 0.5f, 1.0f );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"FinalColor" ), &FinalColor );
 
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
 
 	m_pCamera = new Camera();
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.307f, 0.707f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( -200.0f, 30.5f, -200.0f );
+	m_pCamera->GetNode()->Position() = Vector3f( -50.0f, 30.5f, -50.0f );
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
-	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.2f, 0.2f ) );
+	m_pRenderView->SetBackColor( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
 	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>( D3DX_PI ) / 2.0f, 640.0f / 480.0f );
 
@@ -216,10 +167,7 @@ void App::Initialize()
 	// manually manipulating it.
 
 	m_pNode = new Node3D();
-	m_pEntity = new Entity3D();
-	m_pEntity->SetGeometry( pGeometry );
-	m_pEntity->SetMaterial( pMaterial, false );
-	//m_pEntity->Position() = Vector3f( -8.0f * DispatchSizeX, 0.0f, -8.0f * DispatchSizeZ );  
+	m_pEntity = new ParticleSystemEntity();
 
 	m_pNode->AttachChild( m_pEntity );
 
@@ -243,7 +191,7 @@ void App::Update()
 	// z: Time in seconds since application startup.
 	// w: Current frame number since application startup.
 
-	Vector4f TimeFactors = Vector4f( m_pTimer->Elapsed()*2.0f, (float)m_pTimer->Framerate(), 
+	Vector4f TimeFactors = Vector4f( m_pTimer->Elapsed(), (float)m_pTimer->Framerate(), 
 		m_pTimer->Runtime(), (float)m_pTimer->FrameCount() );
 
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"TimeFactors" ), &TimeFactors );
@@ -265,18 +213,18 @@ void App::Update()
 
 	Matrix3f rotation;
 	rotation.RotationY( m_pTimer->Elapsed() * 0.2f );
-	m_pNode->Rotation() *= rotation;
+	//m_pNode->Rotation() *= rotation;
 
 
 	// Update the scene, and then render all cameras within the scene.
 
-	//m_pRenderer11->pImmPipeline->StartPipelineStatistics();
+	m_pRenderer11->pImmPipeline->StartPipelineStatistics();
 
 	m_pScene->Update( m_pTimer->Elapsed() );
 	m_pScene->Render( m_pRenderer11 );
 
-	//m_pRenderer11->pImmPipeline->EndPipelineStatistics();
-	//Log::Get().Write( m_pRenderer11->pImmPipeline->PrintPipelineStatistics() );
+	m_pRenderer11->pImmPipeline->EndPipelineStatistics();
+	Log::Get().Write( m_pRenderer11->pImmPipeline->PrintPipelineStatistics() );
 
 	std::wstringstream out;
 	out << L"Hieroglyph 3 : Particle Storm\nFPS: " << m_pTimer->Framerate();

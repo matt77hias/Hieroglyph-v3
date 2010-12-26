@@ -43,11 +43,11 @@ struct Particle
 {
     float3 position;
 	float3 direction;
-    float4 status;
+	float  time;
 };
 
 StructuredBuffer<Particle> SimulationState;
-Texture2D       ColorTexture : register( t0 );           
+Texture2D       ParticleTexture : register( t0 );           
 SamplerState    LinearSampler : register( s0 );
 
 //--------------------------------------------------------------------------------
@@ -67,6 +67,7 @@ struct PS_INPUT
 {
     float4 position			: SV_Position;
 	float2 texcoords		: TEXCOORD0;
+	float4 color			: Color;
 	float distance			: Distance;
 };
 //--------------------------------------------------------------------------------
@@ -85,7 +86,8 @@ void GSMAIN( point GS_INPUT input[1], inout TriangleStream<PS_INPUT> SpriteStrea
 {
 	PS_INPUT output;
 
-	float dist = length( input[0].position - ConsumerLocation.xyz ) / 100.0f;
+	float dist = saturate( length( input[0].position - ConsumerLocation.xyz ) / 100.0f );
+	float4 color = float4( 0.2f, 0.2f, 1.0f, 0.0f ) * dist + float4( 1.0f, 0.2f, 0.2f, 0.0f ) * ( 1.0f - dist ); 
 
 	// Transform to view space
 	float4 viewposition = mul( float4( input[0].position, 1.0f ), WorldViewMatrix );
@@ -96,6 +98,7 @@ void GSMAIN( point GS_INPUT input[1], inout TriangleStream<PS_INPUT> SpriteStrea
 		// Transform to clip space
 		output.position = mul( viewposition + g_positions[i], ProjMatrix );
 		output.texcoords = g_texcoords[i];
+		output.color = color;
 		output.distance = dist;
 
         SpriteStream.Append(output);
@@ -106,8 +109,9 @@ void GSMAIN( point GS_INPUT input[1], inout TriangleStream<PS_INPUT> SpriteStrea
 //--------------------------------------------------------------------------------
 float4 PSMAIN( in PS_INPUT input ) : SV_Target
 {
-	float4 color = float4( 0.0f, input.distance, 0.0f, 1.0f );
-	//float4 vValues = ColorTexture.Sample( LinearSampler, input.tex );
+	//float4 color = float4( 0.0f, input.distance, 0.0f, 1.0f );
+	float4 color = ParticleTexture.Sample( LinearSampler, input.texcoords );
+	color = color * input.color;
 
 	return( color );
 }

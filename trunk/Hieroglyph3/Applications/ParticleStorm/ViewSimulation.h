@@ -25,7 +25,7 @@ namespace Glyph3
 	{
 		Vector3f position;
 		Vector3f direction;
-		Vector4f status;
+		float    time;
 	};
 
 	class ViewSimulation : public IRenderView
@@ -43,10 +43,18 @@ namespace Glyph3
 
 		virtual ~ViewSimulation();
 
+		ResourcePtr GetParticleCountConstantBuffer();
+		ResourcePtr GetParticleCountIndirectArgsBuffer();
+
 	protected:
 
 		int m_iParticleCount;
 		ResourcePtr ParticleStateBuffers[2];
+		ResourcePtr ParticleCountCBBuffer; // Constant buffer
+		ResourcePtr ParticleCountIABuffer; // Indirect args
+
+
+		RenderEffectDX11*	pParticleInsertion;
 		RenderEffectDX11*	pParticleUpdate;
 		bool bOneTimeInit;
 	};

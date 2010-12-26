@@ -9,34 +9,27 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// ConstantBufferDX11 
+// IndirectArgsBufferDX11 
 //
 //--------------------------------------------------------------------------------
-#ifndef ConstantBufferDX11_h
-#define ConstantBufferDX11_h
+#ifndef IndirectArgsBufferDX11_h
+#define IndirectArgsBufferDX11_h
 //--------------------------------------------------------------------------------
 #include "BufferDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class ConstantBufferDX11 : public BufferDX11
+	class IndirectArgsBufferDX11 : public BufferDX11
 	{
 	public:
-		ConstantBufferDX11( ID3D11Buffer* pBuffer );
-		virtual ~ConstantBufferDX11();
+		IndirectArgsBufferDX11( ID3D11Buffer* pBuffer );
+		virtual ~IndirectArgsBufferDX11();
 
-		void						SetConstantSize( int size );
-		void						SetConstantCount( int count );
-		void						SetAutoUpdate( bool enable );
-		bool						GetAutoUpdate();
 
 	protected:
-		int							m_iConstantSize;
-		int							m_iConstantCount;
-		bool						m_bAutoUpdate;
 
 		friend RendererDX11;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // ConstantBufferDX11_h
+#endif // IndirectArgsBufferDX11_h

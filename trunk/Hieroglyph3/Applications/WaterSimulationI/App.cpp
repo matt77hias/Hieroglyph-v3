@@ -57,7 +57,7 @@ bool App::ConfigureEngineComponents()
 
 	m_pRenderer11 = new RendererDX11();
 
-	if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_HARDWARE, D3D_FEATURE_LEVEL_11_0 ) )
+	if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_HARDWARE, D3D_FEATURE_LEVEL_10_0 ) )
 	{
 		Log::Get().Write( L"Could not create hardware device, trying to create the reference device..." );
 

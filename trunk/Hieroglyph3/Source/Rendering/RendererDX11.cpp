@@ -592,7 +592,32 @@ ResourcePtr RendererDX11::CreateByteAddressBuffer( BufferConfigDX11* pConfig,  D
 	return( ResourcePtr( new ResourceProxyDX11() ) );
 }
 //--------------------------------------------------------------------------------
-ResourcePtr RendererDX11::CreateConstantBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData )
+ResourcePtr RendererDX11::CreateIndirectArgsBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData )
+{
+	// Create the buffer with the specified configuration.
+
+	ID3D11Buffer* pBuffer = 0;
+	HRESULT hr = m_pDevice->CreateBuffer( &pConfig->m_State, pData, &pBuffer );
+
+	if ( pBuffer )
+	{
+		ByteAddressBufferDX11* pByteAddressBuffer = new ByteAddressBufferDX11( pBuffer );
+		pByteAddressBuffer->SetDesiredDescription( pConfig->m_State );
+		m_vResources.add( pByteAddressBuffer );
+
+		// Return an index with the lower 16 bits of index, and the upper
+		// 16 bits to identify the resource type.
+
+		int ResourceID = ( m_vResources.count() - 1 ) + RT_INDIRECTARGSBUFFER;
+		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
+
+		return( Proxy );
+	}
+
+	return( ResourcePtr( new ResourceProxyDX11() ) );
+}
+//--------------------------------------------------------------------------------
+ResourcePtr RendererDX11::CreateConstantBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData, bool bAutoUpdate )
 {
 	// Set the constant buffer flag in addition to any other flags that
 	// the user has set.
@@ -604,6 +629,7 @@ ResourcePtr RendererDX11::CreateConstantBuffer( BufferConfigDX11* pConfig,  D3D1
 	{
 		ConstantBufferDX11* pConstantBuffer = new ConstantBufferDX11( pBuffer );
 		pConstantBuffer->SetDesiredDescription( pConfig->m_State );
+		pConstantBuffer->SetAutoUpdate( bAutoUpdate );
 		m_vResources.add( pConstantBuffer );
 
 		// Return an index with the lower 16 bits of index, and the upper

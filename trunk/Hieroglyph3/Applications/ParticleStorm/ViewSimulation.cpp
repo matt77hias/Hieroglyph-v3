@@ -49,9 +49,7 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 		float fRandomRZ = ( (float)rand() / (float)RAND_MAX * vel_scale - vel_scale/2.0f );
 
 		pData[i].direction = Vector3f( fRandomRX, fRandomRY, fRandomRZ );
-		//pData[i].direction.Normalize();
-
-		pData[i].status.MakeZero();
+		pData[i].time = 10.0f;
 	}
 
 	D3D11_SUBRESOURCE_DATA InitialData;
@@ -63,7 +61,7 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 	// to the state specified above.
 
 	BufferConfigDX11 config;
-	config.SetDefaultStructuredBuffer( m_iParticleCount, sizeof( Particle ) );
+	config.SetDefaultStructuredBuffer( m_iParticleCount+10, sizeof( Particle ) );
 	config.SetBindFlags( D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE );
 	config.SetMiscFlags( D3D11_RESOURCE_MISC_BUFFER_STRUCTURED );
 	
@@ -187,6 +185,49 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 
 
 
+	UINT* pInitArgs = new UINT[4];
+
+	pInitArgs[0] = m_iParticleCount;
+	pInitArgs[1] = 1;
+	pInitArgs[2] = 2;
+	pInitArgs[3] = 3;
+
+	D3D11_SUBRESOURCE_DATA InitArgsData;
+	InitArgsData.pSysMem				= pInitArgs;
+	InitArgsData.SysMemPitch			= 0;
+	InitArgsData.SysMemSlicePitch		= 0;
+
+	BufferConfigDX11 ArgsConfig;
+	ArgsConfig.SetByteWidth( 4 * sizeof( UINT ) );
+	ArgsConfig.SetBindFlags( D3D11_BIND_CONSTANT_BUFFER );
+	ArgsConfig.SetMiscFlags( 0 );
+	ArgsConfig.SetStructureByteStride( 0 );
+	ArgsConfig.SetUsage( D3D11_USAGE_DEFAULT );
+	ArgsConfig.SetCPUAccessFlags( 0 );
+
+	ParticleCountCBBuffer = Renderer.CreateConstantBuffer( &ArgsConfig, &InitArgsData, false );
+
+	Renderer.m_pParamMgr->SetConstantBufferParameter( L"ParticleCount", ParticleCountCBBuffer );
+
+
+	pInitArgs[0] = m_iParticleCount;
+	pInitArgs[1] = 1;
+	pInitArgs[2] = 0;
+	pInitArgs[3] = 0;
+
+	InitArgsData.pSysMem				= pInitArgs;
+	InitArgsData.SysMemPitch			= 0;
+	InitArgsData.SysMemSlicePitch		= 0;
+
+	ArgsConfig.SetDefaultIndirectArgsBuffer( 4 * sizeof( UINT ) );
+	//ArgsConfig.SetBindFlags( D3D11_BIND_CONSTANT_BUFFER );
+	ArgsConfig.SetUsage( D3D11_USAGE_DEFAULT );
+	//ArgsConfig.SetCPUAccessFlags( D3D11_CPU_ACCESS_READ );
+	ParticleCountIABuffer = Renderer.CreateIndirectArgsBuffer( &ArgsConfig, &InitArgsData );
+
+
+
+
 
 	// Set up the render effect for actually updating the simulation.
 
@@ -196,11 +237,29 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 		std::wstring( L"../Data/Shaders/ParticleSystemUpdateCS.hlsl" ),
 		std::wstring( L"CSMAIN" ),
 		std::wstring( L"cs_5_0" ) );
+
+	pParticleInsertion = new RenderEffectDX11();
+	pParticleInsertion->m_iComputeShader = 
+		Renderer.LoadShader( COMPUTE_SHADER,
+		std::wstring( L"../Data/Shaders/ParticleSystemInsertCS.hlsl" ),
+		std::wstring( L"CSMAIN" ),
+		std::wstring( L"cs_5_0" ) );
+
 }
 //--------------------------------------------------------------------------------
 ViewSimulation::~ViewSimulation()
 {
 	SAFE_DELETE( pParticleUpdate );
+}
+//--------------------------------------------------------------------------------
+ResourcePtr ViewSimulation::GetParticleCountConstantBuffer()
+{
+	return( ParticleCountCBBuffer );
+}
+//--------------------------------------------------------------------------------
+ResourcePtr ViewSimulation::GetParticleCountIndirectArgsBuffer()
+{
+	return( ParticleCountIABuffer );
 }
 //--------------------------------------------------------------------------------
 void ViewSimulation::Update( float fTime )
@@ -220,8 +279,39 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, ParameterManag
 	// Set this view's render parameters.
 	SetRenderParams( pParamManager );
 
-	// Perform the dispatch call to update the simulation state.
-	pPipelineManager->Dispatch( *pParticleUpdate, 1, 1, 1, pParamManager );
+	
+	// Add any new particles here
+	pPipelineManager->Dispatch( *pParticleInsertion, 1, 1, 1, pParamManager );
+
+
+
+	// Update the particles with a fixed number of threads, and mask off the unused threads
+	// with the particle count read out above.
+	pPipelineManager->Dispatch( *pParticleUpdate, 32, 1, 1, pParamManager );
+
+	// Read out the total number of particles for updating
+	pPipelineManager->CopyStructureCount( ParticleCountCBBuffer, 0, ParticleStateBuffers[1] );
+	pPipelineManager->CopyStructureCount( ParticleCountIABuffer, 0, ParticleStateBuffers[1] );
+
+
+//	pPipelineManager->ClearPipelineResources();
+//	pPipelineManager->ApplyPipelineResources();
+
+	
+//	pPipelineManager->CopyStructureCount( DrawArgsBuffer, 0, ParticleStateBuffers[0] );
+//	pPipelineManager->CopyStructureCount( DrawArgsBuffer, 4, ParticleStateBuffers[1] );
+
+//	mapped = pPipelineManager->MapResource( DrawArgsBuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
+//	pData = (UINT*)mapped.pData;
+//	data[0] = pData[0];
+//	data[1] = pData[1];
+//	data[2] = pData[2];
+//	data[3] = pData[3];
+//	pPipelineManager->UnMapResource( DrawArgsBuffer->m_iResource, 0 );
+
+
+	// Read out the total number of particles for rendering
+
 
 	// Switch the two resources so that the current state is maintained in slot 0.
 	ResourcePtr TempState = ParticleStateBuffers[0];
@@ -237,8 +327,8 @@ void ViewSimulation::SetRenderParams( ParameterManagerDX11* pParamManager )
 
 	if ( bOneTimeInit == true )
 	{
-		//pParamManager->SetUnorderedAccessParameter( L"CurrentSimulationState", ParticleStateBuffers[0], m_iParticleCount / 2 );
-		pParamManager->SetUnorderedAccessParameter( L"CurrentSimulationState", ParticleStateBuffers[0], m_iParticleCount );
+		pParamManager->SetUnorderedAccessParameter( L"CurrentSimulationState", ParticleStateBuffers[0], 0 );
+		//pParamManager->SetUnorderedAccessParameter( L"CurrentSimulationState", ParticleStateBuffers[0], m_iParticleCount );
 		pParamManager->SetUnorderedAccessParameter( L"NewSimulationState", ParticleStateBuffers[1], 0 );
 		bOneTimeInit = false;
 	}
@@ -248,8 +338,16 @@ void ViewSimulation::SetRenderParams( ParameterManagerDX11* pParamManager )
 		pParamManager->SetUnorderedAccessParameter( L"NewSimulationState", ParticleStateBuffers[1] );
 	}
 
-	Vector4f DispatchSize = Vector4f( 16.0f, 16.0f, 16.0f * 16.0f, 16.0f * 16.0f );
-	pParamManager->SetVectorParameter( std::wstring( L"DispatchSize" ), &DispatchSize );
+	static const float scale = 2.0f;
+	float fRandomX = ( (float)rand() / (float)RAND_MAX * scale - scale/2.0f );
+	float fRandomY = ( (float)rand() / (float)RAND_MAX * scale - scale/2.0f );
+	float fRandomZ = ( (float)rand() / (float)RAND_MAX * scale - scale/2.0f );
+	Vector3f normalized = Vector3f( fRandomX, fRandomY, fRandomZ );
+	normalized.Normalize();
+
+	Vector4f RandomVector = Vector4f( normalized.x, normalized.y, normalized.z, 0.0f );
+	pParamManager->SetVectorParameter( std::wstring( L"RandomVector" ), &RandomVector );
+	
 }
 //--------------------------------------------------------------------------------
 void ViewSimulation::SetUsageParams( ParameterManagerDX11* pParamManager )

@@ -853,6 +853,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\Rendering\IndirectArgsBufferDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\IndirectArgsBufferDX11.h"
+						>
+					</File>
+					<File
 						RelativePath=".\Rendering\StructuredBufferDX11.cpp"
 						>
 						<FileConfiguration

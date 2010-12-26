@@ -31,6 +31,8 @@ namespace Glyph3
 		void SetDefaultVertexBuffer( UINT size, bool dynamic );
 		void SetDefaultIndexBuffer( UINT size, bool dynamic );
 		void SetDefaultStructuredBuffer( UINT size, UINT structsize );
+		void SetDefaultByteAddressBuffer( UINT size );
+		void SetDefaultIndirectArgsBuffer( UINT size );
 
 		void SetByteWidth( UINT state );
 		void SetUsage( D3D11_USAGE state );

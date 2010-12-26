@@ -117,6 +117,12 @@ namespace Glyph3
 
 		void Dispatch( RenderEffectDX11& effect, UINT x, UINT y, UINT z, ParameterManagerDX11* pParamManager );
 
+		void DispatchIndirect( RenderEffectDX11& effect, ResourcePtr args, UINT offset, ParameterManagerDX11* pParamManager );
+		void DrawIndirect( RenderEffectDX11& effect, ResourcePtr args, UINT offset, int inputLayout,
+			D3D11_PRIMITIVE_TOPOLOGY primType, UINT vertexStride, ParameterManagerDX11* pParamManager);
+
+		void CopyStructureCount( ResourcePtr dest, UINT offset, ResourcePtr uav );
+
 		// The pipeline state can be modified with command lists.  This allows
 		// the renderer to generate a command list on a deferred context, and
 		// then utilize the list to perform rendering on an immediate context.

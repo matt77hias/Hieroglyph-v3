@@ -104,9 +104,10 @@ namespace Glyph3
 		RT_CONSTANTBUFFER = 0x030000,
 		RT_STRUCTUREDBUFFER = 0x040000,
 		RT_BYTEADDRESSBUFFER = 0x050000,
-		RT_TEXTURE1D = 0x060000,
-		RT_TEXTURE2D = 0x070000,
-		RT_TEXTURE3D = 0x080000
+		RT_INDIRECTARGSBUFFER = 0x060000,
+		RT_TEXTURE1D = 0x070000,
+		RT_TEXTURE2D = 0x080000,
+		RT_TEXTURE3D = 0x090000
 	};
 	struct ThreadPayLoad
 	{
@@ -160,9 +161,10 @@ namespace Glyph3
 
 		ResourcePtr CreateVertexBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
 		ResourcePtr CreateIndexBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
-		ResourcePtr CreateConstantBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
+		ResourcePtr CreateConstantBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData, bool bAutoUpdate = true );
 		ResourcePtr CreateStructuredBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
 		ResourcePtr CreateByteAddressBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData );
+		ResourcePtr CreateIndirectArgsBuffer( BufferConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData );
 
 		ResourcePtr CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_SUBRESOURCE_DATA* pData,
                                         ShaderResourceViewConfigDX11* pSRVConfig = NULL,

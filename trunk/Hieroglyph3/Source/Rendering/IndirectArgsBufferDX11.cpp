@@ -10,38 +10,17 @@
 
 //--------------------------------------------------------------------------------
 #include "PCH.h"
-#include "ConstantBufferDX11.h"
+#include "IndirectArgsBufferDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-ConstantBufferDX11::ConstantBufferDX11( ID3D11Buffer* pBuffer )
+IndirectArgsBufferDX11::IndirectArgsBufferDX11( ID3D11Buffer* pBuffer )
 {
 	m_pBuffer = pBuffer;
-	m_bAutoUpdate = true;
 }
 //--------------------------------------------------------------------------------
-ConstantBufferDX11::~ConstantBufferDX11()
+IndirectArgsBufferDX11::~IndirectArgsBufferDX11()
 {
-	// Buffer is released in the BufferDX11 destructor
-}
-//--------------------------------------------------------------------------------
-void ConstantBufferDX11::SetConstantSize( int size )
-{
-	m_iConstantSize = size;
-}
-//--------------------------------------------------------------------------------
-void ConstantBufferDX11::SetConstantCount( int count )
-{
-	m_iConstantCount = count;
-}
-//--------------------------------------------------------------------------------
-void ConstantBufferDX11::SetAutoUpdate( bool enable )
-{
-	m_bAutoUpdate = enable;
-}
-//--------------------------------------------------------------------------------
-bool ConstantBufferDX11::GetAutoUpdate()
-{
-	return( m_bAutoUpdate );
+	// m_pBuffer is released in the BufferDX11 destructor
 }
 //--------------------------------------------------------------------------------

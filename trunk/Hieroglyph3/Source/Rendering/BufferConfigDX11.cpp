@@ -111,6 +111,33 @@ void BufferConfigDX11::SetDefaultStructuredBuffer( UINT size, UINT structsize )
 	m_State.CPUAccessFlags = 0;
 }
 //--------------------------------------------------------------------------------
+void BufferConfigDX11::SetDefaultByteAddressBuffer( UINT size )
+{
+	// Set the state to the default configuration.  These are the D3D11 default
+	// values as well.
+
+	// TODO: These parameters need to be updated to reflect the byte address buffer!
+	m_State.ByteWidth = size;
+    m_State.Usage = D3D11_USAGE_DEFAULT;
+    m_State.BindFlags = 0;
+    m_State.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    m_State.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
+    m_State.StructureByteStride = 0;
+}
+//--------------------------------------------------------------------------------
+void BufferConfigDX11::SetDefaultIndirectArgsBuffer( UINT size )
+{
+	// Set the state to the default configuration.  These are the D3D11 default
+	// values as well.
+
+	m_State.ByteWidth = size;
+    m_State.Usage = D3D11_USAGE_DEFAULT;
+    m_State.BindFlags = 0;
+    m_State.CPUAccessFlags = 0;
+    m_State.MiscFlags = D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS;
+    m_State.StructureByteStride = 0;
+}
+//--------------------------------------------------------------------------------
 void BufferConfigDX11::SetByteWidth( UINT state )
 {
 	m_State.ByteWidth = state;
