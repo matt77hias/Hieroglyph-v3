@@ -23,6 +23,7 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 {
 	bOneTimeInit = true;
 
+
 	m_sParams.iViewType = VT_SIMULATION;
 
 	// Remember what number of thread groups to run in the dispatch call.
@@ -222,6 +223,8 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, ParameterManag
 
 	
 	// Add any new particles here
+	
+
 	pPipelineManager->Dispatch( *pParticleInsertion, 1, 1, 1, pParamManager );
 
 

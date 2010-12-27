@@ -57,6 +57,8 @@ namespace Glyph3
 		RenderEffectDX11*	pParticleInsertion;
 		RenderEffectDX11*	pParticleUpdate;
 		bool bOneTimeInit;
+
+		Timer pTimer;
 	};
 };
 //--------------------------------------------------------------------------------
