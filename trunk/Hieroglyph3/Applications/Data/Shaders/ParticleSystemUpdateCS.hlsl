@@ -24,8 +24,8 @@ cbuffer ParticleCount
 };
 
 static const float G = 10.0f;
-static const float m1 = 1.0f;
-static const float m2 = 1000.0f;
+static const float m1 = 10.0f;
+static const float m2 = 500.0f;
 static const float m1m2 = m1 * m2;
 static const float eventHorizon = 5.0f;
 
@@ -61,7 +61,7 @@ void CSMAIN( uint3 DispatchThreadID : SV_DispatchThreadID )
 		// don't pass it to the output list if it is too close.
 		if ( r > eventHorizon )
 		{
-			if ( p.time < 10.0f )
+			if ( p.time < 100.0f )
 			{
 				NewSimulationState.Append( p );
 			}

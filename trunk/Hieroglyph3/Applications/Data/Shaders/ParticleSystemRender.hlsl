@@ -22,7 +22,7 @@ cbuffer ParticleRenderParameters
 	float4 ConsumerLocation;
 };
 
-static const float scale = 3.0f;
+static const float scale = 0.5f;
 
 static const float4 g_positions[4] =
 {
@@ -87,7 +87,9 @@ void GSMAIN( point GS_INPUT input[1], inout TriangleStream<PS_INPUT> SpriteStrea
 	PS_INPUT output;
 
 	float dist = saturate( length( input[0].position - ConsumerLocation.xyz ) / 100.0f );
-	float4 color = float4( 0.2f, 0.2f, 1.0f, 0.0f ) * dist + float4( 1.0f, 0.2f, 0.2f, 0.0f ) * ( 1.0f - dist ); 
+	//float4 color = float4( 0.2f, 1.0f, 0.2f, 0.0f ) * dist + float4( 1.0f, 0.1f, 0.1f, 0.0f ) * ( 1.0f - dist ); 
+	//float4 color = float4( 0.2f, 1.0f, 1.0f, 0.0f ) * dist + float4( 1.0f, 0.1f, 0.1f, 0.0f ) * ( 1.0f - dist ); 
+	float4 color = float4( 0.2f, 0.2f, 1.0f, 0.0f ) * dist + float4( 1.0f, 0.1f, 0.1f, 0.0f ) * ( 1.0f - dist ); 
 
 	// Transform to view space
 	float4 viewposition = mul( float4( input[0].position, 1.0f ), WorldViewMatrix );

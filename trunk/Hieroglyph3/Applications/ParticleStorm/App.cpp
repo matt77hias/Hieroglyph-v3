@@ -74,8 +74,8 @@ bool App::ConfigureEngineComponents()
 	}
 
 	// Create the window.
-	int width = 640;
-	int height = 480;
+	int width = 1024;
+	int height = 768;
 
 	// Create the window wrapper class instance.
 	m_pWindow = new Win32RenderWindow();

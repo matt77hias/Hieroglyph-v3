@@ -80,7 +80,7 @@ ParticleSystemEntity::ParticleSystemEntity()
 	//pEffect->m_iRasterizerState = 
 	//	pRenderer11->CreateRasterizerState( &RS );
 
-	m_pSimulation = new ViewSimulation( *pRenderer11, 16384 * 128 );
+	m_pSimulation = new ViewSimulation( *pRenderer11, 16384 * 32 );
 
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;

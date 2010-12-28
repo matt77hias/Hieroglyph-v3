@@ -231,7 +231,7 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, ParameterManag
 
 	// Update the particles with a fixed number of threads, and mask off the unused threads
 	// with the particle count read out above.
-	pPipelineManager->Dispatch( *pParticleUpdate, 2, 1, 1, pParamManager );
+	pPipelineManager->Dispatch( *pParticleUpdate, 1024, 1, 1, pParamManager );
 
 	// Read out the total number of particles for updating
 	pPipelineManager->CopyStructureCount( ParticleCountCBBuffer, 0, ParticleStateBuffers[1] );
