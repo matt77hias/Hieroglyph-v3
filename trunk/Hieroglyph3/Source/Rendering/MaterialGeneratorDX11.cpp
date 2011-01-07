@@ -73,14 +73,20 @@ MaterialDX11* MaterialGeneratorDX11::GenerateSkinnedSolid( RendererDX11& Rendere
 
 	pEffect->m_iVertexShader = 
 		Renderer.LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/SolidSkinnedShading.hlsl" ),
+		std::wstring( L"../Data/Shaders/SolidSkinnedShading4Bone.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_5_0" ) );
 	pEffect->m_iPixelShader = 
 		Renderer.LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/SolidSkinnedShading.hlsl" ),
+		std::wstring( L"../Data/Shaders/SolidSkinnedShading4Bone.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
+
+	RasterizerStateConfigDX11 RS;
+	RS.FillMode = D3D11_FILL_WIREFRAME;
+
+	pEffect->m_iRasterizerState = 
+		Renderer.CreateRasterizerState( &RS );
 
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;

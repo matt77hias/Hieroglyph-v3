@@ -19,6 +19,7 @@
 #include "Log.h"
 #include "GlyphString.h"
 
+#include "msModel.h"
 #include <boost/tokenizer.hpp> 
 
 //--------------------------------------------------------------------------------
@@ -912,6 +913,261 @@ GeometryDX11* GeometryLoaderDX11::loadMS3DFileWithAnimation( std::wstring filena
         delete[] pMS3DVertices;
 		pMS3DVertices = NULL;
 	}
+
+	//pMesh->GenerateVertexDeclaration();
+	pMesh->LoadToBuffers();
+
+	return( pMesh );
+}
+//--------------------------------------------------------------------------------
+GeometryDX11* GeometryLoaderDX11::loadMS3DFileWithAnimationAndWeights( std::wstring filename, SkinnedActor* pActor )
+{
+
+	msModel* pModel = new msModel();
+	bool bResult = pModel->Load( GlyphString::ToAscii( filename ).c_str() );
+
+	if ( !bResult )
+	{
+		Log::Get().Write( L"Failed to load *.ms3d model!" );
+		return( 0 );
+	}
+	
+
+	unsigned int usTriangleCount = pModel->GetNumTriangles();
+	unsigned int usVertexCount = pModel->GetNumVertices();
+	unsigned int usJointCount = pModel->GetNumJoints(); 
+
+	// create the vertex element streams
+	VertexElementDX11* pPositions = new VertexElementDX11( 3, usTriangleCount*3 );
+	pPositions->m_SemanticName = VertexElementDX11::PositionSemantic;
+	pPositions->m_uiSemanticIndex = 0;
+	pPositions->m_Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	pPositions->m_uiInputSlot = 0;
+	pPositions->m_uiAlignedByteOffset = 0;
+	pPositions->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	pPositions->m_uiInstanceDataStepRate = 0;
+
+	VertexElementDX11* pBoneIDs = new VertexElementDX11( 4, usTriangleCount*3 );
+	pBoneIDs->m_SemanticName = VertexElementDX11::BoneIDSemantic;
+	pBoneIDs->m_uiSemanticIndex = 0;
+	pBoneIDs->m_Format = DXGI_FORMAT_R32G32B32A32_SINT;
+	pBoneIDs->m_uiInputSlot = 0;
+	pBoneIDs->m_uiAlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	pBoneIDs->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	pBoneIDs->m_uiInstanceDataStepRate = 0;
+
+	VertexElementDX11* pBoneWeights = new VertexElementDX11( 4, usTriangleCount*3 );
+	pBoneWeights->m_SemanticName = VertexElementDX11::BoneWeightSemantic;
+	pBoneWeights->m_uiSemanticIndex = 0;
+	pBoneWeights->m_Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	pBoneWeights->m_uiInputSlot = 0;
+	pBoneWeights->m_uiAlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	pBoneWeights->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	pBoneWeights->m_uiInstanceDataStepRate = 0;
+
+	VertexElementDX11* pTexcoords = new VertexElementDX11( 2, usTriangleCount*3 );
+	pTexcoords->m_SemanticName = VertexElementDX11::TexCoordSemantic;
+	pTexcoords->m_uiSemanticIndex = 0;
+	pTexcoords->m_Format = DXGI_FORMAT_R32G32_FLOAT;
+	pTexcoords->m_uiInputSlot = 0;
+	pTexcoords->m_uiAlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	pTexcoords->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	pTexcoords->m_uiInstanceDataStepRate = 0;
+
+	VertexElementDX11* pNormals = new VertexElementDX11( 3, usTriangleCount*3 );
+	pNormals->m_SemanticName = VertexElementDX11::NormalSemantic;
+	pNormals->m_uiSemanticIndex = 0;
+	pNormals->m_Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	pNormals->m_uiInputSlot = 0;
+	pNormals->m_uiAlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	pNormals->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	pNormals->m_uiInstanceDataStepRate = 0;
+
+	Vector3f* pPos = pPositions->Get3f( 0 );
+	int* pIds = pBoneIDs->Get1i( 0 );
+	Vector4f* pWghts = pBoneWeights->Get4f( 0 );
+	Vector3f* pNrm = pNormals->Get3f( 0 );
+	Vector2f* pTex = pTexcoords->Get2f( 0 );
+
+	// Create the geometry object, and fill it with the data read from the file.
+
+	GeometryDX11* pMesh = new GeometryDX11();
+
+	TriangleIndices face;
+
+	float fTotalWeight = 100.0f;
+
+
+	for ( int i = 0; i < usTriangleCount; i++ )
+	{
+		face.P1() = 3*i+0;
+		face.P2() = 3*i+2;
+		face.P3() = 3*i+1;
+
+		ms3d_triangle_t* pTriangle = pModel->GetTriangle( i );
+		unsigned int vIDs[3];
+		vIDs[0] = pTriangle->vertexIndices[0];
+		vIDs[1] = pTriangle->vertexIndices[1];
+		vIDs[2] = pTriangle->vertexIndices[2];
+
+
+		pPos[3*i+0].x =  pModel->GetVertex( vIDs[0] )->vertex[0];
+		pPos[3*i+0].y =  pModel->GetVertex( vIDs[0] )->vertex[1];
+		pPos[3*i+0].z = -pModel->GetVertex( vIDs[0] )->vertex[2];
+		pPos[3*i+1].x =  pModel->GetVertex( vIDs[1] )->vertex[0];
+		pPos[3*i+1].y =  pModel->GetVertex( vIDs[1] )->vertex[1];
+		pPos[3*i+1].z = -pModel->GetVertex( vIDs[1] )->vertex[2];
+		pPos[3*i+2].x =  pModel->GetVertex( vIDs[2] )->vertex[0];
+		pPos[3*i+2].y =  pModel->GetVertex( vIDs[2] )->vertex[1];
+		pPos[3*i+2].z = -pModel->GetVertex( vIDs[2] )->vertex[2];
+
+		pIds[12*i+0] = pModel->GetVertex( vIDs[0] )->boneId;  if (pIds[12*i+0] == -1) pIds[12*i+0] = 0;
+		pIds[12*i+1] = pModel->GetVertex( vIDs[0] )->boneIds[0]; if (pIds[12*i+1] == -1) pIds[12*i+1] = 0;
+		pIds[12*i+2] = pModel->GetVertex( vIDs[0] )->boneIds[1]; if (pIds[12*i+2] == -1) pIds[12*i+2] = 0;
+		pIds[12*i+3] = pModel->GetVertex( vIDs[0] )->boneIds[2]; if (pIds[12*i+3] == -1) pIds[12*i+3] = 0;
+
+		pIds[12*i+4] = pModel->GetVertex( vIDs[1] )->boneId; if (pIds[12*i+4] == -1) pIds[12*i+4] = 0;
+		pIds[12*i+5] = pModel->GetVertex( vIDs[1] )->boneIds[0]; if (pIds[12*i+5] == -1) pIds[12*i+5] = 0;
+		pIds[12*i+6] = pModel->GetVertex( vIDs[1] )->boneIds[1]; if (pIds[12*i+6] == -1) pIds[12*i+6] = 0;
+		pIds[12*i+7] = pModel->GetVertex( vIDs[1] )->boneIds[2]; if (pIds[12*i+7] == -1) pIds[12*i+7] = 0;
+
+		pIds[12*i+8] = pModel->GetVertex( vIDs[2] )->boneId; if (pIds[12*i+8] == -1) pIds[12*i+8] = 0;
+		pIds[12*i+9] = pModel->GetVertex( vIDs[2] )->boneIds[0]; if (pIds[12*i+9] == -1) pIds[12*i+9] = 0;
+		pIds[12*i+10] = pModel->GetVertex( vIDs[2] )->boneIds[1]; if (pIds[12*i+10] == -1) pIds[12*i+10] = 0;
+		pIds[12*i+11] = pModel->GetVertex( vIDs[2] )->boneIds[2]; if (pIds[12*i+11] == -1) pIds[12*i+11] = 0;
+
+		float w1 = ((float)pModel->GetVertex( vIDs[0] )->weights[0] );
+		float w2 = ((float)pModel->GetVertex( vIDs[0] )->weights[1] );
+		float w3 = ((float)pModel->GetVertex( vIDs[0] )->weights[2] );
+
+		pWghts[3*i+0].x = ((float)pModel->GetVertex( vIDs[0] )->weights[0] ) / fTotalWeight;
+		pWghts[3*i+0].y = ((float)pModel->GetVertex( vIDs[0] )->weights[1] ) / fTotalWeight;
+		pWghts[3*i+0].z = ((float)pModel->GetVertex( vIDs[0] )->weights[2] ) / fTotalWeight;
+		pWghts[3*i+0].w = 1.0f - pWghts[3*i+0].x - pWghts[3*i+0].y - pWghts[3*i+0].z;
+
+		pWghts[3*i+1].x = ((float)pModel->GetVertex( vIDs[1] )->weights[0] ) / fTotalWeight;
+		pWghts[3*i+1].y = ((float)pModel->GetVertex( vIDs[1] )->weights[1] ) / fTotalWeight;
+		pWghts[3*i+1].z = ((float)pModel->GetVertex( vIDs[1] )->weights[2] ) / fTotalWeight;
+		pWghts[3*i+1].w = 1.0f - pWghts[3*i+1].x - pWghts[3*i+1].y - pWghts[3*i+1].z;
+
+		pWghts[3*i+2].x = ((float)pModel->GetVertex( vIDs[2] )->weights[0] ) / fTotalWeight;
+		pWghts[3*i+2].y = ((float)pModel->GetVertex( vIDs[2] )->weights[1] ) / fTotalWeight;
+		pWghts[3*i+2].z = ((float)pModel->GetVertex( vIDs[2] )->weights[2] ) / fTotalWeight;
+		pWghts[3*i+2].w = 1.0f - pWghts[3*i+2].x - pWghts[3*i+2].y - pWghts[3*i+2].z;
+
+
+		pNrm[3*i+0].x = pTriangle->vertexNormals[0][0];
+		pNrm[3*i+0].y = pTriangle->vertexNormals[0][1];
+		pNrm[3*i+0].z = -pTriangle->vertexNormals[0][2];
+		pNrm[3*i+1].x = pTriangle->vertexNormals[1][0];
+		pNrm[3*i+1].y = pTriangle->vertexNormals[1][1];
+		pNrm[3*i+1].z = -pTriangle->vertexNormals[1][2];
+		pNrm[3*i+2].x = pTriangle->vertexNormals[2][0];
+		pNrm[3*i+2].y = pTriangle->vertexNormals[2][1];
+		pNrm[3*i+2].z = -pTriangle->vertexNormals[2][2];
+
+		pTex[3*i+0].x = pTriangle->s[0];
+		pTex[3*i+0].y = pTriangle->t[0];
+		pTex[3*i+1].x = pTriangle->s[1];
+		pTex[3*i+1].y = pTriangle->t[1];
+		pTex[3*i+2].x = pTriangle->s[2];
+		pTex[3*i+2].y = pTriangle->t[2];
+
+		pMesh->AddFace( face );
+	}
+
+	for ( int i = 0; i < usVertexCount; i++ )
+	{
+		pNrm[i].Normalize();
+	}
+
+	pMesh->AddElement( pPositions );
+	pMesh->AddElement( pBoneIDs );
+	pMesh->AddElement( pBoneWeights );
+	pMesh->AddElement( pTexcoords );
+	pMesh->AddElement( pNormals );
+
+	// Now set the geometry in the SkinnedActor, and create the bones
+	// and add them to the SkinnedActor.
+
+	if ( pActor )
+	{
+		// Set the geometry in the body of the actor
+		pActor->GetBody()->SetGeometry( pMesh );
+
+		// Create an array of nodes, one for each joint.
+		std::map<std::string,Node3D*> JointNodes;
+
+		for ( int i = 0; i < usJointCount; i++ )
+		{
+			Node3D* pBone = new Node3D();
+			ms3d_joint_t* pJoint = pModel->GetJoint( i );
+
+			Vector3f BindPosition = Vector3f( pJoint->pos[0],
+			 								  pJoint->pos[1],
+											  pJoint->pos[2] );
+
+			AnimationStream<Vector3f>* pPosFrames = new AnimationStream<Vector3f>();
+
+			for ( int j = 0; j < pJoint->positionKeys.size(); j++ )
+			{
+				Vector3f p = Vector3f( pJoint->positionKeys[j].key[0],
+					                   pJoint->positionKeys[j].key[1],
+					                   pJoint->positionKeys[j].key[2] );
+
+				pPosFrames->AddState( AnimationState<Vector3f>( pJoint->positionKeys[j].time, p ) ); 
+			}
+
+			AnimationStream<Vector3f>* pRotFrames = new AnimationStream<Vector3f>();
+			
+			Vector3f BindRotation = Vector3f( pJoint->rot[0] + 6.28f,
+				                              pJoint->rot[1] + 6.28f,
+											  pJoint->rot[2] + 6.28f );
+
+			for ( int j = 0; j < pJoint->rotationKeys.size(); j++ )
+			{
+
+				Vector3f p = Vector3f( pJoint->rotationKeys[j].key[0] + 6.28f,
+					                   pJoint->rotationKeys[j].key[1] + 6.28f,
+						               pJoint->rotationKeys[j].key[2] + 6.28f );
+
+				//std::stringstream s;
+				//s << "Parent: " << pJoint->parentName << " Name:" << pJoint->name << " :: Rotation Frame " << j << " " << p.x << "," << p.y << "," << p.z;
+				//Log::Get().Write( GlyphString::ToUnicode( s.str() ) );
+
+				pRotFrames->AddState( AnimationState<Vector3f>( pJoint->rotationKeys[j].time, p ) ); 
+			}
+
+			pActor->AddBoneNode( pBone, BindPosition, BindRotation, pPosFrames, pRotFrames );
+
+			std::stringstream s;
+			s << "Parent: " << pJoint->parentName << " Name:" << pJoint->name << " :: Bind Position:" << BindPosition.x << "," << BindPosition.y << "," << BindPosition.z << ":: Bind Rotation:" << BindRotation.x << "," << BindRotation.y << "," << BindRotation.z;
+
+			Log::Get().Write( GlyphString::ToUnicode( s.str() ) );
+			JointNodes[std::string(pJoint->name)] = pBone;
+		}
+
+		// Connect up the bones to form the skeleton.
+		for ( int i = 0; i < usJointCount; i++ )
+		{
+			ms3d_joint_t* pJoint = pModel->GetJoint( i );
+
+			Node3D* pParent = JointNodes[std::string(pJoint->parentName)];
+			Node3D* pChild = JointNodes[std::string(pJoint->name)];
+
+			// If the node has a parent, link them
+			if ( pParent && pChild )
+				pParent->AttachChild( pChild );
+
+			// If the node has no parent, link it to the root of the skinned actor (for connection
+			// to the scene graph).
+			if ( !pParent && pChild )
+				pActor->GetNode()->AttachChild( pChild );
+		}
+	}
+
+
+	delete pModel;
 
 	//pMesh->GenerateVertexDeclaration();
 	pMesh->LoadToBuffers();

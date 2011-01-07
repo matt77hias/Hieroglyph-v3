@@ -262,42 +262,52 @@ void GeometryGeneratorDX11::GenerateAxisGeometry( GeometryDX11* pGeometry )
 		Vector3f* pPos = pPositions->Get3f( 0 );
 		Vector4f* pCols = pColors->Get4f( 0 );
 
+		float fThickness = 0.15f;
+		float fLength = 3.0f;
+
+		Vector4f XBase = Vector4f( 1.0f, 0.0f, 0.0f, 1.0f );
+		Vector4f XEnd  = Vector4f( 1.0f, 0.0f, 0.0f, 1.0f );
+		Vector4f YBase = Vector4f( 0.0f, 1.0f, 0.0f, 1.0f );
+		Vector4f YEnd  = Vector4f( 0.0f, 1.0f, 0.0f, 1.0f );
+		Vector4f ZBase = Vector4f( 0.0f, 0.0f, 1.0f, 1.0f );
+		Vector4f ZEnd  = Vector4f( 0.0f, 0.0f, 1.0f, 1.0f );
+
 
 		// Create the X-Axis
-		pPos[0] = Vector3f( 0.0f, 0.5f, 0.5f );
-		pCols[0] = Vector4f( 1.0f, 1.0f, 0.0f, 1.0f );
-		pPos[1] = Vector3f( 0.0f, -0.5f, 0.5f );
-		pCols[1] = Vector4f( 1.0f, 1.0f, 0.0f, 1.0f );
-		pPos[2] = Vector3f( 0.0f, -0.5f, -0.5f );
-		pCols[2] = Vector4f( 1.0f, 1.0f, 0.0f, 1.0f );
-		pPos[3] = Vector3f( 0.0f, 0.5f, -0.5f );
-		pCols[3] = Vector4f( 1.0f, 1.0f, 0.0f, 1.0f );
-		pPos[4] = Vector3f( 5.0f, 0.0f, 0.0f );
-		pCols[4] = Vector4f( 1.0f, 0.0f, 0.0f, 1.0f );
+		pPos[0] = Vector3f( 0.0f, fThickness, fThickness );
+		pCols[0] = XBase;
+		pPos[1] = Vector3f( 0.0f, -fThickness, fThickness );
+		pCols[1] = XBase;
+		pPos[2] = Vector3f( 0.0f, -fThickness, -fThickness );
+		pCols[2] = XBase;
+		pPos[3] = Vector3f( 0.0f, fThickness, -fThickness );
+		pCols[3] = XBase;
+		pPos[4] = Vector3f( fLength, 0.0f, 0.0f );
+		pCols[4] = XEnd;
 
 		// Next is the Y-Axis.
-		pPos[5] = Vector3f( 0.5f, 0.0f, 0.5f );
-		pCols[5] = Vector4f( 1.0f, 1.0f, 0.0f, 1.0f );
-		pPos[6] = Vector3f( -0.5f, 0.0f, 0.5f );
-		pCols[6] = Vector4f( 1.0f, 1.0f, 0.0f, 1.0f );
-		pPos[7] = Vector3f( -0.5f, 0.0f, -0.5f );
-		pCols[7] = Vector4f( 1.0f, 1.0f, 0.0f, 1.0f );
-		pPos[8] = Vector3f( 0.5f, 0.0f, -0.5f );
-		pCols[8] = Vector4f( 1.0f, 1.0f, 0.0f, 1.0f );
-		pPos[9] = Vector3f( 0.0f, 5.0f, 0.0f );
-		pCols[9] = Vector4f( 0.0f, 1.0f, 0.0f, 1.0f );
+		pPos[5] = Vector3f( 0.5f, 0.0f, fThickness );
+		pCols[5] = YBase;
+		pPos[6] = Vector3f( -fThickness, 0.0f, fThickness );
+		pCols[6] = YBase;
+		pPos[7] = Vector3f( -fThickness, 0.0f, -fThickness );
+		pCols[7] = YBase;
+		pPos[8] = Vector3f( fThickness, 0.0f, -fThickness );
+		pCols[8] = YBase;
+		pPos[9] = Vector3f( 0.0f, fLength, 0.0f );
+		pCols[9] = YEnd;
 
 		// Next is the Z-Axis.
-		pPos[10] = Vector3f( 0.5f, 0.5f, 0.0f );
-		pCols[10] = Vector4f( 1.0f, 1.0f, 0.0f, 1.0f );
-		pPos[11] = Vector3f( -0.5f, 0.5f, 0.0f );
-		pCols[11] = Vector4f( 1.0f, 1.0f, 0.0f, 1.0f );
-		pPos[12] = Vector3f( -0.5f, -0.5f, 0.0f );
-		pCols[12] = Vector4f( 1.0f, 1.0f, 0.0f, 1.0f );
-		pPos[13] = Vector3f( 0.5f, -0.5f, 0.0f );
-		pCols[13] = Vector4f( 1.0f, 1.0f, 0.0f, 1.0f );
-		pPos[14] = Vector3f( 0.0f, 0.0f, 5.0f );
-		pCols[14] = Vector4f( 0.0f, 0.0f, 1.0f, 1.0f );
+		pPos[10] = Vector3f( fThickness, fThickness, 0.0f );
+		pCols[10] = ZBase;
+		pPos[11] = Vector3f( -fThickness, fThickness, 0.0f );
+		pCols[11] = ZBase;
+		pPos[12] = Vector3f( -fThickness, -fThickness, 0.0f );
+		pCols[12] = ZBase;
+		pPos[13] = Vector3f( fThickness, -fThickness, 0.0f );
+		pCols[13] = ZBase;
+		pPos[14] = Vector3f( 0.0f, 0.0f, fLength );
+		pCols[14] = ZEnd;
 
 		// Generate and add each line segment.
 		TriangleIndices tri;

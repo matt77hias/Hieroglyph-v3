@@ -23,6 +23,22 @@
 // Then the number of joints (WORD)
 // Then the actual joints (MS3DJoint)
 //
+// Now comes the sub-version (int)
+//
+// Then the number of group comments (uint)
+// Then all the actual group comments (MS3DComment) - variable length!
+//
+// Then the number of material comments (uint)
+// Then all the actual material comments (MS3DComment) - variable length!
+//
+// Then the number of joint comments (uint)
+// Then all the actual joint comments (MS3DComment) - variable length!
+//
+// Then the number of model comments (uint) - always 0 or 1
+// Then all the actual model comments (MS3DComment) - variable length!
+//
+// 
+// 
 // *NOTE* See www.milkshape3d.com for latest format info
 
 #ifndef ms3dspec_h

@@ -41,6 +41,7 @@ namespace Glyph3
         static std::string NormalSemantic;
         static std::string TexCoordSemantic;
         static std::string BoneIDSemantic;
+		static std::string BoneWeightSemantic;
         static std::string TangentSemantic;
 
 	public:
