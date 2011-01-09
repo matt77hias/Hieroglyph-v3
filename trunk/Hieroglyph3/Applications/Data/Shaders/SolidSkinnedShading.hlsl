@@ -13,7 +13,7 @@ cbuffer Transforms
 {
 	matrix WorldMatrix;	
 	matrix ViewProjMatrix;
-	matrix SkinMatrices[4];
+	matrix SkinMatrices[26];
 };
 
 cbuffer LightParameters

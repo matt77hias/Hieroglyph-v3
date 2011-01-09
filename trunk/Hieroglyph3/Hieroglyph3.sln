@@ -93,6 +93,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ParticleStorm", "Applicatio
 		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MirrorMirror", "Applications\MirrorMirror\MirrorMirror.vcproj", "{75C388EB-7F70-4B62-98D9-9B9B18EDF11E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -175,6 +180,10 @@ Global
 		{9C8C4C20-EFB0-44A7-8321-0754C06B05C4}.Debug|Win32.Build.0 = Debug|Win32
 		{9C8C4C20-EFB0-44A7-8321-0754C06B05C4}.Release|Win32.ActiveCfg = Release|Win32
 		{9C8C4C20-EFB0-44A7-8321-0754C06B05C4}.Release|Win32.Build.0 = Release|Win32
+		{75C388EB-7F70-4B62-98D9-9B9B18EDF11E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{75C388EB-7F70-4B62-98D9-9B9B18EDF11E}.Debug|Win32.Build.0 = Debug|Win32
+		{75C388EB-7F70-4B62-98D9-9B9B18EDF11E}.Release|Win32.ActiveCfg = Release|Win32
+		{75C388EB-7F70-4B62-98D9-9B9B18EDF11E}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -119,8 +119,8 @@ void BufferConfigDX11::SetDefaultByteAddressBuffer( UINT size )
 	// TODO: These parameters need to be updated to reflect the byte address buffer!
 	m_State.ByteWidth = size;
     m_State.Usage = D3D11_USAGE_DEFAULT;
-    m_State.BindFlags = 0;
-    m_State.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    m_State.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+    m_State.CPUAccessFlags = 0;
     m_State.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
     m_State.StructureByteStride = 0;
 }
