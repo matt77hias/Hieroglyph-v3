@@ -2149,6 +2149,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\Objects\RotationController.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Objects\RotationController.h"
+						>
+					</File>
+					<File
 						RelativePath=".\Objects\SkinnedBoneController.cpp"
 						>
 					</File>

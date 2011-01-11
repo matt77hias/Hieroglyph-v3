@@ -328,7 +328,7 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 
 		// Create the threads in a suspended state.
 		g_aThreadHandles[i] = 0;
-		g_aThreadHandles[i] = (HANDLE)_beginthreadex( 0, 0, _RenderViewThreadProc, &g_aPayload[i], CREATE_SUSPENDED, 0 );
+		g_aThreadHandles[i] = (HANDLE)_beginthreadex( 0, 0xfffff, _RenderViewThreadProc, &g_aPayload[i], CREATE_SUSPENDED, 0 );
 
 		// Create the synchronization events.
 		g_aBeginEventHandle[i] = CreateEvent( 0, FALSE, FALSE, 0 );
@@ -1925,18 +1925,41 @@ void RendererDX11::ProcessRenderViewQueue( )
 {
 	if ( !m_bMultiThreadActive )
 	{
-		for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
+		for ( int i = m_vQueuedViews.count()-1; i >= 0; i-=NUM_THREADS )
         {
-            std::string viewName = ViewRenderParams::ViewIndexToName( m_vQueuedViews[i]->GetType() );
-            PIXBeginEvent( GlyphString::ToUnicode( "View Draw: " + viewName ).c_str() );
+			for ( int j = 0; j < NUM_THREADS; j++ )
+			{
+				if ( (i-j) >= 0 )
+				{
+					std::string viewName = ViewRenderParams::ViewIndexToName( m_vQueuedViews[i-j]->GetType() );
+					PIXBeginEvent( GlyphString::ToUnicode( "View Draw: " + viewName ).c_str() );
 
-			m_vQueuedViews[i]->Draw( pImmPipeline, g_aPayload[i].pParamManager );
+					g_aPayload[j].pRenderView = m_vQueuedViews[i-j];
 
-            PIXEndEvent();
+					m_vQueuedViews[i-j]->Draw( pImmPipeline, g_aPayload[j].pParamManager );
+
+					PIXEndEvent();
+				}
+			}
         }
 
 		m_vQueuedViews.empty();
 	}
+	//if ( !m_bMultiThreadActive )
+	//{
+	//	for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
+ //       {
+ //           std::string viewName = ViewRenderParams::ViewIndexToName( m_vQueuedViews[i]->GetType() );
+ //           PIXBeginEvent( GlyphString::ToUnicode( "View Draw: " + viewName ).c_str() );
+
+	//		m_vQueuedViews[i]->Draw( pImmPipeline, g_aPayload[i].pParamManager );
+
+ //           PIXEndEvent();
+ //       }
+
+	//	m_vQueuedViews.empty();
+	//}
+
 	else
 	{
 
@@ -1946,20 +1969,47 @@ void RendererDX11::ProcessRenderViewQueue( )
 		//   Execute command lists
 		//   Update processed count and loop
 
-		for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
+		for ( int i = m_vQueuedViews.count()-1; i >= 0; i-=NUM_THREADS )
 		{
-			g_aPayload[i].pRenderView = m_vQueuedViews[i];
-			SetEvent( g_aBeginEventHandle[i] );
+			DWORD count = 0;
+
+			for ( int j = 0; j < NUM_THREADS; j++ )
+			{
+				if ( (i-j) >= 0 )
+				{
+					count++;
+					g_aPayload[j].pRenderView = m_vQueuedViews[i-j];
+					SetEvent( g_aBeginEventHandle[j] );
+				}
+			}
+
+			WaitForMultipleObjects( count, g_aEndEventHandle, true, INFINITE );
+
+			for ( int j = 0/*count-1*/; count > 0; count-- )
+			{
+				g_aPayload[j].pPipeline->m_pContext->ClearState();
+				pImmPipeline->ExecuteCommandList( g_aPayload[j].pList );
+				g_aPayload[j].pList->ReleaseList();
+				//j--;
+				j++;
+			}
+
 		}
 
-		WaitForMultipleObjects( (DWORD)m_vQueuedViews.count(), g_aEndEventHandle, true, INFINITE );
+		//for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
+		//{
+		//	g_aPayload[i].pRenderView = m_vQueuedViews[i];
+		//	SetEvent( g_aBeginEventHandle[i] );
+		//}
+
+		//WaitForMultipleObjects( (DWORD)m_vQueuedViews.count(), g_aEndEventHandle, true, INFINITE );
 		
-		for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
-		{
-			g_aPayload[i].pPipeline->m_pContext->ClearState();
-			pImmPipeline->ExecuteCommandList( g_aPayload[i].pList );
-			g_aPayload[i].pList->ReleaseList();
-		}
+		//for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
+		//{
+		//	g_aPayload[i].pPipeline->m_pContext->ClearState();
+		//	pImmPipeline->ExecuteCommandList( g_aPayload[i].pList );
+		//	g_aPayload[i].pList->ReleaseList();
+		//}
 
 		m_vQueuedViews.empty();
 

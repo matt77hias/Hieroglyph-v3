@@ -30,7 +30,8 @@ DiffuseSphereEntity::DiffuseSphereEntity()
 
 	// Get the geometry to render
 	GeometryDX11* pGeometry = 0;
-	pGeometry = GeometryLoaderDX11::loadMS3DFile2( L"../Data/Models/UnitSphere2.ms3d" );
+	//pGeometry = GeometryLoaderDX11::loadMS3DFile2( L"../Data/Models/UnitSphere2.ms3d" );
+	pGeometry = GeometryLoaderDX11::loadMS3DFile2( L"../Data/Models/box.ms3d" );
 	pGeometry->LoadToBuffers();
 	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	

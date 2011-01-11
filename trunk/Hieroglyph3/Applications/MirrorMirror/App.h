@@ -10,6 +10,7 @@
 #include "MaterialDX11.h"
 #include "Camera.h"
 #include "Scene.h"
+#include "Actor.h"
 
 #include "SpriteRendererDX11.h"
 #include "SpriteFontDX11.h"
@@ -47,9 +48,11 @@ protected:
 	ViewPerspective*		m_pRenderView;
 	Node3D*					m_pNode;
 	DiffuseSphereEntity*	m_pEntity;
-	ReflectiveSphereEntity*	m_pReflector[4];
+	ReflectiveSphereEntity*	m_pReflector[16];
 	
 	Camera*					m_pCamera;
+	Actor*					m_pDiffuseActor;
+	Actor*					m_pReflectiveActor;
 
 	Vector4f				m_LightParams;
 	Vector4f				m_LightPosition;

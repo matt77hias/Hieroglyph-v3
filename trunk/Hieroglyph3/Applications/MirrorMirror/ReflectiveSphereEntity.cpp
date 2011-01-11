@@ -53,17 +53,17 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 
-
+static int size = 16;
 	// Create the resources to be used for generating the paraboloid maps.
 	Texture2dConfigDX11 ColorConfig;
-	ColorConfig.SetColorBuffer( 1024, 1024 );
+	ColorConfig.SetColorBuffer( size, size );
 	ColorConfig.SetArraySize( 2 );
 	ColorConfig.SetBindFlags( D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET );
 	ResourcePtr ColorTarget = pRenderer11->CreateTexture2D( &ColorConfig, 0 );
 
 
 	Texture2dConfigDX11 DepthConfig;
-	DepthConfig.SetDepthBuffer( 1024, 1024 );
+	DepthConfig.SetDepthBuffer( size, size );
 	DepthConfig.SetArraySize( 2 );
 	ResourcePtr DepthTarget = pRenderer11->CreateTexture2D( &DepthConfig, 0 );
 

@@ -25,6 +25,8 @@
 #include "ReflectiveSphereEntity.h"
 #include "DiffuseSphereEntity.h"
 
+#include "RotationController.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
@@ -170,12 +172,34 @@ void App::Initialize()
 	// scene so that it will be updated via the scene interface instead of 
 	// manually manipulating it.
 
-	m_pNode = new Node3D();
-	m_pEntity = new DiffuseSphereEntity();
-	m_pEntity->Position() = Vector3f( 1.0f, 2.25f, 0.0f );
-	m_pEntity->Rotation().Rotation( Vector3f( 0.0f, 0.0f, 0.0f ) );
 
-	for ( int i = 0; i < 2; i++ )
+	static float radius = 10.0f;
+
+	m_pNode = new Node3D();
+	
+	m_pDiffuseActor = new Actor();
+	m_pDiffuseActor->GetNode()->AttachController( new RotationController( Vector3f( 1.0f, 0.0f, 0.0f ), 0.5f ) );
+	for ( int i = 0; i < 100; i++ )
+	{
+		float x = static_cast<float>( (double)rand() / RAND_MAX ) * 2.0f - 1.0f;
+		float y = static_cast<float>( (double)rand() / RAND_MAX ) * 2.0f - 1.0f;
+		float z = static_cast<float>( (double)rand() / RAND_MAX ) * 2.0f - 1.0f;
+		
+		Vector3f pos = Vector3f( x, y, z );
+		pos.Normalize();
+
+		Entity3D* pEntity = new DiffuseSphereEntity();
+		pEntity->Position() = pos * radius;
+		m_pDiffuseActor->GetNode()->AttachChild( pEntity );
+		m_pDiffuseActor->AddElement( pEntity );
+	}
+
+	m_pReflectiveActor = new Actor();
+	
+	
+	
+
+	for ( int i = 0; i < 16; i++ )
 	{
 		m_pReflector[i] = new ReflectiveSphereEntity();
 		m_pReflector[i]->Position() = Vector3f( -1.0, 1.0f+(i*3), 0.0f );
@@ -183,7 +207,7 @@ void App::Initialize()
 		m_pNode->AttachChild( m_pReflector[i] );
 	}
 
-	m_pNode->AttachChild( m_pEntity );
+	m_pNode->AttachChild( m_pDiffuseActor->GetNode() );
 	
 
 	m_pScene->AddEntity( m_pNode );
@@ -249,7 +273,7 @@ void App::Update()
 	out << L"Hieroglyph 3 : Water Simulation\nFPS: " << m_pTimer->Framerate();
 
 
-	m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, *m_pFont, out.str().c_str(), Matrix4f::Identity() );
+	//m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, *m_pFont, out.str().c_str(), Matrix4f::Identity() );
 
 	// Perform the rendering and presentation for the window.
 
