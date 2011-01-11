@@ -72,6 +72,8 @@ bool App::ConfigureEngineComponents()
 		m_pTimer->SetFixedTimeStep( 1.0f / 10.0f );
 	}
 
+    m_pRenderer11->SetMultiThreadingState( false );
+
 	// Create the window.
 	int width = 640;
 	int height = 480;
@@ -203,7 +205,7 @@ void App::Initialize()
 
 
 	m_pCamera->SetCameraView( m_pRenderView );
-	m_pCamera->SetProjectionParams( 0.1f, 500.0f, (float)D3DX_PI / 2.0f, (float)ResolutionX / (float)ResolutionY );
+	m_pCamera->SetProjectionParams( 0.1f, 500.0f, (float)ResolutionX / (float)ResolutionY, (float)D3DX_PI / 2.0f );
 
 	// Create the scene and add the entities to it.  Then add the camera to the
 	// scene so that it will be updated via the scene interface instead of 

@@ -7,7 +7,7 @@
 // Copyright (C) 2009 Jason Zink.  All rights reserved.
 //--------------------------------------------------------------------------------
 
-Texture2D       AmbientOcclusionBuffer : register( t0 );           
+Texture2D<float>       AmbientOcclusionBuffer : register( t0 );           
 
 // The total texture size
 #define totalsize_x 640
@@ -21,7 +21,7 @@ struct VS_OUTPUT
 
 float4 PSMAIN( in VS_OUTPUT input ) : SV_Target
 {
-	float fOcclusion = AmbientOcclusionBuffer[input.position.xy];
+	float fOcclusion = AmbientOcclusionBuffer[ int2( input.position.xy ) ]; //( int3( input.position.xy, 0 ) ).x;
 	
 	return( float4( fOcclusion, fOcclusion, fOcclusion, fOcclusion ) );
 }

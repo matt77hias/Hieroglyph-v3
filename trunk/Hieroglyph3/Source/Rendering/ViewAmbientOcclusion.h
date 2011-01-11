@@ -41,8 +41,8 @@ namespace Glyph3
 		virtual void SetRenderParams( ParameterManagerDX11* pParamManager );
 		virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
 
-		virtual void SetViewMatrix( Matrix4f& matrix );
-		virtual void SetProjMatrix( Matrix4f& matrix );
+		virtual void SetViewMatrix( const Matrix4f& matrix );
+		virtual void SetProjMatrix( const Matrix4f& matrix );
 
 		virtual ~ViewAmbientOcclusion();
 

@@ -212,18 +212,16 @@ void App::Update()
 		std::wstringstream out;
 		out << L"Hieroglyph 3 : Curved Point Normal Triangles\nFPS: " << m_pTimer->Framerate();
 
-		D3D11_QUERY_DATA_PIPELINE_STATISTICS* stats = m_pRenderer11->pImmPipeline->m_pPipelineStatsData;
+		const D3D11_QUERY_DATA_PIPELINE_STATISTICS& stats = m_pRenderer11->pImmPipeline->m_PipelineStatsData;
 		int trisSent;
 		int trisRasterized;
 		float rasterPerc;
-		if(NULL != stats)
-		{
-			trisSent = static_cast<int>(stats->IAPrimitives);
-			trisRasterized = static_cast<int>(stats->CPrimitives);
-			rasterPerc = 0.0f;
-			if(0!=trisSent)
-				rasterPerc = 100.0f * (static_cast<float>(trisRasterized) / static_cast<float>(trisSent));
-		}
+
+		trisSent = static_cast<int>(stats.IAPrimitives);
+		trisRasterized = static_cast<int>(stats.CPrimitives);
+		rasterPerc = 0.0f;
+		if(0!=trisSent)
+			rasterPerc = 100.0f * (static_cast<float>(trisRasterized) / static_cast<float>(trisSent));		
 
 		// Stats
 		out << L"\nTriangles: " << trisSent << " sent, " << trisRasterized << " rasterized (" << rasterPerc << "%)";

@@ -355,7 +355,7 @@ void App::Initialize()
 
     const float nearClip = 1.0f;
     const float farClip = 15.0f;
-	m_pCamera->SetProjectionParams( nearClip, farClip, (float)D3DX_PI / 2.0f, (float)m_vpWidth / (float)m_vpHeight );
+	m_pCamera->SetProjectionParams( nearClip, farClip, (float)m_vpWidth / (float)m_vpHeight , (float)D3DX_PI / 2.0f);
 
     m_pLightsView = new ViewLights( *m_pRenderer11 );
 

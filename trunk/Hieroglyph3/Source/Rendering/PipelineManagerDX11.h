@@ -163,9 +163,12 @@ namespace Glyph3
 
 		D3D_FEATURE_LEVEL			m_FeatureLevel;
 
-		ID3D11DeviceContext*		m_pContext;
-		ID3D11Query*				m_pQuery;
-		D3D11_QUERY_DATA_PIPELINE_STATISTICS*	m_pPipelineStatsData;
+		ID3D11DeviceContext*		            m_pContext;
+		
+        static const int                        NumQueries = 3;
+        int                                     m_iCurrentQuery;
+        ID3D11Query*				            m_Queries[NumQueries];
+		D3D11_QUERY_DATA_PIPELINE_STATISTICS	m_PipelineStatsData;
 
 		// The shader stage resources are managed by these classes.
 

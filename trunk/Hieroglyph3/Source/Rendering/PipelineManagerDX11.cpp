@@ -53,8 +53,11 @@ using namespace Glyph3;
 PipelineManagerDX11::PipelineManagerDX11()
 {
 	m_pContext = 0;
-	m_pQuery = 0;
-	m_pPipelineStatsData = 0;
+    m_iCurrentQuery = 0;
+    for( int i = 0; i < NumQueries; ++i)
+	    m_Queries[i] = 0;
+
+    ZeroMemory(&m_PipelineStatsData, sizeof(D3D11_QUERY_DATA_PIPELINE_STATISTICS));
 
 	// Reference the shader stages for use in the binding process.
 
@@ -72,8 +75,8 @@ PipelineManagerDX11::~PipelineManagerDX11()
 	if( m_pContext ) m_pContext->Flush();
 
 	SAFE_RELEASE( m_pContext );
-	SAFE_RELEASE( m_pQuery );
-	SAFE_DELETE( m_pPipelineStatsData );
+    for( int i = 0; i < NumQueries; ++i)
+	    SAFE_RELEASE( m_Queries[i] );	
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::SetDeviceContext( ID3D11DeviceContext* pContext, D3D_FEATURE_LEVEL level )
@@ -875,25 +878,23 @@ void PipelineManagerDX11::UnMapResource( int index, UINT subresource )
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::StartPipelineStatistics( )
 {
-	if ( m_pQuery )
-		m_pContext->Begin( m_pQuery );
+	if ( m_Queries[m_iCurrentQuery] )            
+		m_pContext->Begin( m_Queries[m_iCurrentQuery] );    
 	else
 		Log::Get().Write( L"Tried to begin pipeline statistics without a query object!" );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::EndPipelineStatistics( )
 {
-	if ( m_pQuery )
-	{
-		m_pContext->End( m_pQuery );
-		
-		SAFE_DELETE(m_pPipelineStatsData);
-		m_pPipelineStatsData = new D3D11_QUERY_DATA_PIPELINE_STATISTICS;
-
-		if ( S_OK != m_pContext->GetData( m_pQuery, m_pPipelineStatsData, sizeof(D3D11_QUERY_DATA_PIPELINE_STATISTICS), 0) )
-		{
-			SAFE_DELETE(m_pPipelineStatsData);
-		}
+	if ( m_Queries[m_iCurrentQuery] )
+	{        
+		m_pContext->End( m_Queries[m_iCurrentQuery] );
+     
+        m_iCurrentQuery = ( m_iCurrentQuery + 1 ) % NumQueries;
+        HRESULT hr = m_pContext->GetData( m_Queries[m_iCurrentQuery], &m_PipelineStatsData, 
+                                            sizeof(D3D11_QUERY_DATA_PIPELINE_STATISTICS), 0);
+        if ( FAILED( hr ) )
+            Log::Get().Write( L"Failed attempting to retrieve query data" );        
 	}
 	else
 		Log::Get().Write( L"Tried to end pipeline statistics without a valid query object!" );
@@ -901,25 +902,20 @@ void PipelineManagerDX11::EndPipelineStatistics( )
 //--------------------------------------------------------------------------------
 std::wstring PipelineManagerDX11::PrintPipelineStatistics( )
 {
-	if ( NULL != m_pPipelineStatsData )
-	{
-		std::wstringstream s;
-		s << "Pipeline Statistics:" << std::endl;
-		s << "Number of vertices read by the IA: " << m_pPipelineStatsData->IAVertices << std::endl;
-		s << "Number of primitives read by the IA: " << m_pPipelineStatsData->IAPrimitives << std::endl;
-		s << "Number of vertex shader invocations: " << m_pPipelineStatsData->VSInvocations << std::endl;
-		s << "Number of hull shader invocations: " << m_pPipelineStatsData->HSInvocations << std::endl;
-		s << "Number of domain shader invocations: " << m_pPipelineStatsData->DSInvocations << std::endl;
-		s << "Number of geometry shader invocations: " << m_pPipelineStatsData->GSInvocations << std::endl;
-		s << "Number of primitives output by the geometry shader: " << m_pPipelineStatsData->GSPrimitives << std::endl;
-		s << "Number of primitives sent to the rasterizer: " << m_pPipelineStatsData->CInvocations << std::endl;
-		s << "Number of primitives rendered: " << m_pPipelineStatsData->CPrimitives << std::endl;
-		s << "Number of pixel shader invocations: " << m_pPipelineStatsData->PSInvocations << std::endl;
+	std::wstringstream s;
+	s << "Pipeline Statistics:" << std::endl;
+	s << "Number of vertices read by the IA: " << m_PipelineStatsData.IAVertices << std::endl;
+	s << "Number of primitives read by the IA: " << m_PipelineStatsData.IAPrimitives << std::endl;
+	s << "Number of vertex shader invocations: " << m_PipelineStatsData.VSInvocations << std::endl;
+	s << "Number of hull shader invocations: " << m_PipelineStatsData.HSInvocations << std::endl;
+	s << "Number of domain shader invocations: " << m_PipelineStatsData.DSInvocations << std::endl;
+	s << "Number of geometry shader invocations: " << m_PipelineStatsData.GSInvocations << std::endl;
+	s << "Number of primitives output by the geometry shader: " << m_PipelineStatsData.GSPrimitives << std::endl;
+	s << "Number of primitives sent to the rasterizer: " << m_PipelineStatsData.CInvocations << std::endl;
+	s << "Number of primitives rendered: " << m_PipelineStatsData.CPrimitives << std::endl;
+	s << "Number of pixel shader invocations: " << m_PipelineStatsData.PSInvocations << std::endl;
 
-		return( s.str() );
-	}
-
-	return( std::wstring( L"Statistics currently not available..." ) );
+	return( s.str() );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::SaveTextureScreenShot( int index, std::wstring filename, D3DX11_IMAGE_FILE_FORMAT format )

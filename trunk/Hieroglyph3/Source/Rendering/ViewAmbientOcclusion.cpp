@@ -205,7 +205,7 @@ void ViewAmbientOcclusion::SetUsageParams( ParameterManagerDX11* pParamManager )
 	pParamManager->SetShaderResourceParameter( L"AmbientOcclusionBuffer", OcclusionBuffer );
 }
 //--------------------------------------------------------------------------------
-void ViewAmbientOcclusion::SetViewMatrix( Matrix4f& matrix )
+void ViewAmbientOcclusion::SetViewMatrix( const Matrix4f& matrix )
 {
 	IRenderView::SetViewMatrix( matrix );
 
@@ -213,7 +213,7 @@ void ViewAmbientOcclusion::SetViewMatrix( Matrix4f& matrix )
 	pDepthNormalView->SetViewMatrix( matrix );
 }
 //--------------------------------------------------------------------------------
-void ViewAmbientOcclusion::SetProjMatrix( Matrix4f& matrix )
+void ViewAmbientOcclusion::SetProjMatrix( const Matrix4f& matrix )
 {
 	IRenderView::SetProjMatrix( matrix );
 

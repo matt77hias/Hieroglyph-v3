@@ -93,7 +93,7 @@ bool App::ConfigureEngineComponents()
 
 	// We'll keep a copy of the swap chain's render target index to 
 	// use later.
-	m_RenderTarget = m_pRenderer11->GetSwapChainResource( m_pWindow->GetSwapChain() );
+	m_RenderTarget = m_pRenderer11->GetSwapChainResource( m_pWindow->GetSwapChain() );    
 
 	// Next we create a depth buffer for use in the traditional rendering
 	// pipeline.
