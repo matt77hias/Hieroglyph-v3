@@ -134,59 +134,51 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			} break;
 
 		case WM_LBUTTONUP:
-			{
-				//CEvt_SystemLButtonUp* pEvent = new CEvt_SystemLButtonUp( wparam, lparam );
-				//EventManager::Get()->ProcessEvent( pEvent );
-				//return( 0 );
+			{				
+                EvtMouseLButtonUp* pEvent = new EvtMouseLButtonUp( hwnd, wparam, lparam );
+                EventManager::Get()->ProcessEvent( pEvent );
 			} break;
 
 		case WM_LBUTTONDOWN:
 			{
-				//CEvt_SystemLButtonDown* pEvent = new CEvt_SystemLButtonDown( wparam, lparam );
-				//EventManager::Get()->ProcessEvent( pEvent );
-				//return( 0 );
+                EvtMouseLButtonDown* pEvent = new EvtMouseLButtonDown( hwnd, wparam, lparam );
+                EventManager::Get()->ProcessEvent( pEvent );
 			} break;
 			
 		case WM_MBUTTONUP:
 			{
-				//CEvt_SystemMButtonUp* pEvent = new CEvt_SystemMButtonUp( wparam, lparam );
-				//EventManager::Get()->ProcessEvent( pEvent );
-				//return( 0 );
+                EvtMouseMButtonUp* pEvent = new EvtMouseMButtonUp( hwnd, wparam, lparam );
+                EventManager::Get()->ProcessEvent( pEvent );
 			} break;
 
 		case WM_MBUTTONDOWN:
 			{
-				//CEvt_SystemMButtonDown* pEvent = new CEvt_SystemMButtonDown( wparam, lparam );
-				//EventManager::Get()->ProcessEvent( pEvent );
-				//return( 0 );
+                EvtMouseMButtonDown* pEvent = new EvtMouseMButtonDown( hwnd, wparam, lparam );
+                EventManager::Get()->ProcessEvent( pEvent );
 			} break;
 
 		case WM_RBUTTONUP:
 			{
-				//CEvt_SystemRButtonUp* pEvent = new CEvt_SystemRButtonUp( wparam, lparam );
-				//EventManager::Get()->ProcessEvent( pEvent );
-				//return( 0 );
+                EvtMouseRButtonUp* pEvent = new EvtMouseRButtonUp( hwnd, wparam, lparam );
+                EventManager::Get()->ProcessEvent( pEvent );
 			} break;
 
 		case WM_RBUTTONDOWN:
 			{
-				//CEvt_SystemRButtonDown* pEvent = new CEvt_SystemRButtonDown( wparam, lparam );
-				//EventManager::Get()->ProcessEvent( pEvent );
-				//return( 0 );
+                EvtMouseRButtonDown* pEvent = new EvtMouseRButtonDown( hwnd, wparam, lparam );
+                EventManager::Get()->ProcessEvent( pEvent );
 			} break;
 
 		case WM_MOUSEMOVE:
 			{
-				//CEvt_SystemMouseMove* pEvent = new CEvt_SystemMouseMove( wparam, lparam );
-				//EventManager::Get()->ProcessEvent( pEvent );
-				//return( 0 );
+                EvtMouseMove* pEvent = new EvtMouseMove( hwnd, wparam, lparam );
+                EventManager::Get()->ProcessEvent( pEvent );
 			} break;
 
 		case WM_MOUSEWHEEL:
 			{
-				//CEvt_SystemMouseWheel* pEvent = new CEvt_SystemMouseWheel( wparam, lparam );
-				//EventManager::Get()->ProcessEvent( pEvent );
-				//return( 0 );
+                EvtMouseWheel* pEvent = new EvtMouseWheel( hwnd, wparam, lparam );
+                EventManager::Get()->ProcessEvent( pEvent );
 			} break;
 
 		case WM_CHAR:

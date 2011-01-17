@@ -31,8 +31,8 @@ namespace Glyph3
 		bool RButtonDown();
 		bool ShiftKeyDown();
 
-		unsigned int GetX();
-		unsigned int GetY();
+		int GetX();
+		int GetY();
 	};
 
 };

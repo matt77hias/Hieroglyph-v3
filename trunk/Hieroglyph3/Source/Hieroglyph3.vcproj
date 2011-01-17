@@ -2186,6 +2186,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Objects\FirstPersonCamera.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Objects\FirstPersonCamera.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Objects\Light.cpp"
 					>
 				</File>
