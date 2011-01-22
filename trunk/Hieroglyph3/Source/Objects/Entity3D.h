@@ -72,6 +72,7 @@ namespace Glyph3
 
 		bool IsHidden( );
 		void Hide( bool bHide );
+		void SetLocalMatrixCalculation( bool bCalc );
 
 
 		// Controller support is added here.  There can be multiple controllers which
@@ -131,6 +132,7 @@ namespace Glyph3
 
 		// Entity flags
 		bool m_bHidden;
+		bool m_bCalcLocal;
 	
 		Entity3D* m_pParent;
 		int m_iEntityID;

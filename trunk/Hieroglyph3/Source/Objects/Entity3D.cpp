@@ -45,10 +45,11 @@ Entity3D::Entity3D()
 
 	m_pComposite = new CompositeShape();
 
-	UpdateLocal( 0.0f );
-	UpdateWorld( );
+	//UpdateLocal( 0.0f );
+	//UpdateWorld( );
  
 	m_bHidden = false;
+	m_bCalcLocal = true;
 }
 //--------------------------------------------------------------------------------
 Entity3D::~Entity3D()
@@ -136,9 +137,12 @@ void Entity3D::UpdateLocal( float fTime )
 
 	// Load the local space matrix with the rotation and translation components.
 
-	m_mLocal.MakeIdentity( );
-	m_mLocal.SetRotation( m_mRotation );
-	m_mLocal.SetTranslation( m_vTranslation );
+	if ( m_bCalcLocal )
+	{
+		m_mLocal.MakeIdentity( );
+		m_mLocal.SetRotation( m_mRotation );
+		m_mLocal.SetTranslation( m_vTranslation );
+	}
 }
 //--------------------------------------------------------------------------------
 void Entity3D::UpdateWorld( )
@@ -452,5 +456,10 @@ void Entity3D::SetGeometry( GeometryDX11* pGeometry )
 		pGeometry->AddReference();
 
 	m_sParams.pGeometry = pGeometry;
+}
+//--------------------------------------------------------------------------------
+void Entity3D::SetLocalMatrixCalculation( bool bCalc )
+{
+	m_bCalcLocal = bCalc;
 }
 //--------------------------------------------------------------------------------

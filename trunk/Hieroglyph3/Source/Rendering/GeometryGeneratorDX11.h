@@ -26,6 +26,7 @@
 #define GeometryGeneratorDX11_h
 //--------------------------------------------------------------------------------
 #include "GeometryDX11.h"
+#include "SkinnedActor.h"
 #include <string>
 //--------------------------------------------------------------------------------
 namespace Glyph3
@@ -41,6 +42,11 @@ namespace Glyph3
                                     unsigned int VRes, float Radius );
         static void GenerateCone( GeometryDX11* pGeometry, unsigned int URes, 
                                     unsigned int VRes, float Radius, float Height );
+
+        static void GenerateWeightedSkinnedCone( GeometryDX11* pGeometry, unsigned int URes, 
+                                    unsigned int VRes, float Radius, float Height, 
+									unsigned int NumBones = 1, SkinnedActor* pActor = 0 );
+
 
 	private:
 		GeometryGeneratorDX11();

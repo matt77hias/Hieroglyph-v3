@@ -18,6 +18,7 @@
 #include "Vector3f.h"
 #include "Log.h"
 #include "GlyphString.h"
+#include "MaterialGeneratorDX11.h"
 
 #include "msModel.h"
 #include <boost/tokenizer.hpp> 
@@ -1021,40 +1022,160 @@ GeometryDX11* GeometryLoaderDX11::loadMS3DFileWithAnimationAndWeights( std::wstr
 		pPos[3*i+2].y =  pModel->GetVertex( vIDs[2] )->vertex[1];
 		pPos[3*i+2].z = -pModel->GetVertex( vIDs[2] )->vertex[2];
 
-		pIds[12*i+0] = pModel->GetVertex( vIDs[0] )->boneId;  if (pIds[12*i+0] == -1) pIds[12*i+0] = 0;
-		pIds[12*i+1] = pModel->GetVertex( vIDs[0] )->boneIds[0]; if (pIds[12*i+1] == -1) pIds[12*i+1] = 0;
-		pIds[12*i+2] = pModel->GetVertex( vIDs[0] )->boneIds[1]; if (pIds[12*i+2] == -1) pIds[12*i+2] = 0;
-		pIds[12*i+3] = pModel->GetVertex( vIDs[0] )->boneIds[2]; if (pIds[12*i+3] == -1) pIds[12*i+3] = 0;
+		pIds[12*i+0] = pModel->GetVertex( vIDs[0] )->boneId;
+		pIds[12*i+1] = pModel->GetVertex( vIDs[0] )->boneIds[0];
+		pIds[12*i+2] = pModel->GetVertex( vIDs[0] )->boneIds[1]; 
+		pIds[12*i+3] = pModel->GetVertex( vIDs[0] )->boneIds[2]; 
 
-		pIds[12*i+4] = pModel->GetVertex( vIDs[1] )->boneId; if (pIds[12*i+4] == -1) pIds[12*i+4] = 0;
-		pIds[12*i+5] = pModel->GetVertex( vIDs[1] )->boneIds[0]; if (pIds[12*i+5] == -1) pIds[12*i+5] = 0;
-		pIds[12*i+6] = pModel->GetVertex( vIDs[1] )->boneIds[1]; if (pIds[12*i+6] == -1) pIds[12*i+6] = 0;
-		pIds[12*i+7] = pModel->GetVertex( vIDs[1] )->boneIds[2]; if (pIds[12*i+7] == -1) pIds[12*i+7] = 0;
+		pIds[12*i+4] = pModel->GetVertex( vIDs[1] )->boneId; 
+		pIds[12*i+5] = pModel->GetVertex( vIDs[1] )->boneIds[0];
+		pIds[12*i+6] = pModel->GetVertex( vIDs[1] )->boneIds[1]; 
+		pIds[12*i+7] = pModel->GetVertex( vIDs[1] )->boneIds[2]; 
 
-		pIds[12*i+8] = pModel->GetVertex( vIDs[2] )->boneId; if (pIds[12*i+8] == -1) pIds[12*i+8] = 0;
-		pIds[12*i+9] = pModel->GetVertex( vIDs[2] )->boneIds[0]; if (pIds[12*i+9] == -1) pIds[12*i+9] = 0;
-		pIds[12*i+10] = pModel->GetVertex( vIDs[2] )->boneIds[1]; if (pIds[12*i+10] == -1) pIds[12*i+10] = 0;
-		pIds[12*i+11] = pModel->GetVertex( vIDs[2] )->boneIds[2]; if (pIds[12*i+11] == -1) pIds[12*i+11] = 0;
+		pIds[12*i+8] = pModel->GetVertex( vIDs[2] )->boneId;
+		pIds[12*i+9] = pModel->GetVertex( vIDs[2] )->boneIds[0]; 
+		pIds[12*i+10] = pModel->GetVertex( vIDs[2] )->boneIds[1];
+		pIds[12*i+11] = pModel->GetVertex( vIDs[2] )->boneIds[2];
+
 
 		float w1 = ((float)pModel->GetVertex( vIDs[0] )->weights[0] );
 		float w2 = ((float)pModel->GetVertex( vIDs[0] )->weights[1] );
 		float w3 = ((float)pModel->GetVertex( vIDs[0] )->weights[2] );
+		if ( w1 != 0.0f || w2 != 0.0f || w3 != 0.0f )
+		{
+			pWghts[3*i+0].x = w1 / fTotalWeight;
+			pWghts[3*i+0].y = w2 / fTotalWeight;
+			pWghts[3*i+0].z = w3 / fTotalWeight;
+			pWghts[3*i+0].w = 1.0f - w1 - w2 - w3;
+		}
+		else
+		{
+			pWghts[3*i+0].x = 1.0f;
+			pWghts[3*i+0].y = 0.0f;
+			pWghts[3*i+0].z = 0.0f;
+			pWghts[3*i+0].w = 0.0f;
+		}
 
-		pWghts[3*i+0].x = ((float)pModel->GetVertex( vIDs[0] )->weights[0] ) / fTotalWeight;
-		pWghts[3*i+0].y = ((float)pModel->GetVertex( vIDs[0] )->weights[1] ) / fTotalWeight;
-		pWghts[3*i+0].z = ((float)pModel->GetVertex( vIDs[0] )->weights[2] ) / fTotalWeight;
-		pWghts[3*i+0].w = 1.0f - pWghts[3*i+0].x - pWghts[3*i+0].y - pWghts[3*i+0].z;
 
-		pWghts[3*i+1].x = ((float)pModel->GetVertex( vIDs[1] )->weights[0] ) / fTotalWeight;
-		pWghts[3*i+1].y = ((float)pModel->GetVertex( vIDs[1] )->weights[1] ) / fTotalWeight;
-		pWghts[3*i+1].z = ((float)pModel->GetVertex( vIDs[1] )->weights[2] ) / fTotalWeight;
-		pWghts[3*i+1].w = 1.0f - pWghts[3*i+1].x - pWghts[3*i+1].y - pWghts[3*i+1].z;
+		//pWghts[3*i+0].x = ((float)pModel->GetVertex( vIDs[0] )->weights[0] ) / fTotalWeight;
+		//pWghts[3*i+0].y = ((float)pModel->GetVertex( vIDs[0] )->weights[1] ) / fTotalWeight;
+		//pWghts[3*i+0].z = ((float)pModel->GetVertex( vIDs[0] )->weights[2] ) / fTotalWeight;
+		//pWghts[3*i+0].w = 1.0f - pWghts[3*i+0].x - pWghts[3*i+0].y - pWghts[3*i+0].z;
 
-		pWghts[3*i+2].x = ((float)pModel->GetVertex( vIDs[2] )->weights[0] ) / fTotalWeight;
-		pWghts[3*i+2].y = ((float)pModel->GetVertex( vIDs[2] )->weights[1] ) / fTotalWeight;
-		pWghts[3*i+2].z = ((float)pModel->GetVertex( vIDs[2] )->weights[2] ) / fTotalWeight;
-		pWghts[3*i+2].w = 1.0f - pWghts[3*i+2].x - pWghts[3*i+2].y - pWghts[3*i+2].z;
+		w1 = ((float)pModel->GetVertex( vIDs[1] )->weights[0] );
+		w2 = ((float)pModel->GetVertex( vIDs[1] )->weights[1] );
+		w3 = ((float)pModel->GetVertex( vIDs[1] )->weights[2] );
 
+		if ( w1 != 0.0f || w2 != 0.0f || w3 != 0.0f )
+		{
+			pWghts[3*i+1].x = w1 / fTotalWeight;
+			pWghts[3*i+1].y = w2 / fTotalWeight;
+			pWghts[3*i+1].z = w3 / fTotalWeight;
+			pWghts[3*i+1].w = 1.0f - w1 - w2 - w3;
+		}
+		else
+		{
+			pWghts[3*i+1].x = 1.0f;
+			pWghts[3*i+1].y = 0.0f;
+			pWghts[3*i+1].z = 0.0f;
+			pWghts[3*i+1].w = 0.0f;
+		}
+
+		//pWghts[3*i+1].x = ((float)pModel->GetVertex( vIDs[1] )->weights[0] ) / fTotalWeight;
+		//pWghts[3*i+1].y = ((float)pModel->GetVertex( vIDs[1] )->weights[1] ) / fTotalWeight;
+		//pWghts[3*i+1].z = ((float)pModel->GetVertex( vIDs[1] )->weights[2] ) / fTotalWeight;
+		//pWghts[3*i+1].w = 1.0f - pWghts[3*i+1].x - pWghts[3*i+1].y - pWghts[3*i+1].z;
+
+		w1 = ((float)pModel->GetVertex( vIDs[2] )->weights[0] );
+		w2 = ((float)pModel->GetVertex( vIDs[2] )->weights[1] );
+		w3 = ((float)pModel->GetVertex( vIDs[2] )->weights[2] );
+
+		if ( w1 != 0.0f || w2 != 0.0f || w3 != 0.0f )
+		{
+			pWghts[3*i+2].x = w1 / fTotalWeight;
+			pWghts[3*i+2].y = w2 / fTotalWeight;
+			pWghts[3*i+2].z = w3 / fTotalWeight;
+			pWghts[3*i+2].w = 1.0f - w1 - w2 - w3;
+		}
+		else
+		{
+			pWghts[3*i+2].x = 1.0f;
+			pWghts[3*i+2].y = 0.0f;
+			pWghts[3*i+2].z = 0.0f;
+			pWghts[3*i+2].w = 0.0f;
+		}
+
+		//pWghts[3*i+2].x = ((float)pModel->GetVertex( vIDs[2] )->weights[0] ) / fTotalWeight;
+		//pWghts[3*i+2].y = ((float)pModel->GetVertex( vIDs[2] )->weights[1] ) / fTotalWeight;
+		//pWghts[3*i+2].z = ((float)pModel->GetVertex( vIDs[2] )->weights[2] ) / fTotalWeight;
+		//pWghts[3*i+2].w = 1.0f - pWghts[3*i+2].x - pWghts[3*i+2].y - pWghts[3*i+2].z;
+
+
+
+		if (pIds[12*i+0] == -1)
+		{
+			pIds[12*i+0] = 0;
+			pWghts[3*i+0].x = 0.0f; 
+		}
+
+		if (pIds[12*i+1] == -1)
+		{
+			pIds[12*i+1] = 0;
+			pWghts[3*i+0].y = 0.0f; 
+		}
+		if (pIds[12*i+2] == -1)
+		{
+			pIds[12*i+2] = 0;
+			pWghts[3*i+0].z = 0.0f; 
+		}
+		if (pIds[12*i+3] == -1)
+		{
+			pIds[12*i+3] = 0;
+			pWghts[3*i+0].w = 0.0f; 
+		}
+
+
+
+		if (pIds[12*i+4] == -1)
+		{
+			pIds[12*i+4] = 0;
+			pWghts[3*i+1].x = 0.0f; 
+		}
+		if (pIds[12*i+5] == -1)
+		{
+			pIds[12*i+5] = 0;
+			pWghts[3*i+1].y = 0.0f; 
+		}
+		if (pIds[12*i+6] == -1)
+		{
+			pIds[12*i+6] = 0;
+			pWghts[3*i+1].z = 0.0f; 
+		}
+		if (pIds[12*i+7] == -1)
+		{
+			pIds[12*i+7] = 0;
+			pWghts[3*i+1].w = 0.0f; 
+		}
+		if (pIds[12*i+8] == -1)
+		{
+			pIds[12*i+8] = 0;
+			pWghts[3*i+2].x = 0.0f; 
+		}
+		if (pIds[12*i+9] == -1)
+		{
+			pIds[12*i+9] = 0;
+			pWghts[3*i+2].y = 0.0f; 
+		}
+		if (pIds[12*i+10] == -1)
+		{
+			pIds[12*i+10] = 0;
+			pWghts[3*i+2].z = 0.0f; 
+		}
+		if (pIds[12*i+11] == -1)
+		{
+			pIds[12*i+11] = 0;
+			pWghts[3*i+2].w = 0.0f; 
+		}
 
 		pNrm[3*i+0].x = pTriangle->vertexNormals[0][0];
 		pNrm[3*i+0].y = pTriangle->vertexNormals[0][1];
@@ -1093,7 +1214,7 @@ GeometryDX11* GeometryLoaderDX11::loadMS3DFileWithAnimationAndWeights( std::wstr
 	if ( pActor )
 	{
 		// Set the geometry in the body of the actor
-		pActor->GetBody()->SetGeometry( pMesh );
+		//pActor->GetBody()->SetGeometry( pMesh );
 
 		// Create an array of nodes, one for each joint.
 		std::map<std::string,Node3D*> JointNodes;
@@ -1105,7 +1226,7 @@ GeometryDX11* GeometryLoaderDX11::loadMS3DFileWithAnimationAndWeights( std::wstr
 
 			Vector3f BindPosition = Vector3f( pJoint->pos[0],
 			 								  pJoint->pos[1],
-											  pJoint->pos[2] );
+											  -pJoint->pos[2] );
 
 			AnimationStream<Vector3f>* pPosFrames = new AnimationStream<Vector3f>();
 
@@ -1113,27 +1234,31 @@ GeometryDX11* GeometryLoaderDX11::loadMS3DFileWithAnimationAndWeights( std::wstr
 			{
 				Vector3f p = Vector3f( pJoint->positionKeys[j].key[0],
 					                   pJoint->positionKeys[j].key[1],
-					                   pJoint->positionKeys[j].key[2] );
+					                   -pJoint->positionKeys[j].key[2] );
+
+				std::stringstream s;
+				s << "Position Frame " << j << " " << p.x << "," << p.y << "," << p.z;
+				Log::Get().Write( GlyphString::ToUnicode( s.str() ) );
 
 				pPosFrames->AddState( AnimationState<Vector3f>( pJoint->positionKeys[j].time, p ) ); 
 			}
 
 			AnimationStream<Vector3f>* pRotFrames = new AnimationStream<Vector3f>();
 			
-			Vector3f BindRotation = Vector3f( pJoint->rot[0] + 6.28f,
-				                              pJoint->rot[1] + 6.28f,
+			Vector3f BindRotation = Vector3f( -pJoint->rot[0] + 6.28f,
+				                              -pJoint->rot[1] + 6.28f,
 											  pJoint->rot[2] + 6.28f );
 
 			for ( int j = 0; j < pJoint->rotationKeys.size(); j++ )
 			{
 
-				Vector3f p = Vector3f( pJoint->rotationKeys[j].key[0] + 6.28f,
-					                   pJoint->rotationKeys[j].key[1] + 6.28f,
+				Vector3f p = Vector3f( -pJoint->rotationKeys[j].key[0] + 6.28f,
+					                   -pJoint->rotationKeys[j].key[1] + 6.28f,
 						               pJoint->rotationKeys[j].key[2] + 6.28f );
 
-				//std::stringstream s;
-				//s << "Parent: " << pJoint->parentName << " Name:" << pJoint->name << " :: Rotation Frame " << j << " " << p.x << "," << p.y << "," << p.z;
-				//Log::Get().Write( GlyphString::ToUnicode( s.str() ) );
+				std::stringstream s;
+				s << "Rotation Frame " << j << " " << p.x << "," << p.y << "," << p.z;
+				Log::Get().Write( GlyphString::ToUnicode( s.str() ) );
 
 				pRotFrames->AddState( AnimationState<Vector3f>( pJoint->rotationKeys[j].time, p ) ); 
 			}
@@ -1141,7 +1266,7 @@ GeometryDX11* GeometryLoaderDX11::loadMS3DFileWithAnimationAndWeights( std::wstr
 			pActor->AddBoneNode( pBone, BindPosition, BindRotation, pPosFrames, pRotFrames );
 
 			std::stringstream s;
-			s << "Parent: " << pJoint->parentName << " Name:" << pJoint->name << " :: Bind Position:" << BindPosition.x << "," << BindPosition.y << "," << BindPosition.z << ":: Bind Rotation:" << BindRotation.x << "," << BindRotation.y << "," << BindRotation.z;
+			s << "Parent: " << pJoint->parentName << "\t Name:" << pJoint->name << "\t Bind Position:" << BindPosition.x << "," << BindPosition.y << "," << BindPosition.z << "\t Bind Rotation:" << BindRotation.x << "," << BindRotation.y << "," << BindRotation.z;
 
 			Log::Get().Write( GlyphString::ToUnicode( s.str() ) );
 			JointNodes[std::string(pJoint->name)] = pBone;
@@ -1157,12 +1282,30 @@ GeometryDX11* GeometryLoaderDX11::loadMS3DFileWithAnimationAndWeights( std::wstr
 
 			// If the node has a parent, link them
 			if ( pParent && pChild )
+			{
 				pParent->AttachChild( pChild );
+				SkinnedBoneController* pParentController = (SkinnedBoneController*)pParent->GetController( 0 );
+				SkinnedBoneController* pChildController = (SkinnedBoneController*)pChild->GetController( 0 );
+				pChildController->SetParentBone( pParentController );
+			}
 
 			// If the node has no parent, link it to the root of the skinned actor (for connection
 			// to the scene graph).
 			if ( !pParent && pChild )
+			{
 				pActor->GetNode()->AttachChild( pChild );
+
+				pActor->GetGeometryEntity()->SetGeometry( pMesh );
+				pActor->GetGeometryEntity()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedSolid( *RendererDX11::Get() ) );
+				pChild->AttachChild( pActor->GetGeometryEntity() );
+
+				SkinnedBoneController* pChildController = (SkinnedBoneController*)pChild->GetController( 0 );
+				//pChildController->SetBindPosition( Vector3f( 0.0f, 0.0f, 0.0f ) );
+				//pChildController->SetBindRotation( Vector3f( 0.0f, 0.0f, 0.0f ) );
+
+				
+				pChildController->SetBindRotation( Vector3f( 1.5f + 6.28f, 1.5f + 6.28f, 0.0f + 6.28f ) );
+			}
 		}
 	}
 

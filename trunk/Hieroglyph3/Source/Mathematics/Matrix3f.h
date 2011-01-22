@@ -35,6 +35,7 @@ namespace Glyph3
 		void RotationY( float fRadians );
 		void RotationZ( float fRadians );
 		void Rotation( Vector3f& Rot );
+		void RotationZYX( Vector3f& Rot );
 		void RotationEuler( Vector3f& Axis, float Angle );
 
 		void MakeZero();

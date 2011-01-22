@@ -40,10 +40,15 @@ namespace Glyph3
 		void PlayAnimation( std::wstring& name );
 		void PlayAllAnimations( );
 
+		Entity3D* GetGeometryEntity();
+
 	protected:
 		TArray<SkinnedBoneController*>	m_Bones;
 		MatrixArrayParameterDX11*		m_pMatrixParameter;
+		MatrixArrayParameterDX11*		m_pMatrixNormalParameter;
 		Matrix4f*						m_pMatrices;
+		Matrix4f*						m_pNormalMatrices;
+		Entity3D*						m_pGeometryEntity;
 	};
 };
 //--------------------------------------------------------------------------------

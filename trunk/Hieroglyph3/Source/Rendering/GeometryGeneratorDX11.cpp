@@ -11,7 +11,10 @@
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "GeometryGeneratorDX11.h"
+#include "MaterialGeneratorDX11.h"
 #include "VertexElementDX11.h"
+#include "ShaderResourceParameterDX11.h"
+#include "SamplerStateConfigDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -493,6 +496,7 @@ void GeometryGeneratorDX11::GenerateCone( GeometryDX11* pGeometry, unsigned int 
     _ASSERT( Radius > 0.0f );
     _ASSERT( Height > 0.0f );
 
+
     if ( pGeometry )
     {        
         const unsigned int NumVertexRings = VRes;
@@ -586,5 +590,351 @@ void GeometryGeneratorDX11::GenerateCone( GeometryDX11* pGeometry, unsigned int 
             pGeometry->AddFace( face );
         }
     }
+}
+//--------------------------------------------------------------------------------
+void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry, unsigned int URes, 
+                                        unsigned int VRes, float Radius, float Height, 
+										unsigned int NumBones, SkinnedActor* pActor )
+{
+    _ASSERT( VRes >= 1 );
+    _ASSERT( URes >= 4 );
+    _ASSERT( Radius > 0.0f );
+    _ASSERT( Height > 0.0f );
+
+    if ( pGeometry )
+    {        
+        const unsigned int NumVertexRings = VRes;
+        const unsigned int NumVerts = NumVertexRings * URes + 2;
+        const unsigned int NumTriangleRings = VRes - 1;
+        const unsigned int NumTriangles = ( ( NumTriangleRings + 1 )* URes * 2 );
+        const unsigned int NumIndices = NumTriangles * 3;
+
+
+		// create the vertex element streams
+		VertexElementDX11* pPositions = new VertexElementDX11( 3, NumVerts );
+		pPositions->m_SemanticName = VertexElementDX11::PositionSemantic;
+		pPositions->m_uiSemanticIndex = 0;
+		pPositions->m_Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		pPositions->m_uiInputSlot = 0;
+		pPositions->m_uiAlignedByteOffset = 0;
+		pPositions->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		pPositions->m_uiInstanceDataStepRate = 0;
+
+		VertexElementDX11* pBoneIDs = new VertexElementDX11( 4, NumVerts );
+		pBoneIDs->m_SemanticName = VertexElementDX11::BoneIDSemantic;
+		pBoneIDs->m_uiSemanticIndex = 0;
+		pBoneIDs->m_Format = DXGI_FORMAT_R32G32B32A32_SINT;
+		pBoneIDs->m_uiInputSlot = 0;
+		pBoneIDs->m_uiAlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		pBoneIDs->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		pBoneIDs->m_uiInstanceDataStepRate = 0;
+
+		VertexElementDX11* pBoneWeights = new VertexElementDX11( 4, NumVerts );
+		pBoneWeights->m_SemanticName = VertexElementDX11::BoneWeightSemantic;
+		pBoneWeights->m_uiSemanticIndex = 0;
+		pBoneWeights->m_Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		pBoneWeights->m_uiInputSlot = 0;
+		pBoneWeights->m_uiAlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		pBoneWeights->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		pBoneWeights->m_uiInstanceDataStepRate = 0;
+
+		VertexElementDX11* pTexcoords = new VertexElementDX11( 2, NumVerts );
+		pTexcoords->m_SemanticName = VertexElementDX11::TexCoordSemantic;
+		pTexcoords->m_uiSemanticIndex = 0;
+		pTexcoords->m_Format = DXGI_FORMAT_R32G32_FLOAT;
+		pTexcoords->m_uiInputSlot = 0;
+		pTexcoords->m_uiAlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		pTexcoords->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		pTexcoords->m_uiInstanceDataStepRate = 0;
+
+		VertexElementDX11* pNormals = new VertexElementDX11( 3, NumVerts );
+		pNormals->m_SemanticName = VertexElementDX11::NormalSemantic;
+		pNormals->m_uiSemanticIndex = 0;
+		pNormals->m_Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		pNormals->m_uiInputSlot = 0;
+		pNormals->m_uiAlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		pNormals->m_InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		pNormals->m_uiInstanceDataStepRate = 0;
+
+		Vector3f* pPos = pPositions->Get3f( 0 );
+		int* pIds = pBoneIDs->Get1i( 0 );
+		Vector4f* pWghts = pBoneWeights->Get4f( 0 );
+		Vector3f* pNrm = pNormals->Get3f( 0 );
+		Vector2f* pTex = pTexcoords->Get2f( 0 );
+
+
+
+        // Calculate all of the vertex positions
+        int currVert = 0;
+
+        // First vertex will be at the top pole
+        pPos[currVert] = Vector3f( 0.0f, Height, 0.0f );
+
+		pIds[4*currVert+0] = NumBones-1;
+		pIds[4*currVert+1] = 0;
+		pIds[4*currVert+2] = 0;
+		pIds[4*currVert+3] = 0;
+
+		pWghts[currVert] = Vector4f( 1.0f, 0.0f, 0.0f, 0.0f );
+		pTex[currVert] = Vector2f( 0.0f, 0.0f );
+		pNrm[currVert] = Vector3f( 0.0f, 1.0f, 0.0f );
+
+		currVert++;
+
+		//Vector2f TexScale = Vector2f( 5.0f/(3.14159f*2.0f), 20.0f/Height );
+		Vector2f TexScale = Vector2f( 0.5f/(3.14159f*2.0f), 2.0f/Height );
+
+		float boneHeightStep = Height / static_cast<float>( NumBones );
+
+        // Add in the rings of vertices
+        for ( unsigned int v = 0; v < NumVertexRings; ++v )
+        {
+            for ( unsigned int u = 0; u < URes; ++u )
+            {
+                float uAngle = u / static_cast<float>( URes ) * 3.14159f * 2.0f;                
+
+                float heightScale = v / static_cast<float>( NumVertexRings );
+                float x = cosf( uAngle ) * Radius * heightScale;
+                float y = Height - heightScale * Height;
+                float z = sinf( uAngle ) * Radius * heightScale;
+
+                pPos[currVert] = Vector3f( x, y, z );
+				
+				int b0 = (int)(y / boneHeightStep);
+				int b1 = b0 + 1;
+				if ( b0 >= NumBones ) b0 = NumBones-1;
+				if ( b1 >= NumBones ) b1 = NumBones-1;
+
+				pIds[4*currVert+0] = b0;
+				pIds[4*currVert+1] = b1;
+				pIds[4*currVert+2] = 0;
+				pIds[4*currVert+3] = 0;
+
+				float w1 = (( y / ( boneHeightStep ) ) - (float)b0 ) / 2.0f;
+				float w0 = 1.0f - w1;
+
+				pWghts[currVert] = Vector4f( w0, w1, 0.0f, 0.0f );
+				pTex[currVert].x = TexScale.x * uAngle;
+				pTex[currVert].y = TexScale.y * heightScale * Height;
+
+				Vector3f n = Vector3f( 0.0f, 0.0f, 1.0f );
+				Matrix3f rot = Matrix3f();
+				float angle = atanf( Radius/Height );
+				rot.Rotation( Vector3f( atanf(Radius/Height), uAngle-(3.14159f/2.0f), 0.0f ) );
+				pNrm[currVert] = rot * n; //Vector3f( 1.0f, 0.0f, 0.0f );
+
+				currVert++;
+            }
+        }
+
+        // First vertex will be the center of the circle
+        pPos[currVert] = Vector3f( 0.0f, 0.0f, 0.0f );
+        
+		pIds[4*currVert+0] = 0;
+		pIds[4*currVert+1] = 0;
+		pIds[4*currVert+2] = 0;
+		pIds[4*currVert+3] = 0;
+
+		pWghts[currVert] = Vector4f( 1.0f, 0.0f, 0.0f, 0.0f );
+		pTex[currVert] = Vector2f( 0.0f, 0.0f );
+		pNrm[currVert] = Vector3f( 0.0f, 0.0f, 1.0f );
+
+		currVert++;
+
+        _ASSERT( currVert == NumVerts );
+        pGeometry->AddElement( pPositions );
+		pGeometry->AddElement( pBoneIDs );
+		pGeometry->AddElement( pBoneWeights );
+		pGeometry->AddElement( pTexcoords );
+		pGeometry->AddElement( pNormals );
+
+
+
+        // Now we'll add the triangles
+        TriangleIndices face;
+
+        // Top ring first
+        for ( unsigned int u = 0; u < URes; ++u )
+        {
+            const unsigned int currentU = u;
+            const unsigned int nextU = ( u + 1 ) % URes;
+            face = TriangleIndices( 0, nextU + 1, u + 1 );
+            pGeometry->AddFace( face );
+        }
+
+        // Now the other rings
+        for ( unsigned int v = 1; v < VRes; ++v )
+        {
+            const unsigned int top = 1 + ( ( v - 1 ) * URes );
+            const unsigned int bottom = top + URes;
+            for ( unsigned int u = 0; u < URes; ++u )
+            {                
+                const unsigned int currentU = u;
+                const unsigned int nextU = ( u + 1 ) % URes;
+                const unsigned int currTop = top + currentU;
+                const unsigned int nextTop = top + nextU;
+                const unsigned int currBottom = bottom + currentU;
+                const unsigned int nextBottom = bottom + nextU;
+
+                face = TriangleIndices( currTop, nextTop, nextBottom );
+                pGeometry->AddFace( face );
+
+                face = TriangleIndices( nextBottom, currBottom, currTop );
+                pGeometry->AddFace( face );
+            }
+        }
+
+        // And now the bottom
+        const unsigned int top = 1 + ( ( VRes - 1 ) * URes );
+        const unsigned int center = NumVerts - 1;
+        for ( unsigned int u = 0; u < URes; ++u )
+        {
+            const unsigned int currentU = u;
+            const unsigned int nextU = ( u + 1 ) % URes;
+            const unsigned int currTop = top + currentU;
+            const unsigned int nextTop = top + nextU;
+
+            face = TriangleIndices( nextTop, center, currTop );
+            pGeometry->AddFace( face );
+        }
+
+		pGeometry->LoadToBuffers();
+		pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
+
+	
+		// If the actor is passed in, then generate the bone information
+		// and bind it to the actor.
+
+		if ( pActor )
+		{
+			// Set the geometry in the body of the actor
+			//pActor->GetBody()->SetGeometry( pMesh );
+			TArray<Node3D*> m_Bones;
+
+			// Create the bones, distributed along the length of the cone
+			for ( unsigned int i = 0; i < NumBones; i++ )
+			{
+				Node3D* pBone = new Node3D();
+				m_Bones.add( pBone );
+
+				Vector3f BindPosition = Vector3f( 0.0f, 0.0f, 0.0f);
+
+				if ( i != 0 )
+					BindPosition = Vector3f( 0.0f, boneHeightStep, 0.0f);
+
+				AnimationStream<Vector3f>* pPosFrames = new AnimationStream<Vector3f>();
+
+				//for ( int j = 0; j < pJoint->positionKeys.size(); j++ )
+				{
+					Vector3f p = Vector3f( 0.0f, 0.0f, 0.0f );
+					pPosFrames->AddState( AnimationState<Vector3f>( 0.0f, p ) ); 
+				}
+
+				AnimationStream<Vector3f>* pRotFrames = new AnimationStream<Vector3f>();
+				
+				//Vector3f BindRotation = Vector3f( 6.28f, 6.28f, 6.28f );
+				Vector3f BindRotation = Vector3f( 0.0f, 0.0f, 0.0f );
+				//if ( i == 2 ) BindRotation = Vector3f( 6.28f + 0.75f, 6.28f, 6.28f );
+				//if ( i == 5 ) BindRotation = Vector3f( 6.28f + 0.75f, 6.28f, 6.28f );
+
+				//for ( int j = 0; j < pJoint->rotationKeys.size(); j++ )
+				{
+					Vector3f p = Vector3f( 0.0f, 0.0f, 0.0f );
+					pRotFrames->AddState( AnimationState<Vector3f>( 0.0f, p ) ); 
+
+					if ( i > 0 )
+					{
+						p = Vector3f( 0.0f + 0.75f, 0.0f, 0.0f );
+						pRotFrames->AddState( AnimationState<Vector3f>( 1.0f, p ) ); 
+						p = Vector3f( 0.0f + -0.75f, 0.0f, 0.0f );
+						pRotFrames->AddState( AnimationState<Vector3f>( 2.0f, p ) ); 
+						p = Vector3f( 0.0f + 0.75f, 0.0f, 0.0f );
+						pRotFrames->AddState( AnimationState<Vector3f>( 3.0f, p ) ); 
+						p = Vector3f( 0.0f + -0.75f, 0.0f, 0.0f );
+						pRotFrames->AddState( AnimationState<Vector3f>( 4.0f, p ) ); 
+						p = Vector3f( 0.0f + 0.75f, 0.0f, 0.0f );
+						pRotFrames->AddState( AnimationState<Vector3f>( 5.0f, p ) ); 
+					}
+				}
+
+				pActor->AddBoneNode( pBone, BindPosition, BindRotation, pPosFrames, pRotFrames );
+
+				//std::stringstream s;
+				//s << "Parent: " << pJoint->parentName << "\t Name:" << pJoint->name << "\t Bind Position:" << BindPosition.x << "," << BindPosition.y << "," << BindPosition.z << "\t Bind Rotation:" << BindRotation.x << "," << BindRotation.y << "," << BindRotation.z;
+
+				//Log::Get().Write( GlyphString::ToUnicode( s.str() ) );
+				//JointNodes[std::string(pJoint->name)] = pBone;
+			}
+
+			// Connect up the bones to form the skeleton.
+			for ( unsigned int i = 0; i < NumBones; i++ )
+			{
+				Node3D* pParent = m_Bones[i-1];
+				Node3D* pChild = m_Bones[i];
+
+				// If the node has a parent, link them
+				if ( i != 0 )
+				{
+					pParent->AttachChild( pChild );
+					SkinnedBoneController* pParentController = (SkinnedBoneController*)pParent->GetController( 0 );
+					SkinnedBoneController* pChildController = (SkinnedBoneController*)pChild->GetController( 0 );
+					//pChildController->SetParentBone( pParentController );
+				} 
+				else
+				{
+					if ( i == 0 )
+					{
+						pActor->GetNode()->AttachChild( pChild );
+
+						pActor->GetGeometryEntity()->SetGeometry( pGeometry );
+						pActor->GetGeometryEntity()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedSolid( *RendererDX11::Get() ) );
+						pChild->AttachChild( pActor->GetGeometryEntity() );
+
+
+
+						ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/EyeOfHorus.png" );
+						
+						ShaderResourceParameterDX11* pTextureParameter = new ShaderResourceParameterDX11();
+						pTextureParameter->SetName( L"ColorTexture" );
+						pTextureParameter->SetParameterData( &ColorTexture->m_iResourceSRV );
+						pActor->GetGeometryEntity()->AddRenderParameter( pTextureParameter );
+
+
+						SamplerStateConfigDX11 SamplerConfig;
+						SamplerConfig.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+						SamplerConfig.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+						//SamplerConfig.Filter = D3D11_FILTER_ANISOTROPIC;
+						//SamplerConfig.MaxAnisotropy = 16;
+
+						int LinearSampler = RendererDX11::Get()->CreateSamplerState( &SamplerConfig );
+
+						RendererDX11::Get()->m_pParamMgr->SetSamplerParameter( L"LinearSampler", &LinearSampler );
+
+
+
+
+						SkinnedBoneController* pChildController = (SkinnedBoneController*)pChild->GetController( 0 );
+						//pChildController->SetBindPosition( Vector3f( 0.0f, 0.0f, 0.0f ) );
+						//pChildController->SetBindRotation( Vector3f( 0.0f, 0.0f, 0.0f ) );
+
+						
+						//pChildController->SetBindRotation( Vector3f( 1.5f + 6.28f, 1.5f + 6.28f, 0.0f + 6.28f ) );
+					}
+				}
+			}
+		}
+
+
+
+
+
+	}
+
+
+
+
+
+
+
 }
 //--------------------------------------------------------------------------------

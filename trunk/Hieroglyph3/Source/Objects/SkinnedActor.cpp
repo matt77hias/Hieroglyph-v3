@@ -21,7 +21,11 @@ using namespace Glyph3;
 SkinnedActor::SkinnedActor()
 {
 	m_pMatrixParameter = 0;
+	m_pMatrixNormalParameter = 0;
 	m_pMatrices = 0;
+	m_pNormalMatrices = 0;
+
+	m_pGeometryEntity = new Entity3D();
 }
 //--------------------------------------------------------------------------------
 SkinnedActor::~SkinnedActor()
@@ -36,6 +40,11 @@ SkinnedActor::~SkinnedActor()
 
 	if ( m_pMatrices )
 		delete [] m_pMatrices;
+
+	if ( m_pNormalMatrices )
+		delete [] m_pNormalMatrices;
+
+	SAFE_DELETE( m_pGeometryEntity );
 }
 //--------------------------------------------------------------------------------
 void SkinnedActor::AddBoneNode( Node3D* pBone, Vector3f BindPosition, Vector3f BindRotation,
@@ -47,21 +56,29 @@ void SkinnedActor::AddBoneNode( Node3D* pBone, Vector3f BindPosition, Vector3f B
 		// streams and the bind information are loaded into the controller.
 
 		SkinnedBoneController* pController = new SkinnedBoneController();
-		
+
 		pController->SetBindPosition( BindPosition );
 		pController->SetBindRotation( BindRotation );
+		//pBone->Position() = BindPosition;
+		//pBone->Rotation().RotationZYX( BindRotation );
+
 		pController->SetPositionStream( pPositions );
 		pController->SetRotationStream( pRotations );
 
 		// Add the controller onto this bone node.  
 		pBone->AttachController( pController );
+		//pBone->SetLocalMatrixCalculation( false );
+
 
 		// Set the bind pose on the bone.
 		pBone->Position() = BindPosition;
 		pBone->Rotation().Rotation( BindRotation );
+		//pBone->Rotation().RotationZYX( BindRotation );
 
 		// Store the node in the bones list.
 		m_Bones.add( pController );
+
+
 
 		// For debugging, add the visualization for the bones...
 
@@ -81,13 +98,34 @@ void SkinnedActor::AddBoneNode( Node3D* pBone, Vector3f BindPosition, Vector3f B
 //--------------------------------------------------------------------------------
 void SkinnedActor::SetBindPose( )
 {
-	// Update the model's world matrices.
-	GetNode()->Update( 0.0f );
 
 	// Have each controller record the current world matrix inverse for the bind 
 	// pose inverse.
 	for ( int i = 0; i < m_Bones.count(); i++ )
+	{
+		m_Bones[i]->SetLocalSkeleton();
+		//m_Bones[i]->SetGlobalSkeleton();
+		//m_Bones[i]->SetBindPose();
+	}
+
+	// Update the model's world matrices.
+
+	for ( int i = 0; i < m_Bones.count(); i++ )
+	{
+		//m_Bones[i]->SetLocalSkeleton();
+		m_Bones[i]->SetGlobalSkeleton();
+		//m_Bones[i]->SetBindPose();
+	}
+
+	GetNode()->Update( 0.0f );
+
+	for ( int i = 0; i < m_Bones.count(); i++ )
+	{
+		//m_Bones[i]->SetLocalSkeleton();
+		//m_Bones[i]->SetGlobalSkeleton();
 		m_Bones[i]->SetBindPose();
+	}
+
 
 	// Create the matrix array parameter, and add it to the entity.
 	if ( m_pMatrixParameter )
@@ -97,20 +135,29 @@ void SkinnedActor::SetBindPose( )
 	// to the skinned actor's body, which is an entity holding the models geometry.
 	m_pMatrixParameter = new MatrixArrayParameterDX11( m_Bones.count() );
 	m_pMatrixParameter->SetName( std::wstring( L"SkinMatrices" ) );
-	GetBody()->AddRenderParameter( m_pMatrixParameter );
+	GetGeometryEntity()->AddRenderParameter( m_pMatrixParameter );
+
+	m_pMatrixNormalParameter= new MatrixArrayParameterDX11( m_Bones.count() );
+	m_pMatrixNormalParameter->SetName( std::wstring( L"SkinNormalMatrices" ) );
+	GetGeometryEntity()->AddRenderParameter( m_pMatrixNormalParameter );
 	
 	// Create an array to hold the CPU side matrices.
 	m_pMatrices = new Matrix4f[m_Bones.count()];
+	m_pNormalMatrices = new Matrix4f[m_Bones.count()];
 }
 //--------------------------------------------------------------------------------
 void SkinnedActor::SetSkinningMatrices( RendererDX11& Renderer )
 {
 	// Update the CPU side animation matrices.
 	for ( int i = 0; i < m_Bones.count(); i++ )
+	{
 		m_pMatrices[i] = m_Bones[i]->GetTransform();
+		m_pNormalMatrices[i] = m_Bones[i]->GetNormalTransform();
+	}
 
 	// Set the data into the GPU parameter list.
 	m_pMatrixParameter->SetParameterData( m_pMatrices );
+	m_pMatrixNormalParameter->SetParameterData( m_pNormalMatrices );
 }
 //--------------------------------------------------------------------------------
 void SkinnedActor::PlayAnimation( int index )
@@ -159,5 +206,10 @@ void SkinnedActor::PlayAllAnimations( )
 		if ( pStream )
 			pStream->PlayAllAnimations();
 	}
+}
+//--------------------------------------------------------------------------------
+Entity3D* SkinnedActor::GetGeometryEntity()
+{
+	return( m_pGeometryEntity );
 }
 //--------------------------------------------------------------------------------

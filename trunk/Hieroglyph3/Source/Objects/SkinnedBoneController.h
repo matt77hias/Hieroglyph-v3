@@ -30,6 +30,7 @@ namespace Glyph3
 
 		void SetBindPose();
 		Matrix4f GetTransform();
+		Matrix4f GetNormalTransform();
 
 		void SetPositionStream( AnimationStream<Vector3f>* pStream );
 		void SetRotationStream( AnimationStream<Vector3f>* pStream );
@@ -40,10 +41,19 @@ namespace Glyph3
 		void SetBindRotation( Vector3f rotation );
 		Vector3f GetBindPosition( );
 		Vector3f GetBindRotation( );
+		
+		void SetLocalSkeleton( );
+		void SetGlobalSkeleton( );
+		
+		void SetParentBone( SkinnedBoneController* pParent );
 
 		
 	protected:
+		Matrix4f m_LocalSkeleton;
+		Matrix4f m_GlobalSkeleton;
 		Matrix4f m_InvBindPose;
+		SkinnedBoneController* m_pParentBone;
+
 		AnimationStream<Vector3f>*	m_pPositionStream;
 		AnimationStream<Vector3f>*	m_pRotationStream;
 		Vector3f					m_kBindPosition;

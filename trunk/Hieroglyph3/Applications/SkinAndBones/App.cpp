@@ -21,6 +21,9 @@
 #include "RasterizerStateConfigDX11.h"
 
 #include "ParameterManagerDX11.h"
+
+#include "GeometryGeneratorDX11.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
@@ -70,8 +73,8 @@ bool App::ConfigureEngineComponents()
 	}
 
 	// Create the window.
-	int width = 640;
-	int height = 360;
+	int width = 800;
+	int height = 600;
 
 	// Create the window wrapper class instance.
 	m_pWindow = new Win32RenderWindow();
@@ -131,18 +134,18 @@ void App::Initialize()
 {
 	// Create and initialize the geometry to be rendered.  
 	//GeometryDX11* pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
-	GeometryDX11* pGeometry = new GeometryDX11();
-	GeometryGeneratorDX11::GenerateSkinnedBiped( pGeometry );
-	pGeometry->LoadToBuffers();
+	//GeometryDX11* pGeometry = new GeometryDX11();
+	//GeometryGeneratorDX11::GenerateSkinnedBiped( pGeometry );
+	//pGeometry->LoadToBuffers();
 	//pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
-	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_LINELIST );
+	//pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_LINELIST );
 
 	// Create the material for use by the entity.
-	MaterialDX11* pMaterial = MaterialGeneratorDX11::GenerateSkinnedSolid( *m_pRenderer11 );
+	//MaterialDX11* pMaterial = MaterialGeneratorDX11::GenerateSkinnedSolid( *m_pRenderer11 );
 	//MaterialDX11* pMaterial = 0;
 
 	// Create the parameters for use with this effect
-	Vector4f LightParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
+	Vector4f LightParams = Vector4f( 0.2f, 0.7f, 0.2f, 0.7f );
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"LightColor" ), &LightParams );
 
 	Vector4f LightPosition = Vector4f( 20.0f, 20.0f, -20.0f, 0.0f );
@@ -152,10 +155,10 @@ void App::Initialize()
 	// from the camera's point of view of the scene.
 
 	m_pCamera = new Camera();
-	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.707f, 0.707f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( -10.0f, 27.5f, -20.0f );
+	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.307f, 1.507f, 0.0f ) );
+	m_pCamera->GetNode()->Position() = Vector3f( -20.0f, 20.0f, 10.0f );
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
-	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.2f, 0.2f ) );
+	m_pRenderView->SetBackColor( Vector4f( 0.1f, 0.1f, 0.3f, 0.0f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
 	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>( D3DX_PI ) / 2.0f, 640.0f / 480.0f );
 
@@ -176,10 +179,15 @@ void App::Initialize()
 	// transforms used to render the posed mesh.
 
 	m_pActor = new SkinnedActor();
+	GeometryDX11* pGeometry = new GeometryDX11();
 	
-	GeometryLoaderDX11::loadMS3DFileWithAnimation( std::wstring( L"../Data/Models/TBone.ms3d" ), m_pActor );
+	//GeometryLoaderDX11::loadMS3DFileWithAnimation( std::wstring( L"../Data/Models/TBone.ms3d" ), m_pActor );
+	//GeometryLoaderDX11::loadMS3DFileWithAnimationAndWeights( std::wstring( L"../Data/Models/Soldier_LOD1.ms3d" ), m_pActor );
+	//GeometryLoaderDX11::loadMS3DFileWithAnimationAndWeights( std::wstring( L"../Data/Models/TBone2.ms3d" ), m_pActor );
+	GeometryGeneratorDX11::GenerateWeightedSkinnedCone( pGeometry, 10, 20, 2.0f, 40.0f, 6, m_pActor );
+	
 
-	m_pActor->GetBody()->SetMaterial( pMaterial, false );
+	//m_pActor->GetBody()->SetMaterial( pMaterial, false );
 
 	m_pNode->AttachChild( m_pActor->GetNode() );
 
@@ -213,7 +221,7 @@ void App::Update()
 
 	Matrix3f rotation;
 	rotation.RotationY( m_pTimer->Elapsed() * 0.2f );
-	m_pNode->Rotation() *= rotation;
+	//m_pNode->Rotation() *= rotation;
 
 
 	// Update the scene, and then render all cameras within the scene.

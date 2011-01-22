@@ -23,6 +23,10 @@ SkinnedBoneController::SkinnedBoneController()
 	m_pPositionStream = 0;
 	m_pRotationStream = 0;
 
+	m_pParentBone = 0;
+	m_LocalSkeleton.MakeIdentity();
+	m_GlobalSkeleton.MakeIdentity();
+
 	m_bActivate = false;
 }
 //--------------------------------------------------------------------------------
@@ -45,6 +49,31 @@ void SkinnedBoneController::Update( float fTime )
 	// rotation accordingly.  These new values will then be used by the entity
 	// to update it's local and world transformation matrices.
 	
+	// Create the animation matrix
+	//Matrix4f animation;
+	//animation.MakeIdentity();
+
+	//if ( m_pRotationStream )
+	//{
+	//	// Update the rotation animation stream with the elapsed time.
+	//	m_pRotationStream->Update( fTime );
+
+	//	Matrix3f animRot;
+	//	//animRot.RotationZYX( m_pRotationStream->GetState() );
+	//	animRot.Rotation( m_pRotationStream->GetState() );
+	//	animation.SetRotation( animRot );
+	//}
+	//if ( m_pPositionStream )
+	//{
+	//	// Update the position animation stream with the elapsed time.
+	//	m_pPositionStream->Update( fTime );
+	//	animation.SetTranslation( m_pPositionStream->GetState() );
+	//}
+
+	//local *= animation;
+	//m_pEntity->LocalMatrix() = m_LocalSkeleton * animation;
+	//m_pEntity->LocalMatrix() = animation * m_LocalSkeleton;
+
 	if ( m_pPositionStream )
 	{
 		// Update the position animation stream with the elapsed time.
@@ -59,6 +88,10 @@ void SkinnedBoneController::Update( float fTime )
 		m_pRotationStream->Update( fTime );
 
 		// Update the entity's orientation, which is the bind pose plus the current animated rotation.
+		//m_pEntity->Rotation().RotationZYX( m_kBindRotation + m_pRotationStream->GetState() );
+
+		//Matrix3f bind;
+		//bind.RotationZYX( m_kBindRotation )
 		m_pEntity->Rotation().Rotation( m_kBindRotation + m_pRotationStream->GetState() );
 	}
 }
@@ -67,7 +100,9 @@ void SkinnedBoneController::SetBindPose()
 {
 	// The inverse bind pose is the inverse of the world matrix when the model is 
 	// in the bind pose.
+
 	m_InvBindPose = GetEntity()->WorldMatrix().Inverse();
+	//m_InvBindPose = m_GlobalSkeleton.Inverse();
 }
 //--------------------------------------------------------------------------------
 Matrix4f SkinnedBoneController::GetTransform()
@@ -77,6 +112,41 @@ Matrix4f SkinnedBoneController::GetTransform()
 	Matrix4f Transform = m_InvBindPose * GetEntity()->WorldMatrix();
 
 	return( Transform );
+}
+//--------------------------------------------------------------------------------
+Matrix4f SkinnedBoneController::GetNormalTransform()
+{
+	// The output transform is the inverse bind pose, multiplied with the updated
+	// animation based entity world matrix.
+	Matrix4f Transform = m_InvBindPose * GetEntity()->WorldMatrix();
+	Matrix4f InvTransform = Transform.Inverse();
+	Matrix4f TransposeInvTransform = InvTransform.Transpose();
+
+	return( TransposeInvTransform );
+}
+//--------------------------------------------------------------------------------
+void SkinnedBoneController::SetLocalSkeleton( )
+{
+	m_LocalSkeleton.MakeIdentity();
+
+	Matrix3f localRot;
+	//localRot.RotationZYX( this->m_kBindRotation );
+	localRot.Rotation( this->m_kBindRotation );
+
+	m_LocalSkeleton.SetRotation( localRot );
+	m_LocalSkeleton.SetTranslation( m_kBindPosition );
+}
+//--------------------------------------------------------------------------------
+void SkinnedBoneController::SetGlobalSkeleton( )
+{
+	// Concatenate this bone's parent skeleton matrix with its local skeleton matrix.
+	if ( !m_pParentBone )
+		this->m_GlobalSkeleton = m_LocalSkeleton;
+	else
+	{
+		//m_pParentBone->SetGlobalSkeleton();
+		this->m_GlobalSkeleton = m_pParentBone->m_GlobalSkeleton * this->m_LocalSkeleton;
+	}
 }
 //--------------------------------------------------------------------------------
 void SkinnedBoneController::SetPositionStream( AnimationStream<Vector3f>* pStream )
@@ -119,4 +189,8 @@ Vector3f SkinnedBoneController::GetBindRotation( )
 	return( m_kBindRotation );
 }
 //--------------------------------------------------------------------------------
-
+void SkinnedBoneController::SetParentBone( SkinnedBoneController* pParent )
+{
+	this->m_pParentBone = pParent;
+}
+//--------------------------------------------------------------------------------

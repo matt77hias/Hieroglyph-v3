@@ -119,6 +119,19 @@ void Matrix3f::Rotation( Vector3f& Rot )
 	*this = mRot1;
 }
 //----------------------------------------------------------------------------------------------------
+void Matrix3f::RotationZYX( Vector3f& Rot )
+{
+	Matrix3f mRot1;
+	Matrix3f mRot2;
+	
+	mRot1.RotationZ(Rot.z);
+	mRot2.RotationY(Rot.y);
+	mRot1 *= mRot2;
+	mRot2.RotationX(Rot.x);
+	mRot1 *= mRot2;
+	*this = mRot1;
+}
+//----------------------------------------------------------------------------------------------------
 void Matrix3f::RotationEuler( Vector3f& Axis, float Angle )
 {
 	float s = sinf( Angle );
