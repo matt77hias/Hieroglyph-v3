@@ -291,8 +291,8 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	// TODO: Enumerate all of the formats and quality levels available for the given format.
 	//       It may be beneficial to allow this query from the user instead of enumerating
 	//       all possible formats...
-	//UINT NumQuality;
-	//HRESULT hr1 = m_pDevice->CheckMultisampleQualityLevels( DXGI_FORMAT_R8G8B8A8_UNORM, 4, &NumQuality );
+	UINT NumQuality;
+	HRESULT hr1 = m_pDevice->CheckMultisampleQualityLevels( DXGI_FORMAT_R8G8B8A8_UNORM, 4, &NumQuality );
 
 
 	// Initialize the multithreading portion of the renderer.  This includes

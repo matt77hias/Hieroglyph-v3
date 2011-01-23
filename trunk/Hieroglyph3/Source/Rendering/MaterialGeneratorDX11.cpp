@@ -63,6 +63,72 @@ MaterialDX11* MaterialGeneratorDX11::GenerateWireFrame( RendererDX11& Renderer )
 	return( pMaterial );
 }
 //--------------------------------------------------------------------------------
+MaterialDX11* MaterialGeneratorDX11::GenerateStaticTextured( RendererDX11& Renderer )
+{
+	// Create the material that will be returned
+	MaterialDX11* pMaterial = new MaterialDX11();
+
+	// Create and fill the effect that will be used for this view type
+	RenderEffectDX11* pEffect = new RenderEffectDX11();
+
+	pEffect->m_iVertexShader = 
+		Renderer.LoadShader( VERTEX_SHADER,
+		std::wstring( L"../Data/Shaders/MeshStaticTextured.hlsl" ),
+		std::wstring( L"VSMAIN" ),
+		std::wstring( L"vs_5_0" ) );
+	pEffect->m_iPixelShader = 
+		Renderer.LoadShader( PIXEL_SHADER,
+		std::wstring( L"../Data/Shaders/MeshStaticTextured.hlsl" ),
+		std::wstring( L"PSMAIN" ),
+		std::wstring( L"ps_5_0" ) );
+
+	RasterizerStateConfigDX11 RS;
+	//RS.FillMode = D3D11_FILL_WIREFRAME;
+	RS.CullMode = D3D11_CULL_NONE;
+
+	pEffect->m_iRasterizerState = 
+		Renderer.CreateRasterizerState( &RS );
+
+	// Enable the material to render the given view type, and set its effect.
+	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
+	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
+
+	return( pMaterial );
+}
+//--------------------------------------------------------------------------------
+MaterialDX11* MaterialGeneratorDX11::GenerateSkinnedTextured( RendererDX11& Renderer )
+{
+	// Create the material that will be returned
+	MaterialDX11* pMaterial = new MaterialDX11();
+
+	// Create and fill the effect that will be used for this view type
+	RenderEffectDX11* pEffect = new RenderEffectDX11();
+
+	pEffect->m_iVertexShader = 
+		Renderer.LoadShader( VERTEX_SHADER,
+		std::wstring( L"../Data/Shaders/MeshSkinnedTextured.hlsl" ),
+		std::wstring( L"VSMAIN" ),
+		std::wstring( L"vs_5_0" ) );
+	pEffect->m_iPixelShader = 
+		Renderer.LoadShader( PIXEL_SHADER,
+		std::wstring( L"../Data/Shaders/MeshSkinnedTextured.hlsl" ),
+		std::wstring( L"PSMAIN" ),
+		std::wstring( L"ps_5_0" ) );
+
+	RasterizerStateConfigDX11 RS;
+	//RS.FillMode = D3D11_FILL_WIREFRAME;
+	RS.CullMode = D3D11_CULL_NONE;
+
+	pEffect->m_iRasterizerState = 
+		Renderer.CreateRasterizerState( &RS );
+
+	// Enable the material to render the given view type, and set its effect.
+	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
+	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
+
+	return( pMaterial );
+}
+//--------------------------------------------------------------------------------
 MaterialDX11* MaterialGeneratorDX11::GenerateSkinnedSolid( RendererDX11& Renderer )
 {
 	// Create the material that will be returned
@@ -73,22 +139,22 @@ MaterialDX11* MaterialGeneratorDX11::GenerateSkinnedSolid( RendererDX11& Rendere
 
 	pEffect->m_iVertexShader = 
 		Renderer.LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/SolidSkinnedShading4Bone.hlsl" ),
+		std::wstring( L"../Data/Shaders/MeshSkinnedTessellatedTextured.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_5_0" ) );
 	pEffect->m_iHullShader = 
 		Renderer.LoadShader( HULL_SHADER,
-		std::wstring( L"../Data/Shaders/SolidSkinnedShading4Bone.hlsl" ),
+		std::wstring( L"../Data/Shaders/MeshSkinnedTessellatedTextured.hlsl" ),
 		std::wstring( L"HSMAIN" ),
 		std::wstring( L"hs_5_0" ) );
 	pEffect->m_iDomainShader = 
 		Renderer.LoadShader( DOMAIN_SHADER,
-		std::wstring( L"../Data/Shaders/SolidSkinnedShading4Bone.hlsl" ),
+		std::wstring( L"../Data/Shaders/MeshSkinnedTessellatedTextured.hlsl" ),
 		std::wstring( L"DSMAIN" ),
 		std::wstring( L"ds_5_0" ) );
 	pEffect->m_iPixelShader = 
 		Renderer.LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/SolidSkinnedShading4Bone.hlsl" ),
+		std::wstring( L"../Data/Shaders/MeshSkinnedTessellatedTextured.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 

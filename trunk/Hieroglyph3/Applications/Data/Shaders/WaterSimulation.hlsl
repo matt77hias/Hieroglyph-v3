@@ -72,10 +72,10 @@ void CSMAIN( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThr
 	loadedpoints[GroupIndex].Flow = float4( 0.0f, 0.0f, 0.0f, 0.0f );
 
 	// Given your GroupThreadID and the GroupID, calculate the thread's location in the buffer.
-	int3 texturelocation = int3( 0, 0, 0 );
-	texturelocation.x = GroupID.x * size_x + ( GroupThreadID.x - 1 );
-	texturelocation.y = GroupID.y * size_y + ( GroupThreadID.y - 1 );
-	int textureindex = texturelocation.x + texturelocation.y * totalsize_x;
+	int3 location = int3( 0, 0, 0 );
+	location.x = GroupID.x * size_x + ( GroupThreadID.x - 1 );
+	location.y = GroupID.y * size_y + ( GroupThreadID.y - 1 );
+	int textureindex = location.x + location.y * totalsize_x;
 
 	// Test the texture location here, and if within the texture then load the data
 	loadedpoints[GroupIndex] = CurrentWaterState[textureindex];
@@ -97,24 +97,24 @@ void CSMAIN( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThr
 	float4 NewFlow = float4( 0.0f, 0.0f, 0.0f, 0.0f );
 
 	// Check for 'not' right edge
-	if ( ( GroupThreadID.x < padded_x - 1 ) && ( texturelocation.x < totalsize_x - 1 ) )
+	if ( ( GroupThreadID.x < padded_x - 1 ) && ( location.x < totalsize_x - 1 ) )
 	{
 		NewFlow.x = ( loadedpoints[GroupIndex+1].Height - loadedpoints[GroupIndex].Height );
 
 		// Check for 'not' bottom edge
-		if ( ( GroupThreadID.y < padded_y - 1 ) && ( texturelocation.y < totalsize_y - 1 ) )
+		if ( ( GroupThreadID.y < padded_y - 1 ) && ( location.y < totalsize_y - 1 ) )
 		{
 			NewFlow.y = ( loadedpoints[(GroupIndex+1) + padded_x].Height - loadedpoints[GroupIndex].Height );
 		}
 	}
 
 	// Check for 'not' bottom edge
-	if ( ( GroupThreadID.y < padded_y - 1 ) && ( texturelocation.y < totalsize_y - 1 ) )
+	if ( ( GroupThreadID.y < padded_y - 1 ) && ( location.y < totalsize_y - 1 ) )
 	{
 		NewFlow.z = ( loadedpoints[GroupIndex+padded_x].Height - loadedpoints[GroupIndex].Height );
 
 		// Check for 'not' left edge
-		if ( ( GroupThreadID.x > 0 ) && ( texturelocation.x > 0 ) )
+		if ( ( GroupThreadID.x > 0 ) && ( location.x > 0 ) )
 		{
 			NewFlow.w = ( loadedpoints[GroupIndex + padded_x - 1].Height - loadedpoints[GroupIndex].Height );
 		}

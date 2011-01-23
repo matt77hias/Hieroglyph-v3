@@ -23,6 +23,7 @@
 #include "ParameterManagerDX11.h"
 
 #include "GeometryGeneratorDX11.h"
+#include "ShaderResourceParameterDX11.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -73,8 +74,8 @@ bool App::ConfigureEngineComponents()
 	}
 
 	// Create the window.
-	int width = 800;
-	int height = 600;
+	int width = 1280;
+	int height = 768;
 
 	// Create the window wrapper class instance.
 	m_pWindow = new Win32RenderWindow();
@@ -88,6 +89,11 @@ bool App::ConfigureEngineComponents()
 	Config.SetWidth( m_pWindow->GetWidth() );
 	Config.SetHeight( m_pWindow->GetHeight() );
 	Config.SetOutputWindow( m_pWindow->GetHandle() );
+	//DXGI_SAMPLE_DESC sampleDesc;
+	//sampleDesc.Count = 4;
+	//sampleDesc.Quality = 1;
+	//Config.SetSampleDesc( sampleDesc );
+	//Config.SetFormat(DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_pWindow->SetSwapChain( m_pRenderer11->CreateSwapChain( &Config ) );
 
 	// We'll keep a copy of the swap chain's render target index to 
@@ -148,15 +154,17 @@ void App::Initialize()
 	Vector4f LightParams = Vector4f( 0.2f, 0.7f, 0.2f, 0.7f );
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"LightColor" ), &LightParams );
 
-	Vector4f LightPosition = Vector4f( 20.0f, 20.0f, -20.0f, 0.0f );
+	Vector4f LightPosition = Vector4f( -1000.0f, 2000.0f, 2000.0f, 0.0f );
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"LightPositionWS" ), &LightPosition );
 
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
 
 	m_pCamera = new Camera();
-	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.307f, 1.507f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( -20.0f, 20.0f, 10.0f );
+	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.30f, 1.5f, 0.0f ) );
+	m_pCamera->GetNode()->Position() = Vector3f( -20.0f, 25.0f, 10.0f );
+	//m_pCamera->GetNode()->Position() = Vector3f( -160.0f, 225.0f, -150.0f );
+	//m_pCamera->GetNode()->Position() = Vector3f( 400.0f, 75.0f, 50.0f );
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.1f, 0.1f, 0.3f, 0.0f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
@@ -186,10 +194,27 @@ void App::Initialize()
 	//GeometryLoaderDX11::loadMS3DFileWithAnimationAndWeights( std::wstring( L"../Data/Models/TBone2.ms3d" ), m_pActor );
 	GeometryGeneratorDX11::GenerateWeightedSkinnedCone( pGeometry, 10, 20, 2.0f, 40.0f, 6, m_pActor );
 	
+	//GeometryDX11* pStaticGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Dropship_LOD0.ms3d" ) );
+	//pStaticGeometry->LoadToBuffers();
+	//MaterialDX11* pStaticMaterial = MaterialGeneratorDX11::GenerateStaticTextured(*RendererDX11::Get());
+
+	//Entity3D* pEntity2 = new Entity3D();
+	//pEntity2->SetGeometry( pStaticGeometry );
+	//pEntity2->SetMaterial( pStaticMaterial );
+
+	
+	//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/dropship_colormap_default.png" );
+	
+	//ShaderResourceParameterDX11* pTextureParameter = new ShaderResourceParameterDX11();
+	//pTextureParameter->SetName( L"ColorTexture" );
+	//pTextureParameter->SetParameterData( &ColorTexture->m_iResourceSRV );
+	//pEntity2->AddRenderParameter( pTextureParameter );
+
 
 	//m_pActor->GetBody()->SetMaterial( pMaterial, false );
 
 	m_pNode->AttachChild( m_pActor->GetNode() );
+	//m_pNode->AttachChild( pEntity2 );
 
 	m_pScene->AddEntity( m_pNode );
 	m_pScene->AddCamera( m_pCamera );
@@ -242,7 +267,7 @@ void App::Update()
 	// demonstrates how an event is sent and handled by an event listener (which
 	// in this case is the application object itself).
 
-	if ( m_bSaveScreenshot  )
+	//if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
 		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"SkinAndBones_" ), D3DX11_IFF_BMP );

@@ -681,8 +681,8 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 
 		currVert++;
 
-		//Vector2f TexScale = Vector2f( 5.0f/(3.14159f*2.0f), 20.0f/Height );
-		Vector2f TexScale = Vector2f( 0.5f/(3.14159f*2.0f), 2.0f/Height );
+		Vector2f TexScale = Vector2f( 3.0f/(3.14159f*2.0f), 12.0f/Height );
+		//Vector2f TexScale = Vector2f( 0.5f/(3.14159f*2.0f), 2.0f/Height );
 
 		float boneHeightStep = Height / static_cast<float>( NumBones );
 
@@ -717,11 +717,17 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 				pTex[currVert].x = TexScale.x * uAngle;
 				pTex[currVert].y = TexScale.y * heightScale * Height;
 
-				Vector3f n = Vector3f( 0.0f, 0.0f, 1.0f );
-				Matrix3f rot = Matrix3f();
-				float angle = atanf( Radius/Height );
-				rot.Rotation( Vector3f( atanf(Radius/Height), uAngle-(3.14159f/2.0f), 0.0f ) );
-				pNrm[currVert] = rot * n; //Vector3f( 1.0f, 0.0f, 0.0f );
+				Vector3f n = Vector3f( x, 0.0f, z );
+				float ny = atanf( Radius/Height ) * n.Magnitude();
+				n.y = ny;
+				n.Normalize();
+				pNrm[currVert] = n; //Vector3f( 1.0f, 0.0f, 0.0f );
+
+				//Vector3f n = Vector3f( 0.0f, 0.0f, 1.0f );
+				//Matrix3f rot = Matrix3f();
+				//float angle = atanf( Radius/Height );
+				//rot.Rotation( Vector3f( atanf(Radius/Height), uAngle-(3.14159f/2.0f), 0.0f ) );
+				//pNrm[currVert] = rot * n; //Vector3f( 1.0f, 0.0f, 0.0f );
 
 				currVert++;
             }
@@ -799,7 +805,7 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
         }
 
 		pGeometry->LoadToBuffers();
-		pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
+		
 
 	
 		// If the actor is passed in, then generate the bone information
@@ -887,17 +893,31 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 						pActor->GetNode()->AttachChild( pChild );
 
 						pActor->GetGeometryEntity()->SetGeometry( pGeometry );
+						
+						pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );		
 						pActor->GetGeometryEntity()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedSolid( *RendererDX11::Get() ) );
+
+						//pActor->GetGeometryEntity()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedTextured( *RendererDX11::Get() ) );
+						
 						pChild->AttachChild( pActor->GetGeometryEntity() );
 
 
 
-						ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/EyeOfHorus.png" );
+						ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/EyeOfHorus_128_blurred.png" );
+						//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/Hex.png" );
 						
 						ShaderResourceParameterDX11* pTextureParameter = new ShaderResourceParameterDX11();
 						pTextureParameter->SetName( L"ColorTexture" );
 						pTextureParameter->SetParameterData( &ColorTexture->m_iResourceSRV );
 						pActor->GetGeometryEntity()->AddRenderParameter( pTextureParameter );
+
+						ResourcePtr HeightTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/EyeOfHorus.png" );
+						//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/Hex.png" );
+						
+						ShaderResourceParameterDX11* pHeightTextureParameter = new ShaderResourceParameterDX11();
+						pHeightTextureParameter->SetName( L"HeightTexture" );
+						pHeightTextureParameter->SetParameterData( &ColorTexture->m_iResourceSRV );
+						pActor->GetGeometryEntity()->AddRenderParameter( pHeightTextureParameter );
 
 
 						SamplerStateConfigDX11 SamplerConfig;
