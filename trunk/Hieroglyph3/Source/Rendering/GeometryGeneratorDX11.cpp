@@ -265,7 +265,7 @@ void GeometryGeneratorDX11::GenerateAxisGeometry( GeometryDX11* pGeometry )
 		Vector3f* pPos = pPositions->Get3f( 0 );
 		Vector4f* pCols = pColors->Get4f( 0 );
 
-		float fThickness = 0.15f;
+		float fThickness = 0.05f;
 		float fLength = 3.0f;
 
 		Vector4f XBase = Vector4f( 1.0f, 0.0f, 0.0f, 1.0f );
@@ -289,7 +289,7 @@ void GeometryGeneratorDX11::GenerateAxisGeometry( GeometryDX11* pGeometry )
 		pCols[4] = XEnd;
 
 		// Next is the Y-Axis.
-		pPos[5] = Vector3f( 0.5f, 0.0f, fThickness );
+		pPos[5] = Vector3f( fThickness, 0.0f, fThickness );
 		pCols[5] = YBase;
 		pPos[6] = Vector3f( -fThickness, 0.0f, fThickness );
 		pCols[6] = YBase;
@@ -892,14 +892,14 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 					{
 						pActor->GetNode()->AttachChild( pChild );
 
-						pActor->GetGeometryEntity()->SetGeometry( pGeometry );
+						pActor->GetBody()->SetGeometry( pGeometry );
 						
 						pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );		
-						pActor->GetGeometryEntity()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedSolid( *RendererDX11::Get() ) );
+						pActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedSolid( *RendererDX11::Get() ) );
 
-						//pActor->GetGeometryEntity()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedTextured( *RendererDX11::Get() ) );
+						//pActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedTextured( *RendererDX11::Get() ) );
 						
-						pChild->AttachChild( pActor->GetGeometryEntity() );
+						//pChild->AttachChild( pActor->GetGeometryEntity() );
 
 
 
@@ -909,7 +909,7 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 						ShaderResourceParameterDX11* pTextureParameter = new ShaderResourceParameterDX11();
 						pTextureParameter->SetName( L"ColorTexture" );
 						pTextureParameter->SetParameterData( &ColorTexture->m_iResourceSRV );
-						pActor->GetGeometryEntity()->AddRenderParameter( pTextureParameter );
+						pActor->GetBody()->AddRenderParameter( pTextureParameter );
 
 						ResourcePtr HeightTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/EyeOfHorus.png" );
 						//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/Hex.png" );
@@ -917,7 +917,7 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 						ShaderResourceParameterDX11* pHeightTextureParameter = new ShaderResourceParameterDX11();
 						pHeightTextureParameter->SetName( L"HeightTexture" );
 						pHeightTextureParameter->SetParameterData( &ColorTexture->m_iResourceSRV );
-						pActor->GetGeometryEntity()->AddRenderParameter( pHeightTextureParameter );
+						pActor->GetBody()->AddRenderParameter( pHeightTextureParameter );
 
 
 						SamplerStateConfigDX11 SamplerConfig;

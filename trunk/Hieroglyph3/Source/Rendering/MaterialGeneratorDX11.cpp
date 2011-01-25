@@ -217,6 +217,10 @@ MaterialDX11* MaterialGeneratorDX11::GenerateSolidColor( RendererDX11& Renderer 
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_4_0" ) );
 
+	DepthStencilStateConfigDX11 ds;
+	ds.DepthEnable = false;
+	pEffect->m_iDepthStencilState = Renderer.CreateDepthStencilState( &ds );
+
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
 	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;

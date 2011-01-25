@@ -44,26 +44,26 @@ GS_INPUT VSMAIN( VS_INPUT IN )
 {
     GS_INPUT OUT;
 
-	float direction = 1.0f;//viewParms.z;		// this determines the front or back hemisphere
+	// Transform the vertex to be relative to the paraboloid's basis. 
+	OUT.position = mul( float4( IN.position, 1 ), WorldViewMatrix );
 
-	OUT.position = mul( float4( IN.position, 1 ), WorldViewMatrix );	// transform vertex into the maps basis
-	//OUT.position = OUT.position / OUT.position.w;		// divide by w to normalize
+	// Determine the distance between the paraboloid origin and the vertex.
+	float L = length( OUT.position.xyz );
 
-	//OUT.position.z = OUT.position.z * direction;		// set z-values to forward or backward
+	// Normalize the vector to the vertex
+	OUT.position = OUT.position / L;
 	
-	float L = length( OUT.position.xyz );				// determine the distance between (0,0,0) and the vertex
-	OUT.position = OUT.position / L;					// divide the vertex position by the distance 
-	
-	OUT.z_value = OUT.position.z;						// remember which hemisphere the vertex is in
-	//OUT.position.z = OUT.position.z + 1;				// add the reflected vector to find the normal vector
+	// Save the z-component of the normalized vector
+	OUT.z_value = OUT.position.z;
 
-	//OUT.position.x = OUT.position.x / OUT.position.z;	// divide x coord by the new z-value
-	//OUT.position.y = OUT.position.y / OUT.position.z;	// divide y coord by the new z-value
+	// Store the distance to the vertex for use in the depth buffer.
+	OUT.position.z = L / 500;
 
-	OUT.position.z = L / 500;							// set a depth value for correct z-buffering
-	OUT.position.w = 1;									// set w to 1 so there is no w divide
+	// Set w to 1 since we aren't doing any perspective distortion.
+	OUT.position.w = 1;
 
-	OUT.tex	= IN.tex;		// pass through texcoords set 0
+	// Pass through texture coordinates
+	OUT.tex	= IN.tex;		
 
 	return OUT;
 }
@@ -76,37 +76,42 @@ void GSMAIN( triangle GS_INPUT input[3],
 {
 	PS_INPUT output;
 
+	// Initialize the vertex order and the direction of the paraboloid.
 	uint3 order = uint3( 0, 1, 2 );
 	float direction = 1.0f;
 
-	// Transform to view space - need to change this to use a matrix array!
+	// Check to see which copy of the primitive this is.  If it is 0, then it
+	// is considered the front facing paraboloid.  If it is 1, then it is
+	// considered the back facing paraboloid.  For back facing, we reverse
+	// the output vertex winding order.
 	if ( id == 1 )
 	{
 		order.xyz = order.xzy;
 		direction = -1.0f;
 	}
 
-    // Emit two new triangles
+    // Emit three vertices for one complete triangle.
     for ( int i = 0; i < 3; i++ )
     {
+		// Create a projection factor, which determines which half space 
+		// will be considered positive and also adds the viewing vector
+		// which is (0,0,1) and hence can only be added to the z-component.
 		float projFactor = input[order[i]].z_value * direction + 1.0f;
 		output.position.x = input[order[i]].position.x / projFactor;
 		output.position.y = input[order[i]].position.y / projFactor;
 		output.position.z = input[order[i]].position.z;
 		output.position.w = 1.0f;
-		//OUT.position.z = OUT.position.z + 1;				// add the reflected vector to find the normal vector
 
-		//OUT.position.x = OUT.position.x / OUT.position.z;	// divide x coord by the new z-value
-		//OUT.position.y = OUT.position.y / OUT.position.z;	// divide y coord by the new z-value
-
-
-		// Transform to clip space
-		//output.position = input[order[i]].position;
-		//output.position.z = output.position.z * direction;
-		output.tex = input[order[i]].tex;
-		output.z_value = input[order[i]].z_value * direction;
+		// Simply use the geometry shader instance as the render target
+		// index for this primitive.
 		output.rtindex = id;
 
+		// Pass through the texture coordinates to the pixel shader
+		output.tex = input[order[i]].tex;
+
+		output.z_value = input[order[i]].z_value * direction;
+
+		// Write the vertex to the output stream.
         OutputStream.Append(output);
     }
 
@@ -119,6 +124,7 @@ float4 PSMAIN( in PS_INPUT IN ) : SV_Target
 
 	clip( IN.z_value + 0.05f );
 
+	// Sample the texture to find the appropriate color value
 	OUT = ColorTexture.Sample( LinearSampler, IN.tex );
 	
     return OUT;

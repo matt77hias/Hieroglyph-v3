@@ -53,7 +53,7 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 
-static int size = 16;
+static int size = 128;
 	// Create the resources to be used for generating the paraboloid maps.
 	Texture2dConfigDX11 ColorConfig;
 	ColorConfig.SetColorBuffer( size, size );
@@ -69,7 +69,7 @@ static int size = 16;
 
 	m_pParaboloidView = new ViewParaboloidEnvMap( *pRenderer11, ColorTarget, DepthTarget );
 	m_pParaboloidView->SetEntity( this );
-	m_pParaboloidView->SetBackColor( Vector4f( 0.0f, 1.0f, 0.0f, 1.0f ) );
+	m_pParaboloidView->SetBackColor( Vector4f( 0.1f, 0.1f, 0.3f, 1.0f ) );
 
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;

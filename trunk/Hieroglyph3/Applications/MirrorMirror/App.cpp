@@ -122,7 +122,7 @@ bool App::ConfigureEngineComponents()
 	m_pSpriteRenderer = new SpriteRendererDX11();
 	m_pSpriteRenderer->Initialize();
 
-	m_pRenderer11->SetMultiThreadingState( true );
+	m_pRenderer11->SetMultiThreadingState( false );
 
 	return( true );
 }
@@ -179,7 +179,7 @@ void App::Initialize()
 	
 	m_pDiffuseActor = new Actor();
 	m_pDiffuseActor->GetNode()->AttachController( new RotationController( Vector3f( 1.0f, 0.0f, 0.0f ), 0.5f ) );
-	for ( int i = 0; i < 100; i++ )
+	for ( int i = 0; i < 2; i++ )
 	{
 		float x = static_cast<float>( (double)rand() / RAND_MAX ) * 2.0f - 1.0f;
 		float y = static_cast<float>( (double)rand() / RAND_MAX ) * 2.0f - 1.0f;
@@ -199,7 +199,7 @@ void App::Initialize()
 	
 	
 
-	for ( int i = 0; i < 16; i++ )
+	for ( int i = 0; i < 2; i++ )
 	{
 		m_pReflector[i] = new ReflectiveSphereEntity();
 		m_pReflector[i]->Position() = Vector3f( -1.0, 1.0f+(i*3), 0.0f );

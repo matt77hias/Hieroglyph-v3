@@ -135,11 +135,11 @@ void SkinnedActor::SetBindPose( )
 	// to the skinned actor's body, which is an entity holding the models geometry.
 	m_pMatrixParameter = new MatrixArrayParameterDX11( m_Bones.count() );
 	m_pMatrixParameter->SetName( std::wstring( L"SkinMatrices" ) );
-	GetGeometryEntity()->AddRenderParameter( m_pMatrixParameter );
+	GetBody()->AddRenderParameter( m_pMatrixParameter );
 
 	m_pMatrixNormalParameter= new MatrixArrayParameterDX11( m_Bones.count() );
 	m_pMatrixNormalParameter->SetName( std::wstring( L"SkinNormalMatrices" ) );
-	GetGeometryEntity()->AddRenderParameter( m_pMatrixNormalParameter );
+	GetBody()->AddRenderParameter( m_pMatrixNormalParameter );
 	
 	// Create an array to hold the CPU side matrices.
 	m_pMatrices = new Matrix4f[m_Bones.count()];

@@ -29,7 +29,6 @@ struct GS_INPUT
 {
 	float4 position : SV_Position;
 	float  z_value  : ZVALUE;
-	//float2 tex		: TEXCOORD0;
 	float3 normal	: TEXCOORD0;
 	float3 eye		: TEXCOORD1;
 };
@@ -38,7 +37,6 @@ struct PS_INPUT
 {
 	float4 position : SV_Position;
 	float  z_value  : ZVALUE;
-	//float2 tex      : TEXCOORD0;
 	float3 normal	: TEXCOORD0;
 	float3 eye		: TEXCOORD1;
 	uint   rtindex  : SV_RenderTargetArrayIndex;
@@ -53,35 +51,30 @@ GS_INPUT VSMAIN( VS_INPUT IN )
 {
     GS_INPUT OUT;
 
-	// First calculate the output position based on the paraboloid maps that we are
-	// currently generating.
+	// Transform the vertex to be relative to the paraboloid's basis. 
+	OUT.position = mul( float4( IN.position, 1 ), WorldViewMatrix );
 
-	//float direction = viewParms.z;		// this determines the front or back hemisphere
+	// Determine the distance between the paraboloid origin and the vertex.
+	float L = length( OUT.position.xyz );
 
-	OUT.position = mul( float4( IN.position, 1 ), WorldViewMatrix );	// transform vertex into the maps basis
-
-	//OUT.position.z = OUT.position.z * direction;		// set z-values to forward or backward
+	// Normalize the vector to the vertex
+	OUT.position = OUT.position / L;
 	
-	float L = length( OUT.position.xyz );				// determine the distance between (0,0,0) and the vertex
-	OUT.position = OUT.position / L;					// divide the vertex position by the distance 
-	
-	OUT.z_value = OUT.position.z;						// remember which hemisphere the vertex is in
-	//OUT.position.z = OUT.position.z + 1;				// add the reflected vector to find the normal vector
+	// Save the z-component of the normalized vector
+	OUT.z_value = OUT.position.z;
 
-	//OUT.position.x = OUT.position.x / OUT.position.z;	// divide x coord by the new z-value
-	//OUT.position.y = OUT.position.y / OUT.position.z;	// divide y coord by the new z-value
+	// Store the distance to the vertex for use in the depth buffer.
+	OUT.position.z = L / 500;
 
-	OUT.position.z = L / 500;							// set a depth value for correct z-buffering
-	OUT.position.w = 1;									// set w to 1 so there is no w divide
+	// Set w to 1 since we aren't doing any perspective distortion.
+	OUT.position.w = 1;
 
+	// Find the world space position of the vertex.
+	float4 WorldPos		= mul( float4( IN.position, 1 ), WorldMatrix );
 
-	// These are used to lookup this object's paraboloid maps' information
-	float4 WorldPos		= mul( float4(IN.position, 1), WorldMatrix );		// find world space position
-	float3 N			= normalize(mul(IN.normal, (float3x3)WorldMatrix));	// find world space normal
-	float3 E			= normalize(WorldPos.xyz - ViewPosition.xyz);			// find world space eye vector
-
-	OUT.normal			= N;									// output world space normal vector
-	OUT.eye				= E;									// output world space eye vector
+	// Find world space normal and eye vectors.
+	OUT.normal			= normalize( mul( IN.normal, (float3x3)WorldMatrix ) );
+	OUT.eye				= normalize( WorldPos.xyz - ViewPosition.xyz );
 
 	return OUT;
 }
@@ -94,36 +87,43 @@ void GSMAIN( triangle GS_INPUT input[3],
 {
 	PS_INPUT output;
 
+	// Initialize the vertex order and the direction of the paraboloid.
 	uint3 order = uint3( 0, 1, 2 );
 	float direction = 1.0f;
 
-	// Transform to view space - need to change this to use a matrix array!
+	// Check to see which copy of the primitive this is.  If it is 0, then it
+	// is considered the front facing paraboloid.  If it is 1, then it is
+	// considered the back facing paraboloid.  For back facing, we reverse
+	// the output vertex winding order.
 	if ( id == 1 )
 	{
 		order.xyz = order.xzy;
 		direction = -1.0f;
 	}
 
-    // Emit two new triangles
+    // Emit three vertices for one complete triangle.
     for ( int i = 0; i < 3; i++ )
     {
+		// Create a projection factor, which determines which half space 
+		// will be considered positive and also adds the viewing vector
+		// which is (0,0,1) and hence can only be added to the z-component.
 		float projFactor = input[order[i]].z_value * direction + 1.0f;
 		output.position.x = input[order[i]].position.x / projFactor;
 		output.position.y = input[order[i]].position.y / projFactor;
 		output.position.z = input[order[i]].position.z;
 		output.position.w = 1.0f;
-		//OUT.position.z = OUT.position.z + 1;				// add the reflected vector to find the normal vector
 
-		//OUT.position.x = OUT.position.x / OUT.position.z;	// divide x coord by the new z-value
-		//OUT.position.y = OUT.position.y / OUT.position.z;	// divide y coord by the new z-value
-
-
-		//output.tex = input[order[i]].tex;
-		output.z_value = input[order[i]].z_value * direction;
-		output.normal = input[order[i]].normal;
-		output.eye = input[order[i]].eye;
+		// Simply use the geometry shader instance as the render target
+		// index for this primitive.
 		output.rtindex = id;
 
+		// Propagate the normal and eye vectors.
+		output.normal = input[order[i]].normal;
+		output.eye = input[order[i]].eye;
+		
+		output.z_value = input[order[i]].z_value * direction;
+		
+		// Write the vertex to the output stream.
         OutputStream.Append(output);
     }
 
@@ -134,30 +134,37 @@ float4 PSMAIN( PS_INPUT IN ) : SV_Target
 {
     float4 OUT;
 
-	clip( IN.z_value );
+	clip( IN.z_value + 0.05f );
 
-	float3 N = normalize( IN.normal );			// normalize input per-vertex normal vector
-	float3 E = normalize( IN.eye );				// normalize input per-vertex eye vector
-	float3 R = reflect( E, N );					// calculate the reflection vector
+	// Normalize the input normal and eye vectors
+	float3 N = normalize( IN.normal );
+	float3 E = normalize( IN.eye );
+
+	// Calculate the world space reflection vector, and then transform it to 
+	// the paraboloid basis.
+	float3 R = reflect( E, N );
+	R = mul( R, (float3x3)ParaboloidBasis );
 	
-	R = mul( R, (float3x3)ParaboloidBasis );	// transform reflection vector to the maps basis
-	
-	// calculate the forward paraboloid map texture coordinates	
+	// Calculate the forward paraboloid map texture coordinates, with z 
+	// determining which paraboloid map to sample (front or back).
 	float3 front;
 	front.x = (R.x / (2*(1 + R.z))) + 0.5;
 	front.y = 1-((R.y / (2*(1 + R.z))) + 0.5);
 	front.z = 0.0f;
 	
-	// calculate the backward paraboloid map texture coordinates
+	// Calculate the backward paraboloid map texture coordinates, with z 
+	// determining which paraboloid map to sample (front or back).
 	float3 back;
 	back.x = (R.x / (2*(1 - R.z))) + 0.5;
 	back.y = 1-((R.y / (2*(1 - R.z))) + 0.5);
 	back.z = 1.0f;
 
+	// Sample the appropriate paraboloid map based on which direction 
+	// the reflection vector is pointing.
 	if ( R.z > 0 )
-		OUT = ParaboloidTexture.Sample( ParaboloidSampler, front );	// sample the front paraboloid map
+		OUT = ParaboloidTexture.Sample( ParaboloidSampler, front );
 	else
-		OUT = ParaboloidTexture.Sample( ParaboloidSampler, back );	// sample the back paraboloid map
+		OUT = ParaboloidTexture.Sample( ParaboloidSampler, back );
 
 	OUT *= 0.8f;
 
