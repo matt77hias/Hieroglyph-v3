@@ -119,7 +119,8 @@ DiffuseSphereEntity::DiffuseSphereEntity()
 //	Vector4f FinalColor = Vector4f( 0.5f, 1.0f, 0.5f, 1.0f );
 //	pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"FinalColor" ), &FinalColor );
 
-
+	pGeometry->GenerateInputLayout( pEffect->m_iVertexShader );
+	pGeometry->GenerateInputLayout( pParabGenEffect->m_iVertexShader );
 
 	this->SetGeometry( pGeometry );
 	this->SetMaterial( pMaterial, false );
