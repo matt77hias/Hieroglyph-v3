@@ -7,4 +7,9 @@ TessellationParams.vcproj.MainPC.Jack.user
 Debug
 TessParamsDemo_100001.bmp
 TessellationParams.vcproj.MainPC.Jack.user
+</Value></Property><Property><Name>svn:ignore</Name><Value>*.user
+Debug
+TessParamsDemo_100001.bmp
+TessellationParams.vcproj.MainPC.Jack.user
+Release
 </Value></Property></Properties></ItemProperties>

@@ -7,4 +7,10 @@ DeferredRendering.sln
 *.suo
 DeferredRendering.sln
 LightPrepass.sln
+</Value></Property><Property><Name>svn:ignore</Name><Value>*.ncb
+*.psess
+*.suo
+DeferredRendering.sln
+LightPrepass.sln
+*.vsp
 </Value></Property></Properties></ItemProperties>

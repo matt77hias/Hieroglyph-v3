@@ -52,13 +52,12 @@ bool App::ConfigureEngineComponents()
 
 	pEventManager->AddEventListener( SYSTEM_KEYBOARD_KEYUP, this );
 	pEventManager->AddEventListener( SYSTEM_KEYBOARD_KEYDOWN, this );
-	pEventManager->AddEventListener( SYSTEM_KEYBOARD_CHAR, this );
-
+	pEventManager->AddEventListener( SYSTEM_KEYBOARD_CHAR, this );    
 
 	// Create the renderer and initialize it for the desired device
 	// type and feature level.
 
-	m_pRenderer11 = new RendererDX11();
+	m_pRenderer11 = new RendererDX11();    
 
 	if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_HARDWARE, D3D_FEATURE_LEVEL_11_0 ) )
 	{
@@ -122,7 +121,7 @@ bool App::ConfigureEngineComponents()
 	m_pSpriteRenderer = new SpriteRendererDX11();
 	m_pSpriteRenderer->Initialize();
 
-	m_pRenderer11->SetMultiThreadingState( false );
+    m_pRenderer11->SetMultiThreadingState( true );
 
 	return( true );
 }
@@ -179,7 +178,9 @@ void App::Initialize()
 	
 	m_pDiffuseActor = new Actor();
 	m_pDiffuseActor->GetNode()->AttachController( new RotationController( Vector3f( 1.0f, 0.0f, 0.0f ), 0.5f ) );
-	for ( int i = 0; i < 600; i++ )
+
+    DiffuseSphereEntity::LoadResources();
+	for ( int i = 0; i < 200; i++ )
 	{
 		float x = static_cast<float>( (double)rand() / RAND_MAX ) * 2.0f - 1.0f;
 		float y = static_cast<float>( (double)rand() / RAND_MAX ) * 2.0f - 1.0f;
@@ -194,9 +195,7 @@ void App::Initialize()
 		m_pDiffuseActor->AddElement( pEntity );
 	}
 
-	m_pReflectiveActor = new Actor();
-	
-	
+	m_pReflectiveActor = new Actor();		
 	
 
 	for ( int i = 0; i < 3; i++ )

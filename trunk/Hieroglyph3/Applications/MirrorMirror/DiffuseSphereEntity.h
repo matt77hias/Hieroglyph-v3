@@ -20,22 +20,23 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
+    class ShaderResourceParameterDX11;
+
 	class DiffuseSphereEntity : public Entity3D
 	{
 	public:
 		DiffuseSphereEntity( );
-		virtual ~DiffuseSphereEntity( );
 
-		virtual void PreRender( RendererDX11* pRenderer, VIEWTYPE view );
-		virtual void Render( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager, VIEWTYPE view );
-
+        static void LoadResources( );
 
 	public:
-		ResourcePtr ArgsBuffer;
-		ViewParaboloidEnvMap* m_pParaboloidView;
-
-		ResourcePtr ColorTexture;
-		int			LinearSampler;
+		static ResourcePtr ArgsBuffer;
+		static ResourcePtr ColorTexture;
+        static ShaderResourceParameterDX11* TextureParameter;
+		static int LinearSampler;
+        static RenderEffectDX11* RenderEffect;
+        static RenderEffectDX11* ParabolaEffect;
+        static GeometryDX11* SphereGeometry;
 	};
 };
 //--------------------------------------------------------------------------------
