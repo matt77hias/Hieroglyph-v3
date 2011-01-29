@@ -61,6 +61,8 @@ void DiffuseSphereEntity::LoadResources()
     SphereGeometry->LoadToBuffers();
     SphereGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
+
+
     RenderEffect = new RenderEffectDX11();
     RenderEffect->m_iVertexShader = 
         pRenderer11->LoadShader( VERTEX_SHADER,
@@ -100,6 +102,14 @@ void DiffuseSphereEntity::LoadResources()
 
     //pParabGenEffect->m_iRasterizerState = 
     //	pRenderer11->CreateRasterizerState( &RS );
+
+	SphereGeometry->GenerateInputLayout( RenderEffect->m_iVertexShader );
+	SphereGeometry->GenerateInputLayout( ParabolaEffect->m_iVertexShader );
+
+	RenderEffect->ConfigurePipeline( pRenderer11->pImmPipeline, pRenderer11->m_pParamMgr );
+	ParabolaEffect->ConfigurePipeline( pRenderer11->pImmPipeline, pRenderer11->m_pParamMgr );
+
+
 
     ColorTexture = pRenderer11->LoadTexture( L"../Data/Textures/Tiles.png" );
 

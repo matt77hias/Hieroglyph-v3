@@ -53,7 +53,7 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 
-static int size = 128;
+static int size = 256;
 	// Create the resources to be used for generating the paraboloid maps.
 	Texture2dConfigDX11 ColorConfig;
 	ColorConfig.SetColorBuffer( size, size );
@@ -128,6 +128,10 @@ static int size = 128;
 
 	pGeometry->GenerateInputLayout( pEffect->m_iVertexShader );
 	pGeometry->GenerateInputLayout( pParabGenEffect->m_iVertexShader );
+
+	pEffect->ConfigurePipeline( pRenderer11->pImmPipeline, pRenderer11->m_pParamMgr );
+	pParabGenEffect->ConfigurePipeline( pRenderer11->pImmPipeline, pRenderer11->m_pParamMgr );
+
 
 	this->SetGeometry( pGeometry );
 	this->SetMaterial( pMaterial, false );

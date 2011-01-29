@@ -172,7 +172,7 @@ void App::Initialize()
 	// manually manipulating it.
 
 
-	static float radius = 10.0f;
+	static float radius = 20.0f;
 
 	m_pNode = new Node3D();
 	
@@ -205,6 +205,10 @@ void App::Initialize()
 		m_pReflector[i]->m_pParaboloidView->SetRoot( m_pScene->GetRoot() );
 		m_pNode->AttachChild( m_pReflector[i] );
 	}
+
+	m_pReflector[0]->Position() = Vector3f( -1.0, 1.0f, 1.0f );
+	m_pReflector[1]->Position() = Vector3f( 1.0, 1.0f, 1.0f );
+	m_pReflector[2]->Position() = Vector3f( 0.0, -1.0f, 1.0f );
 
 	m_pNode->AttachChild( m_pDiffuseActor->GetNode() );
 	
