@@ -38,8 +38,8 @@ App::App()
 bool App::ConfigureEngineComponents()
 {
 	// The application currently supplies the 
-	int width = 640;
-	int height = 480;
+	int width = 400;
+	int height = 300;
 	bool windowed = true;
 
 	// Set the render window parameters and initialize the window
@@ -153,10 +153,11 @@ void App::Initialize()
 
 	// Load and initialize the geometry to be rendered.
 
-	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/suzanne.ply" ) );
-	m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/CPNTest.ply" ) );
+	m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/spaceship.ply" ) );
+	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/CPNTest.ply" ) );
+	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/BoxWithBadNormals.ply" ) );
 
-	//m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/hedra.ms3d" ) );
+	//m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
 	//m_pGeometry->LoadToBuffers();
 
 	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );	
@@ -455,9 +456,13 @@ void App::UpdateViewState()
 	float fromAngle = fmodf( distance * 2.0f * static_cast<float>(D3DX_PI), 2.0f * static_cast<float>(D3DX_PI));
 	//float toAngle = fmodf( (distance + 0.08f) * 2.0f * static_cast<float>(D3DX_PI), 2.0f * static_cast<float>(D3DX_PI)); // ~30 degrees in front
 
-	vLookFrom.x = sinf(fromAngle) * 2.5f;
-	vLookFrom.y = 1.25f;
-	vLookFrom.z = cosf(fromAngle) * 2.5f;
+	//vLookFrom.x = 4.5f;//sinf(fromAngle) * 2.5f;
+	//vLookFrom.y = 5.25f;
+	//vLookFrom.z = 7.5f;//cosf(fromAngle) * 2.5f;
+	
+	vLookFrom.x = sinf(fromAngle) * 13.5f;
+	vLookFrom.y = 5.25f;
+	vLookFrom.z = cosf(fromAngle) * 13.5f;
 
 	/*
 	vLookAt.x = sinf(toAngle) * 3.0f;
@@ -483,5 +488,8 @@ void App::UpdateViewState()
 
 	Vector4f vCam = Vector4f( vLookFrom.x, vLookFrom.y, vLookFrom.z, /* unused */ 0.0f );
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( L"cameraPosition", &vCam );
+
+	Vector4f vCamLook = Vector4f( vLookAt.x, vLookAt.y, vLookAt.z, /* unused */ 0.0f );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( L"cameraLookAt", &vCamLook );
 }
 //--------------------------------------------------------------------------------

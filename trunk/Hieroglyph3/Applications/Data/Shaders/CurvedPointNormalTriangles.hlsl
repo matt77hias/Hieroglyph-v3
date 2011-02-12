@@ -25,6 +25,7 @@ cbuffer TessellationParameters
 cbuffer RenderingParameters
 {
 	float3 cameraPosition;
+	float3 cameraLookAt;
 };
 //--------------------------------------------------------------------------------
 // Inter-stage structures
@@ -66,43 +67,32 @@ float ComputeWeight(InputPatch<VS_OUTPUT, 3> inPatch, int i, int j)
 //--------------------------------------------------------------------------------
 float3 ComputeEdgePosition(InputPatch<VS_OUTPUT, 3> inPatch, int i, int j)
 {
-	return ( (2.0f * inPatch[i].position) + inPatch[j].position - (ComputeWeight(inPatch, i, j) * inPatch[i].normal)) / 3.0f;
-	/*
-	float3 Q = lerp(inPatch[i].position, inPatch[j].position, 1.0f / 3.0f);
-	// Q projected onto a plane with normal N attached to point P is
-	// = Q - wN
-	//   w = (Q - P)•N
-	float3 P = inPatch[i].position;
-	float3 N = inPatch[i].normal;
-	float w = dot(Q-P,N);
-	Q = Q - (w * N);
-	return Q;
-	*/
-}
-//--------------------------------------------------------------------------------
-float ComputeNormalWeight(InputPatch<VS_OUTPUT, 3> inPatch, int i, int j)
-{
-	float n = dot( (inPatch[j].position - inPatch[i].position), (inPatch[i].normal - inPatch[j].normal) );
-	float d = dot( (inPatch[j].position - inPatch[i].position), (inPatch[j].position - inPatch[i].position) );
-	
-	return 2.0f * ( n / d);
+	return ( 
+			(2.0f * inPatch[i].position) + inPatch[j].position 
+			- (ComputeWeight(inPatch, i, j) * inPatch[i].normal)
+			) / 3.0f;
 }
 //--------------------------------------------------------------------------------
 float3 ComputeEdgeNormal(InputPatch<VS_OUTPUT, 3> inPatch, int i, int j)
 {
-	return  normalize
+	float t = dot
+			  (
+				inPatch[j].position - inPatch[i].position
+				, inPatch[i].normal + inPatch[j].normal
+			   );
+	
+	float b = dot
+			  (
+				inPatch[j].position - inPatch[i].position
+				, inPatch[j].position - inPatch[i].position
+			   );
+			   
+	float v = 2.0f * (t / b);
+	
+	return normalize
 			(
-				(
-					inPatch[i].normal
-					+
-					inPatch[j].normal
-				)
-				-
-				(
-					ComputeNormalWeight(inPatch, i, j) 
-					* 
-					(inPatch[j].position - inPatch[i].position)
-				)
+				inPatch[i].normal + inPatch[j].normal 
+				- v * (inPatch[j].position - inPatch[i].position)
 			);
 }
 //--------------------------------------------------------------------------------
@@ -121,13 +111,18 @@ VS_OUTPUT vsMain( in VS_INPUT input )
 HS_CONSTANT_DATA_OUTPUT hsConstantFunc( InputPatch<VS_OUTPUT, 3> ip, uint PatchID : SV_PrimitiveID )
 {	
     HS_CONSTANT_DATA_OUTPUT output;
+    
+    float3 faceNormal = normalize(cross(ip[2].position - ip[0].position, ip[1].position - ip[0].position));
+    float3 viewDirection = normalize(cameraLookAt - cameraPosition);
+    
+    float backFace = sign(0.2+dot(faceNormal,viewDirection));
 
 	// Insert code to compute Output here
-	output.Edges[0] = EdgeFactors.x;
-	output.Edges[1] = EdgeFactors.y;
-	output.Edges[2] = EdgeFactors.z;
+	output.Edges[0] = EdgeFactors.x * backFace;
+	output.Edges[1] = EdgeFactors.y * backFace;
+	output.Edges[2] = EdgeFactors.z * backFace;
 	
-	output.Inside = EdgeFactors.w;
+	output.Inside = EdgeFactors.w * backFace;
 
     return output;
 }
@@ -146,7 +141,6 @@ HS_OUTPUT hsDefault( InputPatch<VS_OUTPUT, 3> ip, uint i : SV_OutputControlPoint
 	output.position = float3(0.0f, 0.0f, 0.0f);
 	output.normal = float3(0.0f, 0.0f, 0.0f);	
 	
-	// From paper:
 	switch(i)
 	{
 		// Three actual vertices:
@@ -213,6 +207,8 @@ HS_OUTPUT hsDefault( InputPatch<VS_OUTPUT, 3> ip, uint i : SV_OutputControlPoint
 			
 			break;
 			
+		// Normals
+			
 		// n(110) - between v0 and v1
 		case 10:
 			output.normal = ComputeEdgeNormal(ip, 0, 1);
@@ -227,8 +223,7 @@ HS_OUTPUT hsDefault( InputPatch<VS_OUTPUT, 3> ip, uint i : SV_OutputControlPoint
 		case 12:
 			output.normal = ComputeEdgeNormal(ip, 2, 0);
 			break;
-	}
-	
+	}	
 
     return output;
 }
@@ -308,41 +303,42 @@ DS_OUTPUT dsMain( const OutputPatch<HS_OUTPUT, 13> TrianglePatch, float3 Barycen
 	float w = BarycentricCoordinates.z;
 	
 	// Original Vertices
-	float3 b300 = TrianglePatch[0].position;
-	float3 b030 = TrianglePatch[1].position;
-	float3 b003 = TrianglePatch[2].position;
+	float3 p300 = TrianglePatch[0].position;
+	float3 p030 = TrianglePatch[1].position;
+	float3 p003 = TrianglePatch[2].position;
 	
 	// Edge between v0 and v1
-	float3 b210 = TrianglePatch[3].position;
-	float3 b120 = TrianglePatch[4].position;
+	float3 p210 = TrianglePatch[3].position;
+	float3 p120 = TrianglePatch[4].position;
 	
 	// Edge between v1 and v2
-	float3 b021 = TrianglePatch[5].position;
-	float3 b012 = TrianglePatch[6].position;
+	float3 p021 = TrianglePatch[5].position;
+	float3 p012 = TrianglePatch[6].position;
 	
 	// Edge between v2 and v0
-	float3 b102 = TrianglePatch[7].position;
-	float3 b201 = TrianglePatch[8].position;
+	float3 p102 = TrianglePatch[7].position;
+	float3 p201 = TrianglePatch[8].position;
 	
 	// Middle of triangle
-	float3 b111 = TrianglePatch[9].position;
+	float3 p111 = TrianglePatch[9].position;
 	
 	// Calculate this sample point
-	float3 p = (b300 * pow(w,3)) + (b030 * pow(u,3)) + (b003 * pow(v,3))
-			 + (b210 * 3.0f * pow(w,2) * u) 
-			 + (b120 * 3.0f * w * pow(u,2)) 
-			 + (b201 * 3.0f * pow(w,2) * v)
-			 + (b021 * 3.0f * pow(u,2) * v) 
-			 + (b102 * 3.0f * w * pow(v,2)) 
-			 + (b012 * 3.0f * u * pow(v,2))
-			 + (b111 * 6.0f * w * u * v);
+	float3 p = (p300 * pow(w,3)) + (p030 * pow(u,3)) + (p003 * pow(v,3))
+			 + (p210 * 3.0f * pow(w,2) * u) 
+			 + (p120 * 3.0f * w * pow(u,2)) 
+			 + (p201 * 3.0f * pow(w,2) * v)
+			 + (p021 * 3.0f * pow(u,2) * v) 
+			 + (p102 * 3.0f * w * pow(v,2)) 
+			 + (p012 * 3.0f * u * pow(v,2))
+			 + (p111 * 6.0f * w * u * v);
+	
+	//p = w*TrianglePatch[0].position + u*TrianglePatch[1].position + v*TrianglePatch[2].position;
 	
 	// Transform world position with viewprojection matrix
 	output.Position = mul( float4(p, 1.0), mViewProj );
 	
 	// Compute the normal - LINEAR
 	float3 vWorldNorm = w*TrianglePatch[0].normal + u*TrianglePatch[1].normal + v*TrianglePatch[2].normal;
-	vWorldNorm = normalize( vWorldNorm );
 	
 	// Compute the normal - QUADRATIC
 	float3 n200 = TrianglePatch[0].normal;
@@ -356,9 +352,11 @@ DS_OUTPUT dsMain( const OutputPatch<HS_OUTPUT, 13> TrianglePatch, float3 Barycen
 	vWorldNorm = (pow(w,2) * n200) + (pow(u,2) * n020) + (pow(v,2) * n002)
 			   + (w * u * n110) + (u * v * n011) + (w * v * n101);
 	
+	vWorldNorm = normalize( vWorldNorm );
+	
 	// Perform the lighting calc
 	float3 toCamera = normalize( cameraPosition.xyz );
-	output.Colour = saturate( dot(vWorldNorm, toCamera) );
+	output.Colour = saturate( dot(vWorldNorm, toCamera) ) * float3( 0.4, 0.4, 1.0 );
 	
 	//output.Colour = w*TrianglePatch[0].normal+u*TrianglePatch[1].normal+v*TrianglePatch[2].normal;
 	//output.Colour = (vWorldNorm + 1.0f) / 2.0f;
