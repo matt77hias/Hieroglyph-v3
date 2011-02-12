@@ -35,7 +35,7 @@ namespace Glyph3
 		//static void removeWhiteSpace( std::wstring& s );
 		//static std::wstring getElementName( int usage, int index );
 
-		static GeometryDX11* loadStanfordPlyFile( std::wstring filename );
+		static GeometryDX11* loadStanfordPlyFile( std::wstring filename, bool withAdjacency = false );
 
 	private:
 		GeometryLoaderDX11();
@@ -63,6 +63,7 @@ namespace Glyph3
 			T* data;
 		};
 
+		static int FindAdjacentIndex( int edgeStart, int edgeEnd, int triV, int* pRaw, int rawLen);
 		static PlyElementDesc ParsePLYElementHeader(std::string headerLine, std::ifstream& input);
 		static PlyElementPropertyDeclaration ParsePLYElementProperty(std::string desc);
 		static PlyElementPropertyDeclaration ParsePLYElementPropertyList(std::string desc);

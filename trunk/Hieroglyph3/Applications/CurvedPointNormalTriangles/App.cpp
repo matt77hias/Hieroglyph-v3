@@ -38,8 +38,8 @@ App::App()
 bool App::ConfigureEngineComponents()
 {
 	// The application currently supplies the 
-	int width = 400;
-	int height = 300;
+	int width = 800;
+	int height = 600;
 	bool windowed = true;
 
 	// Set the render window parameters and initialize the window
@@ -153,14 +153,13 @@ void App::Initialize()
 
 	// Load and initialize the geometry to be rendered.
 
-	m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/spaceship.ply" ) );
+	m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/spaceship2.ply" ), true );
 	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/CPNTest.ply" ) );
-	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/BoxWithBadNormals.ply" ) );
+	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/BoxWithBadNormals.ply" ), true );
 
 	//m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
 	//m_pGeometry->LoadToBuffers();
-
-	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );	
+	//m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );	
 	
 	// Create the material for use by the entities.
 	CreateShaders();
@@ -308,6 +307,12 @@ bool App::HandleEvent( IEvent* pEvent )
 			// Toggle Wireframe
 			m_bSolidRender = !m_bSolidRender;
 			m_pEffect->m_iRasterizerState = m_bSolidRender ? m_rsSolid : m_rsWireframe;
+		}
+		else if ( 'A' == key )
+		{
+			// Toggle adaptive/uniform
+			m_bDefaultComplexity = !m_bDefaultComplexity;
+			m_pEffect->m_iHullShader = m_bDefaultComplexity ? m_iDefaultHullShader : m_iSilhouetteHullShader;
 		}
 		else if ( VK_ADD == key )
 		{
@@ -460,9 +465,9 @@ void App::UpdateViewState()
 	//vLookFrom.y = 5.25f;
 	//vLookFrom.z = 7.5f;//cosf(fromAngle) * 2.5f;
 	
-	vLookFrom.x = sinf(fromAngle) * 13.5f;
-	vLookFrom.y = 5.25f;
-	vLookFrom.z = cosf(fromAngle) * 13.5f;
+	vLookFrom.x = sinf(fromAngle) * 12.5f;
+	vLookFrom.y = 6.25f;
+	vLookFrom.z = cosf(fromAngle) * 12.5f;
 
 	/*
 	vLookAt.x = sinf(toAngle) * 3.0f;

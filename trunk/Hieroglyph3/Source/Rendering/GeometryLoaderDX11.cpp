@@ -1541,7 +1541,7 @@ GeometryDX11* GeometryLoaderDX11::loadMS3DFileWithAnimationAndWeights( std::wstr
 //}
 
 
-GeometryDX11* GeometryLoaderDX11::loadStanfordPlyFile( std::wstring filename )
+GeometryDX11* GeometryLoaderDX11::loadStanfordPlyFile( std::wstring filename, bool withAdjacency )
 {
 	// Load the contents of the file
 	std::ifstream fin;
@@ -1716,17 +1716,63 @@ GeometryDX11* GeometryLoaderDX11::loadStanfordPlyFile( std::wstring filename )
 				throw new std::exception("Expected each face to have the same number of indexes");
 		}
 
-		// Thirdly, can now set the appropriate topology
-		pMesh->SetPrimitiveType( (D3D11_PRIMITIVE_TOPOLOGY)(D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST + (faceSize - 1)) );
-
-		// Finally, extract this data
-		for(int f = 0; f < d.elementCount; ++f)
+		if(withAdjacency)
 		{
-			void** raw = d.data.at(f);
-			PlyDataArray<int>* idxs = reinterpret_cast<PlyDataArray<int>*>(raw[0]);
+			pMesh->SetPrimitiveType( (D3D11_PRIMITIVE_TOPOLOGY)(D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST + ((2*faceSize) - 1)) );
 
-			for(unsigned int fi = 0; fi < idxs->length; ++fi)
-				pMesh->AddIndex( idxs->data[fi] );
+			// Grab all of the faces so we can search for adjacency
+			int* pRaw = new int[d.elementCount * faceSize];
+
+			int pRawIdx = 0;
+
+			for(int f = 0; f < d.elementCount; ++f)
+			{
+				void** raw = d.data.at(f);
+				PlyDataArray<int>* idxs = reinterpret_cast<PlyDataArray<int>*>(raw[0]);
+
+				for(unsigned int fi = 0; fi < idxs->length; ++fi)
+					pRaw[pRawIdx++] = idxs->data[fi];
+			}
+
+			// We can now go and add the actual indices
+			for(int f = 0; f < (d.elementCount * faceSize); f+=3)
+			{
+				pMesh->AddIndex( pRaw[f + 0] );
+				pMesh->AddIndex( pRaw[f + 1] );
+				pMesh->AddIndex( pRaw[f + 2] );
+
+				// We now need to find an adjacency for each
+				// edge where possible
+				int a0 = FindAdjacentIndex( pRaw[f + 0], pRaw[f + 1], pRaw[f + 2], pRaw, d.elementCount * faceSize );
+				int a1 = FindAdjacentIndex( pRaw[f + 1], pRaw[f + 2], pRaw[f + 0], pRaw, d.elementCount * faceSize );
+				int a2 = FindAdjacentIndex( pRaw[f + 2], pRaw[f + 0], pRaw[f + 1], pRaw, d.elementCount * faceSize );
+
+				std::wstringstream out;
+				out << "Actual indices <" << pRaw[f+0] << ", " << pRaw[f+1] << ", " << pRaw[f+2] << "> have adjacency <" << a0 << ", " << a1 << ", " << a2 << ">.";
+				OutputDebugString( out.str().c_str() );
+				OutputDebugString( L"\n" );
+
+				pMesh->AddIndex( a0 );
+				pMesh->AddIndex( a1 );
+				pMesh->AddIndex( a2 );
+			}
+
+			delete[] pRaw;
+		}
+		else
+		{
+			// Thirdly, can now set the appropriate topology
+			pMesh->SetPrimitiveType( (D3D11_PRIMITIVE_TOPOLOGY)(D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST + (faceSize - 1)) );
+
+			// Finally, extract this data
+			for(int f = 0; f < d.elementCount; ++f)
+			{
+				void** raw = d.data.at(f);
+				PlyDataArray<int>* idxs = reinterpret_cast<PlyDataArray<int>*>(raw[0]);
+
+				for(unsigned int fi = 0; fi < idxs->length; ++fi)
+					pMesh->AddIndex( idxs->data[fi] );
+			}
 		}
 	}
 	else
@@ -1760,6 +1806,29 @@ GeometryDX11* GeometryLoaderDX11::loadStanfordPlyFile( std::wstring filename )
 
 	// Return to caller
 	return pMesh;
+}
+
+int GeometryLoaderDX11::FindAdjacentIndex( int edgeStart, int edgeEnd, int triV, int* pRaw, int rawLen)
+{
+	for(int f = 0; f < rawLen; f+=3)
+	{
+		int esIdx = -1;
+		for( int i = 0; i < 3; ++i ) { if(pRaw[f+i]==edgeStart) esIdx = i; }
+
+		int eeIdx = -1;
+		for( int i = 0; i < 3; ++i ) { if(pRaw[f+i]==edgeEnd) eeIdx = i; }
+
+		if((-1!=esIdx)&&(-1!=eeIdx))
+		{
+			int oIdx = -1;
+			for(int i = 0; i < 3; ++i) { if((i!=esIdx) && (i!=eeIdx)) oIdx = i; }
+
+			if(pRaw[f+oIdx]!=triV)
+				return pRaw[f + oIdx];
+		}
+	}
+
+	return edgeStart;
 }
 
 GeometryLoaderDX11::PlyElementDesc GeometryLoaderDX11::ParsePLYElementHeader(std::string headerLine, std::ifstream& input)

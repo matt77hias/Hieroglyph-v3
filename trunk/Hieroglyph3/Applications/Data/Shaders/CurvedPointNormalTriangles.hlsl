@@ -60,9 +60,22 @@ struct DS_OUTPUT
     float3 Colour			: COLOUR;
 };
 //--------------------------------------------------------------------------------
+float ComputeWeight(InputPatch<VS_OUTPUT, 6> inPatch, int i, int j)
+{
+	return dot(inPatch[j].position - inPatch[i].position, inPatch[i].normal);
+}
+//--------------------------------------------------------------------------------
 float ComputeWeight(InputPatch<VS_OUTPUT, 3> inPatch, int i, int j)
 {
 	return dot(inPatch[j].position - inPatch[i].position, inPatch[i].normal);
+}
+//--------------------------------------------------------------------------------
+float3 ComputeEdgePosition(InputPatch<VS_OUTPUT, 6> inPatch, int i, int j)
+{
+	return ( 
+			(2.0f * inPatch[i].position) + inPatch[j].position 
+			- (ComputeWeight(inPatch, i, j) * inPatch[i].normal)
+			) / 3.0f;
 }
 //--------------------------------------------------------------------------------
 float3 ComputeEdgePosition(InputPatch<VS_OUTPUT, 3> inPatch, int i, int j)
@@ -71,6 +84,29 @@ float3 ComputeEdgePosition(InputPatch<VS_OUTPUT, 3> inPatch, int i, int j)
 			(2.0f * inPatch[i].position) + inPatch[j].position 
 			- (ComputeWeight(inPatch, i, j) * inPatch[i].normal)
 			) / 3.0f;
+}
+//--------------------------------------------------------------------------------
+float3 ComputeEdgeNormal(InputPatch<VS_OUTPUT, 6> inPatch, int i, int j)
+{
+	float t = dot
+			  (
+				inPatch[j].position - inPatch[i].position
+				, inPatch[i].normal + inPatch[j].normal
+			   );
+	
+	float b = dot
+			  (
+				inPatch[j].position - inPatch[i].position
+				, inPatch[j].position - inPatch[i].position
+			   );
+			   
+	float v = 2.0f * (t / b);
+	
+	return normalize
+			(
+				inPatch[i].normal + inPatch[j].normal 
+				- v * (inPatch[j].position - inPatch[i].position)
+			);
 }
 //--------------------------------------------------------------------------------
 float3 ComputeEdgeNormal(InputPatch<VS_OUTPUT, 3> inPatch, int i, int j)
@@ -121,6 +157,37 @@ HS_CONSTANT_DATA_OUTPUT hsConstantFunc( InputPatch<VS_OUTPUT, 3> ip, uint PatchI
 	output.Edges[0] = EdgeFactors.x * backFace;
 	output.Edges[1] = EdgeFactors.y * backFace;
 	output.Edges[2] = EdgeFactors.z * backFace;
+	
+	output.Inside = EdgeFactors.w * backFace;
+
+    return output;
+}
+//--------------------------------------------------------------------------------
+HS_CONSTANT_DATA_OUTPUT hsConstantFuncAdaptive( InputPatch<VS_OUTPUT, 6> ip, uint PatchID : SV_PrimitiveID )
+{	
+    HS_CONSTANT_DATA_OUTPUT output;
+    
+    float3 faceNormal = normalize(cross(ip[2].position - ip[0].position, ip[1].position - ip[0].position));
+    float3 viewDirection = normalize(cameraLookAt - cameraPosition);
+    
+    float backFace = sign(0.2+dot(faceNormal,viewDirection));
+    
+    float3 a0 = normalize(cross(ip[1].position - ip[3].position, ip[0].position - ip[3].position));
+    float3 a1 = normalize(cross(ip[2].position - ip[4].position, ip[1].position - ip[4].position));
+    float3 a2 = normalize(cross(ip[0].position - ip[5].position, ip[2].position - ip[5].position));
+    
+    float e0 = (1.0f - dot(faceNormal, a0)) / 2.0f;
+    float e1 = (1.0f - dot(faceNormal, a1)) / 2.0f;
+    float e2 = (1.0f - dot(faceNormal, a2)) / 2.0f;
+
+	// Insert code to compute Output here
+	output.Edges[0] = EdgeFactors.x * backFace;
+	output.Edges[1] = EdgeFactors.y * backFace;
+	output.Edges[2] = EdgeFactors.z * backFace;
+	
+	output.Edges[0] *= e0;
+	output.Edges[1] *= e1;
+	output.Edges[2] *= e2;
 	
 	output.Inside = EdgeFactors.w * backFace;
 
@@ -231,18 +298,17 @@ HS_OUTPUT hsDefault( InputPatch<VS_OUTPUT, 3> ip, uint i : SV_OutputControlPoint
 [domain("tri")]
 [partitioning("fractional_even")]
 [outputtopology("triangle_cw")]
-[outputcontrolpoints(10)]
-[patchconstantfunc("hsConstantFunc")]
-HS_OUTPUT hsSilhouette( InputPatch<VS_OUTPUT, 3> ip, uint i : SV_OutputControlPointID, uint PatchID : SV_PrimitiveID )
+[outputcontrolpoints(13)]
+[patchconstantfunc("hsConstantFuncAdaptive")]
+HS_OUTPUT hsSilhouette( InputPatch<VS_OUTPUT, 6> ip, uint i : SV_OutputControlPointID, uint PatchID : SV_PrimitiveID )
 {
     HS_OUTPUT output;
 
     // Must provide a default definition just in
     // case we don't match any branch below
 	output.position = float3(0.0f, 0.0f, 0.0f);
-	output.normal = float3(0.0f, 0.0f, 0.0f);
+	output.normal = float3(0.0f, 0.0f, 0.0f);	
 	
-	// From paper:
 	switch(i)
 	{
 		// Three actual vertices:
@@ -262,33 +328,70 @@ HS_OUTPUT hsSilhouette( InputPatch<VS_OUTPUT, 3> ip, uint i : SV_OutputControlPo
 		
 		// b(210)
 		case 3:
+			output.position = ComputeEdgePosition(ip, 0, 1);
+			break;
 		// b(120)
 		case 4:
+			output.position = ComputeEdgePosition(ip, 1, 0);
+			break;
 		
 		// Edge between v1 and v2
 		
 		// b(021)
 		case 5:
+			output.position = ComputeEdgePosition(ip, 1, 2);
+			break;
 		// b(012)
-		case 6:
+		case 6:	
+			output.position = ComputeEdgePosition(ip, 2, 1);
+			break;
 		
 		// Edge between v2 and v0
 		
 		// b(102)
 		case 7:
+			output.position = ComputeEdgePosition(ip, 2, 0);
+			break;
 		// b(201)
 		case 8:
+			output.position = ComputeEdgePosition(ip, 0, 2);
+			break;
 		
 		// Middle of triangle
 		
 		// b(111)
 		case 9:
-		
-			output.position = ip[0].position;
-			output.normal = ip[0].normal;
+			float3 E = 
+						(
+							ComputeEdgePosition(ip, 0, 1) + ComputeEdgePosition(ip, 1, 0)
+							+
+							ComputeEdgePosition(ip, 1, 2) + ComputeEdgePosition(ip, 2, 1)
+							+
+							ComputeEdgePosition(ip, 2, 0) + ComputeEdgePosition(ip, 0, 2)
+						) / 6.0f;
+			float3 V = (ip[0].position + ip[1].position + ip[2].position) / 3.0f;
+			
+			output.position = E + ( (E - V) / 2.0f );
+			
 			break;
-	}
-	
+			
+		// Normals
+			
+		// n(110) - between v0 and v1
+		case 10:
+			output.normal = ComputeEdgeNormal(ip, 0, 1);
+			break;
+		
+		// n(011) - between v1 and v2
+		case 11:
+			output.normal = ComputeEdgeNormal(ip, 1, 2);
+			break;
+		
+		// n(101) - between v2 and v0
+		case 12:
+			output.normal = ComputeEdgeNormal(ip, 2, 0);
+			break;
+	}	
 
     return output;
 }
