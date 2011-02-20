@@ -42,8 +42,8 @@ App::App()
 bool App::ConfigureEngineComponents()
 {
 	// The application currently supplies the 
-	int width = 400;
-	int height = 300;
+	int width = 1024;
+	int height = 768;
 	bool windowed = true;
 
 	// Set the render window parameters and initialize the window
@@ -254,7 +254,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"TessParamsDemo_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"InterlockingTerrainTilesDemo_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
@@ -403,7 +403,7 @@ void App::CreateTerrainGeometry()
 			m_pTerrainGeometry->AddIndex( (z + 1) + (x + 0) * (TERRAIN_X_LEN + 1) );
 			m_pTerrainGeometry->AddIndex( (z + 0) + (x + 1) * (TERRAIN_X_LEN + 1) );
 			m_pTerrainGeometry->AddIndex( (z + 1) + (x + 1) * (TERRAIN_X_LEN + 1) );
-	
+
 			// 4-5 are +x
 			m_pTerrainGeometry->AddIndex( clamp(z + 0, 0, TERRAIN_Z_LEN) + clamp(x + 2, 0, TERRAIN_X_LEN) * (TERRAIN_X_LEN + 1) );
 			m_pTerrainGeometry->AddIndex( clamp(z + 1, 0, TERRAIN_Z_LEN) + clamp(x + 2, 0, TERRAIN_X_LEN) * (TERRAIN_X_LEN + 1) );
@@ -533,25 +533,25 @@ void App::CreateTerrainTextures()
 
 	// Create the SRV
 	ShaderResourceParameterDX11* pHeightMapTexParam = new ShaderResourceParameterDX11();
-    pHeightMapTexParam->SetParameterData( &m_pHeightMapTexture->m_iResourceSRV );
-    pHeightMapTexParam->SetName( std::wstring( L"texHeightMap" ) );
-	
+	pHeightMapTexParam->SetParameterData( &m_pHeightMapTexture->m_iResourceSRV );
+	pHeightMapTexParam->SetName( std::wstring( L"texHeightMap" ) );
+
 	// Map it to the param manager
 	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"texHeightMap", m_pHeightMapTexture );
 
 	// Create a sampler
 	D3D11_SAMPLER_DESC sampDesc;
-    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.BorderColor[0] = sampDesc.BorderColor[1] = sampDesc.BorderColor[2] = sampDesc.BorderColor[3] = 0;
-    sampDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-    sampDesc.MaxAnisotropy = 16;
-    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-    sampDesc.MinLOD = 0.0f;
-    sampDesc.MipLODBias = 0.0f;
-    int samplerState = m_pRenderer11->CreateSamplerState( &sampDesc );
+	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampDesc.BorderColor[0] = sampDesc.BorderColor[1] = sampDesc.BorderColor[2] = sampDesc.BorderColor[3] = 0;
+	sampDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampDesc.MaxAnisotropy = 16;
+	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	sampDesc.MinLOD = 0.0f;
+	sampDesc.MipLODBias = 0.0f;
+	int samplerState = m_pRenderer11->CreateSamplerState( &sampDesc );
 
 	// Set it to the param manager
 	m_pRenderer11->m_pParamMgr->SetSamplerParameter( L"smpHeightMap", &samplerState );

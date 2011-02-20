@@ -176,18 +176,26 @@ HS_CONSTANT_DATA_OUTPUT hsConstantFuncAdaptive( InputPatch<VS_OUTPUT, 6> ip, uin
     float3 a1 = normalize(cross(ip[2].position - ip[4].position, ip[1].position - ip[4].position));
     float3 a2 = normalize(cross(ip[0].position - ip[5].position, ip[2].position - ip[5].position));
     
-    float e0 = (1.0f - dot(faceNormal, a0)) / 2.0f;
-    float e1 = (1.0f - dot(faceNormal, a1)) / 2.0f;
-    float e2 = (1.0f - dot(faceNormal, a2)) / 2.0f;
+    float e0 = saturate( (1.0f - dot(faceNormal, a0)) / 2.0f );
+    float e1 = saturate( (1.0f - dot(faceNormal, a1)) / 2.0f );
+    float e2 = saturate( (1.0f - dot(faceNormal, a2)) / 2.0f );
 
 	// Insert code to compute Output here
-	output.Edges[0] = EdgeFactors.x * backFace;
-	output.Edges[1] = EdgeFactors.y * backFace;
-	output.Edges[2] = EdgeFactors.z * backFace;
+	//output.Edges[0] = EdgeFactors.x * backFace;
+	//output.Edges[1] = EdgeFactors.y * backFace;
+	//output.Edges[2] = EdgeFactors.z * backFace;
 	
-	output.Edges[0] *= e0;
-	output.Edges[1] *= e1;
-	output.Edges[2] *= e2;
+	e0 = saturate( (1.0f - dot(viewDirection, normalize(ip[0].normal + ip[1].normal))) / 2.0f );
+	e2 = saturate( (1.0f - dot(viewDirection, normalize(ip[1].normal + ip[2].normal))) / 2.0f );
+	e1 = saturate( (1.0f - dot(viewDirection, normalize(ip[2].normal + ip[0].normal))) / 2.0f );
+	
+	output.Edges[0] = lerp(1.0f, EdgeFactors.x, e0);
+	output.Edges[1] = 10.0f;//lerp(1.0f, EdgeFactors.y, e1);
+	output.Edges[2] = lerp(1.0f, EdgeFactors.z, e2);
+	
+	/*output.Edges[0] *= backFace;
+	output.Edges[1] *= backFace;
+	output.Edges[2] *= backFace;*/
 	
 	output.Inside = EdgeFactors.w * backFace;
 

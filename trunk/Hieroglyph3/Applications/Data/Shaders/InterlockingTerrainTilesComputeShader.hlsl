@@ -18,8 +18,6 @@ groupshared float3		corners[2][2];
 
 float4 CreatePlaneFromPointAndNormal(float3 n, float3 p)
 {
-	//return float4(n,-dot(n,p));
-	//return float4(n,-(n.x*p.x + n.y*p.y + n.z*p.z));
 	return float4(n,(-n.x*p.x - n.y*p.y - n.z*p.z));
 }
 

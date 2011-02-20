@@ -38,8 +38,8 @@ App::App()
 bool App::ConfigureEngineComponents()
 {
 	// The application currently supplies the 
-	int width = 800;
-	int height = 600;
+	int width = 640;
+	int height = 480;
 	bool windowed = true;
 
 	// Set the render window parameters and initialize the window
@@ -153,9 +153,10 @@ void App::Initialize()
 
 	// Load and initialize the geometry to be rendered.
 
-	m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/spaceship2.ply" ), true );
-	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/CPNTest.ply" ) );
+	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/spaceship2.ply" ), true );
+	m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/CPNTest.ply" ) );
 	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/BoxWithBadNormals.ply" ), true );
+	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/CPNAdaptiveTest.ply" ), true );
 
 	//m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
 	//m_pGeometry->LoadToBuffers();
@@ -465,9 +466,9 @@ void App::UpdateViewState()
 	//vLookFrom.y = 5.25f;
 	//vLookFrom.z = 7.5f;//cosf(fromAngle) * 2.5f;
 	
-	vLookFrom.x = sinf(fromAngle) * 12.5f;
-	vLookFrom.y = 6.25f;
-	vLookFrom.z = cosf(fromAngle) * 12.5f;
+	vLookFrom.x = sinf(fromAngle) * 2.5f;
+	vLookFrom.y = 1.25f;
+	vLookFrom.z = cosf(fromAngle) * 2.5f;
 
 	/*
 	vLookAt.x = sinf(toAngle) * 3.0f;

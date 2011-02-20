@@ -55,10 +55,6 @@ struct DS_OUTPUT
 {
 	float4 position : SV_Position;
 	float3 colour : COLOUR;
-	float3 uvw : DOMAIN_SHADER_LOCATION;
-	float3 wPos : WORLD_POSITION;
-	float4 edges : EDGE_FACTORS;
-	float2 inside : INNER_FACTORS;
 };
 
 // -------------------------------
@@ -101,7 +97,7 @@ float SampleHeightMap(float2 uv)
 
 float3 Sobel( float2 tc )
 {
-	// Constants (hack)
+	// Useful aliases
 	float2 pxSz = float2( 1.0f / heightMapDimensions.x, 1.0f / heightMapDimensions.y );
 	
 	// Compute the necessary offsets:
@@ -279,8 +275,7 @@ HS_PER_PATCH_OUTPUT hsPerPatch( InputPatch<VS_OUTPUT, 12> ip, uint PatchID : SV_
 [outputcontrolpoints(4)]
 [patchconstantfunc("hsPerPatch")]
 HS_OUTPUT hsSimple( InputPatch<VS_OUTPUT, 12> p, 
-                                     uint i : SV_OutputControlPointID,
-                                     uint PatchID : SV_PrimitiveID )
+                                     uint i : SV_OutputControlPointID )
 {
 	// NOTE: This code is executed for each control point
 	//		 so must index on 'i'
@@ -390,8 +385,7 @@ HS_PER_PATCH_OUTPUT hsPerPatchWithLookup( InputPatch<VS_OUTPUT, 12> ip, uint Pat
 [outputcontrolpoints(4)]
 [patchconstantfunc("hsPerPatchWithLookup")]
 HS_OUTPUT hsComplex( InputPatch<VS_OUTPUT, 12> p, 
-                                     uint i : SV_OutputControlPointID,
-                                     uint PatchID : SV_PrimitiveID )
+                                     uint i : SV_OutputControlPointID )
 {
 	// NOTE: This code is executed for each control point
 	//		 so must index on 'i'
@@ -449,17 +443,11 @@ DS_OUTPUT dsMain( HS_PER_PATCH_OUTPUT input,
 	// Determine the height from the texture
 	finalVertexCoord.y = SampleHeightMap(texcoord); 
     
-    // Store some debugging information
-    o.uvw = float3(uv,0.0f);
-    o.wPos = finalVertexCoord;
-    o.edges = float4( input.edgeTesselation[0], input.edgeTesselation[1], input.edgeTesselation[2], input.edgeTesselation[3] );
-    o.inside = float2( input.insideTesselation[0], input.insideTesselation[1] );
-    
     // We then need to transform the world-space
-    // coord to be a proper projection space output
+    // coord to be a proper clip space output
     // that the rasterizer can deal with. Could delegate
     // to the GS, but no need this time!
-    o.position = mul( float4( o.wPos, 1.0f ), mViewProj );
+    o.position = mul( float4( finalVertexCoord, 1.0f ), mViewProj );
     
     #if defined( SHADING_SOLID )
     
