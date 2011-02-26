@@ -218,6 +218,7 @@ void App::Initialize()
 	// use for input to the compute shader.  By specifying null for the 
 	// configuration, the view is created from the default resource configuration.
 
+	//m_Texture = m_pRenderer11->LoadTexture( L"../Data/Textures/EyeOfHorusNoisy.png" );
 	m_Texture = m_pRenderer11->LoadTexture( L"../Data/Textures/Outcrop.png" );
 	//m_Texture = m_pRenderer11->LoadTexture( L"../Data/Textures/fruit.png" );
 
@@ -286,10 +287,10 @@ void App::Update()
 	// dispatch call can be modified accordingly.
 
 	// Brute force Gaussian
-/*	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
+	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
 	m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
 	m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceGaussian, 20, 15, 1, m_pRenderer11->m_pParamMgr );
-*/
+
 
 	// Separable Gaussian
 /*	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
@@ -312,10 +313,10 @@ void App::Update()
 */
 
 	// Brute force Bilateral
-/*	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
-	m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
-	m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
-*/
+	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
+	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
+	//m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+
 	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Output );
 	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Intermediate );
 	//m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
@@ -325,13 +326,27 @@ void App::Update()
 	//m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
 
 	// Separable Bilateral
-	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
-	m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Intermediate );
-	m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
+	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
+	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Intermediate );
+	//m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
 
-	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Intermediate );
-	m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
-	m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
+	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Intermediate );
+	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
+	//m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
+
+
+	////// Fruit input --> Gaussian --> Bilateral
+	////m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
+	////m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
+	////m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceGaussian, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+
+	////m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Output );
+	////m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Intermediate );
+	////m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceGaussian, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+
+	////m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Intermediate );
+	////m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
+	////m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
 
 
 	//m_pRenderer11->StartPipelineStatistics();
@@ -351,7 +366,7 @@ void App::Update()
 	// demonstrates how an event is sent and handled by an event listener (which
 	// in this case is the application object itself).
 
-	if ( m_bSaveScreenshot  )
+	//if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
 		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"WaterSimulation_" ), D3DX11_IFF_BMP );

@@ -161,14 +161,16 @@ void App::Initialize()
 	// from the camera's point of view of the scene.
 
 	m_pCamera = new Camera();
+	//m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.90f, 0.7f, 0.0f ) );
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.30f, 1.5f, 0.0f ) );
 	m_pCamera->GetNode()->Position() = Vector3f( -20.0f, 25.0f, 10.0f );
-	//m_pCamera->GetNode()->Position() = Vector3f( -160.0f, 225.0f, -150.0f );
+	//m_pCamera->GetNode()->Position() = Vector3f( -4.0f, 6.0f, -4.0f );
 	//m_pCamera->GetNode()->Position() = Vector3f( 400.0f, 75.0f, 50.0f );
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.1f, 0.1f, 0.3f, 0.0f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
-	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>( D3DX_PI ) / 2.0f, 640.0f / 480.0f );
+	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, 640.0f / 480.0f, static_cast<float>( D3DX_PI ) / 2.0f );
+	//m_pCamera->SetProjectionParams( 0.1f, 100.0f, 1.0f / 1.0f, static_cast<float>( D3DX_PI ) / 2.0f );
 
 	// Create the scene and add the entities to it.  Then add the camera to the
 	// scene so that it will be updated via the scene interface instead of 
@@ -210,8 +212,32 @@ void App::Initialize()
 	//pTextureParameter->SetParameterData( &ColorTexture->m_iResourceSRV );
 	//pEntity2->AddRenderParameter( pTextureParameter );
 
+	//m_pActor->GetBody()->SetMaterial( pMaterial, false );
+
+
+
+	//GeometryDX11* pStaticGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Box.ms3d" ) );
+	//pStaticGeometry->LoadToBuffers();
+	//MaterialDX11* pStaticMaterial = MaterialGeneratorDX11::GenerateStaticTextured(*RendererDX11::Get());
+
+	//Entity3D* pEntity2 = new Entity3D();
+	//pEntity2->SetGeometry( pStaticGeometry );
+	//pEntity2->SetMaterial( pStaticMaterial );
+
+	//
+	//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/Tiles.png" );
+	//
+	//ShaderResourceParameterDX11* pTextureParameter = new ShaderResourceParameterDX11();
+	//pTextureParameter->SetName( L"ColorTexture" );
+	//pTextureParameter->SetParameterData( &ColorTexture->m_iResourceSRV );
+	//pEntity2->AddRenderParameter( pTextureParameter );
+
 
 	//m_pActor->GetBody()->SetMaterial( pMaterial, false );
+
+
+
+
 
 	m_pNode->AttachChild( m_pActor->GetNode() );
 	//m_pNode->AttachChild( pEntity2 );
