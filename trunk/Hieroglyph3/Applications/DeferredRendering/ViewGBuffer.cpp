@@ -14,7 +14,7 @@
 #include "Node3D.h"
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 #include "PipelineManagerDX11.h"
 #include "Texture2dDX11.h"
 //--------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ void ViewGBuffer::PreDraw( RendererDX11* pRenderer )
 	}
 }
 //--------------------------------------------------------------------------------
-void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager )
+void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	if ( m_pRoot )
 	{
@@ -80,13 +80,13 @@ void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerD
 	}
 }
 //--------------------------------------------------------------------------------
-void ViewGBuffer::SetRenderParams( ParameterManagerDX11* pParamManager )
+void ViewGBuffer::SetRenderParams( IParameterManager* pParamManager )
 {
 	pParamManager->SetViewMatrixParameter( &ViewMatrix );
 	pParamManager->SetProjMatrixParameter( &ProjMatrix );
 }
 //--------------------------------------------------------------------------------
-void ViewGBuffer::SetUsageParams( ParameterManagerDX11* pParamManager )
+void ViewGBuffer::SetUsageParams( IParameterManager* pParamManager )
 {
 
 }

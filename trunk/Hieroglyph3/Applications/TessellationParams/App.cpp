@@ -171,8 +171,11 @@ void App::Initialize()
 
 	// H3 engine requires no transposing of matrices...
 
-	m_pRenderer11->m_pParamMgr->SetMatrixParameter( std::wstring( L"mWorld" ), &mWorld );
-	m_pRenderer11->m_pParamMgr->SetMatrixParameter( std::wstring( L"mViewProj" ), &mViewProj );
+	m_pRenderer11->m_pParamMgr->SetWorldMatrixParameter( &mWorld );
+	m_pRenderer11->m_pParamMgr->SetViewMatrixParameter( &mView );
+	m_pRenderer11->m_pParamMgr->SetProjMatrixParameter( &mProj );
+	//m_pRenderer11->m_pParamMgr->SetMatrixParameter( std::wstring( L"mWorld" ), &mWorld );
+	//m_pRenderer11->m_pParamMgr->SetMatrixParameter( std::wstring( L"mViewProj" ), &mViewProj );
 
 	// Set up the default tessellation params
 	SetEdgeWeight( 0, 1.0f );

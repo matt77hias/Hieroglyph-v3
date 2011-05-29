@@ -18,6 +18,7 @@
 #include "Actor.h"
 #include "SkinnedBoneController.h"
 #include "AnimationStream.h"
+#include "MatrixArrayParameterWriterDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -49,6 +50,9 @@ namespace Glyph3
 		Matrix4f*						m_pMatrices;
 		Matrix4f*						m_pNormalMatrices;
 		Entity3D*						m_pGeometryEntity;
+
+		MatrixArrayParameterWriterDX11* m_pSkinMatrixWriter;
+		MatrixArrayParameterWriterDX11* m_pNormalMatrixWriter;
 	};
 };
 //--------------------------------------------------------------------------------

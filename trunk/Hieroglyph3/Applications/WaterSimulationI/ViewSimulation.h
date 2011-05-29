@@ -16,6 +16,9 @@
 #define ViewSimulation_h
 //--------------------------------------------------------------------------------
 #include "IRenderView.h"
+#include "UnorderedAccessParameterDX11.h"
+#include "ShaderResourceParameterDX11.h"
+#include "VectorParameterDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -34,10 +37,10 @@ namespace Glyph3
 
 		virtual void Update( float fTime );
 		virtual void PreDraw( RendererDX11* pRenderer );
-		virtual void Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager );
+		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 
-		virtual void SetRenderParams( ParameterManagerDX11* pParamManager );
-		virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
+		virtual void SetRenderParams( IParameterManager* pParamManager );
+		virtual void SetUsageParams( IParameterManager* pParamManager );
 
 
 		virtual ~ViewSimulation();
@@ -48,6 +51,11 @@ namespace Glyph3
 
 		ResourcePtr WaterState[2];
 		RenderEffectDX11*	pWaterEffect;
+
+		ShaderResourceParameterDX11* m_pCurrentWaterState;
+		UnorderedAccessParameterDX11* m_pNewWaterState;
+		VectorParameterDX11* m_pDispatchSize;
+
 	};
 };
 //--------------------------------------------------------------------------------

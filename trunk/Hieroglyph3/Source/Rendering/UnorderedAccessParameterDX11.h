@@ -32,15 +32,15 @@ namespace Glyph3
 		UnorderedAccessParameterDX11( UnorderedAccessParameterDX11& copy );
 		virtual ~UnorderedAccessParameterDX11();
 
-		virtual void SetParameterData( void* pData );
-		virtual ParameterType GetParameterType();
-		int GetIndex();
-		unsigned int GetInitialCount();
+		virtual void SetParameterData( void* pData, unsigned int threadID = 0 );
+		virtual const ParameterType GetParameterType();
+		int GetIndex( unsigned int threadID );
+		unsigned int GetInitialCount( unsigned int threadID );
 
-		void UpdateValue( RenderParameterDX11* pParameter );
+		void UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID = 0 );
 
 	protected:
-		UAVParameterData m_ParameterData;
+		UAVParameterData m_ParameterData[NUM_THREADS+1];
 	};
 };
 //--------------------------------------------------------------------------------

@@ -27,14 +27,14 @@ namespace Glyph3
 		MatrixParameterDX11( MatrixParameterDX11& copy );
 		virtual ~MatrixParameterDX11();
 
-		virtual void SetParameterData( void* pData );
-		virtual ParameterType GetParameterType();
-		Matrix4f GetMatrix();
+		virtual void SetParameterData( void* pData, unsigned int threadID = 0 );
+		virtual const ParameterType GetParameterType();
+		Matrix4f GetMatrix( unsigned int threadID = 0);
 
-		void UpdateValue( RenderParameterDX11* pParameter );
+		void UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID = 0 );
 
 	protected:
-		Matrix4f	m_Matrix;
+		Matrix4f	m_Matrix[NUM_THREADS+1];
 	};
 };
 //--------------------------------------------------------------------------------

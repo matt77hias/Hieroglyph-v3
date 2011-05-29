@@ -16,41 +16,52 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 MatrixParameterDX11::MatrixParameterDX11()
 {
-	m_Matrix.MakeIdentity();
+	for ( int i = 0; i <= NUM_THREADS; i++ )
+		m_Matrix[i].MakeIdentity();
 }
 //--------------------------------------------------------------------------------
 MatrixParameterDX11::MatrixParameterDX11( MatrixParameterDX11& copy )
 {
-	m_Matrix = copy.m_Matrix;
+	for ( int i = 0; i <= NUM_THREADS; i++ )
+		m_Matrix[i] = copy.m_Matrix[i];
 }
 //--------------------------------------------------------------------------------
 MatrixParameterDX11::~MatrixParameterDX11()
 {
 }
 //--------------------------------------------------------------------------------
-void MatrixParameterDX11::SetParameterData( void* pData )
+void MatrixParameterDX11::SetParameterData( void* pData, unsigned int threadID )
 {
-	m_Matrix = *reinterpret_cast<Matrix4f*>( pData );
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	m_Matrix[threadID] = *reinterpret_cast<Matrix4f*>( pData );
 }
 //--------------------------------------------------------------------------------
-ParameterType MatrixParameterDX11::GetParameterType()
+const ParameterType MatrixParameterDX11::GetParameterType()
 {
 	return( MATRIX );
 }
 //--------------------------------------------------------------------------------
-Matrix4f MatrixParameterDX11::GetMatrix()
+Matrix4f MatrixParameterDX11::GetMatrix( unsigned int threadID )
 {
-	return( m_Matrix );
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	return( m_Matrix[threadID] );
 }
 //--------------------------------------------------------------------------------
-void MatrixParameterDX11::UpdateValue( RenderParameterDX11* pParameter )
+void MatrixParameterDX11::UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID )
 {
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
 	if ( pParameter )
 	{
 		if ( ( pParameter->GetParameterType() == MATRIX ) && ( pParameter->GetName() == this->GetName() ) )
 		{
 			MatrixParameterDX11* pBuffer = (MatrixParameterDX11*)pParameter;
-			m_Matrix = pBuffer->GetMatrix();
+			m_Matrix[threadID] = pBuffer->GetMatrix( threadID );
 		}
 	}
 }

@@ -15,7 +15,7 @@
 #include "Node3D.h"
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 #include "PipelineManagerDX11.h"
 #include "Texture2dDX11.h"
 //--------------------------------------------------------------------------------
@@ -31,6 +31,8 @@ ViewDepthNormal::ViewDepthNormal( RendererDX11& Renderer, ResourcePtr RenderTarg
 
 	DepthNormalBuffer = RenderTarget;
 	m_RenderTarget = DepthNormalBuffer; // This is to set the buffer as the render target.
+
+	m_pDepthNormalBuffer = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"DepthNormalBuffer" ) );
 }
 //--------------------------------------------------------------------------------
 ViewDepthNormal::~ViewDepthNormal()
@@ -58,7 +60,7 @@ ViewDepthNormal::~ViewDepthNormal()
 //	}
 //}
 ////--------------------------------------------------------------------------------
-//void ViewDepthNormal::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager )
+//void ViewDepthNormal::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 //{
 //	if ( m_pEntity != NULL )
 //		ViewMatrix = m_pEntity->GetView();
@@ -98,15 +100,15 @@ ViewDepthNormal::~ViewDepthNormal()
 //	//m_viewport.MaxZ = MaxZ;
 //}
 ////--------------------------------------------------------------------------------
-void ViewDepthNormal::SetRenderParams( ParameterManagerDX11* pParamManager )
+void ViewDepthNormal::SetRenderParams( IParameterManager* pParamManager )
 {
 	pParamManager->SetViewMatrixParameter( &ViewMatrix );
 	pParamManager->SetProjMatrixParameter( &ProjMatrix );
 }
-
 //--------------------------------------------------------------------------------
-void ViewDepthNormal::SetUsageParams( ParameterManagerDX11* pParamManager )
+void ViewDepthNormal::SetUsageParams( IParameterManager* pParamManager )
 {
-	pParamManager->SetShaderResourceParameter( L"DepthNormalBuffer", DepthNormalBuffer );
+	//pParamManager->SetShaderResourceParameter( L"DepthNormalBuffer", DepthNormalBuffer );
+	pParamManager->SetShaderResourceParameter( m_pDepthNormalBuffer, DepthNormalBuffer );
 }
 //--------------------------------------------------------------------------------

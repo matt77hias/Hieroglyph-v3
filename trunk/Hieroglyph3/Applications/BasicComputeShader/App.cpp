@@ -18,7 +18,7 @@
 #include "GeometryGeneratorDX11.h"
 #include "RenderEffectDX11.h"
 
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------

@@ -14,11 +14,13 @@
 #include "Log.h"
 #include "GeometryDX11.h"
 #include "RenderParameterDX11.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 #include "RasterizerStateConfigDX11.h"
 #include "BlendStateConfigDX11.h"
 #include "DepthStencilStateConfigDX11.h"
 #include "SamplerStateConfigDX11.h"
+#include "ShaderResourceParameterWriterDX11.h"
+#include "SamplerParameterWriterDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -88,23 +90,21 @@ ParticleSystemEntity::ParticleSystemEntity()
 	pMaterial->Params[VT_PERSPECTIVE].vViews.add( m_pSimulation );
 
 
-	ParticleTexture = pRenderer11->LoadTexture( L"../Data/Textures/Particle.png" );
-	
 	SamplerStateConfigDX11 SamplerConfig;
 	LinearSampler = pRenderer11->CreateSamplerState( &SamplerConfig );
 
-	pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"ParticleTexture", ParticleTexture );
-	pRenderer11->m_pParamMgr->SetSamplerParameter( L"LinearSampler", &LinearSampler );
+	SamplerParameterWriterDX11* pSamplerWriter = new SamplerParameterWriterDX11();
+	// TODO: this requires a cast for the SamplerParameterDX11* to RenderParameterDX11* - I don't know why...
+	pSamplerWriter->SetRenderParameterRef( (RenderParameterDX11*)pRenderer11->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"LinearSampler" ) ) );
+	pSamplerWriter->SetValue( LinearSampler );
+	this->AddRenderParameter( pSamplerWriter );
 
 
-	// Set any parameters that will be needed by the shaders used above.
-	
-//	Vector4f DispatchSize = Vector4f( (float)DispatchSizeX, (float)DispatchSizeZ, (float)DispatchSizeX * 16, (float)DispatchSizeZ * 16 );
-//	pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"DispatchSize" ), &DispatchSize );
-
-//	Vector4f FinalColor = Vector4f( 0.5f, 1.0f, 0.5f, 1.0f );
-//	pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"FinalColor" ), &FinalColor );
-
+	ParticleTexture = pRenderer11->LoadTexture( L"../Data/Textures/Particle.png" );
+	ShaderResourceParameterWriterDX11* pTextureWriter = new ShaderResourceParameterWriterDX11();
+	pTextureWriter->SetRenderParameterRef( pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ParticleTexture" ) ) );
+	pTextureWriter->SetValue( ParticleTexture );
+	this->AddRenderParameter( pTextureWriter );
 
 
 	this->SetGeometry( pGeometry );
@@ -123,7 +123,7 @@ void ParticleSystemEntity::PreRender( RendererDX11* pRenderer, VIEWTYPE view )
 		m_sParams.pMaterial->PreRender( pRenderer, view );
 }
 //--------------------------------------------------------------------------------
-void ParticleSystemEntity::Render( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager, VIEWTYPE view )
+void ParticleSystemEntity::Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view )
 {
 	// Test if the entity contains any geometry, and it has a material
 	if ( ( m_sParams.pGeometry ) && ( m_sParams.pMaterial ) )

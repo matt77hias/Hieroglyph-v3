@@ -22,7 +22,7 @@
 
 #include "ViewAmbientOcclusion.h"
 
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -190,8 +190,6 @@ void App::Initialize()
 	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
 
 
-	Vector4f FinalColor = Vector4f( 0.5f, 1.0f, 0.5f, 1.0f );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"FinalColor" ), &FinalColor );
 
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
@@ -222,6 +220,13 @@ void App::Initialize()
 	m_pScene->AddEntity( m_pNode );
 	m_pScene->AddCamera( m_pCamera );
 
+
+	Vector4f FinalColor = Vector4f( 0.5f, 1.0f, 0.5f, 1.0f );
+	m_pFinalColor = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"FinalColor" ) );
+	m_pFinalColor->InitializeParameterData( &m_pFinalColor );
+
+	// Get a handle to the render parameters that the application will be setting.
+	m_pTimeFactors = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"TimeFactors" ) );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -241,7 +246,8 @@ void App::Update()
 	Vector4f TimeFactors = Vector4f( m_pTimer->Elapsed(), (float)m_pTimer->Framerate(), 
 		m_pTimer->Runtime(), (float)m_pTimer->FrameCount() );
 
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"TimeFactors" ), &TimeFactors );
+	m_pTimeFactors->InitializeParameterData( &TimeFactors );
+
 
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.

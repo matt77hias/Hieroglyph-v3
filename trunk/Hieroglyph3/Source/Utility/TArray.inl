@@ -124,6 +124,26 @@ bool TArray<T>::inrange( int index ) const
 }
 //--------------------------------------------------------------------------------
 template <class T>
+void TArray<T>::resize( int count ) const
+{
+	// Check how many elements can be copied
+	int elements = min( count, m_iQuantity );
+
+	// Create the new array and copy the data
+	T* aNewArray = new T[count];
+	for ( int i = 0; i < elements; i++ )
+		aNewArray[i] = m_aData[i];
+
+	// Update the new number of elements and capacity
+	m_iQuantity = elements;
+	m_iCapacity = count;
+
+	// Delete the old array and store the new one
+	delete[] m_aData;
+	m_aData = aNewArray;
+}
+//--------------------------------------------------------------------------------
+template <class T>
 T& TArray<T>::operator[] (int i)
 {
 	if ( i < 0 )

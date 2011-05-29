@@ -16,6 +16,8 @@
 #define ViewParaboloidEnvMap_h
 //--------------------------------------------------------------------------------
 #include "IRenderView.h"
+#include "ShaderResourceParameterDX11.h"
+#include "MatrixParameterDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -28,13 +30,13 @@ namespace Glyph3
 
 		virtual void Update( float fTime );
 		virtual void PreDraw( RendererDX11* pRenderer );
-		virtual void Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager );
+		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 
 		virtual void SetBackColor( Vector4f color );
 		virtual void SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ );
 
-		virtual void SetRenderParams( ParameterManagerDX11* pParamManager );
-		virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
+		virtual void SetRenderParams( IParameterManager* pParamManager );
+		virtual void SetUsageParams( IParameterManager* pParamManager );
 
 
 		virtual ~ViewParaboloidEnvMap();
@@ -45,6 +47,9 @@ namespace Glyph3
 
 		ResourcePtr		m_RenderTarget;
 		ResourcePtr		m_DepthTarget;
+
+		ShaderResourceParameterDX11*	m_pParaboloidTextureParam;
+		MatrixParameterDX11*			m_pParaboloidBasisParam;
 
 		Matrix4f		m_ParaboloidBasis;
 	};

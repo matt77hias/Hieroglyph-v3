@@ -31,13 +31,13 @@ namespace Glyph3
 
 		virtual void Update( float fTime );
 		virtual void PreDraw( RendererDX11* pRenderer );
-		virtual void Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager );
+		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 
 		virtual void SetBackColor( Vector4f color );
 		virtual void SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ );
 
-		virtual void SetRenderParams( ParameterManagerDX11* pParamManager );
-		virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
+		virtual void SetRenderParams( IParameterManager* pParamManager );
+		virtual void SetUsageParams( IParameterManager* pParamManager );
 
 
 		virtual ~ViewPerspective();

@@ -10,8 +10,9 @@
 
 //--------------------------------------------------------------------------------
 #include "PCH.h"
+#include "Log.h"
 #include "MaterialDX11.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 #include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
@@ -65,20 +66,19 @@ void MaterialDX11::PreRender( RendererDX11* pRenderer, VIEWTYPE type )
 		Params[type].vViews[i]->PreDraw( pRenderer );
 }
 //--------------------------------------------------------------------------------
-void MaterialDX11::AddRenderParameter( RenderParameterDX11* pParameter )
+void MaterialDX11::AddRenderParameter( ParameterWriter* pWriter )
 {
 	// Add render parameter will take the pointer passed in and add it to the
 	// entity's internal list.  Therefore, this must not be from the stack!
 
-	if ( pParameter )
+	if ( pWriter )
 	{
-
 		// Search the list to see if this parameter is already there
-		RenderParameterDX11* pCurr = 0;
+		ParameterWriter* pCurr = 0;
 
 		for ( int i = 0; i < m_RenderParameters.count(); i++ )
 		{
-			if ( pParameter->GetName() == m_RenderParameters[i]->GetName() )
+			if ( pWriter->GetRenderParameterRef()->GetName() == m_RenderParameters[i]->GetRenderParameterRef()->GetName() )
 			{
 				pCurr = m_RenderParameters[i];
 				break;
@@ -87,16 +87,17 @@ void MaterialDX11::AddRenderParameter( RenderParameterDX11* pParameter )
 
 		if ( !pCurr )
 		{
-			m_RenderParameters.add( pParameter );
+			m_RenderParameters.add( pWriter );
 		}
 		else
 		{
-			pCurr->UpdateValue( pParameter ); 
+			Log::Get().Write( L"Tried to add a parameter to a material that was already there!" );
+			//pCurr->UpdateValue( pParameter ); 
 		}
 	}
 }
 //--------------------------------------------------------------------------------
-void MaterialDX11::UpdateRenderParameter( RenderParameterDX11* pParameter )
+/*void MaterialDX11::UpdateRenderParameter( RenderParameterDX11* pParameter )
 {
 	// Update render parameter will attempt to set the value of an existing
 	// render parameter that is already stored in the entity.  If it is not there
@@ -126,9 +127,9 @@ void MaterialDX11::UpdateRenderParameter( RenderParameterDX11* pParameter )
 			pCurr->UpdateValue( pParameter ); 
 		}
 	}
-}
+}*/
 //--------------------------------------------------------------------------------
-void MaterialDX11::SetRenderParams( ParameterManagerDX11* pParamManager, VIEWTYPE type )
+void MaterialDX11::SetRenderParams( IParameterManager* pParamManager, VIEWTYPE type )
 {
 	if ( m_pEntity )
 	{
@@ -146,7 +147,7 @@ void MaterialDX11::SetRenderParams( ParameterManagerDX11* pParamManager, VIEWTYP
 	// Set the additional render parameters that have been added to the material.
 
 	for ( int i = 0; i < m_RenderParameters.count(); i++ )
-		pParamManager->SetParameter( m_RenderParameters[i] );
+		m_RenderParameters[i]->WriteParameter( pParamManager );
 }
 //--------------------------------------------------------------------------------
 void MaterialDX11::SetEntity( Entity3D* pEntity )

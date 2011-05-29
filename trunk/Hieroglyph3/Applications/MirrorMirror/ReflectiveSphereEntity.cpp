@@ -21,6 +21,7 @@
 #include "SamplerStateConfigDX11.h"
 #include "GeometryLoaderDX11.h"
 #include "Texture2dConfigDX11.h"
+#include "SamplerParameterDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -115,7 +116,9 @@ static int size = 256;
 	ParaboloidSampler = pRenderer11->CreateSamplerState( &SamplerConfig );
 
 	//pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"ParticleTexture", ParticleTexture );
-	pRenderer11->m_pParamMgr->SetSamplerParameter( L"ParaboloidSampler", &ParaboloidSampler );
+	//pRenderer11->m_pParamMgr->SetSamplerParameter( L"ParaboloidSampler", &ParaboloidSampler );
+	SamplerParameterDX11* pSamplerParameter = pRenderer11->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"ParaboloidSampler" ) );
+    pSamplerParameter->InitializeParameterData( &ParaboloidSampler );
 
 
 	// Set any parameters that will be needed by the shaders used above.
@@ -149,7 +152,7 @@ void ReflectiveSphereEntity::PreRender( RendererDX11* pRenderer, VIEWTYPE view )
 		m_sParams.pMaterial->PreRender( pRenderer, view );
 }
 //--------------------------------------------------------------------------------
-void ReflectiveSphereEntity::Render( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager, VIEWTYPE view )
+void ReflectiveSphereEntity::Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view )
 {
 	// Test if the entity contains any geometry, and it has a material
 	if ( ( m_sParams.pGeometry ) && ( m_sParams.pMaterial ) )

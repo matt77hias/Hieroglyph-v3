@@ -25,7 +25,7 @@
 #include "ScriptIntfActor.h"
 #include "ConsoleWindow.h"
 
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------

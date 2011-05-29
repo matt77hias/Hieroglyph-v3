@@ -17,7 +17,7 @@
 //--------------------------------------------------------------------------------
 #include "RendererDX11.h"
 #include "PipelineManagerDX11.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 #include "Timer.h"
 #include "IEventListener.h"
 #include <vector>
@@ -49,7 +49,7 @@ namespace Glyph3
 
 		virtual void Update( float fTime ) = 0;
 		virtual void PreDraw( RendererDX11* pRenderer ) = 0;
-		virtual void Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager ) = 0;
+		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager ) = 0;
 
 		// A reference is provided to allow views to reference it's entity's data.
 
@@ -65,8 +65,8 @@ namespace Glyph3
 		// is used to set semantics that are needed to use the output of the 
 		// render view by other objects.
 		
-		virtual void SetRenderParams( ParameterManagerDX11* pParamManager ) = 0;
-		virtual void SetUsageParams( ParameterManagerDX11* pParamManager ) = 0;
+		virtual void SetRenderParams( IParameterManager* pParamManager ) = 0;
+		virtual void SetUsageParams( IParameterManager* pParamManager ) = 0;
 
 		void SetName( std::wstring& name );
 

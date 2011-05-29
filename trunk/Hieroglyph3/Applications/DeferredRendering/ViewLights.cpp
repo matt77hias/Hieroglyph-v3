@@ -14,7 +14,7 @@
 #include "Node3D.h"
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 #include "PipelineManagerDX11.h"
 #include "Texture2dDX11.h"
 #include "DepthStencilStateConfigDX11.h"
@@ -227,6 +227,23 @@ ViewLights::ViewLights( RendererDX11& Renderer)
         }
     }
 
+	m_pInvProjMatrix = Renderer.m_pParamMgr->GetMatrixParameterRef( std::wstring( L"InvProjMatrix" ) );
+	m_pProjMatrix = Renderer.m_pParamMgr->GetMatrixParameterRef( std::wstring( L"ProjMatrix" ) );
+	m_pCameraPos = Renderer.m_pParamMgr->GetVectorParameterRef( std::wstring( L"CameraPos" ) );
+
+	m_pLightPos = Renderer.m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightPos" ) );
+	m_pLightColor = Renderer.m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightColor" ) );
+	m_pLightDirection = Renderer.m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightDirection" ) );
+	m_pLightRange = Renderer.m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightRange" ) );
+	m_pSpotlightAngles = Renderer.m_pParamMgr->GetVectorParameterRef( std::wstring( L"SpotlightAngles" ) );
+
+
+	m_pGBufferTargets[0] = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"NormalTexture" ) );
+	m_pGBufferTargets[1] = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"DiffuseAlbedoTexture" ) );
+	m_pGBufferTargets[2] = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"SpecularAlbedoTexture" ) );
+	m_pGBufferTargets[3] = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"PositionTexture" ) );
+
+	m_pDepthTexture = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"DepthTexture" ) );
 }
 //--------------------------------------------------------------------------------
 ViewLights::~ViewLights()
@@ -249,7 +266,7 @@ void ViewLights::PreDraw( RendererDX11* pRenderer )
     pRenderer->QueueRenderView( this );
 }
 //--------------------------------------------------------------------------------
-void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager )
+void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
     // Bind the render target
     pPipelineManager->ClearRenderTargets();
@@ -293,11 +310,11 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
             direction = ViewMatrix * direction;
         }
 
-        pParamManager->SetVectorParameter( L"LightPos", &pos );
-        pParamManager->SetVectorParameter( L"LightColor", &Vector4f( light.Color, 1.0f ) );
-        pParamManager->SetVectorParameter( L"LightDirection", &direction );
-        pParamManager->SetVectorParameter( L"LightRange", &Vector4f( light.Range, 1.0f, 1.0f, 1.0f ) );
-        pParamManager->SetVectorParameter( L"SpotlightAngles", &Vector4f( cosf( light.SpotInnerAngle / 2.0f ),
+        pParamManager->SetVectorParameter( m_pLightPos, &pos );
+        pParamManager->SetVectorParameter( m_pLightColor, &Vector4f( light.Color, 1.0f ) );
+        pParamManager->SetVectorParameter( m_pLightDirection, &direction );
+        pParamManager->SetVectorParameter( m_pLightRange, &Vector4f( light.Range, 1.0f, 1.0f, 1.0f ) );
+        pParamManager->SetVectorParameter( m_pSpotlightAngles, &Vector4f( cosf( light.SpotInnerAngle / 2.0f ),
                                                                           cosf( light.SpotOuterAngle / 2.0f ),
                                                                           0.0f, 0.0f ) );
 
@@ -404,39 +421,39 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
     m_Lights.empty();
 }
 //--------------------------------------------------------------------------------
-void ViewLights::SetRenderParams( ParameterManagerDX11* pParamManager )
+void ViewLights::SetRenderParams( IParameterManager* pParamManager )
 {
     pParamManager->SetViewMatrixParameter( &ViewMatrix );
     pParamManager->SetProjMatrixParameter( &ProjMatrix );
 
     Matrix4f invProj = ProjMatrix.Inverse();
-    pParamManager->SetMatrixParameter( L"InvProjMatrix", &invProj );
-    pParamManager->SetMatrixParameter( L"ProjMatrix", &ProjMatrix );
+    pParamManager->SetMatrixParameter( m_pInvProjMatrix, &invProj );
+    pParamManager->SetMatrixParameter( m_pProjMatrix, &ProjMatrix );
 
     if ( m_pRoot != NULL )
     {
         Vector4f cameraPos( m_pRoot->Position(), 1.0f );
-        pParamManager->SetVectorParameter( L"CameraPos", &cameraPos );
+        pParamManager->SetVectorParameter( m_pCameraPos, &cameraPos );
     }
 
     // Set the G-Buffer textures
-    static const std::wstring TextureNames[4] =
-    {
-        L"NormalTexture",
-        L"DiffuseAlbedoTexture",
-        L"SpecularAlbedoTexture",
-        L"PositionTexture",
-    };
+    //static const std::wstring TextureNames[4] =
+    //{
+    //    L"NormalTexture",
+    //    L"DiffuseAlbedoTexture",
+    //    L"SpecularAlbedoTexture",
+    //    L"PositionTexture",
+    //};
 
     for ( int i = 0; i < m_GBufferTargets.count(); ++i )
-        pParamManager->SetShaderResourceParameter( TextureNames[i], m_GBufferTargets[i] );
+        pParamManager->SetShaderResourceParameter( m_pGBufferTargets[i], m_GBufferTargets[i] );
 
     // Bind depth if optimizations are enabled
     if ( GBufferOptMode::Enabled() )
-        pParamManager->SetShaderResourceParameter( L"DepthTexture", m_DepthTarget );
+        pParamManager->SetShaderResourceParameter( m_pDepthTexture, m_DepthTarget );
 }
 //--------------------------------------------------------------------------------
-void ViewLights::SetUsageParams( ParameterManagerDX11* pParamManager )
+void ViewLights::SetUsageParams( IParameterManager* pParamManager )
 {
 
 }

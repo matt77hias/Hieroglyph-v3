@@ -55,7 +55,7 @@ int IRenderView::GetRTID( int index )
 		return( 0 );
 }
 //--------------------------------------------------------------------------------
-void IRenderView::SetRenderParams( ParameterManagerDX11* pParamManager )
+void IRenderView::SetRenderParams( IParameterManager* pParamManager )
 {
 	// Set the render parameters for this view.  Note that the view and projection
 	// matrices are not set, since this will vary depending on the render view

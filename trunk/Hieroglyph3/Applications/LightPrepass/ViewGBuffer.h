@@ -18,6 +18,7 @@
 #include "IRenderView.h"
 #include "RenderEffectDX11.h"
 #include "GeometryDX11.h"
+#include "ShaderResourceParameterDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -28,10 +29,10 @@ namespace Glyph3
 
 		virtual void Update( float fTime );
 		virtual void PreDraw( RendererDX11* pRenderer );
-		virtual void Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager );
+		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 
-		virtual void SetRenderParams( ParameterManagerDX11* pParamManager );
-		virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
+		virtual void SetRenderParams( IParameterManager* pParamManager );
+		virtual void SetUsageParams( IParameterManager* pParamManager );
 
         void SetTargets( ResourcePtr GBufferTargets, ResourcePtr DepthTarget,
                           int Viewport );
@@ -50,6 +51,8 @@ namespace Glyph3
         int                     m_iMaskRSState;
         RenderEffectDX11		m_MaskEffect;
         GeometryDX11			m_QuadGeometry;
+
+		ShaderResourceParameterDX11*	m_pGBufferTexture;
 	};
 }
 //--------------------------------------------------------------------------------

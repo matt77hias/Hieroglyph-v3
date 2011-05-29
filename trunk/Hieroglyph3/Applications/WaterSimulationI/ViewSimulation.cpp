@@ -15,7 +15,7 @@
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
 #include <sstream>
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -83,6 +83,10 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX, int SizeY )
 		std::wstring( L"../Data/Shaders/WaterSimulation.hlsl" ),
 		std::wstring( L"CSMAIN" ),
 		std::wstring( L"cs_4_0" ) );
+
+	m_pCurrentWaterState = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"CurrentWaterState" ) );
+	m_pNewWaterState = Renderer.m_pParamMgr->GetUnorderedAccessParameterRef( std::wstring( L"NewWaterState" ) );
+	m_pDispatchSize = Renderer.m_pParamMgr->GetVectorParameterRef( std::wstring( L"DispatchSize" ) );
 }
 //--------------------------------------------------------------------------------
 ViewSimulation::~ViewSimulation()
@@ -102,7 +106,7 @@ void ViewSimulation::PreDraw( RendererDX11* pRenderer )
 	pRenderer->QueueRenderView( this );
 }
 //--------------------------------------------------------------------------------
-void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager )
+void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	// Set this view's render parameters.
 	SetRenderParams( pParamManager );
@@ -116,24 +120,32 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, ParameterManag
 	WaterState[1] = TempState;
 }
 //--------------------------------------------------------------------------------
-void ViewSimulation::SetRenderParams( ParameterManagerDX11* pParamManager )
+void ViewSimulation::SetRenderParams( IParameterManager* pParamManager )
 {
 	// Set the parameters for this view to be able to perform its processing
 	// sequence.  In this case, water state '0' is always considered the current
 	// state.
 
-	pParamManager->SetShaderResourceParameter( L"CurrentWaterState", WaterState[0] );
-	pParamManager->SetUnorderedAccessParameter( L"NewWaterState", WaterState[1] );
+	//pParamManager->SetShaderResourceParameter( L"CurrentWaterState", WaterState[0] );
+	//pParamManager->SetUnorderedAccessParameter( L"NewWaterState", WaterState[1] );
+	pParamManager->SetShaderResourceParameter( m_pCurrentWaterState, WaterState[0] );
+	pParamManager->SetUnorderedAccessParameter( m_pNewWaterState, WaterState[1] );
+
 }
 //--------------------------------------------------------------------------------
-void ViewSimulation::SetUsageParams( ParameterManagerDX11* pParamManager )
+void ViewSimulation::SetUsageParams( IParameterManager* pParamManager )
 {
 	// Set the parameters for allowing an application to use the current state
 	// as a height map via a shader resource view.
 
-	Vector4f DispatchSize = Vector4f( 16.0f, 16.0f, 16.0f * 16.0f, 16.0f * 16.0f );
-	pParamManager->SetVectorParameter( std::wstring( L"DispatchSize" ), &DispatchSize );
 
-	pParamManager->SetShaderResourceParameter( L"CurrentWaterState", WaterState[0] );
+	Vector4f DispatchSize = Vector4f( 16.0f, 16.0f, 16.0f * 16.0f, 16.0f * 16.0f );
+
+	//pParamManager->SetVectorParameter( std::wstring( L"DispatchSize" ), &DispatchSize );
+	//pParamManager->SetShaderResourceParameter( L"CurrentWaterState", WaterState[0] );
+
+	pParamManager->SetShaderResourceParameter( m_pCurrentWaterState, WaterState[0] );
+	pParamManager->SetVectorParameter( m_pDispatchSize, &DispatchSize );
+
 }
 //--------------------------------------------------------------------------------

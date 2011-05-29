@@ -19,6 +19,9 @@
 #include "GeometryDX11.h"
 #include "RenderEffectDX11.h"
 #include "AppSettings.h"
+#include "MatrixParameterDX11.h"
+#include "VectorParameterDX11.h"
+#include "ShaderResourceParameterDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -59,10 +62,10 @@ namespace Glyph3
 
         virtual void Update( float fTime );
         virtual void PreDraw( RendererDX11* pRenderer );
-        virtual void Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager );
+        virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 
-        virtual void SetRenderParams( ParameterManagerDX11* pParamManager );
-        virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
+        virtual void SetRenderParams( IParameterManager* pParamManager );
+        virtual void SetUsageParams( IParameterManager* pParamManager );
 
         void AddLight( const Light& light );
         void SetTargets( ResourcePtr GBufferTarget, ResourcePtr pRenderTarget,
@@ -101,6 +104,14 @@ namespace Glyph3
         TArray<Light>           m_SpotLights;
         TArray<Light>           m_DirectionalLights;
         Matrix4f                m_WorldMatrix;
+
+		MatrixParameterDX11*	m_pInvProjMatrix;
+		MatrixParameterDX11*	m_pProjMatrix;
+
+		VectorParameterDX11*	m_pClipPlanes;
+
+		ShaderResourceParameterDX11*	m_pGBufferTexture;
+		ShaderResourceParameterDX11*	m_pDepthTexture;
     };
 }
 //--------------------------------------------------------------------------------

@@ -4,8 +4,8 @@
 
 cbuffer main
 {
-	matrix mWorld;
-	matrix mViewProj;
+	matrix WorldMatrix;
+	matrix ViewProjMatrix;
 	float4 vEdgeWeights;
 	float2 vInsideWeights;
 };
@@ -62,7 +62,7 @@ VS_OUTPUT vsMain( in VS_INPUT v )
 {
 	VS_OUTPUT o = (VS_OUTPUT)0;
 	
-	o.position = mul( float4( v.position, 1.0f ), mWorld ).xyz;
+	o.position = mul( float4( v.position, 1.0f ), WorldMatrix ).xyz;
 	
 	o.colour = v.colour.rgb;
 		
@@ -196,7 +196,7 @@ DS_OUTPUT dsTriangleMain( HS_PER_TRI_PATCH_OUTPUT input,
     // coord to be a proper projection space output
     // that the rasterizer can deal with. Could delegate
     // to the GS, but no need this time!
-    o.position = mul( float4( o.wPos, 1.0f ), mViewProj );
+    o.position = mul( float4( o.wPos, 1.0f ), ViewProjMatrix );
     
     // We also need to interpolate the colour in
     // the same way
@@ -256,7 +256,7 @@ DS_OUTPUT dsQuadMain( HS_PER_QUAD_PATCH_OUTPUT input,
     // coord to be a proper projection space output
     // that the rasterizer can deal with. Could delegate
     // to the GS, but no need this time!
-    o.position = mul( float4( o.wPos, 1.0f ), mViewProj );
+    o.position = mul( float4( o.wPos, 1.0f ), ViewProjMatrix );
     
     // We also need to interpolate the colour in
     // the same way

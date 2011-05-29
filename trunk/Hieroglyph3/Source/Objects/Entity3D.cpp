@@ -15,7 +15,7 @@
 #include "GeometryDX11.h"
 #include "IntrRay3fSphere3f.h"
 #include "RenderParameterDX11.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -201,7 +201,7 @@ void Entity3D::PreRender( RendererDX11* pRenderer, VIEWTYPE view )
 		m_sParams.pMaterial->PreRender( pRenderer, view );
 }
 //--------------------------------------------------------------------------------
-void Entity3D::Render( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager, VIEWTYPE view )
+void Entity3D::Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view )
 {
 	// Test if the entity contains any geometry, and it has a material
 	if ( ( m_sParams.pGeometry ) && ( m_sParams.pMaterial ) )
@@ -225,20 +225,19 @@ void Entity3D::Render( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
 	}
 }
 //--------------------------------------------------------------------------------
-void Entity3D::AddRenderParameter( RenderParameterDX11* pParameter )
+void Entity3D::AddRenderParameter( ParameterWriter* pWriter )
 {
 	// Add render parameter will take the pointer passed in and add it to the
 	// entity's internal list.  Therefore, this must not be from the stack!
 
-	if ( pParameter )
+	if ( pWriter )
 	{
-
 		// Search the list to see if this parameter is already there
-		RenderParameterDX11* pCurr = 0;
+		ParameterWriter* pCurr = 0;
 
 		for ( int i = 0; i < m_RenderParameters.count(); i++ )
 		{
-			if ( pParameter->GetName() == m_RenderParameters[i]->GetName() )
+			if ( pWriter->GetRenderParameterRef()->GetName() == m_RenderParameters[i]->GetRenderParameterRef()->GetName() )
 			{
 				pCurr = m_RenderParameters[i];
 				break;
@@ -247,55 +246,23 @@ void Entity3D::AddRenderParameter( RenderParameterDX11* pParameter )
 
 		if ( !pCurr )
 		{
-			m_RenderParameters.add( pParameter );
+			m_RenderParameters.add( pWriter );
 		}
 		else
 		{
-			pCurr->UpdateValue( pParameter ); 
+			Log::Get().Write( L"Tried to add a parameter to an entity that was already there!" );
 		}
 	}
 }
 //--------------------------------------------------------------------------------
-void Entity3D::UpdateRenderParameter( RenderParameterDX11* pParameter )
-{
-	// Update render parameter will attempt to set the value of an existing
-	// render parameter that is already stored in the entity.  If it is not there
-	// already, then it creates one and then sets the value by copying it.
-
-	if ( pParameter )
-	{
-		// Search the list to see if this parameter is already there
-		RenderParameterDX11* pCurr = 0;
-
-		for ( int i = 0; i < m_RenderParameters.count(); i++ )
-		{
-			if ( pParameter->GetName() == m_RenderParameters[i]->GetName() )
-			{
-				pCurr = m_RenderParameters[i];
-				break;
-			}
-		}
-
-		if ( !pCurr )
-		{
-			RenderParameterDX11* pCopy = pParameter->CreateCopy();
-			m_RenderParameters.add( pCopy );
-		}
-		else
-		{
-			pCurr->UpdateValue( pParameter ); 
-		}
-	}
-}
-//--------------------------------------------------------------------------------
-void Entity3D::SetRenderParams( ParameterManagerDX11* pParamManager )
+void Entity3D::SetRenderParams( IParameterManager* pParamManager )
 {
 	// Set the world matrix
 	pParamManager->SetWorldMatrixParameter( &m_sParams.WorldMatrix );
 	
 	// Scroll through each parameter and set it in the renderer
 	for ( int i = 0; i < m_RenderParameters.count(); i++ )
-		pParamManager->SetParameter( m_RenderParameters[i] );
+		m_RenderParameters[i]->WriteParameter( pParamManager );
 }
 //--------------------------------------------------------------------------------
 void Entity3D::Hide( bool bHide )

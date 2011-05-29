@@ -31,7 +31,7 @@ void Node3D::PreRender( RendererDX11* pRenderer, VIEWTYPE view )
 	}
 }
 //--------------------------------------------------------------------------------
-void Node3D::Render( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager, VIEWTYPE view )
+void Node3D::Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view )
 {
 	for ( int i = 0; i < m_vChildren.count(); i++ )
 	{

@@ -14,7 +14,7 @@
 #include "Node3D.h"
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 #include "PipelineManagerDX11.h"
 #include "Texture2dDX11.h"
 //--------------------------------------------------------------------------------
@@ -27,6 +27,8 @@ ViewFinalPass::ViewFinalPass( RendererDX11& Renderer )
 
     ViewMatrix.MakeIdentity();
     ProjMatrix.MakeIdentity();
+
+	m_pLightTexture = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"LightTexture" ) );
 }
 //--------------------------------------------------------------------------------
 ViewFinalPass::~ViewFinalPass()
@@ -55,7 +57,7 @@ void ViewFinalPass::PreDraw( RendererDX11* pRenderer )
     }
 }
 //--------------------------------------------------------------------------------
-void ViewFinalPass::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager )
+void ViewFinalPass::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
     if ( m_pRoot )
     {
@@ -69,16 +71,16 @@ void ViewFinalPass::Draw( PipelineManagerDX11* pPipelineManager, ParameterManage
     }
 }
 //--------------------------------------------------------------------------------
-void ViewFinalPass::SetRenderParams( ParameterManagerDX11* pParamManager )
+void ViewFinalPass::SetRenderParams( IParameterManager* pParamManager )
 {
     pParamManager->SetViewMatrixParameter( &ViewMatrix );
     pParamManager->SetProjMatrixParameter( &ProjMatrix );
 
     // Set the light texture
-    pParamManager->SetShaderResourceParameter( L"LightTexture", m_LightTarget);
+    pParamManager->SetShaderResourceParameter( m_pLightTexture, m_LightTarget);
 }
 //--------------------------------------------------------------------------------
-void ViewFinalPass::SetUsageParams( ParameterManagerDX11* pParamManager )
+void ViewFinalPass::SetUsageParams( IParameterManager* pParamManager )
 {
 
 }

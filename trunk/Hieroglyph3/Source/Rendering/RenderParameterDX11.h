@@ -40,13 +40,15 @@ namespace Glyph3
 
 		RenderParameterDX11* CreateCopy();
 
-		virtual void SetParameterData( void* pData ) = 0;
-		virtual ParameterType GetParameterType() = 0;
+		void InitializeParameterData( void* pData );
+
+		virtual void SetParameterData( void* pData, unsigned int threadID = 0 ) = 0;
+		virtual const ParameterType GetParameterType() = 0;
 
 		void SetName( const std::wstring& name );
 		std::wstring& GetName();
 
-		virtual void UpdateValue( RenderParameterDX11* pParameter ) = 0;
+		virtual void UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID = 0 ) = 0;
 
 	protected:
 		std::wstring	m_sParameterName;

@@ -18,6 +18,8 @@
 #include "SpriteRendererDX11.h"
 #include "SpriteFontDX11.h"
 
+#include "VectorParameterDX11.h"
+
 using namespace Glyph3;
 
 class App : public Application, public IEventListener
@@ -64,6 +66,8 @@ protected:
 	float					m_fTessFactor;
 
 	Camera*		m_pCamera;
+
+	VectorParameterDX11* m_pEdgeFactors;
 
 	virtual void CreateShaders();
 	virtual void UpdateViewState();

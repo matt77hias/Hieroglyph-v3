@@ -27,15 +27,15 @@ namespace Glyph3
 		ConstantBufferParameterDX11( ConstantBufferParameterDX11& copy );
 		virtual ~ConstantBufferParameterDX11();
 
-		virtual void SetParameterData( void* pData );
-		virtual ParameterType GetParameterType();
+		virtual void SetParameterData( void* pData, unsigned int threadID = 0 );
+		virtual const ParameterType GetParameterType();
 
-		void UpdateValue( RenderParameterDX11* pParameter );
+		virtual void UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID = 0 );
 
-		int GetIndex();
+		int GetIndex( unsigned int threadID );
 
 	protected:
-		int		m_iCBuffer;
+		int		m_iCBuffer[NUM_THREADS+1];
 	};
 };
 //--------------------------------------------------------------------------------

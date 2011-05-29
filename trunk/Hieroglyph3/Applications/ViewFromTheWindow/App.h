@@ -11,6 +11,8 @@
 #include "Camera.h"
 #include "Scene.h"
 
+#include "VectorParameterDX11.h"
+
 using namespace Glyph3;
 
 class App : public Application, public IEventListener
@@ -54,4 +56,7 @@ protected:
 	Vector2f				m_DesktopRes;
 
 	bool					m_bSaveScreenshot;
+
+	VectorParameterDX11*	m_pLightColor;
+	VectorParameterDX11*	m_pLightPosition;
 };

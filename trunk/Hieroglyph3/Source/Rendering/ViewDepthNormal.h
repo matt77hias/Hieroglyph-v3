@@ -19,6 +19,7 @@
 #define ViewDepthNormal_h
 //--------------------------------------------------------------------------------
 #include "ViewPerspective.h"
+#include "ShaderResourceParameterDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -31,13 +32,13 @@ namespace Glyph3
 
 		//virtual void Update( float fTime );
 		//virtual void PreDraw( RendererDX11* pRenderer );
-		//virtual void Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager );
+		//virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 
 		//void SetBackColor( Vector4f color );
 		//void SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ );
 
-		virtual void SetRenderParams( ParameterManagerDX11* pParamManager );
-		virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
+		virtual void SetRenderParams( IParameterManager* pParamManager );
+		virtual void SetUsageParams( IParameterManager* pParamManager );
 
 
 		virtual ~ViewDepthNormal();
@@ -47,6 +48,7 @@ namespace Glyph3
 		int ResolutionY;
 
 		ResourcePtr DepthNormalBuffer;
+		ShaderResourceParameterDX11* m_pDepthNormalBuffer;
 	};
 };
 //--------------------------------------------------------------------------------

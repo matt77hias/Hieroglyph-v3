@@ -18,7 +18,7 @@
 #include "GeometryLoaderDX11.h"
 #include "MaterialGeneratorDX11.h"
 
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -172,10 +172,13 @@ void App::Initialize()
 	// Create the parameters for use with this effect
 
 	m_LightParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"LightColor" ), &m_LightParams );
+	m_pLightColor = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightColor" ) );
+	m_pLightColor->InitializeParameterData( &m_LightParams );
 
 	m_LightPosition = Vector4f( 20.0f, 20.0f, -20.0f, 0.0f );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"LightPositionWS" ), &m_LightPosition );
+	m_pLightPosition = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightPositionWS" ) );
+	m_pLightPosition->InitializeParameterData( &m_LightPosition );
+	
 
 	// Create the material for use by the entities.
 

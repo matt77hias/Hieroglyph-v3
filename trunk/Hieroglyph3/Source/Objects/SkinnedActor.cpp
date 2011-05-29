@@ -15,6 +15,7 @@
 #include "Log.h"
 #include "GeometryGeneratorDX11.h"
 #include "MaterialGeneratorDX11.h"
+#include "MatrixArrayParameterWriterDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -98,7 +99,6 @@ void SkinnedActor::AddBoneNode( Node3D* pBone, Vector3f BindPosition, Vector3f B
 //--------------------------------------------------------------------------------
 void SkinnedActor::SetBindPose( )
 {
-
 	// Have each controller record the current world matrix inverse for the bind 
 	// pose inverse.
 	for ( int i = 0; i < m_Bones.count(); i++ )
@@ -131,19 +131,30 @@ void SkinnedActor::SetBindPose( )
 	if ( m_pMatrixParameter )
 		Log::Get().Write( L"Bitch about someone calling 'SetBindPose' more than once..." );
 
-	// Create and set up the matrix array rendering parameter.  This gets added
-	// to the skinned actor's body, which is an entity holding the models geometry.
-	m_pMatrixParameter = new MatrixArrayParameterDX11( m_Bones.count() );
-	m_pMatrixParameter->SetName( std::wstring( L"SkinMatrices" ) );
-	GetBody()->AddRenderParameter( m_pMatrixParameter );
 
-	m_pMatrixNormalParameter= new MatrixArrayParameterDX11( m_Bones.count() );
-	m_pMatrixNormalParameter->SetName( std::wstring( L"SkinNormalMatrices" ) );
-	GetBody()->AddRenderParameter( m_pMatrixNormalParameter );
-	
 	// Create an array to hold the CPU side matrices.
+
 	m_pMatrices = new Matrix4f[m_Bones.count()];
 	m_pNormalMatrices = new Matrix4f[m_Bones.count()];
+
+	// Create and set up the matrix array rendering parameter.  This gets added
+	// to the skinned actor's body, which is an entity holding the models geometry.
+
+	m_pSkinMatrixWriter = new MatrixArrayParameterWriterDX11();
+	m_pSkinMatrixWriter->SetRenderParameterRef( 
+		RendererDX11::Get()->m_pParamMgr->GetMatrixArrayParameterRef( std::wstring( L"SkinMatrices" ), m_Bones.count() ) );
+	m_pSkinMatrixWriter->SetValue( m_pMatrices );
+	m_pSkinMatrixWriter->SetCount( m_Bones.count() );
+
+	GetBody()->AddRenderParameter( m_pSkinMatrixWriter );
+
+	m_pNormalMatrixWriter = new MatrixArrayParameterWriterDX11();
+	m_pNormalMatrixWriter->SetRenderParameterRef( 
+		RendererDX11::Get()->m_pParamMgr->GetMatrixArrayParameterRef( std::wstring( L"SkinNormalMatrices" ), m_Bones.count() ) );
+	m_pNormalMatrixWriter->SetValue( m_pNormalMatrices );
+	m_pNormalMatrixWriter->SetCount( m_Bones.count() );
+
+	GetBody()->AddRenderParameter( m_pNormalMatrixWriter );
 }
 //--------------------------------------------------------------------------------
 void SkinnedActor::SetSkinningMatrices( RendererDX11& Renderer )
@@ -154,10 +165,6 @@ void SkinnedActor::SetSkinningMatrices( RendererDX11& Renderer )
 		m_pMatrices[i] = m_Bones[i]->GetTransform();
 		m_pNormalMatrices[i] = m_Bones[i]->GetNormalTransform();
 	}
-
-	// Set the data into the GPU parameter list.
-	m_pMatrixParameter->SetParameterData( m_pMatrices );
-	m_pMatrixNormalParameter->SetParameterData( m_pNormalMatrices );
 }
 //--------------------------------------------------------------------------------
 void SkinnedActor::PlayAnimation( int index )

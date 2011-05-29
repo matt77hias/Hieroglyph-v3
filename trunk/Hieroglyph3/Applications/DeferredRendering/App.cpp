@@ -20,9 +20,9 @@
 
 #include "ViewAmbientOcclusion.h"
 
-#include "ParameterManagerDX11.h"
-#include "SamplerParameterDX11.h"
-#include "ShaderResourceParameterDX11.h"
+#include "IParameterManager.h"
+#include "SamplerParameterWriterDX11.h"
+#include "ShaderResourceParameterWriterDX11.h"
 #include "DepthStencilStateConfigDX11.h"
 
 using namespace Glyph3;
@@ -310,14 +310,16 @@ void App::Initialize()
     _ASSERT( m_NormalMap->m_iResource != -1 );
 
     // Set the texture parameters
-    ShaderResourceParameterDX11* pDiffuseParam = new ShaderResourceParameterDX11();
-    pDiffuseParam->SetParameterData( &m_DiffuseTexture->m_iResourceSRV );
-    pDiffuseParam->SetName( std::wstring( L"DiffuseMap" ) );
+	ShaderResourceParameterWriterDX11* pDiffuseParam = new ShaderResourceParameterWriterDX11();
+	pDiffuseParam->SetRenderParameterRef(
+		m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"DiffuseMap" ) ) );
+    pDiffuseParam->SetValue( m_DiffuseTexture );
     m_pMaterial->AddRenderParameter( pDiffuseParam );
 
-    ShaderResourceParameterDX11* pNormalMapParam = new ShaderResourceParameterDX11();
-    pNormalMapParam->SetParameterData( &m_NormalMap->m_iResourceSRV );
-    pNormalMapParam->SetName( std::wstring( L"NormalMap" ) );
+    ShaderResourceParameterWriterDX11* pNormalMapParam = new ShaderResourceParameterWriterDX11();
+	pNormalMapParam->SetRenderParameterRef(
+		m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"NormalMap" ) ) );
+    pNormalMapParam->SetValue( m_NormalMap );
     m_pMaterial->AddRenderParameter( pNormalMapParam );
 
     // Create a sampler state
@@ -335,9 +337,10 @@ void App::Initialize()
     int samplerState = m_pRenderer11->CreateSamplerState( &sampDesc );
 
     // Create a sampler state parameter
-    SamplerParameterDX11* pSamplerParam = new SamplerParameterDX11();
-    pSamplerParam->SetParameterData( &samplerState );
-    pSamplerParam->SetName( std::wstring( L"AnisoSampler" ) );
+    SamplerParameterWriterDX11* pSamplerParam = new SamplerParameterWriterDX11();
+    pSamplerParam->SetRenderParameterRef(
+		(RenderParameterDX11*)m_pRenderer11->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"AnisoSampler" ) ) );
+	pSamplerParam->SetValue( samplerState );
     m_pMaterial->AddRenderParameter( pSamplerParam );
 
 	// Enable the material to render the given view type
@@ -428,7 +431,7 @@ void App::Update()
 
     // Render to the backbuffer
     PipelineManagerDX11* pImmPipeline = m_pRenderer11->pImmPipeline;
-    ParameterManagerDX11* pParams = m_pRenderer11->m_pParamMgr;
+    IParameterManager* pParams = m_pRenderer11->m_pParamMgr;
     pImmPipeline->ClearRenderTargets();
     pImmPipeline->BindRenderTargets( 0, m_BackBuffer );
     pImmPipeline->ApplyRenderTargets();
@@ -599,7 +602,7 @@ std::wstring App::GetName( )
 void App::DrawHUD( )
 {
     PipelineManagerDX11* pImmPipeline = m_pRenderer11->pImmPipeline;
-    ParameterManagerDX11* pParams = m_pRenderer11->m_pParamMgr;
+    IParameterManager* pParams = m_pRenderer11->m_pParamMgr;
 
     Matrix4f transform = Matrix4f::Identity();
     transform.SetTranslation( Vector3f( 30.0f, 30.0f, 0.0f ) );

@@ -20,7 +20,7 @@
 #include "MaterialGeneratorDX11.h"
 #include "RasterizerStateConfigDX11.h"
 
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 
 #include "ReflectiveSphereEntity.h"
 #include "DiffuseSphereEntity.h"
@@ -150,11 +150,15 @@ void App::Initialize()
 	// Set any parameters that will be needed by the shaders used above.
 	
 	m_LightParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"LightColor" ), &m_LightParams );
+	m_pLightColor = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightColor" ) );
+	m_pLightColor->InitializeParameterData( &m_LightParams );
 
 	m_LightPosition = Vector4f( 20.0f, 20.0f, -20.0f, 0.0f );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"LightPositionWS" ), &m_LightPosition );
+	m_pLightPosition = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightPositionWS" ) );
+	m_pLightPosition->InitializeParameterData( &m_LightPosition );
 
+	m_pTimeFactors = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"TimeFactors" ) );
+	m_pViewPosition = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"ViewPosition" ) );
 
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
@@ -180,7 +184,7 @@ void App::Initialize()
 	m_pDiffuseActor->GetNode()->AttachController( new RotationController( Vector3f( 1.0f, 0.0f, 0.0f ), 0.5f ) );
 
     DiffuseSphereEntity::LoadResources();
-	for ( int i = 0; i < 200; i++ )
+	for ( int i = 0; i < 1000; i++ )
 	{
 		float x = static_cast<float>( (double)rand() / RAND_MAX ) * 2.0f - 1.0f;
 		float y = static_cast<float>( (double)rand() / RAND_MAX ) * 2.0f - 1.0f;
@@ -216,7 +220,7 @@ void App::Initialize()
 	m_pScene->AddEntity( m_pNode );
 	m_pScene->AddCamera( m_pCamera );
 
-	//m_pRenderer11->SetMultiThreadingState( false );
+	m_pRenderer11->SetMultiThreadingState( false );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -240,13 +244,15 @@ void App::Update()
 		                              m_pCamera->GetNode()->Position().y,
 		                              m_pCamera->GetNode()->Position().z,
 		                              1.0f );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"ViewPosition" ), &ViewPosition );
+	m_pViewPosition->InitializeParameterData( &ViewPosition );
+	//m_pRenderer11->m_pParamMgr->SetVectorParameter( m_pViewPosition, &ViewPosition );
 
 	//std::wstringstream s;
 	//s << L"Frame Number: " << m_pTimer->FrameCount() << L" Elapsed Time: " << m_pTimer->Elapsed();
 	//Log::Get().Write( s.str() );
 
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"TimeFactors" ), &TimeFactors );
+	m_pTimeFactors->InitializeParameterData( &TimeFactors );
+	//m_pRenderer11->m_pParamMgr->SetVectorParameter( m_pTimeFactors, &TimeFactors );
 
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.

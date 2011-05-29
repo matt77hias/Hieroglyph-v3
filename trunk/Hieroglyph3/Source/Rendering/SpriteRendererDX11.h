@@ -58,14 +58,14 @@ namespace Glyph3
 		bool Initialize();
 
 		void Render(	PipelineManagerDX11* pipeline,
-						ParameterManagerDX11* parameters,
+						IParameterManager* parameters,
 						ResourcePtr texture,
 						const SpriteDrawData* drawData,
 						UINT numSprites,
 						FilterMode filterMode = Linear );
 
 		void Render(	PipelineManagerDX11* pipeline,
-						ParameterManagerDX11* parameters,
+						IParameterManager* parameters,
 						ResourcePtr texture,
 						const Matrix4f& transform,
 						const Vector4f& Color = Vector4f( 1, 1, 1, 1 ),
@@ -73,7 +73,7 @@ namespace Glyph3
 						const SpriteDrawRect* drawRect = NULL );
 
 		void RenderText(	PipelineManagerDX11* pipeline,
-							ParameterManagerDX11* parameters,
+							IParameterManager* parameters,
 							const SpriteFontDX11& font,
 							const wchar_t* text,
 							const Matrix4f& transform,

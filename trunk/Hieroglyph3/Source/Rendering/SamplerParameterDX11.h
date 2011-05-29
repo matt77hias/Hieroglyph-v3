@@ -26,14 +26,14 @@ namespace Glyph3
 		SamplerParameterDX11( SamplerParameterDX11& copy );
 		virtual ~SamplerParameterDX11();
 
-		virtual void SetParameterData( void* pData );
-		virtual ParameterType GetParameterType();
-		int GetIndex();
+		virtual void SetParameterData( void* pData, unsigned int threadID = 0 );
+		virtual const ParameterType GetParameterType();
+		int GetIndex( unsigned int threadID );
 
-		void UpdateValue( RenderParameterDX11* pParameter );
+		void UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID = 0 );
 
 	protected:
-		int		m_iSampler;
+		int		m_iSampler[NUM_THREADS+1];
 	};
 };
 //--------------------------------------------------------------------------------

@@ -15,7 +15,7 @@
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
 #include <sstream>
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -187,6 +187,12 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 		std::wstring( L"CSMAIN" ),
 		std::wstring( L"cs_5_0" ) );
 
+	
+	pCurrentSimState = Renderer.m_pParamMgr->GetUnorderedAccessParameterRef( std::wstring( L"CurrentSimulationState" ) );
+	pNextSimState = Renderer.m_pParamMgr->GetUnorderedAccessParameterRef( std::wstring( L"NewSimulationState" ) );
+	pSimState = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"SimulationState" ) );
+	pRandomVector = Renderer.m_pParamMgr->GetVectorParameterRef( std::wstring( L"RandomVector" ) );
+	//pDispatchSize  = Renderer.m_pParamMgr->GetVectorParameterRef( std::wstring( L"RandomVector" ) );
 }
 //--------------------------------------------------------------------------------
 ViewSimulation::~ViewSimulation()
@@ -216,7 +222,7 @@ void ViewSimulation::PreDraw( RendererDX11* pRenderer )
 	pRenderer->QueueRenderView( this );
 }
 //--------------------------------------------------------------------------------
-void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager )
+void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	// Set this view's render parameters.
 	SetRenderParams( pParamManager );
@@ -263,23 +269,24 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, ParameterManag
 	ParticleStateBuffers[1] = TempState;
 }
 //--------------------------------------------------------------------------------
-void ViewSimulation::SetRenderParams( ParameterManagerDX11* pParamManager )
+void ViewSimulation::SetRenderParams( IParameterManager* pParamManager )
 {
 	// Set the parameters for this view to be able to perform its processing
 	// sequence.  In this case, water state '0' is always considered the current
 	// state.
 
+	
 	if ( bOneTimeInit == true )
 	{
-		pParamManager->SetUnorderedAccessParameter( L"CurrentSimulationState", ParticleStateBuffers[0], 0 );
+		pParamManager->SetUnorderedAccessParameter( pCurrentSimState, ParticleStateBuffers[0], 0 );
 		//pParamManager->SetUnorderedAccessParameter( L"CurrentSimulationState", ParticleStateBuffers[0], m_iParticleCount );
-		pParamManager->SetUnorderedAccessParameter( L"NewSimulationState", ParticleStateBuffers[1], 0 );
+		pParamManager->SetUnorderedAccessParameter( pNextSimState, ParticleStateBuffers[1], 0 );
 		bOneTimeInit = false;
 	}
 	else
 	{
-		pParamManager->SetUnorderedAccessParameter( L"CurrentSimulationState", ParticleStateBuffers[0] );
-		pParamManager->SetUnorderedAccessParameter( L"NewSimulationState", ParticleStateBuffers[1] );
+		pParamManager->SetUnorderedAccessParameter( pCurrentSimState, ParticleStateBuffers[0] );
+		pParamManager->SetUnorderedAccessParameter( pNextSimState, ParticleStateBuffers[1] );
 	}
 
 	static const float scale = 2.0f;
@@ -290,18 +297,18 @@ void ViewSimulation::SetRenderParams( ParameterManagerDX11* pParamManager )
 	normalized.Normalize();
 
 	Vector4f RandomVector = Vector4f( normalized.x, normalized.y, normalized.z, 0.0f );
-	pParamManager->SetVectorParameter( std::wstring( L"RandomVector" ), &RandomVector );
+	pParamManager->SetVectorParameter( pRandomVector, &RandomVector );
 	
 }
 //--------------------------------------------------------------------------------
-void ViewSimulation::SetUsageParams( ParameterManagerDX11* pParamManager )
+void ViewSimulation::SetUsageParams( IParameterManager* pParamManager )
 {
 	// Set the parameters for allowing an application to use the current state
 	// as a height map via a shader resource view.
 
-	Vector4f DispatchSize = Vector4f( 16.0f, 16.0f, 16.0f * 16.0f, 16.0f * 16.0f );
-	pParamManager->SetVectorParameter( std::wstring( L"DispatchSize" ), &DispatchSize );
+	//Vector4f DispatchSize = Vector4f( 16.0f, 16.0f, 16.0f * 16.0f, 16.0f * 16.0f );
+	//pParamManager->SetVectorParameter( pDispatchSize, &DispatchSize );
 
-	pParamManager->SetShaderResourceParameter( L"SimulationState", ParticleStateBuffers[0] );
+	pParamManager->SetShaderResourceParameter( pSimState, ParticleStateBuffers[0] );
 }
 //--------------------------------------------------------------------------------

@@ -20,7 +20,7 @@
 #include "MaterialGeneratorDX11.h"
 #include "RasterizerStateConfigDX11.h"
 
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 
 #include "GeometryGeneratorDX11.h"
 #include "ShaderResourceParameterDX11.h"
@@ -74,8 +74,8 @@ bool App::ConfigureEngineComponents()
 	}
 
 	// Create the window.
-	int width = 1280;
-	int height = 768;
+	int width = 800;
+	int height = 600;
 
 	// Create the window wrapper class instance.
 	m_pWindow = new Win32RenderWindow();
@@ -151,11 +151,15 @@ void App::Initialize()
 	//MaterialDX11* pMaterial = 0;
 
 	// Create the parameters for use with this effect
+
 	Vector4f LightParams = Vector4f( 0.2f, 0.7f, 0.2f, 0.7f );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"LightColor" ), &LightParams );
+	m_pLightColor = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightColor" ) );
+	m_pLightColor->InitializeParameterData( &LightParams );
 
 	Vector4f LightPosition = Vector4f( -1000.0f, 2000.0f, 2000.0f, 0.0f );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"LightPositionWS" ), &LightPosition );
+	m_pLightPosition = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightPositionWS" ) );
+	m_pLightPosition->InitializeParameterData( &LightPosition );
+
 
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
@@ -169,7 +173,7 @@ void App::Initialize()
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.1f, 0.1f, 0.3f, 0.0f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
-	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, 640.0f / 480.0f, static_cast<float>( D3DX_PI ) / 2.0f );
+	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, 800.0f / 600.0f, static_cast<float>( D3DX_PI ) / 2.0f );
 	//m_pCamera->SetProjectionParams( 0.1f, 100.0f, 1.0f / 1.0f, static_cast<float>( D3DX_PI ) / 2.0f );
 
 	// Create the scene and add the entities to it.  Then add the camera to the

@@ -17,7 +17,7 @@
 
 #include "RasterizerStateConfigDX11.h"
 #include "DepthStencilStateConfigDX11.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 #include "SamplerParameterDX11.h"
 #include "ShaderResourceParameterDX11.h"
 
@@ -154,6 +154,22 @@ void App::Initialize()
 	pEventManager->AddEventListener( SYSTEM_KEYBOARD_KEYDOWN, this );
 	pEventManager->AddEventListener( SYSTEM_KEYBOARD_CHAR, this );
 
+	m_pbufferResults = m_pRenderer11->m_pParamMgr->GetUnorderedAccessParameterRef( std::wstring( L"bufferResults" ) );
+	m_ptexLODLookup = m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"texLODLookup" ) );
+	m_ptexHeightMap = m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"texHeightMap" ) );
+	
+	m_pmWorld = m_pRenderer11->m_pParamMgr->GetMatrixParameterRef( std::wstring( L"mWorld" ) );
+	m_pmViewProj = m_pRenderer11->m_pParamMgr->GetMatrixParameterRef( std::wstring( L"mViewProj" ) );
+	m_pmInvTposeWorld = m_pRenderer11->m_pParamMgr->GetMatrixParameterRef( std::wstring( L"mInvTposeWorld" ) );
+
+	m_pcameraPosition = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"cameraPosition" ) );
+	m_pheightMapDimensions = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"heightMapDimensions" ) );
+	m_pminMaxDistance = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"minMaxDistance" ) );
+	m_pminMaxLOD = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"minMaxLOD" ) );
+
+	m_psmpHeightMap = m_pRenderer11->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"smpHeightMap" ) );
+
+
 	// Create the necessary resources
 	CreateTerrainGeometry();
 	CreateTerrainShaders();
@@ -164,10 +180,10 @@ void App::Initialize()
 	// Set initial shader values
 	// (computed off camera pos + geometry matrix)
 	Vector4f vMinMaxDist = Vector4f( 4.0f, 18.0f, /* unused */ 0.0f, /* unused */ 0.0f );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( L"minMaxDistance", &vMinMaxDist );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( m_pminMaxDistance, &vMinMaxDist );
 
 	Vector4f vMinMaxLod = Vector4f( 1.0f, 5.0f, /* unused */ 0.0f, /* unused */ 0.0f );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( L"minMaxLOD", &vMinMaxLod );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( m_pminMaxLOD, &vMinMaxLod );
 
 	// Create the text rendering
 	m_pFont = new SpriteFontDX11();
@@ -529,15 +545,15 @@ void App::CreateTerrainTextures()
 	// Store the height/width to the param manager
 	D3D11_TEXTURE2D_DESC d = m_pHeightMapTexture->m_pTexture2dConfig->GetTextureDesc();
 	Vector4f vTexDim = Vector4f( static_cast<float>(d.Width), static_cast<float>(d.Height), static_cast<float>(TERRAIN_X_LEN), static_cast<float>(TERRAIN_Z_LEN) );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( L"heightMapDimensions", &vTexDim );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( m_pheightMapDimensions, &vTexDim );
 
-	// Create the SRV
-	ShaderResourceParameterDX11* pHeightMapTexParam = new ShaderResourceParameterDX11();
-	pHeightMapTexParam->SetParameterData( &m_pHeightMapTexture->m_iResourceSRV );
-	pHeightMapTexParam->SetName( std::wstring( L"texHeightMap" ) );
+	//// Create the SRV
+	//ShaderResourceParameterDX11* pHeightMapTexParam = new ShaderResourceParameterDX11();
+	//pHeightMapTexParam->SetParameterData( &m_pHeightMapTexture->m_iResourceSRV );
+	//pHeightMapTexParam->SetName( std::wstring( L"texHeightMap" ) );
 
 	// Map it to the param manager
-	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"texHeightMap", m_pHeightMapTexture );
+	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( m_ptexHeightMap, m_pHeightMapTexture );
 
 	// Create a sampler
 	D3D11_SAMPLER_DESC sampDesc;
@@ -554,7 +570,7 @@ void App::CreateTerrainTextures()
 	int samplerState = m_pRenderer11->CreateSamplerState( &sampDesc );
 
 	// Set it to the param manager
-	m_pRenderer11->m_pParamMgr->SetSamplerParameter( L"smpHeightMap", &samplerState );
+	m_pRenderer11->m_pParamMgr->SetSamplerParameter( m_psmpHeightMap, &samplerState );
 
 	Log::Get().Write( L"Created textures" );
 }
@@ -612,12 +628,12 @@ void App::UpdateViewState()
 		Matrix4f mViewProj = mView * mProj;
 
 		// Set the various values to the parameter manager
-		m_pRenderer11->m_pParamMgr->SetMatrixParameter( L"mWorld", &mWorld );
-		m_pRenderer11->m_pParamMgr->SetMatrixParameter( L"mViewProj", &mViewProj );
-		m_pRenderer11->m_pParamMgr->SetMatrixParameter( L"mInvTposeWorld", &mInvTPoseWorld );
+		m_pRenderer11->m_pParamMgr->SetMatrixParameter( m_pmWorld, &mWorld );
+		m_pRenderer11->m_pParamMgr->SetMatrixParameter( m_pmViewProj, &mViewProj );
+		m_pRenderer11->m_pParamMgr->SetMatrixParameter( m_pmInvTposeWorld, &mInvTPoseWorld );
 
 		Vector4f vCam = Vector4f( vLookFrom.x, vLookFrom.y, vLookFrom.z, /* unused */ 0.0f );
-		m_pRenderer11->m_pParamMgr->SetVectorParameter( L"cameraPosition", &vCam );
+		m_pRenderer11->m_pParamMgr->SetVectorParameter( m_pcameraPosition, &vCam );
 	}
 	else
 	{
@@ -663,8 +679,8 @@ void App::RunComputeShader()
 	Log::Get().Write( L"Running Compute Shader Pre-Pass" );
 
 	// Bind the resources
-	m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"bufferResults", m_pLodLookupTexture );
-	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"texHeightMap", m_pHeightMapTexture );
+	m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( m_pbufferResults, m_pLodLookupTexture );
+	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( m_ptexHeightMap, m_pHeightMapTexture );
 
 	// Determine number of threads
 	D3D11_TEXTURE2D_DESC d = m_pHeightMapTexture->m_pTexture2dConfig->GetTextureDesc();
@@ -673,7 +689,7 @@ void App::RunComputeShader()
 	m_pRenderer11->pImmPipeline->Dispatch( *m_pComputeShaderEffect, d.Width / 16, d.Height / 16, 1, m_pRenderer11->m_pParamMgr );
 
 	// Bind the output to the hull shader
-	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"texLODLookup", m_pLodLookupTexture );
+	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( m_ptexLODLookup, m_pLodLookupTexture );
 
 	Log::Get().Write( L"Compute Shader Pre-Pass Complete" );
 }

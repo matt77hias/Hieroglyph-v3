@@ -12,6 +12,12 @@
 #include "SpriteRendererDX11.h"
 #include "SpriteFontDX11.h"
 
+#include "ShaderResourceParameterDX11.h"
+#include "UnorderedAccessParameterDX11.h"
+#include "VectorParameterDX11.h"
+#include "MatrixParameterDX11.h"
+#include "SamplerParameterDX11.h"
+
 using namespace Glyph3;
 
 class App : public Application, public IEventListener
@@ -79,4 +85,16 @@ protected:
 	virtual void UpdateViewState();
 	virtual void CreateComputeShaderResources();
 	virtual void RunComputeShader();
+
+	UnorderedAccessParameterDX11*	m_pbufferResults;
+	ShaderResourceParameterDX11*	m_ptexLODLookup;
+	ShaderResourceParameterDX11*	m_ptexHeightMap;
+	MatrixParameterDX11*			m_pmWorld;
+	MatrixParameterDX11*			m_pmViewProj;
+	MatrixParameterDX11*			m_pmInvTposeWorld;
+	VectorParameterDX11*			m_pcameraPosition;
+	VectorParameterDX11*			m_pheightMapDimensions;
+	VectorParameterDX11*			m_pminMaxDistance;
+	VectorParameterDX11*			m_pminMaxLOD;
+	SamplerParameterDX11*			m_psmpHeightMap;
 };

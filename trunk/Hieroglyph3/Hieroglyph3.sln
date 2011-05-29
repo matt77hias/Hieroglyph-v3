@@ -18,11 +18,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicComputeShader", "Appli
 		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicHolographicRendering", "Applications\BasicHolographicRendering\BasicHolographicRendering.vcproj", "{D6FA1FEE-F5F1-43F7-9AC0-37E3EC8752A8}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ViewFromTheWindow", "Applications\ViewFromTheWindow\ViewFromTheWindow.vcproj", "{64EABEAD-7FF1-445A-9707-ADD5CF20D262}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
@@ -120,10 +115,6 @@ Global
 		{91038F7E-DB37-4526-8696-0BBD99932880}.Debug|Win32.Build.0 = Debug|Win32
 		{91038F7E-DB37-4526-8696-0BBD99932880}.Release|Win32.ActiveCfg = Release|Win32
 		{91038F7E-DB37-4526-8696-0BBD99932880}.Release|Win32.Build.0 = Release|Win32
-		{D6FA1FEE-F5F1-43F7-9AC0-37E3EC8752A8}.Debug|Win32.ActiveCfg = Debug|Win32
-		{D6FA1FEE-F5F1-43F7-9AC0-37E3EC8752A8}.Debug|Win32.Build.0 = Debug|Win32
-		{D6FA1FEE-F5F1-43F7-9AC0-37E3EC8752A8}.Release|Win32.ActiveCfg = Release|Win32
-		{D6FA1FEE-F5F1-43F7-9AC0-37E3EC8752A8}.Release|Win32.Build.0 = Release|Win32
 		{64EABEAD-7FF1-445A-9707-ADD5CF20D262}.Debug|Win32.ActiveCfg = Debug|Win32
 		{64EABEAD-7FF1-445A-9707-ADD5CF20D262}.Debug|Win32.Build.0 = Debug|Win32
 		{64EABEAD-7FF1-445A-9707-ADD5CF20D262}.Release|Win32.ActiveCfg = Release|Win32

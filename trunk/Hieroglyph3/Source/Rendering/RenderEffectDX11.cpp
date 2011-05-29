@@ -35,7 +35,7 @@ RenderEffectDX11::~RenderEffectDX11()
 
 }
 //--------------------------------------------------------------------------------
-void RenderEffectDX11::ConfigurePipeline( PipelineManagerDX11* pPipeline, ParameterManagerDX11* pParamManager )
+void RenderEffectDX11::ConfigurePipeline( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
 {
 	// For the standard states, only apply the state change if there is a valid
 	// state in this render effect.  If not, use the current state that has already

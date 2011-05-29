@@ -16,7 +16,7 @@
 #include "ViewPortDX11.h"
 #include "SamplerStateDX11.h"
 #include "InputLayoutDX11.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 #include "ResourceDX11.h"
 
 #include "RenderParameterDX11.h"
@@ -172,21 +172,22 @@ D3D11_VIEWPORT PipelineManagerDX11::GetCurrentViewport( ) {
 	return vp;
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::BindConstantBufferParameter( ShaderType type, const std::wstring& name, UINT slot, 
-                                                      ParameterManagerDX11* pParamManager )
+void PipelineManagerDX11::BindConstantBufferParameter( ShaderType type, RenderParameterDX11* pParam, UINT slot, 
+                                                      IParameterManager* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
 	// TODO: Verify that using GetParameter(...) here is ok for all multithreaded cases! 
 	//RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
-	RenderParameterDX11* pParameter = pParamManager->GetParameter( name );
+	//RenderParameterDX11* pParameter = pParamManager->GetParameterRef( name );
+	unsigned int tID = pParamManager->GetID();
 
-	if ( pParameter != 0 )
+	if ( pParam != 0 )
 	{
 		// Check the type of the parameter
-		if ( pParameter->GetParameterType() == CBUFFER )
+		if ( pParam->GetParameterType() == CBUFFER )
 		{
-			ConstantBufferParameterDX11* pBuffer = reinterpret_cast<ConstantBufferParameterDX11*>( pParameter );
-			int ID = ( pBuffer->GetIndex() & 0xffff ); 
+			ConstantBufferParameterDX11* pBuffer = reinterpret_cast<ConstantBufferParameterDX11*>( pParam );
+			int ID = ( pBuffer->GetIndex( tID ) & 0xffff ); 
 
 			ResourceDX11* pResource = pRenderer->GetResource( ID );
 
@@ -218,23 +219,24 @@ void PipelineManagerDX11::BindConstantBufferParameter( ShaderType type, const st
 	}
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::BindShaderResourceParameter( ShaderType type, const std::wstring& name, UINT slot, 
-                                                      ParameterManagerDX11* pParamManager )
+void PipelineManagerDX11::BindShaderResourceParameter( ShaderType type, RenderParameterDX11* pParam, UINT slot, 
+                                                      IParameterManager* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
 	// TODO: Verify that using GetParameter(...) here is ok for all multithreaded cases! 
 	//RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
-	RenderParameterDX11* pParameter = pParamManager->GetParameter( name );
+	//RenderParameterDX11* pParameter = pParamManager->GetParameterRef( name );
+	unsigned int tID = pParamManager->GetID();
 
-	if ( pParameter != 0 )
+	if ( pParam != 0 )
 	{
 		// Check the type of the parameter
-		if ( pParameter->GetParameterType() == SHADER_RESOURCE )
+		if ( pParam->GetParameterType() == SHADER_RESOURCE )
 		{
 			ShaderResourceParameterDX11* pResource = 
-				reinterpret_cast<ShaderResourceParameterDX11*>( pParameter );
+				reinterpret_cast<ShaderResourceParameterDX11*>( pParam );
 
-			int ID = pResource->GetIndex(); 
+			int ID = pResource->GetIndex( tID ); 
 
 			ShaderResourceViewDX11* pView = pRenderer->GetShaderResourceView( ID );
 
@@ -266,24 +268,25 @@ void PipelineManagerDX11::BindShaderResourceParameter( ShaderType type, const st
 	}
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::BindUnorderedAccessParameter( ShaderType type, const std::wstring& name, UINT slot, 
-                                                       ParameterManagerDX11* pParamManager )
+void PipelineManagerDX11::BindUnorderedAccessParameter( ShaderType type, RenderParameterDX11* pParam, UINT slot, 
+                                                       IParameterManager* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
 	// TODO: Verify that using GetParameter(...) here is ok for all multithreaded cases! 
 	//RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
-	RenderParameterDX11* pParameter = pParamManager->GetParameter( name );
+	//RenderParameterDX11* pParameter = pParamManager->GetParameterRef( name );
+	unsigned int tID = pParamManager->GetID();
 
-	if ( pParameter != 0 )
+	if ( pParam != 0 )
 	{
 		// Check the type of the parameter
-		if ( pParameter->GetParameterType() == UNORDERED_ACCESS )
+		if ( pParam->GetParameterType() == UNORDERED_ACCESS )
 		{
 			UnorderedAccessParameterDX11* pResource = 
-				reinterpret_cast<UnorderedAccessParameterDX11*>( pParameter );
+				reinterpret_cast<UnorderedAccessParameterDX11*>( pParam );
 
-			int ID = pResource->GetIndex(); 
-			unsigned int initial = pResource->GetInitialCount();
+			int ID = pResource->GetIndex( tID ); 
+			unsigned int initial = pResource->GetInitialCount( tID );
 
 			UnorderedAccessViewDX11* pView = pRenderer->GetUnorderedAccessView( ID );
 
@@ -315,23 +318,24 @@ void PipelineManagerDX11::BindUnorderedAccessParameter( ShaderType type, const s
 	}
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::BindSamplerStateParameter( ShaderType type, const std::wstring& name, UINT slot, 
-                                                    ParameterManagerDX11* pParamManager )
+void PipelineManagerDX11::BindSamplerStateParameter( ShaderType type, RenderParameterDX11* pParam, UINT slot, 
+                                                    IParameterManager* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
 	// TODO: Verify that using GetParameter(...) here is ok for all multithreaded cases! 
 	//RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
-	RenderParameterDX11* pParameter = pParamManager->GetParameter( name );
+	//RenderParameterDX11* pParameter = pParamManager->GetParameterRef( name );
+	unsigned int tID = pParamManager->GetID();
 
-	if ( pParameter != 0 )
+	if ( pParam != 0 )
 	{
 		// Check the type of the parameter
-		if ( pParameter->GetParameterType() == SAMPLER )
+		if ( pParam->GetParameterType() == SAMPLER )
 		{
 			SamplerParameterDX11* pResource = 
-				reinterpret_cast<SamplerParameterDX11*>( pParameter );
+				reinterpret_cast<SamplerParameterDX11*>( pParam );
 
-			int ID = pResource->GetIndex(); 
+			int ID = pResource->GetIndex( tID ); 
 			SamplerStateDX11* pState = pRenderer->GetSamplerState( ID );
 
 			// Allow a range including -1 up to the number of samplers
@@ -541,7 +545,7 @@ void PipelineManagerDX11::ClearPipelineResources( )
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::Draw( RenderEffectDX11& effect, GeometryDX11& geometry, 
-										ParameterManagerDX11* pParamManager )
+										IParameterManager* pParamManager )
 {
 	Draw( effect, geometry.m_VB, geometry.m_IB,
 		geometry.GetInputLayout( effect.m_iVertexShader ), geometry.m_ePrimType,
@@ -550,7 +554,7 @@ void PipelineManagerDX11::Draw( RenderEffectDX11& effect, GeometryDX11& geometry
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::Draw( RenderEffectDX11& effect, ResourcePtr vb, ResourcePtr ib,
 						int inputLayput, D3D11_PRIMITIVE_TOPOLOGY primType,
-						UINT vertexStride, UINT numIndices, ParameterManagerDX11* pParamManager )
+						UINT vertexStride, UINT numIndices, IParameterManager* pParamManager )
 {
 	// Specify the type of geometry that we will be dealing with.
 	m_pContext->IASetPrimitiveTopology( primType );
@@ -583,7 +587,7 @@ void PipelineManagerDX11::Draw( RenderEffectDX11& effect, ResourcePtr vb, Resour
 void PipelineManagerDX11::DrawNonIndexed( RenderEffectDX11& effect, ResourcePtr vb, 
                                            int inputLayput, D3D11_PRIMITIVE_TOPOLOGY primType,
                                            UINT vertexStride, UINT vertexCount, UINT startVertexLocation,
-                                           ParameterManagerDX11* pParamManager )
+                                           IParameterManager* pParamManager )
 {
     // Specify the type of geometry that we will be dealing with.
     m_pContext->IASetPrimitiveTopology( primType );
@@ -607,7 +611,7 @@ void PipelineManagerDX11::DrawNonIndexed( RenderEffectDX11& effect, ResourcePtr 
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::DrawInstanced( RenderEffectDX11& effect, GeometryDX11& geometry,
 								 ResourcePtr instanceData, UINT instanceDataStride,
-								 UINT numInstances, ParameterManagerDX11* pParamManager )
+								 UINT numInstances, IParameterManager* pParamManager )
 {
 	DrawInstanced( effect, geometry.m_VB, geometry.m_ePrimType, geometry.m_IB,
 		geometry.GetInputLayout( effect.m_iVertexShader ),
@@ -619,7 +623,7 @@ void PipelineManagerDX11::DrawInstanced( RenderEffectDX11& effect, ResourcePtr v
 								 D3D11_PRIMITIVE_TOPOLOGY primType, ResourcePtr ib,
 								 int inputLayout, UINT vertexStride, UINT numIndices,
 								 ResourcePtr instanceData, UINT instanceDataStride,
-								 UINT numInstances, ParameterManagerDX11* pParamManager )
+								 UINT numInstances, IParameterManager* pParamManager )
 {
 	// Specify the type of geometry that we will be dealing with.
 
@@ -649,7 +653,7 @@ void PipelineManagerDX11::DrawInstanced( RenderEffectDX11& effect, ResourcePtr v
 void PipelineManagerDX11::DispatchIndirect( RenderEffectDX11& effect,
 										    ResourcePtr args,
 											UINT offset,
-											ParameterManagerDX11* pParamManager )
+											IParameterManager* pParamManager )
 {
 	// Use the effect to load all of the pipeline stages here.
 
@@ -679,7 +683,7 @@ void PipelineManagerDX11::DrawIndirect( RenderEffectDX11& effect,
 										int inputLayout,
 										D3D11_PRIMITIVE_TOPOLOGY primType,
 										UINT vertexStride,
-										ParameterManagerDX11* pParamManager )
+										IParameterManager* pParamManager )
 {
 	int Type = args->m_iResource & 0x00FF0000;
 	int ID = args->m_iResource & 0x0000FFFF;
@@ -711,7 +715,7 @@ void PipelineManagerDX11::DrawIndirect( RenderEffectDX11& effect,
 
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::Dispatch( RenderEffectDX11& effect, UINT x, UINT y, UINT z, ParameterManagerDX11* pParamManager )
+void PipelineManagerDX11::Dispatch( RenderEffectDX11& effect, UINT x, UINT y, UINT z, IParameterManager* pParamManager )
 {
 	// Use the effect to load all of the pipeline stages here.
 
@@ -770,7 +774,7 @@ void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth, UINT stenci
 	SAFE_RELEASE( pDepthStencilView );
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::BindShader( ShaderType type, int ID, ParameterManagerDX11* pParamManager )
+void PipelineManagerDX11::BindShader( ShaderType type, int ID, IParameterManager* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
 	ShaderDX11* pShaderDX11 = pRenderer->GetShader( ID );

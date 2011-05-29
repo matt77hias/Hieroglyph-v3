@@ -14,7 +14,7 @@
 #include "Node3D.h"
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 #include "PipelineManagerDX11.h"
 #include "Texture2dDX11.h"
 #include "DepthStencilStateConfigDX11.h"
@@ -37,7 +37,7 @@ static float Clamp( float x, float low, float high )
 //--------------------------------------------------------------------------------
 static void DrawLightType( const TArray<Light>& lights, RenderEffectDX11 effects[2], 
                             ResourcePtr vb, int inputLayout, PipelineManagerDX11* pPipelineManager,
-                            ParameterManagerDX11* pParamManager )
+                            IParameterManager* pParamManager )
 {
     if ( lights.count() > 0 )
     {
@@ -296,6 +296,15 @@ ViewLights::ViewLights( RendererDX11& Renderer)
 
     if( m_iPointLightIL == -1 || m_iSpotLightIL == -1 || m_iDirectionalLightIL == -1 )
         Log::Get().Write( L"Failed to create light input layout" );
+
+	m_pInvProjMatrix = Renderer.m_pParamMgr->GetMatrixParameterRef( std::wstring( L"InvProjMatrix" ) );
+	m_pProjMatrix = Renderer.m_pParamMgr->GetMatrixParameterRef( std::wstring( L"ProjMatrix" ) );
+
+	m_pClipPlanes = Renderer.m_pParamMgr->GetVectorParameterRef( std::wstring( L"ClipPlanes" ) );
+
+	m_pGBufferTexture = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"GBufferTexture" ) );
+	m_pDepthTexture = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"DepthTexture" ) );
+
 }
 //--------------------------------------------------------------------------------
 ViewLights::~ViewLights()
@@ -318,7 +327,7 @@ void ViewLights::PreDraw( RendererDX11* pRenderer )
     pRenderer->QueueRenderView( this );
 }
 //--------------------------------------------------------------------------------
-void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager )
+void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
     // Bind the render target
     pPipelineManager->ClearRenderTargets();
@@ -356,25 +365,25 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX
     m_DirectionalLights.empty();
 }
 //--------------------------------------------------------------------------------
-void ViewLights::SetRenderParams( ParameterManagerDX11* pParamManager )
+void ViewLights::SetRenderParams( IParameterManager* pParamManager )
 {
     pParamManager->SetViewMatrixParameter( &ViewMatrix );
     pParamManager->SetProjMatrixParameter( &ProjMatrix );
 
     Matrix4f invProj = ProjMatrix.Inverse();
-    pParamManager->SetMatrixParameter( L"InvProjMatrix", &invProj );
-    pParamManager->SetMatrixParameter( L"ProjMatrix", &ProjMatrix );
+    pParamManager->SetMatrixParameter( m_pInvProjMatrix, &invProj );
+    pParamManager->SetMatrixParameter( m_pProjMatrix, &ProjMatrix );
 
-    pParamManager->SetVectorParameter( L"ClipPlanes", &Vector4f( m_fNearClip, m_fFarClip, 1.0f, 1.0f ) );    
+    pParamManager->SetVectorParameter( m_pClipPlanes, &Vector4f( m_fNearClip, m_fFarClip, 1.0f, 1.0f ) );    
 
     // Set the G-Buffer texture
-    pParamManager->SetShaderResourceParameter( L"GBufferTexture", m_pGBufferTarget );
+    pParamManager->SetShaderResourceParameter( m_pGBufferTexture, m_pGBufferTarget );
 
     // Bind depth
-    pParamManager->SetShaderResourceParameter( L"DepthTexture", m_pDepthTarget );
+    pParamManager->SetShaderResourceParameter( m_pDepthTexture, m_pDepthTarget );
 }
 //--------------------------------------------------------------------------------
-void ViewLights::SetUsageParams( ParameterManagerDX11* pParamManager )
+void ViewLights::SetUsageParams( IParameterManager* pParamManager )
 {
 
 }

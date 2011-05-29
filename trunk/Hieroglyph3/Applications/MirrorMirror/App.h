@@ -17,6 +17,7 @@
 
 #include "ReflectiveSphereEntity.h"
 #include "DiffuseSphereEntity.h"
+#include "VectorParameterDX11.h"
 
 using namespace Glyph3;
 
@@ -61,4 +62,9 @@ protected:
 	SpriteRendererDX11*		m_pSpriteRenderer;
 
 	bool					m_bSaveScreenshot;
+
+	VectorParameterDX11*	m_pLightColor;
+	VectorParameterDX11*	m_pLightPosition;
+	VectorParameterDX11*	m_pTimeFactors;
+	VectorParameterDX11*	m_pViewPosition;
 };

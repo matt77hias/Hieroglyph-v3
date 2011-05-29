@@ -14,7 +14,8 @@
 #include "GeometryLoaderDX11.h"
 #include "MaterialGeneratorDX11.h"
 #include "ShaderResourceParameterDX11.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
+#include "ShaderResourceParameterWriterDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -80,11 +81,12 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 
 
 	// Add a parameter to the screen that will bind the texture for visualization.
-	ShaderResourceParameterDX11* pParameter = new ShaderResourceParameterDX11();
-	pParameter->SetName( std::wstring( L"ColorTexture" ) );
-	pParameter->SetParameterData( reinterpret_cast<void*>( &resource->m_iResourceSRV ) );
-
-	pActor->GetBody()->AddRenderParameter( pParameter );
+	
+	ShaderResourceParameterWriterDX11* pWriter = new ShaderResourceParameterWriterDX11();
+	pWriter->SetRenderParameterRef( Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) ) );
+	pWriter->SetValue( resource );
+	
+	pActor->GetBody()->AddRenderParameter( pWriter );
 
 	D3D11_SAMPLER_DESC state; 
 	state.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;

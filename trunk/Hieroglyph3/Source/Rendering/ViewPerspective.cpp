@@ -15,7 +15,7 @@
 #include "Node3D.h"
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 #include "PipelineManagerDX11.h"
 #include "Texture2dDX11.h"
 //--------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ void ViewPerspective::PreDraw( RendererDX11* pRenderer )
 	}
 }
 //--------------------------------------------------------------------------------
-void ViewPerspective::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager )
+void ViewPerspective::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	if ( m_pRoot )
 	{
@@ -123,13 +123,13 @@ void ViewPerspective::SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float Min
 	//m_viewport.MaxZ = MaxZ;
 }
 //--------------------------------------------------------------------------------
-void ViewPerspective::SetRenderParams( ParameterManagerDX11* pParamManager )
+void ViewPerspective::SetRenderParams( IParameterManager* pParamManager )
 {
 	pParamManager->SetViewMatrixParameter( &ViewMatrix );
 	pParamManager->SetProjMatrixParameter( &ProjMatrix );
 }
 //--------------------------------------------------------------------------------
-void ViewPerspective::SetUsageParams( ParameterManagerDX11* pParamManager )
+void ViewPerspective::SetUsageParams( IParameterManager* pParamManager )
 {
 
 }

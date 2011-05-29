@@ -20,7 +20,7 @@
 #include "MaterialGeneratorDX11.h"
 #include "RasterizerStateConfigDX11.h"
 
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -238,8 +238,12 @@ void App::Initialize()
 	// resources with the appropriate shader variables at rendering time.  The
 	// resource proxy object contains the needed 'ResourceView' instances.
 
-	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"ColorMap00", m_Output );
+	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"ColorMap00", m_Output );
+	m_pColorMapParameter = m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorMap00" ) );
+	m_pInputParameter = m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"InputMap" ) );
+	m_pOutputParameter = m_pRenderer11->m_pParamMgr->GetUnorderedAccessParameterRef( std::wstring( L"OutputMap" ) );
 
+	m_pColorMapParameter->InitializeParameterData( &m_Output->m_iResourceSRV );
 
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
@@ -287,66 +291,56 @@ void App::Update()
 	// dispatch call can be modified accordingly.
 
 	// Brute force Gaussian
-	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
-	m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
+/*	m_pInputParameter->InitializeParameterData( &m_Texture->m_iResourceSRV );
+	m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
 	m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceGaussian, 20, 15, 1, m_pRenderer11->m_pParamMgr );
-
+*/
 
 	// Separable Gaussian
-/*	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
-	m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Intermediate );
+/*
+	m_pInputParameter->InitializeParameterData( &m_Texture->m_iResourceSRV );
+	m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
 	m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableGaussianX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
 
-	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Intermediate );
-	m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
+	m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
+	m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
 	m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableGaussianY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
 */
 
 	// Cached Gaussian
-/*	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
-	m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Intermediate );
+/*
+	m_pInputParameter->InitializeParameterData( &m_Texture->m_iResourceSRV );
+	m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
 	m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
 
-	m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Intermediate );
-	m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
+	m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
+	m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
 	m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
 */
 
 	// Brute force Bilateral
-	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
-	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
-	//m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+	/*
+	m_pInputParameter->InitializeParameterData( &m_Texture->m_iResourceSRV );
+	m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
+	m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
 
-	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Output );
-	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Intermediate );
-	//m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+	m_pInputParameter->InitializeParameterData( &m_Output->m_iResourceSRV );
+	m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
+	m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
 
-	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
-	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
-	//m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+	m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
+	m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
+	m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+*/
 
 	// Separable Bilateral
-	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
-	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Intermediate );
-	//m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
+	m_pInputParameter->InitializeParameterData( &m_Texture->m_iResourceSRV );
+	m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
+	m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
 
-	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Intermediate );
-	//m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
-	//m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
-
-
-	////// Fruit input --> Gaussian --> Bilateral
-	////m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Texture );
-	////m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
-	////m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceGaussian, 20, 15, 1, m_pRenderer11->m_pParamMgr );
-
-	////m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Output );
-	////m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Intermediate );
-	////m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceGaussian, 20, 15, 1, m_pRenderer11->m_pParamMgr );
-
-	////m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"InputMap", m_Intermediate );
-	////m_pRenderer11->m_pParamMgr->SetUnorderedAccessParameter( L"OutputMap", m_Output );
-	////m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+	m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
+	m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
+	m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
 
 
 	//m_pRenderer11->StartPipelineStatistics();

@@ -21,6 +21,8 @@
 #include "SamplerStateConfigDX11.h"
 #include "GeometryLoaderDX11.h"
 #include "ShaderResourceParameterDX11.h"
+#include "ShaderResourceParameterWriterDX11.h"
+#include "SamplerParameterDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -48,7 +50,12 @@ DiffuseSphereEntity::DiffuseSphereEntity()
 	this->SetGeometry( SphereGeometry );
 	this->SetMaterial( pMaterial, false );
 
-    this->AddRenderParameter( TextureParameter );
+
+	ShaderResourceParameterWriterDX11* pTextureWriter = new ShaderResourceParameterWriterDX11();
+	pTextureWriter->SetRenderParameterRef( RendererDX11::Get()->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) ) );
+	pTextureWriter->SetValue( ColorTexture );
+	
+    this->AddRenderParameter( pTextureWriter );
 }
 //--------------------------------------------------------------------------------
 void DiffuseSphereEntity::LoadResources()
@@ -58,6 +65,7 @@ void DiffuseSphereEntity::LoadResources()
     // Get the geometry to render
     //pGeometry = GeometryLoaderDX11::loadMS3DFile2( L"../Data/Models/UnitSphere2.ms3d" );
     SphereGeometry = GeometryLoaderDX11::loadMS3DFile2( L"../Data/Models/box.ms3d" );
+	//SphereGeometry = GeometryLoaderDX11::loadMS3DFile2( L"../Data/Models/Soldier_LOD1.ms3d" );
     SphereGeometry->LoadToBuffers();
     SphereGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
@@ -96,11 +104,11 @@ void DiffuseSphereEntity::LoadResources()
         std::wstring( L"PSMAIN" ),
         std::wstring( L"ps_5_0" ) );
 
-    //RasterizerStateConfigDX11 RS;
-    //RS.FillMode = D3D11_FILL_WIREFRAME;
+    RasterizerStateConfigDX11 RS;
+    RS.FillMode = D3D11_FILL_WIREFRAME;
     //RS.CullMode = D3D11_CULL_NONE;
 
-    //pParabGenEffect->m_iRasterizerState = 
+    //ParabolaEffect->m_iRasterizerState = 
     //	pRenderer11->CreateRasterizerState( &RS );
 
 	SphereGeometry->GenerateInputLayout( RenderEffect->m_iVertexShader );
@@ -112,17 +120,18 @@ void DiffuseSphereEntity::LoadResources()
 
 
     ColorTexture = pRenderer11->LoadTexture( L"../Data/Textures/Tiles.png" );
+	//ColorTexture = pRenderer11->LoadTexture( L"../Data/Textures/HiResSoldier_colormap.png" );
 
-    TextureParameter = new ShaderResourceParameterDX11();
-    TextureParameter->SetName( L"ColorTexture" );
-    TextureParameter->SetParameterData( &ColorTexture->m_iResourceSRV );    
+    TextureParameter = pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) );
+    TextureParameter->InitializeParameterData( &ColorTexture->m_iResourceSRV );    
 
     SamplerStateConfigDX11 SamplerConfig;
     SamplerConfig.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
     SamplerConfig.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
     LinearSampler = pRenderer11->CreateSamplerState( &SamplerConfig );
 
-    pRenderer11->m_pParamMgr->SetSamplerParameter( L"LinearSampler", &LinearSampler );
+	SamplerParameterDX11* pSamplerParameter = pRenderer11->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"LinearSampler" ) );
+    pSamplerParameter->InitializeParameterData( &LinearSampler );
 
 
     // Set any parameters that will be needed by the shaders used above.

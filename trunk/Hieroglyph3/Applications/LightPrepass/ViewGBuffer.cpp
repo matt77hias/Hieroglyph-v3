@@ -14,7 +14,7 @@
 #include "Node3D.h"
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 #include "PipelineManagerDX11.h"
 #include "Texture2dDX11.h"
 #include "DepthStencilStateConfigDX11.h"
@@ -79,6 +79,7 @@ ViewGBuffer::ViewGBuffer( RendererDX11& Renderer )
         std::wstring( L"ps_5_0" ) );
     _ASSERT( m_MaskEffect.m_iPixelShader != -1 );
 
+	m_pGBufferTexture = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"GBufferTexture" ) );
 }
 //--------------------------------------------------------------------------------
 ViewGBuffer::~ViewGBuffer()
@@ -107,7 +108,7 @@ void ViewGBuffer::PreDraw( RendererDX11* pRenderer )
 	}
 }
 //--------------------------------------------------------------------------------
-void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager )
+void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	if ( m_pRoot )
 	{
@@ -140,19 +141,19 @@ void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerD
         pPipelineManager->BindDepthTarget( m_DepthTarget );
         pPipelineManager->ApplyRenderTargets();
 
-        pParamManager->SetShaderResourceParameter( L"GBufferTexture", m_GBufferTarget );
+        pParamManager->SetShaderResourceParameter( m_pGBufferTexture, m_GBufferTarget );
 
         pPipelineManager->Draw( m_MaskEffect, m_QuadGeometry, pParamManager );
 	}
 }
 //--------------------------------------------------------------------------------
-void ViewGBuffer::SetRenderParams( ParameterManagerDX11* pParamManager )
+void ViewGBuffer::SetRenderParams( IParameterManager* pParamManager )
 {
 	pParamManager->SetViewMatrixParameter( &ViewMatrix );
 	pParamManager->SetProjMatrixParameter( &ProjMatrix );
 }
 //--------------------------------------------------------------------------------
-void ViewGBuffer::SetUsageParams( ParameterManagerDX11* pParamManager )
+void ViewGBuffer::SetUsageParams( IParameterManager* pParamManager )
 {
 
 }

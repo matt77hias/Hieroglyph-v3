@@ -229,7 +229,7 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	// Create the renderer components here, including the parameter manager, 
 	// pipeline manager, and resource manager.
 
-	m_pParamMgr = new ParameterManagerDX11();
+	m_pParamMgr = new ParameterManagerDX11( 0 );
 	pImmPipeline = new PipelineManagerDX11();
 	pImmPipeline->SetDeviceContext( pContext, m_FeatureLevel );
 
@@ -319,7 +319,7 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 		g_aPayload[i].pList = new CommandListDX11();
 		
 		// Generate a new parameter manager for each thread.
-		g_aPayload[i].pParamManager = new ParameterManagerDX11();
+		g_aPayload[i].pParamManager = new ParameterManagerDX11( i+1 );
 		g_aPayload[i].pParamManager->AttachParent( m_pParamMgr );
 
 		// Initialize the payload data variables.
@@ -1022,43 +1022,96 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 
 	for ( UINT i = 0; i < desc.ConstantBuffers; i++ )
 	{
-		ConstantBufferLayout BufferLayout;
 		ID3D11ShaderReflectionConstantBuffer* pConstBuffer = pReflector->GetConstantBufferByIndex( i );
+		
 		D3D11_SHADER_BUFFER_DESC desc;
 		pConstBuffer->GetDesc( &desc );
-		BufferLayout.Description = ShaderBufferDesc( desc );
-		// Load the description of each variable for use later on when binding a buffer
-		for ( UINT j = 0; j < BufferLayout.Description.Variables; j++ )
+		
+		if ( desc.Type == D3D_CT_CBUFFER || desc.Type == D3D_CT_TBUFFER )
 		{
-			// Get the variable description and store it
-			ID3D11ShaderReflectionVariable* pVariable = pConstBuffer->GetVariableByIndex( j );
-			D3D11_SHADER_VARIABLE_DESC var_desc;
-			pVariable->GetDesc( &var_desc );
-			ShaderVariableDesc variabledesc( var_desc );
+			ConstantBufferLayout BufferLayout;
+			BufferLayout.Description = ShaderBufferDesc( desc );
+			BufferLayout.pParamRef = m_pParamMgr->GetConstantBufferParameterRef( BufferLayout.Description.Name );
 
-			BufferLayout.Variables.add( variabledesc );
-			// Get the variable type description and store it
-			ID3D11ShaderReflectionType* pType = pVariable->GetType();
-			D3D11_SHADER_TYPE_DESC type_desc;
-			pType->GetDesc( &type_desc );
-			ShaderTypeDesc typedesc( type_desc );
+			// Load the description of each variable for use later on when binding a buffer
+			for ( UINT j = 0; j < BufferLayout.Description.Variables; j++ )
+			{
+				// Get the variable description and store it
+				ID3D11ShaderReflectionVariable* pVariable = pConstBuffer->GetVariableByIndex( j );
+				D3D11_SHADER_VARIABLE_DESC var_desc;
+				pVariable->GetDesc( &var_desc );
+				ShaderVariableDesc variabledesc( var_desc );
 
-			BufferLayout.Types.add( typedesc );
+				BufferLayout.Variables.add( variabledesc );
+
+				// Get the variable type description and store it
+				ID3D11ShaderReflectionType* pType = pVariable->GetType();
+				D3D11_SHADER_TYPE_DESC type_desc;
+				pType->GetDesc( &type_desc );
+				ShaderTypeDesc typedesc( type_desc );
+
+				BufferLayout.Types.add( typedesc );
+
+				// Get references to the parameters for binding to these variables.
+				RenderParameterDX11* pParam = 0;
+				if ( typedesc.Class == D3D10_SVC_VECTOR )
+				{
+					pParam = m_pParamMgr->GetVectorParameterRef( variabledesc.Name );
+				}
+				else if ( ( typedesc.Class == D3D10_SVC_MATRIX_ROWS ) ||
+							( typedesc.Class == D3D10_SVC_MATRIX_COLUMNS ) )
+				{
+					// Check if it is an array of matrices first...
+					unsigned int count = typedesc.Elements;
+					if ( count == 0 ) 
+					{
+						pParam = m_pParamMgr->GetMatrixParameterRef( variabledesc.Name );
+					}
+					else
+					{
+						pParam = m_pParamMgr->GetMatrixArrayParameterRef( variabledesc.Name, count );
+					}
+				}
+
+				BufferLayout.Parameters.add( pParam );
+			}
+
+			pShaderWrapper->ConstantBuffers.add( BufferLayout );
 		}
-
-		pShaderWrapper->ConstantBuffers.add( BufferLayout );
 	}
 
 
 	// Get the overall resource binding information for this shader.  This includes
 	// the constant buffers, plus all of the other objects that can be bound to the
-	// pipeline with resource views.
+	// pipeline with resource views (shader resource views and unordered access views).
 
 	for ( UINT i = 0; i < desc.BoundResources; i++ )
 	{
 		D3D11_SHADER_INPUT_BIND_DESC resource_desc;
 		pReflector->GetResourceBindingDesc( i, &resource_desc );
 		ShaderInputBindDesc binddesc( resource_desc );
+
+		if ( resource_desc.Type == D3D10_SIT_CBUFFER || resource_desc.Type == D3D10_SIT_TBUFFER )
+		{
+			binddesc.pParamRef = m_pParamMgr->GetConstantBufferParameterRef( binddesc.Name );
+		}
+		else if ( resource_desc.Type == D3D10_SIT_TEXTURE || resource_desc.Type == D3D11_SIT_STRUCTURED )
+		{
+			binddesc.pParamRef = m_pParamMgr->GetShaderResourceParameterRef( binddesc.Name );
+		}
+		else if ( resource_desc.Type == D3D10_SIT_SAMPLER )
+		{
+			binddesc.pParamRef = m_pParamMgr->GetSamplerStateParameterRef( binddesc.Name );
+		}
+		else if ( resource_desc.Type == D3D11_SIT_UAV_RWTYPED || resource_desc.Type == D3D11_SIT_UAV_RWSTRUCTURED
+			|| resource_desc.Type == D3D11_SIT_BYTEADDRESS || resource_desc.Type == D3D11_SIT_UAV_RWBYTEADDRESS
+			|| resource_desc.Type == D3D11_SIT_UAV_APPEND_STRUCTURED || resource_desc.Type == D3D11_SIT_UAV_CONSUME_STRUCTURED
+			|| resource_desc.Type == D3D11_SIT_UAV_RWSTRUCTURED_WITH_COUNTER )
+		{
+			binddesc.pParamRef = m_pParamMgr->GetUnorderedAccessParameterRef( binddesc.Name );
+		}
+
+
 		pShaderWrapper->ResourceBindings.add( binddesc );
 	}
 

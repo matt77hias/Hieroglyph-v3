@@ -23,6 +23,7 @@
 #include "TArray.h"
 #include <string>
 #include "GlyphString.h"
+#include "RenderParameterDX11.h"
 //--------------------------------------------------------------------------------
 #ifndef ShaderDX11_h
 #define ShaderDX11_h
@@ -202,6 +203,7 @@ namespace Glyph3
 			ReturnType = desc.ReturnType;
 			Dimension = desc.Dimension;
 			NumSamples = desc.NumSamples;
+			pParamRef = 0;
 		};
 		
 		ShaderInputBindDesc()
@@ -214,6 +216,7 @@ namespace Glyph3
 			ReturnType = D3D11_RETURN_TYPE_UNORM;
 			Dimension = D3D10_SRV_DIMENSION_UNKNOWN;
 			NumSamples = 0;
+			pParamRef = 0;
 		};
 
 		std::wstring Name;
@@ -224,6 +227,7 @@ namespace Glyph3
 		D3D11_RESOURCE_RETURN_TYPE ReturnType;
 		D3D10_SRV_DIMENSION Dimension;
 		UINT NumSamples;
+		RenderParameterDX11* pParamRef;
 	};
 
 
@@ -232,11 +236,13 @@ namespace Glyph3
 		ShaderBufferDesc Description;
 		TArray<ShaderVariableDesc> Variables;
 		TArray<ShaderTypeDesc> Types;
+		TArray<RenderParameterDX11*> Parameters;
+		RenderParameterDX11* pParamRef;
 	};
 
 	class RendererDX11;
 	class PipelineManagerDX11;
-	class ParameterManagerDX11;
+	class IParameterManager;
 
 	class ShaderDX11
 	{
@@ -246,8 +252,8 @@ namespace Glyph3
 
 		virtual ShaderType GetType() = 0;
 		
-		void UpdateParameters( PipelineManagerDX11* pPipeline, ParameterManagerDX11* pParamManager );
-		void BindParameters( PipelineManagerDX11* pPipeline, ParameterManagerDX11* pParamManager );
+		void UpdateParameters( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager );
+		void BindParameters( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager );
 
 		void PrintShaderDetails();
 

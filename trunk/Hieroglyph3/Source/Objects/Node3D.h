@@ -29,7 +29,7 @@ namespace Glyph3
 		virtual ~Node3D();
 
 		virtual void PreRender( RendererDX11* pRenderer, VIEWTYPE view );
-		virtual void Render( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager, VIEWTYPE view );
+		virtual void Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view );
 		
 		virtual void Update( float time );
 

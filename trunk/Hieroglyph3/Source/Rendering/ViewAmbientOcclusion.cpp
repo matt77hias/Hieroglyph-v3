@@ -16,7 +16,7 @@
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
 #include "ActorGenerator.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ void ViewAmbientOcclusion::PreDraw( RendererDX11* pRenderer )
 //	}
 }
 //--------------------------------------------------------------------------------
-void ViewAmbientOcclusion::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager )
+void ViewAmbientOcclusion::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	ViewPerspective::Draw( pPipelineManager, pParamManager );
 
@@ -184,7 +184,7 @@ void ViewAmbientOcclusion::Draw( PipelineManagerDX11* pPipelineManager, Paramete
 	
 }
 //--------------------------------------------------------------------------------
-void ViewAmbientOcclusion::SetRenderParams( ParameterManagerDX11* pParamManager )
+void ViewAmbientOcclusion::SetRenderParams( IParameterManager* pParamManager )
 {
 	// Set the parameters for this view to be able to perform its processing
 	// sequence.  In this case, we set the depth/normal buffer as a shader 
@@ -197,7 +197,7 @@ void ViewAmbientOcclusion::SetRenderParams( ParameterManagerDX11* pParamManager 
 	pParamManager->SetShaderResourceParameter( L"AmbientOcclusionBuffer", OcclusionBuffer );
 }
 //--------------------------------------------------------------------------------
-void ViewAmbientOcclusion::SetUsageParams( ParameterManagerDX11* pParamManager )
+void ViewAmbientOcclusion::SetUsageParams( IParameterManager* pParamManager )
 {
 	// Set the parameters for allowing an application to use the current resources
 	// for rendering.

@@ -27,11 +27,11 @@ namespace Glyph3
 		EntityParameterDX11( EntityParameterDX11& copy );
 		virtual ~EntityParameterDX11();
 
-		virtual void SetParameterData( void* pData );
+		virtual void SetParameterData( void* pData, unsigned int threadID = 0 );
 		virtual ParameterType GetParameterType();
 		Entity3D* GetEntity();
 
-		void UpdateValue( RenderParameterDX11* pParameter );
+		void UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID = 0 );
 
 	protected:
 		Entity3D*	m_pEntity;

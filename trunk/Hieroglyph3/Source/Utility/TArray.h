@@ -75,6 +75,10 @@ namespace Glyph3
 		
 		bool inrange( int index ) const;
 
+		// Resize the array to the given number of elements.
+
+		void resize( int count ) const;
+
 		// Array style access
 	    T& operator[] (int i);
 		const T& operator[] (int i) const;

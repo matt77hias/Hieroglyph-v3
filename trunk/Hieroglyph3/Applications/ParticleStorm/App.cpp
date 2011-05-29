@@ -22,7 +22,7 @@
 
 #include "ViewSimulation.h"
 
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 #include "ParticleSystemEntity.h"
 
 using namespace Glyph3;
@@ -175,6 +175,10 @@ void App::Initialize()
 	m_pScene->AddCamera( m_pCamera );
 
 	m_pRenderer11->SetMultiThreadingState( false );
+
+	m_pTimeFactors = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"TimeFactors" ) );
+	m_pEmitterLocation = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"EmitterLocation" ) );
+	m_pConsumerLocation = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"ConsumerLocation" ) );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -193,14 +197,12 @@ void App::Update()
 
 	Vector4f TimeFactors = Vector4f( m_pTimer->Elapsed(), (float)m_pTimer->Framerate(), 
 		m_pTimer->Runtime(), (float)m_pTimer->FrameCount() );
-
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"TimeFactors" ), &TimeFactors );
-
 	Vector4f EmitterLocation = Vector4f( -50.0f, 10.0f, 0.0f, 0.0f );
 	Vector4f ConsumerLocation = Vector4f( 50.0f, 0.0f, 0.0f, 0.0f );
 
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EmitterLocation" ), &EmitterLocation );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"ConsumerLocation" ), &ConsumerLocation );
+	m_pTimeFactors->InitializeParameterData( &TimeFactors );
+	m_pEmitterLocation->InitializeParameterData( &EmitterLocation );	
+	m_pConsumerLocation->InitializeParameterData( &ConsumerLocation );
 
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.

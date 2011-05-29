@@ -28,7 +28,7 @@ EntityParameterDX11::~EntityParameterDX11()
 {
 }
 //--------------------------------------------------------------------------------
-void EntityParameterDX11::SetParameterData( void* pData )
+void EntityParameterDX11::SetParameterData( void* pData, unsigned int threadID )
 {
 	m_pEntity = reinterpret_cast<Entity3D*>( pData );
 }
@@ -43,7 +43,7 @@ Entity3D* EntityParameterDX11::GetEntity()
 	return( m_pEntity );
 }
 //--------------------------------------------------------------------------------
-void EntityParameterDX11::UpdateValue( RenderParameterDX11* pParameter )
+void EntityParameterDX11::UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID )
 {
 	if ( pParameter )
 	{

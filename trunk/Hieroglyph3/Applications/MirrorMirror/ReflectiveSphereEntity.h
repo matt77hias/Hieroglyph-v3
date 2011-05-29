@@ -27,7 +27,7 @@ namespace Glyph3
 		virtual ~ReflectiveSphereEntity( );
 
 		virtual void PreRender( RendererDX11* pRenderer, VIEWTYPE view );
-		virtual void Render( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager, VIEWTYPE view );
+		virtual void Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view );
 
 
 	public:

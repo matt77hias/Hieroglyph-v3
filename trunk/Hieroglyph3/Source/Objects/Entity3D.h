@@ -29,6 +29,7 @@
 #include "TArray.h"
 #include "CompositeShape.h"
 #include "EntityRenderParams.h"
+#include "ParameterWriter.h"
 
 #include <string>
 #include <vector>
@@ -50,7 +51,7 @@ namespace Glyph3
 		virtual void UpdateWorld( );
 
 		virtual void PreRender( RendererDX11* pRenderer, VIEWTYPE view );
-		virtual void Render( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager, VIEWTYPE view );
+		virtual void Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view );
 
 		Matrix4f& LocalMatrix( );
 		Matrix4f& WorldMatrix( );
@@ -61,9 +62,9 @@ namespace Glyph3
 
 		void SetGeometry( GeometryDX11* pGeometry );
 
-		void AddRenderParameter( RenderParameterDX11* pParameter );
-		void UpdateRenderParameter( RenderParameterDX11* pParameter );
-		void SetRenderParams( ParameterManagerDX11* pParamManager );
+		void AddRenderParameter( ParameterWriter* pWriter );
+		//void UpdateRenderParameter( RenderParameterDX11* pParameter );
+		void SetRenderParams( IParameterManager* pParamManager );
 		
 
 		// Various entity properties are accessed here.
@@ -137,7 +138,7 @@ namespace Glyph3
 		Entity3D* m_pParent;
 		int m_iEntityID;
 		TArray< IController* > m_Controllers;
-		TArray< RenderParameterDX11* > m_RenderParameters;
+		TArray< ParameterWriter* > m_RenderParameters;
 
 	public:
 		EntityRenderParams m_sParams;

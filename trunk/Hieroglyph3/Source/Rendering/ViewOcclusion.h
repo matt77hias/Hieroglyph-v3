@@ -29,10 +29,10 @@ namespace Glyph3
 
 		virtual void Update( float fTime );
 		virtual void PreDraw( RendererDX11* pRenderer );
-		virtual void Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager );
+		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 
-		virtual void SetRenderParams( ParameterManagerDX11* pParamManager );
-		virtual void SetUsageParams( ParameterManagerDX11* pParamManager );
+		virtual void SetRenderParams( IParameterManager* pParamManager );
+		virtual void SetUsageParams( IParameterManager* pParamManager );
 
 
 		virtual ~ViewOcclusion();
@@ -48,6 +48,10 @@ namespace Glyph3
 		RenderEffectDX11*	pOcclusionEffect;
 		RenderEffectDX11*	pBilateralXEffect;
 		RenderEffectDX11*	pBilateralYEffect;
+
+		ShaderResourceParameterDX11* m_pDepthNormalBuffer;
+		ShaderResourceParameterDX11* m_pAmbientOcclusionBuffer;
+		UnorderedAccessParameterDX11* m_pAmbientOcclusionTarget;
 	};
 };
 //--------------------------------------------------------------------------------

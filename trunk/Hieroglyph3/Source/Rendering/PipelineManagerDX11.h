@@ -54,10 +54,10 @@ namespace Glyph3
 		// provided to apply the resource changes as an optimization, which allows for the
 		// renderer to cache resource changes between rendering calls if appropriate.
 
-		void BindConstantBufferParameter( ShaderType type, const std::wstring& name, UINT slot, ParameterManagerDX11* pParamManager );
-		void BindShaderResourceParameter( ShaderType type, const std::wstring& name, UINT slot, ParameterManagerDX11* pParamManager );
-		void BindUnorderedAccessParameter( ShaderType type, const std::wstring& name, UINT slot, ParameterManagerDX11* pParamManager );
-		void BindSamplerStateParameter( ShaderType type, const std::wstring& name, UINT slot, ParameterManagerDX11* pParamManager );
+		void BindConstantBufferParameter( ShaderType type, RenderParameterDX11* pParam, UINT slot, IParameterManager* pParamManager );
+		void BindShaderResourceParameter( ShaderType type, RenderParameterDX11* pParam, UINT slot, IParameterManager* pParamManager );
+		void BindUnorderedAccessParameter( ShaderType type, RenderParameterDX11* pParam, UINT slot, IParameterManager* pParamManager );
+		void BindSamplerStateParameter( ShaderType type, RenderParameterDX11* pParam, UINT slot, IParameterManager* pParamManager );
 
 		// TODO: Create objects to represent each of the fixed function stages, and 
 		//       utilize this 'Clear', 'Bind', and 'Apply' paradigm.
@@ -72,7 +72,7 @@ namespace Glyph3
 		void ClearRenderTargets( );	
 		void ApplyRenderTargets( );
 
-		void BindShader( ShaderType type, int ID, ParameterManagerDX11* pParamManager );
+		void BindShader( ShaderType type, int ID, IParameterManager* pParamManager );
 		void UnbindShader( ShaderType type );
 
 		// The changes made to the pipeline resources with the Bind calls are cached and 
@@ -99,27 +99,27 @@ namespace Glyph3
 		// With the dispatch call, the same configuration is used except that you
 		// specify the dimensions of the thread groups to instantiate.
 
-		void Draw( RenderEffectDX11& effect, GeometryDX11& chunk, ParameterManagerDX11* pParamManager );
+		void Draw( RenderEffectDX11& effect, GeometryDX11& chunk, IParameterManager* pParamManager );
 		void Draw( RenderEffectDX11& effect, ResourcePtr vb, ResourcePtr ib,
 					int inputLayout, D3D11_PRIMITIVE_TOPOLOGY primType,
-					UINT vertexStride, UINT numIndices, ParameterManagerDX11* pParamManager);
+					UINT vertexStride, UINT numIndices, IParameterManager* pParamManager);
         void DrawNonIndexed( RenderEffectDX11& effect, ResourcePtr vb, int inputLayout, 
                     D3D11_PRIMITIVE_TOPOLOGY primType, UINT vertexStride, UINT vertexCount, 
-                    UINT startVertexLocation, ParameterManagerDX11* pParamManager);
+                    UINT startVertexLocation, IParameterManager* pParamManager);
 		void DrawInstanced( RenderEffectDX11& effect, GeometryDX11& chunk,
 							ResourcePtr instanceData, UINT instanceDataStride,
-							UINT numInstances, ParameterManagerDX11* pParamManager );
+							UINT numInstances, IParameterManager* pParamManager );
 		void DrawInstanced( RenderEffectDX11& effect, ResourcePtr vb,
 							D3D11_PRIMITIVE_TOPOLOGY primType, ResourcePtr ib,
 							int inputLayout, UINT vertexStride, UINT numIndices,
 							ResourcePtr instanceData, UINT instanceDataStride,
-							UINT numInstances, ParameterManagerDX11* pParamManager );
+							UINT numInstances, IParameterManager* pParamManager );
 
-		void Dispatch( RenderEffectDX11& effect, UINT x, UINT y, UINT z, ParameterManagerDX11* pParamManager );
+		void Dispatch( RenderEffectDX11& effect, UINT x, UINT y, UINT z, IParameterManager* pParamManager );
 
-		void DispatchIndirect( RenderEffectDX11& effect, ResourcePtr args, UINT offset, ParameterManagerDX11* pParamManager );
+		void DispatchIndirect( RenderEffectDX11& effect, ResourcePtr args, UINT offset, IParameterManager* pParamManager );
 		void DrawIndirect( RenderEffectDX11& effect, ResourcePtr args, UINT offset, int inputLayout,
-			D3D11_PRIMITIVE_TOPOLOGY primType, UINT vertexStride, ParameterManagerDX11* pParamManager);
+			D3D11_PRIMITIVE_TOPOLOGY primType, UINT vertexStride, IParameterManager* pParamManager);
 
 		void CopyStructureCount( ResourcePtr dest, UINT offset, ResourcePtr uav );
 

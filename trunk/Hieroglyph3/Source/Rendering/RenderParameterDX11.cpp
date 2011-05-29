@@ -44,6 +44,12 @@ void RenderParameterDX11::SetName( const std::wstring& name )
 	m_sParameterName = name;
 }
 //--------------------------------------------------------------------------------
+void RenderParameterDX11::InitializeParameterData( void* pData )
+{
+	for ( int i = 0; i <= NUM_THREADS; i++ )
+		SetParameterData( pData, i );
+}
+//--------------------------------------------------------------------------------
 RenderParameterDX11* RenderParameterDX11::CreateCopy()
 {
 	RenderParameterDX11* pParam = 0;

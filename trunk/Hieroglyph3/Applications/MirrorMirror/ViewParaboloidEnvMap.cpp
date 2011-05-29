@@ -15,7 +15,7 @@
 #include "Node3D.h"
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 #include "PipelineManagerDX11.h"
 #include "Texture2dDX11.h"
 //--------------------------------------------------------------------------------
@@ -55,6 +55,10 @@ ViewParaboloidEnvMap::ViewParaboloidEnvMap( RendererDX11& Renderer, ResourcePtr 
 
 		m_iViewport = Renderer.CreateViewPort( viewport );
 	}
+
+	m_pParaboloidTextureParam = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ParaboloidTexture" ) );
+	m_pParaboloidBasisParam = Renderer.m_pParamMgr->GetMatrixParameterRef( std::wstring( L"ParaboloidBasis" ) );
+
 }
 //--------------------------------------------------------------------------------
 ViewParaboloidEnvMap::~ViewParaboloidEnvMap()
@@ -75,6 +79,7 @@ void ViewParaboloidEnvMap::PreDraw( RendererDX11* pRenderer )
 	if ( m_pEntity != NULL )
 	{
 		m_ParaboloidBasis = m_pEntity->GetView();
+		//m_ParaboloidBasis.MakeIdentity();
 		SetViewMatrix( m_ParaboloidBasis );
 	}
 
@@ -102,7 +107,7 @@ void ViewParaboloidEnvMap::PreDraw( RendererDX11* pRenderer )
 	}
 }
 //--------------------------------------------------------------------------------
-void ViewParaboloidEnvMap::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager )
+void ViewParaboloidEnvMap::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	//if ( m_iCurrRecurrence > 0 )
 	{
@@ -139,6 +144,8 @@ void ViewParaboloidEnvMap::Draw( PipelineManagerDX11* pPipelineManager, Paramete
 			//m_pRoot->Render( pPipelineManager, pParamManager, GetType() );
 
 			pPipelineManager->ClearRenderTargets();
+
+			//pPipelineManager->SaveTextureScreenShot( m_RenderTarget->m_iResource, std::wstring( L"WaterSimulation_" ), D3DX11_IFF_DDS ); 
 		}
 	}
 }
@@ -153,15 +160,15 @@ void ViewParaboloidEnvMap::SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, floa
 	//m_viewport.MaxZ = MaxZ;
 }
 //--------------------------------------------------------------------------------
-void ViewParaboloidEnvMap::SetRenderParams( ParameterManagerDX11* pParamManager )
+void ViewParaboloidEnvMap::SetRenderParams( IParameterManager* pParamManager )
 {
 	pParamManager->SetViewMatrixParameter( &ViewMatrix );
 	pParamManager->SetProjMatrixParameter( &ProjMatrix );
 }
 //--------------------------------------------------------------------------------
-void ViewParaboloidEnvMap::SetUsageParams( ParameterManagerDX11* pParamManager )
+void ViewParaboloidEnvMap::SetUsageParams( IParameterManager* pParamManager )
 {
-	pParamManager->SetMatrixParameter( std::wstring( L"ParaboloidBasis" ), &m_ParaboloidBasis );
-	pParamManager->SetShaderResourceParameter( std::wstring( L"ParaboloidTexture" ), m_RenderTarget );
+	pParamManager->SetMatrixParameter( m_pParaboloidBasisParam, &m_ParaboloidBasis );
+	pParamManager->SetShaderResourceParameter( m_pParaboloidTextureParam, m_RenderTarget );
 }
 //--------------------------------------------------------------------------------

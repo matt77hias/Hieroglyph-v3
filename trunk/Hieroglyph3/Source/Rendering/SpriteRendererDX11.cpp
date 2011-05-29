@@ -258,7 +258,7 @@ bool SpriteRendererDX11::Initialize()
 }
 //--------------------------------------------------------------------------------
 void SpriteRendererDX11::Render( PipelineManagerDX11* pipeline,
-								 ParameterManagerDX11* parameters,
+								 IParameterManager* parameters,
 								 ResourcePtr texture,
 								 const SpriteDrawData* drawData,
 								 UINT numSprites, FilterMode filterMode )
@@ -320,7 +320,7 @@ void SpriteRendererDX11::Render( PipelineManagerDX11* pipeline,
 }
 //--------------------------------------------------------------------------------
 void SpriteRendererDX11::Render( PipelineManagerDX11* pipeline, 
-								 ParameterManagerDX11* parameters,
+								 IParameterManager* parameters,
 							     ResourcePtr texture, 
 								 const Matrix4f& transform,
 								 const Vector4f& color, FilterMode filterMode,
@@ -346,7 +346,7 @@ void SpriteRendererDX11::Render( PipelineManagerDX11* pipeline,
 }
 //--------------------------------------------------------------------------------
 void SpriteRendererDX11::RenderText( PipelineManagerDX11* pipeline, 
-									 ParameterManagerDX11* parameters,
+									 IParameterManager* parameters,
 									 const SpriteFontDX11& font, const wchar_t* text,
 									 const Matrix4f& transform, const Vector4f& color )
 {

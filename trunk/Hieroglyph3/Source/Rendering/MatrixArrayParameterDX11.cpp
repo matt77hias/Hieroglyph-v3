@@ -20,50 +20,64 @@ MatrixArrayParameterDX11::MatrixArrayParameterDX11( int count )
 		count = 1;
 
 	m_iMatrixCount = count; 
-	m_pMatrices = new Matrix4f[count];
+
+	for ( int i = 0; i <= NUM_THREADS; i++ )
+		m_pMatrices[i] = new Matrix4f[count];
 }
 //--------------------------------------------------------------------------------
 MatrixArrayParameterDX11::MatrixArrayParameterDX11( MatrixArrayParameterDX11& copy )
 {
 	if ( this->m_iMatrixCount != copy.m_iMatrixCount )
 	{
-		delete [] m_pMatrices;
-		m_pMatrices = new Matrix4f[copy.m_iMatrixCount];
+		for ( int i = 0; i <= NUM_THREADS; i++ )
+		{
+			delete [] m_pMatrices[i];
+			m_pMatrices[i] = new Matrix4f[copy.m_iMatrixCount];
+		}
 		m_iMatrixCount = copy.m_iMatrixCount;
 	}
 
-	memcpy( m_pMatrices, copy.m_pMatrices, m_iMatrixCount * sizeof( Matrix4f) );
+	for ( int i = 0; i <= NUM_THREADS; i++ )
+		memcpy( m_pMatrices[i], copy.m_pMatrices[i], m_iMatrixCount * sizeof( Matrix4f) );
 }
 //--------------------------------------------------------------------------------
 MatrixArrayParameterDX11& MatrixArrayParameterDX11::operator=( MatrixArrayParameterDX11& parameter )
 {
 	if ( this->m_iMatrixCount != parameter.m_iMatrixCount )
 	{
-		delete [] m_pMatrices;
-		m_pMatrices = new Matrix4f[parameter.m_iMatrixCount];
+		for ( int i = 0; i <= NUM_THREADS; i++ )
+		{
+			delete [] m_pMatrices[i];
+			m_pMatrices[i] = new Matrix4f[parameter.m_iMatrixCount];
+		}
 		m_iMatrixCount = parameter.m_iMatrixCount;
 	}
 
-	memcpy( m_pMatrices, parameter.m_pMatrices, m_iMatrixCount * sizeof( Matrix4f) );
+	for ( int i = 0; i <= NUM_THREADS; i++ )
+		memcpy( m_pMatrices[i], parameter.m_pMatrices[i], m_iMatrixCount * sizeof( Matrix4f) );
 
    return *this;  // Assignment operator returns left side.
 }
 //--------------------------------------------------------------------------------
 MatrixArrayParameterDX11::~MatrixArrayParameterDX11()
 {
-	delete [] m_pMatrices;
+	for ( int i = 0; i <= NUM_THREADS; i++ )
+		delete [] m_pMatrices[i];
 }
 //--------------------------------------------------------------------------------
-void MatrixArrayParameterDX11::SetParameterData( void* pData )
+void MatrixArrayParameterDX11::SetParameterData( void* pData, unsigned int threadID )
 {
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
 	// TODO: This isn't very safe - the caller could supply less than the correct 
 	//       amount of matrices...  I need a better way to set this parameter data.
 
-	memcpy( m_pMatrices, pData, m_iMatrixCount * sizeof( Matrix4f ) );
+	memcpy( m_pMatrices[threadID], pData, m_iMatrixCount * sizeof( Matrix4f ) );
 	//m_Matrix = *reinterpret_cast<Matrix4f*>( pData );
 }
 //--------------------------------------------------------------------------------
-ParameterType MatrixArrayParameterDX11::GetParameterType()
+const ParameterType MatrixArrayParameterDX11::GetParameterType()
 {
 	return( MATRIX_ARRAY );
 }
@@ -73,12 +87,15 @@ int MatrixArrayParameterDX11::GetMatrixCount()
 	return( m_iMatrixCount );
 }
 //--------------------------------------------------------------------------------
-Matrix4f* MatrixArrayParameterDX11::GetMatrices()
+Matrix4f* MatrixArrayParameterDX11::GetMatrices( unsigned int threadID )
 {
-	return( m_pMatrices );
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	return( m_pMatrices[threadID] );
 }
 //--------------------------------------------------------------------------------
-void MatrixArrayParameterDX11::UpdateValue( RenderParameterDX11* pParameter )
+void MatrixArrayParameterDX11::UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID )
 {
 	if ( pParameter )
 	{
@@ -87,7 +104,7 @@ void MatrixArrayParameterDX11::UpdateValue( RenderParameterDX11* pParameter )
 			MatrixArrayParameterDX11* pBuffer = (MatrixArrayParameterDX11*)pParameter;
 			if ( this->GetMatrixCount() == pBuffer->GetMatrixCount() )
 			{
-				memcpy( (void*)m_pMatrices, (void*)pBuffer->GetMatrices(), m_iMatrixCount * sizeof( Matrix4f ) );
+				memcpy( (void*)m_pMatrices, (void*)pBuffer->GetMatrices( threadID ), m_iMatrixCount * sizeof( Matrix4f ) );
 			}
 		}
 	}

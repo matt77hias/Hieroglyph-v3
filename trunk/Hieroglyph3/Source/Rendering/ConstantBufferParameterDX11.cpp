@@ -16,41 +16,52 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ConstantBufferParameterDX11::ConstantBufferParameterDX11()
 {
-	m_iCBuffer = -1;
+	for ( int i = 0; i <= NUM_THREADS; i++ )
+		m_iCBuffer[i] = -1;
 }
 //--------------------------------------------------------------------------------
 ConstantBufferParameterDX11::ConstantBufferParameterDX11( ConstantBufferParameterDX11& copy )
 {
-	m_iCBuffer = copy.m_iCBuffer;
+	for ( int i = 0; i <= NUM_THREADS; i++ )
+		m_iCBuffer[i] = copy.m_iCBuffer[i];
 }
 //--------------------------------------------------------------------------------
 ConstantBufferParameterDX11::~ConstantBufferParameterDX11()
 {
 }
 //--------------------------------------------------------------------------------
-void ConstantBufferParameterDX11::SetParameterData( void* pData )
+void ConstantBufferParameterDX11::SetParameterData( void* pData, unsigned int threadID )
 {
-	m_iCBuffer = *reinterpret_cast<int*>( pData );
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	m_iCBuffer[threadID] = *reinterpret_cast<int*>( pData );
 }
 //--------------------------------------------------------------------------------
-ParameterType ConstantBufferParameterDX11::GetParameterType()
+const ParameterType ConstantBufferParameterDX11::GetParameterType()
 {
 	return( CBUFFER );
 }
 //--------------------------------------------------------------------------------
-int ConstantBufferParameterDX11::GetIndex()
+int ConstantBufferParameterDX11::GetIndex( unsigned int threadID )
 {
-	return( m_iCBuffer );
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	return( m_iCBuffer[threadID] );
 }
 //--------------------------------------------------------------------------------
-void ConstantBufferParameterDX11::UpdateValue( RenderParameterDX11* pParameter )
+void ConstantBufferParameterDX11::UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID )
 {
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
 	if ( pParameter )
 	{
 		if ( ( pParameter->GetParameterType() == CBUFFER ) && ( pParameter->GetName() == this->GetName() ) )
 		{
 			ConstantBufferParameterDX11* pBuffer = (ConstantBufferParameterDX11*)pParameter;
-			m_iCBuffer = pBuffer->GetIndex();
+			m_iCBuffer[threadID] = pBuffer->GetIndex( threadID );
 		}
 	}
 }

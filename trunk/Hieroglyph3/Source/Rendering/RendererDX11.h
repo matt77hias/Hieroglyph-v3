@@ -114,7 +114,7 @@ namespace Glyph3
 		int id;
 		bool bComplete;
 		PipelineManagerDX11* pPipeline;
-		ParameterManagerDX11* pParamManager;
+		IParameterManager* pParamManager;
 		IRenderView* pRenderView;
 		CommandListDX11* pList;
 	};
@@ -322,7 +322,7 @@ namespace Glyph3
 		TArray<ViewPortDX11*>									m_vViewPorts;
 
 	public:
-		ParameterManagerDX11*									m_pParamMgr;
+		IParameterManager*									m_pParamMgr;
 		PipelineManagerDX11*									pImmPipeline;
 		PipelineManagerDX11*									m_pDeferredPipeline;
 

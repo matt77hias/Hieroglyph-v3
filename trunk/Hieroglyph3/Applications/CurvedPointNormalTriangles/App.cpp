@@ -18,7 +18,7 @@
 #include "BufferConfigDX11.h"
 #include "MaterialGeneratorDX11.h"
 
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -166,8 +166,9 @@ void App::Initialize()
 	CreateShaders();
 
 	// Create the parameters for use with this effect
+	m_pEdgeFactors = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"EdgeFactors" ) );
 	Vector4f tessParams = Vector4f( m_fTessFactor, m_fTessFactor, m_fTessFactor, m_fTessFactor );
-	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EdgeFactors" ), &tessParams );
+	m_pRenderer11->m_pParamMgr->SetVectorParameter( m_pEdgeFactors, &tessParams );
 
 
 	// Create the text rendering
@@ -323,7 +324,7 @@ bool App::HandleEvent( IEvent* pEvent )
 				m_fTessFactor = 10.0f;
 
 			Vector4f tessParams = Vector4f( m_fTessFactor, m_fTessFactor, m_fTessFactor, m_fTessFactor );
-			m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EdgeFactors" ), &tessParams );
+			m_pRenderer11->m_pParamMgr->SetVectorParameter( m_pEdgeFactors, &tessParams );
 		}
 		else if ( VK_SUBTRACT == key )
 		{
@@ -333,7 +334,7 @@ bool App::HandleEvent( IEvent* pEvent )
 				m_fTessFactor = 1.0f;
 
 			Vector4f tessParams = Vector4f( m_fTessFactor, m_fTessFactor, m_fTessFactor, m_fTessFactor );
-			m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EdgeFactors" ), &tessParams );
+			m_pRenderer11->m_pParamMgr->SetVectorParameter( m_pEdgeFactors, &tessParams );
 		}
 		else
 		{

@@ -16,7 +16,7 @@
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
 #include "ActorGenerator.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -54,6 +54,11 @@ ViewOcclusion::ViewOcclusion( RendererDX11& Renderer, ResourcePtr OcclusionTarge
 		std::wstring( L"../Data/Shaders/SeparableBilateralCS.hlsl" ),
 		std::wstring( L"CS_Vertical" ),
 		std::wstring( L"cs_5_0" ) );
+
+	m_pDepthNormalBuffer = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"DepthNormalBuffer" ) );
+	m_pAmbientOcclusionBuffer = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"AmbientOcclusionBuffer" ) );
+	m_pAmbientOcclusionTarget = Renderer.m_pParamMgr->GetUnorderedAccessParameterRef( std::wstring( L"AmbientOcclusionTarget" ) );
+
 }
 //--------------------------------------------------------------------------------
 ViewOcclusion::~ViewOcclusion()
@@ -73,7 +78,7 @@ void ViewOcclusion::PreDraw( RendererDX11* pRenderer )
 	pRenderer->QueueRenderView( this );
 }
 //--------------------------------------------------------------------------------
-void ViewOcclusion::Draw( PipelineManagerDX11* pPipelineManager, ParameterManagerDX11* pParamManager )
+void ViewOcclusion::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	
 	// TODO: I added this bind statement here to force the DepthNormalBuffer to not
@@ -117,21 +122,21 @@ void ViewOcclusion::Draw( PipelineManagerDX11* pPipelineManager, ParameterManage
 	
 }
 //--------------------------------------------------------------------------------
-void ViewOcclusion::SetRenderParams( ParameterManagerDX11* pParamManager )
+void ViewOcclusion::SetRenderParams( IParameterManager* pParamManager )
 {
 	// Set the parameters for this view to be able to perform its processing
 	// sequence.  In this case, we set the depth/normal buffer as a shader 
 	// resource and the occlusion buffer as an unordered access view.
 
-	pParamManager->SetShaderResourceParameter( L"DepthNormalBuffer", DepthNormalBuffer );
-	pParamManager->SetUnorderedAccessParameter( L"AmbientOcclusionTarget", OcclusionBuffer );
+	pParamManager->SetShaderResourceParameter( (RenderParameterDX11*)m_pDepthNormalBuffer, DepthNormalBuffer );
+	pParamManager->SetUnorderedAccessParameter( (RenderParameterDX11*)m_pAmbientOcclusionTarget, OcclusionBuffer );
 }
 //--------------------------------------------------------------------------------
-void ViewOcclusion::SetUsageParams( ParameterManagerDX11* pParamManager )
+void ViewOcclusion::SetUsageParams( IParameterManager* pParamManager )
 {
 	// Set the parameters for allowing an application to use the current resources
 	// for rendering.
 
-	pParamManager->SetShaderResourceParameter( L"AmbientOcclusionBuffer", OcclusionBuffer );
+	pParamManager->SetShaderResourceParameter( (RenderParameterDX11*)m_pAmbientOcclusionBuffer, OcclusionBuffer );
 }
 //--------------------------------------------------------------------------------

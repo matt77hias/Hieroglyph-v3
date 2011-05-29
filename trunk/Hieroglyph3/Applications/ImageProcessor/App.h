@@ -11,6 +11,9 @@
 #include "Camera.h"
 #include "Scene.h"
 
+#include "ShaderResourceParameterDX11.h"
+#include "UnorderedAccessParameterDX11.h"
+
 using namespace Glyph3;
 
 class App : public Application, public IEventListener
@@ -61,4 +64,8 @@ protected:
 	Camera*					m_pCamera;
 
 	bool					m_bSaveScreenshot;
+
+	ShaderResourceParameterDX11* m_pColorMapParameter;
+	ShaderResourceParameterDX11* m_pInputParameter;
+	UnorderedAccessParameterDX11* m_pOutputParameter;
 };

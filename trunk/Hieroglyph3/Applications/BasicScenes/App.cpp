@@ -18,7 +18,7 @@
 #include "BufferConfigDX11.h"
 #include "MaterialGeneratorDX11.h"
 
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------

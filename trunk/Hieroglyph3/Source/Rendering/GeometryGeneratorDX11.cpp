@@ -14,7 +14,9 @@
 #include "MaterialGeneratorDX11.h"
 #include "VertexElementDX11.h"
 #include "ShaderResourceParameterDX11.h"
+#include "SamplerParameterDX11.h"
 #include "SamplerStateConfigDX11.h"
+#include "ShaderResourceParameterWriterDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -906,18 +908,19 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 						ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/EyeOfHorus_128_blurred.png" );
 						//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/Hex.png" );
 						
-						ShaderResourceParameterDX11* pTextureParameter = new ShaderResourceParameterDX11();
-						pTextureParameter->SetName( L"ColorTexture" );
-						pTextureParameter->SetParameterData( &ColorTexture->m_iResourceSRV );
-						pActor->GetBody()->AddRenderParameter( pTextureParameter );
+						ShaderResourceParameterWriterDX11* pColorWriter = new ShaderResourceParameterWriterDX11();
+						pColorWriter->SetRenderParameterRef( RendererDX11::Get()->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) ) );
+						pColorWriter->SetValue( ColorTexture );
+						pActor->GetBody()->AddRenderParameter( pColorWriter );
 
 						ResourcePtr HeightTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/EyeOfHorus.png" );
 						//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/Hex.png" );
-						
-						ShaderResourceParameterDX11* pHeightTextureParameter = new ShaderResourceParameterDX11();
-						pHeightTextureParameter->SetName( L"HeightTexture" );
-						pHeightTextureParameter->SetParameterData( &ColorTexture->m_iResourceSRV );
-						pActor->GetBody()->AddRenderParameter( pHeightTextureParameter );
+
+						ShaderResourceParameterWriterDX11* pHeightWriter = new ShaderResourceParameterWriterDX11();
+						pHeightWriter->SetRenderParameterRef( RendererDX11::Get()->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"HeightTexture" ) ) );
+						pHeightWriter->SetValue( HeightTexture );
+						pActor->GetBody()->AddRenderParameter( pHeightWriter );
+
 
 
 						SamplerStateConfigDX11 SamplerConfig;
@@ -928,7 +931,10 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 
 						int LinearSampler = RendererDX11::Get()->CreateSamplerState( &SamplerConfig );
 
-						RendererDX11::Get()->m_pParamMgr->SetSamplerParameter( L"LinearSampler", &LinearSampler );
+						SamplerParameterDX11* pSamplerParameter = 
+							RendererDX11::Get()->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"LinearSampler" ) );
+
+						pSamplerParameter->InitializeParameterData( &LinearSampler );
 
 
 

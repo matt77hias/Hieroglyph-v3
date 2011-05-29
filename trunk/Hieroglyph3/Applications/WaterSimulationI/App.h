@@ -14,6 +14,8 @@
 #include "SpriteRendererDX11.h"
 #include "SpriteFontDX11.h"
 
+#include "VectorParameterDX11.h"
+
 using namespace Glyph3;
 
 class App : public Application, public IEventListener
@@ -51,4 +53,9 @@ protected:
 	SpriteRendererDX11*		m_pSpriteRenderer;
 
 	bool					m_bSaveScreenshot;
+
+	// Add parameter references here for setting parameters.
+	VectorParameterDX11*	m_pTimeFactors;
+	VectorParameterDX11*	m_pDispatchSize;
+	VectorParameterDX11*	m_pFinalColor;
 };

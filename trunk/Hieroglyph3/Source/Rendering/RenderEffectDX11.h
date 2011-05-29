@@ -30,7 +30,7 @@ namespace Glyph3
 		RenderEffectDX11();
 		virtual ~RenderEffectDX11();
 
-		void ConfigurePipeline( PipelineManagerDX11* pPipeline, ParameterManagerDX11* pParamManager );
+		void ConfigurePipeline( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager );
 
 	public:
 		int		m_iVertexShader;

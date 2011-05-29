@@ -16,41 +16,52 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 SamplerParameterDX11::SamplerParameterDX11()
 {
-	m_iSampler = -1;
+	for ( int i = 0; i <= NUM_THREADS; i++ )
+		m_iSampler[i] = -1;
 }
 //--------------------------------------------------------------------------------
 SamplerParameterDX11::SamplerParameterDX11( SamplerParameterDX11& copy )
 {
-	m_iSampler = copy.m_iSampler;
+	for ( int i = 0; i <= NUM_THREADS; i++ )
+		m_iSampler[i] = copy.m_iSampler[i];
 }
 //--------------------------------------------------------------------------------
 SamplerParameterDX11::~SamplerParameterDX11()
 {
 }
 //--------------------------------------------------------------------------------
-void SamplerParameterDX11::SetParameterData( void* pData )
+void SamplerParameterDX11::SetParameterData( void* pData, unsigned int threadID )
 {
-	m_iSampler = *reinterpret_cast<int*>( pData );
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	m_iSampler[threadID] = *reinterpret_cast<int*>( pData );
 }
 //--------------------------------------------------------------------------------
-ParameterType SamplerParameterDX11::GetParameterType()
+const ParameterType SamplerParameterDX11::GetParameterType()
 {
 	return( SAMPLER );
 }
 //--------------------------------------------------------------------------------
-int SamplerParameterDX11::GetIndex()
+int SamplerParameterDX11::GetIndex( unsigned int threadID )
 {
-	return( m_iSampler );
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	return( m_iSampler[threadID] );
 }
 //--------------------------------------------------------------------------------
-void SamplerParameterDX11::UpdateValue( RenderParameterDX11* pParameter )
+void SamplerParameterDX11::UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID )
 {
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
 	if ( pParameter )
 	{
 		if ( ( pParameter->GetParameterType() == SAMPLER ) && ( pParameter->GetName() == this->GetName() ) )
 		{
 			SamplerParameterDX11* pBuffer = (SamplerParameterDX11*)pParameter;
-			m_iSampler = pBuffer->GetIndex();
+			m_iSampler[threadID] = pBuffer->GetIndex( threadID );
 		}
 	}
 }

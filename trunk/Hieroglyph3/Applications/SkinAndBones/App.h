@@ -12,6 +12,7 @@
 #include "Scene.h"
 #include "SkinnedActor.h"
 #include "AnimationStream.h"
+#include "VectorParameterDX11.h"
 
 using namespace Glyph3;
 
@@ -49,4 +50,7 @@ protected:
 	AnimationStream<Vector3f>*	m_pAnimationStream;
 
 	bool					m_bSaveScreenshot;
+
+	VectorParameterDX11*	m_pLightColor;
+	VectorParameterDX11*	m_pLightPosition;
 };

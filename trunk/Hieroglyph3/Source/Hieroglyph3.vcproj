@@ -1466,6 +1466,10 @@
 				Name="Parameter System"
 				>
 				<File
+					RelativePath=".\Rendering\IParameterManager.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Rendering\ParameterManagerDX11.cpp"
 					>
 					<FileConfiguration
@@ -1498,22 +1502,6 @@
 					</File>
 					<File
 						RelativePath=".\Rendering\ConstantBufferParameterDX11.h"
-						>
-					</File>
-					<File
-						RelativePath=".\Rendering\EntityParameterDX11.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								UsePrecompiledHeader="2"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath=".\Rendering\EntityParameterDX11.h"
 						>
 					</File>
 					<File
@@ -1626,6 +1614,74 @@
 					</File>
 					<File
 						RelativePath=".\Rendering\VectorParameterDX11.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Parameter Writers"
+					>
+					<File
+						RelativePath=".\Rendering\ConstantBufferParameterWriterDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ConstantBufferParameterWriterDX11.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\MatrixArrayParameterWriterDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\MatrixArrayParameterWriterDX11.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\MatrixParameterWriterDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\MatrixParameterWriterDX11.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ParameterWriter.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ParameterWriter.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\SamplerParameterWriterDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\SamplerParameterWriterDX11.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ShaderResourceParameterWriterDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ShaderResourceParameterWriterDX11.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\UnorderedAccessParameterWriterDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\UnorderedAccessParameterWriterDX11.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\VectorParameterWriterDX11.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\VectorParameterWriterDX11.h"
 						>
 					</File>
 				</Filter>

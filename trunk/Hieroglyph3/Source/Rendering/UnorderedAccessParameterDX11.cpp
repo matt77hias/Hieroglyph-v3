@@ -16,49 +16,67 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 UnorderedAccessParameterDX11::UnorderedAccessParameterDX11()
 {
-	m_ParameterData.m_iUnorderedAccessView = -1;
-	m_ParameterData.m_iInitialCount = -1;
+	for ( int i = 0; i <= NUM_THREADS; i++ )
+	{
+		m_ParameterData[i].m_iUnorderedAccessView = -1;
+		m_ParameterData[i].m_iInitialCount = -1;
+	}
 }
 //--------------------------------------------------------------------------------
 UnorderedAccessParameterDX11::UnorderedAccessParameterDX11( UnorderedAccessParameterDX11& copy )
 {
-	m_ParameterData.m_iUnorderedAccessView = copy.m_ParameterData.m_iUnorderedAccessView;
-	m_ParameterData.m_iInitialCount = copy.m_ParameterData.m_iInitialCount;
+	for ( int i = 0; i <= NUM_THREADS; i++ )
+	{
+		m_ParameterData[i].m_iUnorderedAccessView = copy.m_ParameterData[i].m_iUnorderedAccessView;
+		m_ParameterData[i].m_iInitialCount = copy.m_ParameterData[i].m_iInitialCount;
+	}
 }
 //--------------------------------------------------------------------------------
 UnorderedAccessParameterDX11::~UnorderedAccessParameterDX11()
 {
 }
 //--------------------------------------------------------------------------------
-void UnorderedAccessParameterDX11::SetParameterData( void* pData )
+void UnorderedAccessParameterDX11::SetParameterData( void* pData, unsigned int threadID )
 {
-	m_ParameterData = *reinterpret_cast<UAVParameterData*>( pData );
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	m_ParameterData[threadID] = *reinterpret_cast<UAVParameterData*>( pData );
 }
 //--------------------------------------------------------------------------------
-ParameterType UnorderedAccessParameterDX11::GetParameterType()
+const ParameterType UnorderedAccessParameterDX11::GetParameterType()
 {
 	return( UNORDERED_ACCESS );
 }
 //--------------------------------------------------------------------------------
-int UnorderedAccessParameterDX11::GetIndex()
+int UnorderedAccessParameterDX11::GetIndex( unsigned int threadID )
 {
-	return( m_ParameterData.m_iUnorderedAccessView );
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	return( m_ParameterData[threadID].m_iUnorderedAccessView );
 }
 //--------------------------------------------------------------------------------
-unsigned int UnorderedAccessParameterDX11::GetInitialCount()
+unsigned int UnorderedAccessParameterDX11::GetInitialCount( unsigned int threadID )
 {
-	return( m_ParameterData.m_iInitialCount );
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	return( m_ParameterData[threadID].m_iInitialCount );
 }
 //--------------------------------------------------------------------------------
-void UnorderedAccessParameterDX11::UpdateValue( RenderParameterDX11* pParameter )
+void UnorderedAccessParameterDX11::UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID )
 {
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
 	if ( pParameter )
 	{
 		if ( ( pParameter->GetParameterType() == UNORDERED_ACCESS ) && ( pParameter->GetName() == this->GetName() ) )
 		{
 			UnorderedAccessParameterDX11* pBuffer = (UnorderedAccessParameterDX11*)pParameter;
-			m_ParameterData.m_iUnorderedAccessView = pBuffer->GetIndex();
-			m_ParameterData.m_iInitialCount = pBuffer->GetInitialCount();
+			m_ParameterData[threadID].m_iUnorderedAccessView = pBuffer->GetIndex( threadID );
+			m_ParameterData[threadID].m_iInitialCount = pBuffer->GetInitialCount( threadID );
 		}
 	}
 }

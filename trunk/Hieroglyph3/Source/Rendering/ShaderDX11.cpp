@@ -14,7 +14,7 @@
 #include "BufferConfigDX11.h"
 #include "Log.h"
 #include "GlyphString.h"
-#include "ParameterManagerDX11.h"
+#include "IParameterManager.h"
 #include "PipelineManagerDX11.h"
 #include "ConstantBufferDX11.h"
 //--------------------------------------------------------------------------------
@@ -29,7 +29,7 @@ ShaderDX11::~ShaderDX11()
 
 }
 //--------------------------------------------------------------------------------
-void ShaderDX11::UpdateParameters( PipelineManagerDX11* pPipeline, ParameterManagerDX11* pParamManager )
+void ShaderDX11::UpdateParameters( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
 {
 	// Renderer will call this function when binding the shader to the pipeline.
 	// This function will then call renderer functions to update each constant
@@ -42,7 +42,8 @@ void ShaderDX11::UpdateParameters( PipelineManagerDX11* pPipeline, ParameterMana
 			// Get the index of the constant buffer parameter currently set with 
 			// this name.
 
-			int index = pParamManager->GetConstantBufferParameter( ConstantBuffers[i].Description.Name );
+			int index = pParamManager->GetConstantBufferParameter( ConstantBuffers[i].pParamRef );
+//			int index = pParamManager->GetConstantBufferParameter( ConstantBuffers[i].Description.Name );
 
 			// If the constant buffer does not exist yet, create a one with 
 			// standard options - writeable by the CPU and only bound as a 
@@ -61,7 +62,8 @@ void ShaderDX11::UpdateParameters( PipelineManagerDX11* pPipeline, ParameterMana
 				ResourcePtr resource = RendererDX11::Get()->CreateConstantBuffer( &cbuffer, 0 );
 				index = resource->m_iResource;
 
-				pParamManager->SetConstantBufferParameter( ConstantBuffers[i].Description.Name, resource );
+				pParamManager->SetConstantBufferParameter( ConstantBuffers[i].pParamRef, resource );
+				//pParamManager->SetConstantBufferParameter( ConstantBuffers[i].Description.Name, resource );
 			}
 
 			// Test the index to ensure that it is a constant buffer
@@ -85,13 +87,14 @@ void ShaderDX11::UpdateParameters( PipelineManagerDX11* pPipeline, ParameterMana
 
 					for ( int j = 0; j < ConstantBuffers[i].Variables.count(); j++ )
 					{
-						const std::wstring& name = ConstantBuffers[i].Variables[j].Name;
+						RenderParameterDX11* pParam = ConstantBuffers[i].Parameters[j];
+						//const std::wstring& name = ConstantBuffers[i].Variables[j].Name;
 						int offset = ConstantBuffers[i].Variables[j].StartOffset;
 						UINT size = ConstantBuffers[i].Variables[j].Size;
 						
 						if ( ConstantBuffers[i].Types[j].Class == D3D10_SVC_VECTOR )
 						{
-							Vector4f vector = pParamManager->GetVectorParameter( name );
+							Vector4f vector = pParamManager->GetVectorParameter( pParam );
 							Vector4f* pBuf = (Vector4f*)((char*)resource.pData + offset);
 							*pBuf = vector;
 						}
@@ -102,7 +105,7 @@ void ShaderDX11::UpdateParameters( PipelineManagerDX11* pPipeline, ParameterMana
 							unsigned int count = ConstantBuffers[i].Types[j].Elements;
 							if ( count == 0 ) 
 							{
-								Matrix4f matrix = pParamManager->GetMatrixParameter( name );
+								Matrix4f matrix = pParamManager->GetMatrixParameter( pParam );
 								Matrix4f* pBuf = (Matrix4f*)((char*)resource.pData + offset);
 								*pBuf = matrix;
 							}
@@ -111,7 +114,7 @@ void ShaderDX11::UpdateParameters( PipelineManagerDX11* pPipeline, ParameterMana
 								// If a matrix array, then use the corresponding parameter type.
 								// TODO: If the shader expects a different number of matrices than are present
 								//       from the matrix array parameter, then this causes an exception!
-								Matrix4f* pMatrices = pParamManager->GetMatrixArrayParameter( name, count );
+								Matrix4f* pMatrices = pParamManager->GetMatrixArrayParameter( pParam );
 								memcpy( ((char*)resource.pData + offset), (char*)pMatrices, ConstantBuffers[i].Variables[j].Size );
 							}
 						}
@@ -132,7 +135,7 @@ void ShaderDX11::UpdateParameters( PipelineManagerDX11* pPipeline, ParameterMana
 	}
 }
 //--------------------------------------------------------------------------------
-void ShaderDX11::BindParameters( PipelineManagerDX11* pPipeline, ParameterManagerDX11* pParamManager )
+void ShaderDX11::BindParameters( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
 {
 	// Here the shader will attempt to bind each parameter needed by the pipeline.
 	// The renderer supplies methods for binding a parameter based on the name
@@ -141,46 +144,46 @@ void ShaderDX11::BindParameters( PipelineManagerDX11* pPipeline, ParameterManage
 
 	for ( int i = 0; i < ResourceBindings.count(); i++ )
 	{
-		const std::wstring& name = ResourceBindings[i].Name;
+		//const std::wstring& name = ResourceBindings[i].Name;
 		UINT slot = ResourceBindings[i].BindPoint;
 
 		switch ( ResourceBindings[i].Type )
 		{
 		case D3D10_SIT_CBUFFER:
-			pPipeline->BindConstantBufferParameter( GetType(), name, slot, pParamManager );
+			pPipeline->BindConstantBufferParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
 		case D3D10_SIT_TBUFFER:
-			pPipeline->BindConstantBufferParameter( GetType(), name, slot, pParamManager );
+			pPipeline->BindConstantBufferParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
 		case D3D10_SIT_TEXTURE:
-			pPipeline->BindShaderResourceParameter( GetType(), name, slot, pParamManager );
+			pPipeline->BindShaderResourceParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
 		case D3D10_SIT_SAMPLER:
-			pPipeline->BindSamplerStateParameter( GetType(), name, slot, pParamManager );
+			pPipeline->BindSamplerStateParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
 		case D3D11_SIT_UAV_RWTYPED:
-			pPipeline->BindUnorderedAccessParameter( GetType(), name, slot, pParamManager );
+			pPipeline->BindUnorderedAccessParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
 		case D3D11_SIT_STRUCTURED:
-			pPipeline->BindShaderResourceParameter( GetType(), name, slot, pParamManager );
+			pPipeline->BindShaderResourceParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
 		case D3D11_SIT_UAV_RWSTRUCTURED:
-			pPipeline->BindUnorderedAccessParameter( GetType(), name, slot, pParamManager );
+			pPipeline->BindUnorderedAccessParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
 		case D3D11_SIT_BYTEADDRESS:
-			pPipeline->BindShaderResourceParameter( GetType(), name, slot, pParamManager );
+			pPipeline->BindShaderResourceParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
 		case D3D11_SIT_UAV_RWBYTEADDRESS:
-			pPipeline->BindUnorderedAccessParameter( GetType(), name, slot, pParamManager );
+			pPipeline->BindUnorderedAccessParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
 		case D3D11_SIT_UAV_APPEND_STRUCTURED:
-			pPipeline->BindUnorderedAccessParameter( GetType(), name, slot, pParamManager );
+			pPipeline->BindUnorderedAccessParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
 		case D3D11_SIT_UAV_CONSUME_STRUCTURED:
-			pPipeline->BindUnorderedAccessParameter( GetType(), name, slot, pParamManager );
+			pPipeline->BindUnorderedAccessParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
 		case D3D11_SIT_UAV_RWSTRUCTURED_WITH_COUNTER:
-			pPipeline->BindUnorderedAccessParameter( GetType(), name, slot, pParamManager );
+			pPipeline->BindUnorderedAccessParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
 		}
 	}
