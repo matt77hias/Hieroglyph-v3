@@ -162,8 +162,8 @@ void SkinnedActor::SetSkinningMatrices( RendererDX11& Renderer )
 	// Update the CPU side animation matrices.
 	for ( int i = 0; i < m_Bones.count(); i++ )
 	{
-		m_pMatrices[i] = m_Bones[i]->GetTransform();
-		m_pNormalMatrices[i] = m_Bones[i]->GetNormalTransform();
+		m_pMatrices[i] = m_Bones[i]->GetTransform() * this->GetBody()->WorldMatrix();
+		m_pNormalMatrices[i] = m_Bones[i]->GetNormalTransform() * this->GetBody()->WorldMatrix();
 	}
 }
 //--------------------------------------------------------------------------------

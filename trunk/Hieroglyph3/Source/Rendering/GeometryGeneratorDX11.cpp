@@ -897,9 +897,6 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 						pActor->GetBody()->SetGeometry( pGeometry );
 						
 						pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );		
-						pActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedSolid( *RendererDX11::Get() ) );
-
-						//pActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedTextured( *RendererDX11::Get() ) );
 						
 						//pChild->AttachChild( pActor->GetGeometryEntity() );
 
@@ -926,8 +923,8 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 						SamplerStateConfigDX11 SamplerConfig;
 						SamplerConfig.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 						SamplerConfig.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-						//SamplerConfig.Filter = D3D11_FILTER_ANISOTROPIC;
-						//SamplerConfig.MaxAnisotropy = 16;
+						SamplerConfig.Filter = D3D11_FILTER_ANISOTROPIC;
+						SamplerConfig.MaxAnisotropy = 16;
 
 						int LinearSampler = RendererDX11::Get()->CreateSamplerState( &SamplerConfig );
 
@@ -935,16 +932,6 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 							RendererDX11::Get()->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"LinearSampler" ) );
 
 						pSamplerParameter->InitializeParameterData( &LinearSampler );
-
-
-
-
-						SkinnedBoneController* pChildController = (SkinnedBoneController*)pChild->GetController( 0 );
-						//pChildController->SetBindPosition( Vector3f( 0.0f, 0.0f, 0.0f ) );
-						//pChildController->SetBindRotation( Vector3f( 0.0f, 0.0f, 0.0f ) );
-
-						
-						//pChildController->SetBindRotation( Vector3f( 1.5f + 6.28f, 1.5f + 6.28f, 0.0f + 6.28f ) );
 					}
 				}
 			}

@@ -110,9 +110,7 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 
-//	m_pRenderer11->pImmPipeline->SetViewPort( m_pRenderer11->CreateViewPort( viewport ) );
-//	m_pRenderer11->m_pDeferredPipeline->SetViewPort( 0 );
-	
+	// Create the text rendering classes.
 	m_pFont = new SpriteFontDX11();
 	m_pFont->Initialize( L"Consolas", 16.0f, 0, false );
 	
@@ -143,7 +141,7 @@ void App::ShutdownEngineComponents()
 void App::Initialize()
 {
 	// Create and initialize the geometry to be rendered.  This represents a 
-	// heightmap that will be tessellated modified with the water state.
+	// heightmap that will be displaced with the water state at each vertex.
 
 	const int DispatchSizeX = 16;
 	const int DispatchSizeZ = 16;
@@ -154,7 +152,7 @@ void App::Initialize()
 	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	
 
-	// Create the material for use by the entity.
+	// Create the material for use by the heightmap.
 	MaterialDX11* pMaterial = new MaterialDX11();
 
 	// Create and fill the effect that will be used for this view type
@@ -182,7 +180,8 @@ void App::Initialize()
 	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
 	pMaterial->Params[VT_PERSPECTIVE].vViews.add( new ViewSimulation( *m_pRenderer11, DispatchSizeX, DispatchSizeZ ) );
 
-	// Set any parameters that will be needed by the shaders used above.
+	// Initialize parameter values that will be needed by the shaders used above.
+
 	Vector4f DispatchSize = Vector4f( (float)DispatchSizeX, (float)DispatchSizeZ, (float)DispatchSizeX * 16, (float)DispatchSizeZ * 16 );
 	m_pDispatchSize = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"DispatchSize" ) );
 	m_pDispatchSize->InitializeParameterData( &DispatchSize );
@@ -202,8 +201,8 @@ void App::Initialize()
 	m_pCamera->SetCameraView( m_pRenderView );
 	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, 1024.0f / 640.0f, static_cast<float>( D3DX_PI ) / 2.0f );
 
-	// Create the scene and add the entities to it.  Then add the camera to the
-	// scene so that it will be updated via the scene interface instead of 
+	// Create the desired scene and add the entities to it.  Then add the camera to the
+	// scene so that it will be updated automatically via the scene interface instead of 
 	// manually manipulating it.
 
 	m_pNode = new Node3D();
@@ -219,7 +218,8 @@ void App::Initialize()
 
 	m_pRenderer11->SetMultiThreadingState( false );
 
-	// Get a handle to the render parameters that the application will be setting.
+	// Get a handle to the render parameters that the application will be setting every
+	// frame.  This allows for fast parameter setting.
 	m_pTimeFactors = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"TimeFactors" ) );
 }
 //--------------------------------------------------------------------------------
@@ -242,10 +242,6 @@ void App::Update()
 
 	m_pTimeFactors->InitializeParameterData( &TimeFactors );
 
-	//std::wstringstream s;
-	//s << L"Frame Number: " << m_pTimer->FrameCount() << L" Elapsed Time: " << m_pTimer->Elapsed();
-	//Log::Get().Write( s.str() );
-
 
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.
@@ -253,8 +249,8 @@ void App::Update()
 	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
 
 
-	// Manipulate the scene here - simply rotate the root of the scene in this
-	// example.
+	// Manipulate the scene here - simply rotate the root of the scene proportionally to
+	// the amount of time that has passed between frames.
 
 	Matrix3f rotation;
 	rotation.RotationY( m_pTimer->Elapsed() * 0.2f );
@@ -271,11 +267,13 @@ void App::Update()
 	//m_pRenderer11->EndPipelineStatistics();
 	//Log::Get().Write( m_pRenderer11->PrintPipelineStatistics() );
 
+	// Render the onscreen text.
+
 	std::wstringstream out;
 	out << L"Hieroglyph 3 : Water Simulation\nFPS: " << m_pTimer->Framerate();
 
-
 	m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, *m_pFont, out.str().c_str(), Matrix4f::Identity() );
+
 
 	// Perform the rendering and presentation for the window.
 
@@ -296,9 +294,7 @@ void App::Update()
 void App::Shutdown()
 {
 	SAFE_DELETE( m_pEntity );
-	
 	SAFE_DELETE( m_pNode );
-
 	SAFE_DELETE( m_pCamera );
 
 	// Print the framerate out for the log before shutting down.
@@ -348,6 +344,6 @@ bool App::HandleEvent( IEvent* pEvent )
 //--------------------------------------------------------------------------------
 std::wstring App::GetName( )
 {
-	return( std::wstring( L"BasicApplication" ) );
+	return( std::wstring( L"WaterSimulation" ) );
 }
 //--------------------------------------------------------------------------------

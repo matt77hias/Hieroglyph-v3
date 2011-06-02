@@ -43,7 +43,10 @@ protected:
 
 	ViewPerspective*		m_pRenderView;
 	Node3D*					m_pNode;
-	SkinnedActor*			m_pActor;
+	
+	SkinnedActor*			m_pSkinnedActor;
+	SkinnedActor*			m_pDisplacedActor;
+	Actor*					m_pStaticActor;
 	
 	Camera*					m_pCamera;
 

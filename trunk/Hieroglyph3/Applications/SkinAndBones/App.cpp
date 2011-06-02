@@ -23,7 +23,7 @@
 #include "IParameterManager.h"
 
 #include "GeometryGeneratorDX11.h"
-#include "ShaderResourceParameterDX11.h"
+#include "ShaderResourceParameterWriterDX11.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -89,11 +89,6 @@ bool App::ConfigureEngineComponents()
 	Config.SetWidth( m_pWindow->GetWidth() );
 	Config.SetHeight( m_pWindow->GetHeight() );
 	Config.SetOutputWindow( m_pWindow->GetHandle() );
-	//DXGI_SAMPLE_DESC sampleDesc;
-	//sampleDesc.Count = 4;
-	//sampleDesc.Quality = 1;
-	//Config.SetSampleDesc( sampleDesc );
-	//Config.SetFormat(DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_pWindow->SetSwapChain( m_pRenderer11->CreateSwapChain( &Config ) );
 
 	// We'll keep a copy of the swap chain's render target index to 
@@ -138,25 +133,14 @@ void App::ShutdownEngineComponents()
 //--------------------------------------------------------------------------------
 void App::Initialize()
 {
-	// Create and initialize the geometry to be rendered.  
-	//GeometryDX11* pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
-	//GeometryDX11* pGeometry = new GeometryDX11();
-	//GeometryGeneratorDX11::GenerateSkinnedBiped( pGeometry );
-	//pGeometry->LoadToBuffers();
-	//pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
-	//pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_LINELIST );
 
-	// Create the material for use by the entity.
-	//MaterialDX11* pMaterial = MaterialGeneratorDX11::GenerateSkinnedSolid( *m_pRenderer11 );
-	//MaterialDX11* pMaterial = 0;
-
-	// Create the parameters for use with this effect
+	// Create the light parameters for use with this effect
 
 	Vector4f LightParams = Vector4f( 0.2f, 0.7f, 0.2f, 0.7f );
 	m_pLightColor = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightColor" ) );
 	m_pLightColor->InitializeParameterData( &LightParams );
 
-	Vector4f LightPosition = Vector4f( -1000.0f, 2000.0f, 2000.0f, 0.0f );
+	Vector4f LightPosition = Vector4f( -1000.0f, 200.0f, 0.0f, 0.0f );
 	m_pLightPosition = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightPositionWS" ) );
 	m_pLightPosition->InitializeParameterData( &LightPosition );
 
@@ -165,94 +149,78 @@ void App::Initialize()
 	// from the camera's point of view of the scene.
 
 	m_pCamera = new Camera();
-	//m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.90f, 0.7f, 0.0f ) );
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.30f, 1.5f, 0.0f ) );
 	m_pCamera->GetNode()->Position() = Vector3f( -20.0f, 25.0f, 10.0f );
-	//m_pCamera->GetNode()->Position() = Vector3f( -4.0f, 6.0f, -4.0f );
-	//m_pCamera->GetNode()->Position() = Vector3f( 400.0f, 75.0f, 50.0f );
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.1f, 0.1f, 0.3f, 0.0f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
 	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, 800.0f / 600.0f, static_cast<float>( D3DX_PI ) / 2.0f );
-	//m_pCamera->SetProjectionParams( 0.1f, 100.0f, 1.0f / 1.0f, static_cast<float>( D3DX_PI ) / 2.0f );
+
 
 	// Create the scene and add the entities to it.  Then add the camera to the
 	// scene so that it will be updated via the scene interface instead of 
 	// manually manipulating it.
 
 	m_pNode = new Node3D();
-	
-	// Create the skinned actor.  This actor is essentially a single entity that
-	// geometry representing the bind pose for the actor.  The bone information
-	// must be present in the geometry, and then a node must be added to the 
-	// skinned actor's root node for each bone required in the model.
-	
-	// Each node/bone is then used to calculate the transformation matrices for
-	// their respective vertices.  This allows each of the nodes to be controlled
-	// relative to their parent node, and automatically update the required 
-	// transforms used to render the posed mesh.
 
-	m_pActor = new SkinnedActor();
+
+	// Create the displaced skinned actor
+
+	m_pDisplacedActor = new SkinnedActor();
 	GeometryDX11* pGeometry = new GeometryDX11();
-	
-	//GeometryLoaderDX11::loadMS3DFileWithAnimation( std::wstring( L"../Data/Models/TBone.ms3d" ), m_pActor );
-	//GeometryLoaderDX11::loadMS3DFileWithAnimationAndWeights( std::wstring( L"../Data/Models/Soldier_LOD1.ms3d" ), m_pActor );
-	//GeometryLoaderDX11::loadMS3DFileWithAnimationAndWeights( std::wstring( L"../Data/Models/TBone2.ms3d" ), m_pActor );
-	GeometryGeneratorDX11::GenerateWeightedSkinnedCone( pGeometry, 10, 20, 2.0f, 40.0f, 6, m_pActor );
-	
-	//GeometryDX11* pStaticGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Dropship_LOD0.ms3d" ) );
-	//pStaticGeometry->LoadToBuffers();
-	//MaterialDX11* pStaticMaterial = MaterialGeneratorDX11::GenerateStaticTextured(*RendererDX11::Get());
-
-	//Entity3D* pEntity2 = new Entity3D();
-	//pEntity2->SetGeometry( pStaticGeometry );
-	//pEntity2->SetMaterial( pStaticMaterial );
+	GeometryGeneratorDX11::GenerateWeightedSkinnedCone( pGeometry, 10, 20, 2.0f, 40.0f, 6, m_pDisplacedActor );
+	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
+	m_pDisplacedActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedSolid( *m_pRenderer11 ) );
+	m_pDisplacedActor->GetNode()->Position() = Vector3f( 0.0f, 0.0f, 0.0f );
 
 	
-	//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/dropship_colormap_default.png" );
+	// Create the skinned actor without displacement
+
+	m_pSkinnedActor = new SkinnedActor();
+	GeometryDX11* pSkinnedGeometry = new GeometryDX11();
+	GeometryGeneratorDX11::GenerateWeightedSkinnedCone( pSkinnedGeometry, 10, 20, 2.0f, 40.0f, 6, m_pSkinnedActor );
+	pSkinnedGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	m_pSkinnedActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedTextured( *m_pRenderer11 ) );
+	m_pSkinnedActor->GetNode()->Position() = Vector3f( 0.0f, 0.0f, 40.0f );
+
 	
-	//ShaderResourceParameterDX11* pTextureParameter = new ShaderResourceParameterDX11();
-	//pTextureParameter->SetName( L"ColorTexture" );
-	//pTextureParameter->SetParameterData( &ColorTexture->m_iResourceSRV );
-	//pEntity2->AddRenderParameter( pTextureParameter );
+	// Generate the static mesh, and attach a texture to its entity
 
-	//m_pActor->GetBody()->SetMaterial( pMaterial, false );
-
-
-
-	//GeometryDX11* pStaticGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Box.ms3d" ) );
-	//pStaticGeometry->LoadToBuffers();
-	//MaterialDX11* pStaticMaterial = MaterialGeneratorDX11::GenerateStaticTextured(*RendererDX11::Get());
-
-	//Entity3D* pEntity2 = new Entity3D();
-	//pEntity2->SetGeometry( pStaticGeometry );
-	//pEntity2->SetMaterial( pStaticMaterial );
-
-	//
-	//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/Tiles.png" );
-	//
-	//ShaderResourceParameterDX11* pTextureParameter = new ShaderResourceParameterDX11();
-	//pTextureParameter->SetName( L"ColorTexture" );
-	//pTextureParameter->SetParameterData( &ColorTexture->m_iResourceSRV );
-	//pEntity2->AddRenderParameter( pTextureParameter );
+	m_pStaticActor = new Actor();
+	m_pStaticActor->GetBody()->Position() = Vector3f( 0.0f, 0.0f, 20.0f );
+	GeometryDX11* pStaticGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
+	pStaticGeometry->LoadToBuffers();
+	MaterialDX11* pStaticMaterial = MaterialGeneratorDX11::GenerateStaticTextured(*RendererDX11::Get());
+	m_pStaticActor->GetBody()->SetGeometry( pStaticGeometry );
+	m_pStaticActor->GetBody()->SetMaterial( pStaticMaterial );
+	
+	ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/Tiles.png" );
+	ShaderResourceParameterWriterDX11* pTextureParameter = new ShaderResourceParameterWriterDX11();
+	pTextureParameter->SetRenderParameterRef(
+		(RenderParameterDX11*)m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) ) );
+	pTextureParameter->SetValue( ColorTexture );
+	m_pStaticActor->GetBody()->AddRenderParameter( pTextureParameter );
 
 
-	//m_pActor->GetBody()->SetMaterial( pMaterial, false );
+	// Attach the actors to the scene, so that they will be rendered all together.
 
-
-
-
-
-	m_pNode->AttachChild( m_pActor->GetNode() );
-	//m_pNode->AttachChild( pEntity2 );
+	m_pNode->AttachChild( m_pDisplacedActor->GetNode() );
+	m_pNode->AttachChild( m_pSkinnedActor->GetNode() );
+	m_pNode->AttachChild( m_pStaticActor->GetNode() );
 
 	m_pScene->AddEntity( m_pNode );
 	m_pScene->AddCamera( m_pCamera );
 
-	m_pActor->SetBindPose();
-	m_pActor->SetSkinningMatrices( *m_pRenderer11 );
 
-	m_pActor->PlayAllAnimations();
+	// Setup the skinned actors' bind poses and start their animations.
+
+	m_pDisplacedActor->SetBindPose();
+	m_pDisplacedActor->SetSkinningMatrices( *m_pRenderer11 );
+	m_pDisplacedActor->PlayAllAnimations();
+
+	m_pSkinnedActor->SetBindPose();
+	m_pSkinnedActor->SetSkinningMatrices( *m_pRenderer11 );
+	m_pSkinnedActor->PlayAllAnimations();
 
 	m_pRenderer11->SetMultiThreadingState( false );
 }
@@ -271,19 +239,12 @@ void App::Update()
 	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
 
 
-	// Manipulate the scene here - simply rotate the root of the scene in this
-	// example.
-
-	Matrix3f rotation;
-	rotation.RotationY( m_pTimer->Elapsed() * 0.2f );
-	//m_pNode->Rotation() *= rotation;
-
-
 	// Update the scene, and then render all cameras within the scene.
 
 	m_pScene->Update( m_pTimer->Elapsed() );
 
-	m_pActor->SetSkinningMatrices( *m_pRenderer11 );
+	m_pDisplacedActor->SetSkinningMatrices( *m_pRenderer11 );
+	m_pSkinnedActor->SetSkinningMatrices( *m_pRenderer11 );
 
 	m_pScene->Render( m_pRenderer11 );
 
@@ -306,10 +267,11 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pActor );
+	SAFE_DELETE( m_pStaticActor );
+	SAFE_DELETE( m_pSkinnedActor );
+	SAFE_DELETE( m_pDisplacedActor );
 	
 	SAFE_DELETE( m_pNode );
-
 	SAFE_DELETE( m_pCamera );
 
 	// Print the framerate out for the log before shutting down.
@@ -359,6 +321,6 @@ bool App::HandleEvent( IEvent* pEvent )
 //--------------------------------------------------------------------------------
 std::wstring App::GetName( )
 {
-	return( std::wstring( L"BasicApplication" ) );
+	return( std::wstring( L"SkinAndBones" ) );
 }
 //--------------------------------------------------------------------------------

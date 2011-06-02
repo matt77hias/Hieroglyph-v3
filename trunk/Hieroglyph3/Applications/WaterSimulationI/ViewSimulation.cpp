@@ -31,7 +31,7 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX, int SizeY )
 	int PointCountX = SizeX * 16;
 	int PointCountY = SizeY * 16;
 
-	// Prepare some intial state data for the simulation.
+	// Prepare some intial height data for the simulation.
 
 	GridPoint* pData = new GridPoint[PointCountX*PointCountY];
 	for ( int j = 0; j < PointCountY; j++ )
@@ -70,8 +70,8 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX, int SizeY )
 	WaterState[0] = Renderer.CreateStructuredBuffer( &config, &InitialData );
 	WaterState[1] = Renderer.CreateStructuredBuffer( &config, &InitialData );
 
-	// Release the system memory since the simulation is now going to be run on
-	// the GPU :)
+	// Release the system memory since the simulation state is now going to be
+	// managed by the GPU.
 
 	delete[] pData;
 
@@ -84,6 +84,7 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX, int SizeY )
 		std::wstring( L"CSMAIN" ),
 		std::wstring( L"cs_4_0" ) );
 
+	// Get references to the parameters that will be updated throughout the simulation.
 	m_pCurrentWaterState = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"CurrentWaterState" ) );
 	m_pNewWaterState = Renderer.m_pParamMgr->GetUnorderedAccessParameterRef( std::wstring( L"NewWaterState" ) );
 	m_pDispatchSize = Renderer.m_pParamMgr->GetVectorParameterRef( std::wstring( L"DispatchSize" ) );
@@ -126,11 +127,8 @@ void ViewSimulation::SetRenderParams( IParameterManager* pParamManager )
 	// sequence.  In this case, water state '0' is always considered the current
 	// state.
 
-	//pParamManager->SetShaderResourceParameter( L"CurrentWaterState", WaterState[0] );
-	//pParamManager->SetUnorderedAccessParameter( L"NewWaterState", WaterState[1] );
 	pParamManager->SetShaderResourceParameter( m_pCurrentWaterState, WaterState[0] );
 	pParamManager->SetUnorderedAccessParameter( m_pNewWaterState, WaterState[1] );
-
 }
 //--------------------------------------------------------------------------------
 void ViewSimulation::SetUsageParams( IParameterManager* pParamManager )
@@ -138,14 +136,9 @@ void ViewSimulation::SetUsageParams( IParameterManager* pParamManager )
 	// Set the parameters for allowing an application to use the current state
 	// as a height map via a shader resource view.
 
-
 	Vector4f DispatchSize = Vector4f( 16.0f, 16.0f, 16.0f * 16.0f, 16.0f * 16.0f );
-
-	//pParamManager->SetVectorParameter( std::wstring( L"DispatchSize" ), &DispatchSize );
-	//pParamManager->SetShaderResourceParameter( L"CurrentWaterState", WaterState[0] );
 
 	pParamManager->SetShaderResourceParameter( m_pCurrentWaterState, WaterState[0] );
 	pParamManager->SetVectorParameter( m_pDispatchSize, &DispatchSize );
-
 }
 //--------------------------------------------------------------------------------
