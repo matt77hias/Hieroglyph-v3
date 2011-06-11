@@ -24,6 +24,8 @@ namespace Glyph3
 {
 	class Entity3D;
 
+	// The basic particle structure that we will be using.
+
 	struct Particle
 	{
 		Vector3f position;
@@ -31,6 +33,7 @@ namespace Glyph3
 		float    time;
 	};
 
+	
 	class ViewSimulation : public IRenderView
 	{
 	public:
@@ -56,18 +59,19 @@ namespace Glyph3
 		ResourcePtr ParticleCountCBBuffer; // Constant buffer
 		ResourcePtr ParticleCountIABuffer; // Indirect args
 
+		// The render effects that we will use for inserting particles and updating
+		// their state in the simulation.
 
 		RenderEffectDX11*	pParticleInsertion;
 		RenderEffectDX11*	pParticleUpdate;
 		bool bOneTimeInit;
 
-		Timer pTimer;
+		// The various rendering parameters that will be used by this render view.
 
 		UnorderedAccessParameterDX11* pCurrentSimState;
 		UnorderedAccessParameterDX11* pNextSimState;
 		ShaderResourceParameterDX11* pSimState;
 		VectorParameterDX11* pRandomVector;
-		//VectorParameterDX11* pDispatchSize;
 	};
 };
 //--------------------------------------------------------------------------------

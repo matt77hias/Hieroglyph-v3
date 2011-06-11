@@ -60,6 +60,9 @@ ParticleSystemEntity::ParticleSystemEntity()
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 
+	// We will use additive blending, so configure each state appropriately.
+	// TODO: Should add a preconfigured method to the BlendStateConfigDX11 for
+	//       doing this...
 	BlendStateConfigDX11 BS;
 	BS.RenderTarget[0].BlendEnable = true;
 	BS.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
@@ -77,10 +80,14 @@ ParticleSystemEntity::ParticleSystemEntity()
 	pEffect->m_iDepthStencilState =
 		pRenderer11->CreateDepthStencilState( &DS );
 
+	// This block can be uncommented to allow wireframe viewing of the particles...
 	//RasterizerStateConfigDX11 RS;
 	//RS.FillMode = D3D11_FILL_WIREFRAME;
 	//pEffect->m_iRasterizerState = 
 	//	pRenderer11->CreateRasterizerState( &RS );
+
+	// Create the render view that will run the simulation.  The size should be
+	// selected accordingly for the maximum number of particles.
 
 	m_pSimulation = new ViewSimulation( *pRenderer11, 16384 * 32 );
 
@@ -89,6 +96,9 @@ ParticleSystemEntity::ParticleSystemEntity()
 	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
 	pMaterial->Params[VT_PERSPECTIVE].vViews.add( m_pSimulation );
 
+
+	// Create and attach the needed render parameters to the entity.  This consists of
+	// the sampler and the texture being used for the particle rendering.
 
 	SamplerStateConfigDX11 SamplerConfig;
 	LinearSampler = pRenderer11->CreateSamplerState( &SamplerConfig );
@@ -99,8 +109,8 @@ ParticleSystemEntity::ParticleSystemEntity()
 	pSamplerWriter->SetValue( LinearSampler );
 	this->AddRenderParameter( pSamplerWriter );
 
-
 	ParticleTexture = pRenderer11->LoadTexture( L"../Data/Textures/Particle.png" );
+
 	ShaderResourceParameterWriterDX11* pTextureWriter = new ShaderResourceParameterWriterDX11();
 	pTextureWriter->SetRenderParameterRef( pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ParticleTexture" ) ) );
 	pTextureWriter->SetValue( ParticleTexture );
@@ -140,10 +150,10 @@ void ParticleSystemEntity::Render( PipelineManagerDX11* pPipelineManager, IParam
 			// Set the entity render parameters
 			this->SetRenderParams( pParamManager );
 
-			// Send the geometry to the renderer using the appropriate
-			// material view effect.
-			//pPipelineManager->Draw( *m_sParams.pMaterial->Params[view].pEffect, *m_sParams.pGeometry, pParamManager );
-
+			// Send the geometry to the renderer using the DrawIndirect() method.
+			// This uses the indirect args buffer to determine how many particles
+			// need to be rendered, allowing this entity to be oblivious to how many
+			// particles it currently has...
 			RenderEffectDX11* pEffect = m_sParams.pMaterial->Params[view].pEffect;
 
 			pPipelineManager->DrawIndirect( 

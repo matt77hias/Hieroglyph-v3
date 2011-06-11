@@ -111,9 +111,6 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 
-//	m_pRenderer11->pImmPipeline->SetViewPort( m_pRenderer11->CreateViewPort( viewport ) );
-//	m_pRenderer11->m_pDeferredPipeline->SetViewPort( 0 );
-	
 	m_pFont = new SpriteFontDX11();
 	m_pFont->Initialize( L"Consolas", 16.0f, 0, false );
 	
@@ -210,14 +207,6 @@ void App::Update()
 	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
 
 
-	// Manipulate the scene here - simply rotate the root of the scene in this
-	// example.
-
-	Matrix3f rotation;
-	rotation.RotationY( m_pTimer->Elapsed() * 0.2f );
-	//m_pNode->Rotation() *= rotation;
-
-
 	// Update the scene, and then render all cameras within the scene.
 
 	m_pRenderer11->pImmPipeline->StartPipelineStatistics();
@@ -246,16 +235,14 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"WaterSimulation_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"ParticleStorm_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
 	SAFE_DELETE( m_pEntity );
-	
 	SAFE_DELETE( m_pNode );
-
 	SAFE_DELETE( m_pCamera );
 
 	// Print the framerate out for the log before shutting down.
@@ -305,6 +292,6 @@ bool App::HandleEvent( IEvent* pEvent )
 //--------------------------------------------------------------------------------
 std::wstring App::GetName( )
 {
-	return( std::wstring( L"BasicApplication" ) );
+	return( std::wstring( L"ParticleStorm" ) );
 }
 //--------------------------------------------------------------------------------

@@ -26,31 +26,23 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 
 	m_sParams.iViewType = VT_SIMULATION;
 
-	// Remember what number of thread groups to run in the dispatch call.
+	// Remember what number of thread groups to run in the dispatch call.  This
+	// allows the creator of this view to choose the size of buffers to create
+	// instead of hard coding it.
 
 	m_iParticleCount = SizeX;
 
-	// Prepare some intial state data for the simulation.
+
+	// Prepare some intial state data for the simulation.  Since the particle 
+	// data is added into the simulation dynamically, this data actually won't
+	// be used for anything.
 
 	Particle* pData = new Particle[m_iParticleCount];
 
-	srand( 1 );
-
-	const float scale = 200.0f;
-	const float vel_scale = 10.0f;
 	for ( int i = 0; i < m_iParticleCount; i++ )
 	{
-		float fRandomX = ( (float)rand() / (float)RAND_MAX * scale - scale/2.0f );
-		float fRandomY = ( (float)rand() / (float)RAND_MAX * scale - scale/2.0f );
-		float fRandomZ = ( (float)rand() / (float)RAND_MAX * scale - scale/2.0f );
-		pData[i].position = Vector3f( fRandomX, fRandomY, fRandomZ );
-
-		float fRandomRX = ( (float)rand() / (float)RAND_MAX * vel_scale - vel_scale/2.0f );
-		float fRandomRY = ( (float)rand() / (float)RAND_MAX * vel_scale - vel_scale/2.0f );
-		float fRandomRZ = ( (float)rand() / (float)RAND_MAX * vel_scale - vel_scale/2.0f );
-
-		pData[i].direction = Vector3f( fRandomRX, fRandomRY, fRandomRZ );
-		pData[i].time = 10.0f;
+		pData[i].position.MakeZero();
+		pData[i].direction = Vector3f( 0.0f, 0.0f, 1.0f );
 	}
 
 	D3D11_SUBRESOURCE_DATA InitialData;
@@ -58,27 +50,30 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 	InitialData.SysMemPitch			= 0;
 	InitialData.SysMemSlicePitch	= 0;
 
+
 	// Create the resources that will hold the state of the simulation, and initialized
-	// to the state specified above.
+	// to the state specified above.  We create two buffers with the same set of 
+	// options to serve as the current and next simulation states, respectively.
 
 	BufferConfigDX11 config;
 	config.SetDefaultStructuredBuffer( m_iParticleCount, sizeof( Particle ) );
 	config.SetBindFlags( D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE );
 	config.SetMiscFlags( D3D11_RESOURCE_MISC_BUFFER_STRUCTURED );
 	
-
 	ResourcePtr buffer1 = Renderer.CreateStructuredBuffer( &config, &InitialData );
 	ResourcePtr buffer2 = Renderer.CreateStructuredBuffer( &config, &InitialData );
 
-	// Release the system memory since the simulation data is now on the GPU :)
+	// Release the system memory after buffer creation, since the simulation data is 
+	// now on the GPU :)
 
 	delete[] pData;
-
 
 	
 	D3D11_BUFFER_UAV uav;
 
-	// Create a UAV for the first half of the buffer
+	// Create a UAV and SRV for the first buffer to allow use both as a source of 
+	// data and a destination for updated data.
+
 	uav.FirstElement = 0;
 	uav.NumElements = m_iParticleCount;
 	uav.Flags = D3D11_BUFFER_UAV_FLAG_APPEND;
@@ -102,7 +97,10 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 																NULL,
                                                                 &firstHalfUAV ) );
 
-	// Create a UAV for the second half of the buffer
+
+	// Create a UAV and SRV for the second buffer to allow use both as a source of 
+	// data and a destination for updated data.
+
 	uav.FirstElement = 0;
 	uav.NumElements = m_iParticleCount;
 	uav.Flags = D3D11_BUFFER_UAV_FLAG_APPEND;
@@ -126,10 +124,14 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
                                                                 &secondHalfUAV ) );
 
 
+	// Create a buffer to be used as the constant buffer for particle counts.  This 
+	// is initialized to all zeros, since the particle buffers start out empty.  The 
+	// current number of particles is dynamically loaded into the buffer with the 
+	// CopyStuctureCount method.
 
 	UINT* pInitArgs = new UINT[4];
 
-	pInitArgs[0] = 0 /*m_iParticleCount*/;
+	pInitArgs[0] = 0;
 	pInitArgs[1] = 0;
 	pInitArgs[2] = 0;
 	pInitArgs[3] = 0;
@@ -152,7 +154,14 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 	Renderer.m_pParamMgr->SetConstantBufferParameter( L"ParticleCount", ParticleCountCBBuffer );
 
 
-	pInitArgs[0] = 0 /*m_iParticleCount*/;
+	// Create a buffer to be used as the inidirect arguments buffer.  This is initialized to
+	// all zeros, since the particle buffers start out empty.  The current number of particles
+	// is dynamically loaded into the buffer with the CopyStuctureCount method.
+	//
+	// The second argument is set to a 1, since we will be using the DrawInstancedIndirect() method,
+	// and it indicates to use one instance of the data in the buffer.
+
+	pInitArgs[0] = 0;
 	pInitArgs[1] = 1;
 	pInitArgs[2] = 0;
 	pInitArgs[3] = 0;
@@ -162,12 +171,8 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 	InitArgsData.SysMemSlicePitch		= 0;
 
 	ArgsConfig.SetDefaultIndirectArgsBuffer( 4 * sizeof( UINT ) );
-	//ArgsConfig.SetBindFlags( D3D11_BIND_CONSTANT_BUFFER );
 	ArgsConfig.SetUsage( D3D11_USAGE_DEFAULT );
-	//ArgsConfig.SetCPUAccessFlags( D3D11_CPU_ACCESS_READ );
 	ParticleCountIABuffer = Renderer.CreateIndirectArgsBuffer( &ArgsConfig, &InitArgsData );
-
-
 
 
 
@@ -188,11 +193,12 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 		std::wstring( L"cs_5_0" ) );
 
 	
+	// Get handles to all of the rendering parameters that we will be using.
+
 	pCurrentSimState = Renderer.m_pParamMgr->GetUnorderedAccessParameterRef( std::wstring( L"CurrentSimulationState" ) );
 	pNextSimState = Renderer.m_pParamMgr->GetUnorderedAccessParameterRef( std::wstring( L"NewSimulationState" ) );
 	pSimState = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"SimulationState" ) );
 	pRandomVector = Renderer.m_pParamMgr->GetVectorParameterRef( std::wstring( L"RandomVector" ) );
-	//pDispatchSize  = Renderer.m_pParamMgr->GetVectorParameterRef( std::wstring( L"RandomVector" ) );
 }
 //--------------------------------------------------------------------------------
 ViewSimulation::~ViewSimulation()
@@ -219,6 +225,7 @@ void ViewSimulation::PreDraw( RendererDX11* pRenderer )
 	// Queue this view into the renderer for processing.  Since this is a 
 	// simulation style view, there is no root and hence no additional recursive
 	// 'PreDraw'ing required.
+
 	pRenderer->QueueRenderView( this );
 }
 //--------------------------------------------------------------------------------
@@ -228,42 +235,28 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterMana
 	SetRenderParams( pParamManager );
 
 	
-	// Add any new particles here
-	
+	// Add any new particles here.  For now we simply add one batch of particles every
+	// frame.  If there are issues with overflowing the buffer then we would need to 
+	// throttle the creation of new particles here.	
 
 	pPipelineManager->Dispatch( *pParticleInsertion, 1, 1, 1, pParamManager );
 
 
+	// Update the particles with a fixed number of threads.  The unused threads will simply
+	// not do anything, as they can't read any data from the Append/Consume buffer.
 
-	// Update the particles with a fixed number of threads, and mask off the unused threads
-	// with the particle count read out above.
 	pPipelineManager->Dispatch( *pParticleUpdate, 1024, 1, 1, pParamManager );
 
-	// Read out the total number of particles for updating
+
+	// Read out the total number of particles for updating into a constant buffer and an
+	// indirect argument buffer.
+
 	pPipelineManager->CopyStructureCount( ParticleCountCBBuffer, 0, ParticleStateBuffers[1] );
 	pPipelineManager->CopyStructureCount( ParticleCountIABuffer, 0, ParticleStateBuffers[1] );
 
 
-//	pPipelineManager->ClearPipelineResources();
-//	pPipelineManager->ApplyPipelineResources();
-
-	
-//	pPipelineManager->CopyStructureCount( DrawArgsBuffer, 0, ParticleStateBuffers[0] );
-//	pPipelineManager->CopyStructureCount( DrawArgsBuffer, 4, ParticleStateBuffers[1] );
-
-//	mapped = pPipelineManager->MapResource( DrawArgsBuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
-//	pData = (UINT*)mapped.pData;
-//	data[0] = pData[0];
-//	data[1] = pData[1];
-//	data[2] = pData[2];
-//	data[3] = pData[3];
-//	pPipelineManager->UnMapResource( DrawArgsBuffer->m_iResource, 0 );
-
-
-	// Read out the total number of particles for rendering
-
-
 	// Switch the two resources so that the current state is maintained in slot 0.
+
 	ResourcePtr TempState = ParticleStateBuffers[0];
 	ParticleStateBuffers[0] = ParticleStateBuffers[1];
 	ParticleStateBuffers[1] = TempState;
@@ -275,11 +268,9 @@ void ViewSimulation::SetRenderParams( IParameterManager* pParamManager )
 	// sequence.  In this case, water state '0' is always considered the current
 	// state.
 
-	
 	if ( bOneTimeInit == true )
 	{
 		pParamManager->SetUnorderedAccessParameter( pCurrentSimState, ParticleStateBuffers[0], 0 );
-		//pParamManager->SetUnorderedAccessParameter( L"CurrentSimulationState", ParticleStateBuffers[0], m_iParticleCount );
 		pParamManager->SetUnorderedAccessParameter( pNextSimState, ParticleStateBuffers[1], 0 );
 		bOneTimeInit = false;
 	}
@@ -289,25 +280,26 @@ void ViewSimulation::SetRenderParams( IParameterManager* pParamManager )
 		pParamManager->SetUnorderedAccessParameter( pNextSimState, ParticleStateBuffers[1] );
 	}
 
+	
+	// Calculate a random vector for rotating the inserted particles.  This gives 
+	// a randomized initial rotation to the particles.
+
 	static const float scale = 2.0f;
 	float fRandomX = ( (float)rand() / (float)RAND_MAX * scale - scale/2.0f );
 	float fRandomY = ( (float)rand() / (float)RAND_MAX * scale - scale/2.0f );
 	float fRandomZ = ( (float)rand() / (float)RAND_MAX * scale - scale/2.0f );
+	
 	Vector3f normalized = Vector3f( fRandomX, fRandomY, fRandomZ );
 	normalized.Normalize();
 
 	Vector4f RandomVector = Vector4f( normalized.x, normalized.y, normalized.z, 0.0f );
 	pParamManager->SetVectorParameter( pRandomVector, &RandomVector );
-	
 }
 //--------------------------------------------------------------------------------
 void ViewSimulation::SetUsageParams( IParameterManager* pParamManager )
 {
-	// Set the parameters for allowing an application to use the current state
-	// as a height map via a shader resource view.
-
-	//Vector4f DispatchSize = Vector4f( 16.0f, 16.0f, 16.0f * 16.0f, 16.0f * 16.0f );
-	//pParamManager->SetVectorParameter( pDispatchSize, &DispatchSize );
+	// Set the current state of the simulation for use as particle data while 
+	// rendering.
 
 	pParamManager->SetShaderResourceParameter( pSimState, ParticleStateBuffers[0] );
 }
