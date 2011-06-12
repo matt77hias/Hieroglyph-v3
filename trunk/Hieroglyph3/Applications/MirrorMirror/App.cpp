@@ -112,9 +112,6 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 
-//	m_pRenderer11->pImmPipeline->SetViewPort( m_pRenderer11->CreateViewPort( viewport ) );
-//	m_pRenderer11->m_pDeferredPipeline->SetViewPort( 0 );
-	
 	m_pFont = new SpriteFontDX11();
 	m_pFont->Initialize( L"Consolas", 16.0f, 0, false );
 	
@@ -244,15 +241,10 @@ void App::Update()
 		                              m_pCamera->GetNode()->Position().y,
 		                              m_pCamera->GetNode()->Position().z,
 		                              1.0f );
+
 	m_pViewPosition->InitializeParameterData( &ViewPosition );
-	//m_pRenderer11->m_pParamMgr->SetVectorParameter( m_pViewPosition, &ViewPosition );
-
-	//std::wstringstream s;
-	//s << L"Frame Number: " << m_pTimer->FrameCount() << L" Elapsed Time: " << m_pTimer->Elapsed();
-	//Log::Get().Write( s.str() );
-
 	m_pTimeFactors->InitializeParameterData( &TimeFactors );
-	//m_pRenderer11->m_pParamMgr->SetVectorParameter( m_pTimeFactors, &TimeFactors );
+
 
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.
@@ -279,7 +271,7 @@ void App::Update()
 	//Log::Get().Write( m_pRenderer11->PrintPipelineStatistics() );
 
 	std::wstringstream out;
-	out << L"Hieroglyph 3 : Water Simulation\nFPS: " << m_pTimer->Framerate();
+	out << L"Hieroglyph 3 : MirrorMirror\nFPS: " << m_pTimer->Framerate();
 
 
 	//m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, *m_pFont, out.str().c_str(), Matrix4f::Identity() );
@@ -296,7 +288,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"WaterSimulation_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"MirrorMirror_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
@@ -355,6 +347,6 @@ bool App::HandleEvent( IEvent* pEvent )
 //--------------------------------------------------------------------------------
 std::wstring App::GetName( )
 {
-	return( std::wstring( L"BasicApplication" ) );
+	return( std::wstring( L"MirrorMirror" ) );
 }
 //--------------------------------------------------------------------------------

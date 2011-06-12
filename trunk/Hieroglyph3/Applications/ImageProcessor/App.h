@@ -14,6 +14,9 @@
 #include "ShaderResourceParameterDX11.h"
 #include "UnorderedAccessParameterDX11.h"
 
+#include "SpriteRendererDX11.h"
+#include "SpriteFontDX11.h"
+
 using namespace Glyph3;
 
 class App : public Application, public IEventListener
@@ -42,7 +45,7 @@ protected:
 	ResourcePtr				m_DepthTarget;
 
 	// Texture Resources
-	ResourcePtr				m_Texture;
+	ResourcePtr				m_Texture[3];
 	ResourcePtr				m_Intermediate;
 	ResourcePtr				m_Output;
 
@@ -63,9 +66,15 @@ protected:
 
 	Camera*					m_pCamera;
 
+	SpriteFontDX11*			m_pFont;
+	SpriteRendererDX11*		m_pSpriteRenderer;
+
 	bool					m_bSaveScreenshot;
 
 	ShaderResourceParameterDX11* m_pColorMapParameter;
 	ShaderResourceParameterDX11* m_pInputParameter;
 	UnorderedAccessParameterDX11* m_pOutputParameter;
+
+	int						m_iAlgorithm;
+	int						m_iImage;
 };

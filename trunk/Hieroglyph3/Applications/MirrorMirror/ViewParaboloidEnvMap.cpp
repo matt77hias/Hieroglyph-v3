@@ -36,6 +36,9 @@ ViewParaboloidEnvMap::ViewParaboloidEnvMap( RendererDX11& Renderer, ResourcePtr 
 	m_pEntity = 0;
 	m_vColor.MakeZero();
 
+	
+	// Set up a viewport based on the dimensions of the resource.
+
 	ResourceDX11* pResource = Renderer.GetResource( m_RenderTarget->m_iResource & 0x0000ffff );
 
 	if ( pResource->GetType() == D3D11_RESOURCE_DIMENSION_TEXTURE2D )
@@ -55,6 +58,9 @@ ViewParaboloidEnvMap::ViewParaboloidEnvMap( RendererDX11& Renderer, ResourcePtr 
 
 		m_iViewport = Renderer.CreateViewPort( viewport );
 	}
+
+	
+	// Get references to the parameters that will be used.
 
 	m_pParaboloidTextureParam = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ParaboloidTexture" ) );
 	m_pParaboloidBasisParam = Renderer.m_pParamMgr->GetMatrixParameterRef( std::wstring( L"ParaboloidBasis" ) );
@@ -79,7 +85,6 @@ void ViewParaboloidEnvMap::PreDraw( RendererDX11* pRenderer )
 	if ( m_pEntity != NULL )
 	{
 		m_ParaboloidBasis = m_pEntity->GetView();
-		//m_ParaboloidBasis.MakeIdentity();
 		SetViewMatrix( m_ParaboloidBasis );
 	}
 
@@ -99,65 +104,50 @@ void ViewParaboloidEnvMap::PreDraw( RendererDX11* pRenderer )
 			for ( int i = 0; i < set.count(); i++ )
 			{
 				if ( set[i] != this->m_pEntity )
-					set[i]->PreRender( pRenderer, GetType() );// pPipelineManager, pParamManager, GetType() );
+					set[i]->PreRender( pRenderer, GetType() );
 			}
-			// Run through the graph and pre-render the entities
-			//m_pRoot->PreRender( pRenderer, GetType() );
 		}
 	}
 }
 //--------------------------------------------------------------------------------
 void ViewParaboloidEnvMap::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
-	//if ( m_iCurrRecurrence > 0 )
+	if ( m_pRoot )
 	{
+		// Set the parameters for rendering this view
+		pPipelineManager->ClearRenderTargets();
+		pPipelineManager->BindRenderTargets( 0, m_RenderTarget );
+		pPipelineManager->BindDepthTarget( m_DepthTarget );
+		pPipelineManager->ApplyRenderTargets();
 
-		if ( m_pRoot )
+		pPipelineManager->SetViewPort( m_iViewport );
+
+		// Set default states for these stages
+		pPipelineManager->SetRasterizerState( 0 );
+		pPipelineManager->SetDepthStencilState( 0 );
+		pPipelineManager->SetBlendState( 0 );
+
+		pPipelineManager->ClearBuffers( m_vColor, 1.0f );
+
+		// Set this view's render parameters
+		SetRenderParams( pParamManager );
+
+		// Run through the graph and render each of the entities
+		TArray<Entity3D*> set;
+		m_pRoot->GetEntities( set );
+
+		for ( int i = 0; i < set.count(); i++ )
 		{
-			// Set the parameters for rendering this view
-			pPipelineManager->ClearRenderTargets();
-			pPipelineManager->BindRenderTargets( 0, m_RenderTarget );
-			pPipelineManager->BindDepthTarget( m_DepthTarget );
-			pPipelineManager->ApplyRenderTargets();
-
-			pPipelineManager->SetViewPort( m_iViewport );
-
-			// Set default states for these stages
-			pPipelineManager->SetRasterizerState( 0 );
-			pPipelineManager->SetDepthStencilState( 0 );
-			pPipelineManager->SetBlendState( 0 );
-
-			pPipelineManager->ClearBuffers( m_vColor, 1.0f );
-
-			// Set this view's render parameters
-			SetRenderParams( pParamManager );
-
-			// Run through the graph and render each of the entities
-			TArray<Entity3D*> set;
-			m_pRoot->GetEntities( set );
-
-			for ( int i = 0; i < set.count(); i++ )
-			{
-				if ( set[i] != this->m_pEntity )
-					set[i]->Render( pPipelineManager, pParamManager, GetType() );
-			}
-			//m_pRoot->Render( pPipelineManager, pParamManager, GetType() );
-
-			pPipelineManager->ClearRenderTargets();
-
-			//pPipelineManager->SaveTextureScreenShot( m_RenderTarget->m_iResource, std::wstring( L"WaterSimulation_" ), D3DX11_IFF_DDS ); 
+			if ( set[i] != this->m_pEntity )
+				set[i]->Render( pPipelineManager, pParamManager, GetType() );
 		}
+
+		pPipelineManager->ClearRenderTargets();
 	}
 }
 //--------------------------------------------------------------------------------
 void ViewParaboloidEnvMap::SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ )
 {
-	//m_viewport.X = x;
-	//m_viewport.Y = y;
-	//m_viewport.Width = w;
-	//m_viewport.Height = h;
-	//m_viewport.MinZ = MinZ;
-	//m_viewport.MaxZ = MaxZ;
 }
 //--------------------------------------------------------------------------------
 void ViewParaboloidEnvMap::SetRenderParams( IParameterManager* pParamManager )

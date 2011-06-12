@@ -45,14 +45,15 @@ DiffuseSphereEntity::DiffuseSphereEntity()
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_DUAL_PARABOLOID_ENVMAP].bRender = true;
 	pMaterial->Params[VT_DUAL_PARABOLOID_ENVMAP].pEffect = ParabolaEffect;
-	//pMaterial->Params[VT_DUAL_PARABOLOID_ENVMAP].vViews.add( m_pParaboloidView );
 
 	this->SetGeometry( SphereGeometry );
 	this->SetMaterial( pMaterial, false );
 
+	// Create a parameter writer to automatically set the desired texture.
 
 	ShaderResourceParameterWriterDX11* pTextureWriter = new ShaderResourceParameterWriterDX11();
-	pTextureWriter->SetRenderParameterRef( RendererDX11::Get()->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) ) );
+	pTextureWriter->SetRenderParameterRef( 
+		RendererDX11::Get()->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) ) );
 	pTextureWriter->SetValue( ColorTexture );
 	
     this->AddRenderParameter( pTextureWriter );
@@ -63,13 +64,10 @@ void DiffuseSphereEntity::LoadResources()
     RendererDX11* pRenderer11 = RendererDX11::Get();
 
     // Get the geometry to render
-    //pGeometry = GeometryLoaderDX11::loadMS3DFile2( L"../Data/Models/UnitSphere2.ms3d" );
+    //SphereGeometry = GeometryLoaderDX11::loadMS3DFile2( L"../Data/Models/UnitSphere2.ms3d" );
     SphereGeometry = GeometryLoaderDX11::loadMS3DFile2( L"../Data/Models/box.ms3d" );
-	//SphereGeometry = GeometryLoaderDX11::loadMS3DFile2( L"../Data/Models/Soldier_LOD1.ms3d" );
     SphereGeometry->LoadToBuffers();
     SphereGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-
-
 
     RenderEffect = new RenderEffectDX11();
     RenderEffect->m_iVertexShader = 
@@ -86,6 +84,7 @@ void DiffuseSphereEntity::LoadResources()
     // Create and fill the effect that will be used for a diffuse object 
     // to be rendered into a paraboloid map, which will use the paraboloid
     // projection with its normal sampling technique.
+
     ParabolaEffect = new RenderEffectDX11();
 
     ParabolaEffect->m_iVertexShader = 
@@ -104,8 +103,8 @@ void DiffuseSphereEntity::LoadResources()
         std::wstring( L"PSMAIN" ),
         std::wstring( L"ps_5_0" ) );
 
-    RasterizerStateConfigDX11 RS;
-    RS.FillMode = D3D11_FILL_WIREFRAME;
+    //RasterizerStateConfigDX11 RS;
+    //RS.FillMode = D3D11_FILL_WIREFRAME;
     //RS.CullMode = D3D11_CULL_NONE;
 
     //ParabolaEffect->m_iRasterizerState = 
@@ -118,9 +117,7 @@ void DiffuseSphereEntity::LoadResources()
 	ParabolaEffect->ConfigurePipeline( pRenderer11->pImmPipeline, pRenderer11->m_pParamMgr );
 
 
-
     ColorTexture = pRenderer11->LoadTexture( L"../Data/Textures/Tiles.png" );
-	//ColorTexture = pRenderer11->LoadTexture( L"../Data/Textures/HiResSoldier_colormap.png" );
 
     TextureParameter = pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) );
     TextureParameter->InitializeParameterData( &ColorTexture->m_iResourceSRV );    
@@ -132,14 +129,5 @@ void DiffuseSphereEntity::LoadResources()
 
 	SamplerParameterDX11* pSamplerParameter = pRenderer11->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"LinearSampler" ) );
     pSamplerParameter->InitializeParameterData( &LinearSampler );
-
-
-    // Set any parameters that will be needed by the shaders used above.
-
-    //	Vector4f DispatchSize = Vector4f( (float)DispatchSizeX, (float)DispatchSizeZ, (float)DispatchSizeX * 16, (float)DispatchSizeZ * 16 );
-    //	pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"DispatchSize" ), &DispatchSize );
-
-    //	Vector4f FinalColor = Vector4f( 0.5f, 1.0f, 0.5f, 1.0f );
-    //	pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"FinalColor" ), &FinalColor );
 }
 //--------------------------------------------------------------------------------

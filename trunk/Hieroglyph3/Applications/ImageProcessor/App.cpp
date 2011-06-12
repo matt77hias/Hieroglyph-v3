@@ -110,11 +110,23 @@ bool App::ConfigureEngineComponents()
 
 	m_pRenderer11->pImmPipeline->SetViewPort( m_pRenderer11->CreateViewPort( viewport ) );
 	
+	// Create the text rendering classes.
+	m_pFont = new SpriteFontDX11();
+	m_pFont->Initialize( L"Consolas", 16.0f, 0, false );
+	
+	m_pSpriteRenderer = new SpriteRendererDX11();
+	m_pSpriteRenderer->Initialize();
+
+	m_pRenderer11->SetMultiThreadingState( false );
+
 	return( true );
 }
 //--------------------------------------------------------------------------------
 void App::ShutdownEngineComponents()
 {
+	SAFE_DELETE( m_pFont );
+	SAFE_DELETE( m_pSpriteRenderer );
+
 	if ( m_pRenderer11 )
 	{
 		m_pRenderer11->Shutdown();
@@ -130,6 +142,11 @@ void App::ShutdownEngineComponents()
 //--------------------------------------------------------------------------------
 void App::Initialize()
 {
+	m_iImage = 0;
+	m_iAlgorithm = 0;
+
+	// Create render effects for each of the required compute shaders for all of
+	// our various algorithms.
 
 	m_pBruteForceGaussian = new RenderEffectDX11();
 	m_pBruteForceGaussian->m_iComputeShader = 
@@ -205,26 +222,29 @@ void App::Initialize()
 		std::wstring( L"ps_5_0" ) );
 
 	// Enable the material to render the given view type, and set its effect.
+
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
 	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
 
-	// Create the geometry that will fill the screen with our results
+
+	// Create the geometry that will fill the screen with our results - just a full
+	// screen quad in this case.
+
 	GeometryDX11* pGeometry = new GeometryDX11();
 	GeometryGeneratorDX11::GenerateFullScreenQuad( pGeometry );
 	pGeometry->LoadToBuffers();
 
 
-	// Here we load our desired texture, and create a shader resource view to 
-	// use for input to the compute shader.  By specifying null for the 
-	// configuration, the view is created from the default resource configuration.
+	// Here we load our desired texture.
 
-	//m_Texture = m_pRenderer11->LoadTexture( L"../Data/Textures/EyeOfHorusNoisy.png" );
-	m_Texture = m_pRenderer11->LoadTexture( L"../Data/Textures/Outcrop.png" );
-	//m_Texture = m_pRenderer11->LoadTexture( L"../Data/Textures/fruit.png" );
-
+	
+	m_Texture[0] = m_pRenderer11->LoadTexture( L"../Data/Textures/Outcrop.png" );
+	m_Texture[1] = m_pRenderer11->LoadTexture( L"../Data/Textures/fruit.png" );
+	m_Texture[2] = m_pRenderer11->LoadTexture( L"../Data/Textures/Hex.png" );
 	
 
 	// Create the texture for output of the compute shader.
+	
 	Texture2dConfigDX11 FilteredConfig;
 	FilteredConfig.SetColorBuffer( 640, 480 ); 
 	FilteredConfig.SetBindFlags( D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE );
@@ -233,17 +253,18 @@ void App::Initialize()
 	m_Output = m_pRenderer11->CreateTexture2D( &FilteredConfig, 0 );
 
 
-	// Specify the bindings for the resources.  These take as input a parameter
-	// name and a resource proxy object created above.  This will connect these
-	// resources with the appropriate shader variables at rendering time.  The
-	// resource proxy object contains the needed 'ResourceView' instances.
+	// Get references to the parameters that will be used in rendering.
 
-	//m_pRenderer11->m_pParamMgr->SetShaderResourceParameter( L"ColorMap00", m_Output );
 	m_pColorMapParameter = m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorMap00" ) );
 	m_pInputParameter = m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"InputMap" ) );
 	m_pOutputParameter = m_pRenderer11->m_pParamMgr->GetUnorderedAccessParameterRef( std::wstring( L"OutputMap" ) );
 
+
+	// Since this one won't be changing, it can be initialized here once, and then
+	// not updated again later.
+
 	m_pColorMapParameter->InitializeParameterData( &m_Output->m_iResourceSRV );
+
 
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
@@ -256,6 +277,7 @@ void App::Initialize()
 	m_pCamera->SetCameraView( m_pRenderView );
 	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>( D3DX_PI ) / 2.0f, 640.0f / 480.0f );
 
+
 	// Create the scene and add the entities to it.  Then add the camera to the
 	// scene so that it will be updated via the scene interface instead of 
 	// manually manipulating it.
@@ -264,7 +286,6 @@ void App::Initialize()
 	m_pEntity = new Entity3D();
 	m_pEntity->SetGeometry( pGeometry );
 	m_pEntity->SetMaterial( pMaterial, false );
-	//m_pEntity->Position() = Vector3f( -8.0f * DispatchSizeX, 0.0f, -8.0f * DispatchSizeZ );  
 
 	m_pNode->AttachChild( m_pEntity );
 
@@ -286,62 +307,83 @@ void App::Update()
 	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
 
 
+	// Setup the text rendering for the onscreen UI.
+
+	std::wstringstream out;
+	out << L"Hieroglyph 3 : ImageProcessor\nFPS: " << m_pTimer->Framerate() << std::endl;
+	out << L"Press I to select the next image" << std::endl;
+	out << L"Press N to select the next algorithm" << std::endl;
+	out << L"Current Algorithm: ";
+
+
 	// Perform the filtering with the compute shader.  The assumption in this case
 	// is that the texture is 640x480 - if there is a different size then the 
 	// dispatch call can be modified accordingly.
 
 	// Brute force Gaussian
-/*	m_pInputParameter->InitializeParameterData( &m_Texture->m_iResourceSRV );
-	m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
-	m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceGaussian, 20, 15, 1, m_pRenderer11->m_pParamMgr );
-*/
+	if ( m_iAlgorithm == 0 )
+	{
+		out << L"Brute Force Gaussian" << std::endl;
+		m_pInputParameter->InitializeParameterData( &m_Texture[m_iImage]->m_iResourceSRV );
+		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceGaussian, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+	}
 
 	// Separable Gaussian
-/*
-	m_pInputParameter->InitializeParameterData( &m_Texture->m_iResourceSRV );
-	m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
-	m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableGaussianX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
+	if ( m_iAlgorithm == 1 )
+	{
+		out << L"Separable Gaussian" << std::endl;
+		m_pInputParameter->InitializeParameterData( &m_Texture[m_iImage]->m_iResourceSRV );
+		m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableGaussianX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
 
-	m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
-	m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
-	m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableGaussianY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
-*/
+		m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
+		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableGaussianY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
+	}
 
 	// Cached Gaussian
-/*
-	m_pInputParameter->InitializeParameterData( &m_Texture->m_iResourceSRV );
-	m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
-	m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
-
-	m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
-	m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
-	m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
-*/
+	if ( m_iAlgorithm == 2 )
+	{
+		out << L"Cached Separable Gaussian" << std::endl;
+		m_pInputParameter->InitializeParameterData( &m_Texture[m_iImage]->m_iResourceSRV );
+		m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
+	
+		m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
+		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
+	}
 
 	// Brute force Bilateral
-	/*
-	m_pInputParameter->InitializeParameterData( &m_Texture->m_iResourceSRV );
-	m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
-	m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+	if ( m_iAlgorithm == 3 )
+	{
+		out << L"Brute Force Bilateral" << std::endl;
+		m_pInputParameter->InitializeParameterData( &m_Texture[m_iImage]->m_iResourceSRV );
+		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
 
-	m_pInputParameter->InitializeParameterData( &m_Output->m_iResourceSRV );
-	m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
-	m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+		m_pInputParameter->InitializeParameterData( &m_Output->m_iResourceSRV );
+		m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
 
-	m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
-	m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
-	m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
-*/
+		m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
+		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+	}
 
 	// Separable Bilateral
-	m_pInputParameter->InitializeParameterData( &m_Texture->m_iResourceSRV );
-	m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
-	m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
+	if ( m_iAlgorithm == 4 )
+	{
+		out << L"Separable Bilateral" << std::endl;
+		m_pInputParameter->InitializeParameterData( &m_Texture[m_iImage]->m_iResourceSRV );
+		m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
 
-	m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
-	m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
-	m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
-
+		m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
+		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
+	}
 
 	//m_pRenderer11->StartPipelineStatistics();
 
@@ -350,6 +392,10 @@ void App::Update()
 
 	//m_pRenderer11->EndPipelineStatistics();
 	//Log::Get().Write( m_pRenderer11->PrintPipelineStatistics() );
+
+
+	m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, *m_pFont, out.str().c_str(), Matrix4f::Identity() );
+
 
 	// Perform the rendering and presentation for the window.
 
@@ -360,19 +406,17 @@ void App::Update()
 	// demonstrates how an event is sent and handled by an event listener (which
 	// in this case is the application object itself).
 
-	//if ( m_bSaveScreenshot  )
+	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"WaterSimulation_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"ImageProcessor_" ), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
 	SAFE_DELETE( m_pEntity );
-	
 	SAFE_DELETE( m_pNode );
-
 	SAFE_DELETE( m_pCamera );
 
 	// Print the framerate out for the log before shutting down.
@@ -410,6 +454,20 @@ bool App::HandleEvent( IEvent* pEvent )
 			m_bSaveScreenshot = true;
 			return( true );
 		}
+		else if ( key == 0x4E ) // 'N' Key - Save a screen shot for the next frame
+		{
+			m_iAlgorithm++;
+			if ( m_iAlgorithm > 4 ) m_iAlgorithm = 0;
+
+			return( true );
+		}
+		else if ( key == 0x49 ) // 'I' Key - Save a screen shot for the next frame
+		{
+			m_iImage++;
+			if ( m_iImage > 2 ) m_iImage = 0;
+
+			return( true );
+		}
 		else
 		{
 			return( false );
@@ -422,6 +480,6 @@ bool App::HandleEvent( IEvent* pEvent )
 //--------------------------------------------------------------------------------
 std::wstring App::GetName( )
 {
-	return( std::wstring( L"BasicApplication" ) );
+	return( std::wstring( L"ImageProcessor" ) );
 }
 //--------------------------------------------------------------------------------
