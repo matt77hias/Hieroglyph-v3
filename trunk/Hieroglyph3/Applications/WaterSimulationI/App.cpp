@@ -112,7 +112,7 @@ bool App::ConfigureEngineComponents()
 
 	// Create the text rendering classes.
 	m_pFont = new SpriteFontDX11();
-	m_pFont->Initialize( L"Consolas", 16.0f, 0, false );
+	m_pFont->Initialize( L"Consolas", 20.0f, 0, false );
 	
 	m_pSpriteRenderer = new SpriteRendererDX11();
 	m_pSpriteRenderer->Initialize();
@@ -197,7 +197,7 @@ void App::Initialize()
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.307f, 0.707f, 0.0f ) );
 	m_pCamera->GetNode()->Position() = Vector3f( -70.0f, 30.5f, -75.0f );
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
-	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.2f, 0.2f ) );
+	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
 	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, 1024.0f / 640.0f, static_cast<float>( D3DX_PI ) / 2.0f );
 

@@ -683,7 +683,7 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 
 		currVert++;
 
-		Vector2f TexScale = Vector2f( 3.0f/(3.14159f*2.0f), 12.0f/Height );
+		Vector2f TexScale = Vector2f( 4.0f/(3.14159f*2.0f), 12.0f/Height );
 		//Vector2f TexScale = Vector2f( 0.5f/(3.14159f*2.0f), 2.0f/Height );
 
 		float boneHeightStep = Height / static_cast<float>( NumBones );
@@ -693,7 +693,7 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
         {
             for ( unsigned int u = 0; u < URes; ++u )
             {
-                float uAngle = u / static_cast<float>( URes ) * 3.14159f * 2.0f;                
+                float uAngle = static_cast<float>(u) / static_cast<float>( URes ) * 3.14159f * 2.0f;                
 
                 float heightScale = v / static_cast<float>( NumVertexRings );
                 float x = cosf( uAngle ) * Radius * heightScale;
@@ -723,13 +723,7 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 				float ny = atanf( Radius/Height ) * n.Magnitude();
 				n.y = ny;
 				n.Normalize();
-				pNrm[currVert] = n; //Vector3f( 1.0f, 0.0f, 0.0f );
-
-				//Vector3f n = Vector3f( 0.0f, 0.0f, 1.0f );
-				//Matrix3f rot = Matrix3f();
-				//float angle = atanf( Radius/Height );
-				//rot.Rotation( Vector3f( atanf(Radius/Height), uAngle-(3.14159f/2.0f), 0.0f ) );
-				//pNrm[currVert] = rot * n; //Vector3f( 1.0f, 0.0f, 0.0f );
+				pNrm[currVert] = n;
 
 				currVert++;
             }
@@ -832,18 +826,13 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 
 				AnimationStream<Vector3f>* pPosFrames = new AnimationStream<Vector3f>();
 
-				//for ( int j = 0; j < pJoint->positionKeys.size(); j++ )
-				{
-					Vector3f p = Vector3f( 0.0f, 0.0f, 0.0f );
-					pPosFrames->AddState( AnimationState<Vector3f>( 0.0f, p ) ); 
-				}
+				// Give a initial state to all bones.
+				Vector3f p = Vector3f( 0.0f, 0.0f, 0.0f );
+				pPosFrames->AddState( AnimationState<Vector3f>( 0.0f, p ) ); 
 
 				AnimationStream<Vector3f>* pRotFrames = new AnimationStream<Vector3f>();
 				
-				//Vector3f BindRotation = Vector3f( 6.28f, 6.28f, 6.28f );
 				Vector3f BindRotation = Vector3f( 0.0f, 0.0f, 0.0f );
-				//if ( i == 2 ) BindRotation = Vector3f( 6.28f + 0.75f, 6.28f, 6.28f );
-				//if ( i == 5 ) BindRotation = Vector3f( 6.28f + 0.75f, 6.28f, 6.28f );
 
 				//for ( int j = 0; j < pJoint->rotationKeys.size(); j++ )
 				{
@@ -852,16 +841,18 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 
 					if ( i > 0 )
 					{
-						p = Vector3f( 0.0f + 0.75f, 0.0f, 0.0f );
+						p = Vector3f( 0.0f + 0.75f, -0.25f, 0.0f );
 						pRotFrames->AddState( AnimationState<Vector3f>( 1.0f, p ) ); 
-						p = Vector3f( 0.0f + -0.75f, 0.0f, 0.0f );
+						p = Vector3f( 0.0f + -0.75f, 0.25f, 0.0f );
 						pRotFrames->AddState( AnimationState<Vector3f>( 2.0f, p ) ); 
-						p = Vector3f( 0.0f + 0.75f, 0.0f, 0.0f );
+						p = Vector3f( 0.0f + 0.75f, -0.25f, 0.0f );
 						pRotFrames->AddState( AnimationState<Vector3f>( 3.0f, p ) ); 
-						p = Vector3f( 0.0f + -0.75f, 0.0f, 0.0f );
+						p = Vector3f( 0.0f + -0.75f, 0.25f, 0.0f );
 						pRotFrames->AddState( AnimationState<Vector3f>( 4.0f, p ) ); 
-						p = Vector3f( 0.0f + 0.75f, 0.0f, 0.0f );
+						p = Vector3f( 0.0f + 0.75f, -0.25f, 0.0f );
 						pRotFrames->AddState( AnimationState<Vector3f>( 5.0f, p ) ); 
+						p = Vector3f( 0.0f, 0.0f, 0.0f );
+						pRotFrames->AddState( AnimationState<Vector3f>( 6.0f, p ) ); 
 					}
 				}
 

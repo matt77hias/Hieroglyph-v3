@@ -100,7 +100,7 @@ HS_PATCH_OUTPUT HSPATCH(
 	//
 	//output.Inside = EdgeFactors.w; //2.0f;
 
-	const float factor = 16.0f;
+	const float factor = 32.0f;
 
 	output.Edges[0] = factor;
 	output.Edges[1] = factor;
@@ -167,7 +167,7 @@ DS_OUTPUT DSMAIN( const OutputPatch<HS_POINT_OUTPUT, 3> TriPatch,
 	// Perform the displacement.  The 'fScale' parameter determines the maximum 
 	// world space offset that can be applied to the surface.  The displacement
 	// is performed along the interpolated vertex normal vector.
-	const float fScale = 0.75f;
+	const float fScale = 0.5f;
 	vWorldPos.xyz = vWorldPos.xyz + output.normal * texHeight.r * fScale;
 
 	// Transform world position with viewprojection matrix

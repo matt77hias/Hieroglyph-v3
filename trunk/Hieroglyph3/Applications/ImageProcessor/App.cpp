@@ -112,7 +112,7 @@ bool App::ConfigureEngineComponents()
 	
 	// Create the text rendering classes.
 	m_pFont = new SpriteFontDX11();
-	m_pFont->Initialize( L"Consolas", 16.0f, 0, false );
+	m_pFont->Initialize( L"Consolas", 20.0f, 0, false );
 	
 	m_pSpriteRenderer = new SpriteRendererDX11();
 	m_pSpriteRenderer->Initialize();
@@ -275,7 +275,7 @@ void App::Initialize()
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.2f, 0.2f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
-	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>( D3DX_PI ) / 2.0f, 640.0f / 480.0f );
+	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, 640.0f / 480.0f, static_cast<float>( D3DX_PI ) / 2.0f );
 
 
 	// Create the scene and add the entities to it.  Then add the camera to the
@@ -394,7 +394,7 @@ void App::Update()
 	//Log::Get().Write( m_pRenderer11->PrintPipelineStatistics() );
 
 
-	m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, *m_pFont, out.str().c_str(), Matrix4f::Identity() );
+	m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, *m_pFont, out.str().c_str(), Matrix4f::Identity(),Vector4f( 1.0f, 0.0f, 0.0f, 1.0f ) );
 
 
 	// Perform the rendering and presentation for the window.

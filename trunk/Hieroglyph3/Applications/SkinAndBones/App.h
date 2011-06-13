@@ -13,6 +13,7 @@
 #include "SkinnedActor.h"
 #include "AnimationStream.h"
 #include "VectorParameterDX11.h"
+#include "ViewTextOverlay.h"
 
 using namespace Glyph3;
 
@@ -56,4 +57,5 @@ protected:
 
 	VectorParameterDX11*	m_pLightColor;
 	VectorParameterDX11*	m_pLightPosition;
+	ViewTextOverlay*		m_pViewTextOverlay;
 };

@@ -24,6 +24,7 @@
 
 #include "GeometryGeneratorDX11.h"
 #include "ShaderResourceParameterWriterDX11.h"
+#include "RotationController.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -149,12 +150,16 @@ void App::Initialize()
 	// from the camera's point of view of the scene.
 
 	m_pCamera = new Camera();
-	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.30f, 1.5f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( -20.0f, 25.0f, 10.0f );
+	//m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.30f, 1.5f, 0.0f ) );
+	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 25.0f, -10.0f );
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.1f, 0.1f, 0.3f, 0.0f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
 	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, 800.0f / 600.0f, static_cast<float>( D3DX_PI ) / 2.0f );
+
+	// Setup the rendering of a text overlay.
+
+	m_pViewTextOverlay = new ViewTextOverlay( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 
 
 	// Create the scene and add the entities to it.  Then add the camera to the
@@ -168,31 +173,38 @@ void App::Initialize()
 
 	m_pDisplacedActor = new SkinnedActor();
 	GeometryDX11* pGeometry = new GeometryDX11();
-	GeometryGeneratorDX11::GenerateWeightedSkinnedCone( pGeometry, 10, 20, 2.0f, 40.0f, 6, m_pDisplacedActor );
+	GeometryGeneratorDX11::GenerateWeightedSkinnedCone( pGeometry, 16, 20, 2.0f, 40.0f, 6, m_pDisplacedActor );
 	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
 	m_pDisplacedActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedSolid( *m_pRenderer11 ) );
-	m_pDisplacedActor->GetNode()->Position() = Vector3f( 0.0f, 0.0f, 0.0f );
+
+	RotationController* pRotController1 = new RotationController();
+	m_pDisplacedActor->GetNode()->AttachController( pRotController1 );
 
 	
 	// Create the skinned actor without displacement
 
 	m_pSkinnedActor = new SkinnedActor();
 	GeometryDX11* pSkinnedGeometry = new GeometryDX11();
-	GeometryGeneratorDX11::GenerateWeightedSkinnedCone( pSkinnedGeometry, 10, 20, 2.0f, 40.0f, 6, m_pSkinnedActor );
+	GeometryGeneratorDX11::GenerateWeightedSkinnedCone( pSkinnedGeometry, 16, 20, 2.0f, 40.0f, 6, m_pSkinnedActor );
 	pSkinnedGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	m_pSkinnedActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedTextured( *m_pRenderer11 ) );
-	m_pSkinnedActor->GetNode()->Position() = Vector3f( 0.0f, 0.0f, 40.0f );
+
+	RotationController* pRotController2 = new RotationController();
+	m_pSkinnedActor->GetNode()->AttachController( pRotController2 );
 
 	
 	// Generate the static mesh, and attach a texture to its entity
 
 	m_pStaticActor = new Actor();
-	m_pStaticActor->GetBody()->Position() = Vector3f( 0.0f, 0.0f, 20.0f );
 	GeometryDX11* pStaticGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
 	pStaticGeometry->LoadToBuffers();
 	MaterialDX11* pStaticMaterial = MaterialGeneratorDX11::GenerateStaticTextured(*RendererDX11::Get());
 	m_pStaticActor->GetBody()->SetGeometry( pStaticGeometry );
 	m_pStaticActor->GetBody()->SetMaterial( pStaticMaterial );
+
+	RotationController* pRotController3 = new RotationController();
+	m_pStaticActor->GetBody()->AttachController( pRotController3);
+
 	
 	ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/Tiles.png" );
 	ShaderResourceParameterWriterDX11* pTextureParameter = new ShaderResourceParameterWriterDX11();
@@ -223,6 +235,10 @@ void App::Initialize()
 	m_pSkinnedActor->PlayAllAnimations();
 
 	m_pRenderer11->SetMultiThreadingState( false );
+
+	m_pStaticActor->GetBody()->Position() = Vector3f( -20.0f, 10.0f, 15.0f );
+	m_pSkinnedActor->GetNode()->Position() = Vector3f( 0.0f, 0.0f, 20.0f );
+	m_pDisplacedActor->GetNode()->Position() = Vector3f( 20.0f, 0.0f, 20.0f );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -238,7 +254,6 @@ void App::Update()
 
 	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
 
-
 	// Update the scene, and then render all cameras within the scene.
 
 	m_pScene->Update( m_pTimer->Elapsed() );
@@ -248,6 +263,16 @@ void App::Update()
 
 	m_pScene->Render( m_pRenderer11 );
 
+	std::wstringstream out;
+	out << L"Hieroglyph 3 : Skin and Bones" << std::endl;
+	out << L"The static mesh represents rigid geometry, while skinned meshes can be animated." << std::endl;
+	out << L"Each node in the skinned meshes displays its coordinate axes." << std::endl;
+	out << L"To start the animations press 'A'" << std::endl;
+
+	m_pViewTextOverlay->WriteText( out.str(), Matrix4f::Identity(), Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
+	m_pRenderer11->QueueRenderView( m_pViewTextOverlay );
+	m_pRenderer11->ProcessRenderViewQueue();
 
 	// Perform the rendering and presentation for the window.
 
@@ -258,7 +283,7 @@ void App::Update()
 	// demonstrates how an event is sent and handled by an event listener (which
 	// in this case is the application object itself).
 
-	//if ( m_bSaveScreenshot  )
+	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
 		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"SkinAndBones_" ), D3DX11_IFF_BMP );
@@ -267,6 +292,7 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
+	SAFE_DELETE( m_pViewTextOverlay );
 	SAFE_DELETE( m_pStaticActor );
 	SAFE_DELETE( m_pSkinnedActor );
 	SAFE_DELETE( m_pDisplacedActor );
@@ -302,6 +328,12 @@ bool App::HandleEvent( IEvent* pEvent )
 		if ( key == VK_ESCAPE ) // 'Esc' Key - Exit the application
 		{
 			this->RequestTermination();
+			return( true );
+		}
+		else if ( key == 0x41 ) // 'A' Key - restart animations
+		{
+			m_pDisplacedActor->PlayAllAnimations();
+			m_pSkinnedActor->PlayAllAnimations();
 			return( true );
 		}
 		else if ( key == 0x53 ) // 'S' Key - Save a screen shot for the next frame

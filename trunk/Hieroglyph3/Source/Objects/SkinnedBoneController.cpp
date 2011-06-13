@@ -49,31 +49,6 @@ void SkinnedBoneController::Update( float fTime )
 	// rotation accordingly.  These new values will then be used by the entity
 	// to update it's local and world transformation matrices.
 	
-	// Create the animation matrix
-	//Matrix4f animation;
-	//animation.MakeIdentity();
-
-	//if ( m_pRotationStream )
-	//{
-	//	// Update the rotation animation stream with the elapsed time.
-	//	m_pRotationStream->Update( fTime );
-
-	//	Matrix3f animRot;
-	//	//animRot.RotationZYX( m_pRotationStream->GetState() );
-	//	animRot.Rotation( m_pRotationStream->GetState() );
-	//	animation.SetRotation( animRot );
-	//}
-	//if ( m_pPositionStream )
-	//{
-	//	// Update the position animation stream with the elapsed time.
-	//	m_pPositionStream->Update( fTime );
-	//	animation.SetTranslation( m_pPositionStream->GetState() );
-	//}
-
-	//local *= animation;
-	//m_pEntity->LocalMatrix() = m_LocalSkeleton * animation;
-	//m_pEntity->LocalMatrix() = animation * m_LocalSkeleton;
-
 	if ( m_pPositionStream )
 	{
 		// Update the position animation stream with the elapsed time.
@@ -82,16 +57,13 @@ void SkinnedBoneController::Update( float fTime )
 		// Update the entity's position, which is the bind pose plus the current animated position.
 		m_pEntity->Position() = m_kBindPosition + m_pPositionStream->GetState();
 	}
+
 	if ( m_pRotationStream )
 	{
 		// Update the rotation animation stream with the elapsed time.
 		m_pRotationStream->Update( fTime );
 
-		// Update the entity's orientation, which is the bind pose plus the current animated rotation.
-		//m_pEntity->Rotation().RotationZYX( m_kBindRotation + m_pRotationStream->GetState() );
-
-		//Matrix3f bind;
-		//bind.RotationZYX( m_kBindRotation )
+		// Update the entity's rotation, which is the bind pose plus the current animated rotation.
 		m_pEntity->Rotation().Rotation( m_kBindRotation + m_pRotationStream->GetState() );
 	}
 }
@@ -102,7 +74,6 @@ void SkinnedBoneController::SetBindPose()
 	// in the bind pose.
 
 	m_InvBindPose = GetEntity()->WorldMatrix().Inverse();
-	//m_InvBindPose = m_GlobalSkeleton.Inverse();
 }
 //--------------------------------------------------------------------------------
 Matrix4f SkinnedBoneController::GetTransform()

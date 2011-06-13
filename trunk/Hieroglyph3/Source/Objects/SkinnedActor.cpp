@@ -21,8 +21,6 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 SkinnedActor::SkinnedActor()
 {
-	m_pMatrixParameter = 0;
-	m_pMatrixNormalParameter = 0;
 	m_pMatrices = 0;
 	m_pNormalMatrices = 0;
 
@@ -60,21 +58,17 @@ void SkinnedActor::AddBoneNode( Node3D* pBone, Vector3f BindPosition, Vector3f B
 
 		pController->SetBindPosition( BindPosition );
 		pController->SetBindRotation( BindRotation );
-		//pBone->Position() = BindPosition;
-		//pBone->Rotation().RotationZYX( BindRotation );
 
 		pController->SetPositionStream( pPositions );
 		pController->SetRotationStream( pRotations );
 
 		// Add the controller onto this bone node.  
 		pBone->AttachController( pController );
-		//pBone->SetLocalMatrixCalculation( false );
 
 
 		// Set the bind pose on the bone.
 		pBone->Position() = BindPosition;
 		pBone->Rotation().Rotation( BindRotation );
-		//pBone->Rotation().RotationZYX( BindRotation );
 
 		// Store the node in the bones list.
 		m_Bones.add( pController );
@@ -101,35 +95,13 @@ void SkinnedActor::SetBindPose( )
 {
 	// Have each controller record the current world matrix inverse for the bind 
 	// pose inverse.
-	for ( int i = 0; i < m_Bones.count(); i++ )
-	{
-		m_Bones[i]->SetLocalSkeleton();
-		//m_Bones[i]->SetGlobalSkeleton();
-		//m_Bones[i]->SetBindPose();
-	}
-
-	// Update the model's world matrices.
-
-	for ( int i = 0; i < m_Bones.count(); i++ )
-	{
-		//m_Bones[i]->SetLocalSkeleton();
-		m_Bones[i]->SetGlobalSkeleton();
-		//m_Bones[i]->SetBindPose();
-	}
 
 	GetNode()->Update( 0.0f );
 
 	for ( int i = 0; i < m_Bones.count(); i++ )
 	{
-		//m_Bones[i]->SetLocalSkeleton();
-		//m_Bones[i]->SetGlobalSkeleton();
 		m_Bones[i]->SetBindPose();
 	}
-
-
-	// Create the matrix array parameter, and add it to the entity.
-	if ( m_pMatrixParameter )
-		Log::Get().Write( L"Bitch about someone calling 'SetBindPose' more than once..." );
 
 
 	// Create an array to hold the CPU side matrices.
@@ -162,8 +134,8 @@ void SkinnedActor::SetSkinningMatrices( RendererDX11& Renderer )
 	// Update the CPU side animation matrices.
 	for ( int i = 0; i < m_Bones.count(); i++ )
 	{
-		m_pMatrices[i] = m_Bones[i]->GetTransform() * this->GetBody()->WorldMatrix();
-		m_pNormalMatrices[i] = m_Bones[i]->GetNormalTransform() * this->GetBody()->WorldMatrix();
+		m_pMatrices[i] = m_Bones[i]->GetTransform();
+		m_pNormalMatrices[i] = m_Bones[i]->GetNormalTransform();
 	}
 }
 //--------------------------------------------------------------------------------

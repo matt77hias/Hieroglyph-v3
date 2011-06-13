@@ -1944,6 +1944,14 @@
 						RelativePath=".\Rendering\ViewRenderParams.h"
 						>
 					</File>
+					<File
+						RelativePath=".\Rendering\ViewTextOverlay.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Rendering\ViewTextOverlay.h"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter
