@@ -33,10 +33,11 @@
 #include "Timer.h"
 #include "EventManager.h"
 #include "Scene.h"
+#include "IEventListener.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class Application
+	class Application : public IEventListener
 	{
 	public:
 		Application();

@@ -175,6 +175,17 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 	ParticleCountIABuffer = Renderer.CreateIndirectArgsBuffer( &ArgsConfig, &InitArgsData );
 
 
+	// Create a buffer to be used as a staging buffer for readback from the GPU.
+
+	pInitArgs[0] = 0;
+	pInitArgs[1] = 0;
+	pInitArgs[2] = 0;
+	pInitArgs[3] = 0;
+
+	BufferConfigDX11 StagingConfig;
+	StagingConfig.SetDefaultStagingBuffer( 4 * sizeof( UINT ) );
+	ParticleCountSTBuffer = Renderer.CreateIndirectArgsBuffer( &StagingConfig, &InitArgsData );
+
 
 	// Set up the render effect for actually updating the simulation.
 
@@ -231,28 +242,93 @@ void ViewSimulation::PreDraw( RendererDX11* pRenderer )
 //--------------------------------------------------------------------------------
 void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
+
+
+	//D3D11_MAPPED_SUBRESOURCE mapped;
+	//unsigned int* pCount = 0;
+	//unsigned int count[6];
+
+	//pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 0, ParticleStateBuffers[0] );
+
+	//mapped = pPipelineManager->MapResource( ParticleCountSTBuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
+	//pCount = (unsigned int*)(mapped.pData);
+	//count[0] = pCount[0];
+	//pPipelineManager->UnMapResource( ParticleCountSTBuffer->m_iResource, 0 );
+
+
+	//pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 0, ParticleStateBuffers[1] );
+
+	//mapped = pPipelineManager->MapResource( ParticleCountSTBuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
+	//pCount = (unsigned int*)(mapped.pData);
+	//count[1] = pCount[0];
+	//pPipelineManager->UnMapResource( ParticleCountSTBuffer->m_iResource, 0 );
+
+	// Initialize the buffers...
+	if ( bOneTimeInit == true )
+	{
+		// Set this view's render parameters.
+		SetRenderParams( pParamManager );
+
+		pPipelineManager->Dispatch( *pParticleUpdate, 1, 1, 1, pParamManager );
+	}
+
 	// Set this view's render parameters.
 	SetRenderParams( pParamManager );
-
 	
+
 	// Add any new particles here.  For now we simply add one batch of particles every
 	// frame.  If there are issues with overflowing the buffer then we would need to 
 	// throttle the creation of new particles here.	
-
+	
 	pPipelineManager->Dispatch( *pParticleInsertion, 1, 1, 1, pParamManager );
+
+	// Read out the total number of particles for updating into a constant buffer and an
+	// indirect argument buffer.
+
+	//pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 0, ParticleStateBuffers[0] );
+
+	//mapped = pPipelineManager->MapResource( ParticleCountSTBuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
+	//pCount = (unsigned int*)(mapped.pData);
+	//count[2] = pCount[0];
+	//pPipelineManager->UnMapResource( ParticleCountSTBuffer->m_iResource, 0 );
+
+
+	//pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 0, ParticleStateBuffers[1] );
+
+	//mapped = pPipelineManager->MapResource( ParticleCountSTBuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
+	//pCount = (unsigned int*)(mapped.pData);
+	//count[3] = pCount[0];
+	//pPipelineManager->UnMapResource( ParticleCountSTBuffer->m_iResource, 0 );
+
+
+	pPipelineManager->CopyStructureCount( ParticleCountIABuffer, 0, ParticleStateBuffers[0] );
+	pPipelineManager->CopyStructureCount( ParticleCountCBBuffer, 0, ParticleStateBuffers[0] );	
 
 
 	// Update the particles with a fixed number of threads.  The unused threads will simply
 	// not do anything, as they can't read any data from the Append/Consume buffer.
 
-	pPipelineManager->Dispatch( *pParticleUpdate, 1024, 1, 1, pParamManager );
+	pPipelineManager->Dispatch( *pParticleUpdate, 2, 1, 1, pParamManager );
 
 
-	// Read out the total number of particles for updating into a constant buffer and an
-	// indirect argument buffer.
 
-	pPipelineManager->CopyStructureCount( ParticleCountCBBuffer, 0, ParticleStateBuffers[1] );
-	pPipelineManager->CopyStructureCount( ParticleCountIABuffer, 0, ParticleStateBuffers[1] );
+	//pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 0, ParticleStateBuffers[0] );
+
+	//mapped = pPipelineManager->MapResource( ParticleCountSTBuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
+	//pCount = (unsigned int*)(mapped.pData);
+	//count[4] = pCount[0];
+	//pPipelineManager->UnMapResource( ParticleCountSTBuffer->m_iResource, 0 );
+
+
+	//pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 0, ParticleStateBuffers[1] );
+
+	//mapped = pPipelineManager->MapResource( ParticleCountSTBuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
+	//pCount = (unsigned int*)(mapped.pData);
+	//count[5] = pCount[0];
+	//pPipelineManager->UnMapResource( ParticleCountSTBuffer->m_iResource, 0 );
+
+
+
 
 
 	// Switch the two resources so that the current state is maintained in slot 0.

@@ -8,7 +8,7 @@ struct Particle
 	float  time;
 };
 
-AppendStructuredBuffer<Particle>	NewSimulationState : register( u0 );
+AppendStructuredBuffer<Particle>	CurrentSimulationState : register( u0 );
 
 cbuffer ParticleInsertParameters
 {
@@ -45,5 +45,5 @@ void CSMAIN( uint3 GroupThreadID : SV_GroupThreadID )
 	p.time = 0.0f;
 
 	// Append the new particle to the output buffer
-	NewSimulationState.Append( p );
+	CurrentSimulationState.Append( p );
 }

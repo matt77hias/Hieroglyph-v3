@@ -33,6 +33,7 @@ namespace Glyph3
 		void SetDefaultStructuredBuffer( UINT size, UINT structsize );
 		void SetDefaultByteAddressBuffer( UINT size );
 		void SetDefaultIndirectArgsBuffer( UINT size );
+		void SetDefaultStagingBuffer( UINT size );
 
 		void SetByteWidth( UINT state );
 		void SetUsage( D3D11_USAGE state );

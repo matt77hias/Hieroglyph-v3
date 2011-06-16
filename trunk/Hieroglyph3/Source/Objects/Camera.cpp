@@ -18,6 +18,7 @@ using namespace Glyph3;
 Camera::Camera()
 {
 	m_pCameraView = 0;
+	m_pOverlayView = 0;
 	m_pScene = 0;
 
 	m_fNear = 0.1f;
@@ -34,10 +35,20 @@ Camera::~Camera()
 	// camera is released.
 
 	SAFE_DELETE( m_pCameraView );
+	SAFE_DELETE( m_pOverlayView );
 }
 //--------------------------------------------------------------------------------
 void Camera::RenderFrame( RendererDX11* pRenderer )
 {
+	// If an overlay is available, add it to the renderer first so that it will
+	// be executed last.
+
+	if ( m_pOverlayView )
+		pRenderer->QueueRenderView( m_pOverlayView );
+
+	// If a render view for the camera is available, then render it with the given
+	// scene.
+
 	if ( m_pCameraView )
 	{
 		// Set the scene's root into the render view
@@ -45,14 +56,10 @@ void Camera::RenderFrame( RendererDX11* pRenderer )
 		if ( m_pScene )
 			m_pCameraView->SetRoot( m_pScene->GetRoot() );
 
-		// Execute the render view, which performs a pre-draw pass followed by 
-		// the execution of the renderer's view queue.  Here we set the camera's
-		// usage parameters before hand, since all of the further views will use
-		// this camera to setup the frame (i.e. the view and projection matrices).
+		// Use the pre-draw method to queue any needed render views in the scene.
+		// This is followed by rendering all of the views to generate the current
+		// frame.
 
-		// TODO: Possibly add the view's update method here...
-
-		//m_pCameraView->SetRenderParams( pRenderer->m_pParamMgr );
 		m_pCameraView->PreDraw( pRenderer );
 		pRenderer->ProcessRenderViewQueue();
 	}
@@ -62,6 +69,11 @@ void Camera::SetCameraView( IRenderView* pView )
 {
 	m_pCameraView = pView;
 	m_pCameraView->SetEntity( m_pBody );
+}
+//--------------------------------------------------------------------------------
+void Camera::SetOverlayView( IRenderView* pView )
+{
+	m_pOverlayView = pView;
 }
 //--------------------------------------------------------------------------------
 void Camera::SetScene( Scene* pScene )

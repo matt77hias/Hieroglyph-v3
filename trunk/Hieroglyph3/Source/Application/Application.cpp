@@ -35,6 +35,13 @@ Application::Application()
 
 	m_pEventMgr = new EventManager();
 
+	// The application object wants to know about these three events, so it 
+	// registers itself with the appropriate event IDs.
+
+	m_pEventMgr->AddEventListener( SYSTEM_KEYBOARD_KEYUP, this );
+	m_pEventMgr->AddEventListener( SYSTEM_KEYBOARD_KEYDOWN, this );
+	m_pEventMgr->AddEventListener( SYSTEM_KEYBOARD_CHAR, this );
+
 	// Create an initial scene to be used by the applications.
 
 	m_pScene = new Scene();

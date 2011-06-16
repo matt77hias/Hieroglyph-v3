@@ -35,86 +35,11 @@ App AppInstance; // Provides an instance of the application
 //--------------------------------------------------------------------------------
 App::App()
 {
-	m_bSaveScreenshot = false;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
 {
-	// Basic event handling is supported with the EventManager class.  This is a 
-	// singleton class that allows an EventListener to register which events it
-	// wants to receive.
-
-	EventManager* pEventManager = EventManager::Get( );
-
-	// The application object wants to know about these three events, so it 
-	// registers itself with the appropriate event IDs.
-
-	pEventManager->AddEventListener( SYSTEM_KEYBOARD_KEYUP, this );
-	pEventManager->AddEventListener( SYSTEM_KEYBOARD_KEYDOWN, this );
-	pEventManager->AddEventListener( SYSTEM_KEYBOARD_CHAR, this );
-
-
-	// Create the renderer and initialize it for the desired device
-	// type and feature level.
-
-	m_pRenderer11 = new RendererDX11();
-
-	if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_HARDWARE, D3D_FEATURE_LEVEL_11_0 ) )
-	{
-		Log::Get().Write( L"Could not create hardware device, trying to create the reference device..." );
-
-		if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_REFERENCE, D3D_FEATURE_LEVEL_11_0 ) )
-		{
-			MessageBox( m_pWindow->GetHandle(), L"Could not create a hardware or software Direct3D 11 device - the program will now abort!", L"Hieroglyph 3 Rendering", MB_ICONEXCLAMATION | MB_SYSTEMMODAL );
-			RequestTermination();			
-			return( false );
-		}
-
-		// If using the reference device, utilize a fixed time step for any animations.
-		m_pTimer->SetFixedTimeStep( 1.0f / 80.0f );
-	}
-
-	// Create the window.
-	int width = 800;
-	int height = 600;
-
-	// Create the window wrapper class instance.
-	m_pWindow = new Win32RenderWindow();
-	m_pWindow->SetPosition( 20, 20 );
-	m_pWindow->SetSize( width, height );
-	m_pWindow->SetCaption( std::wstring( L"Direct3D 11 Window" ) );
-	m_pWindow->Initialize();
-
-	// Create a swap chain for the window.
-	SwapChainConfigDX11 Config;
-	Config.SetWidth( m_pWindow->GetWidth() );
-	Config.SetHeight( m_pWindow->GetHeight() );
-	Config.SetOutputWindow( m_pWindow->GetHandle() );
-	m_pWindow->SetSwapChain( m_pRenderer11->CreateSwapChain( &Config ) );
-
-	// We'll keep a copy of the swap chain's render target index to 
-	// use later.
-	m_RenderTarget = m_pRenderer11->GetSwapChainResource( m_pWindow->GetSwapChain() );
-
-	// Next we create a depth buffer for use in the traditional rendering
-	// pipeline.
-	Texture2dConfigDX11 DepthConfig;
-	DepthConfig.SetDepthBuffer( width, height );
-	m_DepthTarget = m_pRenderer11->CreateTexture2D( &DepthConfig, 0 );
-
-	// Create a view port to use on the scene.  This basically selects the 
-	// entire floating point area of the render target.
-	D3D11_VIEWPORT viewport;
-	viewport.Width = static_cast< float >( width );
-	viewport.Height = static_cast< float >( height );
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-
-	m_pRenderer11->pImmPipeline->SetViewPort( m_pRenderer11->CreateViewPort( viewport ) );
-	
-	return( true );
+	return( ConfigureRenderingEngineComponents( 800, 600, D3D_FEATURE_LEVEL_11_0 ) );
 }
 //--------------------------------------------------------------------------------
 void App::ShutdownEngineComponents()
@@ -149,17 +74,8 @@ void App::Initialize()
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
 
-	m_pCamera = new Camera();
-	//m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.30f, 1.5f, 0.0f ) );
 	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 25.0f, -10.0f );
-	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.1f, 0.1f, 0.3f, 0.0f ) );
-	m_pCamera->SetCameraView( m_pRenderView );
-	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, 800.0f / 600.0f, static_cast<float>( D3DX_PI ) / 2.0f );
-
-	// Setup the rendering of a text overlay.
-
-	m_pViewTextOverlay = new ViewTextOverlay( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 
 
 	// Create the scene and add the entities to it.  Then add the camera to the
@@ -221,7 +137,6 @@ void App::Initialize()
 	m_pNode->AttachChild( m_pStaticActor->GetNode() );
 
 	m_pScene->AddEntity( m_pNode );
-	m_pScene->AddCamera( m_pCamera );
 
 
 	// Setup the skinned actors' bind poses and start their animations.
@@ -233,8 +148,6 @@ void App::Initialize()
 	m_pSkinnedActor->SetBindPose();
 	m_pSkinnedActor->SetSkinningMatrices( *m_pRenderer11 );
 	m_pSkinnedActor->PlayAllAnimations();
-
-	m_pRenderer11->SetMultiThreadingState( false );
 
 	m_pStaticActor->GetBody()->Position() = Vector3f( -20.0f, 10.0f, 15.0f );
 	m_pSkinnedActor->GetNode()->Position() = Vector3f( 0.0f, 0.0f, 20.0f );
@@ -254,6 +167,15 @@ void App::Update()
 
 	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
 
+
+	std::wstringstream out;
+	out << L"Hieroglyph 3 : Skin and Bones" << std::endl;
+	out << L"The static mesh represents rigid geometry, while skinned meshes can be animated." << std::endl;
+	out << L"Each node in the skinned meshes displays its coordinate axes." << std::endl;
+	out << L"To start the animations press 'A'" << std::endl;
+
+	m_pTextOverlayView->WriteText( out.str(), Matrix4f::Identity(), Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
 	// Update the scene, and then render all cameras within the scene.
 
 	m_pScene->Update( m_pTimer->Elapsed() );
@@ -263,16 +185,6 @@ void App::Update()
 
 	m_pScene->Render( m_pRenderer11 );
 
-	std::wstringstream out;
-	out << L"Hieroglyph 3 : Skin and Bones" << std::endl;
-	out << L"The static mesh represents rigid geometry, while skinned meshes can be animated." << std::endl;
-	out << L"Each node in the skinned meshes displays its coordinate axes." << std::endl;
-	out << L"To start the animations press 'A'" << std::endl;
-
-	m_pViewTextOverlay->WriteText( out.str(), Matrix4f::Identity(), Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
-
-	m_pRenderer11->QueueRenderView( m_pViewTextOverlay );
-	m_pRenderer11->ProcessRenderViewQueue();
 
 	// Perform the rendering and presentation for the window.
 
@@ -286,13 +198,12 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"SkinAndBones_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pViewTextOverlay );
 	SAFE_DELETE( m_pStaticActor );
 	SAFE_DELETE( m_pSkinnedActor );
 	SAFE_DELETE( m_pDisplacedActor );

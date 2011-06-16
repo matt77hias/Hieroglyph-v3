@@ -235,6 +235,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Application\RenderApplication.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Application\RenderApplication.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Application\RenderWindow.cpp"
 				>
 			</File>

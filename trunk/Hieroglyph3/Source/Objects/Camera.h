@@ -31,6 +31,7 @@ namespace Glyph3
 		virtual ~Camera();
 
 		void SetCameraView( IRenderView* pView );
+		void SetOverlayView( IRenderView* pView );
 		void SetScene( Scene* pScene );
 		void RenderFrame( RendererDX11* pRenderer );
 
@@ -40,6 +41,7 @@ namespace Glyph3
 
 	protected:
 		IRenderView* m_pCameraView;
+		IRenderView* m_pOverlayView;
 		Scene* m_pScene;
 
 		float m_fNear;

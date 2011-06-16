@@ -23,7 +23,7 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ViewTextOverlay::ViewTextOverlay( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget )
 {
-	m_sParams.iViewType = VT_PERSPECTIVE;
+	m_sParams.iViewType = VT_GUI_SKIN;
 
 	m_RenderTarget = RenderTarget;
 	m_DepthTarget = DepthTarget;
@@ -78,6 +78,18 @@ void ViewTextOverlay::PreDraw( RendererDX11* pRenderer )
 //--------------------------------------------------------------------------------
 void ViewTextOverlay::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
+	// Set the parameters for rendering this view
+	pPipelineManager->ClearRenderTargets();
+	pPipelineManager->BindRenderTargets( 0, m_RenderTarget );
+	pPipelineManager->BindDepthTarget( m_DepthTarget );
+	pPipelineManager->ApplyRenderTargets();
+
+	pPipelineManager->SetViewPort( m_iViewport );
+
+	// Set default states for these stages
+	pPipelineManager->SetRasterizerState( 0 );
+	pPipelineManager->SetDepthStencilState( 0 );
+	pPipelineManager->SetBlendState( 0 );
 
 	for ( int i = 0; i < m_TextEntries.count(); i++ )
 	{

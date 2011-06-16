@@ -58,6 +58,7 @@ namespace Glyph3
 		ResourcePtr ParticleStateBuffers[2];
 		ResourcePtr ParticleCountCBBuffer; // Constant buffer
 		ResourcePtr ParticleCountIABuffer; // Indirect args
+		ResourcePtr ParticleCountSTBuffer; // Staging buffer
 
 		// The render effects that we will use for inserting particles and updating
 		// their state in the simulation.

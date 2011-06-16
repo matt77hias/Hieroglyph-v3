@@ -1,6 +1,5 @@
 
-#include "Application.h"
-#include "IEventListener.h"
+#include "RenderApplication.h"
 
 #include "Win32RenderWindow.h"
 #include "RendererDX11.h"
@@ -18,7 +17,7 @@
 
 using namespace Glyph3;
 
-class App : public Application, public IEventListener
+class App : public RenderApplication
 {
 
 public:
@@ -37,22 +36,22 @@ public:
 
 protected:
 
-	RendererDX11*			m_pRenderer11;
-	Win32RenderWindow*		m_pWindow;
+//	RendererDX11*			m_pRenderer11;
+//	Win32RenderWindow*		m_pWindow;
 
-	ResourcePtr				m_RenderTarget;
-	ResourcePtr				m_DepthTarget;
+//	ResourcePtr				m_RenderTarget;
+//	ResourcePtr				m_DepthTarget;
 
-	ViewPerspective*		m_pRenderView;
+//	ViewPerspective*		m_pRenderView;
 	Node3D*					m_pNode;
 	Entity3D*				m_pEntity;
 	
-	Camera*					m_pCamera;
+//	Camera*					m_pCamera;
 
-	SpriteFontDX11*			m_pFont;
-	SpriteRendererDX11*		m_pSpriteRenderer;
+//	SpriteFontDX11*			m_pFont;
+//	SpriteRendererDX11*		m_pSpriteRenderer;
 
-	bool					m_bSaveScreenshot;
+//	bool					m_bSaveScreenshot;
 
 	VectorParameterDX11*	m_pTimeFactors;
 	VectorParameterDX11*	m_pEmitterLocation;

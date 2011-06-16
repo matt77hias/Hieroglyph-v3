@@ -134,20 +134,6 @@ void App::ShutdownEngineComponents()
 //--------------------------------------------------------------------------------
 void App::Initialize()
 {
-	// Basic event handling is supported with the EventManager class.  This is a 
-	// singleton class that allows an EventListener to register which events it
-	// wants to receive.
-
-	EventManager* pEventManager = EventManager::Get( );
-
-	// The application object wants to know about these three events, so it 
-	// registers itself with the appropriate event IDs.
-
-	pEventManager->AddEventListener( SYSTEM_KEYBOARD_KEYUP, this );
-	pEventManager->AddEventListener( SYSTEM_KEYBOARD_KEYDOWN, this );
-	pEventManager->AddEventListener( SYSTEM_KEYBOARD_CHAR, this );
-
-
 	// Load and initialize the geometry to be rendered.
 
 	m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
