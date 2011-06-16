@@ -308,7 +308,7 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterMana
 	// Update the particles with a fixed number of threads.  The unused threads will simply
 	// not do anything, as they can't read any data from the Append/Consume buffer.
 
-	pPipelineManager->Dispatch( *pParticleUpdate, 2, 1, 1, pParamManager );
+	pPipelineManager->Dispatch( *pParticleUpdate, 512, 1, 1, pParamManager );
 
 
 
