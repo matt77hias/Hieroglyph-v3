@@ -93,7 +93,6 @@ RendererDX11::RendererDX11()
 
 	m_pParamMgr = 0;
 	pImmPipeline = 0;
-	m_pDeferredPipeline = 0;
 
 	m_bMultiThreadActive = true;			// Initialize this to always use MT!
 	m_FeatureLevel = D3D_FEATURE_LEVEL_9_1; // Initialize this to only support 9.1...
@@ -233,33 +232,23 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	pImmPipeline = new PipelineManagerDX11();
 	pImmPipeline->SetDeviceContext( pContext, m_FeatureLevel );
 
-	// Create deferred contexts if desired...
-	ID3D11DeviceContext* pDeferred = 0;
-	m_pDevice->CreateDeferredContext( 0, &pDeferred );
-
-	m_pDeferredPipeline = new PipelineManagerDX11();
-	m_pDeferredPipeline->SetDeviceContext( pDeferred, m_FeatureLevel );
-
 	// Rasterizer State (RS) - the first state will be index zero, so no need
 	// to keep a copy of it here.
 
 	RasterizerStateConfigDX11 RasterizerState;
 	pImmPipeline->SetRasterizerState( CreateRasterizerState( &RasterizerState ) );
-	m_pDeferredPipeline->SetRasterizerState( 0 );
 
 	// Depth Stencil State (DS) - the first state will be index zero, so no need
 	// to keep a copy of it here.
 
 	DepthStencilStateConfigDX11 DepthStencilState;
 	pImmPipeline->SetDepthStencilState( CreateDepthStencilState( &DepthStencilState ) );
-	m_pDeferredPipeline->SetDepthStencilState( 0 );
 
 	// Output Merger State (OM) - the first state will be index zero, so no need
 	// to keep a copy of it here.
 
 	BlendStateConfigDX11 BlendState;
 	pImmPipeline->SetBlendState( CreateBlendState( &BlendState ) );
-	m_pDeferredPipeline->SetBlendState( 0 );
 
 	// Create a query object to be used to gather statistics on the pipeline.
 
@@ -309,7 +298,7 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 
 		// Create the pipeline and set the context.
 		g_aPayload[i].pPipeline = new PipelineManagerDX11();
-		g_aPayload[i].pPipeline->m_pContext = pDeferred;
+		g_aPayload[i].pPipeline->SetDeviceContext( pDeferred, m_FeatureLevel );
 		g_aPayload[i].pPipeline->SetRasterizerState( 0 );
 		g_aPayload[i].pPipeline->SetDepthStencilState( 0 );
 		g_aPayload[i].pPipeline->SetBlendState( 0 );
@@ -361,7 +350,6 @@ void RendererDX11::Shutdown()
 
 	SAFE_DELETE( m_pParamMgr );
 	SAFE_DELETE( pImmPipeline );
-	SAFE_DELETE( m_pDeferredPipeline );
 
 	// Since these are all managed with smart pointers, we just empty the
 	// container and the objects will automatically be deleted.
@@ -2118,7 +2106,7 @@ unsigned int WINAPI _RenderViewThreadProc( void* lpParameter )
 		// Execute the render view with the provided pipeline and parameter managers.
 		pPayload->pRenderView->Draw( pPayload->pPipeline, pPayload->pParamManager );
 
-		pPayload->pPipeline->m_pContext->ClearState();
+		//pPayload->pPipeline->m_pContext->ClearState();
 
 		// Generate the command list.
 		pPayload->pPipeline->GenerateCommandList( pPayload->pList );

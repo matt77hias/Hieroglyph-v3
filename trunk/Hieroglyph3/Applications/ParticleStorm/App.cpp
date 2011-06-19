@@ -77,7 +77,7 @@ void App::Initialize()
 	m_pScene->AddEntity( m_pNode );
 
 
-	m_pRenderer11->SetMultiThreadingState( false );
+	//m_pRenderer11->SetMultiThreadingState( false );
 
 	m_pTimeFactors = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"TimeFactors" ) );
 	m_pEmitterLocation = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"EmitterLocation" ) );
@@ -112,6 +112,20 @@ void App::Update()
 
 	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
 
+	// The following code can be used to read out the structure count data from
+	// the staging buffer of the ViewSimulation class.  This requires the copy
+	// methods to be un-commented in the classes draw method.
+	//
+	//D3D11_MAPPED_SUBRESOURCE mapped;
+	//unsigned int* pCount = 0;
+	//unsigned int count[8];
+
+	//ResourcePtr stagingbuffer = ((ParticleSystemEntity*)m_pEntity)->GetSimulationView()->GetParticleCountStagingBuffer();
+	//mapped = m_pRenderer11->pImmPipeline->MapResource( stagingbuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
+	//pCount = (unsigned int*)(mapped.pData);
+	//for ( int i = 0; i < 8; i++ )
+	//	count[i] = pCount[i];
+	//m_pRenderer11->pImmPipeline->UnMapResource( stagingbuffer->m_iResource, 0 );
 
 	// Update the scene, and then render all cameras within the scene.
 

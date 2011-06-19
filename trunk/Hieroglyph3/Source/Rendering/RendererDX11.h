@@ -322,9 +322,9 @@ namespace Glyph3
 		TArray<ViewPortDX11*>									m_vViewPorts;
 
 	public:
-		IParameterManager*									m_pParamMgr;
+		IParameterManager*										m_pParamMgr;
 		PipelineManagerDX11*									pImmPipeline;
-		PipelineManagerDX11*									m_pDeferredPipeline;
+
 
 	protected:
 

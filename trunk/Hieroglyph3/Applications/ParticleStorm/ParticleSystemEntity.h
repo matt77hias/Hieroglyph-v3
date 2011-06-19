@@ -29,6 +29,7 @@ namespace Glyph3
 		virtual void PreRender( RendererDX11* pRenderer, VIEWTYPE view );
 		virtual void Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view );
 
+		ViewSimulation* GetSimulationView();
 
 	public:
 		ResourcePtr ArgsBuffer;

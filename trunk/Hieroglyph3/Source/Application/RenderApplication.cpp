@@ -42,14 +42,14 @@ RenderApplication::RenderApplication()
 	m_bSaveScreenshot = false;
 }
 //--------------------------------------------------------------------------------
-bool RenderApplication::ConfigureRenderingEngineComponents( int width, int height, D3D_FEATURE_LEVEL desiredLevel )
+bool RenderApplication::ConfigureRenderingEngineComponents( int width, int height, D3D_FEATURE_LEVEL desiredLevel, D3D_DRIVER_TYPE driverType )
 {
 	// Create the renderer and initialize it for the desired device
 	// type and feature level.
 
 	m_pRenderer11 = new RendererDX11();
 
-	if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_HARDWARE, desiredLevel ) )
+	if ( !m_pRenderer11->Initialize( driverType, desiredLevel ) )
 	{
 		Log::Get().Write( L"Could not create hardware device, trying to create the reference device..." );
 

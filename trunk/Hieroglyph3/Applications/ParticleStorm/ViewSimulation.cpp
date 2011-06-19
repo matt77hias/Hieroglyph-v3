@@ -43,6 +43,7 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 	{
 		pData[i].position.MakeZero();
 		pData[i].direction = Vector3f( 0.0f, 0.0f, 1.0f );
+		pData[i].time = 0.0f;
 	}
 
 	D3D11_SUBRESOURCE_DATA InitialData;
@@ -129,7 +130,7 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 	// current number of particles is dynamically loaded into the buffer with the 
 	// CopyStuctureCount method.
 
-	UINT* pInitArgs = new UINT[4];
+	UINT* pInitArgs = new UINT[8];
 
 	pInitArgs[0] = 0;
 	pInitArgs[1] = 0;
@@ -175,17 +176,17 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 	ParticleCountIABuffer = Renderer.CreateIndirectArgsBuffer( &ArgsConfig, &InitArgsData );
 
 
-	// Create a buffer to be used as a staging buffer for readback from the GPU.
+	// Create a buffer to be used as a staging buffer for readback from the GPU.  We will
+	// allow the index to be used to define where to copy to...
 
-	pInitArgs[0] = 0;
-	pInitArgs[1] = 0;
-	pInitArgs[2] = 0;
-	pInitArgs[3] = 0;
+	for ( int i = 0; i < BUFFER_SIZE; i++ )
+		pInitArgs[i] = 0;
 
 	BufferConfigDX11 StagingConfig;
-	StagingConfig.SetDefaultStagingBuffer( 4 * sizeof( UINT ) );
+	StagingConfig.SetDefaultStagingBuffer( BUFFER_SIZE * sizeof( UINT ) );
 	ParticleCountSTBuffer = Renderer.CreateIndirectArgsBuffer( &StagingConfig, &InitArgsData );
 
+	m_BufferIndex = 0;
 
 	// Set up the render effect for actually updating the simulation.
 
@@ -227,6 +228,11 @@ ResourcePtr ViewSimulation::GetParticleCountIndirectArgsBuffer()
 	return( ParticleCountIABuffer );
 }
 //--------------------------------------------------------------------------------
+ResourcePtr ViewSimulation::GetParticleCountStagingBuffer()
+{
+	return( ParticleCountSTBuffer );
+}
+//--------------------------------------------------------------------------------
 void ViewSimulation::Update( float fTime )
 {
 }
@@ -243,25 +249,12 @@ void ViewSimulation::PreDraw( RendererDX11* pRenderer )
 void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 
+	//if ( m_BufferIndex < BUFFER_SIZE )
+	//	pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[0] );
 
-	//D3D11_MAPPED_SUBRESOURCE mapped;
-	//unsigned int* pCount = 0;
-	//unsigned int count[6];
+	//if ( m_BufferIndex < BUFFER_SIZE )
+	//	pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[1] );
 
-	//pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 0, ParticleStateBuffers[0] );
-
-	//mapped = pPipelineManager->MapResource( ParticleCountSTBuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
-	//pCount = (unsigned int*)(mapped.pData);
-	//count[0] = pCount[0];
-	//pPipelineManager->UnMapResource( ParticleCountSTBuffer->m_iResource, 0 );
-
-
-	//pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 0, ParticleStateBuffers[1] );
-
-	//mapped = pPipelineManager->MapResource( ParticleCountSTBuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
-	//pCount = (unsigned int*)(mapped.pData);
-	//count[1] = pCount[0];
-	//pPipelineManager->UnMapResource( ParticleCountSTBuffer->m_iResource, 0 );
 
 	// Initialize the buffers...
 	if ( bOneTimeInit == true )
@@ -276,6 +269,14 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterMana
 	SetRenderParams( pParamManager );
 	
 
+	//if ( m_BufferIndex < BUFFER_SIZE )
+	//	pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[0] );
+
+	//if ( m_BufferIndex < BUFFER_SIZE )
+	//	pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[1] );
+
+
+
 	// Add any new particles here.  For now we simply add one batch of particles every
 	// frame.  If there are issues with overflowing the buffer then we would need to 
 	// throttle the creation of new particles here.	
@@ -285,20 +286,11 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterMana
 	// Read out the total number of particles for updating into a constant buffer and an
 	// indirect argument buffer.
 
-	//pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 0, ParticleStateBuffers[0] );
+	//if ( m_BufferIndex < BUFFER_SIZE )
+	//	pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[0] );
 
-	//mapped = pPipelineManager->MapResource( ParticleCountSTBuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
-	//pCount = (unsigned int*)(mapped.pData);
-	//count[2] = pCount[0];
-	//pPipelineManager->UnMapResource( ParticleCountSTBuffer->m_iResource, 0 );
-
-
-	//pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 0, ParticleStateBuffers[1] );
-
-	//mapped = pPipelineManager->MapResource( ParticleCountSTBuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
-	//pCount = (unsigned int*)(mapped.pData);
-	//count[3] = pCount[0];
-	//pPipelineManager->UnMapResource( ParticleCountSTBuffer->m_iResource, 0 );
+	//if ( m_BufferIndex < BUFFER_SIZE )
+	//	pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[1] );
 
 
 	pPipelineManager->CopyStructureCount( ParticleCountIABuffer, 0, ParticleStateBuffers[0] );
@@ -312,30 +304,13 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterMana
 
 
 
-	//pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 0, ParticleStateBuffers[0] );
+	//if ( m_BufferIndex < BUFFER_SIZE )
+	//	pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[0] );
 
-	//mapped = pPipelineManager->MapResource( ParticleCountSTBuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
-	//pCount = (unsigned int*)(mapped.pData);
-	//count[4] = pCount[0];
-	//pPipelineManager->UnMapResource( ParticleCountSTBuffer->m_iResource, 0 );
+	//if ( m_BufferIndex < BUFFER_SIZE )
+	//	pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[1] );
 
-
-	//pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 0, ParticleStateBuffers[1] );
-
-	//mapped = pPipelineManager->MapResource( ParticleCountSTBuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
-	//pCount = (unsigned int*)(mapped.pData);
-	//count[5] = pCount[0];
-	//pPipelineManager->UnMapResource( ParticleCountSTBuffer->m_iResource, 0 );
-
-
-
-
-
-	// Switch the two resources so that the current state is maintained in slot 0.
-
-	ResourcePtr TempState = ParticleStateBuffers[0];
-	ParticleStateBuffers[0] = ParticleStateBuffers[1];
-	ParticleStateBuffers[1] = TempState;
+	m_BufferIndex = 0;
 }
 //--------------------------------------------------------------------------------
 void ViewSimulation::SetRenderParams( IParameterManager* pParamManager )
@@ -377,6 +352,28 @@ void ViewSimulation::SetUsageParams( IParameterManager* pParamManager )
 	// Set the current state of the simulation for use as particle data while 
 	// rendering.
 
-	pParamManager->SetShaderResourceParameter( pSimState, ParticleStateBuffers[0] );
+	pParamManager->SetShaderResourceParameter( pSimState, ParticleStateBuffers[1] );
+}
+//--------------------------------------------------------------------------------
+bool ViewSimulation::HandleEvent( IEvent* pEvent )
+{
+	eEVENT e = pEvent->GetEventType();
+
+	// Start of a rendering frame
+	if ( e == RENDER_FRAME_START )
+	{
+		// Swap the two buffers in between frames to allow multithreaded access
+		// during the rendering phase for the particle buffers.
+		ResourcePtr TempState = ParticleStateBuffers[0];
+		ParticleStateBuffers[0] = ParticleStateBuffers[1];
+		ParticleStateBuffers[1] = TempState;
+
+		// Return false to ensure other views can reset as well
+		return( false );
+	}
+
+	IRenderView::HandleEvent( pEvent );
+
+	return( false );
 }
 //--------------------------------------------------------------------------------

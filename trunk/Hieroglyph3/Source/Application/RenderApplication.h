@@ -19,7 +19,7 @@ public:
 	RenderApplication();
 	
 public:
-	bool ConfigureRenderingEngineComponents( int width, int height, D3D_FEATURE_LEVEL desiredLevel );
+	bool ConfigureRenderingEngineComponents( int width, int height, D3D_FEATURE_LEVEL desiredLevel, D3D_DRIVER_TYPE driverType = D3D_DRIVER_TYPE_HARDWARE );
 
 protected:
 

@@ -89,7 +89,7 @@ ParticleSystemEntity::ParticleSystemEntity()
 	// Create the render view that will run the simulation.  The size should be
 	// selected accordingly for the maximum number of particles.
 
-	m_pSimulation = new ViewSimulation( *pRenderer11, 16384 * 32 );
+	m_pSimulation = new ViewSimulation( *pRenderer11, /*16384*/2048 * 32 );
 
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
@@ -166,5 +166,10 @@ void ParticleSystemEntity::Render( PipelineManagerDX11* pPipelineManager, IParam
 				pParamManager );
 		}
 	}
+}
+//--------------------------------------------------------------------------------
+ViewSimulation* ParticleSystemEntity::GetSimulationView()
+{
+	return( m_pSimulation );
 }
 //--------------------------------------------------------------------------------

@@ -51,6 +51,9 @@ namespace Glyph3
 
 		ResourcePtr GetParticleCountConstantBuffer();
 		ResourcePtr GetParticleCountIndirectArgsBuffer();
+		ResourcePtr GetParticleCountStagingBuffer();
+
+		virtual bool HandleEvent( IEvent* pEvent );
 
 	protected:
 
@@ -59,6 +62,10 @@ namespace Glyph3
 		ResourcePtr ParticleCountCBBuffer; // Constant buffer
 		ResourcePtr ParticleCountIABuffer; // Indirect args
 		ResourcePtr ParticleCountSTBuffer; // Staging buffer
+
+		unsigned int m_BufferIndex;
+
+		#define BUFFER_SIZE 8
 
 		// The render effects that we will use for inserting particles and updating
 		// their state in the simulation.
