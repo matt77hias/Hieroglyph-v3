@@ -32,7 +32,7 @@ bool SpriteFontDX11::Initialize(LPCWSTR fontName, float fontSize, UINT fontStyle
 {
 	m_fSize = fontSize;
 
-	TextRenderingHint hint = antiAliased ? TextRenderingHintAntiAliasGridFit : TextRenderingHintSystemDefault;
+	TextRenderingHint hint = antiAliased ? TextRenderingHintAntiAliasGridFit : TextRenderingHintSingleBitPerPixelGridFit;
 
 	// Init GDI+
 	ULONG_PTR token = NULL;
