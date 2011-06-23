@@ -158,7 +158,7 @@ void FirstPersonCamera::Update()
     timer.Update();
     float timeDelta = timer.Elapsed();    
 
-    float CamMoveSpeed = 1.0f * timeDelta;
+    float CamMoveSpeed = 10.0f * timeDelta;
     const float CamRotSpeed = 0.24f * timeDelta;    
 
     // Move the camera with keyboard input
@@ -197,6 +197,6 @@ void FirstPersonCamera::Update()
     m_fRotationY = WrapAngle( m_fRotationY );
 
     // Make a rotation matrix from the X/Y rotation
-    rotation.Rotation( Vector3f( m_fRotationX, m_fRotationY, 0.0f ) );    
+    rotation.RotationZYX( Vector3f( m_fRotationX, m_fRotationY, 0.0f ) );    
 }
 //--------------------------------------------------------------------------------

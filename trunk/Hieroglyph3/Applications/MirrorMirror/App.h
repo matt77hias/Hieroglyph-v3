@@ -1,5 +1,5 @@
 
-#include "Application.h"
+#include "RenderApplication.h"
 
 #include "Win32RenderWindow.h"
 #include "RendererDX11.h"
@@ -20,7 +20,7 @@
 
 using namespace Glyph3;
 
-class App : public Application
+class App : public RenderApplication
 {
 
 public:
@@ -39,28 +39,15 @@ public:
 
 protected:
 
-	RendererDX11*			m_pRenderer11;
-	Win32RenderWindow*		m_pWindow;
-
-	ResourcePtr				m_RenderTarget;
-	ResourcePtr				m_DepthTarget;
-
-	ViewPerspective*		m_pRenderView;
 	Node3D*					m_pNode;
 	DiffuseSphereEntity*	m_pEntity;
 	ReflectiveSphereEntity*	m_pReflector[16];
 	
-	Camera*					m_pCamera;
 	Actor*					m_pDiffuseActor;
 	Actor*					m_pReflectiveActor;
 
 	Vector4f				m_LightParams;
 	Vector4f				m_LightPosition;
-
-	SpriteFontDX11*			m_pFont;
-	SpriteRendererDX11*		m_pSpriteRenderer;
-
-	bool					m_bSaveScreenshot;
 
 	VectorParameterDX11*	m_pLightColor;
 	VectorParameterDX11*	m_pLightPosition;

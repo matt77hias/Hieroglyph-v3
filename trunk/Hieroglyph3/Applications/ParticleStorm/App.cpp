@@ -138,8 +138,10 @@ void App::Update()
 	Log::Get().Write( m_pRenderer11->pImmPipeline->PrintPipelineStatistics() );
 
 	std::wstringstream out;
-	out << L"Hieroglyph 3 : Particle Storm\nFPS: " << m_pTimer->Framerate();
-	m_pTextOverlayView->WriteText( out.str(), Matrix4f::Identity(), Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	out << L"Hieroglyph 3 : " << GetName() << std::endl;
+	out << L"nFPS: " << m_pTimer->Framerate();
+	m_pTextOverlayView->WriteText( out.str(), Matrix4f::TranslationMatrix( 5.0f, 5.0f, 0.0f ),
+		Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 
 	// Perform the rendering and presentation for the window.

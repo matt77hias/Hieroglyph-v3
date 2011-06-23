@@ -23,6 +23,7 @@
 #include "RasterizerStateConfigDX11.h"
 
 #include "IParameterManager.h"
+#include "FirstPersonCamera.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -102,12 +103,12 @@ bool RenderApplication::ConfigureRenderingEngineComponents( int width, int heigh
 	m_pTextOverlayView = new ViewTextOverlay( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 
 
-	m_pCamera = new Camera();
+	m_pCamera = new FirstPersonCamera();
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.0f, 0.0f, 0.0f ) );
 	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 10.0f, -20.0f );
 	m_pCamera->SetCameraView( m_pRenderView );
 	m_pCamera->SetOverlayView( m_pTextOverlayView );
-	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>(m_iWidth) / static_cast<float>(m_iHeight), static_cast<float>( D3DX_PI ) / 2.0f );
+	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>(m_iWidth) / static_cast<float>(m_iHeight), static_cast<float>( D3DX_PI ) / 4.0f );
 
 	m_pScene->AddCamera( m_pCamera );
 

@@ -60,7 +60,7 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 	config.SetDefaultStructuredBuffer( m_iParticleCount, sizeof( Particle ) );
 	config.SetBindFlags( D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE );
 	config.SetMiscFlags( D3D11_RESOURCE_MISC_BUFFER_STRUCTURED );
-	
+		
 	ResourcePtr buffer1 = Renderer.CreateStructuredBuffer( &config, &InitialData );
 	ResourcePtr buffer2 = Renderer.CreateStructuredBuffer( &config, &InitialData );
 

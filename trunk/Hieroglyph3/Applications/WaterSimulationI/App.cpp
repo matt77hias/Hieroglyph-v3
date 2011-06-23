@@ -223,7 +223,7 @@ bool App::HandleEvent( IEvent* pEvent )
 
 		unsigned int key = pKeyDown->GetCharacterCode();
 
-		return( true );
+		//return( true );
 	}
 	else if ( e == SYSTEM_KEYBOARD_KEYUP )
 	{
