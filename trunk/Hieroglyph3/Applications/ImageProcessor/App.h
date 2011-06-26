@@ -1,10 +1,6 @@
 
-#include "Application.h"
+#include "RenderApplication.h"
 
-#include "Win32RenderWindow.h"
-#include "RendererDX11.h"
-
-#include "ViewPerspective.h"
 #include "GeometryDX11.h"
 #include "MaterialDX11.h"
 #include "Camera.h"
@@ -13,12 +9,9 @@
 #include "ShaderResourceParameterDX11.h"
 #include "UnorderedAccessParameterDX11.h"
 
-#include "SpriteRendererDX11.h"
-#include "SpriteFontDX11.h"
-
 using namespace Glyph3;
 
-class App : public Application
+class App : public RenderApplication
 {
 
 public:
@@ -37,19 +30,11 @@ public:
 
 protected:
 
-	RendererDX11*			m_pRenderer11;
-	Win32RenderWindow*		m_pWindow;
-
-	ResourcePtr				m_RenderTarget;
-	ResourcePtr				m_DepthTarget;
-
 	// Texture Resources
 	ResourcePtr				m_Texture[3];
 	ResourcePtr				m_Intermediate;
 	ResourcePtr				m_Output;
 
-
-	ViewPerspective*		m_pRenderView;
 	Node3D*					m_pNode;
 	Entity3D*				m_pEntity;
 
@@ -62,13 +47,6 @@ protected:
 	RenderEffectDX11*		m_pBruteForceBilateral;
 	RenderEffectDX11*		m_pSeparableBilateralX;
 	RenderEffectDX11*		m_pSeparableBilateralY;
-
-	Camera*					m_pCamera;
-
-	SpriteFontDX11*			m_pFont;
-	SpriteRendererDX11*		m_pSpriteRenderer;
-
-	bool					m_bSaveScreenshot;
 
 	ShaderResourceParameterDX11* m_pColorMapParameter;
 	ShaderResourceParameterDX11* m_pInputParameter;

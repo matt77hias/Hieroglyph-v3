@@ -12,9 +12,6 @@
 
 #include "ScriptManager.h"
 
-#include "SwapChainConfigDX11.h"
-#include "Texture2dConfigDX11.h"
-
 #include "GeometryLoaderDX11.h"
 #include "GeometryGeneratorDX11.h"
 #include "MaterialGeneratorDX11.h"
@@ -36,83 +33,11 @@ App::App()
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
 {
-	// Create the renderer and initialize it for the desired device
-	// type and feature level.
-
-	m_pRenderer11 = new RendererDX11();
-
-	if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_HARDWARE, D3D_FEATURE_LEVEL_11_0 ) )
-	{
-		Log::Get().Write( L"Could not create hardware device, trying to create the reference device..." );
-
-		if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_REFERENCE, D3D_FEATURE_LEVEL_11_0 ) )
-		{
-			MessageBox( m_pWindow->GetHandle(), L"Could not create a hardware or software Direct3D 11 device - the program will now abort!", L"Hieroglyph 3 Rendering", MB_ICONEXCLAMATION | MB_SYSTEMMODAL );
-			RequestTermination();			
-			return( false );
-		}
-
-		// If using the reference device, utilize a fixed time step for any animations.
-		m_pTimer->SetFixedTimeStep( 1.0f / 10.0f );
-	}
-
-	// Create the window.
-	int width = 640;
-	int height = 480;
-
-	// Create the window wrapper class instance.
-	m_pWindow = new Win32RenderWindow();
-	m_pWindow->SetPosition( 20, 20 );
-	m_pWindow->SetSize( width, height );
-	m_pWindow->SetCaption( std::wstring( L"Direct3D 11 Window" ) );
-	m_pWindow->Initialize();
-
-	// Create a swap chain for the window.
-	SwapChainConfigDX11 Config;
-	Config.SetWidth( m_pWindow->GetWidth() );
-	Config.SetHeight( m_pWindow->GetHeight() );
-	Config.SetOutputWindow( m_pWindow->GetHandle() );
-	m_pWindow->SetSwapChain( m_pRenderer11->CreateSwapChain( &Config ) );
-
-	// We'll keep a copy of the swap chain's render target index to 
-	// use later.
-	m_RenderTarget = m_pRenderer11->GetSwapChainResource( m_pWindow->GetSwapChain() );
-
-	// Next we create a depth buffer for use in the traditional rendering
-	// pipeline.
-	Texture2dConfigDX11 DepthConfig;
-	DepthConfig.SetDepthBuffer( width, height );
-	m_DepthTarget = m_pRenderer11->CreateTexture2D( &DepthConfig, 0 );
-
-	// Create a view port to use on the scene.  This basically selects the 
-	// entire floating point area of the render target.
-	D3D11_VIEWPORT viewport;
-	viewport.Width = static_cast< float >( width );
-	viewport.Height = static_cast< float >( height );
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-
-	m_pRenderer11->pImmPipeline->SetViewPort( m_pRenderer11->CreateViewPort( viewport ) );
-	
-	// Create the text rendering classes.
-	m_pFont = new SpriteFontDX11();
-	m_pFont->Initialize( L"Consolas", 20.0f, 0, false );
-	
-	m_pSpriteRenderer = new SpriteRendererDX11();
-	m_pSpriteRenderer->Initialize();
-
-	m_pRenderer11->SetMultiThreadingState( false );
-
-	return( true );
+	return( ConfigureRenderingEngineComponents( 640, 480, D3D_FEATURE_LEVEL_11_0 ) );
 }
 //--------------------------------------------------------------------------------
 void App::ShutdownEngineComponents()
 {
-	SAFE_DELETE( m_pFont );
-	SAFE_DELETE( m_pSpriteRenderer );
-
 	if ( m_pRenderer11 )
 	{
 		m_pRenderer11->Shutdown();
@@ -255,13 +180,9 @@ void App::Initialize()
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
 
-	m_pCamera = new Camera();
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.307f, 0.707f, 0.0f ) );
 	m_pCamera->GetNode()->Position() = Vector3f( -70.0f, 30.5f, -75.0f );
-	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.2f, 0.2f ) );
-	m_pCamera->SetCameraView( m_pRenderView );
-	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, 640.0f / 480.0f, static_cast<float>( D3DX_PI ) / 2.0f );
 
 
 	// Create the scene and add the entities to it.  Then add the camera to the
@@ -274,10 +195,7 @@ void App::Initialize()
 	m_pEntity->SetMaterial( pMaterial, false );
 
 	m_pNode->AttachChild( m_pEntity );
-
 	m_pScene->AddEntity( m_pNode );
-	m_pScene->AddCamera( m_pCamera );
-
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -371,16 +289,10 @@ void App::Update()
 		m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
 	}
 
-	//m_pRenderer11->StartPipelineStatistics();
+	m_pTextOverlayView->WriteText( out.str(), Matrix4f::TranslationMatrix( 10.0f, 10.0f, 0.0f ), Vector4f( 1.0f, 1.0f, 0.0f, 1.0f ) );
 
 	m_pScene->Update( m_pTimer->Elapsed() );
 	m_pScene->Render( m_pRenderer11 );
-
-	//m_pRenderer11->EndPipelineStatistics();
-	//Log::Get().Write( m_pRenderer11->PrintPipelineStatistics() );
-
-
-	m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, *m_pFont, out.str().c_str(), Matrix4f::Identity(),Vector4f( 1.0f, 0.0f, 0.0f, 1.0f ) );
 
 
 	// Perform the rendering and presentation for the window.
@@ -395,7 +307,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"ImageProcessor_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
