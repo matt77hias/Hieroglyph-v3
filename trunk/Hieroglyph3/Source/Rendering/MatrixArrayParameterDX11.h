@@ -12,11 +12,11 @@
 // MatrixArrayParameterDX11
 //
 //--------------------------------------------------------------------------------
-#include "RenderParameterDX11.h"
-#include "Matrix4f.h"
-//--------------------------------------------------------------------------------
 #ifndef MatrixArrayParameterDX11_h
 #define MatrixArrayParameterDX11_h
+//--------------------------------------------------------------------------------
+#include "RenderParameterDX11.h"
+#include "Matrix4f.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

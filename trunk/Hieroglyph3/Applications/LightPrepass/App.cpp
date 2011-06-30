@@ -23,6 +23,9 @@
 #include "ShaderResourceParameterWriterDX11.h"
 #include "DepthStencilStateConfigDX11.h"
 
+#include "DepthStencilViewConfigDX11.h"
+#include "ShaderResourceViewConfigDX11.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application

@@ -19,6 +19,8 @@
 #include "SpriteFontDX11.h"
 #include "PipelineManagerDX11.h"
 #include "ParameterManagerDX11.h"
+#include "BufferConfigDX11.h"
+#include "Texture2dConfigDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------

@@ -12,21 +12,21 @@
 // ResourceProxyDX11
 //
 //--------------------------------------------------------------------------------
-#include "BufferConfigDX11.h"
-#include "Texture1dConfigDX11.h"
-#include "Texture2dConfigDX11.h"
-#include "Texture3dConfigDX11.h"
-#include "DepthStencilViewConfigDX11.h"
-#include "ShaderResourceViewConfigDX11.h"
-#include "UnorderedAccessViewConfigDX11.h"
-#include "RenderTargetViewConfigDX11.h"
-#include "RendererDX11.h"
-//--------------------------------------------------------------------------------
 #ifndef ResourceProxyDX11_h
 #define ResourceProxyDX11_h
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
+	class BufferConfigDX11;
+	class Texture1dConfigDX11;
+	class Texture2dConfigDX11;
+	class Texture3dConfigDX11;
+	class DepthStencilViewConfigDX11;
+	class ShaderResourceViewConfigDX11;
+	class UnorderedAccessViewConfigDX11;
+	class RenderTargetViewConfigDX11;
+	class RendererDX11;
+
 	class ResourceProxyDX11
 	{
 	public:

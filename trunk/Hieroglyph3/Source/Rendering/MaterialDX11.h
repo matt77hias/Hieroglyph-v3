@@ -12,15 +12,15 @@
 // MaterialDX11
 //
 //--------------------------------------------------------------------------------
+#ifndef MaterialDX11_h
+#define MaterialDX11_h
+//--------------------------------------------------------------------------------
 #include "RendererDX11.h"
 #include "IRenderView.h"
 #include "RenderEffectDX11.h"
 #include "RenderParameterDX11.h"
 #include "ISharedObject.h"
 #include "ParameterWriter.h"
-//--------------------------------------------------------------------------------
-#ifndef MaterialDX11_h
-#define MaterialDX11_h
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

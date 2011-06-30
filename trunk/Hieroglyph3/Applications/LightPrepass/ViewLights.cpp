@@ -23,6 +23,7 @@
 #include "BlendStateConfigDX11.h"
 #include "AppSettings.h"
 #include "RasterizerStateConfigDX11.h"
+#include "BufferConfigDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------

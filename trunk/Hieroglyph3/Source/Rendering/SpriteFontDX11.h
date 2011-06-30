@@ -12,14 +12,14 @@
 // SpriteFontDX11
 //
 //--------------------------------------------------------------------------------
+#ifndef SpriteFontDX11_h
+#define SpriteFontDX11_h
+//--------------------------------------------------------------------------------
 #include "RendererDX11.h"
 #include "Log.h"
 #include <GdiPlus.h>
 
 #pragma comment( lib, "gdiplus.lib" )
-//--------------------------------------------------------------------------------
-#ifndef SpriteFontDX11_h
-#define SpriteFontDX11_h
 //--------------------------------------------------------------------------------
 #define GdiPlusCall( status )													 \
 	do																			 \

@@ -25,16 +25,6 @@
 #include "Vector4f.h"
 #include "Matrix4f.h"
 
-#include "ViewRenderParams.h"
-#include "VertexStageDX11.h"
-#include "HullStageDX11.h"
-#include "DomainStageDX11.h"
-#include "GeometryStageDX11.h"
-#include "PixelStageDX11.h"
-#include "ComputeStageDX11.h"
-
-#include "OutputMergerStageDX11.h"
-
 #include "ResourceProxyDX11.h"
 
 #define SAFE_RELEASE( x ) {if(x){(x)->Release();(x)=NULL;}}
@@ -92,10 +82,20 @@ namespace Glyph3
 
 	class RenderParameterDX11;
 
-	class ParameterManagerDX11;
+	class IParameterManager;
 	class PipelineManagerDX11;
 
 	class IRenderView;
+
+	enum ShaderType
+	{
+		VERTEX_SHADER = 0,
+		HULL_SHADER = 1,
+		DOMAIN_SHADER = 2,
+		GEOMETRY_SHADER = 3,
+		PIXEL_SHADER = 4,
+		COMPUTE_SHADER = 5
+	};
 
 	enum ResourceType
 	{

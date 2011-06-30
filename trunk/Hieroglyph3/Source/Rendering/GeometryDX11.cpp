@@ -15,6 +15,7 @@
 #include "IndexBufferDX11.h"
 #include "BufferConfigDX11.h"
 #include "Log.h"
+#include "GlyphString.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------

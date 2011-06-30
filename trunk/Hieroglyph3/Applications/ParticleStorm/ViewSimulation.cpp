@@ -16,6 +16,9 @@
 #include "Log.h"
 #include <sstream>
 #include "IParameterManager.h"
+#include "BufferConfigDX11.h"
+#include "UnorderedAccessViewConfigDX11.h"
+#include "ShaderResourceViewConfigDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------

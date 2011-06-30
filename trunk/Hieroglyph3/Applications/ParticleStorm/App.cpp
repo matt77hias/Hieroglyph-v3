@@ -63,7 +63,7 @@ void App::Initialize()
 	// from the camera's point of view of the scene.
 
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.307f, 0.707f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( -50.0f, 30.5f, -50.0f );
+	m_pCamera->GetNode()->Position() = Vector3f( -100.0f, 60.5f, -100.0f );
 	m_pRenderView->SetBackColor( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 
 	// Create the scene and add the entities to it.  Then add the camera to the
@@ -139,7 +139,7 @@ void App::Update()
 
 	std::wstringstream out;
 	out << L"Hieroglyph 3 : " << GetName() << std::endl;
-	out << L"nFPS: " << m_pTimer->Framerate();
+	out << L"FPS: " << m_pTimer->Framerate();
 	m_pTextOverlayView->WriteText( out.str(), Matrix4f::TranslationMatrix( 5.0f, 5.0f, 0.0f ),
 		Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
 

@@ -19,29 +19,19 @@
 // When a shader is bound to the pipeline, it's needed resources are updated if
 // needed and then loaded into the corresponding shader stage.
 //--------------------------------------------------------------------------------
+#ifndef ShaderDX11_h
+#define ShaderDX11_h
+//--------------------------------------------------------------------------------
 #include "RendererDX11.h"
 #include "TArray.h"
 #include <string>
 #include "GlyphString.h"
 #include "RenderParameterDX11.h"
 //--------------------------------------------------------------------------------
-#ifndef ShaderDX11_h
-#define ShaderDX11_h
-//--------------------------------------------------------------------------------
 namespace Glyph3
 {
 	// This enumeration is used to access an array shader stages/programs.  Do not
 	// modify the value of each of the enumerations!
-
-	enum ShaderType
-	{
-		VERTEX_SHADER = 0,
-		HULL_SHADER = 1,
-		DOMAIN_SHADER = 2,
-		GEOMETRY_SHADER = 3,
-		PIXEL_SHADER = 4,
-		COMPUTE_SHADER = 5
-	};
 
 	enum ShaderMask
 	{

@@ -12,10 +12,10 @@
 // UnorderedAccessParameterWriterDX11
 //
 //--------------------------------------------------------------------------------
-#include "ParameterWriter.h"
-//--------------------------------------------------------------------------------
 #ifndef UnorderedAccessParameterWriterDX11_h
 #define UnorderedAccessParameterWriterDX11_h
+//--------------------------------------------------------------------------------
+#include "ParameterWriter.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

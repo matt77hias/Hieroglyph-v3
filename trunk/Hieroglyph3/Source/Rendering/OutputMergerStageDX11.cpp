@@ -16,7 +16,7 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 OutputMergerStageDX11::OutputMergerStageDX11()
 {
-	for ( int i = 0; i < 8; i++ )
+	for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ )
 	{
 		RenderTargetViews[i] = 0;
 		APIRenderTargetViews[i] = 0;
@@ -40,7 +40,7 @@ void OutputMergerStageDX11::SetFeautureLevel( D3D_FEATURE_LEVEL level )
 //--------------------------------------------------------------------------------
 void OutputMergerStageDX11::SetRenderTargetView( int index, ID3D11RenderTargetView* pView )
 {
-	if ( ( index >= 0 ) && ( index < 8 ) )
+	if ( ( index >= 0 ) && ( index < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT ) )
 	{
 		RenderTargetViews[index] = pView;
 	}
@@ -68,7 +68,7 @@ void OutputMergerStageDX11::BindResources( ID3D11DeviceContext* pContext )
 	
 	// Find the highest index that doesn't match.
 	int max = 0;
-	for ( int i = 7; i >= 0; i-- )
+	for ( int i = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT-1; i >= 0; i-- )
 	{
 		if ( RenderTargetViews[i] != APIRenderTargetViews[i] )
 		{
@@ -82,11 +82,12 @@ void OutputMergerStageDX11::BindResources( ID3D11DeviceContext* pContext )
 
 	// If any targets are different then copy them over.
 	if ( max > 0 )
-		pContext->OMSetRenderTargets( 7, RenderTargetViews, DepthTargetViews );
+		pContext->OMSetRenderTargets( D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, RenderTargetViews, DepthTargetViews );
 	
 	// Update the API views to know what to update next time.
-	for ( int i = 0; i < 8; i++ )
+	for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ )
 		APIRenderTargetViews[i] = RenderTargetViews[i];
+
     APIDepthTargetViews = DepthTargetViews;
 }
 //--------------------------------------------------------------------------------
@@ -95,7 +96,7 @@ void OutputMergerStageDX11::ClearResources( ID3D11DeviceContext* pContext )
 	// Clear out all array elements in our cached arrays.  This will be used to 
 	// write nulls into the context later on.
 
-	memset( RenderTargetViews, 0, 8 * sizeof( RenderTargetViews[0] ) );
+	memset( RenderTargetViews, 0, D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT * sizeof( RenderTargetViews[0] ) );
 	DepthTargetViews = 0;
 	memset( UnorderedAccessViews, 0, sizeof( UnorderedAccessViews[0] ) * D3D11_PS_CS_UAV_REGISTER_COUNT );
 	for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) UAVInitialCounts[i] = -1;
@@ -110,5 +111,31 @@ void OutputMergerStageDX11::UnbindResources( ID3D11DeviceContext* pContext )
 	// Bind the changes to the pipeline.
 
 	BindResources( pContext );
+}
+//--------------------------------------------------------------------------------
+unsigned int OutputMergerStageDX11::GetViewsSetCount()
+{
+	unsigned int count = 0;
+
+	for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ )
+	{
+		if ( RenderTargetViews[i] != 0 )
+			count++;
+	}
+
+	return( count );
+}
+//--------------------------------------------------------------------------------
+unsigned int OutputMergerStageDX11::GetViewsBoundCount()
+{
+	unsigned int count = 0;
+
+	for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ )
+	{
+		if ( APIRenderTargetViews[i] != 0 )
+			count++;
+	}
+
+	return( count );
 }
 //--------------------------------------------------------------------------------

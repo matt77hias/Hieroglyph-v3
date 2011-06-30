@@ -12,11 +12,11 @@
 // DepthStencilStateDX11
 //
 //--------------------------------------------------------------------------------
-#include "RendererDX11.h"
-#include "PipelineManagerDX11.h"
-//--------------------------------------------------------------------------------
 #ifndef DepthStencilStateDX11_h
 #define DepthStencilStateDX11_h
+//--------------------------------------------------------------------------------
+#include "RendererDX11.h"
+#include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

@@ -12,11 +12,10 @@
 // ConstantBufferParameterDX11
 //
 //--------------------------------------------------------------------------------
-#include "RenderParameterDX11.h"
-#include "Vector4f.h"
-//--------------------------------------------------------------------------------
 #ifndef ConstantBufferParameterDX11_h
 #define ConstantBufferParameterDX11_h
+//--------------------------------------------------------------------------------
+#include "RenderParameterDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

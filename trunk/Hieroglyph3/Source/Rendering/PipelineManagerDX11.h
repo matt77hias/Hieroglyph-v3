@@ -22,6 +22,7 @@
 #include "GeometryStageDX11.h"
 #include "PixelStageDX11.h"
 #include "ComputeStageDX11.h"
+#include "OutputMergerStageDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

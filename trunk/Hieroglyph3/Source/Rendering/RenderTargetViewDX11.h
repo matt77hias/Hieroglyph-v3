@@ -12,11 +12,11 @@
 // RenderTargetViewDX11
 //
 //--------------------------------------------------------------------------------
-#include "ResourceViewDX11.h"
-#include "PipelineManagerDx11.h"
-//--------------------------------------------------------------------------------
 #ifndef RenderTargetViewDX11_h
 #define RenderTargetViewDX11_h
+//--------------------------------------------------------------------------------
+#include "ResourceViewDX11.h"
+#include "PipelineManagerDx11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

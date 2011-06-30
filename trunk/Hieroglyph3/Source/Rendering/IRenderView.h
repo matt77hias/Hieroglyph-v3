@@ -20,6 +20,7 @@
 #include "IParameterManager.h"
 #include "Timer.h"
 #include "IEventListener.h"
+#include "ViewRenderParams.h"
 #include <vector>
 //--------------------------------------------------------------------------------
 namespace Glyph3

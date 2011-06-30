@@ -16,6 +16,7 @@
 #include "GeometryGeneratorDX11.h"
 #include "MaterialGeneratorDX11.h"
 #include "RasterizerStateConfigDX11.h"
+#include "Texture2dConfigDX11.h"
 
 #include "IParameterManager.h"
 

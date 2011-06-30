@@ -753,25 +753,26 @@ void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth, UINT stenci
     ID3D11RenderTargetView* pRenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { NULL };
 	ID3D11DepthStencilView* pDepthStencilView = 0;
 
-	m_pContext->OMGetRenderTargets( D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, pRenderTargetViews, &pDepthStencilView );
+	// Our output merger class manages the current render targets bound to the pipeline.
+	// The number of views that are currently set refers to the views that the application
+	// has submitted to the pipeline, but not necessarily that have been bound to the API.
+	// For each view that the application thinks is bound, we clear it as requested.  Since
+	// the view count is the number of non-null views, we don't need to check here.
 
-	for( UINT i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i )
+	UINT viewCount = OutputMergerStage.GetViewsSetCount();
+
+	for( UINT i = 0; i < viewCount; ++i )
 	{
-        if( pRenderTargetViews[i] != NULL )
-        {
-		    float clearColours[] = { color.x, color.y, color.z, color.w }; // RGBA
-		    m_pContext->ClearRenderTargetView( pRenderTargetViews[i], clearColours );
-            SAFE_RELEASE( pRenderTargetViews[i] );
-        }
+	    float clearColours[] = { color.x, color.y, color.z, color.w }; // RGBA
+	    m_pContext->ClearRenderTargetView( OutputMergerStage.RenderTargetViews[i], clearColours );
 	}
 
-	if ( pDepthStencilView )
-	{
-		m_pContext->ClearDepthStencilView( pDepthStencilView, D3D11_CLEAR_DEPTH, depth, stencil );
-	}
+	// Check if the output merger currently has a depth target set, and if so clear it.
 
-	// Release the two views	
-	SAFE_RELEASE( pDepthStencilView );
+	if ( OutputMergerStage.DepthTargetViews != 0 )
+	{
+		m_pContext->ClearDepthStencilView( OutputMergerStage.DepthTargetViews, D3D11_CLEAR_DEPTH, depth, stencil );
+	}
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::BindShader( ShaderType type, int ID, IParameterManager* pParamManager )

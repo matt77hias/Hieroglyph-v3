@@ -12,10 +12,10 @@
 // ConstantBufferParameterWriterDX11
 //
 //--------------------------------------------------------------------------------
-#include "ParameterWriter.h"
-//--------------------------------------------------------------------------------
 #ifndef ConstantBufferParameterWriterDX11_h
 #define ConstantBufferParameterWriterDX11_h
+//--------------------------------------------------------------------------------
+#include "ParameterWriter.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

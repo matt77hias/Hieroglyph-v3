@@ -12,10 +12,10 @@
 // ShaderResourceParameterWriterDX11
 //
 //--------------------------------------------------------------------------------
-#include "ParameterWriter.h"
-//--------------------------------------------------------------------------------
 #ifndef ShaderResourceParameterWriterDX11_h
 #define ShaderResourceParameterWriterDX11_h
+//--------------------------------------------------------------------------------
+#include "ParameterWriter.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

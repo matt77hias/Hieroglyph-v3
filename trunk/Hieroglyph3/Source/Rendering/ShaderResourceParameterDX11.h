@@ -12,11 +12,10 @@
 // ShaderResourceParameterDX11
 //
 //--------------------------------------------------------------------------------
-#include "RenderParameterDX11.h"
-#include "Vector4f.h"
-//--------------------------------------------------------------------------------
 #ifndef ShaderResourceParameterDX11_h
 #define ShaderResourceParameterDX11_h
+//--------------------------------------------------------------------------------
+#include "RenderParameterDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

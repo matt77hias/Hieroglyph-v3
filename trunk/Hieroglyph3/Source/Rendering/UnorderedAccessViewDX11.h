@@ -12,11 +12,11 @@
 // UnorderedAccessViewDX11
 //
 //--------------------------------------------------------------------------------
-#include "ResourceViewDX11.h"
-#include "PipelineManagerDx11.h"
-//--------------------------------------------------------------------------------
 #ifndef UnorderedAccessViewDX11_h
 #define UnorderedAccessViewDX11_h
+//--------------------------------------------------------------------------------
+#include "ResourceViewDX11.h"
+#include "PipelineManagerDx11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

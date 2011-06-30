@@ -16,11 +16,11 @@
 // application to specify a single render effect to completely configure the 
 // renderer based on it's current state.
 //--------------------------------------------------------------------------------
-#include "RendererDX11.h"
-#include "PipelineManagerDX11.h"
-//--------------------------------------------------------------------------------
 #ifndef RenderEffectDX11_h
 #define RenderEffectDX11_h
+//--------------------------------------------------------------------------------
+#include "RendererDX11.h"
+#include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

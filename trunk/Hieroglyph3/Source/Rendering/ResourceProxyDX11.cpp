@@ -11,6 +11,15 @@
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "ResourceProxyDX11.h"
+#include "BufferConfigDX11.h"
+#include "Texture1dConfigDX11.h"
+#include "Texture2dConfigDX11.h"
+#include "Texture3dConfigDX11.h"
+#include "DepthStencilViewConfigDX11.h"
+#include "ShaderResourceViewConfigDX11.h"
+#include "UnorderedAccessViewConfigDX11.h"
+#include "RenderTargetViewConfigDX11.h"
+#include "RendererDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------

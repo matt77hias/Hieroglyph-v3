@@ -11,6 +11,7 @@
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "SpriteFontDX11.h"
+#include "Texture2DConfigDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 using namespace Gdiplus;

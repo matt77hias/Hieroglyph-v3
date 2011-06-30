@@ -12,11 +12,11 @@
 // ShaderResourceViewDX11
 //
 //--------------------------------------------------------------------------------
-#include "ResourceViewDX11.h"
-#include "PipelineManagerDx11.h"
-//--------------------------------------------------------------------------------
 #ifndef ShaderResourceViewDX11_h
 #define ShaderResourceViewDX11_h
+//--------------------------------------------------------------------------------
+#include "ResourceViewDX11.h"
+#include "PipelineManagerDx11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
