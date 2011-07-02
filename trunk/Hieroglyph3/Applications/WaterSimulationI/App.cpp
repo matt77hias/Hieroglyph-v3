@@ -198,7 +198,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"WaterSimulation_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
@@ -248,9 +248,10 @@ bool App::HandleEvent( IEvent* pEvent )
 			return( false );
 		}
 	}
-
 	
-	return( false );
+	// Call the parent class's event handler if we haven't handled the event.
+
+	return( RenderApplication::HandleEvent( pEvent ) );
 }
 //--------------------------------------------------------------------------------
 std::wstring App::GetName( )

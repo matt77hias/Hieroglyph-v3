@@ -17,9 +17,13 @@ class RenderApplication : public Application
 
 public:
 	RenderApplication();
+	virtual ~RenderApplication();
 	
 public:
 	bool ConfigureRenderingEngineComponents( int width, int height, D3D_FEATURE_LEVEL desiredLevel, D3D_DRIVER_TYPE driverType = D3D_DRIVER_TYPE_HARDWARE );
+
+	virtual bool HandleEvent( IEvent* pEvent );
+
 
 protected:
 
@@ -35,6 +39,7 @@ protected:
 	ViewPerspective*		m_pRenderView;
 	ViewTextOverlay*		m_pTextOverlayView;
 
+public:
 	Camera*					m_pCamera;
 
 	bool					m_bSaveScreenshot;

@@ -397,8 +397,9 @@ bool App::HandleEvent( IEvent* pEvent )
 		}
 	}
 
+	// Call the parent class's event handler if we haven't handled the event.
 	
-	return( false );
+	return( Application::HandleEvent( pEvent ) );
 }
 //--------------------------------------------------------------------------------
 std::wstring App::GetName( )

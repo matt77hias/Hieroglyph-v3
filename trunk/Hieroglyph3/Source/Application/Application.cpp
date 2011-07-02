@@ -9,6 +9,8 @@
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "Application.h"
+#include "EvtInfoMessage.h"
+#include "EvtErrorMessage.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -35,21 +37,22 @@ Application::Application()
 
 	m_pEventMgr = new EventManager();
 
-	// The application object wants to know about these three events, so it 
+	// The application object wants to know about these events, so it 
 	// registers itself with the appropriate event IDs.
 
 	m_pEventMgr->AddEventListener( SYSTEM_KEYBOARD_KEYUP, this );
 	m_pEventMgr->AddEventListener( SYSTEM_KEYBOARD_KEYDOWN, this );
 	m_pEventMgr->AddEventListener( SYSTEM_KEYBOARD_CHAR, this );
+	m_pEventMgr->AddEventListener( INFO_MESSAGE, this );
+	m_pEventMgr->AddEventListener( ERROR_MESSAGE, this );
 
-	// Create an initial scene to be used by the applications.
-
+	// TODO: this should go into the RenderApplication class!
 	m_pScene = new Scene();
 }
 //--------------------------------------------------------------------------------
 Application::~Application( )
 {
-	if ( m_pScene != 0 )
+	if ( m_pScene != NULL )
 		delete m_pScene;
 
 	if ( m_pTimer != NULL )
@@ -70,5 +73,25 @@ void Application::RequestTermination( )
 {
 	// This triggers the termination of the application
 	PostQuitMessage( 0 );
+}
+//--------------------------------------------------------------------------------
+bool Application::HandleEvent( IEvent* pEvent )
+{
+	eEVENT e = pEvent->GetEventType();
+
+	if ( e == INFO_MESSAGE )
+	{
+		EvtInfoMessage* pInfoMessage = dynamic_cast<EvtInfoMessage*>( pEvent );
+		MessageBox( 0, pInfoMessage->GetInfoMessage().c_str(), L"Hieroglyph 3 :: Info Message", MB_ICONINFORMATION | MB_SYSTEMMODAL );
+	}
+
+	else if ( e == ERROR_MESSAGE )
+	{
+		EvtErrorMessage* pErrorMessage = dynamic_cast<EvtErrorMessage*>( pEvent );
+		MessageBox( 0, pErrorMessage->GetErrorMessage().c_str(), L"Hieroglyph 3 :: Error Message", MB_ICONERROR | MB_SYSTEMMODAL );
+		RequestTermination();
+	}
+	
+	return( false );
 }
 //--------------------------------------------------------------------------------

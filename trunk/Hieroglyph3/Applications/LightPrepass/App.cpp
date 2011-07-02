@@ -479,9 +479,7 @@ void App::Update()
 void App::Shutdown()
 {
 	SAFE_DELETE( m_pEntity );
-
 	SAFE_DELETE( m_pNode );
-
 	SAFE_DELETE( m_pCamera );
 
 	// Print the framerate out for the log before shutting down.
@@ -531,8 +529,9 @@ bool App::HandleEvent( IEvent* pEvent )
 		}
 	}
 
+	// Call the parent class's event handler if we haven't handled the event.
 
-	return( false );
+	return( Application::HandleEvent( pEvent ) );
 }
 //--------------------------------------------------------------------------------
 std::wstring App::GetName( )

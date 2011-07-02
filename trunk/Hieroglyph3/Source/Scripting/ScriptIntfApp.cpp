@@ -6,6 +6,7 @@
 #include "Actor.h"
 #include "GeometryLoaderDX11.h"
 #include "MaterialGeneratorDX11.h"
+#include "RenderApplication.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------

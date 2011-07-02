@@ -534,6 +534,26 @@
 					</File>
 				</Filter>
 			</Filter>
+			<Filter
+				Name="Notifications"
+				>
+				<File
+					RelativePath=".\Events\EvtErrorMessage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Events\EvtErrorMessage.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Events\EvtInfoMessage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Events\EvtInfoMessage.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Scripting"

@@ -9,54 +9,35 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// IEvent
+// EvtInfoMessage
 //
-// Copyright (C) 2003-2007 Jason Zink
+// The info message event is used to allow the engine to provide information that
+// is not critical to the user.  This message should be displayed by the 
+// application, and then the application can continue on.
 //--------------------------------------------------------------------------------
-#ifndef IEvent_h
-#define IEvent_h
+#ifndef EvtInfoMessage_h
+#define EvtInfoMessage_h
 //--------------------------------------------------------------------------------
-#include <string>
+#include "IEvent.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	enum eEVENT
-	{
-		//GUI_CURSOR_OVER,
-		//GUI_CURSOR_ENTER,
-		//GUI_CURSOR_LEAVE,
-		//GUI_CURSOR_BUTTON_DOWN,
-		//GUI_CURSOR_BUTTON_PRESSED,
-		//GUI_CURSOR_BUTTON_UP,
-		//GUI_UI_BUTTON_PRESSED,
-		RENDER_FRAME_START,
-		SYSTEM_LBUTTON_DOWN,
-		SYSTEM_LBUTTON_UP,
-		SYSTEM_MBUTTON_DOWN,
-		SYSTEM_MBUTTON_UP,
-		SYSTEM_RBUTTON_DOWN,
-		SYSTEM_RBUTTON_UP,
-		SYSTEM_MOUSE_LEAVE,
-		SYSTEM_MOUSE_WHEEL,
-		SYSTEM_MOUSE_MOVE,
-		SYSTEM_KEYBOARD_KEYDOWN,
-		SYSTEM_KEYBOARD_KEYUP,
-		SYSTEM_KEYBOARD_CHAR,
-		WINDOW_RESIZE,
-		LOG_MESSAGE,
-		INFO_MESSAGE,
-		ERROR_MESSAGE,
-		//TEXT_CONTROLLER_STATE_REQUEST,
-		//ENTITY3D_CONTROLLER_STATE_REQUEST,
-		NUM_EVENTS
-	};
-
-	class IEvent
+	class EvtInfoMessage : public IEvent
 	{
 	public:
-		virtual std::wstring GetEventName( ) = 0;
-		virtual eEVENT GetEventType( ) = 0;
+		EvtInfoMessage( std::wstring& message );
+		EvtInfoMessage( const wchar_t* message );
+		virtual ~EvtInfoMessage( );
+
+		virtual std::wstring GetEventName( );
+		virtual eEVENT GetEventType( );
+
+		std::wstring& GetInfoMessage( );
+
+	protected:
+		std::wstring m_Message;
 	};
+
 };
 //--------------------------------------------------------------------------------
-#endif // IEvent_h
+#endif // EvtInfoMessage_h

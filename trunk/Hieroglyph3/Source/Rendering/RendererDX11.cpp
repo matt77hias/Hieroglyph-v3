@@ -74,6 +74,9 @@
 
 #include "IRenderView.h"
 
+#include "EventManager.h"
+#include "EvtErrorMessage.h"
+
 #include "Process.h"
 #include <sstream>
 //--------------------------------------------------------------------------------
@@ -856,12 +859,21 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 		&hr
 		) ) )
 	{
+
+		std::wstringstream message;
+
+		message << L"Error compiling shader program: " << filename << std::endl;
+		message << L"The following error was reported:" << std::endl;
+
 		if ( ( enablelogging ) && ( pErrorMessages != 0 ) )
 		{
 			LPVOID pCompileErrors = pErrorMessages->GetBufferPointer();
 			const char* pMessage = (const char*)pCompileErrors;
-			Log::Get().Write( GlyphString::ToUnicode( std::string( pMessage ) ) );
+			message << GlyphString::ToUnicode( std::string( pMessage ) );
+			Log::Get().Write( message.str() );
 		}
+
+		EventManager::Get()->ProcessEvent( new EvtErrorMessage( message.str() ) );
 
 		return( -1 );
 	}

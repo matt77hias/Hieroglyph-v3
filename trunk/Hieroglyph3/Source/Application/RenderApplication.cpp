@@ -43,6 +43,10 @@ RenderApplication::RenderApplication()
 	m_bSaveScreenshot = false;
 }
 //--------------------------------------------------------------------------------
+RenderApplication::~RenderApplication( )
+{
+}
+//--------------------------------------------------------------------------------
 bool RenderApplication::ConfigureRenderingEngineComponents( int width, int height, D3D_FEATURE_LEVEL desiredLevel, D3D_DRIVER_TYPE driverType )
 {
 	// Create the renderer and initialize it for the desired device
@@ -56,7 +60,7 @@ bool RenderApplication::ConfigureRenderingEngineComponents( int width, int heigh
 
 		if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_REFERENCE, D3D_FEATURE_LEVEL_11_0 ) )
 		{
-			MessageBox( m_pWindow->GetHandle(), L"Could not create a hardware or software Direct3D 11 device - the program will now abort!", L"Hieroglyph 3 Rendering", MB_ICONEXCLAMATION | MB_SYSTEMMODAL );
+			MessageBox( 0, L"Could not create a hardware or software Direct3D 11 device - the program will now abort!", L"Hieroglyph 3 Rendering", MB_ICONEXCLAMATION | MB_SYSTEMMODAL );
 			RequestTermination();			
 			return( false );
 		}
@@ -115,5 +119,17 @@ bool RenderApplication::ConfigureRenderingEngineComponents( int width, int heigh
 	m_pRenderer11->SetMultiThreadingState( true );
 
 	return( true );
+}
+//--------------------------------------------------------------------------------
+bool RenderApplication::HandleEvent( IEvent* pEvent )
+{
+	// This method body is included here for future use, to allow the 
+	// RenderApplication to handle some events if needed.
+
+	eEVENT e = pEvent->GetEventType();
+
+	// Call the parent class's event handler if we haven't handled the event.
+	
+	return( Application::HandleEvent( pEvent ) );
 }
 //--------------------------------------------------------------------------------
