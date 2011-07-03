@@ -131,7 +131,6 @@ void App::Initialize()
 
 	m_pTimeFactors = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"TimeFactors" ) );
 
-	//m_pRenderer11->SetMultiThreadingState( false );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -157,7 +156,7 @@ void App::Update()
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.
 
-	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
+	EventManager::Get()->ProcessEvent( new EvtFrameStart( *m_pTimer ) );
 
 
 	// Manipulate the scene here - simply rotate the root of the scene proportionally to

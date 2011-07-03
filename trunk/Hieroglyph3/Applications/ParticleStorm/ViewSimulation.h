@@ -72,6 +72,9 @@ namespace Glyph3
 
 		RenderEffectDX11*	pParticleInsertion;
 		RenderEffectDX11*	pParticleUpdate;
+		
+		float m_fDelta;
+		float m_fThrottle;
 		bool bOneTimeInit;
 
 		// The various rendering parameters that will be used by this render view.

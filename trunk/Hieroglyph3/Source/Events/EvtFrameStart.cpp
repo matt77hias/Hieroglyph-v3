@@ -11,11 +11,14 @@
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "EvtFrameStart.h"
+#include "Timer.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-EvtFrameStart::EvtFrameStart( )
+EvtFrameStart::EvtFrameStart( Timer& timer )
+	: m_Timer( timer )
 {
+	m_Timer = timer;
 }
 //--------------------------------------------------------------------------------
 EvtFrameStart::~EvtFrameStart( )
@@ -30,5 +33,25 @@ std::wstring EvtFrameStart::GetEventName( )
 eEVENT EvtFrameStart::GetEventType( )
 {
 	return( RENDER_FRAME_START );
+}
+//--------------------------------------------------------------------------------
+float EvtFrameStart::GetElapsed()
+{
+	return( m_Timer.Elapsed() );
+}
+//--------------------------------------------------------------------------------
+float EvtFrameStart::GetFrameRate()
+{
+	return( static_cast<float>( m_Timer.Framerate() ) );
+}
+//--------------------------------------------------------------------------------
+float EvtFrameStart::GetRuntime()
+{
+	return( m_Timer.Runtime() );
+}
+//--------------------------------------------------------------------------------
+int EvtFrameStart::GetFrameCount()
+{
+	return( m_Timer.FrameCount() );
 }
 //--------------------------------------------------------------------------------

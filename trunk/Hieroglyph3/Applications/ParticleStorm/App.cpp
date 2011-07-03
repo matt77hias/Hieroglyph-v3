@@ -110,7 +110,7 @@ void App::Update()
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.
 
-	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
+	EventManager::Get()->ProcessEvent( new EvtFrameStart( *m_pTimer ) );
 
 	// The following code can be used to read out the structure count data from
 	// the staging buffer of the ViewSimulation class.  This requires the copy

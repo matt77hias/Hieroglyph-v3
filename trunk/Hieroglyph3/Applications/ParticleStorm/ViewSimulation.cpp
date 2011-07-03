@@ -19,13 +19,15 @@
 #include "BufferConfigDX11.h"
 #include "UnorderedAccessViewConfigDX11.h"
 #include "ShaderResourceViewConfigDX11.h"
+#include "EvtFrameStart.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 {
 	bOneTimeInit = true;
-
+	m_fDelta = 0.0f;
+	m_fThrottle = 8.0f * 100.0f / static_cast<float>( SizeX );
 
 	m_sParams.iViewType = VT_SIMULATION;
 
@@ -284,7 +286,11 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterMana
 	// frame.  If there are issues with overflowing the buffer then we would need to 
 	// throttle the creation of new particles here.	
 	
-	pPipelineManager->Dispatch( *pParticleInsertion, 1, 1, 1, pParamManager );
+	if ( m_fDelta > m_fThrottle )
+	{
+		m_fDelta = 0.0f;
+		pPipelineManager->Dispatch( *pParticleInsertion, 1, 1, 1, pParamManager );
+	}
 
 	// Read out the total number of particles for updating into a constant buffer and an
 	// indirect argument buffer.
@@ -365,6 +371,10 @@ bool ViewSimulation::HandleEvent( IEvent* pEvent )
 	// Start of a rendering frame
 	if ( e == RENDER_FRAME_START )
 	{
+		EvtFrameStart* pFrameStart = (EvtFrameStart*)pEvent;
+
+		m_fDelta += pFrameStart->GetElapsed();
+
 		// Swap the two buffers in between frames to allow multithreaded access
 		// during the rendering phase for the particle buffers.
 		ResourcePtr TempState = ParticleStateBuffers[0];

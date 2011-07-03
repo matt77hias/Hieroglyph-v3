@@ -200,7 +200,7 @@ void App::Update()
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.
 
-	EventManager::Get()->ProcessEvent( new EvtFrameStart() );
+	EventManager::Get()->ProcessEvent( new EvtFrameStart( *m_pTimer ) );
 
 	// Perform the filtering with the compute shader.  The assumption in this case
 	// is that the texture is 640x480 - if there is a different size then the 

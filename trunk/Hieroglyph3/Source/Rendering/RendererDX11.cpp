@@ -862,7 +862,7 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 
 		std::wstringstream message;
 
-		message << L"Error compiling shader program: " << filename << std::endl;
+		message << L"Error compiling shader program: " << filename << std::endl << std::endl;
 		message << L"The following error was reported:" << std::endl;
 
 		if ( ( enablelogging ) && ( pErrorMessages != 0 ) )
