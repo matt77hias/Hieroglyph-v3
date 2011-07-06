@@ -26,8 +26,13 @@ using namespace Glyph3;
 ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 {
 	bOneTimeInit = true;
-	m_fDelta = 0.0f;
-	m_fThrottle = 8.0f * 100.0f / static_cast<float>( SizeX );
+
+	// The throttle time is calculated as the number of particles per insertion,
+	// times the maximum particle lifetime and divided by the total buffer size.
+
+	m_fThrottle = 8.0f * 30.0f / static_cast<float>( SizeX );
+	m_fDelta = m_fThrottle;
+
 
 	m_sParams.iViewType = VT_SIMULATION;
 
@@ -292,6 +297,7 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterMana
 		pPipelineManager->Dispatch( *pParticleInsertion, 1, 1, 1, pParamManager );
 	}
 
+
 	// Read out the total number of particles for updating into a constant buffer and an
 	// indirect argument buffer.
 
@@ -301,16 +307,19 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterMana
 	//if ( m_BufferIndex < BUFFER_SIZE )
 	//	pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[1] );
 
-
-	pPipelineManager->CopyStructureCount( ParticleCountIABuffer, 0, ParticleStateBuffers[0] );
+	
 	pPipelineManager->CopyStructureCount( ParticleCountCBBuffer, 0, ParticleStateBuffers[0] );	
 
 
 	// Update the particles with a fixed number of threads.  The unused threads will simply
 	// not do anything, as they can't read any data from the Append/Consume buffer.
 
-	pPipelineManager->Dispatch( *pParticleUpdate, 512, 1, 1, pParamManager );
+	pPipelineManager->Dispatch( *pParticleUpdate, m_iParticleCount/512, 1, 1, pParamManager );
 
+	
+	// To render, we need to only select the particles that exist after the update.
+
+	pPipelineManager->CopyStructureCount( ParticleCountIABuffer, 0, ParticleStateBuffers[1] );
 
 
 	//if ( m_BufferIndex < BUFFER_SIZE )

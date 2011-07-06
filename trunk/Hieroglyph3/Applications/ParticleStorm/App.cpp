@@ -116,26 +116,38 @@ void App::Update()
 	// the staging buffer of the ViewSimulation class.  This requires the copy
 	// methods to be un-commented in the classes draw method.
 	//
-	//D3D11_MAPPED_SUBRESOURCE mapped;
-	//unsigned int* pCount = 0;
-	//unsigned int count[8];
+	/*
+	D3D11_MAPPED_SUBRESOURCE mapped;
+	unsigned int* pCount = 0;
+	unsigned int count[8];
 
-	//ResourcePtr stagingbuffer = ((ParticleSystemEntity*)m_pEntity)->GetSimulationView()->GetParticleCountStagingBuffer();
-	//mapped = m_pRenderer11->pImmPipeline->MapResource( stagingbuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
-	//pCount = (unsigned int*)(mapped.pData);
-	//for ( int i = 0; i < 8; i++ )
-	//	count[i] = pCount[i];
-	//m_pRenderer11->pImmPipeline->UnMapResource( stagingbuffer->m_iResource, 0 );
+	ResourcePtr stagingbuffer = ((ParticleSystemEntity*)m_pEntity)->GetSimulationView()->GetParticleCountStagingBuffer();
+	mapped = m_pRenderer11->pImmPipeline->MapResource( stagingbuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
+	pCount = (unsigned int*)(mapped.pData);
+
+	std::wstringstream debugout;
+	debugout << L"Values: ";
+
+	for ( int i = 0; i < 8; i++ )
+	{
+		count[i] = pCount[i];
+		debugout << count[i] << L", ";
+	}
+	m_pRenderer11->pImmPipeline->UnMapResource( stagingbuffer->m_iResource, 0 );
+
+	Log::Get().Write( debugout.str() );
+	*/
+
 
 	// Update the scene, and then render all cameras within the scene.
 
-	m_pRenderer11->pImmPipeline->StartPipelineStatistics();
+	//m_pRenderer11->pImmPipeline->StartPipelineStatistics();
 
 	m_pScene->Update( m_pTimer->Elapsed() );
 	m_pScene->Render( m_pRenderer11 );
 
-	m_pRenderer11->pImmPipeline->EndPipelineStatistics();
-	Log::Get().Write( m_pRenderer11->pImmPipeline->PrintPipelineStatistics() );
+	//m_pRenderer11->pImmPipeline->EndPipelineStatistics();
+	//Log::Get().Write( m_pRenderer11->pImmPipeline->PrintPipelineStatistics() );
 
 	std::wstringstream out;
 	out << L"Hieroglyph 3 : " << GetName() << std::endl;

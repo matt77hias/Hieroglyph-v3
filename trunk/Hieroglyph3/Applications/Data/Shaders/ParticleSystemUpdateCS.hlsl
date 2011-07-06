@@ -61,7 +61,7 @@ void CSMAIN( uint3 DispatchThreadID : SV_DispatchThreadID )
 		// don't pass it to the output list if it is too close.
 		if ( r > eventHorizon )
 		{
-			if ( p.time < 100.0f )
+			if ( p.time < 30.0f )
 			{
 				NewSimulationState.Append( p );
 			}
