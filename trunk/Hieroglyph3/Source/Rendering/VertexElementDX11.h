@@ -61,6 +61,8 @@ namespace Glyph3
 
 		int*			Get1i( int i );
 
+		unsigned int*	Get1ui( int i );
+
 		float*					operator[]( int i );
 		const float*			operator[]( int i ) const;
 

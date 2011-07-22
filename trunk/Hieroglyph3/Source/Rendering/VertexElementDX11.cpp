@@ -75,6 +75,11 @@ int* VertexElementDX11::Get1i( int i )
 	return( (int*)&m_pfData[ i ] );
 }
 //--------------------------------------------------------------------------------
+unsigned int* VertexElementDX11::Get1ui( int i )
+{
+	return( (unsigned int*)&m_pfData[ i ] );
+}
+//--------------------------------------------------------------------------------
 float* VertexElementDX11::operator[]( int i )
 {
 	return( &m_pfData[ m_iTuple * i ] );

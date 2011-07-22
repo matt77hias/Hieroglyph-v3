@@ -35,6 +35,10 @@ GeometryDX11::~GeometryDX11()
 		if ( m_vElements[i] != NULL )
 			delete m_vElements[i];
 	}
+
+	std::map<int, InputLayoutKey*>::iterator it = m_InputLayouts.begin();
+	for( ; it != m_InputLayouts.end(); it++ )
+        SAFE_DELETE( (*it).second );
 }
 //--------------------------------------------------------------------------------
 void GeometryDX11::AddElement( VertexElementDX11* element )

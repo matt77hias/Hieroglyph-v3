@@ -659,7 +659,7 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 		pNormals->m_uiInstanceDataStepRate = 0;
 
 		Vector3f* pPos = pPositions->Get3f( 0 );
-		int* pIds = pBoneIDs->Get1i( 0 );
+		unsigned int* pIds = pBoneIDs->Get1ui( 0 );
 		Vector4f* pWghts = pBoneWeights->Get4f( 0 );
 		Vector3f* pNrm = pNormals->Get3f( 0 );
 		Vector2f* pTex = pTexcoords->Get2f( 0 );
@@ -702,8 +702,8 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 
                 pPos[currVert] = Vector3f( x, y, z );
 				
-				int b0 = (int)(y / boneHeightStep);
-				int b1 = b0 + 1;
+				unsigned int b0 = (int)(y / boneHeightStep);
+				unsigned int b1 = b0 + 1;
 				if ( b0 >= NumBones ) b0 = NumBones-1;
 				if ( b1 >= NumBones ) b1 = NumBones-1;
 

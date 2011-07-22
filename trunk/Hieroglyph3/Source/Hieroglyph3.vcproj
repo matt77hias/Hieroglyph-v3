@@ -1785,23 +1785,7 @@
 					Name="File Formats"
 					>
 					<File
-						RelativePath=".\Rendering\mathlib.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\Rendering\mathlib.h"
-						>
-					</File>
-					<File
 						RelativePath=".\Rendering\ms3dspec.h"
-						>
-					</File>
-					<File
-						RelativePath=".\Rendering\msModel.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\Rendering\msModel.h"
 						>
 					</File>
 				</Filter>
