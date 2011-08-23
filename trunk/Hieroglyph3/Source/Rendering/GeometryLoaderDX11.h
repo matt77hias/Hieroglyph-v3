@@ -18,7 +18,6 @@
 #include "GeometryDX11.h"
 #include "SkinnedActor.h"
 #include <string>
-#include <boost/tokenizer.hpp> 
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -71,7 +70,7 @@ namespace Glyph3
 		static void** ParsePLYElementData(std::string text, const std::vector<PlyElementPropertyDeclaration>& desc);
 		template<typename T> static T* ExtractDataPtr(std::string input);
 		template<typename T> static T ExtractDataVal(std::string input);
-		template<typename T> static PlyDataArray<T>* ExtractDataPtrArray(int length, boost::tokenizer<boost::char_separator<char>>::iterator iterator);
+		template<typename T> static PlyDataArray<T>* ExtractDataPtrArray(int length, std::vector<std::string>::iterator iterator);
 		static int FindPlyElementIndex(std::vector<PlyElementDesc> elems, std::string name);
 		static int FindPlyElementPropertyIndex(std::vector<PlyElementPropertyDeclaration> elems, std::string name);
 	};

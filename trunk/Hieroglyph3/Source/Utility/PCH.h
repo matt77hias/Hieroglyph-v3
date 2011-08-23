@@ -35,9 +35,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <memory.h>
-
-// Boost includes
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <assert.h>
 
 // DirectX SDK includes
 #include <dxgi.h>

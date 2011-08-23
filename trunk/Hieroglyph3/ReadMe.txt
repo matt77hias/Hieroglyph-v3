@@ -24,8 +24,7 @@ Building Instructions:
 
 Hieroglyph requires the following items to be available to the linker/compiler:
 
-1. DirectX SDK - Hieroglyph is currently being developed and tested with the February 2010 SDK.
-2. Boost - Hieroglyph is currently being developed and tested with version 1.39 of the library.
-3. Lua - The Lua libraries must be linked in as well.  I have included a copy of the VS2008 project I use to build Lua in the distribution, along with the source code for Lua v5.1.4.  If you already build Lua on your own, you can change the to your own libraries.  You will need to modify the post build rules to copy the appropriate libs and headers to the SDK output folder if you do so.
+1. DirectX SDK - Hieroglyph is currently being developed and tested with the June 2010 SDK.
+2. Lua - The Lua libraries must be linked in.  I have included a copy of the VS2008 project I use to build Lua in the distribution, along with the source code for Lua v5.1.4.  If you already build Lua on your own, you can change the to your own libraries.  You will need to modify the post build rules to copy the appropriate libs and headers to the SDK output folder if you do so.
 
 Outside of these dependancies, you should also install the latest windows SDK for your target platform.

@@ -1457,7 +1457,7 @@ int RendererDX11::CreateBlendState( BlendStateConfigDX11* pConfig )
 		return( -1 );
 	}
 
-	boost::shared_ptr<BlendStateDX11> ptr( new BlendStateDX11( pState ) );
+	shared_ptr<BlendStateDX11> ptr( new BlendStateDX11( pState ) );
 	m_vBlendStates.add( ptr );
 
 	return( m_vBlendStates.count() - 1 );
@@ -1475,7 +1475,7 @@ int RendererDX11::CreateDepthStencilState( DepthStencilStateConfigDX11* pConfig 
 		return( -1 );
 	}
 
-	boost::shared_ptr<DepthStencilStateDX11> ptr( new DepthStencilStateDX11( pState ) );
+	shared_ptr<DepthStencilStateDX11> ptr( new DepthStencilStateDX11( pState ) );
 	m_vDepthStencilStates.add( ptr );
 
 	return( m_vDepthStencilStates.count() - 1 );
@@ -1493,7 +1493,7 @@ int RendererDX11::CreateRasterizerState( RasterizerStateConfigDX11* pConfig )
 		return( -1 );
 	}
 
-	boost::shared_ptr<RasterizerStateDX11> ptr( new RasterizerStateDX11( pState ) );
+	shared_ptr<RasterizerStateDX11> ptr( new RasterizerStateDX11( pState ) );
 	m_vRasterizerStates.add( ptr );
 
 	return( m_vRasterizerStates.count() - 1 );
@@ -1906,17 +1906,17 @@ Vector2f RendererDX11::GetDesktopResolution()
 						static_cast<float>( desc.DesktopCoordinates.bottom - desc.DesktopCoordinates.top ) ) );
 }
 //--------------------------------------------------------------------------------
-boost::shared_ptr<BlendStateDX11> RendererDX11::GetBlendState( int index )
+shared_ptr<BlendStateDX11> RendererDX11::GetBlendState( int index )
 {
 	return( m_vBlendStates[index] ); 
 }
 //--------------------------------------------------------------------------------
-boost::shared_ptr<DepthStencilStateDX11> RendererDX11::GetDepthState( int index )
+shared_ptr<DepthStencilStateDX11> RendererDX11::GetDepthState( int index )
 {
 	return( m_vDepthStencilStates[index] );
 }
 //--------------------------------------------------------------------------------
-boost::shared_ptr<RasterizerStateDX11> RendererDX11::GetRasterizerState( int index )
+shared_ptr<RasterizerStateDX11> RendererDX11::GetRasterizerState( int index )
 {
 	return( m_vRasterizerStates[index] );
 }

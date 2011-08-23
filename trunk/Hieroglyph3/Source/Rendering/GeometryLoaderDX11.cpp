@@ -19,9 +19,7 @@
 #include "Log.h"
 #include "GlyphString.h"
 #include "MaterialGeneratorDX11.h"
-
-//#include "msModel.h"
-#include <boost/tokenizer.hpp> 
+#include <sstream>
 
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
@@ -1927,11 +1925,17 @@ void** GeometryLoaderDX11::ParsePLYElementData(std::string text, const std::vect
 
 	parsed = new void*[desc.size()];
 
-	boost::char_separator<char> sep(" ");
-	boost::tokenizer<boost::char_separator<char>> tok(text, sep);
+	std::vector<std::string> tokens;
+	std::istringstream is (text);
+	std::string tmps;
+    while (is.good()) {
+        is >> tmps;
+		tokens.push_back(tmps);
+    }
+
 
 	unsigned int e = 0;
-	for(boost::tokenizer<boost::char_separator<char>>::iterator it = tok.begin(); it != tok.end(); ++it)
+	for(std::vector<std::string>::iterator it = tokens.begin(); it != tokens.end(); ++it)
 	{
 		if( e >= desc.size())
 			break;
@@ -2049,7 +2053,7 @@ template<typename T> T GeometryLoaderDX11::ExtractDataVal(std::string input)
 	return t;
 }
 
-template<typename T> GeometryLoaderDX11::PlyDataArray<T>* GeometryLoaderDX11::ExtractDataPtrArray(int length, boost::tokenizer<boost::char_separator<char>>::iterator iterator)
+template<typename T> GeometryLoaderDX11::PlyDataArray<T>* GeometryLoaderDX11::ExtractDataPtrArray(int length, std::vector<std::string>::iterator iterator)
 {
 	PlyDataArray<T>* t = new PlyDataArray<T>;
 	t->length = length;
@@ -2063,6 +2067,8 @@ template<typename T> GeometryLoaderDX11::PlyDataArray<T>* GeometryLoaderDX11::Ex
 
 	return t;
 }
+
+
 
 int GeometryLoaderDX11::FindPlyElementIndex(std::vector<PlyElementDesc> elems, std::string name)
 {

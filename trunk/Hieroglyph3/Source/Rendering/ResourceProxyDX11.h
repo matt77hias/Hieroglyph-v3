@@ -15,6 +15,8 @@
 #ifndef ResourceProxyDX11_h
 #define ResourceProxyDX11_h
 //--------------------------------------------------------------------------------
+#include "shared_ptr.h"
+//--------------------------------------------------------------------------------
 namespace Glyph3
 {
 	class BufferConfigDX11;
@@ -79,7 +81,7 @@ namespace Glyph3
                                 DepthStencilViewConfigDX11* pDSVConfig = NULL );
 	};
 
-	typedef boost::shared_ptr<ResourceProxyDX11> ResourcePtr;
+	typedef shared_ptr<ResourceProxyDX11> ResourcePtr;
 };
 //--------------------------------------------------------------------------------
 #endif // ResourceProxyDX11_h

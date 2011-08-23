@@ -26,6 +26,7 @@
 #include "Matrix4f.h"
 
 #include "ResourceProxyDX11.h"
+#include "shared_ptr.h"
 
 #define SAFE_RELEASE( x ) {if(x){(x)->Release();(x)=NULL;}}
 #define SAFE_DELETE( x ) {if(x){delete (x);(x)=NULL;}}
@@ -245,9 +246,9 @@ namespace Glyph3
 		static std::wstring Print_D3D11_TESSELLATOR_DOMAIN( D3D11_TESSELLATOR_DOMAIN domain );
 
 		// Provide access to the pipeline states.
-		boost::shared_ptr<BlendStateDX11>				GetBlendState( int index );
-		boost::shared_ptr<DepthStencilStateDX11>		GetDepthState( int index );
-		boost::shared_ptr<RasterizerStateDX11>			GetRasterizerState( int index );
+		shared_ptr<BlendStateDX11>						GetBlendState( int index );
+		shared_ptr<DepthStencilStateDX11>				GetDepthState( int index );
+		shared_ptr<RasterizerStateDX11>					GetRasterizerState( int index );
 		ViewPortDX11*									GetViewPort( int index );
 		ResourceDX11*									GetResource( int index );
 
@@ -313,9 +314,9 @@ namespace Glyph3
 		// destroying many resources, and allow the renderer clients to have greater access
 		// the objects without querying the renderer.
 
-		TArray<boost::shared_ptr<BlendStateDX11>>				m_vBlendStates;
-		TArray<boost::shared_ptr<DepthStencilStateDX11>>		m_vDepthStencilStates;
-		TArray<boost::shared_ptr<RasterizerStateDX11>>			m_vRasterizerStates;
+		TArray<shared_ptr<BlendStateDX11>>						m_vBlendStates;
+		TArray<shared_ptr<DepthStencilStateDX11>>				m_vDepthStencilStates;
+		TArray<shared_ptr<RasterizerStateDX11>>					m_vRasterizerStates;
 
 		TArray<InputLayoutDX11*>								m_vInputLayouts;
 		TArray<SamplerStateDX11*>								m_vSamplerStates;
