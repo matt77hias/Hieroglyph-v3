@@ -56,7 +56,7 @@ DiffuseSphereEntity::DiffuseSphereEntity()
 		RendererDX11::Get()->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) ) );
 	pTextureWriter->SetValue( ColorTexture );
 	
-    this->AddRenderParameter( pTextureWriter );
+    this->Parameters.AddRenderParameter( pTextureWriter );
 }
 //--------------------------------------------------------------------------------
 void DiffuseSphereEntity::LoadResources()

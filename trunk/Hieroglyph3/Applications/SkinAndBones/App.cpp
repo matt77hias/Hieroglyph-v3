@@ -74,7 +74,8 @@ void App::Initialize()
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
 
-	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 25.0f, -10.0f );
+	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 50.0f, -20.0f );
+	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.7f, 0.0f, 0.0f ) );
 	m_pRenderView->SetBackColor( Vector4f( 0.1f, 0.1f, 0.3f, 0.0f ) );
 
 
@@ -127,7 +128,7 @@ void App::Initialize()
 	pTextureParameter->SetRenderParameterRef(
 		(RenderParameterDX11*)m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) ) );
 	pTextureParameter->SetValue( ColorTexture );
-	m_pStaticActor->GetBody()->AddRenderParameter( pTextureParameter );
+	m_pStaticActor->GetBody()->Parameters.AddRenderParameter( pTextureParameter );
 
 
 	// Attach the actors to the scene, so that they will be rendered all together.

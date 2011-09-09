@@ -297,13 +297,13 @@ void App::Initialize()
     pDiffuseParam->SetRenderParameterRef(
 		m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"DiffuseMap" ) ) );
 	pDiffuseParam->SetValue( m_DiffuseTexture );
-    m_pMaterial->AddRenderParameter( pDiffuseParam );
+    m_pMaterial->Parameters.AddRenderParameter( pDiffuseParam );
 
     ShaderResourceParameterWriterDX11* pNormalMapParam = new ShaderResourceParameterWriterDX11();
 	pNormalMapParam->SetRenderParameterRef(
 		m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"NormalMap" ) ) );
 	pNormalMapParam->SetValue( m_NormalMap );
-    m_pMaterial->AddRenderParameter( pNormalMapParam );
+    m_pMaterial->Parameters.AddRenderParameter( pNormalMapParam );
 
     // Create a sampler state
     D3D11_SAMPLER_DESC sampDesc;
@@ -324,7 +324,7 @@ void App::Initialize()
     pSamplerParam->SetRenderParameterRef(
 		(RenderParameterDX11*)m_pRenderer11->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"AnisoSampler" ) ) );
 	pSamplerParam->SetValue( samplerState );
-    m_pMaterial->AddRenderParameter( pSamplerParam );
+    m_pMaterial->Parameters.AddRenderParameter( pSamplerParam );
 
 	// Create the camera, and the render view that will produce an image of the
 	// from the camera's point of view of the scene.

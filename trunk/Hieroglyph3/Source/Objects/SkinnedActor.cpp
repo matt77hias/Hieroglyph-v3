@@ -118,7 +118,7 @@ void SkinnedActor::SetBindPose( )
 	m_pSkinMatrixWriter->SetValue( m_pMatrices );
 	m_pSkinMatrixWriter->SetCount( m_Bones.count() );
 
-	GetBody()->AddRenderParameter( m_pSkinMatrixWriter );
+	GetBody()->Parameters.AddRenderParameter( m_pSkinMatrixWriter );
 
 	m_pNormalMatrixWriter = new MatrixArrayParameterWriterDX11();
 	m_pNormalMatrixWriter->SetRenderParameterRef( 
@@ -126,7 +126,7 @@ void SkinnedActor::SetBindPose( )
 	m_pNormalMatrixWriter->SetValue( m_pNormalMatrices );
 	m_pNormalMatrixWriter->SetCount( m_Bones.count() );
 
-	GetBody()->AddRenderParameter( m_pNormalMatrixWriter );
+	GetBody()->Parameters.AddRenderParameter( m_pNormalMatrixWriter );
 }
 //--------------------------------------------------------------------------------
 void SkinnedActor::SetSkinningMatrices( RendererDX11& Renderer )

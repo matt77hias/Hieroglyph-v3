@@ -1,96 +1,53 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hieroglyph3", "Source\Hieroglyph3.vcproj", "{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicApplication", "Applications\BasicApplication\BasicApplication.vcproj", "{FFB165E8-4D2F-4715-AD7B-EB084FDA0975}"
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hieroglyph3", "Source\Hieroglyph3.vcxproj", "{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}"
 	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+		{DBA1913E-154D-420A-84A9-AD8A789851CC} = {DBA1913E-154D-420A-84A9-AD8A789851CC}
+		{036DBAF4-D87B-4F38-A8B2-2D3C7F71A7B1} = {036DBAF4-D87B-4F38-A8B2-2D3C7F71A7B1}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicTessellation", "Applications\BasicTessellation\BasicTessellation.vcproj", "{D2E817F0-1291-4F0B-BC5E-7582B5AFC0E8}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicApplication", "Applications\BasicApplication\BasicApplication.vcxproj", "{FFB165E8-4D2F-4715-AD7B-EB084FDA0975}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicComputeShader", "Applications\BasicComputeShader\BasicComputeShader.vcproj", "{91038F7E-DB37-4526-8696-0BBD99932880}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicTessellation", "Applications\BasicTessellation\BasicTessellation.vcxproj", "{D2E817F0-1291-4F0B-BC5E-7582B5AFC0E8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ViewFromTheWindow", "Applications\ViewFromTheWindow\ViewFromTheWindow.vcproj", "{64EABEAD-7FF1-445A-9707-ADD5CF20D262}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicComputeShader", "Applications\BasicComputeShader\BasicComputeShader.vcxproj", "{91038F7E-DB37-4526-8696-0BBD99932880}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicRenderViews", "Applications\BasicRenderViews\BasicRenderViews.vcproj", "{3AF292FF-5AE7-481D-93C3-4AAA087F0F4B}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ViewFromTheWindow", "Applications\ViewFromTheWindow\ViewFromTheWindow.vcxproj", "{64EABEAD-7FF1-445A-9707-ADD5CF20D262}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicScenes", "Applications\BasicScenes\BasicScenes.vcproj", "{D21FBFE7-021F-4511-A64C-44750ED174FB}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicRenderViews", "Applications\BasicRenderViews\BasicRenderViews.vcxproj", "{3AF292FF-5AE7-481D-93C3-4AAA087F0F4B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WaterSimulationI", "Applications\WaterSimulationI\WaterSimulationI.vcproj", "{A01C0178-BD8A-48DD-8A0E-3CFFF1B1802F}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicScenes", "Applications\BasicScenes\BasicScenes.vcxproj", "{D21FBFE7-021F-4511-A64C-44750ED174FB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AmbientOcclusionI", "Applications\AmbientOcclusionI\AmbientOcclusionI.vcproj", "{50DA7DA6-6E7E-4148-90EF-8A028A2BB1CA}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WaterSimulationI", "Applications\WaterSimulationI\WaterSimulationI.vcxproj", "{A01C0178-BD8A-48DD-8A0E-3CFFF1B1802F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageProcessor", "Applications\ImageProcessor\ImageProcessor.vcproj", "{84F60DAA-B6D4-4BBE-A389-5671AE26D85B}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AmbientOcclusionI", "Applications\AmbientOcclusionI\AmbientOcclusionI.vcxproj", "{50DA7DA6-6E7E-4148-90EF-8A028A2BB1CA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SkinAndBones", "Applications\SkinAndBones\SkinAndBones.vcproj", "{E451755D-66D6-4FFA-8804-DAADAA319A91}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageProcessor", "Applications\ImageProcessor\ImageProcessor.vcxproj", "{84F60DAA-B6D4-4BBE-A389-5671AE26D85B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicScripting", "Applications\BasicScripting\BasicScripting.vcproj", "{D8673413-1893-4A76-B09D-0FBF2DE44FB5}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SkinAndBones", "Applications\SkinAndBones\SkinAndBones.vcxproj", "{E451755D-66D6-4FFA-8804-DAADAA319A91}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TessellationParams", "Applications\TessellationParams\TessellationParams.vcproj", "{0D13C5FC-2967-49FD-B762-5004CF824254}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicScripting", "Applications\BasicScripting\BasicScripting.vcxproj", "{D8673413-1893-4A76-B09D-0FBF2DE44FB5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DeferredRendering", "Applications\DeferredRendering\DeferredRendering.vcproj", "{815673AC-FD51-44A8-B498-C0398DC85B41}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TessellationParams", "Applications\TessellationParams\TessellationParams.vcxproj", "{0D13C5FC-2967-49FD-B762-5004CF824254}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InterlockingTerrainTiles", "Applications\InterlockingTerrainTiles\InterlockingTerrainTiles.vcproj", "{92ED8783-D45A-48FD-9B94-DD1FD7DAB7F9}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DeferredRendering", "Applications\DeferredRendering\DeferredRendering.vcxproj", "{815673AC-FD51-44A8-B498-C0398DC85B41}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LightPrepass", "Applications\LightPrepass\LightPrepass.vcproj", "{DB0736EE-C788-44A3-BACA-79C041E23F1D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InterlockingTerrainTiles", "Applications\InterlockingTerrainTiles\InterlockingTerrainTiles.vcxproj", "{92ED8783-D45A-48FD-9B94-DD1FD7DAB7F9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CurvedPointNormalTriangles", "Applications\CurvedPointNormalTriangles\CurvedPointNormalTriangles.vcproj", "{A074582D-4AFA-4EC2-8CBE-7B37D0EFFA37}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LightPrepass", "Applications\LightPrepass\LightPrepass.vcxproj", "{DB0736EE-C788-44A3-BACA-79C041E23F1D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ParticleStorm", "Applications\ParticleStorm\ParticleStorm.vcproj", "{9C8C4C20-EFB0-44A7-8321-0754C06B05C4}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CurvedPointNormalTriangles", "Applications\CurvedPointNormalTriangles\CurvedPointNormalTriangles.vcxproj", "{A074582D-4AFA-4EC2-8CBE-7B37D0EFFA37}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MirrorMirror", "Applications\MirrorMirror\MirrorMirror.vcproj", "{75C388EB-7F70-4B62-98D9-9B9B18EDF11E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ParticleStorm", "Applications\ParticleStorm\ParticleStorm.vcxproj", "{9C8C4C20-EFB0-44A7-8321-0754C06B05C4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MirrorMirror", "Applications\MirrorMirror\MirrorMirror.vcxproj", "{75C388EB-7F70-4B62-98D9-9B9B18EDF11E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LuaLib", "Dependancies\lua-5.1.4\vc90_build\LuaLib\LuaLib.vcxproj", "{DBA1913E-154D-420A-84A9-AD8A789851CC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LuaLibLib", "Dependancies\lua-5.1.4\vc90_build\LuaLibLib\LuaLibLib.vcxproj", "{036DBAF4-D87B-4F38-A8B2-2D3C7F71A7B1}"
 	ProjectSection(ProjectDependencies) = postProject
-		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+		{DBA1913E-154D-420A-84A9-AD8A789851CC} = {DBA1913E-154D-420A-84A9-AD8A789851CC}
 	EndProjectSection
 EndProject
 Global
@@ -175,6 +132,14 @@ Global
 		{75C388EB-7F70-4B62-98D9-9B9B18EDF11E}.Debug|Win32.Build.0 = Debug|Win32
 		{75C388EB-7F70-4B62-98D9-9B9B18EDF11E}.Release|Win32.ActiveCfg = Release|Win32
 		{75C388EB-7F70-4B62-98D9-9B9B18EDF11E}.Release|Win32.Build.0 = Release|Win32
+		{DBA1913E-154D-420A-84A9-AD8A789851CC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DBA1913E-154D-420A-84A9-AD8A789851CC}.Debug|Win32.Build.0 = Debug|Win32
+		{DBA1913E-154D-420A-84A9-AD8A789851CC}.Release|Win32.ActiveCfg = Release|Win32
+		{DBA1913E-154D-420A-84A9-AD8A789851CC}.Release|Win32.Build.0 = Release|Win32
+		{036DBAF4-D87B-4F38-A8B2-2D3C7F71A7B1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{036DBAF4-D87B-4F38-A8B2-2D3C7F71A7B1}.Debug|Win32.Build.0 = Debug|Win32
+		{036DBAF4-D87B-4F38-A8B2-2D3C7F71A7B1}.Release|Win32.ActiveCfg = Release|Win32
+		{036DBAF4-D87B-4F38-A8B2-2D3C7F71A7B1}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,47 +9,32 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// MaterialDX11
+// ParameterContainer
 //
 //--------------------------------------------------------------------------------
-#ifndef MaterialDX11_h
-#define MaterialDX11_h
+#ifndef ParameterContainer_h
+#define ParameterContainer_h
 //--------------------------------------------------------------------------------
-#include "RendererDX11.h"
-#include "IRenderView.h"
-#include "RenderEffectDX11.h"
-#include "RenderParameterDX11.h"
-#include "ISharedObject.h"
-#include "ParameterContainer.h"
+#include "TArray.h"
+#include "ParameterWriter.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	struct MaterialParams
-	{
-		bool							bRender;
-		RenderEffectDX11*				pEffect;
-		TArray<RenderParameterDX11*>	vParameters;
-		TArray<IRenderView*>			vViews;
-	};
 
-
-	class MaterialDX11 : public ISharedObject
+	class ParameterContainer
 	{
 	public:
-		MaterialDX11();
-		virtual ~MaterialDX11();
+		ParameterContainer( );
+		virtual ~ParameterContainer( );
 
-		void PreRender( RendererDX11* pRenderer, VIEWTYPE type );
-		void SetEntity( Entity3D* pEntity );
-		void SetRenderParams( IParameterManager* pParamManager, VIEWTYPE type );
+		void AddRenderParameter( ParameterWriter* pWriter );
+		//void UpdateRenderParameter( RenderParameterDX11* pParameter );
+		void SetRenderParams( IParameterManager* pParamManager );
+		
+	protected:
 
-	public:
-		MaterialParams				Params[VT_NUM_VIEW_TYPES];
-		ParameterContainer			Parameters;
-		Entity3D*					m_pEntity;
+		TArray< ParameterWriter* > m_RenderParameters;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // MaterialDX11_h
-//--------------------------------------------------------------------------------
-
+#endif // ParameterContainer_h

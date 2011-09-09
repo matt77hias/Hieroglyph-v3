@@ -86,7 +86,7 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 	pWriter->SetRenderParameterRef( Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) ) );
 	pWriter->SetValue( resource );
 	
-	pActor->GetBody()->AddRenderParameter( pWriter );
+	pActor->GetBody()->Parameters.AddRenderParameter( pWriter );
 
 	D3D11_SAMPLER_DESC state; 
 	state.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;

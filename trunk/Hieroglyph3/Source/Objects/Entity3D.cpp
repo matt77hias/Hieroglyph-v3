@@ -57,9 +57,6 @@ Entity3D::~Entity3D()
 	for ( int i = 0; i < m_Controllers.count(); i++ )
 		delete m_Controllers[i];
 
-	for ( int i = 0; i < m_RenderParameters.count(); i++ )
-		delete m_RenderParameters[i];
-
 	if ( m_pComposite )
 		delete m_pComposite;
 }
@@ -225,44 +222,13 @@ void Entity3D::Render( PipelineManagerDX11* pPipelineManager, IParameterManager*
 	}
 }
 //--------------------------------------------------------------------------------
-void Entity3D::AddRenderParameter( ParameterWriter* pWriter )
-{
-	// Add render parameter will take the pointer passed in and add it to the
-	// entity's internal list.  Therefore, this must not be from the stack!
-
-	if ( pWriter )
-	{
-		// Search the list to see if this parameter is already there
-		ParameterWriter* pCurr = 0;
-
-		for ( int i = 0; i < m_RenderParameters.count(); i++ )
-		{
-			if ( pWriter->GetRenderParameterRef()->GetName() == m_RenderParameters[i]->GetRenderParameterRef()->GetName() )
-			{
-				pCurr = m_RenderParameters[i];
-				break;
-			}
-		}
-
-		if ( !pCurr )
-		{
-			m_RenderParameters.add( pWriter );
-		}
-		else
-		{
-			Log::Get().Write( L"Tried to add a parameter to an entity that was already there!" );
-		}
-	}
-}
-//--------------------------------------------------------------------------------
 void Entity3D::SetRenderParams( IParameterManager* pParamManager )
 {
 	// Set the world matrix
 	pParamManager->SetWorldMatrixParameter( &m_sParams.WorldMatrix );
 	
 	// Scroll through each parameter and set it in the renderer
-	for ( int i = 0; i < m_RenderParameters.count(); i++ )
-		m_RenderParameters[i]->WriteParameter( pParamManager );
+	Parameters.SetRenderParams( pParamManager );
 }
 //--------------------------------------------------------------------------------
 void Entity3D::Hide( bool bHide )

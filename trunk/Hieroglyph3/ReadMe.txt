@@ -7,7 +7,7 @@ This library has been written by Jason Zink with the intention of promoting the 
 
 The library itself is written in C++ and utilizes DirectX 11 and Lua.  To run the demo programs, just open the Hieroglyph3.sln file, build the solution, then run the desired demo.  There are a number of demo programs that are intended to be demonstrative of how to use the engine, as well as a growing number of more advanced demos.  
 
-The current status of the engine is pre-alpha, but is becoming much more stable.  The renderer is nearly complete, and the object systems, material systems, and scene based systems are all functional now.  As these systems are finalized I will be adding more sample programs to demonstrate their use.  Also included in this initial release is a basic event system and a basic scripting system.  Further development will come for these systems as well as time becomes available.  
+The current status of the engine is pre-alpha, but is becoming much more stable.   
 
 If you have any comments, bugs to report, or suggestions, please feel free to contact me on the gamedev.net private message system (my ID is 'Jason Z'), post a comment in my gamedev.net journal, or start a discussion on the codeplex discussion tabs.  I hope you enjoy using the library as much as I have enjoyed writing it!
 

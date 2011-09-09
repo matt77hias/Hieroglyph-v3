@@ -107,14 +107,14 @@ ParticleSystemEntity::ParticleSystemEntity()
 	// TODO: this requires a cast for the SamplerParameterDX11* to RenderParameterDX11* - I don't know why...
 	pSamplerWriter->SetRenderParameterRef( (RenderParameterDX11*)pRenderer11->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"LinearSampler" ) ) );
 	pSamplerWriter->SetValue( LinearSampler );
-	this->AddRenderParameter( pSamplerWriter );
+	this->Parameters.AddRenderParameter( pSamplerWriter );
 
 	ParticleTexture = pRenderer11->LoadTexture( L"../Data/Textures/Particle.png" );
 
 	ShaderResourceParameterWriterDX11* pTextureWriter = new ShaderResourceParameterWriterDX11();
 	pTextureWriter->SetRenderParameterRef( pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ParticleTexture" ) ) );
 	pTextureWriter->SetValue( ParticleTexture );
-	this->AddRenderParameter( pTextureWriter );
+	this->Parameters.AddRenderParameter( pTextureWriter );
 
 
 	this->SetGeometry( pGeometry );
