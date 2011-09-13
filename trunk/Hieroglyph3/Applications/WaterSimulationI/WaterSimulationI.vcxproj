@@ -60,6 +60,7 @@
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Hieroglyph3.lib;d3dcompiler.lib;dxerr.lib;dxguid.lib;winmm.lib;comctl32.lib;dxgi.lib;d3dx11.lib;%(AdditionalDependencies)</AdditionalDependencies>
