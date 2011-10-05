@@ -422,7 +422,7 @@ void App::Update()
     PipelineManagerDX11* pImmPipeline = m_pRenderer11->pImmPipeline;
     IParameterManager* pParams = m_pRenderer11->m_pParamMgr;
     pImmPipeline->ClearRenderTargets();
-    pImmPipeline->BindRenderTargets( 0, m_BackBuffer );
+    pImmPipeline->OutputMergerStage.BindRenderTarget( 0, m_BackBuffer );
     pImmPipeline->ApplyRenderTargets();
     pImmPipeline->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 

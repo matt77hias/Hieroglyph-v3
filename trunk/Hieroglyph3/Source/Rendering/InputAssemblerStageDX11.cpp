@@ -10,14 +10,11 @@
 
 //--------------------------------------------------------------------------------
 #include "PCH.h"
-#include "OutputMergerStageDX11.h"
-#include "RenderTargetViewDX11.h"
-#include "DepthStencilViewDX11.h"
-#include "Log.h"
+#include "InputAssemblerStageDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-OutputMergerStageDX11::OutputMergerStageDX11()
+InputAssemblerStageDX11::InputAssemblerStageDX11()
 {
 	for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ )
 	{
@@ -31,60 +28,30 @@ OutputMergerStageDX11::OutputMergerStageDX11()
     APIDepthTargetViews = NULL;
 }
 //--------------------------------------------------------------------------------
-OutputMergerStageDX11::~OutputMergerStageDX11()
+InputAssemblerStageDX11::~InputAssemblerStageDX11()
 {
 	
 }
 //--------------------------------------------------------------------------------
-void OutputMergerStageDX11::SetFeautureLevel( D3D_FEATURE_LEVEL level )
+void InputAssemblerStageDX11::SetFeautureLevel( D3D_FEATURE_LEVEL level )
 {
 	m_FeatureLevel = level;
 }
 //--------------------------------------------------------------------------------
-void OutputMergerStageDX11::BindRenderTarget( int index, ResourcePtr Target )
+void InputAssemblerStageDX11::SetRenderTargetView( int index, ID3D11RenderTargetView* pView )
 {
-	int RenderID = Target->m_iResourceRTV;
-
-	RendererDX11* pRenderer = RendererDX11::Get();
-	
-	RenderTargetViewDX11* pView = pRenderer->GetRenderTargetView( RenderID );
-
-	if ( pView )
+	if ( ( index >= 0 ) && ( index < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT ) )
 	{
-		ID3D11RenderTargetView* pRenderTarget = { pView->m_pRenderTargetView };
-
-		if ( ( index >= 0 ) && ( index < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT ) )
-		{
-			RenderTargetViews[index] = pRenderTarget;
-		}
-	}
-	else
-	{
-		Log::Get().Write( L"Tried to bind an invalid render target view!" );
+		RenderTargetViews[index] = pView;
 	}
 }
 //--------------------------------------------------------------------------------
-void OutputMergerStageDX11::BindDepthTarget( ResourcePtr DepthTarget )
+void InputAssemblerStageDX11::SetDepthStencilView( ID3D11DepthStencilView* pView )
 {
-	int DepthID = DepthTarget->m_iResourceDSV;
-
-	RendererDX11* pRenderer = RendererDX11::Get();
-	
-	DepthStencilViewDX11* pView = pRenderer->GetDepthStencilView( DepthID );
-
-	if ( pView )
-	{
-		ID3D11DepthStencilView* pDepthStencilView = pView->m_pDepthStencilView;
-
-		DepthTargetViews = pDepthStencilView;
-	}
-	else
-	{
-		Log::Get().Write( L"Tried to bind an invalid depth stencil view!" );
-	}
+	DepthTargetViews = pView;
 }
 //--------------------------------------------------------------------------------
-void OutputMergerStageDX11::SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV, unsigned int initial )
+void InputAssemblerStageDX11::SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV, unsigned int initial )
 {
 	if ( ( index >= 0 ) && ( index < D3D11_PS_CS_UAV_REGISTER_COUNT ) )
 	{
@@ -93,7 +60,7 @@ void OutputMergerStageDX11::SetUnorderedAccessView( int index, ID3D11UnorderedAc
 	}
 }
 //--------------------------------------------------------------------------------
-void OutputMergerStageDX11::BindResources( ID3D11DeviceContext* pContext )
+void InputAssemblerStageDX11::BindResources( ID3D11DeviceContext* pContext )
 {
 	// Update all of the render targets and depth stencil targets
 	//pContext->OMSetRenderTargetsAndUnorderedAccessViews( 8, RenderTargetViews, DepthTargetViews, 
@@ -124,12 +91,7 @@ void OutputMergerStageDX11::BindResources( ID3D11DeviceContext* pContext )
     APIDepthTargetViews = DepthTargetViews;
 }
 //--------------------------------------------------------------------------------
-void OutputMergerStageDX11::SetToDefaultState()
-{
-	memset( APIRenderTargetViews, 0, D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT * sizeof( APIRenderTargetViews[0] ) );
-}
-//--------------------------------------------------------------------------------
-void OutputMergerStageDX11::ClearResources()
+void InputAssemblerStageDX11::ClearResources( ID3D11DeviceContext* pContext )
 {
 	// Clear out all array elements in our cached arrays.  This will be used to 
 	// write nulls into the context later on.
@@ -140,18 +102,18 @@ void OutputMergerStageDX11::ClearResources()
 	for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) UAVInitialCounts[i] = -1;
 }
 //--------------------------------------------------------------------------------
-void OutputMergerStageDX11::UnbindResources( ID3D11DeviceContext* pContext )
+void InputAssemblerStageDX11::UnbindResources( ID3D11DeviceContext* pContext )
 {
 	// Clear out the resource settings.
 
-	ClearResources();
+	ClearResources( pContext );
 
 	// Bind the changes to the pipeline.
 
 	BindResources( pContext );
 }
 //--------------------------------------------------------------------------------
-unsigned int OutputMergerStageDX11::GetViewsSetCount()
+unsigned int InputAssemblerStageDX11::GetViewsSetCount()
 {
 	unsigned int count = 0;
 
@@ -164,7 +126,7 @@ unsigned int OutputMergerStageDX11::GetViewsSetCount()
 	return( count );
 }
 //--------------------------------------------------------------------------------
-unsigned int OutputMergerStageDX11::GetViewsBoundCount()
+unsigned int InputAssemblerStageDX11::GetViewsBoundCount()
 {
 	unsigned int count = 0;
 

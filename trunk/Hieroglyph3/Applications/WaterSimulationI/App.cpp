@@ -130,7 +130,6 @@ void App::Initialize()
 	// frame.  This allows for fast parameter setting.
 
 	m_pTimeFactors = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"TimeFactors" ) );
-
 }
 //--------------------------------------------------------------------------------
 void App::Update()

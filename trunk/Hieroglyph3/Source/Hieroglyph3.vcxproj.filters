@@ -125,6 +125,9 @@
     <Filter Include="Rendering\Rendering Geometry\File Formats">
       <UniqueIdentifier>{9d8706bf-b60a-4b24-bbe6-d0b297432a36}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Events\Rendering Events">
+      <UniqueIdentifier>{fdcaa64a-b076-465c-9f59-64f466540be8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Mathematics\Matrix3f.cpp">
@@ -183,9 +186,6 @@
     </ClCompile>
     <ClCompile Include="Events\EventManager.cpp">
       <Filter>Events</Filter>
-    </ClCompile>
-    <ClCompile Include="Events\EvtFrameStart.cpp">
-      <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="Events\EvtWindowMsg.cpp">
       <Filter>Events\Windows Messages</Filter>
@@ -604,6 +604,12 @@
     <ClCompile Include="Rendering\ParameterContainer.cpp">
       <Filter>Rendering\Parameter System</Filter>
     </ClCompile>
+    <ClCompile Include="Events\EvtFrameStart.cpp">
+      <Filter>Events\Rendering Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\InputAssemblerStageDX11.cpp">
+      <Filter>Rendering\Pipeline\Fixed Stages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mathematics\Matrix3f.h">
@@ -671,9 +677,6 @@
     </ClInclude>
     <ClInclude Include="Events\IEventListener.h">
       <Filter>Events</Filter>
-    </ClInclude>
-    <ClInclude Include="Events\EvtFrameStart.h">
-      <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="Events\EvtWindowMsg.h">
       <Filter>Events\Windows Messages</Filter>
@@ -1109,6 +1112,12 @@
     </ClInclude>
     <ClInclude Include="Rendering\ParameterContainer.h">
       <Filter>Rendering\Parameter System</Filter>
+    </ClInclude>
+    <ClInclude Include="Events\EvtFrameStart.h">
+      <Filter>Events\Rendering Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\InputAssemblerStageDX11.h">
+      <Filter>Rendering\Pipeline\Fixed Stages</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -270,7 +270,7 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager*
 {
     // Bind the render target
     pPipelineManager->ClearRenderTargets();
-    pPipelineManager->BindRenderTargets( 0, m_pRenderTarget );
+    pPipelineManager->OutputMergerStage.BindRenderTarget( 0, m_pRenderTarget );
     pPipelineManager->ApplyRenderTargets();
 
     // Clear the render target
@@ -278,7 +278,7 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager*
     pPipelineManager->ClearBuffers( color, 1.0f, 0 );
 
     // Bind the read-only depth buffer
-    pPipelineManager->BindDepthTarget( m_DepthTarget );
+    pPipelineManager->OutputMergerStage.BindDepthTarget( m_DepthTarget );
     pPipelineManager->ApplyRenderTargets();
 
     pPipelineManager->SetViewPort( m_iViewport );

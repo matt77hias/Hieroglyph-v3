@@ -30,6 +30,7 @@ namespace Glyph3
 		ID3D11RenderTargetView*			m_pRenderTargetView;
 		
 		friend PipelineManagerDX11;
+		friend OutputMergerStageDX11;
 	};
 };
 //--------------------------------------------------------------------------------

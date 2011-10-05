@@ -432,12 +432,12 @@ void App::Update()
     // Set the render target for the final pass, and clear it
     PipelineManagerDX11* pImmPipeline = m_pRenderer11->pImmPipeline;
     pImmPipeline->ClearRenderTargets();
-    pImmPipeline->BindRenderTargets( 0, m_FinalTarget );
+    pImmPipeline->OutputMergerStage.BindRenderTarget( 0, m_FinalTarget );
     pImmPipeline->ApplyRenderTargets();
     pImmPipeline->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 
     // Also bind the depth buffer
-    pImmPipeline->BindDepthTarget( m_DepthTarget );
+    pImmPipeline->OutputMergerStage.BindDepthTarget( m_DepthTarget );
     pImmPipeline->ApplyRenderTargets();
 
     // Now set the camera and material to render the final pass
@@ -451,7 +451,7 @@ void App::Update()
     // Render to the backbuffer
     IParameterManager* pParams = m_pRenderer11->m_pParamMgr;
     pImmPipeline->ClearRenderTargets();
-    pImmPipeline->BindRenderTargets( 0, m_BackBuffer );
+    pImmPipeline->OutputMergerStage.BindRenderTarget( 0, m_BackBuffer );
     pImmPipeline->ApplyRenderTargets();
     pImmPipeline->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 

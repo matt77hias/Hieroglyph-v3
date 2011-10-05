@@ -367,41 +367,41 @@ void PipelineManagerDX11::BindSamplerStateParameter( ShaderType type, RenderPara
 	}
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::BindRenderTargets( int index, ResourcePtr RenderTarget )
-{
-	int RenderID = RenderTarget->m_iResourceRTV;
-
-	RendererDX11* pRenderer = RendererDX11::Get();
-	
-	RenderTargetViewDX11* pView = pRenderer->GetRenderTargetView( RenderID );
-
-	if ( pView )
-	{
-		ID3D11RenderTargetView* pRenderTarget = { pView->m_pRenderTargetView };
-
-		OutputMergerStage.SetRenderTargetView( index, pRenderTarget );
-	}
-	else
-		Log::Get().Write( L"Tried to bind an invalid render target view!" );
-}
+//void PipelineManagerDX11::BindRenderTargets( int index, ResourcePtr RenderTarget )
+//{
+//	int RenderID = RenderTarget->m_iResourceRTV;
+//
+//	RendererDX11* pRenderer = RendererDX11::Get();
+//	
+//	RenderTargetViewDX11* pView = pRenderer->GetRenderTargetView( RenderID );
+//
+//	if ( pView )
+//	{
+//		ID3D11RenderTargetView* pRenderTarget = { pView->m_pRenderTargetView };
+//
+//		OutputMergerStage.SetRenderTargetView( index, pRenderTarget );
+//	}
+//	else
+//		Log::Get().Write( L"Tried to bind an invalid render target view!" );
+//}
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::BindDepthTarget( ResourcePtr DepthTarget )
-{
-	int DepthID = DepthTarget->m_iResourceDSV;
-
-	RendererDX11* pRenderer = RendererDX11::Get();
-	
-	DepthStencilViewDX11* pView = pRenderer->GetDepthStencilView( DepthID );
-
-	if ( pView )
-	{
-		ID3D11DepthStencilView* pDepthStencilView = pView->m_pDepthStencilView;
-
-		OutputMergerStage.SetDepthStencilView( pDepthStencilView );
-	}
-	else
-		Log::Get().Write( L"Tried to bind an invalid depth stencil view!" );
-}
+//void PipelineManagerDX11::BindDepthTarget( ResourcePtr DepthTarget )
+//{
+//	int DepthID = DepthTarget->m_iResourceDSV;
+//
+//	RendererDX11* pRenderer = RendererDX11::Get();
+//	
+//	DepthStencilViewDX11* pView = pRenderer->GetDepthStencilView( DepthID );
+//
+//	if ( pView )
+//	{
+//		ID3D11DepthStencilView* pDepthStencilView = pView->m_pDepthStencilView;
+//
+//		OutputMergerStage.SetDepthStencilView( pDepthStencilView );
+//	}
+//	else
+//		Log::Get().Write( L"Tried to bind an invalid depth stencil view!" );
+//}
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ClearRenderTargets( )
 {
@@ -1030,7 +1030,15 @@ void PipelineManagerDX11::CopySubresourceRegion( ResourcePtr DestResource, UINT 
 void PipelineManagerDX11::GenerateCommandList( CommandListDX11* pList )
 {
 	if ( m_pContext->GetType() == D3D11_DEVICE_CONTEXT_DEFERRED )
+	{
 		m_pContext->FinishCommandList( true, &pList->m_pList );
+
+		// Reset the cached context state to default, since we do that for all
+		// command lists.
+		//
+		// TODO: Add the other stage states here...
+		OutputMergerStage.SetToDefaultState();
+	}
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ExecuteCommandList( CommandListDX11* pList )

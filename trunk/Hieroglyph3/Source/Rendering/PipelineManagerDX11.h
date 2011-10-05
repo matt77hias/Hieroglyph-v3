@@ -64,12 +64,10 @@ namespace Glyph3
 		//       utilize this 'Clear', 'Bind', and 'Apply' paradigm.
 
 		// Render targets are bound to the output merger stage, which is represented
-		// internally as a seperate class.  The array of render targets is cached on
+		// as a seperate class (OutputMergerStageDX11).  The array of render targets is cached on
 		// the CPU side prior to actual binding with the API.  This allows a series of
 		// changes to be made to several render targerts prior to actually binding.
 
-		void BindRenderTargets( int index, ResourcePtr RenderID );
-		void BindDepthTarget( ResourcePtr DepthID );
 		void ClearRenderTargets( );	
 		void ApplyRenderTargets( );
 
@@ -185,6 +183,7 @@ namespace Glyph3
 
 		ShaderStageDX11*	ShaderStages[6];
 
+	public:
 
 		OutputMergerStageDX11	OutputMergerStage;
 

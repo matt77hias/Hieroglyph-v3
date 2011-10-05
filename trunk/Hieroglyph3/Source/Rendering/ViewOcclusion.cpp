@@ -80,23 +80,11 @@ void ViewOcclusion::PreDraw( RendererDX11* pRenderer )
 //--------------------------------------------------------------------------------
 void ViewOcclusion::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
-	
-	// TODO: I added this bind statement here to force the DepthNormalBuffer to not
-	//       be bound to the pipeline anymore.  This should be done automatically, or
-	//       with an explicit method to clear render targets or something similar.
-	//       One automatic way would be to check the resource being set for the shader
-	//       resource parameter, to see if it is a render target view as well.  If so,
-	//       then clear the render targets when the SRV is set.
-
-	//pPipelineManager->ClearRenderTargets();
-	//pPipelineManager->ApplyPipelineResources();
-
 	// Process the occlusion buffer next.  Start by setting the needed resource
 	// parameters for the depth/normal buffer and the occlusion buffer.
 
 	pPipelineManager->ClearRenderTargets();
 	pPipelineManager->ApplyRenderTargets();
-
 
 	SetRenderParams( pParamManager );
 
@@ -104,22 +92,8 @@ void ViewOcclusion::Draw( PipelineManagerDX11* pPipelineManager, IParameterManag
 	pPipelineManager->Dispatch( *pOcclusionEffect, ResolutionX / 32, ResolutionY / 32, 1, pParamManager );
 
 	// Perform the blurring operations next.
-	//pPipelineManager->Dispatch( *pBilateralXEffect, 1, ResolutionY, 1, pParamManager );
-	//pPipelineManager->Dispatch( *pBilateralYEffect, ResolutionX, 1, 1, pParamManager );
-	//pPipelineManager( *pBilateralXEffect, 1, ResolutionY, 1 );
-	//pPipelineManager( *pBilateralYEffect, ResolutionX, 1, 1 );
-
-	// Perform the final rendering pass now.  This will use the ViewOcclusion
-	// output parameters (i.e. a shader resource view with occlusion buffer in it), and 
-	// render with the perspective view's draw method.
-	//ViewOcclusion::SetUsageParams( pParamManager );
-	//ViewPerspective::SetRenderParams( pParamManager );
-
-	//ViewPerspective::Draw( pPipelineManager, pParamManager );
-
-	// Add the visualization rendering into the scene
-	//pVisActor->GetNode()->Render( pPipelineManager, pParamManager, VT_PERSPECTIVE );
-	
+	pPipelineManager->Dispatch( *pBilateralXEffect, 1, ResolutionY, 1, pParamManager );
+	pPipelineManager->Dispatch( *pBilateralYEffect, ResolutionX, 1, 1, pParamManager );
 }
 //--------------------------------------------------------------------------------
 void ViewOcclusion::SetRenderParams( IParameterManager* pParamManager )

@@ -16,6 +16,7 @@
 #include "ShaderResourceParameterDX11.h"
 #include "IParameterManager.h"
 #include "ShaderResourceParameterWriterDX11.h"
+#include "SamplerParameterWriterDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -29,9 +30,9 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 	// Create the new actor
 	Actor* pActor = new Actor();
 
-	// The body of the actor is going to represent the frame around the 
-	// visualization, while a second entity added to the actor will represent the
-	// visualization canvas itself.
+	// The body of the actor is going to represent the canvas of the visualization
+	// frame, while a second entity added to the actor will represent the frame
+	// around the canvas.
 
 	Entity3D* pFrame = new Entity3D();
 	pActor->GetNode()->AttachChild( pFrame );
@@ -76,7 +77,6 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 
 	pActor->GetBody()->SetMaterial( pMaterial );
 	pActor->GetNode()->Position() = Vector3f( 0.0f, 2.0f, 0.0f );
-	pActor->GetNode()->Rotation().Rotation( Vector3f( 1.50f, -0.707f, 0.0f ) );
 	pActor->GetNode()->Update( 0.0f );
 
 
@@ -101,6 +101,14 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 	
 	int sampler = Renderer.CreateSamplerState( &state );
 	Renderer.m_pParamMgr->SetSamplerParameter( std::wstring( L"LinearSampler" ), &sampler ); 
+
+    // Create a sampler state parameter
+    SamplerParameterWriterDX11* pSamplerParam = new SamplerParameterWriterDX11();
+    pSamplerParam->SetRenderParameterRef(
+		(RenderParameterDX11*)Renderer.m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"LinearSampler" ) ) );
+	pSamplerParam->SetValue( sampler );
+    pActor->GetBody()->Parameters.AddRenderParameter( pSamplerParam );
+
 
 	return( pActor );
 }

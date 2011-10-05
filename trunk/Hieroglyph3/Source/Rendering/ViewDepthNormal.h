@@ -11,9 +11,9 @@
 //--------------------------------------------------------------------------------
 // ViewDepthNormal
 //
-// ViewDepthNormal is intended to be the primary render view that most of the
-// everyday rendering will use.  This render view will use the scene graph to
-// select the currently visible objects and render them.
+// ViewDepthNormal is intended to generate a depth/normal buffer of a give scene.
+// This allows any other views to utilize a commonly generated buffer instead of
+// having to hard code the generation into multiple places.
 //--------------------------------------------------------------------------------
 #ifndef ViewDepthNormal_h
 #define ViewDepthNormal_h
@@ -29,19 +29,9 @@ namespace Glyph3
 	{
 	public:
 		ViewDepthNormal( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget );
-
-		//virtual void Update( float fTime );
-		//virtual void PreDraw( RendererDX11* pRenderer );
-		//virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
-
-		//void SetBackColor( Vector4f color );
-		//void SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ );
-
-		virtual void SetRenderParams( IParameterManager* pParamManager );
-		virtual void SetUsageParams( IParameterManager* pParamManager );
-
-
 		virtual ~ViewDepthNormal();
+
+		virtual void SetUsageParams( IParameterManager* pParamManager );
 
 	protected:
 		int ResolutionX;

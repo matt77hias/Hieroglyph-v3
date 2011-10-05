@@ -89,9 +89,8 @@ bool App::ConfigureEngineComponents()
 	// Bind the swap chain render target and the depth buffer for use in 
 	// rendering.  
 
-	m_pRenderer11->pImmPipeline->ClearRenderTargets();
-	m_pRenderer11->pImmPipeline->BindRenderTargets( 0, m_RenderTarget );
-	m_pRenderer11->pImmPipeline->BindDepthTarget( m_DepthTarget );
+	m_pRenderer11->pImmPipeline->OutputMergerStage.BindRenderTarget( 0, m_RenderTarget );
+	m_pRenderer11->pImmPipeline->OutputMergerStage.BindDepthTarget( m_DepthTarget );
 	m_pRenderer11->pImmPipeline->ApplyRenderTargets();
 
 

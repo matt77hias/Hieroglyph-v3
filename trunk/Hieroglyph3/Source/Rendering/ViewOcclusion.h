@@ -11,6 +11,9 @@
 //--------------------------------------------------------------------------------
 // ViewOcclusion
 //
+// The ViewOcclusion class takes as input a depth/normal buffer, and then generates
+// an occlusion buffer from it.  It then performs a bilateral blur in two passes,
+// to produce the final output occlusion buffer.
 //--------------------------------------------------------------------------------
 #ifndef ViewOcclusion_h
 #define ViewOcclusion_h

@@ -11,6 +11,9 @@
 //--------------------------------------------------------------------------------
 // ViewAmbientOcclusion
 //
+// This class extends the standard perspective view to produce a depth/normal 
+// buffer, then produce an occlusion buffer from it, and then finally produce an
+// end image like a perspective view would.
 //--------------------------------------------------------------------------------
 #ifndef ViewAmbientOcclusion_h
 #define ViewAmbientOcclusion_h
@@ -19,6 +22,7 @@
 #include "ViewOcclusion.h"
 #include "ViewDepthNormal.h"
 #include "Actor.h"
+#include "ShaderResourceParameterDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -35,8 +39,6 @@ namespace Glyph3
 
 		virtual void SetEntity( Entity3D* pEntity );
 		virtual void SetRoot( Node3D* pRoot );
-
-		virtual void SetBackColor( Vector4f color );
 
 		virtual void SetRenderParams( IParameterManager* pParamManager );
 		virtual void SetUsageParams( IParameterManager* pParamManager );
@@ -55,14 +57,13 @@ namespace Glyph3
 		ResourcePtr OcclusionBuffer;
 		ResourcePtr BilateralBuffer;
 
-		//ViewPerspective*	pPerspectiveView;
 		ViewOcclusion*		pOcclusionView;
 		ViewDepthNormal*	pDepthNormalView;
-//		RenderEffectDX11*	pOcclusionEffect;
-//		RenderEffectDX11*	pBilateralXEffect;
-//		RenderEffectDX11*	pBilateralYEffect;
 
 		Actor*				pVisActor;
+
+		ShaderResourceParameterDX11*	pDepthBufferParameter;
+		ShaderResourceParameterDX11*	pOcclusionBufferParameter;
 	};
 };
 //--------------------------------------------------------------------------------

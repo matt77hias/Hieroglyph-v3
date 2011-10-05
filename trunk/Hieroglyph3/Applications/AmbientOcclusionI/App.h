@@ -55,4 +55,6 @@ protected:
 	// Add parameter references here for setting parameters.
 	VectorParameterDX11*	m_pTimeFactors;
 	VectorParameterDX11*	m_pFinalColor;
+	VectorParameterDX11*	m_pLightColor;
+	VectorParameterDX11*	m_pLightPosition;
 };

@@ -62,8 +62,8 @@ void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager
 		// Set the parameters for rendering this view
 		pPipelineManager->ClearRenderTargets();
 		for ( int i = 0; i < m_GBufferTargets.count(); ++i)
-			pPipelineManager->BindRenderTargets( i, m_GBufferTargets[i] );
-		pPipelineManager->BindDepthTarget( m_DepthTarget );
+			pPipelineManager->OutputMergerStage.BindRenderTarget( i, m_GBufferTargets[i] );
+		pPipelineManager->OutputMergerStage.BindDepthTarget( m_DepthTarget );
 		pPipelineManager->ApplyRenderTargets();
 
 		pPipelineManager->SetViewPort( m_iViewport );

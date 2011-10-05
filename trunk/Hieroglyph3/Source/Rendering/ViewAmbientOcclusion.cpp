@@ -49,52 +49,32 @@ ViewAmbientOcclusion::ViewAmbientOcclusion( RendererDX11& Renderer, ResourcePtr 
 
 	BilateralBuffer = Renderer.CreateTexture2D( &config, 0 );
 
-	//pPerspectiveView = new ViewPerspective( Renderer, RenderTarget, DepthTarget );
+	// Create the two sub-views to perform the extra rendering operations for
+	// ambient occlusion.
+
 	pOcclusionView = new ViewOcclusion( Renderer, OcclusionBuffer, BilateralBuffer, DepthNormalBuffer );
 	pDepthNormalView = new ViewDepthNormal( Renderer, DepthNormalBuffer, DepthTarget );
 
+	// Create the visualization actor and send in the occlusion buffer.
 
-	// Create the effects that will be used to calculate the occlusion buffer and
-	// the bilateral filters.
+	pVisActor = 0;
+	pVisActor = ActorGenerator::GenerateVisualizationTexture2D( Renderer, 
+			DepthNormalBuffer, 0 );
 
-	//pOcclusionEffect = new RenderEffectDX11();
-	//pOcclusionEffect->m_iComputeShader = 
-	//	Renderer.LoadShader( COMPUTE_SHADER,
-	//	std::wstring( L"../Data/Shaders/AmbientOcclusionCS_32.hlsl" ),
-	//	std::wstring( L"CSMAIN" ),
-	//	std::wstring( L"cs_5_0" ) );
+	// Grab references to the desired parameters in order to quickly set their
+	// values as needed later on.
 
-	//pBilateralXEffect = new RenderEffectDX11();
-	//pBilateralXEffect->m_iComputeShader = 
-	//	Renderer.LoadShader( COMPUTE_SHADER,
-	//	std::wstring( L"../Data/Shaders/SeparableBilateralCS.hlsl" ),
-	//	std::wstring( L"CS_Horizontal" ),
-	//	std::wstring( L"cs_5_0" ) );
+	pDepthBufferParameter = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"DepthNormalBuffer" ) );
+	pOcclusionBufferParameter = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"AmbientOcclusionBuffer" ) );
 
-	//pBilateralYEffect = new RenderEffectDX11();
-	//pBilateralYEffect->m_iComputeShader = 
-	//	Renderer.LoadShader( COMPUTE_SHADER,
-	//	std::wstring( L"../Data/Shaders/SeparableBilateralCS.hlsl" ),
-	//	std::wstring( L"CS_Vertical" ),
-	//	std::wstring( L"cs_5_0" ) );
-
-	// Create the visualization actor and send in the occlusion buffer
-
-//	pVisActor = ActorGenerator::GenerateVisualizationTexture2D( Renderer, 
-//			DepthNormalBuffer, 0 );
 }
 //--------------------------------------------------------------------------------
 ViewAmbientOcclusion::~ViewAmbientOcclusion()
 {
-	//SAFE_DELETE( pPerspectiveView );
 	SAFE_DELETE( pOcclusionView );
 	SAFE_DELETE( pDepthNormalView );
 
-	//SAFE_DELETE( pOcclusionEffect );
-	//SAFE_DELETE( pBilateralXEffect );
-	//SAFE_DELETE( pBilateralYEffect );
-
-	//SAFE_DELETE( pVisActor );
+	SAFE_DELETE( pVisActor );
 }
 //--------------------------------------------------------------------------------
 void ViewAmbientOcclusion::Update( float fTime )
@@ -103,98 +83,46 @@ void ViewAmbientOcclusion::Update( float fTime )
 //--------------------------------------------------------------------------------
 void ViewAmbientOcclusion::PreDraw( RendererDX11* pRenderer )
 {
+	// Call the super class's predraw in order to queue it in the renderer.  The
+	// views are processed in a LIFO order, so this will be executed last in both
+	// single- or multi-threaded mode.
+
 	ViewPerspective::PreDraw( pRenderer );
 
-	//pPerspectiveView->PreDraw( pRenderer );
+	// Next we call the predraw method of each of the supporting views.  Once 
+	// again, the views are processed in reverse order of submission, so the depth
+	// normal view will be processed first, then the occlusion view, then the 
+	// actual standard perspective view (whose objects will use the ambient 
+	// occlusion buffers).
+
 	pOcclusionView->PreDraw( pRenderer );
 	pDepthNormalView->PreDraw( pRenderer );
-
-//	if ( m_pRoot )
-//	{
-		// Queue this view into the renderer for processing.
-//		pRenderer->QueueRenderView( this );
-
-		// Run through the graph and pre-render the entities
-//		m_pRoot->PreRender( pRenderer, VT_LINEAR_DEPTH_NORMAL );
-//	}
 }
 //--------------------------------------------------------------------------------
 void ViewAmbientOcclusion::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
+	// Here we are simply calling our super class's draw method to perform the 
+	// standard rendering process.
+
 	ViewPerspective::Draw( pPipelineManager, pParamManager );
 
-	// Set the view matrix if this render view is associated with an entity.
-	//if ( m_pEntity != NULL )
-	//	ViewMatrix = m_pEntity->GetView();
 
-	// Render the depth/normal buffer, keeping the depth target for a later pass.
-	//if ( m_pRoot )
-	//{
-	//	// Run through the graph and pre-render the entities
-	//	//m_pRoot->PreRender( pPipelineManager, pParamManager, VT_LINEAR_DEPTH_NORMALS );
+	// Add the visualization rendering into the scene
 
-	//	// Set the parameters for rendering this view
-	//	pPipelineManager->ClearRenderTargets();
-	//	pPipelineManager->BindRenderTargets( 0, DepthNormalBuffer );
-	//	pPipelineManager->BindDepthTarget( m_DepthTarget );
-	//	pPipelineManager->ApplyRenderTargets();
-	//	pPipelineManager->ClearBuffers( m_vColor, 1.0f );
-
-	//	// Set the perspective view's render parameters, since the depth normal
-	//	// buffer is a perspective rendering.
-	//	ViewPerspective::SetRenderParams( pParamManager );
-
-	//	// Run through the graph and render each of the entities
-	//	m_pRoot->Render( pPipelineManager, pParamManager, VT_LINEAR_DEPTH_NORMAL );
-	//}
-	//
-	//// TODO: I added this bind statement here to force the DepthNormalBuffer to not
-	////       be bound to the pipeline anymore.  This should be done automatically, or
-	////       with an explicit method to clear render targets or something similar.
-	////       One automatic way would be to check the resource being set for the shader
-	////       resource parameter, to see if it is a render target view as well.  If so,
-	////       then clear the render targets when the SRV is set.
-
-	//pPipelineManager->ClearRenderTargets();
-	//pPipelineManager->ApplyPipelineResources();
-
-	//// Process the occlusion buffer next.  Start by setting the needed resource
-	//// parameters for the depth/normal buffer and the occlusion buffer.
-	//ViewAmbientOcclusion::SetRenderParams( pParamManager );
-
-	//// Execute the compute shader to calculate the raw occlusion buffer.
-	//pPipelineManager->Dispatch( *pOcclusionEffect, ResolutionX / 32, ResolutionY / 32, 1, pParamManager );
-
-	//// Perform the blurring operations next.
-	//pPipelineManager->Dispatch( *pBilateralXEffect, 1, ResolutionY, 1, pParamManager );
-	//pPipelineManager->Dispatch( *pBilateralYEffect, ResolutionX, 1, 1, pParamManager );
-	////pPipelineManager( *pBilateralXEffect, 1, ResolutionY, 1 );
-	////pPipelineManager( *pBilateralYEffect, ResolutionX, 1, 1 );
-
-	//// Perform the final rendering pass now.  This will use the ViewAmbientOcclusion
-	//// output parameters (i.e. a shader resource view with occlusion buffer in it), and 
-	//// render with the perspective view's draw method.
-	//ViewAmbientOcclusion::SetUsageParams( pParamManager );
-	//ViewPerspective::SetRenderParams( pParamManager );
-
-	//ViewPerspective::Draw( pPipelineManager, pParamManager );
-
-	//// Add the visualization rendering into the scene
-	//pVisActor->GetNode()->Render( pPipelineManager, pParamManager, VT_PERSPECTIVE );
-	
+	pVisActor->GetNode()->Render( pPipelineManager, pParamManager, VT_PERSPECTIVE );
 }
 //--------------------------------------------------------------------------------
 void ViewAmbientOcclusion::SetRenderParams( IParameterManager* pParamManager )
 {
 	// Set the parameters for this view to be able to perform its processing
-	// sequence.  In this case, we set the depth/normal buffer as a shader 
-	// resource and the occlusion buffer as an unordered access view.
+	// sequence.  In this case, we set the depth/normal buffer and the ambient
+	// occlusion buffer as shader resources in addition to the standard parameters
+	// that are set for a normal perspective view.
 
 	ViewPerspective::SetRenderParams( pParamManager );
 
-	pParamManager->SetShaderResourceParameter( L"DepthNormalBuffer", DepthNormalBuffer );
-	//pParamManager->SetUnorderedAccessParameter( L"AmbientOcclusionTarget", OcclusionBuffer );
-	pParamManager->SetShaderResourceParameter( L"AmbientOcclusionBuffer", OcclusionBuffer );
+	pParamManager->SetShaderResourceParameter( pDepthBufferParameter, DepthNormalBuffer );
+	pParamManager->SetShaderResourceParameter( pOcclusionBufferParameter, OcclusionBuffer );
 }
 //--------------------------------------------------------------------------------
 void ViewAmbientOcclusion::SetUsageParams( IParameterManager* pParamManager )
@@ -202,46 +130,42 @@ void ViewAmbientOcclusion::SetUsageParams( IParameterManager* pParamManager )
 	// Set the parameters for allowing an application to use the current resources
 	// for rendering.
 
-	pParamManager->SetShaderResourceParameter( L"AmbientOcclusionBuffer", OcclusionBuffer );
+	pParamManager->SetShaderResourceParameter( pOcclusionBufferParameter, OcclusionBuffer );
 }
 //--------------------------------------------------------------------------------
 void ViewAmbientOcclusion::SetViewMatrix( const Matrix4f& matrix )
 {
+	// Perform the view matrix setting for this view.
 	IRenderView::SetViewMatrix( matrix );
 
-	//pPerspectiveView->SetViewMatrix( matrix );
+	// Propagate the view matrix to the depth/normal view.
 	pDepthNormalView->SetViewMatrix( matrix );
 }
 //--------------------------------------------------------------------------------
 void ViewAmbientOcclusion::SetProjMatrix( const Matrix4f& matrix )
 {
+	// Perform the projection matrix setting for this view.
 	IRenderView::SetProjMatrix( matrix );
 
-	//pPerspectiveView->SetProjMatrix( matrix );
+	// Propagate the projection matrix to the depth/normal view.
 	pDepthNormalView->SetProjMatrix( matrix );
 }
 //--------------------------------------------------------------------------------
 void ViewAmbientOcclusion::SetRoot( Node3D* pRoot )
 {
+	// Perform the root setting call for this view.
 	m_pRoot = pRoot;
 
-	//pPerspectiveView->SetRoot( pRoot );
+	// Propagate the root setting call to the depth/normal view.
 	pDepthNormalView->SetRoot( pRoot );
 }
 //--------------------------------------------------------------------------------
 void ViewAmbientOcclusion::SetEntity( Entity3D* pEntity )
 {
+	// Perform the entity setting call for this view.
 	m_pEntity = pEntity;
 
-	//pPerspectiveView->SetEntity( pEntity );
+	// Propagate the entity call to the depth/normal view.
 	pDepthNormalView->SetEntity( pEntity );
-}
-//--------------------------------------------------------------------------------
-void ViewAmbientOcclusion::SetBackColor( Vector4f color )
-{
-	m_vColor = color;
-
-	//pPerspectiveView->SetBackColor( color );
-	//pDepthNormalView->SetBackColor( color );
 }
 //--------------------------------------------------------------------------------

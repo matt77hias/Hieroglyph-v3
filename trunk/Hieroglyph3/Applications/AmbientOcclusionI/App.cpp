@@ -207,12 +207,20 @@ void App::Initialize()
 	m_pScene->AddCamera( m_pCamera );
 
 
+	// Get a handle to the render parameters that the application will be setting.
+	m_pTimeFactors = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"TimeFactors" ) );
+
 	Vector4f FinalColor = Vector4f( 0.5f, 1.0f, 0.5f, 1.0f );
 	m_pFinalColor = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"FinalColor" ) );
 	m_pFinalColor->InitializeParameterData( &m_pFinalColor );
 
-	// Get a handle to the render parameters that the application will be setting.
-	m_pTimeFactors = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"TimeFactors" ) );
+	Vector4f LightParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
+	m_pLightColor = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightColor" ) );
+	m_pLightColor->InitializeParameterData( &LightParams );
+
+	Vector4f LightPosition = Vector4f( 10.0f, 20.0f, -20.0f, 0.0f );
+	m_pLightPosition = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightPositionWS" ) );
+	m_pLightPosition->InitializeParameterData( &LightPosition );
 }
 //--------------------------------------------------------------------------------
 void App::Update()

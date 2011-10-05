@@ -91,9 +91,8 @@ void ViewPerspective::Draw( PipelineManagerDX11* pPipelineManager, IParameterMan
 	if ( m_pRoot )
 	{
 		// Set the parameters for rendering this view
-		pPipelineManager->ClearRenderTargets();
-		pPipelineManager->BindRenderTargets( 0, m_RenderTarget );
-		pPipelineManager->BindDepthTarget( m_DepthTarget );
+		pPipelineManager->OutputMergerStage.BindRenderTarget( 0, m_RenderTarget );
+		pPipelineManager->OutputMergerStage.BindDepthTarget( m_DepthTarget );
 		pPipelineManager->ApplyRenderTargets();
 
 		pPipelineManager->SetViewPort( m_iViewport );

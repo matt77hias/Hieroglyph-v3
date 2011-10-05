@@ -30,6 +30,7 @@ namespace Glyph3
 		ID3D11DepthStencilView*			m_pDepthStencilView;
 		
 		friend PipelineManagerDX11;
+		friend OutputMergerStageDX11;
 	};
 };
 //--------------------------------------------------------------------------------

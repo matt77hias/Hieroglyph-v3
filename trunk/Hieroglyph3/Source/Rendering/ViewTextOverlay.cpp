@@ -79,9 +79,8 @@ void ViewTextOverlay::PreDraw( RendererDX11* pRenderer )
 void ViewTextOverlay::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	// Set the parameters for rendering this view
-	pPipelineManager->ClearRenderTargets();
-	pPipelineManager->BindRenderTargets( 0, m_RenderTarget );
-	pPipelineManager->BindDepthTarget( m_DepthTarget );
+	pPipelineManager->OutputMergerStage.BindRenderTarget( 0, m_RenderTarget );
+	pPipelineManager->OutputMergerStage.BindDepthTarget( m_DepthTarget );
 	pPipelineManager->ApplyRenderTargets();
 
 	pPipelineManager->SetViewPort( m_iViewport );

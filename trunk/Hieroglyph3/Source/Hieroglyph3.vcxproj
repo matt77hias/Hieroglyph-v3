@@ -118,6 +118,7 @@ copy Animation\*.h ..\SDK\Include
     <ClCompile Include="Application\RenderApplication.cpp" />
     <ClCompile Include="Application\RenderWindow.cpp" />
     <ClCompile Include="Application\Win32RenderWindow.cpp" />
+    <ClCompile Include="Rendering\InputAssemblerStageDX11.cpp" />
     <ClCompile Include="Rendering\ParameterContainer.cpp" />
     <ClCompile Include="Utility\GlyphString.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -455,6 +456,7 @@ copy Animation\*.h ..\SDK\Include
     <ClInclude Include="Application\RenderApplication.h" />
     <ClInclude Include="Application\RenderWindow.h" />
     <ClInclude Include="Application\Win32RenderWindow.h" />
+    <ClInclude Include="Rendering\InputAssemblerStageDX11.h" />
     <ClInclude Include="Rendering\ParameterContainer.h" />
     <ClInclude Include="Utility\GlyphString.h" />
     <ClInclude Include="Utility\ISharedObject.h" />

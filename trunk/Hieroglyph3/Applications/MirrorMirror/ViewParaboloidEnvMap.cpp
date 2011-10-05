@@ -115,9 +115,9 @@ void ViewParaboloidEnvMap::Draw( PipelineManagerDX11* pPipelineManager, IParamet
 	if ( m_pRoot )
 	{
 		// Set the parameters for rendering this view
-		pPipelineManager->ClearRenderTargets();
-		pPipelineManager->BindRenderTargets( 0, m_RenderTarget );
-		pPipelineManager->BindDepthTarget( m_DepthTarget );
+		//pPipelineManager->ClearRenderTargets();
+		pPipelineManager->OutputMergerStage.BindRenderTarget( 0, m_RenderTarget );
+		pPipelineManager->OutputMergerStage.BindDepthTarget( m_DepthTarget );
 		pPipelineManager->ApplyRenderTargets();
 
 		pPipelineManager->SetViewPort( m_iViewport );

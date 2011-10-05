@@ -9,29 +9,29 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// OutputMergerStageDX11
+// InputAssemblerStageDX11
 //
 //--------------------------------------------------------------------------------
-#ifndef OutputMergerStageDX11_h
-#define OutputMergerStageDX11_h
+#ifndef InputAssemblerStageDX11_h
+#define InputAssemblerStageDX11_h
 //--------------------------------------------------------------------------------
 #include "RendererDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class OutputMergerStageDX11
+	class InputAssemblerStageDX11
 	{
 	public:
-		OutputMergerStageDX11();
-		virtual ~OutputMergerStageDX11();
+		InputAssemblerStageDX11();
+		virtual ~InputAssemblerStageDX11();
 
 		void SetFeautureLevel( D3D_FEATURE_LEVEL level );
 
 		// Each of these set methods will buffer their input views for binding
 		// at a later time when the BindResources method is called.  Until it is,
 		// these views are cached for later use.
-		void BindRenderTarget( int index, ResourcePtr Target );
-		void BindDepthTarget( ResourcePtr DepthTarget );
+		void SetRenderTargetView( int index, ID3D11RenderTargetView* pBuffer );
+		void SetDepthStencilView( ID3D11DepthStencilView* pState );
 		void SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV, unsigned int initial = -1 );
 
 		// Binding resources actually binds the currently 'set' views and makes 
@@ -39,12 +39,8 @@ namespace Glyph3
 		void BindResources( ID3D11DeviceContext* pContext );
 		
 		// Clearing resources wipes out the currently 'set' views from the buffer.
-		void ClearResources();
+		void ClearResources( ID3D11DeviceContext* pContext );
 		void UnbindResources( ID3D11DeviceContext* pContext );
-
-		// This method will set the current cached API state to the default value.
-		// This is commonly used when the context is reset for some reason.
-		void SetToDefaultState();
 
 		// The number of views 'set' indicates how many views will be bound after
 		// the next call to bind resources (i.e. the number of views planned to be
@@ -70,6 +66,6 @@ namespace Glyph3
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // OutputMergerStageDX11_h
+#endif // InputAssemblerStageDX11_h
 //--------------------------------------------------------------------------------
 
