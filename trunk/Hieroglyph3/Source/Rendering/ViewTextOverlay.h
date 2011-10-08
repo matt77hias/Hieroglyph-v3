@@ -41,7 +41,7 @@ namespace Glyph3
 	class ViewTextOverlay : public IRenderView
 	{
 	public:
-		ViewTextOverlay( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget );
+		ViewTextOverlay( RendererDX11& Renderer, ResourcePtr RenderTarget );
 
 		virtual void Update( float fTime );
 		virtual void PreDraw( RendererDX11* pRenderer );

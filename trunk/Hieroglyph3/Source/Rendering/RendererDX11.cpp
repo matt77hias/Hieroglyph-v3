@@ -1440,9 +1440,36 @@ ResourcePtr RendererDX11::LoadTexture( std::wstring filename, D3DX11_IMAGE_LOAD_
 	Texture2dConfigDX11 TextureConfig;
 	reinterpret_cast< ID3D11Texture2D* >( pTexture )->GetDesc( &TextureConfig.m_State );
 
-	//ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, &TextureConfig, this ) );
 	return( ResourcePtr( new ResourceProxyDX11( ResourceID, &TextureConfig, this ) ) );
-	//return( Proxy );
+}
+//--------------------------------------------------------------------------------
+ResourcePtr RendererDX11::LoadTexture( void* pData, SIZE_T sizeInBytes, D3DX11_IMAGE_LOAD_INFO* pLoadInfo )
+{
+	ID3D11Resource* pTexture = 0;
+
+	HRESULT hr = D3DX11CreateTextureFromMemory(
+		m_pDevice,
+		pData,
+		sizeInBytes,
+		pLoadInfo,
+		0,
+		&pTexture,
+		0
+	);
+
+	if ( FAILED( hr ) )
+	{
+		Log::Get().Write( L"Failed to load texture from memory!" );
+		return( ResourcePtr( new ResourceProxyDX11() ) );
+	}
+
+	m_vResources.add( new Texture2dDX11( reinterpret_cast< ID3D11Texture2D* >( pTexture ) ) );
+
+	int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE2D;
+	Texture2dConfigDX11 TextureConfig;
+	reinterpret_cast< ID3D11Texture2D* >( pTexture )->GetDesc( &TextureConfig.m_State );
+
+	return( ResourcePtr( new ResourceProxyDX11( ResourceID, &TextureConfig, this ) ) );
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateBlendState( BlendStateConfigDX11* pConfig )

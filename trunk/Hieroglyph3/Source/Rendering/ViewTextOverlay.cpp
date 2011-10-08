@@ -21,12 +21,11 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-ViewTextOverlay::ViewTextOverlay( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget )
+ViewTextOverlay::ViewTextOverlay( RendererDX11& Renderer, ResourcePtr RenderTarget )
 {
 	m_sParams.iViewType = VT_GUI_SKIN;
 
 	m_RenderTarget = RenderTarget;
-	m_DepthTarget = DepthTarget;
 
 	ViewMatrix.MakeIdentity();
 	ProjMatrix.MakeIdentity();
@@ -80,7 +79,6 @@ void ViewTextOverlay::Draw( PipelineManagerDX11* pPipelineManager, IParameterMan
 {
 	// Set the parameters for rendering this view
 	pPipelineManager->OutputMergerStage.BindRenderTarget( 0, m_RenderTarget );
-	pPipelineManager->OutputMergerStage.BindDepthTarget( m_DepthTarget );
 	pPipelineManager->ApplyRenderTargets();
 
 	pPipelineManager->SetViewPort( m_iViewport );

@@ -225,6 +225,7 @@ namespace Glyph3
 		Vector2f GetDesktopResolution();
 
 		ResourcePtr LoadTexture( std::wstring filename, D3DX11_IMAGE_LOAD_INFO* pLoadInfo = NULL );
+		ResourcePtr LoadTexture( void* pData, SIZE_T sizeInBytes, D3DX11_IMAGE_LOAD_INFO* pLoadInfo = NULL );
 
 		// These functions are used to convert the enumerated values to human readable text.
 		// This is convenient for logging or displaying various states.
@@ -273,7 +274,7 @@ namespace Glyph3
 		// Basic controls over the threading system
 		void SetMultiThreadingState( bool enable );
 
-	private:
+	protected:
 
 		// The main API interfaces used in the renderer.
 		ID3D11Device*				m_pDevice;

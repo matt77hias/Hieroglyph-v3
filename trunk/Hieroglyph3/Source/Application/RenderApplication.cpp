@@ -104,7 +104,7 @@ bool RenderApplication::ConfigureRenderingEngineComponents( int width, int heigh
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
 
-	m_pTextOverlayView = new ViewTextOverlay( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
+	m_pTextOverlayView = new ViewTextOverlay( *m_pRenderer11, m_RenderTarget );
 
 
 	m_pCamera = new FirstPersonCamera();

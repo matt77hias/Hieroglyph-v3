@@ -12,8 +12,8 @@
 #include "Scene.h"
 #include "TArray.h"
 
-#include "ViewGBuffer.h"
-#include "ViewLights.h"
+#include "ViewDeferredRenderer.h"
+#include "ViewTextOverlay.h"
 #include "AppSettings.h"
 
 using namespace Glyph3;
@@ -37,18 +37,12 @@ public:
 
 protected:
 
-    void SetupViews();
+
     void DrawHUD();
 
 	RendererDX11*			m_pRenderer11;
 	Win32RenderWindow*		m_pWindow;
 
-    TArray<ResourcePtr>		m_GBuffer[GBufferOptMode::NumSettings][AAMode::NumSettings];
-	ResourcePtr				m_DepthTarget[AAMode::NumSettings];
-    ResourcePtr             m_ReadOnlyDepthTarget[AAMode::NumSettings];
-    ResourcePtr             m_FinalTarget[AAMode::NumSettings];
-    int                     m_iViewport[AAMode::NumSettings];
-    ResourcePtr             m_ResolveTarget;
 	ResourcePtr				m_BackBuffer;
 
     MaterialDX11*           m_pMaterial;
@@ -59,8 +53,8 @@ protected:
     ResourcePtr             m_DiffuseTexture;
     ResourcePtr             m_NormalMap;
 
-	ViewGBuffer*			m_pGBufferView;
-    ViewLights*             m_pLightsView;
+	ViewTextOverlay*		m_pTextOverlayView;
+	ViewDeferredRenderer*	m_pDeferredView;
 	SpriteRendererDX11		m_SpriteRenderer;
 	SpriteFontDX11			m_Font;
 

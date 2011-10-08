@@ -100,12 +100,14 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="AppSettings.cpp" />
+    <ClCompile Include="ViewDeferredRenderer.cpp" />
     <ClCompile Include="ViewGBuffer.cpp" />
     <ClCompile Include="ViewLights.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="AppSettings.h" />
+    <ClInclude Include="ViewDeferredRenderer.h" />
     <ClInclude Include="ViewGBuffer.h" />
     <ClInclude Include="ViewLights.h" />
   </ItemGroup>
