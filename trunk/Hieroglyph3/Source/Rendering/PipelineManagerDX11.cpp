@@ -413,6 +413,17 @@ void PipelineManagerDX11::ApplyRenderTargets( )
 	OutputMergerStage.BindResources( m_pContext );
 }
 //--------------------------------------------------------------------------------
+void PipelineManagerDX11::ApplyInputResources( )
+{
+	InputAssemblerStage.ApplyDesiredState( m_pContext );
+}
+//--------------------------------------------------------------------------------
+void PipelineManagerDX11::ClearInputResources( )
+{
+	InputAssemblerStage.ClearDesiredState();
+	InputAssemblerStage.ApplyDesiredState( m_pContext );
+}
+//--------------------------------------------------------------------------------
 void PipelineManagerDX11::UnbindInputLayout( )
 {
 	m_pContext->IASetInputLayout( 0 );
@@ -514,14 +525,12 @@ void PipelineManagerDX11::BindIndexBuffer( ResourcePtr resource )
 	ID3D11Buffer* pBuffer = (ID3D11Buffer*)pRenderer->GetResource( ID )->GetResource();
 
 	// If the resource is in range, then attempt to set it
-	if ( pBuffer )
-	{
-		//ID3D11Buffer* Buffers = 0;
-		//Buffers = (ID3D11Buffer*)m_vResources[ID]->GetResource();
+	if ( pBuffer ) {
 		m_pContext->IASetIndexBuffer( pBuffer, DXGI_FORMAT_R32_UINT, 0 );
 	}
-	else
+	else {
 		Log::Get().Write( L"Tried to bind an invalid index buffer ID!" );
+	}
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ApplyPipelineResources( )
@@ -544,6 +553,11 @@ void PipelineManagerDX11::ClearPipelineResources( )
 	ComputeShaderStage.UnbindResources( m_pContext );
 }
 //--------------------------------------------------------------------------------
+void PipelineManagerDX11::DrawIndexed( UINT IndexCount, UINT StartIndex, int VertexOffset )
+{
+	m_pContext->DrawIndexed( IndexCount, StartIndex, VertexOffset );
+}
+//--------------------------------------------------------------------------------
 void PipelineManagerDX11::Draw( RenderEffectDX11& effect, GeometryDX11& geometry, 
 										IParameterManager* pParamManager )
 {
@@ -556,25 +570,29 @@ void PipelineManagerDX11::Draw( RenderEffectDX11& effect, ResourcePtr vb, Resour
 						int inputLayput, D3D11_PRIMITIVE_TOPOLOGY primType,
 						UINT vertexStride, UINT numIndices, IParameterManager* pParamManager )
 {
-	// Specify the type of geometry that we will be dealing with.
-	m_pContext->IASetPrimitiveTopology( primType );
+	// Configure the pipeline input data with the input assembler
+	// state object.
+	InputAssemblerStateDX11 IAState;
 
+	IAState.SetPrimitiveTopology( primType );
+	
 	// Bind the vertex and index buffers.
-	if ( vb != NULL )
-		BindVertexBuffer( vb, vertexStride );
-	else
-		UnbindVertexBuffer();
+	if ( vb != NULL ) {
+		IAState.SetVertexBuffer( 0, vb, 0, vertexStride );
+	}
 
-	if ( ib != NULL )
-		BindIndexBuffer( ib );
-	else
-		UnbindIndexBuffer();
+	if ( ib != NULL ) {
+		IAState.SetIndexBuffer( ib );
+	}
 
 	// Bind the input layout.
-	if ( vb != NULL )
-		BindInputLayout( inputLayput );
-	else
-		UnbindInputLayout();
+	if ( vb != NULL ) {
+		IAState.SetInputLayout( inputLayput );
+	}
+
+	// Set and apply the state in this pipeline manager's input assembler.
+	InputAssemblerStage.SetDesiredState( IAState );
+	InputAssemblerStage.ApplyDesiredState( m_pContext );
 
 	// Use the effect to load all of the pipeline stages here.
 	ClearPipelineResources();
@@ -793,6 +811,9 @@ void PipelineManagerDX11::BindShader( ShaderType type, int ID, IParameterManager
 
 		if ( pShaderDX11->GetType() == type )
 		{
+			// Record the shader ID for use later on
+			ShaderStages[type]->SetShaderIndex( ID );
+
 			switch( type )
 			{
 				case VERTEX_SHADER:

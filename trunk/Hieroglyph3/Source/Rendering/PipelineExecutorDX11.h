@@ -9,43 +9,29 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// InputAssemblerStageDX11
+// PipelineExecutorDX11
 //
 //--------------------------------------------------------------------------------
-#ifndef InputAssemblerStageDX11_h
-#define InputAssemblerStageDX11_h
+#ifndef PipelineExecutorDX11_h
+#define PipelineExecutorDX11_h
 //--------------------------------------------------------------------------------
-#include "PCH.h"
-#include "InputAssemblerStateDX11.h"
+
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class InputAssemblerStageDX11
+	class PipelineManagerDX11;
+	class IParameterManager;
+
+	class PipelineExecutorDX11
 	{
 	public:
-		InputAssemblerStageDX11();
-		virtual ~InputAssemblerStageDX11();
+		PipelineExecutorDX11();
+		virtual ~PipelineExecutorDX11();
 
-		void SetFeautureLevel( D3D_FEATURE_LEVEL level );
-
-		// This method allows setting the complete input assember state with a
-		// single call by the user.  This means the user can configure their
-		// state ahead of time and then simply set it all at once.
-		void SetDesiredState( InputAssemblerStateDX11& state );
-		void ClearDesiredState( );
-
-		// This method applies the desired state to the API.
-		void ApplyDesiredState( ID3D11DeviceContext* pContext );
-
-	protected:
-
-		D3D_FEATURE_LEVEL				m_FeatureLevel;
-
-		InputAssemblerStateDX11			m_DesiredState;
-		InputAssemblerStateDX11			m_CurrentState;
+		virtual void Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager ) = 0;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // InputAssemblerStageDX11_h
+#endif // PipelineExecutorDX11_h
 //--------------------------------------------------------------------------------
 

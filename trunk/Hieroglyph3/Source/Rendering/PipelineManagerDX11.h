@@ -22,6 +22,7 @@
 #include "GeometryStageDX11.h"
 #include "PixelStageDX11.h"
 #include "ComputeStageDX11.h"
+#include "InputAssemblerStageDX11.h"
 #include "OutputMergerStageDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
@@ -81,6 +82,10 @@ namespace Glyph3
 		void ApplyPipelineResources( );
 		void ClearPipelineResources( );
 
+		void ApplyInputResources( );
+		void ClearInputResources( );
+
+
 		void BindInputLayout( int ID );
 		void UnbindInputLayout( );
 
@@ -97,6 +102,8 @@ namespace Glyph3
 		// pipeline with the given configuration (supplied by the render effect).
 		// With the dispatch call, the same configuration is used except that you
 		// specify the dimensions of the thread groups to instantiate.
+
+
 
 		void Draw( RenderEffectDX11& effect, GeometryDX11& chunk, IParameterManager* pParamManager );
 		void Draw( RenderEffectDX11& effect, ResourcePtr vb, ResourcePtr ib,
@@ -119,6 +126,14 @@ namespace Glyph3
 		void DispatchIndirect( RenderEffectDX11& effect, ResourcePtr args, UINT offset, IParameterManager* pParamManager );
 		void DrawIndirect( RenderEffectDX11& effect, ResourcePtr args, UINT offset, int inputLayout,
 			D3D11_PRIMITIVE_TOPOLOGY primType, UINT vertexStride, IParameterManager* pParamManager);
+
+
+		// These draw calls are thin wrappers around the basic API draw calls.  They are intended
+		// to be used by the PipelineExecutorDX11 subclasses to invoke the pipeline.
+
+		void DrawIndexed( UINT IndexCount, UINT StartIndex, int VertexOffset ); 
+
+
 
 		void CopyStructureCount( ResourcePtr dest, UINT offset, ResourcePtr uav );
 
@@ -184,7 +199,7 @@ namespace Glyph3
 		ShaderStageDX11*	ShaderStages[6];
 
 	public:
-
+		InputAssemblerStageDX11	InputAssemblerStage;
 		OutputMergerStageDX11	OutputMergerStage;
 
 	};

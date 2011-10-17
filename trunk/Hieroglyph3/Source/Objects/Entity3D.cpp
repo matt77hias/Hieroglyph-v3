@@ -215,9 +215,15 @@ void Entity3D::Render( PipelineManagerDX11* pPipelineManager, IParameterManager*
 			// Set the entity render parameters
 			this->SetRenderParams( pParamManager );
 
-			// Send the geometry to the renderer using the appropriate
-			// material view effect.
-			pPipelineManager->Draw( *m_sParams.pMaterial->Params[view].pEffect, *m_sParams.pGeometry, pParamManager );
+			// Configure the pipeline with the render effect supplied by the material.
+			pPipelineManager->ClearPipelineResources();
+			m_sParams.pMaterial->Params[view].pEffect->ConfigurePipeline( pPipelineManager, pParamManager );
+			pPipelineManager->ApplyPipelineResources();
+
+			// Let the geometry execute its drawing operation.  This includes 
+			// configuring the input to the pipeline, plus calling an appropriate
+			// draw call.
+			m_sParams.pGeometry->Execute( pPipelineManager, pParamManager );
 		}
 	}
 }

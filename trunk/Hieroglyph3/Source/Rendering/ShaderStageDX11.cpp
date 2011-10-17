@@ -23,6 +23,7 @@ static void SetToNull( void* pArray, int num )
 ShaderStageDX11::ShaderStageDX11()
 {
 	m_FeatureLevel = D3D_FEATURE_LEVEL_9_1;
+	m_ShaderIndex = -1;
 
 	for ( int i = 0; i < D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT; i++ ) ConstantBuffers[i] = 0;
 	for ( int i = 0; i < D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT; i++ ) SamplerStates[i] = 0;
@@ -195,5 +196,15 @@ void ShaderStageDX11::UnbindResources( ID3D11DeviceContext* pContext )
 	// Bind the changes to the pipeline.
 
 	BindResources( pContext );
+}
+//--------------------------------------------------------------------------------
+void ShaderStageDX11::SetShaderIndex( int index )
+{
+	m_ShaderIndex = index;
+}
+//--------------------------------------------------------------------------------
+int ShaderStageDX11::GetShaderIndex()
+{
+	return( m_ShaderIndex );
 }
 //--------------------------------------------------------------------------------

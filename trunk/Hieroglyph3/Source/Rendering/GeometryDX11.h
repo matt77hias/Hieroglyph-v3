@@ -22,6 +22,8 @@
 #include "LineIndices.h"
 #include "PointIndices.h"
 #include "ISharedObject.h"
+#include "PipelineExecutorDX11.h"
+#include "InputAssemblerStateDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -34,12 +36,17 @@ namespace Glyph3
 		int layout;
 	};
 
-	class GeometryDX11 : public ISharedObject
+	// TODO: This class should not use ISharedObject anymore.  It should be replaced
+	//       with shared_ptr references instead of this!!!
+
+	class GeometryDX11 : public PipelineExecutorDX11, public ISharedObject
 	{
 	public:
 		GeometryDX11( );
 		virtual ~GeometryDX11( );
 	
+		virtual void Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager );
+
 		void AddElement( VertexElementDX11* element );
 		void AddFace( TriangleIndices& face );
 		void AddLine( LineIndices& line );
@@ -89,6 +96,8 @@ namespace Glyph3
 
 		// The type of primitives listed in the index buffer
 		D3D11_PRIMITIVE_TOPOLOGY m_ePrimType;
+
+		InputAssemblerStateDX11 IAState;
 	};
 };
 //--------------------------------------------------------------------------------

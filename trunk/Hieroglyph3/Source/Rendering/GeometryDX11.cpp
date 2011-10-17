@@ -16,6 +16,7 @@
 #include "BufferConfigDX11.h"
 #include "Log.h"
 #include "GlyphString.h"
+#include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -39,6 +40,18 @@ GeometryDX11::~GeometryDX11()
 	std::map<int, InputLayoutKey*>::iterator it = m_InputLayouts.begin();
 	for( ; it != m_InputLayouts.end(); it++ )
         SAFE_DELETE( (*it).second );
+}
+//--------------------------------------------------------------------------------
+void GeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
+{
+	// Set the Input Assembler state, then perform the draw call.
+	int layout = GetInputLayout( pPipeline->ShaderStages[VERTEX_SHADER]->GetShaderIndex() );
+	IAState.SetInputLayout( layout );
+	
+	pPipeline->InputAssemblerStage.SetDesiredState( IAState );
+	pPipeline->ApplyInputResources();
+
+	pPipeline->DrawIndexed( GetIndexCount(), 0, 0 );
 }
 //--------------------------------------------------------------------------------
 void GeometryDX11::AddElement( VertexElementDX11* element )
@@ -374,6 +387,7 @@ void GeometryDX11::LoadToBuffers()
 		BufferConfigDX11 vbuffer;
 		vbuffer.SetDefaultVertexBuffer( vertices_length, false );
 		m_VB = RendererDX11::Get()->CreateVertexBuffer( &vbuffer, &data );
+		IAState.SetVertexBuffer( 0, m_VB, 0, m_iVertexSize );
 
 		delete [] pBytes; 
 		// TODO: add error checking here!
@@ -389,6 +403,10 @@ void GeometryDX11::LoadToBuffers()
 	BufferConfigDX11 ibuffer;
 	ibuffer.SetDefaultIndexBuffer( sizeof( UINT ) * GetIndexCount(), false );
 	m_IB = RendererDX11::Get()->CreateIndexBuffer( &ibuffer, &data );
+
+	IAState.SetIndexBuffer( m_IB );
+
+	IAState.SetPrimitiveTopology( m_ePrimType );
 }
 //--------------------------------------------------------------------------------
 UINT GeometryDX11::GetIndexCount()

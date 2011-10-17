@@ -9,33 +9,17 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// InputLayoutDX11
-//
-//--------------------------------------------------------------------------------
-#ifndef InputLayoutDX11_h
-#define InputLayoutDX11_h
-//--------------------------------------------------------------------------------
 #include "PCH.h"
+#include "PipelineExecutorDX11.h"
 //--------------------------------------------------------------------------------
-namespace Glyph3
+using namespace Glyph3;
+//--------------------------------------------------------------------------------
+PipelineExecutorDX11::PipelineExecutorDX11( )
 {
-	class PipelineManagerDX11;
-	class InputAssemblerStageDX11;
-
-	class InputLayoutDX11
-	{
-	public:
-		InputLayoutDX11( ID3D11InputLayout* pLayout );
-		virtual ~InputLayoutDX11();
-
-	protected:
-		ID3D11InputLayout*			m_pInputLayout;
-
-		friend PipelineManagerDX11;
-		friend InputAssemblerStageDX11;
-	};
-};
+}
 //--------------------------------------------------------------------------------
-#endif // InputLayoutDX11_h
-//--------------------------------------------------------------------------------
+PipelineExecutorDX11::~PipelineExecutorDX11()
+{
 
+}
+//--------------------------------------------------------------------------------

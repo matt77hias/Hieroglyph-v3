@@ -9,43 +9,56 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// InputAssemblerStageDX11
+// InputAssemblerStateDX11
 //
 //--------------------------------------------------------------------------------
-#ifndef InputAssemblerStageDX11_h
-#define InputAssemblerStageDX11_h
+#ifndef InputAssemblerStateDX11_h
+#define InputAssemblerStateDX11_h
 //--------------------------------------------------------------------------------
 #include "PCH.h"
-#include "InputAssemblerStateDX11.h"
+#include "ResourceProxyDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class InputAssemblerStageDX11
+	class InputAssemblerStageDX11;
+
+	class InputAssemblerStateDX11
 	{
 	public:
-		InputAssemblerStageDX11();
-		virtual ~InputAssemblerStageDX11();
+		InputAssemblerStateDX11();
+		virtual ~InputAssemblerStateDX11();
 
 		void SetFeautureLevel( D3D_FEATURE_LEVEL level );
 
-		// This method allows setting the complete input assember state with a
-		// single call by the user.  This means the user can configure their
-		// state ahead of time and then simply set it all at once.
-		void SetDesiredState( InputAssemblerStateDX11& state );
-		void ClearDesiredState( );
+		void SetIndexBuffer( ResourcePtr buffer );
+		void SetVertexBuffer( unsigned int slot, ResourcePtr buffer, unsigned int offset, unsigned int stride );
+		void SetInputLayout( int layout );
+		void SetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY topology );
 
-		// This method applies the desired state to the API.
-		void ApplyDesiredState( ID3D11DeviceContext* pContext );
+		
+		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology();
+		UINT GetVertexStride( UINT slot );
+		UINT GetVertexOffset( UINT slot );
+
+
+
+		void ClearState( );
 
 	protected:
 
 		D3D_FEATURE_LEVEL				m_FeatureLevel;
 
-		InputAssemblerStateDX11			m_DesiredState;
-		InputAssemblerStateDX11			m_CurrentState;
+		ResourcePtr						IndexBuffer;
+		ResourcePtr						VertexBuffers[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
+		UINT							VertexStrides[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
+		UINT							VertexOffsets[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
+		int								InputLayout;
+		D3D11_PRIMITIVE_TOPOLOGY		PrimitiveTopology;
+
+		friend InputAssemblerStageDX11;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // InputAssemblerStageDX11_h
+#endif // InputAssemblerStateDX11_h
 //--------------------------------------------------------------------------------
 

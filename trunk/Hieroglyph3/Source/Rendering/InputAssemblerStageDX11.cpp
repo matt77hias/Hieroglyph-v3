@@ -10,22 +10,16 @@
 
 //--------------------------------------------------------------------------------
 #include "PCH.h"
+#include "RendererDX11.h"
+#include "ResourceDX11.h"
+#include "Log.h"
 #include "InputAssemblerStageDX11.h"
+#include "InputLayoutDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 InputAssemblerStageDX11::InputAssemblerStageDX11()
 {
-	for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ )
-	{
-		RenderTargetViews[i] = 0;
-		APIRenderTargetViews[i] = 0;
-	}
-
-	DepthTargetViews = 0;
-	for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) UnorderedAccessViews[i] = 0;
-	for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) UAVInitialCounts[i] = -1;
-    APIDepthTargetViews = NULL;
 }
 //--------------------------------------------------------------------------------
 InputAssemblerStageDX11::~InputAssemblerStageDX11()
@@ -38,104 +32,82 @@ void InputAssemblerStageDX11::SetFeautureLevel( D3D_FEATURE_LEVEL level )
 	m_FeatureLevel = level;
 }
 //--------------------------------------------------------------------------------
-void InputAssemblerStageDX11::SetRenderTargetView( int index, ID3D11RenderTargetView* pView )
+void InputAssemblerStageDX11::SetDesiredState( InputAssemblerStateDX11& state )
 {
-	if ( ( index >= 0 ) && ( index < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT ) )
-	{
-		RenderTargetViews[index] = pView;
-	}
-}
-//--------------------------------------------------------------------------------
-void InputAssemblerStageDX11::SetDepthStencilView( ID3D11DepthStencilView* pView )
-{
-	DepthTargetViews = pView;
-}
-//--------------------------------------------------------------------------------
-void InputAssemblerStageDX11::SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV, unsigned int initial )
-{
-	if ( ( index >= 0 ) && ( index < D3D11_PS_CS_UAV_REGISTER_COUNT ) )
-	{
-		UnorderedAccessViews[index] = pUAV;
-		UAVInitialCounts[index] = initial;
-	}
-}
-//--------------------------------------------------------------------------------
-void InputAssemblerStageDX11::BindResources( ID3D11DeviceContext* pContext )
-{
-	// Update all of the render targets and depth stencil targets
-	//pContext->OMSetRenderTargetsAndUnorderedAccessViews( 8, RenderTargetViews, DepthTargetViews, 
-	//	0, D3D11_PS_CS_UAV_REGISTER_COUNT, UnorderedAccessViews, (UINT*)&UnorderedAccessViews );
-	
-	// Find the highest index that doesn't match.
-	int max = 0;
-	for ( int i = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT-1; i >= 0; i-- )
-	{
-		if ( RenderTargetViews[i] != APIRenderTargetViews[i] )
-		{
-			max = i+1;
-			break;
-		}
+	m_DesiredState.IndexBuffer = state.IndexBuffer;
+
+	for ( int i = 0; i < D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT; i++ ) {
+		m_DesiredState.VertexBuffers[i] = state.VertexBuffers[i];
+		m_DesiredState.VertexStrides[i] = state.VertexStrides[i];
+		m_DesiredState.VertexOffsets[i] = state.VertexOffsets[i];
 	}
 
-    if ( DepthTargetViews != APIDepthTargetViews )
-        max++;
-
-	// If any targets are different then copy them over.
-	if ( max > 0 )
-		pContext->OMSetRenderTargets( D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, RenderTargetViews, DepthTargetViews );
-	
-	// Update the API views to know what to update next time.
-	for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ )
-		APIRenderTargetViews[i] = RenderTargetViews[i];
-
-    APIDepthTargetViews = DepthTargetViews;
+	m_DesiredState.InputLayout = state.InputLayout;
+	m_DesiredState.PrimitiveTopology = state.PrimitiveTopology;
 }
 //--------------------------------------------------------------------------------
-void InputAssemblerStageDX11::ClearResources( ID3D11DeviceContext* pContext )
+void InputAssemblerStageDX11::ClearDesiredState()
 {
-	// Clear out all array elements in our cached arrays.  This will be used to 
-	// write nulls into the context later on.
-
-	memset( RenderTargetViews, 0, D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT * sizeof( RenderTargetViews[0] ) );
-	DepthTargetViews = 0;
-	memset( UnorderedAccessViews, 0, sizeof( UnorderedAccessViews[0] ) * D3D11_PS_CS_UAV_REGISTER_COUNT );
-	for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) UAVInitialCounts[i] = -1;
+	m_DesiredState.ClearState();
 }
 //--------------------------------------------------------------------------------
-void InputAssemblerStageDX11::UnbindResources( ID3D11DeviceContext* pContext )
+void InputAssemblerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 {
-	// Clear out the resource settings.
+	// Bind the input layout first.
 
-	ClearResources( pContext );
+	RendererDX11* pRenderer = RendererDX11::Get();
+	InputLayoutDX11* pLayout = pRenderer->GetInputLayout( m_DesiredState.InputLayout );
 
-	// Bind the changes to the pipeline.
+	if ( pLayout )
+		pContext->IASetInputLayout( pLayout->m_pInputLayout );
+	else
+		Log::Get().Write( L"Tried to bind an invalid input layout ID!" );
 
-	BindResources( pContext );
-}
-//--------------------------------------------------------------------------------
-unsigned int InputAssemblerStageDX11::GetViewsSetCount()
-{
-	unsigned int count = 0;
 
-	for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ )
+	// Bind the primitive topology
+
+	pContext->IASetPrimitiveTopology( m_DesiredState.PrimitiveTopology );
+
+
+	// Bind the vertex buffers
+
+	ID3D11Buffer* Buffers[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
+
+	UINT slot = 0;
+	while ( slot < D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT
+		&& m_DesiredState.VertexBuffers[slot] != NULL )
 	{
-		if ( RenderTargetViews[i] != 0 )
-			count++;
+		int index = m_DesiredState.VertexBuffers[slot]->m_iResource;
+
+		// Select only the index portion of the handle.
+		int TYPE	= index & 0x00FF0000;
+		int ID		= index & 0x0000FFFF;
+
+		Buffers[slot] = reinterpret_cast<ID3D11Buffer*>( pRenderer->GetResource( ID )->GetResource() );
+		if ( !Buffers[slot] )					
+			Log::Get().Write( L"Tried to bind an invalid vertex buffer ID!" );
+
+		slot++;
 	}
 
-	return( count );
-}
-//--------------------------------------------------------------------------------
-unsigned int InputAssemblerStageDX11::GetViewsBoundCount()
-{
-	unsigned int count = 0;
+	pContext->IASetVertexBuffers( 0, slot, Buffers, m_DesiredState.VertexStrides, m_DesiredState.VertexOffsets );
 
-	for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ )
-	{
-		if ( APIRenderTargetViews[i] != 0 )
-			count++;
+
+	// TODO: Add the ability to use different formats and offsets to this function!
+	int index = m_DesiredState.IndexBuffer->m_iResource;
+
+	// Select only the index portion of the handle.
+	int TYPE	= index & 0x00FF0000;
+	int ID		= index & 0x0000FFFF;
+
+	ID3D11Buffer* pBuffer = (ID3D11Buffer*)pRenderer->GetResource( ID )->GetResource();
+
+	// If the resource is in range, then attempt to set it
+	if ( pBuffer ) {
+		pContext->IASetIndexBuffer( pBuffer, DXGI_FORMAT_R32_UINT, 0 );
 	}
-
-	return( count );
+	else {
+		Log::Get().Write( L"Tried to bind an invalid index buffer ID!" );
+	}
 }
 //--------------------------------------------------------------------------------

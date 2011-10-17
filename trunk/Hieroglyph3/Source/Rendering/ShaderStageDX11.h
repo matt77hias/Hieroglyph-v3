@@ -27,11 +27,13 @@ namespace Glyph3
 
 		void SetFeatureLevel( D3D_FEATURE_LEVEL level );
 
+		void SetShaderIndex( int index );
 		void SetConstantBuffer( int index, ID3D11Buffer* pBuffer );
 		void SetSamplerState( int index, ID3D11SamplerState* pState );
 		void SetShaderResourceView( int index, ID3D11ShaderResourceView* pSRV );
 		void SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV, unsigned int initial = -1 );
 
+		int GetShaderIndex();
 		virtual ShaderType GetType() = 0;
 		void BindResources( ID3D11DeviceContext* pContext );
 		void UnbindResources( ID3D11DeviceContext* pContext );
@@ -45,6 +47,8 @@ namespace Glyph3
 	protected:
 
 		D3D_FEATURE_LEVEL			m_FeatureLevel;
+
+		int							m_ShaderIndex;
 
 		// TODO: Set up some way to selectively record the current state of the 
 		//       pipeline, then only set the needed shader slots instead of always

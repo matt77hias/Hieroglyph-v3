@@ -610,6 +610,12 @@
     <ClCompile Include="Rendering\InputAssemblerStageDX11.cpp">
       <Filter>Rendering\Pipeline\Fixed Stages</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\InputAssemblerStateDX11.cpp">
+      <Filter>Rendering\Pipeline\Fixed Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\PipelineExecutorDX11.cpp">
+      <Filter>Rendering\Rendering Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mathematics\Matrix3f.h">
@@ -1118,6 +1124,12 @@
     </ClInclude>
     <ClInclude Include="Rendering\InputAssemblerStageDX11.h">
       <Filter>Rendering\Pipeline\Fixed Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\InputAssemblerStateDX11.h">
+      <Filter>Rendering\Pipeline\Fixed Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\PipelineExecutorDX11.h">
+      <Filter>Rendering\Rendering Geometry</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
