@@ -32,7 +32,7 @@ ShaderResourceParameterDX11* DiffuseSphereEntity::TextureParameter = NULL;
 int DiffuseSphereEntity::LinearSampler = -1;
 RenderEffectDX11* DiffuseSphereEntity::RenderEffect = NULL;
 RenderEffectDX11* DiffuseSphereEntity::ParabolaEffect = NULL;
-GeometryDX11* DiffuseSphereEntity::SphereGeometry = NULL;
+GeometryPtr DiffuseSphereEntity::SphereGeometry = NULL;
 //--------------------------------------------------------------------------------
 DiffuseSphereEntity::DiffuseSphereEntity()
 {

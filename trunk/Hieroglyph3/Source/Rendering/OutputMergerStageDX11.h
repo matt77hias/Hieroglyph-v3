@@ -15,10 +15,13 @@
 #ifndef OutputMergerStageDX11_h
 #define OutputMergerStageDX11_h
 //--------------------------------------------------------------------------------
-#include "RendererDX11.h"
+#include "PCH.h"
+#include "ResourceProxyDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
+	class PipelineManagerDX11;
+
 	class OutputMergerStageDX11
 	{
 	public:

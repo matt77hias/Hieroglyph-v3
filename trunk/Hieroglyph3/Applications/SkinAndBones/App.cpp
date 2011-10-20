@@ -89,7 +89,7 @@ void App::Initialize()
 	// Create the displaced skinned actor
 
 	m_pDisplacedActor = new SkinnedActor();
-	GeometryDX11* pGeometry = new GeometryDX11();
+	GeometryPtr pGeometry = GeometryPtr( new GeometryDX11() );
 	GeometryGeneratorDX11::GenerateWeightedSkinnedCone( pGeometry, 16, 20, 2.0f, 40.0f, 6, m_pDisplacedActor );
 	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
 	m_pDisplacedActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedSolid( *m_pRenderer11 ) );
@@ -101,7 +101,7 @@ void App::Initialize()
 	// Create the skinned actor without displacement
 
 	m_pSkinnedActor = new SkinnedActor();
-	GeometryDX11* pSkinnedGeometry = new GeometryDX11();
+	GeometryPtr pSkinnedGeometry = GeometryPtr( new GeometryDX11() );
 	GeometryGeneratorDX11::GenerateWeightedSkinnedCone( pSkinnedGeometry, 16, 20, 2.0f, 40.0f, 6, m_pSkinnedActor );
 	pSkinnedGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	m_pSkinnedActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedTextured( *m_pRenderer11 ) );
@@ -113,7 +113,7 @@ void App::Initialize()
 	// Generate the static mesh, and attach a texture to its entity
 
 	m_pStaticActor = new Actor();
-	GeometryDX11* pStaticGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
+	GeometryPtr pStaticGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
 	pStaticGeometry->LoadToBuffers();
 	MaterialDX11* pStaticMaterial = MaterialGeneratorDX11::GenerateStaticTextured(*RendererDX11::Get());
 	m_pStaticActor->GetBody()->SetGeometry( pStaticGeometry );

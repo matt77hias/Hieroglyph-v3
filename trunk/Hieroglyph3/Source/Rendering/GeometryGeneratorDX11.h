@@ -34,16 +34,16 @@ namespace Glyph3
 	class GeometryGeneratorDX11
 	{
 	public:
-		static void GenerateFullScreenQuad( GeometryDX11* pGeometry );
-		static void GenerateTexturedPlane( GeometryDX11* pGeometry, int SizeX, int SizeY );
-		static void GenerateSkinnedBiped( GeometryDX11* pGeometry );
-		static void GenerateAxisGeometry( GeometryDX11* pGeometry );
-        static void GenerateSphere( GeometryDX11* pGeometry, unsigned int URes, 
+		static void GenerateFullScreenQuad( GeometryPtr pGeometry );
+		static void GenerateTexturedPlane( GeometryPtr pGeometry, int SizeX, int SizeY );
+		static void GenerateSkinnedBiped( GeometryPtr pGeometry );
+		static void GenerateAxisGeometry( GeometryPtr pGeometry );
+        static void GenerateSphere( GeometryPtr pGeometry, unsigned int URes, 
                                     unsigned int VRes, float Radius );
-        static void GenerateCone( GeometryDX11* pGeometry, unsigned int URes, 
+        static void GenerateCone( GeometryPtr pGeometry, unsigned int URes, 
                                     unsigned int VRes, float Radius, float Height );
 
-        static void GenerateWeightedSkinnedCone( GeometryDX11* pGeometry, unsigned int URes, 
+        static void GenerateWeightedSkinnedCone( GeometryPtr pGeometry, unsigned int URes, 
                                     unsigned int VRes, float Radius, float Height, 
 									unsigned int NumBones = 1, SkinnedActor* pActor = 0 );
 

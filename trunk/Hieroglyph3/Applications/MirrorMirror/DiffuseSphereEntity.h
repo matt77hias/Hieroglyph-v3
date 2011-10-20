@@ -36,7 +36,7 @@ namespace Glyph3
 		static int LinearSampler;
         static RenderEffectDX11* RenderEffect;
         static RenderEffectDX11* ParabolaEffect;
-        static GeometryDX11* SphereGeometry;
+        static GeometryPtr SphereGeometry;
 	};
 };
 //--------------------------------------------------------------------------------

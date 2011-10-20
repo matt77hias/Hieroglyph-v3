@@ -41,7 +41,7 @@ protected:
 	ResourcePtr				m_Output;
 
 	// Geometry for full screen pass
-	GeometryDX11*			m_pFullScreen;
+	GeometryPtr				m_pFullScreen;
 
 	// RenderEffects for running the compute shader and rendering
 	// the resulting texture to the backbuffer.

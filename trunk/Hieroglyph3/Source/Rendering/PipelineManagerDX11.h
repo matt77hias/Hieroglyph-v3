@@ -15,7 +15,6 @@
 #ifndef PipelineManagerDX11_h
 #define PipelineManagerDX11_h
 //--------------------------------------------------------------------------------
-#include "RendererDX11.h"
 #include "VertexStageDX11.h"
 #include "HullStageDX11.h"
 #include "DomainStageDX11.h"
@@ -24,6 +23,9 @@
 #include "ComputeStageDX11.h"
 #include "InputAssemblerStageDX11.h"
 #include "OutputMergerStageDX11.h"
+#include "GeometryDX11.h"
+#include "RenderEffectDX11.h"
+#include "ResourceProxyDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -105,14 +107,14 @@ namespace Glyph3
 
 
 
-		void Draw( RenderEffectDX11& effect, GeometryDX11& chunk, IParameterManager* pParamManager );
+		void Draw( RenderEffectDX11& effect, GeometryPtr chunk, IParameterManager* pParamManager );
 		void Draw( RenderEffectDX11& effect, ResourcePtr vb, ResourcePtr ib,
 					int inputLayout, D3D11_PRIMITIVE_TOPOLOGY primType,
 					UINT vertexStride, UINT numIndices, IParameterManager* pParamManager);
         void DrawNonIndexed( RenderEffectDX11& effect, ResourcePtr vb, int inputLayout, 
                     D3D11_PRIMITIVE_TOPOLOGY primType, UINT vertexStride, UINT vertexCount, 
                     UINT startVertexLocation, IParameterManager* pParamManager);
-		void DrawInstanced( RenderEffectDX11& effect, GeometryDX11& chunk,
+		void DrawInstanced( RenderEffectDX11& effect, GeometryPtr chunk,
 							ResourcePtr instanceData, UINT instanceDataStride,
 							UINT numInstances, IParameterManager* pParamManager );
 		void DrawInstanced( RenderEffectDX11& effect, ResourcePtr vb,

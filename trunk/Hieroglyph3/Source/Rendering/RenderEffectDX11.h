@@ -19,11 +19,13 @@
 #ifndef RenderEffectDX11_h
 #define RenderEffectDX11_h
 //--------------------------------------------------------------------------------
-#include "RendererDX11.h"
-#include "PipelineManagerDX11.h"
+
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
+	class PipelineManagerDX11;
+	class IParameterManager;
+
 	class RenderEffectDX11
 	{
 	public:

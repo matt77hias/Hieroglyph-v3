@@ -15,7 +15,6 @@
 #ifndef RasterizerStateDX11_h
 #define RasterizerStateDX11_h
 //--------------------------------------------------------------------------------
-#include "RendererDX11.h"
 #include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
@@ -31,6 +30,7 @@ namespace Glyph3
 
 		friend PipelineManagerDX11;
 	};
+	typedef std::shared_ptr<RasterizerStateDX11> RasterizerStatePtr;
 };
 //--------------------------------------------------------------------------------
 #endif // RasterizerStateDX11_h

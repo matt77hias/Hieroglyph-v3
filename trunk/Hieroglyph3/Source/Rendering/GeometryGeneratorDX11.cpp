@@ -24,9 +24,9 @@ GeometryGeneratorDX11::GeometryGeneratorDX11( )
 {
 }
 //--------------------------------------------------------------------------------
-void GeometryGeneratorDX11::GenerateFullScreenQuad( GeometryDX11* pGeometry )
+void GeometryGeneratorDX11::GenerateFullScreenQuad( GeometryPtr pGeometry )
 {
-	if ( pGeometry )
+	if ( pGeometry != NULL )
 	{
 		VertexElementDX11* pClipPositions = new VertexElementDX11( 4, 4 );
 		pClipPositions->m_SemanticName = "POSITION";
@@ -73,9 +73,9 @@ void GeometryGeneratorDX11::GenerateFullScreenQuad( GeometryDX11* pGeometry )
 	}
 }
 //--------------------------------------------------------------------------------
-void GeometryGeneratorDX11::GenerateTexturedPlane( GeometryDX11* pGeometry, int SizeX, int SizeY )
+void GeometryGeneratorDX11::GenerateTexturedPlane( GeometryPtr pGeometry, int SizeX, int SizeY )
 {
-	if ( pGeometry )
+	if ( pGeometry != NULL )
 	{
 		VertexElementDX11* pPositions = new VertexElementDX11( 3, SizeX * SizeY );
 		pPositions->m_SemanticName = "POSITION";
@@ -135,12 +135,12 @@ void GeometryGeneratorDX11::GenerateTexturedPlane( GeometryDX11* pGeometry, int 
 	}
 }
 //--------------------------------------------------------------------------------
-void GeometryGeneratorDX11::GenerateSkinnedBiped( GeometryDX11* pGeometry )
+void GeometryGeneratorDX11::GenerateSkinnedBiped( GeometryPtr pGeometry )
 {
 	// The skinned geometry requires to have at least positions, plus bone ID's.
 	// Other vertex attributes can be added in addition to these if needed.
 
-	if ( pGeometry )
+	if ( pGeometry != NULL )
 	{
 		VertexElementDX11* pPositions = new VertexElementDX11( 3, 8 );
 		pPositions->m_SemanticName = "POSITION";
@@ -240,11 +240,11 @@ void GeometryGeneratorDX11::GenerateSkinnedBiped( GeometryDX11* pGeometry )
 	}	
 }
 //--------------------------------------------------------------------------------
-void GeometryGeneratorDX11::GenerateAxisGeometry( GeometryDX11* pGeometry )
+void GeometryGeneratorDX11::GenerateAxisGeometry( GeometryPtr pGeometry )
 {
 	// The axis geometry requires to have at positions plus colors.
 
-	if ( pGeometry )
+	if ( pGeometry != NULL )
 	{
 		VertexElementDX11* pPositions = new VertexElementDX11( 3, 5*3 );
 		pPositions->m_SemanticName = "POSITION";
@@ -382,19 +382,17 @@ void GeometryGeneratorDX11::GenerateAxisGeometry( GeometryDX11* pGeometry )
 		// Add the vertex elements to the geometry object.
 		pGeometry->AddElement( pPositions );
 		pGeometry->AddElement( pColors );
-
-		//pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_LINELIST );
 	}	
 }
 //--------------------------------------------------------------------------------
-void GeometryGeneratorDX11::GenerateSphere( GeometryDX11* pGeometry, unsigned int URes, 
+void GeometryGeneratorDX11::GenerateSphere( GeometryPtr pGeometry, unsigned int URes, 
                                             unsigned int VRes, float Radius )
 {
     _ASSERT( VRes >= 3 );
     _ASSERT( URes >= 4 );
     _ASSERT( Radius > 0.0f );
 
-    if ( pGeometry )
+    if ( pGeometry != NULL )
     {        
         const unsigned int NumVertexRings = VRes - 1;
         const unsigned int NumVerts = NumVertexRings * URes + 2;
@@ -489,8 +487,7 @@ void GeometryGeneratorDX11::GenerateSphere( GeometryDX11* pGeometry, unsigned in
     }
 }
 //--------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------
-void GeometryGeneratorDX11::GenerateCone( GeometryDX11* pGeometry, unsigned int URes, 
+void GeometryGeneratorDX11::GenerateCone( GeometryPtr pGeometry, unsigned int URes, 
                                         unsigned int VRes, float Radius, float Height )
 {
     _ASSERT( VRes >= 1 );
@@ -594,7 +591,7 @@ void GeometryGeneratorDX11::GenerateCone( GeometryDX11* pGeometry, unsigned int 
     }
 }
 //--------------------------------------------------------------------------------
-void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry, unsigned int URes, 
+void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryPtr pGeometry, unsigned int URes, 
                                         unsigned int VRes, float Radius, float Height, 
 										unsigned int NumBones, SkinnedActor* pActor )
 {
@@ -603,7 +600,7 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
     _ASSERT( Radius > 0.0f );
     _ASSERT( Height > 0.0f );
 
-    if ( pGeometry )
+    if ( pGeometry != NULL )
     {        
         const unsigned int NumVertexRings = VRes;
         const unsigned int NumVerts = NumVertexRings * URes + 2;
@@ -927,18 +924,6 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryDX11* pGeometry
 				}
 			}
 		}
-
-
-
-
-
 	}
-
-
-
-
-
-
-
 }
 //--------------------------------------------------------------------------------

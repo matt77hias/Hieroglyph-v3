@@ -30,8 +30,7 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 	RendererDX11* pRenderer11 = RendererDX11::Get();
 
 	// Get the geometry to render
-	GeometryDX11* pGeometry = 0;
-	pGeometry = GeometryLoaderDX11::loadMS3DFile2( L"../Data/Models/UnitSphere2.ms3d" );
+	GeometryPtr pGeometry = GeometryLoaderDX11::loadMS3DFile2( L"../Data/Models/UnitSphere2.ms3d" );
 	pGeometry->LoadToBuffers();
 	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	
@@ -161,7 +160,7 @@ void ReflectiveSphereEntity::PreRender( RendererDX11* pRenderer, VIEWTYPE view )
 void ReflectiveSphereEntity::Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view )
 {
 	// Test if the entity contains any geometry, and it has a material
-	if ( ( m_sParams.pGeometry ) && ( m_sParams.pMaterial ) )
+	if ( ( m_sParams.Executor != NULL ) && ( m_sParams.pMaterial ) )
 	{
 		// Only render if the material indicates that you should
 		if ( m_sParams.pMaterial->Params[view].bRender )
@@ -177,7 +176,9 @@ void ReflectiveSphereEntity::Render( PipelineManagerDX11* pPipelineManager, IPar
 
 			// Send the geometry to the renderer using the appropriate
 			// material view effect.
-			pPipelineManager->Draw( *m_sParams.pMaterial->Params[view].pEffect, *m_sParams.pGeometry, pParamManager );
+			GeometryPtr geometry = std::dynamic_pointer_cast<GeometryDX11>(m_sParams.Executor);
+
+			pPipelineManager->Draw( *m_sParams.pMaterial->Params[view].pEffect, geometry, pParamManager );
 		}
 	}
 }

@@ -11,7 +11,6 @@
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "EntityRenderParams.h"
-#include "GeometryDX11.h"
 #include "MaterialDX11.h"
 #include "Log.h"
 //--------------------------------------------------------------------------------
@@ -21,13 +20,13 @@ EntityRenderParams::EntityRenderParams()
 {
 	iPass = GEOMETRY;
 	WorldMatrix.MakeIdentity();
-	pGeometry = 0;
+	Executor = 0;
 	pMaterial = 0;
 }
 //--------------------------------------------------------------------------------
 EntityRenderParams::~EntityRenderParams()
 {
-	SAFE_RELEASE( pGeometry )
+	//SAFE_RELEASE( pGeometry )
 	SAFE_RELEASE( pMaterial )
 }
 //--------------------------------------------------------------------------------

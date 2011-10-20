@@ -201,12 +201,12 @@ void App::Update()
 	if( QUAD_MODE == m_bGeometryMode )
 	{
 		m_pQuadEffect->ConfigurePipeline( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr );
-		m_pRenderer11->pImmPipeline->Draw( *m_pQuadEffect, *m_pQuadGeometry, m_pRenderer11->m_pParamMgr ); 
+		m_pRenderer11->pImmPipeline->Draw( *m_pQuadEffect, m_pQuadGeometry, m_pRenderer11->m_pParamMgr ); 
 	}
 	else if( TRI_MODE == m_bGeometryMode )
 	{
 		m_pTriangleEffect->ConfigurePipeline( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr );
-		m_pRenderer11->pImmPipeline->Draw( *m_pTriangleEffect, *m_pTriangleGeometry, m_pRenderer11->m_pParamMgr ); 
+		m_pRenderer11->pImmPipeline->Draw( *m_pTriangleEffect, m_pTriangleGeometry, m_pRenderer11->m_pParamMgr ); 
 	}
 
 	// Draw the UI text
@@ -282,10 +282,10 @@ void App::Update()
 void App::Shutdown()
 {
 	// Safely dispose of our rendering resource
-	SAFE_RELEASE( m_pQuadGeometry );
+	m_pQuadGeometry = NULL;
 	SAFE_DELETE( m_pQuadEffect );
 
-	SAFE_RELEASE( m_pTriangleGeometry );
+	m_pTriangleGeometry = NULL;
 	SAFE_DELETE( m_pTriangleEffect );
 
 	SAFE_DELETE( m_pFont );
@@ -408,8 +408,8 @@ std::wstring App::GetName( )
 //--------------------------------------------------------------------------------
 void App::CreateQuadResources()
 {
-	SAFE_RELEASE( m_pQuadGeometry );
-	m_pQuadGeometry = new GeometryDX11();
+	m_pQuadGeometry = NULL;
+	m_pQuadGeometry = GeometryPtr( new GeometryDX11() );
 
 	// Create only four vertices and no index buffer
 
@@ -521,8 +521,8 @@ void App::CreateQuadResources()
 //--------------------------------------------------------------------------------
 void App::CreateTriangleResources()
 {
-	SAFE_RELEASE( m_pTriangleGeometry );
-	m_pTriangleGeometry = new GeometryDX11();
+	m_pTriangleGeometry = NULL;
+	m_pTriangleGeometry = GeometryPtr( new GeometryDX11() );
 
 	// Create only three vertices and no index buffer
 

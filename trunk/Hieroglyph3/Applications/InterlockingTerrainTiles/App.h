@@ -53,7 +53,7 @@ protected:
 	SpriteFontDX11*				m_pFont;
 	SpriteRendererDX11*			m_pSpriteRenderer;
 
-	GeometryDX11*				m_pTerrainGeometry;
+	GeometryPtr					m_pTerrainGeometry;
 	RenderEffectDX11*			m_pTerrainEffect;
 	ResourcePtr					m_pHeightMapTexture;
 	RenderEffectDX11*			m_pComputeShaderEffect;

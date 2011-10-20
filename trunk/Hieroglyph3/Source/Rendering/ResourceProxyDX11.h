@@ -15,7 +15,7 @@
 #ifndef ResourceProxyDX11_h
 #define ResourceProxyDX11_h
 //--------------------------------------------------------------------------------
-#include "shared_ptr.h"
+#include <memory>
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -81,7 +81,7 @@ namespace Glyph3
                                 DepthStencilViewConfigDX11* pDSVConfig = NULL );
 	};
 
-	typedef shared_ptr<ResourceProxyDX11> ResourcePtr;
+	typedef std::shared_ptr<ResourceProxyDX11> ResourcePtr;
 };
 //--------------------------------------------------------------------------------
 #endif // ResourceProxyDX11_h

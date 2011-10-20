@@ -51,9 +51,9 @@ int ScriptIntfApp::CreateActor( lua_State* pLuaState )
 
 	// TODO: utilize a common material for all of the objects created in this way!
 	Actor* pActor = new Actor();
-	GeometryDX11* pGeometry = GeometryLoaderDX11::loadMS3DFile2( GlyphString::ToUnicode( std::string( geometry ) ) );
-	pGeometry->LoadToBuffers();
-	pActor->GetBody()->SetGeometry( pGeometry );
+	GeometryPtr Geometry = GeometryLoaderDX11::loadMS3DFile2( GlyphString::ToUnicode( std::string( geometry ) ) );
+	Geometry->LoadToBuffers();
+	pActor->GetBody()->SetGeometry( Geometry );
 	pActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GeneratePhong( *RendererDX11::Get() ) );
 
 	// Add this actor the application's scene.

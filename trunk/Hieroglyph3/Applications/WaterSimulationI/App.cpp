@@ -60,7 +60,7 @@ void App::Initialize()
 	const int DispatchSizeX = 16;
 	const int DispatchSizeZ = 16;
 
-	GeometryDX11* pGeometry = new GeometryDX11();
+	GeometryPtr pGeometry = GeometryPtr( new GeometryDX11() );
 	GeometryGeneratorDX11::GenerateTexturedPlane( pGeometry, 16 * DispatchSizeX, 16 * DispatchSizeZ );
 	pGeometry->LoadToBuffers();
 	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );

@@ -45,7 +45,7 @@ protected:
 	Node3D*					m_pNode;
 	Entity3D*				m_pEntity;
 	
-	GeometryDX11*			m_pGeometry;
+	GeometryPtr				m_pGeometry;
 	MaterialDX11*			m_pMaterial;
 	
 	Vector4f				m_LightParams;

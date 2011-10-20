@@ -26,15 +26,15 @@ namespace Glyph3
 	public:
 		//static GeometryDX11* loadPlyFile( std::wstring filename );
 		//static GeometryDX11* loadMS3DFile( std::wstring filename );		
-		static GeometryDX11* loadMS3DFile2( std::wstring filename );		
-		static GeometryDX11* loadMS3DFileWithAnimationAndWeights( std::wstring filename, SkinnedActor* pActor = 0 );
-		static GeometryDX11* loadMS3DFileWithAnimation( std::wstring filename, SkinnedActor* pActor = 0 );	
+		static GeometryPtr loadMS3DFile2( std::wstring filename );		
+		static GeometryPtr loadMS3DFileWithAnimationAndWeights( std::wstring filename, SkinnedActor* pActor = 0 );
+		static GeometryPtr loadMS3DFileWithAnimation( std::wstring filename, SkinnedActor* pActor = 0 );	
 		
 		
 		//static void removeWhiteSpace( std::wstring& s );
 		//static std::wstring getElementName( int usage, int index );
 
-		static GeometryDX11* loadStanfordPlyFile( std::wstring filename, bool withAdjacency = false );
+		static GeometryPtr loadStanfordPlyFile( std::wstring filename, bool withAdjacency = false );
 
 	private:
 		GeometryLoaderDX11();

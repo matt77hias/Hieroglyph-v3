@@ -15,7 +15,7 @@
 #ifndef PipelineExecutorDX11_h
 #define PipelineExecutorDX11_h
 //--------------------------------------------------------------------------------
-
+#include <memory>
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -30,6 +30,8 @@ namespace Glyph3
 
 		virtual void Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager ) = 0;
 	};
+
+	typedef std::shared_ptr<PipelineExecutorDX11> ExecutorPtr;
 };
 //--------------------------------------------------------------------------------
 #endif // PipelineExecutorDX11_h

@@ -1484,7 +1484,7 @@ int RendererDX11::CreateBlendState( BlendStateConfigDX11* pConfig )
 		return( -1 );
 	}
 
-	shared_ptr<BlendStateDX11> ptr( new BlendStateDX11( pState ) );
+	BlendStatePtr ptr = BlendStatePtr( new BlendStateDX11( pState ) );
 	m_vBlendStates.add( ptr );
 
 	return( m_vBlendStates.count() - 1 );
@@ -1502,7 +1502,7 @@ int RendererDX11::CreateDepthStencilState( DepthStencilStateConfigDX11* pConfig 
 		return( -1 );
 	}
 
-	shared_ptr<DepthStencilStateDX11> ptr( new DepthStencilStateDX11( pState ) );
+	DepthStencilStatePtr ptr = DepthStencilStatePtr( new DepthStencilStateDX11( pState ) );
 	m_vDepthStencilStates.add( ptr );
 
 	return( m_vDepthStencilStates.count() - 1 );
@@ -1520,7 +1520,7 @@ int RendererDX11::CreateRasterizerState( RasterizerStateConfigDX11* pConfig )
 		return( -1 );
 	}
 
-	shared_ptr<RasterizerStateDX11> ptr( new RasterizerStateDX11( pState ) );
+	RasterizerStatePtr ptr = RasterizerStatePtr( new RasterizerStateDX11( pState ) );
 	m_vRasterizerStates.add( ptr );
 
 	return( m_vRasterizerStates.count() - 1 );
@@ -1933,17 +1933,17 @@ Vector2f RendererDX11::GetDesktopResolution()
 						static_cast<float>( desc.DesktopCoordinates.bottom - desc.DesktopCoordinates.top ) ) );
 }
 //--------------------------------------------------------------------------------
-shared_ptr<BlendStateDX11> RendererDX11::GetBlendState( int index )
+BlendStatePtr RendererDX11::GetBlendState( int index )
 {
 	return( m_vBlendStates[index] ); 
 }
 //--------------------------------------------------------------------------------
-shared_ptr<DepthStencilStateDX11> RendererDX11::GetDepthState( int index )
+DepthStencilStatePtr RendererDX11::GetDepthState( int index )
 {
 	return( m_vDepthStencilStates[index] );
 }
 //--------------------------------------------------------------------------------
-shared_ptr<RasterizerStateDX11> RendererDX11::GetRasterizerState( int index )
+RasterizerStatePtr RendererDX11::GetRasterizerState( int index )
 {
 	return( m_vRasterizerStates[index] );
 }

@@ -142,7 +142,7 @@ void App::Initialize()
 	// Create the geometry that will fill the screen with our results - just a full
 	// screen quad in this case.
 
-	GeometryDX11* pGeometry = new GeometryDX11();
+	GeometryPtr pGeometry = GeometryPtr( new GeometryDX11() );
 	GeometryGeneratorDX11::GenerateFullScreenQuad( pGeometry );
 	pGeometry->LoadToBuffers();
 

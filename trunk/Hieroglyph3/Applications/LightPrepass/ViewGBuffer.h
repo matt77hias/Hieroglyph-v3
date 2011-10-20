@@ -50,7 +50,7 @@ namespace Glyph3
         int                     m_iMaskDSState;
         int                     m_iMaskRSState;
         RenderEffectDX11		m_MaskEffect;
-        GeometryDX11			m_QuadGeometry;
+        GeometryPtr				m_QuadGeometry;
 
 		ShaderResourceParameterDX11*	m_pGBufferTexture;
 	};

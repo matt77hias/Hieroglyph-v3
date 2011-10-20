@@ -200,7 +200,7 @@ void App::Update()
 
 	m_pRenderer11->pImmPipeline->StartPipelineStatistics();
 	{
-		m_pRenderer11->pImmPipeline->Draw( *m_pTerrainEffect, *m_pTerrainGeometry, m_pRenderer11->m_pParamMgr );
+		m_pRenderer11->pImmPipeline->Draw( *m_pTerrainEffect, m_pTerrainGeometry, m_pRenderer11->m_pParamMgr );
 	}
 	m_pRenderer11->pImmPipeline->EndPipelineStatistics();
 
@@ -263,7 +263,7 @@ void App::Update()
 void App::Shutdown()
 {
 	// Safely dispose of our rendering resource
-	SAFE_RELEASE( m_pTerrainGeometry );
+	m_pTerrainGeometry = NULL;
 	SAFE_DELETE( m_pTerrainEffect );
 	SAFE_DELETE( m_pComputeShaderEffect );
 
@@ -352,8 +352,8 @@ void App::CreateTerrainGeometry()
 	Log::Get().Write( L"Creating terrain geometry" );
 
 	// Setup actual resource
-	SAFE_RELEASE( m_pTerrainGeometry );
-	m_pTerrainGeometry = new GeometryDX11( );
+	m_pTerrainGeometry = NULL;
+	m_pTerrainGeometry = GeometryPtr( new GeometryDX11( ) );
 
 	// Create vertex data
 	VertexElementDX11 *pPositions = new VertexElementDX11( 3, (TERRAIN_X_LEN + 1) * (TERRAIN_Z_LEN + 1) );

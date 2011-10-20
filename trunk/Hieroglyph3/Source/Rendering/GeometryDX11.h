@@ -17,13 +17,13 @@
 #define GeometryDX11_h
 //--------------------------------------------------------------------------------
 #include "VertexElementDX11.h"
-#include "RendererDX11.h"
 #include "TriangleIndices.h"
 #include "LineIndices.h"
 #include "PointIndices.h"
-#include "ISharedObject.h"
 #include "PipelineExecutorDX11.h"
 #include "InputAssemblerStateDX11.h"
+#include "TArray.h"
+#include <memory>
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -36,10 +36,7 @@ namespace Glyph3
 		int layout;
 	};
 
-	// TODO: This class should not use ISharedObject anymore.  It should be replaced
-	//       with shared_ptr references instead of this!!!
-
-	class GeometryDX11 : public PipelineExecutorDX11, public ISharedObject
+	class GeometryDX11 : public PipelineExecutorDX11
 	{
 	public:
 		GeometryDX11( );
@@ -99,6 +96,8 @@ namespace Glyph3
 
 		InputAssemblerStateDX11 IAState;
 	};
+
+	typedef std::shared_ptr<GeometryDX11> GeometryPtr;
 };
 //--------------------------------------------------------------------------------
 #endif // GeometryDX11_h

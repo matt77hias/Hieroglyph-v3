@@ -15,7 +15,6 @@
 #ifndef BlendStateDX11_h
 #define BlendStateDX11_h
 //--------------------------------------------------------------------------------
-#include "RendererDX11.h"
 #include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
@@ -31,6 +30,7 @@ namespace Glyph3
 
 		friend PipelineManagerDX11;
 	};
+	typedef std::shared_ptr<BlendStateDX11> BlendStatePtr;
 };
 //--------------------------------------------------------------------------------
 #endif // BlendStateDX11_h

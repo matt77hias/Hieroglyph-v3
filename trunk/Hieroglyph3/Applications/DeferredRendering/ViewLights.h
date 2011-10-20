@@ -95,9 +95,9 @@ namespace Glyph3
         ResourcePtr			    m_ReadOnlyDepthTarget;
         TArray<ResourcePtr>     m_GBufferTargets;
 
-        GeometryDX11			m_QuadGeometry;
-        GeometryDX11            m_SphereGeometry;
-        GeometryDX11            m_ConeGeometry;
+        GeometryPtr				m_QuadGeometry;
+        GeometryPtr		        m_SphereGeometry;
+        GeometryPtr	            m_ConeGeometry;
 
         RenderEffectDX11		m_PointLightEffect[GBufferOptMode::NumSettings][LightOptMode::NumSettings][AAMode::NumSettings];
         RenderEffectDX11		m_SpotLightEffect[GBufferOptMode::NumSettings][LightOptMode::NumSettings][AAMode::NumSettings];

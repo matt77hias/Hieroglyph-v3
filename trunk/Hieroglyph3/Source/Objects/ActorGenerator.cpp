@@ -39,18 +39,17 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 	pActor->AddElement( pFrame );
 
 	// Create/load the geometry to put around the visualization (i.e. the picture frame)
-	pFrame->SetGeometry( GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/ScreenFrame.ms3d" ) ) );
-
-	// TODO: fix this!
-	pFrame->m_sParams.pGeometry->LoadToBuffers();
-	
+	GeometryPtr frameGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/ScreenFrame.ms3d" ) );
+	frameGeometry->LoadToBuffers();
+	pFrame->SetGeometry( frameGeometry );
+		
 	// Create the material for the picture frame
 	pFrame->SetMaterial( MaterialGeneratorDX11::GeneratePhong( Renderer ) );
 
 	// Create/load the geometry to put the visualization on (i.e. the picture)
-	pActor->GetBody()->SetGeometry( GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Screen.ms3d" ) ) );
-	// TODO: fix this!
-	pActor->GetBody()->m_sParams.pGeometry->LoadToBuffers();
+	GeometryPtr screenGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Screen.ms3d" ) );
+	screenGeometry->LoadToBuffers();
+	pActor->GetBody()->SetGeometry( screenGeometry );
 
 	// Use the passed in material to render the visualization.  This allows for 
 	// a user to create customized visualizations for special format textures.

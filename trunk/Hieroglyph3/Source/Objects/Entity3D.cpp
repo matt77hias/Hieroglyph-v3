@@ -201,7 +201,7 @@ void Entity3D::PreRender( RendererDX11* pRenderer, VIEWTYPE view )
 void Entity3D::Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view )
 {
 	// Test if the entity contains any geometry, and it has a material
-	if ( ( m_sParams.pGeometry ) && ( m_sParams.pMaterial ) )
+	if ( ( m_sParams.Executor != NULL ) && ( m_sParams.pMaterial ) )
 	{
 		// Only render if the material indicates that you should
 		if ( m_sParams.pMaterial->Params[view].bRender )
@@ -223,7 +223,7 @@ void Entity3D::Render( PipelineManagerDX11* pPipelineManager, IParameterManager*
 			// Let the geometry execute its drawing operation.  This includes 
 			// configuring the input to the pipeline, plus calling an appropriate
 			// draw call.
-			m_sParams.pGeometry->Execute( pPipelineManager, pParamManager );
+			m_sParams.Executor->Execute( pPipelineManager, pParamManager );
 		}
 	}
 }
@@ -386,15 +386,13 @@ void Entity3D::GetEntities( TArray< Entity3D* >& set )
 	set.add( this );
 }
 //--------------------------------------------------------------------------------
-void Entity3D::SetGeometry( GeometryDX11* pGeometry )
+void Entity3D::SetGeometry( ExecutorPtr executor )
 {
-	if ( m_sParams.pGeometry )
-		m_sParams.pGeometry->Release();
+	// If there is already an executor set, then release it.
+	if ( m_sParams.Executor != NULL )
+		m_sParams.Executor = NULL;
 
-	if ( pGeometry )
-		pGeometry->AddReference();
-
-	m_sParams.pGeometry = pGeometry;
+	m_sParams.Executor = executor;
 }
 //--------------------------------------------------------------------------------
 void Entity3D::SetLocalMatrixCalculation( bool bCalc )

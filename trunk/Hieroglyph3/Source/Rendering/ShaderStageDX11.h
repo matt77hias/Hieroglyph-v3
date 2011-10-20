@@ -69,8 +69,6 @@ namespace Glyph3
 		bool bSamplersDirty;
 		bool bShaderResourceViewsDirty;
 		bool bUnorderedAccessViewsDirty;
-
-		friend RendererDX11;
 	};
 };
 //--------------------------------------------------------------------------------

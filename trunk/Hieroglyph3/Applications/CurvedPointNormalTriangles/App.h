@@ -54,7 +54,7 @@ protected:
 	bool					m_bSolidRender;
 	bool					m_bDefaultComplexity;
 	
-	GeometryDX11*			m_pGeometry;
+	GeometryPtr				m_pGeometry;
 	RenderEffectDX11*		m_pEffect;
 
 	int						m_iDefaultHullShader;

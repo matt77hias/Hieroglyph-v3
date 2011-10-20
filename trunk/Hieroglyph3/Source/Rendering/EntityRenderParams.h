@@ -25,7 +25,8 @@
 #ifndef EntityRenderParams_h
 #define EntityRenderParams_h
 //--------------------------------------------------------------------------------
-#include "ViewRenderParams.h"
+#include "PipelineExecutorDX11.h"
+#include "Matrix4f.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -34,7 +35,6 @@ namespace Glyph3
 	// provide a special consideration when selecting its object rendering 
 	// order.
 
-	class GeometryDX11;
 	class MaterialDX11;
 
 	class EntityRenderParams
@@ -55,10 +55,10 @@ namespace Glyph3
 		~EntityRenderParams();
 
 	public:
-		ENTITYTYPE		iPass;
-		Matrix4f		WorldMatrix;
-		GeometryDX11*	pGeometry;
-		MaterialDX11*	pMaterial;
+		ENTITYTYPE				iPass;
+		Matrix4f				WorldMatrix;
+		ExecutorPtr				Executor;
+		MaterialDX11*			pMaterial;
 	};
 };
 //--------------------------------------------------------------------------------

@@ -187,7 +187,7 @@ void App::Update()
 
 	m_pRenderer11->pImmPipeline->StartPipelineStatistics();
 	{
-		m_pRenderer11->pImmPipeline->Draw( *m_pEffect, *m_pGeometry, m_pRenderer11->m_pParamMgr );
+		m_pRenderer11->pImmPipeline->Draw( *m_pEffect, m_pGeometry, m_pRenderer11->m_pParamMgr );
 	}
 	m_pRenderer11->pImmPipeline->EndPipelineStatistics();
 
@@ -249,7 +249,7 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_RELEASE( m_pGeometry );
+	m_pGeometry = NULL;
 	
 	SAFE_DELETE( m_pEffect );
 	SAFE_DELETE( m_pCamera );

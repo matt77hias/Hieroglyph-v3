@@ -666,9 +666,6 @@
     <ClInclude Include="Utility\PCH.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Utility\shared_ptr.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
     <ClInclude Include="Utility\TArray.h">
       <Filter>Utility</Filter>
     </ClInclude>

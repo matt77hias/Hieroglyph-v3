@@ -61,7 +61,7 @@ namespace Glyph3
 		void SetMaterial( MaterialDX11* pMaterial, bool bSingleEntity = true );
 		MaterialDX11* GetMaterial( );
 
-		void SetGeometry( GeometryDX11* pGeometry );
+		void SetGeometry( ExecutorPtr executor );
 
 
 		// Various entity properties are accessed here.

@@ -466,7 +466,6 @@ copy Animation\*.h ..\SDK\Include
     <ClInclude Include="Utility\ISharedObject.h" />
     <ClInclude Include="Utility\Log.h" />
     <ClInclude Include="Utility\PCH.h" />
-    <ClInclude Include="Utility\shared_ptr.h" />
     <ClInclude Include="Utility\TArray.h" />
     <ClInclude Include="Utility\Timer.h" />
     <ClInclude Include="Events\EventManager.h" />

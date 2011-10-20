@@ -12,6 +12,7 @@
 #include "PCH.h"
 #include "RenderEffectDX11.h"
 #include "PipelineManagerDX11.h"
+#include "IParameterManager.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------

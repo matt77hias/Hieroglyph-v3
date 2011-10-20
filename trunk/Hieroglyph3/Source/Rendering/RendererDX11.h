@@ -26,10 +26,12 @@
 #include "Matrix4f.h"
 
 #include "ResourceProxyDX11.h"
-#include "shared_ptr.h"
-
+#include <memory>
+#include "ShaderDX11.h"
+#include "BlendStateDX11.h"
+#include "DepthStencilStateDX11.h"
+#include "RasterizerStateDX11.h"
 //--------------------------------------------------------------------------------
-
 namespace Glyph3
 {
 	class VertexBufferDX11;
@@ -58,23 +60,13 @@ namespace Glyph3
 	class DepthStencilViewDX11;
 	class UnorderedAccessViewDX11;
 
-	class ShaderDX11;
 	class InputLayoutDX11;
-	class BlendStateDX11;
-	class DepthStencilStateDX11;
-	class RasterizerStateDX11;
 	class SamplerStateDX11;
 
 	class BlendStateConfigDX11;
 	class DepthStencilStateConfigDX11;
 	class RasterizerStateConfigDX11;
 
-	class VertexShaderDX11;
-	class HullShaderDX11;
-	class DomainShaderDX11;
-	class GeometryShaderDX11;
-	class PixelShaderDX11;
-	class ComputeShaderDX11;
 	class RenderEffectDX11;
 
 	class RenderParameterDX11;
@@ -84,15 +76,6 @@ namespace Glyph3
 
 	class IRenderView;
 
-	enum ShaderType
-	{
-		VERTEX_SHADER = 0,
-		HULL_SHADER = 1,
-		DOMAIN_SHADER = 2,
-		GEOMETRY_SHADER = 3,
-		PIXEL_SHADER = 4,
-		COMPUTE_SHADER = 5
-	};
 
 	enum ResourceType
 	{
@@ -243,9 +226,9 @@ namespace Glyph3
 		static std::wstring Print_D3D11_TESSELLATOR_DOMAIN( D3D11_TESSELLATOR_DOMAIN domain );
 
 		// Provide access to the pipeline states.
-		shared_ptr<BlendStateDX11>						GetBlendState( int index );
-		shared_ptr<DepthStencilStateDX11>				GetDepthState( int index );
-		shared_ptr<RasterizerStateDX11>					GetRasterizerState( int index );
+		BlendStatePtr									GetBlendState( int index );
+		DepthStencilStatePtr							GetDepthState( int index );
+		RasterizerStatePtr								GetRasterizerState( int index );
 		ViewPortDX11*									GetViewPort( int index );
 		ResourceDX11*									GetResource( int index );
 
@@ -311,25 +294,25 @@ namespace Glyph3
 		// destroying many resources, and allow the renderer clients to have greater access
 		// the objects without querying the renderer.
 
-		TArray<shared_ptr<BlendStateDX11>>						m_vBlendStates;
-		TArray<shared_ptr<DepthStencilStateDX11>>				m_vDepthStencilStates;
-		TArray<shared_ptr<RasterizerStateDX11>>					m_vRasterizerStates;
+		TArray<BlendStatePtr>					m_vBlendStates;
+		TArray<DepthStencilStatePtr>			m_vDepthStencilStates;
+		TArray<RasterizerStatePtr>				m_vRasterizerStates;
 
-		TArray<InputLayoutDX11*>								m_vInputLayouts;
-		TArray<SamplerStateDX11*>								m_vSamplerStates;
-		TArray<ViewPortDX11*>									m_vViewPorts;
+		TArray<InputLayoutDX11*>				m_vInputLayouts;
+		TArray<SamplerStateDX11*>				m_vSamplerStates;
+		TArray<ViewPortDX11*>					m_vViewPorts;
 
 	public:
-		IParameterManager*										m_pParamMgr;
-		PipelineManagerDX11*									pImmPipeline;
+		IParameterManager*						m_pParamMgr;
+		PipelineManagerDX11*					pImmPipeline;
 
 
 	protected:
 
-		bool													m_bMultiThreadActive;
-		D3D_FEATURE_LEVEL										m_FeatureLevel;
+		bool									m_bMultiThreadActive;
+		D3D_FEATURE_LEVEL						m_FeatureLevel;
 
-		TArray<IRenderView*>									m_vQueuedViews;
+		TArray<IRenderView*>					m_vQueuedViews;
 
 		// Internal API for friends to use - only the rendering system should use these!
 		VertexBufferDX11* GetVertexBuffer( int index );
@@ -342,7 +325,6 @@ namespace Glyph3
 unsigned int WINAPI _RenderViewThreadProc( void* lpParameter );
 
 // Multithreading support objects
-#define NUM_THREADS 4
 extern HANDLE						g_aThreadHandles[NUM_THREADS];
 extern Glyph3::ThreadPayLoad		g_aPayload[NUM_THREADS];
 extern HANDLE						g_aBeginEventHandle[NUM_THREADS];

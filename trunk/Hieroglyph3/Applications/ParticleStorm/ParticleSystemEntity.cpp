@@ -29,7 +29,7 @@ ParticleSystemEntity::ParticleSystemEntity()
 	RendererDX11* pRenderer11 = RendererDX11::Get();
 
 	// Create a geometry object *WITHOUT* any vertex data
-	GeometryDX11* pGeometry = new GeometryDX11();
+	GeometryPtr pGeometry = GeometryPtr( new GeometryDX11() );
 
 	for ( int i = 0; i<512; i++ )
 		pGeometry->AddPoint( PointIndices( i ) );
@@ -136,7 +136,7 @@ void ParticleSystemEntity::PreRender( RendererDX11* pRenderer, VIEWTYPE view )
 void ParticleSystemEntity::Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view )
 {
 	// Test if the entity contains any geometry, and it has a material
-	if ( ( m_sParams.pGeometry ) && ( m_sParams.pMaterial ) )
+	if ( ( m_sParams.Executor != NULL ) && ( m_sParams.pMaterial ) )
 	{
 		// Only render if the material indicates that you should
 		if ( m_sParams.pMaterial->Params[view].bRender )
@@ -156,13 +156,15 @@ void ParticleSystemEntity::Render( PipelineManagerDX11* pPipelineManager, IParam
 			// particles it currently has...
 			RenderEffectDX11* pEffect = m_sParams.pMaterial->Params[view].pEffect;
 
+			GeometryPtr geometry = std::dynamic_pointer_cast<GeometryDX11>(m_sParams.Executor);
+
 			pPipelineManager->DrawIndirect( 
 				*pEffect, 
 				m_pSimulation->GetParticleCountIndirectArgsBuffer(),
 				0,
-				m_sParams.pGeometry->GetInputLayout( pEffect->m_iVertexShader ),
-				m_sParams.pGeometry->m_ePrimType,
-				m_sParams.pGeometry->GetVertexSize(),
+				geometry->GetInputLayout( pEffect->m_iVertexShader ),
+				geometry->m_ePrimType,
+				geometry->GetVertexSize(),
 				pParamManager );
 		}
 	}

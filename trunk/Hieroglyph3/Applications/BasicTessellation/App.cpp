@@ -233,7 +233,7 @@ void App::Update()
 
 	m_pRenderer11->pImmPipeline->ClearBuffers( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ), 1.0f );
 
-	m_pRenderer11->pImmPipeline->Draw( *m_pTessellationEffect, *m_pGeometry, m_pRenderer11->m_pParamMgr ); 
+	m_pRenderer11->pImmPipeline->Draw( *m_pTessellationEffect, m_pGeometry, m_pRenderer11->m_pParamMgr ); 
 
 
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
@@ -252,7 +252,7 @@ void App::Update()
 void App::Shutdown()
 {
 	SAFE_DELETE( m_pTessellationEffect );
-	SAFE_RELEASE( m_pGeometry );
+	m_pGeometry = NULL;
 
 	// Print the framerate out for the log before shutting down.
 

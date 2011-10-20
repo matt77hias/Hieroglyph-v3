@@ -43,10 +43,10 @@ protected:
 	static const bool		TRI_MODE = true;
 	static const bool		QUAD_MODE = false;
 
-	GeometryDX11*			m_pQuadGeometry;
+	GeometryPtr				m_pQuadGeometry;
 	RenderEffectDX11*		m_pQuadEffect;
 
-	GeometryDX11*			m_pTriangleGeometry;
+	GeometryPtr				m_pTriangleGeometry;
 	RenderEffectDX11*		m_pTriangleEffect;
 
 	SpriteFontDX11*			m_pFont;

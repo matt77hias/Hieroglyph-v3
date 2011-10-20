@@ -117,16 +117,16 @@ ViewLights::ViewLights( RendererDX11& Renderer)
         Log::Get().Write( L"Failed to create light rasterizer state" );
 
     // Generate geometry for a full screen quad
-    GeometryGeneratorDX11::GenerateFullScreenQuad( &m_QuadGeometry );
-    m_QuadGeometry.LoadToBuffers();
+    GeometryGeneratorDX11::GenerateFullScreenQuad( m_QuadGeometry );
+    m_QuadGeometry->LoadToBuffers();
 
     // Generate geometry for a sphere
-    GeometryGeneratorDX11::GenerateSphere( &m_SphereGeometry, 8, 7, 1.0f );
-    m_SphereGeometry.LoadToBuffers();
+    GeometryGeneratorDX11::GenerateSphere( m_SphereGeometry, 8, 7, 1.0f );
+    m_SphereGeometry->LoadToBuffers();
 
     // Generate geometry for a cone
-    GeometryGeneratorDX11::GenerateCone( &m_ConeGeometry, 8, 2, 1.0f, 1.0f );
-    m_ConeGeometry.LoadToBuffers();
+    GeometryGeneratorDX11::GenerateCone( m_ConeGeometry, 8, 2, 1.0f, 1.0f );
+    m_ConeGeometry->LoadToBuffers();
 
     for ( int gBufferOptMode = 0; gBufferOptMode < GBufferOptMode::NumSettings; ++gBufferOptMode )
     {

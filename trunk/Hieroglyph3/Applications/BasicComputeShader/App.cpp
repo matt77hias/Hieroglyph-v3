@@ -173,7 +173,7 @@ void App::Initialize()
 
 	// Create a full screen quad for rendering the texture to the backbuffer.
 
-	m_pFullScreen = new GeometryDX11();
+	m_pFullScreen = GeometryPtr( new GeometryDX11() );
 	GeometryGeneratorDX11::GenerateFullScreenQuad( m_pFullScreen );
 
 	m_pFullScreen->GenerateInputLayout( m_pTextureEffect->m_iVertexShader );
@@ -210,7 +210,7 @@ void App::Update()
 	// Render the texture to the backbuffer.
 
 	m_pRenderer11->pImmPipeline->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ), 1.0f );
-	m_pRenderer11->pImmPipeline->Draw( *m_pTextureEffect, *m_pFullScreen, m_pRenderer11->m_pParamMgr );
+	m_pRenderer11->pImmPipeline->Draw( *m_pTextureEffect, m_pFullScreen, m_pRenderer11->m_pParamMgr );
 
 	// Present the results to the window.
 
@@ -229,7 +229,7 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_RELEASE( m_pFullScreen );
+	m_pFullScreen = NULL;
 
 	// Print the framerate out for the log before shutting down.
 

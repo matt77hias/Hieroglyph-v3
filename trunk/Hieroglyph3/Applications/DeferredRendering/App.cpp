@@ -101,8 +101,7 @@ void App::ShutdownEngineComponents()
 void App::Initialize()
 {
 	// Create and initialize the geometry to be rendered.
-	GeometryDX11* pGeometry = new GeometryDX11();
-	pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Sample_Scene.ms3d" ) );
+	GeometryPtr pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Sample_Scene.ms3d" ) );
     bool success = pGeometry->ComputeTangentFrame();
     _ASSERT( success );
 	pGeometry->LoadToBuffers();

@@ -130,8 +130,7 @@ void App::Initialize()
 
 	// Create and initialize the geometry to be rendered.  
 
-	GeometryDX11* pGeometry = new GeometryDX11();
-	pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Sample_Scene.ms3d" ) );
+	GeometryPtr pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Sample_Scene.ms3d" ) );
 	pGeometry->LoadToBuffers();
 	//pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
 	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );

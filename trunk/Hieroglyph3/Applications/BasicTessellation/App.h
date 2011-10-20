@@ -35,7 +35,7 @@ protected:
 	bool					m_bSaveScreenshot;
 
 	RenderEffectDX11*		m_pTessellationEffect;
-	GeometryDX11*			m_pGeometry;
+	GeometryPtr				m_pGeometry;
 
 	Matrix4f				m_WorldMatrix;
 	Matrix4f				m_ViewMatrix;

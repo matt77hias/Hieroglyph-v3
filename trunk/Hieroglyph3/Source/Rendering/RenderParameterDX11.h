@@ -15,7 +15,7 @@
 #ifndef RenderParameterDX11_h
 #define RenderParameterDX11_h
 //--------------------------------------------------------------------------------
-#include "RendererDX11.h"
+#include "PCH.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

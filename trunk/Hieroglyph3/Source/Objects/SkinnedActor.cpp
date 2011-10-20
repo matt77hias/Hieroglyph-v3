@@ -82,7 +82,7 @@ void SkinnedActor::AddBoneNode( Node3D* pBone, Vector3f BindPosition, Vector3f B
 		Entity3D* pAxes = new Entity3D();
 		pAxes->SetMaterial( MaterialGeneratorDX11::GenerateSolidColor( *pRenderer ) );
 
-		GeometryDX11* pGeometry = new GeometryDX11();
+		GeometryPtr pGeometry = GeometryPtr( new GeometryDX11() );
 		GeometryGeneratorDX11::GenerateAxisGeometry( pGeometry );
 		pGeometry->LoadToBuffers();
 		pAxes->SetGeometry( pGeometry );

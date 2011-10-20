@@ -558,12 +558,12 @@ void PipelineManagerDX11::DrawIndexed( UINT IndexCount, UINT StartIndex, int Ver
 	m_pContext->DrawIndexed( IndexCount, StartIndex, VertexOffset );
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::Draw( RenderEffectDX11& effect, GeometryDX11& geometry, 
+void PipelineManagerDX11::Draw( RenderEffectDX11& effect, GeometryPtr geometry, 
 										IParameterManager* pParamManager )
 {
-	Draw( effect, geometry.m_VB, geometry.m_IB,
-		geometry.GetInputLayout( effect.m_iVertexShader ), geometry.m_ePrimType,
-		geometry.GetVertexSize(), geometry.GetIndexCount(), pParamManager );
+	Draw( effect, geometry->m_VB, geometry->m_IB,
+		geometry->GetInputLayout( effect.m_iVertexShader ), geometry->m_ePrimType,
+		geometry->GetVertexSize(), geometry->GetIndexCount(), pParamManager );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::Draw( RenderEffectDX11& effect, ResourcePtr vb, ResourcePtr ib,
@@ -627,13 +627,13 @@ void PipelineManagerDX11::DrawNonIndexed( RenderEffectDX11& effect, ResourcePtr 
     m_pContext->Draw( vertexCount, startVertexLocation );
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::DrawInstanced( RenderEffectDX11& effect, GeometryDX11& geometry,
+void PipelineManagerDX11::DrawInstanced( RenderEffectDX11& effect, GeometryPtr geometry,
 								 ResourcePtr instanceData, UINT instanceDataStride,
 								 UINT numInstances, IParameterManager* pParamManager )
 {
-	DrawInstanced( effect, geometry.m_VB, geometry.m_ePrimType, geometry.m_IB,
-		geometry.GetInputLayout( effect.m_iVertexShader ),
-		geometry.GetVertexSize(), geometry.GetIndexCount(),
+	DrawInstanced( effect, geometry->m_VB, geometry->m_ePrimType, geometry->m_IB,
+		geometry->GetInputLayout( effect.m_iVertexShader ),
+		geometry->GetVertexSize(), geometry->GetIndexCount(),
 		instanceData, instanceDataStride, numInstances, pParamManager );
 }
 //--------------------------------------------------------------------------------
