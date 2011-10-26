@@ -234,6 +234,8 @@ int GeometryDX11::GetPrimitiveCount()
 void GeometryDX11::SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY type )
 {
 	m_ePrimType = type;
+
+	IAState.SetPrimitiveTopology( m_ePrimType );
 }
 //--------------------------------------------------------------------------------
 int GeometryDX11::GetVertexCount()

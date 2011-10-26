@@ -21,6 +21,7 @@
 #include "RenderParameterDX11.h"
 #include "ISharedObject.h"
 #include "ParameterContainer.h"
+#include <memory>
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -48,6 +49,7 @@ namespace Glyph3
 		ParameterContainer			Parameters;
 		Entity3D*					m_pEntity;
 	};
+	typedef std::shared_ptr<MaterialDX11> MaterialPtr;
 };
 //--------------------------------------------------------------------------------
 #endif // MaterialDX11_h

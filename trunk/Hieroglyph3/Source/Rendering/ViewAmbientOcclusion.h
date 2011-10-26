@@ -46,6 +46,8 @@ namespace Glyph3
 		virtual void SetViewMatrix( const Matrix4f& matrix );
 		virtual void SetProjMatrix( const Matrix4f& matrix );
 
+		void SetVisualizationActive( bool active );
+
 		virtual ~ViewAmbientOcclusion();
 
 	protected:
@@ -64,6 +66,8 @@ namespace Glyph3
 
 		ShaderResourceParameterDX11*	pDepthBufferParameter;
 		ShaderResourceParameterDX11*	pOcclusionBufferParameter;
+
+		bool				bRenderVisualization;
 	};
 };
 //--------------------------------------------------------------------------------

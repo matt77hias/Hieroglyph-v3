@@ -61,6 +61,8 @@ ViewAmbientOcclusion::ViewAmbientOcclusion( RendererDX11& Renderer, ResourcePtr 
 	pVisActor = ActorGenerator::GenerateVisualizationTexture2D( Renderer, 
 			DepthNormalBuffer, 0 );
 
+	bRenderVisualization = false;
+
 	// Grab references to the desired parameters in order to quickly set their
 	// values as needed later on.
 
@@ -109,7 +111,9 @@ void ViewAmbientOcclusion::Draw( PipelineManagerDX11* pPipelineManager, IParamet
 
 	// Add the visualization rendering into the scene
 
-	pVisActor->GetNode()->Render( pPipelineManager, pParamManager, VT_PERSPECTIVE );
+	if ( bRenderVisualization ) {
+		pVisActor->GetNode()->Render( pPipelineManager, pParamManager, VT_PERSPECTIVE );
+	}
 }
 //--------------------------------------------------------------------------------
 void ViewAmbientOcclusion::SetRenderParams( IParameterManager* pParamManager )
@@ -167,5 +171,10 @@ void ViewAmbientOcclusion::SetEntity( Entity3D* pEntity )
 
 	// Propagate the entity call to the depth/normal view.
 	pDepthNormalView->SetEntity( pEntity );
+}
+//--------------------------------------------------------------------------------
+void ViewAmbientOcclusion::SetVisualizationActive( bool active )
+{
+	bRenderVisualization = active;
 }
 //--------------------------------------------------------------------------------
