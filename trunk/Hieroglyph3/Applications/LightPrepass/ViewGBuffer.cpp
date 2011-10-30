@@ -61,6 +61,7 @@ ViewGBuffer::ViewGBuffer( RendererDX11& Renderer )
     m_MaskEffect.m_iRasterizerState = m_iMaskRSState;
 
     // Generate geometry for a full screen quad
+	m_QuadGeometry = GeometryPtr( new GeometryDX11() );
     GeometryGeneratorDX11::GenerateFullScreenQuad( m_QuadGeometry );
     m_QuadGeometry->LoadToBuffers();
 
