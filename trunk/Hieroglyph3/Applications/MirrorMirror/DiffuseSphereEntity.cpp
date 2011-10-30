@@ -64,20 +64,20 @@ void DiffuseSphereEntity::LoadResources()
     RendererDX11* pRenderer11 = RendererDX11::Get();
 
     // Get the geometry to render
-    //SphereGeometry = GeometryLoaderDX11::loadMS3DFile2( L"../Data/Models/UnitSphere2.ms3d" );
-    SphereGeometry = GeometryLoaderDX11::loadMS3DFile2( L"../Data/Models/box.ms3d" );
+    //SphereGeometry = GeometryLoaderDX11::loadMS3DFile2( L"UnitSphere2.ms3d" );
+    SphereGeometry = GeometryLoaderDX11::loadMS3DFile2( L"box.ms3d" );
     SphereGeometry->LoadToBuffers();
     SphereGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
     RenderEffect = new RenderEffectDX11();
     RenderEffect->m_iVertexShader = 
         pRenderer11->LoadShader( VERTEX_SHADER,
-        std::wstring( L"../Data/Shaders/ObjectTexturedVS.hlsl" ),
+        std::wstring( L"ObjectTexturedVS.hlsl" ),
         std::wstring( L"VSMAIN" ),
         std::wstring( L"vs_5_0" ) );
     RenderEffect->m_iPixelShader = 
         pRenderer11->LoadShader( PIXEL_SHADER,
-        std::wstring( L"../Data/Shaders/ObjectTexturedPS.hlsl" ),
+        std::wstring( L"ObjectTexturedPS.hlsl" ),
         std::wstring( L"PSMAIN" ),
         std::wstring( L"ps_5_0" ) );
 
@@ -89,17 +89,17 @@ void DiffuseSphereEntity::LoadResources()
 
     ParabolaEffect->m_iVertexShader = 
         pRenderer11->LoadShader( VERTEX_SHADER,
-        std::wstring( L"../Data/Shaders/DualParaboloidEnvMapGen.hlsl" ),
+        std::wstring( L"DualParaboloidEnvMapGen.hlsl" ),
         std::wstring( L"VSMAIN" ),
         std::wstring( L"vs_5_0" ) );
     ParabolaEffect->m_iGeometryShader = 
         pRenderer11->LoadShader( GEOMETRY_SHADER,
-        std::wstring( L"../Data/Shaders/DualParaboloidEnvMapGen.hlsl" ),
+        std::wstring( L"DualParaboloidEnvMapGen.hlsl" ),
         std::wstring( L"GSMAIN" ),
         std::wstring( L"gs_5_0" ) );
     ParabolaEffect->m_iPixelShader = 
         pRenderer11->LoadShader( PIXEL_SHADER,
-        std::wstring( L"../Data/Shaders/DualParaboloidEnvMapGen.hlsl" ),
+        std::wstring( L"DualParaboloidEnvMapGen.hlsl" ),
         std::wstring( L"PSMAIN" ),
         std::wstring( L"ps_5_0" ) );
 
@@ -117,7 +117,7 @@ void DiffuseSphereEntity::LoadResources()
 	ParabolaEffect->ConfigurePipeline( pRenderer11->pImmPipeline, pRenderer11->m_pParamMgr );
 
 
-    ColorTexture = pRenderer11->LoadTexture( L"../Data/Textures/Tiles.png" );
+    ColorTexture = pRenderer11->LoadTexture( L"Tiles.png" );
 
     TextureParameter = pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) );
     TextureParameter->InitializeParameterData( &ColorTexture->m_iResourceSRV );    

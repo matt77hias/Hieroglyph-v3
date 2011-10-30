@@ -39,7 +39,7 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 	pActor->AddElement( pFrame );
 
 	// Create/load the geometry to put around the visualization (i.e. the picture frame)
-	GeometryPtr frameGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/ScreenFrame.ms3d" ) );
+	GeometryPtr frameGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"ScreenFrame.ms3d" ) );
 	frameGeometry->LoadToBuffers();
 	pFrame->SetGeometry( frameGeometry );
 		
@@ -47,7 +47,7 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 	pFrame->SetMaterial( MaterialGeneratorDX11::GeneratePhong( Renderer ) );
 
 	// Create/load the geometry to put the visualization on (i.e. the picture)
-	GeometryPtr screenGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Screen.ms3d" ) );
+	GeometryPtr screenGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"Screen.ms3d" ) );
 	screenGeometry->LoadToBuffers();
 	pActor->GetBody()->SetGeometry( screenGeometry );
 
@@ -60,12 +60,12 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 
 	pEffect->m_iVertexShader = 
 		Renderer.LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/ObjectTexturedVS.hlsl" ),
+		std::wstring( L"ObjectTexturedVS.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_5_0" ) );
 	pEffect->m_iPixelShader = 
 		Renderer.LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/ObjectTexturedPS.hlsl" ),
+		std::wstring( L"ObjectTexturedPS.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 

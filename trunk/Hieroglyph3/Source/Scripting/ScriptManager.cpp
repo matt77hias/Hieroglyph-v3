@@ -47,6 +47,9 @@ void ScriptManager::Run( char* FileName )
 //	char AsciiFileName[1024];
 //	WideCharToMultiByte( CP_ACP, 0, FileName, -1, AsciiFileName, 1024, NULL, NULL);
  
+	// TODO: Update this function to reference the script folder specified in the
+	//       FileSystem class!!!
+
 	luaL_dofile( m_pLuaState, FileName );
 }
 //--------------------------------------------------------------------------------

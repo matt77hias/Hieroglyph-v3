@@ -130,7 +130,7 @@ void App::Initialize()
 
 	// Create and initialize the geometry to be rendered.  
 
-	GeometryPtr pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Sample_Scene.ms3d" ) );
+	GeometryPtr pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"Sample_Scene.ms3d" ) );
 	pGeometry->LoadToBuffers();
 	//pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
 	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
@@ -143,12 +143,12 @@ void App::Initialize()
 
 	pDepthEffect->m_iVertexShader = 
 		m_pRenderer11->LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/DepthVS.hlsl" ),
+		std::wstring( L"DepthVS.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_5_0" ) );
 	pDepthEffect->m_iPixelShader = 
 		m_pRenderer11->LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/DepthPS.hlsl" ),
+		std::wstring( L"DepthPS.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 
@@ -161,12 +161,12 @@ void App::Initialize()
 
 	pEffect->m_iVertexShader = 
 		m_pRenderer11->LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/FinalVS.hlsl" ),
+		std::wstring( L"FinalVS.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_5_0" ) );
 	pEffect->m_iPixelShader = 
 		m_pRenderer11->LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/FinalPS.hlsl" ),
+		std::wstring( L"FinalPS.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 

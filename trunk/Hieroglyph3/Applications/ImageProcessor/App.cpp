@@ -63,35 +63,35 @@ void App::Initialize()
 	m_pBruteForceGaussian = new RenderEffectDX11();
 	m_pBruteForceGaussian->m_iComputeShader = 
 		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
-		std::wstring( L"../Data/Shaders/GaussianBruteForceCS.hlsl" ),
+		std::wstring( L"GaussianBruteForceCS.hlsl" ),
 		std::wstring( L"CSMAIN" ),
 		std::wstring( L"cs_5_0" ) );
 
 	m_pSeparableGaussianX = new RenderEffectDX11();
 	m_pSeparableGaussianX->m_iComputeShader = 
 		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
-		std::wstring( L"../Data/Shaders/GaussianSeparableCS.hlsl" ),
+		std::wstring( L"GaussianSeparableCS.hlsl" ),
 		std::wstring( L"CSMAINX" ),
 		std::wstring( L"cs_5_0" ) );
 
 	m_pSeparableGaussianY = new RenderEffectDX11();
 	m_pSeparableGaussianY->m_iComputeShader = 
 		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
-		std::wstring( L"../Data/Shaders/GaussianSeparableCS.hlsl" ),
+		std::wstring( L"GaussianSeparableCS.hlsl" ),
 		std::wstring( L"CSMAINY" ),
 		std::wstring( L"cs_5_0" ) );
 
 	m_pCachedGaussianX = new RenderEffectDX11();
 	m_pCachedGaussianX->m_iComputeShader = 
 		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
-		std::wstring( L"../Data/Shaders/GaussianCachedCS.hlsl" ),
+		std::wstring( L"GaussianCachedCS.hlsl" ),
 		std::wstring( L"CSMAINX" ),
 		std::wstring( L"cs_5_0" ) );
 
 	m_pCachedGaussianY = new RenderEffectDX11();
 	m_pCachedGaussianY->m_iComputeShader = 
 		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
-		std::wstring( L"../Data/Shaders/GaussianCachedCS.hlsl" ),
+		std::wstring( L"GaussianCachedCS.hlsl" ),
 		std::wstring( L"CSMAINY" ),
 		std::wstring( L"cs_5_0" ) );
 
@@ -99,21 +99,21 @@ void App::Initialize()
 	m_pBruteForceBilateral = new RenderEffectDX11();
 	m_pBruteForceBilateral->m_iComputeShader = 
 		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
-		std::wstring( L"../Data/Shaders/BilateralBruteForceCS.hlsl" ),
+		std::wstring( L"BilateralBruteForceCS.hlsl" ),
 		std::wstring( L"CSMAIN" ),
 		std::wstring( L"cs_5_0" ) );
 
 	m_pSeparableBilateralX = new RenderEffectDX11();
 	m_pSeparableBilateralX->m_iComputeShader = 
 		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
-		std::wstring( L"../Data/Shaders/BilateralSeparableCS.hlsl" ),
+		std::wstring( L"BilateralSeparableCS.hlsl" ),
 		std::wstring( L"CSMAINX" ),
 		std::wstring( L"cs_5_0" ) );
 
 	m_pSeparableBilateralY = new RenderEffectDX11();
 	m_pSeparableBilateralY->m_iComputeShader = 
 		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
-		std::wstring( L"../Data/Shaders/BilateralSeparableCS.hlsl" ),
+		std::wstring( L"BilateralSeparableCS.hlsl" ),
 		std::wstring( L"CSMAINY" ),
 		std::wstring( L"cs_5_0" ) );
 
@@ -124,12 +124,12 @@ void App::Initialize()
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 	pEffect->m_iVertexShader = 
 		m_pRenderer11->LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/TextureVS.hlsl" ),
+		std::wstring( L"TextureVS.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_5_0" ) );
 	pEffect->m_iPixelShader = 
 		m_pRenderer11->LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/TexturePS.hlsl" ),
+		std::wstring( L"TexturePS.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 
@@ -150,9 +150,9 @@ void App::Initialize()
 	// Here we load our desired texture.
 
 	
-	m_Texture[0] = m_pRenderer11->LoadTexture( L"../Data/Textures/Outcrop.png" );
-	m_Texture[1] = m_pRenderer11->LoadTexture( L"../Data/Textures/fruit.png" );
-	m_Texture[2] = m_pRenderer11->LoadTexture( L"../Data/Textures/Hex.png" );
+	m_Texture[0] = m_pRenderer11->LoadTexture( L"Outcrop.png" );
+	m_Texture[1] = m_pRenderer11->LoadTexture( L"fruit.png" );
+	m_Texture[2] = m_pRenderer11->LoadTexture( L"Hex.png" );
 	
 
 	// Create the texture for output of the compute shader.

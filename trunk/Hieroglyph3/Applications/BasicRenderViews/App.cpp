@@ -137,7 +137,7 @@ void App::Initialize()
 {
 	// Load and initialize the geometry to be rendered.
 
-	m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
+	m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"box.ms3d" ) );
 	m_pGeometry->LoadToBuffers();
 	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
 

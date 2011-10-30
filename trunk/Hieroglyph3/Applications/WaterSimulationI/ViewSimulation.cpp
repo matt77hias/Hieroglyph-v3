@@ -81,7 +81,7 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX, int SizeY )
 	pWaterEffect = new RenderEffectDX11();
 	pWaterEffect->m_iComputeShader = 
 		Renderer.LoadShader( COMPUTE_SHADER,
-		std::wstring( L"../Data/Shaders/WaterSimulation.hlsl" ),
+		std::wstring( L"WaterSimulation.hlsl" ),
 		std::wstring( L"CSMAIN" ),
 		std::wstring( L"cs_4_0" ) );
 

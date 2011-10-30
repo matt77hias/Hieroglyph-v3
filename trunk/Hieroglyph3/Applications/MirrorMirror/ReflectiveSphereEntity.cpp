@@ -30,7 +30,7 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 	RendererDX11* pRenderer11 = RendererDX11::Get();
 
 	// Get the geometry to render
-	GeometryPtr pGeometry = GeometryLoaderDX11::loadMS3DFile2( L"../Data/Models/UnitSphere2.ms3d" );
+	GeometryPtr pGeometry = GeometryLoaderDX11::loadMS3DFile2( L"UnitSphere2.ms3d" );
 	pGeometry->LoadToBuffers();
 	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	
@@ -46,12 +46,12 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 
 	pEffect->m_iVertexShader = 
 		pRenderer11->LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/DualParaboloidEnvMapLookup.hlsl" ),
+		std::wstring( L"DualParaboloidEnvMapLookup.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_5_0" ) );
 	pEffect->m_iPixelShader = 
 		pRenderer11->LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/DualParaboloidEnvMapLookup.hlsl" ),
+		std::wstring( L"DualParaboloidEnvMapLookup.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 
@@ -97,17 +97,17 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 
 	pParabGenEffect->m_iVertexShader = 
 		pRenderer11->LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/DualParaboloidEnvMapLookupGen.hlsl" ),
+		std::wstring( L"DualParaboloidEnvMapLookupGen.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_5_0" ) );
 	pParabGenEffect->m_iGeometryShader = 
 		pRenderer11->LoadShader( GEOMETRY_SHADER,
-		std::wstring( L"../Data/Shaders/DualParaboloidEnvMapLookupGen.hlsl" ),
+		std::wstring( L"DualParaboloidEnvMapLookupGen.hlsl" ),
 		std::wstring( L"GSMAIN" ),
 		std::wstring( L"gs_5_0" ) );
 	pParabGenEffect->m_iPixelShader = 
 		pRenderer11->LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/DualParaboloidEnvMapLookupGen.hlsl" ),
+		std::wstring( L"DualParaboloidEnvMapLookupGen.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 

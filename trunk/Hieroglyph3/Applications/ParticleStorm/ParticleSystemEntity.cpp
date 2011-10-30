@@ -46,17 +46,17 @@ ParticleSystemEntity::ParticleSystemEntity()
 
 	pEffect->m_iVertexShader = 
 		pRenderer11->LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/ParticleSystemRender.hlsl" ),
+		std::wstring( L"ParticleSystemRender.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_5_0" ) );
 	pEffect->m_iGeometryShader = 
 		pRenderer11->LoadShader( GEOMETRY_SHADER,
-		std::wstring( L"../Data/Shaders/ParticleSystemRender.hlsl" ),
+		std::wstring( L"ParticleSystemRender.hlsl" ),
 		std::wstring( L"GSMAIN" ),
 		std::wstring( L"gs_5_0" ) );
 	pEffect->m_iPixelShader = 
 		pRenderer11->LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/ParticleSystemRender.hlsl" ),
+		std::wstring( L"ParticleSystemRender.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 
@@ -109,7 +109,7 @@ ParticleSystemEntity::ParticleSystemEntity()
 	pSamplerWriter->SetValue( LinearSampler );
 	this->Parameters.AddRenderParameter( pSamplerWriter );
 
-	ParticleTexture = pRenderer11->LoadTexture( L"../Data/Textures/Particle.png" );
+	ParticleTexture = pRenderer11->LoadTexture( L"Particle.png" );
 
 	ShaderResourceParameterWriterDX11* pTextureWriter = new ShaderResourceParameterWriterDX11();
 	pTextureWriter->SetRenderParameterRef( pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ParticleTexture" ) ) );

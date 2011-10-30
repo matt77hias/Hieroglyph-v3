@@ -443,7 +443,7 @@ void App::CreateTerrainShaders()
 	// Create the vertex shader
 	m_pTerrainEffect->m_iVertexShader = 
 		m_pRenderer11->LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ),
+		std::wstring( L"InterlockingTerrainTiles.hlsl" ),
 		std::wstring( L"vsMain" ),
 		std::wstring( L"vs_5_0" ) );
 	_ASSERT( -1 != m_pTerrainEffect->m_iVertexShader );
@@ -452,13 +452,13 @@ void App::CreateTerrainShaders()
 
 	// Create the hull shader
 	m_iSimpleHullShader = m_pRenderer11->LoadShader( HULL_SHADER,
-							std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ),
+							std::wstring( L"InterlockingTerrainTiles.hlsl" ),
 							std::wstring( L"hsSimple" ),
 							std::wstring( L"hs_5_0" ) );
 	_ASSERT( -1 != m_iSimpleHullShader );
 
 	m_iComplexHullShader = m_pRenderer11->LoadShader( HULL_SHADER,
-							std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ),
+							std::wstring( L"InterlockingTerrainTiles.hlsl" ),
 							std::wstring( L"hsComplex" ),
 							std::wstring( L"hs_5_0" ) );
 	_ASSERT( -1 != m_iComplexHullShader );
@@ -470,15 +470,15 @@ void App::CreateTerrainShaders()
 	// Create the domain shaders
 
 	D3D10_SHADER_MACRO dsSolid[2] = { "SHADING_SOLID", "1", NULL, NULL };
-	m_TerrainDomainShaders[SolidColour] = m_pRenderer11->LoadShader( DOMAIN_SHADER, std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ), std::wstring( L"dsMain" ), std::wstring( L"ds_5_0" ), dsSolid );
+	m_TerrainDomainShaders[SolidColour] = m_pRenderer11->LoadShader( DOMAIN_SHADER, std::wstring( L"InterlockingTerrainTiles.hlsl" ), std::wstring( L"dsMain" ), std::wstring( L"ds_5_0" ), dsSolid );
 	_ASSERT( -1 != m_TerrainDomainShaders[SolidColour] );
 
 	D3D10_SHADER_MACRO dsShaded[2] = { "SHADING_SIMPLE", "1", NULL, NULL };
-	m_TerrainDomainShaders[SimpleShading] = m_pRenderer11->LoadShader( DOMAIN_SHADER, std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ), std::wstring( L"dsMain" ), std::wstring( L"ds_5_0" ), dsShaded );
+	m_TerrainDomainShaders[SimpleShading] = m_pRenderer11->LoadShader( DOMAIN_SHADER, std::wstring( L"InterlockingTerrainTiles.hlsl" ), std::wstring( L"dsMain" ), std::wstring( L"ds_5_0" ), dsShaded );
 	_ASSERT( -1 != m_TerrainDomainShaders[SimpleShading] );
 
 	D3D10_SHADER_MACRO dsDebug[2] = { "SHADING_DEBUG_LOD", "1", NULL, NULL };
-	m_TerrainDomainShaders[LodDebugView] = m_pRenderer11->LoadShader( DOMAIN_SHADER, std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ), std::wstring( L"dsMain" ), std::wstring( L"ds_5_0" ), dsDebug );
+	m_TerrainDomainShaders[LodDebugView] = m_pRenderer11->LoadShader( DOMAIN_SHADER, std::wstring( L"InterlockingTerrainTiles.hlsl" ), std::wstring( L"dsMain" ), std::wstring( L"ds_5_0" ), dsDebug );
 	_ASSERT( -1 != m_TerrainDomainShaders[LodDebugView] );
 
 	m_pTerrainEffect->m_iDomainShader = m_TerrainDomainShaders[ m_smCurrentShading ];
@@ -488,7 +488,7 @@ void App::CreateTerrainShaders()
 	// Create the geometry shader
 	m_pTerrainEffect->m_iGeometryShader = 
 		m_pRenderer11->LoadShader( GEOMETRY_SHADER,
-		std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ),
+		std::wstring( L"InterlockingTerrainTiles.hlsl" ),
 		std::wstring( L"gsMain" ),
 		std::wstring( L"gs_5_0" ) );
 	_ASSERT( -1 != m_pTerrainEffect->m_iGeometryShader );
@@ -498,7 +498,7 @@ void App::CreateTerrainShaders()
 	// Create the pixel shader
 	m_pTerrainEffect->m_iPixelShader = 
 		m_pRenderer11->LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/InterlockingTerrainTiles.hlsl" ),
+		std::wstring( L"InterlockingTerrainTiles.hlsl" ),
 		std::wstring( L"psMain" ),
 		std::wstring( L"ps_5_0" ) );
 	_ASSERT( -1 != m_pTerrainEffect->m_iPixelShader );
@@ -527,7 +527,7 @@ void App::CreateTerrainTextures()
 	Log::Get().Write( L"Creating textures" );
 
 	// Load the texture
-	m_pHeightMapTexture = m_pRenderer11->LoadTexture( std::wstring( L"../Data/Textures/TerrainHeightMap.png" ) );
+	m_pHeightMapTexture = m_pRenderer11->LoadTexture( std::wstring( L"TerrainHeightMap.png" ) );
 
 	// Store the height/width to the param manager
 	D3D11_TEXTURE2D_DESC d = m_pHeightMapTexture->m_pTexture2dConfig->GetTextureDesc();
@@ -653,7 +653,7 @@ void App::CreateComputeShaderResources()
 	// Compile the compute shader
 	m_pComputeShaderEffect->m_iComputeShader = 
 		m_pRenderer11->LoadShader( COMPUTE_SHADER,
-		std::wstring( L"../Data/Shaders/InterlockingTerrainTilesComputeShader.hlsl" ),
+		std::wstring( L"InterlockingTerrainTilesComputeShader.hlsl" ),
 		std::wstring( L"csMain" ),
 		std::wstring( L"cs_5_0" ) );
 	_ASSERT( -1 != m_pComputeShaderEffect->m_iComputeShader );

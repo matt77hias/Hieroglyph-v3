@@ -164,7 +164,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
         // Point light shaders
         m_PointLightEffect[i].m_iVertexShader =
             Renderer.LoadShader( VERTEX_SHADER,
-            std::wstring( L"../Data/Shaders/LightsLP.hlsl" ),
+            std::wstring( L"LightsLP.hlsl" ),
             std::wstring( L"VSMain" ),
             std::wstring( L"vs_5_0" ),
             defines );
@@ -172,7 +172,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
 
         m_PointLightEffect[i].m_iGeometryShader =
             Renderer.LoadShader( GEOMETRY_SHADER,
-            std::wstring( L"../Data/Shaders/LightsLP.hlsl" ),
+            std::wstring( L"LightsLP.hlsl" ),
             std::wstring( L"GSMain" ),
             std::wstring( L"gs_5_0" ),
             defines );
@@ -180,7 +180,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
 
         m_PointLightEffect[i].m_iPixelShader =
             Renderer.LoadShader( PIXEL_SHADER,
-            std::wstring( L"../Data/Shaders/LightsLP.hlsl" ),
+            std::wstring( L"LightsLP.hlsl" ),
             psEntry,
             std::wstring( L"ps_5_0" ),
             defines );
@@ -197,7 +197,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
 
         m_SpotLightEffect[i].m_iVertexShader =
             Renderer.LoadShader( VERTEX_SHADER,
-            std::wstring( L"../Data/Shaders/LightsLP.hlsl" ),
+            std::wstring( L"LightsLP.hlsl" ),
             std::wstring( L"VSMain" ),
             std::wstring( L"vs_5_0" ),
             defines );
@@ -205,7 +205,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
 
         m_SpotLightEffect[i].m_iGeometryShader =
             Renderer.LoadShader( GEOMETRY_SHADER,
-            std::wstring( L"../Data/Shaders/LightsLP.hlsl" ),
+            std::wstring( L"LightsLP.hlsl" ),
             std::wstring( L"GSMain" ),
             std::wstring( L"gs_5_0" ),
             defines );
@@ -213,7 +213,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
 
         m_SpotLightEffect[i].m_iPixelShader =
             Renderer.LoadShader( PIXEL_SHADER,
-            std::wstring( L"../Data/Shaders/LightsLP.hlsl" ),
+            std::wstring( L"LightsLP.hlsl" ),
             psEntry,
             std::wstring( L"ps_5_0" ),
             defines );
@@ -230,7 +230,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
 
         m_DirectionalLightEffect[i].m_iVertexShader =
             Renderer.LoadShader( VERTEX_SHADER,
-            std::wstring( L"../Data/Shaders/LightsLP.hlsl" ),
+            std::wstring( L"LightsLP.hlsl" ),
             std::wstring( L"VSMain" ),
             std::wstring( L"vs_5_0" ),
             defines );
@@ -238,7 +238,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
 
         m_DirectionalLightEffect[i].m_iGeometryShader =
             Renderer.LoadShader( GEOMETRY_SHADER,
-            std::wstring( L"../Data/Shaders/LightsLP.hlsl" ),
+            std::wstring( L"LightsLP.hlsl" ),
             std::wstring( L"GSMain" ),
             std::wstring( L"gs_5_0" ),
             defines );
@@ -246,7 +246,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
 
         m_DirectionalLightEffect[i].m_iPixelShader =
             Renderer.LoadShader( PIXEL_SHADER,
-            std::wstring( L"../Data/Shaders/LightsLP.hlsl" ),
+            std::wstring( L"LightsLP.hlsl" ),
             psEntry,
             std::wstring( L"ps_5_0" ),
             defines );

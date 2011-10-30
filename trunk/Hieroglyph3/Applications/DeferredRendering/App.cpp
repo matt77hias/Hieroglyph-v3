@@ -101,7 +101,7 @@ void App::ShutdownEngineComponents()
 void App::Initialize()
 {
 	// Create and initialize the geometry to be rendered.
-	GeometryPtr pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Sample_Scene.ms3d" ) );
+	GeometryPtr pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"Sample_Scene.ms3d" ) );
     bool success = pGeometry->ComputeTangentFrame();
     _ASSERT( success );
 	pGeometry->LoadToBuffers();
@@ -111,13 +111,13 @@ void App::Initialize()
     m_pGBufferEffect[GBufferOptMode::OptDisabled] = new RenderEffectDX11();
 	m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_iVertexShader =
 		m_pRenderer11->LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/GBuffer.hlsl" ),
+		std::wstring( L"GBuffer.hlsl" ),
 		std::wstring( L"VSMain" ),
 		std::wstring( L"vs_5_0" ) );
     _ASSERT( m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_iVertexShader != -1 );
 	m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_iPixelShader =
 		m_pRenderer11->LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/GBuffer.hlsl" ),
+		std::wstring( L"GBuffer.hlsl" ),
 		std::wstring( L"PSMain" ),
 		std::wstring( L"ps_5_0" ) );
     _ASSERT( m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_iPixelShader != -1 );
@@ -125,13 +125,13 @@ void App::Initialize()
     m_pGBufferEffect[GBufferOptMode::OptEnabled] = new RenderEffectDX11();
     m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_iVertexShader =
         m_pRenderer11->LoadShader( VERTEX_SHADER,
-        std::wstring( L"../Data/Shaders/GBuffer.hlsl" ),
+        std::wstring( L"GBuffer.hlsl" ),
         std::wstring( L"VSMainOptimized" ),
         std::wstring( L"vs_5_0" ) );
     _ASSERT( m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_iVertexShader != -1 );
     m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_iPixelShader =
         m_pRenderer11->LoadShader( PIXEL_SHADER,
-        std::wstring( L"../Data/Shaders/GBuffer.hlsl" ),
+        std::wstring( L"GBuffer.hlsl" ),
         std::wstring( L"PSMainOptimized" ),
         std::wstring( L"ps_5_0" ) );
     _ASSERT( m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_iPixelShader != -1 );
@@ -180,8 +180,8 @@ void App::Initialize()
     // the texture data is gamma-corrected when sampled in the shader
     D3DX11_IMAGE_LOAD_INFO loadInfo;
     loadInfo.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    m_DiffuseTexture = m_pRenderer11->LoadTexture( std::wstring( L"../Data/Textures/Hex.png" ), &loadInfo );
-    m_NormalMap = m_pRenderer11->LoadTexture( std::wstring( L"../Data/Textures/Hex_Normal.png" ) );
+    m_DiffuseTexture = m_pRenderer11->LoadTexture( std::wstring( L"Hex.png" ), &loadInfo );
+    m_NormalMap = m_pRenderer11->LoadTexture( std::wstring( L"Hex_Normal.png" ) );
 
     _ASSERT( m_DiffuseTexture->m_iResource != -1 );
     _ASSERT( m_NormalMap->m_iResource != -1 );

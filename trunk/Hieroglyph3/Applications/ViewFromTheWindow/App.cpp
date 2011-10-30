@@ -151,7 +151,7 @@ void App::Initialize()
 {
 	// Load and initialize the geometry to be rendered.
 
-	m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/Sample_Scene.ms3d" ) );
+	m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"Sample_Scene.ms3d" ) );
 	m_pGeometry->LoadToBuffers();
 	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 

@@ -20,7 +20,7 @@
 #include "GlyphString.h"
 #include "MaterialGeneratorDX11.h"
 #include <sstream>
-
+#include "FileSystem.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -30,6 +30,10 @@ GeometryLoaderDX11::GeometryLoaderDX11( )
 //--------------------------------------------------------------------------------
 GeometryPtr GeometryLoaderDX11::loadMS3DFile2( std::wstring filename )
 {
+	// Get the file path to the models
+	FileSystem fs;
+	filename = fs.GetModelsFolder() + filename;
+
 	// Temporary Milkshape structures
 	unsigned short usVertexCount = 0;
 	unsigned short usTriangleCount = 0;
@@ -251,6 +255,10 @@ GeometryPtr GeometryLoaderDX11::loadMS3DFile2( std::wstring filename )
 //--------------------------------------------------------------------------------
 GeometryPtr GeometryLoaderDX11::loadMS3DFileWithAnimation( std::wstring filename, SkinnedActor* pActor )
 {
+	// Get the file path to the models
+	FileSystem fs;
+	filename = fs.GetModelsFolder() + filename;
+
 	// Temporary Milkshape structures
 	unsigned short usVertexCount = 0;
 	unsigned short usTriangleCount = 0;
@@ -1029,6 +1037,10 @@ GeometryPtr GeometryLoaderDX11::loadMS3DFileWithAnimation( std::wstring filename
 //--------------------------------------------------------------------------------
 GeometryPtr GeometryLoaderDX11::loadStanfordPlyFile( std::wstring filename, bool withAdjacency )
 {
+	// Get the file path to the models
+	FileSystem fs;
+	filename = fs.GetModelsFolder() + filename;
+
 	// Load the contents of the file
 	std::ifstream fin;
 

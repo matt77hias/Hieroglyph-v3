@@ -31,22 +31,22 @@ MaterialDX11* MaterialGeneratorDX11::GenerateWireFrame( RendererDX11& Renderer )
 
 	pEffect->m_iVertexShader = 
 		Renderer.LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/BasicTessellation.hlsl" ),
+		std::wstring( L"BasicTessellation.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_5_0" ) );
 	pEffect->m_iHullShader =
 		Renderer.LoadShader( HULL_SHADER,
-		std::wstring( L"../Data/Shaders/BasicTessellation.hlsl" ),
+		std::wstring( L"BasicTessellation.hlsl" ),
 		std::wstring( L"HSMAIN" ),
 		std::wstring( L"hs_5_0" ) );
 	pEffect->m_iDomainShader =
 		Renderer.LoadShader( DOMAIN_SHADER,
-		std::wstring( L"../Data/Shaders/BasicTessellation.hlsl" ),
+		std::wstring( L"BasicTessellation.hlsl" ),
 		std::wstring( L"DSMAIN" ),
 		std::wstring( L"ds_5_0" ) );
 	pEffect->m_iPixelShader = 
 		Renderer.LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/BasicTessellation.hlsl" ),
+		std::wstring( L"BasicTessellation.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 
@@ -73,12 +73,12 @@ MaterialDX11* MaterialGeneratorDX11::GenerateStaticTextured( RendererDX11& Rende
 
 	pEffect->m_iVertexShader = 
 		Renderer.LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/MeshStaticTextured.hlsl" ),
+		std::wstring( L"MeshStaticTextured.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_5_0" ) );
 	pEffect->m_iPixelShader = 
 		Renderer.LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/MeshStaticTextured.hlsl" ),
+		std::wstring( L"MeshStaticTextured.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 
@@ -106,12 +106,12 @@ MaterialDX11* MaterialGeneratorDX11::GenerateSkinnedTextured( RendererDX11& Rend
 
 	pEffect->m_iVertexShader = 
 		Renderer.LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/MeshSkinnedTextured.hlsl" ),
+		std::wstring( L"MeshSkinnedTextured.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_5_0" ) );
 	pEffect->m_iPixelShader = 
 		Renderer.LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/MeshSkinnedTextured.hlsl" ),
+		std::wstring( L"MeshSkinnedTextured.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 
@@ -139,22 +139,22 @@ MaterialDX11* MaterialGeneratorDX11::GenerateSkinnedSolid( RendererDX11& Rendere
 
 	pEffect->m_iVertexShader = 
 		Renderer.LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/MeshSkinnedTessellatedTextured.hlsl" ),
+		std::wstring( L"MeshSkinnedTessellatedTextured.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_5_0" ) );
 	pEffect->m_iHullShader = 
 		Renderer.LoadShader( HULL_SHADER,
-		std::wstring( L"../Data/Shaders/MeshSkinnedTessellatedTextured.hlsl" ),
+		std::wstring( L"MeshSkinnedTessellatedTextured.hlsl" ),
 		std::wstring( L"HSMAIN" ),
 		std::wstring( L"hs_5_0" ) );
 	pEffect->m_iDomainShader = 
 		Renderer.LoadShader( DOMAIN_SHADER,
-		std::wstring( L"../Data/Shaders/MeshSkinnedTessellatedTextured.hlsl" ),
+		std::wstring( L"MeshSkinnedTessellatedTextured.hlsl" ),
 		std::wstring( L"DSMAIN" ),
 		std::wstring( L"ds_5_0" ) );
 	pEffect->m_iPixelShader = 
 		Renderer.LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/MeshSkinnedTessellatedTextured.hlsl" ),
+		std::wstring( L"MeshSkinnedTessellatedTextured.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 
@@ -182,12 +182,12 @@ MaterialDX11* MaterialGeneratorDX11::GeneratePhong( RendererDX11& Renderer )
 
 	pEffect->m_iVertexShader = 
 		Renderer.LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/PhongShading.hlsl" ),
+		std::wstring( L"PhongShading.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_5_0" ) );
 	pEffect->m_iPixelShader = 
 		Renderer.LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/PhongShading.hlsl" ),
+		std::wstring( L"PhongShading.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 
@@ -208,12 +208,12 @@ MaterialDX11* MaterialGeneratorDX11::GenerateSolidColor( RendererDX11& Renderer 
 
 	pEffect->m_iVertexShader = 
 		Renderer.LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/VertexColor.hlsl" ),
+		std::wstring( L"VertexColor.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_4_0" ) );
 	pEffect->m_iPixelShader = 
 		Renderer.LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/VertexColor.hlsl" ),
+		std::wstring( L"VertexColor.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_4_0" ) );
 

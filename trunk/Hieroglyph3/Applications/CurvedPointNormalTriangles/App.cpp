@@ -138,12 +138,12 @@ void App::Initialize()
 {
 	// Load and initialize the geometry to be rendered.
 
-	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/spaceship2.ply" ), true );
-	m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/CPNTest.ply" ) );
-	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/BoxWithBadNormals.ply" ), true );
-	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"../Data/Models/CPNAdaptiveTest.ply" ), true );
+	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"spaceship2.ply" ), true );
+	m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"CPNTest.ply" ) );
+	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"BoxWithBadNormals.ply" ), true );
+	//m_pGeometry = GeometryLoaderDX11::loadStanfordPlyFile( std::wstring( L"CPNAdaptiveTest.ply" ), true );
 
-	//m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
+	//m_pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"box.ms3d" ) );
 	//m_pGeometry->LoadToBuffers();
 	//m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );	
 	
@@ -347,7 +347,7 @@ void App::CreateShaders()
 	// Create the vertex shader
 	m_pEffect->m_iVertexShader = 
 		m_pRenderer11->LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/CurvedPointNormalTriangles.hlsl" ),
+		std::wstring( L"CurvedPointNormalTriangles.hlsl" ),
 		std::wstring( L"vsMain" ),
 		std::wstring( L"vs_5_0" ) );
 	_ASSERT( -1 != m_pEffect->m_iVertexShader );
@@ -356,13 +356,13 @@ void App::CreateShaders()
 
 	// Create the hull shader
 	m_iDefaultHullShader = m_pRenderer11->LoadShader( HULL_SHADER,
-							std::wstring( L"../Data/Shaders/CurvedPointNormalTriangles.hlsl" ),
+							std::wstring( L"CurvedPointNormalTriangles.hlsl" ),
 							std::wstring( L"hsDefault" ),
 							std::wstring( L"hs_5_0" ) );
 	_ASSERT( -1 != m_iDefaultHullShader );
 
 	m_iSilhouetteHullShader = m_pRenderer11->LoadShader( HULL_SHADER,
-							std::wstring( L"../Data/Shaders/CurvedPointNormalTriangles.hlsl" ),
+							std::wstring( L"CurvedPointNormalTriangles.hlsl" ),
 							std::wstring( L"hsSilhouette" ),
 							std::wstring( L"hs_5_0" ) );
 	_ASSERT( -1 != m_iSilhouetteHullShader );
@@ -374,7 +374,7 @@ void App::CreateShaders()
 	// Create the domain shader
 	m_pEffect->m_iDomainShader = 
 		m_pRenderer11->LoadShader( DOMAIN_SHADER,
-		std::wstring( L"../Data/Shaders/CurvedPointNormalTriangles.hlsl" ),
+		std::wstring( L"CurvedPointNormalTriangles.hlsl" ),
 		std::wstring( L"dsMain" ),
 		std::wstring( L"ds_5_0" ) );
 	_ASSERT( -1 != m_pEffect->m_iDomainShader );
@@ -384,7 +384,7 @@ void App::CreateShaders()
 	// Create the geometry shader
 	m_pEffect->m_iGeometryShader = 
 		m_pRenderer11->LoadShader( GEOMETRY_SHADER,
-		std::wstring( L"../Data/Shaders/CurvedPointNormalTriangles.hlsl" ),
+		std::wstring( L"CurvedPointNormalTriangles.hlsl" ),
 		std::wstring( L"gsMain" ),
 		std::wstring( L"gs_5_0" ) );
 	_ASSERT( -1 != m_pEffect->m_iGeometryShader );
@@ -394,7 +394,7 @@ void App::CreateShaders()
 	// Create the pixel shader
 	m_pEffect->m_iPixelShader = 
 		m_pRenderer11->LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/CurvedPointNormalTriangles.hlsl" ),
+		std::wstring( L"CurvedPointNormalTriangles.hlsl" ),
 		std::wstring( L"psMain" ),
 		std::wstring( L"ps_5_0" ) );
 	_ASSERT( -1 != m_pEffect->m_iPixelShader );

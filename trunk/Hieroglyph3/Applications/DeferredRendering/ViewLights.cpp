@@ -158,7 +158,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
                 // Point light shaders
                 m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader =
                     Renderer.LoadShader( VERTEX_SHADER,
-                    std::wstring( L"../Data/Shaders/Lights.hlsl" ),
+                    std::wstring( L"Lights.hlsl" ),
                     std::wstring( L"VSMain" ),
                     std::wstring( L"vs_5_0" ),
                     defines );
@@ -166,7 +166,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
 
                 m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iPixelShader =
                     Renderer.LoadShader( PIXEL_SHADER,
-                    std::wstring( L"../Data/Shaders/Lights.hlsl" ),
+                    std::wstring( L"Lights.hlsl" ),
                     std::wstring( L"PSMain" ),
                     std::wstring( L"ps_5_0" ),
                     defines );
@@ -183,7 +183,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
 
                 m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader =
                     Renderer.LoadShader( VERTEX_SHADER,
-                    std::wstring( L"../Data/Shaders/Lights.hlsl" ),
+                    std::wstring( L"Lights.hlsl" ),
                     std::wstring( L"VSMain" ),
                     std::wstring( L"vs_5_0" ),
                     defines );
@@ -191,7 +191,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
 
                 m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iPixelShader =
                     Renderer.LoadShader( PIXEL_SHADER,
-                    std::wstring( L"../Data/Shaders/Lights.hlsl" ),
+                    std::wstring( L"Lights.hlsl" ),
                     std::wstring( L"PSMain" ),
                     std::wstring( L"ps_5_0" ),
                     defines );
@@ -208,7 +208,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
 
                 m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader =
                     Renderer.LoadShader( VERTEX_SHADER,
-                    std::wstring( L"../Data/Shaders/Lights.hlsl" ),
+                    std::wstring( L"Lights.hlsl" ),
                     std::wstring( L"VSMain" ),
                     std::wstring( L"vs_5_0" ),
                     defines );
@@ -216,7 +216,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
 
                 m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iPixelShader =
                     Renderer.LoadShader( PIXEL_SHADER,
-                    std::wstring( L"../Data/Shaders/Lights.hlsl" ),
+                    std::wstring( L"Lights.hlsl" ),
                     std::wstring( L"PSMain" ),
                     std::wstring( L"ps_5_0" ),
                     defines );

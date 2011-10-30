@@ -14,6 +14,12 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
+std::wstring FileSystem::sDataFolder = L"../Data/";
+std::wstring FileSystem::sModelsSubFolder = L"Models/";
+std::wstring FileSystem::sScriptsSubFolder = L"Scripts/";
+std::wstring FileSystem::sShaderSubFolder = L"Shaders/";
+std::wstring FileSystem::sTextureSubFolder = L"Textures/";
+//--------------------------------------------------------------------------------
 FileSystem::FileSystem()
 {
 }
@@ -72,5 +78,55 @@ std::wstring FileSystem::GetLogFolder( )
 	std::wstring result = buffer;
 
 	return( result );
+}
+//--------------------------------------------------------------------------------
+std::wstring FileSystem::GetDataFolder()
+{
+	return( sDataFolder );
+}
+//--------------------------------------------------------------------------------
+std::wstring FileSystem::GetModelsFolder()
+{
+	return( sDataFolder + sModelsSubFolder );
+}
+//--------------------------------------------------------------------------------
+std::wstring FileSystem::GetScriptsFolder()
+{
+	return( sDataFolder + sScriptsSubFolder );
+}
+//--------------------------------------------------------------------------------
+std::wstring FileSystem::GetShaderFolder()
+{
+	return( sDataFolder + sShaderSubFolder );
+}
+//--------------------------------------------------------------------------------
+std::wstring FileSystem::GetTextureFolder()
+{
+	return( sDataFolder + sTextureSubFolder );
+}
+//--------------------------------------------------------------------------------
+void FileSystem::SetDataFolder( const std::wstring& folder )
+{
+	sDataFolder = folder;
+}
+//--------------------------------------------------------------------------------
+void FileSystem::SetModelsFolder( const std::wstring& folder )
+{
+	sModelsSubFolder = folder;
+}
+//--------------------------------------------------------------------------------
+void FileSystem::SetScriptsFolder( const std::wstring& folder )
+{
+	sScriptsSubFolder = folder;
+}
+//--------------------------------------------------------------------------------
+void FileSystem::SetShaderFolder( const std::wstring& folder )
+{
+	sShaderSubFolder = folder;
+}
+//--------------------------------------------------------------------------------
+void FileSystem::SetTextureFolder( const std::wstring& folder )
+{
+	sTextureSubFolder = folder;
 }
 //--------------------------------------------------------------------------------

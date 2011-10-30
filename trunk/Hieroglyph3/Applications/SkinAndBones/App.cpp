@@ -113,7 +113,7 @@ void App::Initialize()
 	// Generate the static mesh, and attach a texture to its entity
 
 	m_pStaticActor = new Actor();
-	GeometryPtr pStaticGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"../Data/Models/box.ms3d" ) );
+	GeometryPtr pStaticGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"box.ms3d" ) );
 	pStaticGeometry->LoadToBuffers();
 	MaterialDX11* pStaticMaterial = MaterialGeneratorDX11::GenerateStaticTextured(*RendererDX11::Get());
 	m_pStaticActor->GetBody()->SetGeometry( pStaticGeometry );
@@ -123,7 +123,7 @@ void App::Initialize()
 	m_pStaticActor->GetBody()->AttachController( pRotController3);
 
 	
-	ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/Tiles.png" );
+	ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"Tiles.png" );
 	ShaderResourceParameterWriterDX11* pTextureParameter = new ShaderResourceParameterWriterDX11();
 	pTextureParameter->SetRenderParameterRef(
 		(RenderParameterDX11*)m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) ) );

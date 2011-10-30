@@ -68,14 +68,14 @@ ViewGBuffer::ViewGBuffer( RendererDX11& Renderer )
     // Load shaders for generating the mask
     m_MaskEffect.m_iVertexShader =
         Renderer.LoadShader( VERTEX_SHADER,
-        std::wstring( L"../Data/Shaders/MaskLP.hlsl" ),
+        std::wstring( L"MaskLP.hlsl" ),
         std::wstring( L"VSMain" ),
         std::wstring( L"vs_5_0" ) );
     _ASSERT( m_MaskEffect.m_iVertexShader != -1 );
 
     m_MaskEffect.m_iPixelShader =
         Renderer.LoadShader( PIXEL_SHADER,
-        std::wstring( L"../Data/Shaders/MaskLP.hlsl" ),
+        std::wstring( L"MaskLP.hlsl" ),
         std::wstring( L"PSMain" ),
         std::wstring( L"ps_5_0" ) );
     _ASSERT( m_MaskEffect.m_iPixelShader != -1 );

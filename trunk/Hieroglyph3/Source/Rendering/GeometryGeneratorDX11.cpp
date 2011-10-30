@@ -921,16 +921,16 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryPtr pGeometry, 
 
 
 
-					ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/EyeOfHorus_128_blurred.png" );
-					//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/Hex.png" );
+					ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"EyeOfHorus_128_blurred.png" );
+					//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"Hex.png" );
 						
 					ShaderResourceParameterWriterDX11* pColorWriter = new ShaderResourceParameterWriterDX11();
 					pColorWriter->SetRenderParameterRef( RendererDX11::Get()->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) ) );
 					pColorWriter->SetValue( ColorTexture );
 					pActor->GetBody()->Parameters.AddRenderParameter( pColorWriter );
 
-					ResourcePtr HeightTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/EyeOfHorus.png" );
-					//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"../Data/Textures/Hex.png" );
+					ResourcePtr HeightTexture = RendererDX11::Get()->LoadTexture( L"EyeOfHorus.png" );
+					//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"Hex.png" );
 
 					ShaderResourceParameterWriterDX11* pHeightWriter = new ShaderResourceParameterWriterDX11();
 					pHeightWriter->SetRenderParameterRef( RendererDX11::Get()->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"HeightTexture" ) ) );

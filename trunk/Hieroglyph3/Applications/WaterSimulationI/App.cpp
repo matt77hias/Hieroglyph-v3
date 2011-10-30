@@ -74,12 +74,12 @@ void App::Initialize()
 
 	pEffect->m_iVertexShader = 
 		m_pRenderer11->LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/HeightmapVisualization.hlsl" ),
+		std::wstring( L"HeightmapVisualization.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_4_0" ) );
 	pEffect->m_iPixelShader = 
 		m_pRenderer11->LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/HeightmapVisualization.hlsl" ),
+		std::wstring( L"HeightmapVisualization.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_4_0" ) );
 

@@ -37,21 +37,21 @@ ViewOcclusion::ViewOcclusion( RendererDX11& Renderer, ResourcePtr OcclusionTarge
 	pOcclusionEffect = new RenderEffectDX11();
 	pOcclusionEffect->m_iComputeShader = 
 		Renderer.LoadShader( COMPUTE_SHADER,
-		std::wstring( L"../Data/Shaders/AmbientOcclusionCS_32.hlsl" ),
+		std::wstring( L"AmbientOcclusionCS_32.hlsl" ),
 		std::wstring( L"CSMAIN" ),
 		std::wstring( L"cs_5_0" ) );
 
 	pBilateralXEffect = new RenderEffectDX11();
 	pBilateralXEffect->m_iComputeShader = 
 		Renderer.LoadShader( COMPUTE_SHADER,
-		std::wstring( L"../Data/Shaders/SeparableBilateralCS.hlsl" ),
+		std::wstring( L"SeparableBilateralCS.hlsl" ),
 		std::wstring( L"CS_Horizontal" ),
 		std::wstring( L"cs_5_0" ) );
 
 	pBilateralYEffect = new RenderEffectDX11();
 	pBilateralYEffect->m_iComputeShader = 
 		Renderer.LoadShader( COMPUTE_SHADER,
-		std::wstring( L"../Data/Shaders/SeparableBilateralCS.hlsl" ),
+		std::wstring( L"SeparableBilateralCS.hlsl" ),
 		std::wstring( L"CS_Vertical" ),
 		std::wstring( L"cs_5_0" ) );
 

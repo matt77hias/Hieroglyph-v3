@@ -77,6 +77,7 @@
 #include "EventManager.h"
 #include "EvtErrorMessage.h"
 
+#include "FileSystem.h"
 #include "Process.h"
 #include <sstream>
 //--------------------------------------------------------------------------------
@@ -845,6 +846,11 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
     flags |= D3D10_SHADER_DEBUG | D3D10_SHADER_SKIP_OPTIMIZATION | D3D10_SHADER_WARNINGS_ARE_ERRORS;
 #endif
 
+	// Get the current path to the shader folders, and add the filename to it.
+
+	FileSystem fs;
+	filename = fs.GetShaderFolder() + filename;
+
 	if ( FAILED( hr = D3DX11CompileFromFile(
 		filename.c_str(),
 		pDefines,
@@ -1418,6 +1424,9 @@ int RendererDX11::CreateInputLayout( TArray<D3D11_INPUT_ELEMENT_DESC>& elements,
 ResourcePtr RendererDX11::LoadTexture( std::wstring filename, D3DX11_IMAGE_LOAD_INFO* pLoadInfo )
 {
 	ID3D11Resource* pTexture = 0;
+
+	FileSystem fs;
+	filename = fs.GetTextureFolder() + filename;
 
 	HRESULT hr = D3DX11CreateTextureFromFile(
 		m_pDevice,

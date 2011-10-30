@@ -138,7 +138,7 @@ void App::Initialize()
 	// use for input to the compute shader.  By specifying null for the 
 	// configuration, the view is created from the default resource configuration.
 
-	m_Texture = m_pRenderer11->LoadTexture( L"../Data/Textures/Outcrop.png" );
+	m_Texture = m_pRenderer11->LoadTexture( L"Outcrop.png" );
 	
 
 	// Create the texture for output of the compute shader.
@@ -155,19 +155,19 @@ void App::Initialize()
 	m_pFilterEffect = new RenderEffectDX11();
 	m_pFilterEffect->m_iComputeShader = 
 		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
-		std::wstring( L"../Data/Shaders/InvertColorCS.hlsl" ),
+		std::wstring( L"InvertColorCS.hlsl" ),
 		std::wstring( L"CSMAIN" ),
 		std::wstring( L"cs_5_0" ) );
 
 	m_pTextureEffect = new RenderEffectDX11();
 	m_pTextureEffect->m_iVertexShader = 
 		m_pRenderer11->LoadShader( VERTEX_SHADER,
-		std::wstring( L"../Data/Shaders/TextureVS.hlsl" ),
+		std::wstring( L"TextureVS.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_5_0" ) );
 	m_pTextureEffect->m_iPixelShader = 
 		m_pRenderer11->LoadShader( PIXEL_SHADER,
-		std::wstring( L"../Data/Shaders/TexturePS.hlsl" ),
+		std::wstring( L"TexturePS.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 

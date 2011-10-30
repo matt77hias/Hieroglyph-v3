@@ -203,14 +203,14 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 	pParticleUpdate = new RenderEffectDX11();
 	pParticleUpdate->m_iComputeShader = 
 		Renderer.LoadShader( COMPUTE_SHADER,
-		std::wstring( L"../Data/Shaders/ParticleSystemUpdateCS.hlsl" ),
+		std::wstring( L"ParticleSystemUpdateCS.hlsl" ),
 		std::wstring( L"CSMAIN" ),
 		std::wstring( L"cs_5_0" ) );
 
 	pParticleInsertion = new RenderEffectDX11();
 	pParticleInsertion->m_iComputeShader = 
 		Renderer.LoadShader( COMPUTE_SHADER,
-		std::wstring( L"../Data/Shaders/ParticleSystemInsertCS.hlsl" ),
+		std::wstring( L"ParticleSystemInsertCS.hlsl" ),
 		std::wstring( L"CSMAIN" ),
 		std::wstring( L"cs_5_0" ) );
 
