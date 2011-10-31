@@ -120,6 +120,13 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Data\Shaders\DualParaboloidEnvMapGen.hlsl" />
+    <None Include="..\Data\Shaders\DualParaboloidEnvMapLookup.hlsl" />
+    <None Include="..\Data\Shaders\DualParaboloidEnvMapLookupGen.hlsl" />
+    <None Include="..\Data\Shaders\ObjectTexturedPS.hlsl" />
+    <None Include="..\Data\Shaders\ObjectTexturedVS.hlsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

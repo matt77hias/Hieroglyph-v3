@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="App.cpp" />
+    <ClCompile Include="DiffuseSphereEntity.cpp" />
+    <ClCompile Include="ReflectiveSphereEntity.cpp" />
+    <ClCompile Include="ViewParaboloidEnvMap.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="App.h" />
+    <ClInclude Include="DiffuseSphereEntity.h" />
+    <ClInclude Include="ReflectiveSphereEntity.h" />
+    <ClInclude Include="ViewParaboloidEnvMap.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{d60e5d04-a24a-46ed-b3d3-9ffe3e5d4434}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Data\Shaders\ObjectTexturedPS.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Data\Shaders\ObjectTexturedVS.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Data\Shaders\DualParaboloidEnvMapGen.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Data\Shaders\DualParaboloidEnvMapLookup.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Data\Shaders\DualParaboloidEnvMapLookupGen.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>

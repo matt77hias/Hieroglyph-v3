@@ -114,6 +114,11 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Data\Shaders\MeshSkinnedTessellatedTextured.hlsl" />
+    <None Include="..\Data\Shaders\MeshSkinnedTextured.hlsl" />
+    <None Include="..\Data\Shaders\MeshStaticTextured.hlsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

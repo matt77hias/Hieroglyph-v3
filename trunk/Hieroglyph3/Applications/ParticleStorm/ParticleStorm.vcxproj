@@ -118,6 +118,11 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Data\Shaders\ParticleSystemInsertCS.hlsl" />
+    <None Include="..\Data\Shaders\ParticleSystemRender.hlsl" />
+    <None Include="..\Data\Shaders\ParticleSystemUpdateCS.hlsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

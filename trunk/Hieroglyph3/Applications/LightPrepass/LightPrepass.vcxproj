@@ -121,6 +121,7 @@
     <None Include="..\Data\Shaders\FinalPassLP.hlsl" />
     <None Include="..\Data\Shaders\GBufferLP.hlsl" />
     <None Include="..\Data\Shaders\LightsLP.hlsl" />
+    <None Include="..\Data\Shaders\MaskLP.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

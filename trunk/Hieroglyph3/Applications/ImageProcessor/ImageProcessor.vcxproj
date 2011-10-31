@@ -114,6 +114,15 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Data\Shaders\BilateralBruteForceCS.hlsl" />
+    <None Include="..\Data\Shaders\BilateralSeparableCS.hlsl" />
+    <None Include="..\Data\Shaders\GaussianBruteForceCS.hlsl" />
+    <None Include="..\Data\Shaders\GaussianCachedCS.hlsl" />
+    <None Include="..\Data\Shaders\GaussianSeparableCS.hlsl" />
+    <None Include="..\Data\Shaders\TexturePS.hlsl" />
+    <None Include="..\Data\Shaders\TextureVS.hlsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

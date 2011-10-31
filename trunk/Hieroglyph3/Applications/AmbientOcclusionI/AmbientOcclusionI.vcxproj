@@ -114,6 +114,14 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Data\Shaders\AmbientOcclusionCS_16.hlsl" />
+    <None Include="..\Data\Shaders\AmbientOcclusionCS_32.hlsl" />
+    <None Include="..\Data\Shaders\DepthPS.hlsl" />
+    <None Include="..\Data\Shaders\DepthVS.hlsl" />
+    <None Include="..\Data\Shaders\FinalPS.hlsl" />
+    <None Include="..\Data\Shaders\FinalVS.hlsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

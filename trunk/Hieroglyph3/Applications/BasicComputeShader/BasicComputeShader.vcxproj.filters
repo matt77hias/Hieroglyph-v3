@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="App.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="App.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{8aa36a56-0244-47c1-859d-621d9db4fc68}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Data\Shaders\InvertColorCS.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Data\Shaders\TexturePS.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Data\Shaders\TextureVS.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>
