@@ -22,17 +22,17 @@ namespace Glyph3
 	class MaterialGeneratorDX11
 	{
 	public:
-		static MaterialDX11* GenerateWireFrame( RendererDX11& Renderer );
+		static MaterialPtr GenerateWireFrame( RendererDX11& Renderer );
 
 		
-		static MaterialDX11* GenerateStaticTextured( RendererDX11& Renderer );
-		static MaterialDX11* GenerateSkinnedTextured( RendererDX11& Renderer );
-		static MaterialDX11* GenerateSkinnedSolid( RendererDX11& Renderer );
+		static MaterialPtr GenerateStaticTextured( RendererDX11& Renderer );
+		static MaterialPtr GenerateSkinnedTextured( RendererDX11& Renderer );
+		static MaterialPtr GenerateSkinnedSolid( RendererDX11& Renderer );
 
-		static MaterialDX11* GeneratePhong( RendererDX11& Renderer );
-		static MaterialDX11* GenerateSolidColor( RendererDX11& Renderer );
+		static MaterialPtr GeneratePhong( RendererDX11& Renderer );
+		static MaterialPtr GenerateSolidColor( RendererDX11& Renderer );
 
-		static MaterialDX11* GenerateFromFile( RendererDX11& Renderer, std::wstring& file, unsigned int shaders );
+		static MaterialPtr GenerateFromFile( RendererDX11& Renderer, std::wstring& file, unsigned int shaders );
 	private:
 		MaterialGeneratorDX11();
 		

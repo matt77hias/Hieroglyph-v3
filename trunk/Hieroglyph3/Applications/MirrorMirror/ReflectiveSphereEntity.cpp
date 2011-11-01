@@ -36,7 +36,7 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 	
 
 	// Create the material for use by the entity.
-	MaterialDX11* pMaterial = new MaterialDX11();
+	MaterialPtr pMaterial = MaterialPtr( new MaterialDX11() );
 
 
 	// Create and fill the effect that will be used for rendering the reflective material
@@ -143,7 +143,7 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 	pParabGenEffect->ConfigurePipeline( pRenderer11->pImmPipeline, pRenderer11->m_pParamMgr );
 
 	this->SetGeometry( pGeometry );
-	this->SetMaterial( pMaterial, false );
+	this->SetMaterial( pMaterial );
 }
 //--------------------------------------------------------------------------------
 ReflectiveSphereEntity::~ReflectiveSphereEntity()
@@ -153,32 +153,36 @@ ReflectiveSphereEntity::~ReflectiveSphereEntity()
 void ReflectiveSphereEntity::PreRender( RendererDX11* pRenderer, VIEWTYPE view )
 {
 	// Perform the pre-render function only if the material has been set
-	if ( m_sParams.pMaterial )
-		m_sParams.pMaterial->PreRender( pRenderer, view );
+	if ( m_sParams.Material != NULL )
+		m_sParams.Material->PreRender( pRenderer, view );
 }
 //--------------------------------------------------------------------------------
 void ReflectiveSphereEntity::Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view )
 {
 	// Test if the entity contains any geometry, and it has a material
-	if ( ( m_sParams.Executor != NULL ) && ( m_sParams.pMaterial ) )
+	if ( ( m_sParams.Executor != NULL ) && ( m_sParams.Material != NULL ) )
 	{
 		// Only render if the material indicates that you should
-		if ( m_sParams.pMaterial->Params[view].bRender )
+		if ( m_sParams.Material->Params[view].bRender )
 		{
 			// Set the material render parameters.  This is done before the entity
 			// render parameters so that unique values can be set by the individual
 			// entities, and still allow the material to set parameters for any
 			// entities that don't specialize the parameters.
-			m_sParams.pMaterial->SetRenderParams( pParamManager, view );
+			m_sParams.Material->SetRenderParams( pParamManager, view );
 
 			// Set the entity render parameters
 			this->SetRenderParams( pParamManager );
 
-			// Send the geometry to the renderer using the appropriate
-			// material view effect.
-			GeometryPtr geometry = std::dynamic_pointer_cast<GeometryDX11>(m_sParams.Executor);
+			// Configure the pipeline with the render effect supplied by the material.
+			pPipelineManager->ClearPipelineResources();
+			m_sParams.Material->Params[view].pEffect->ConfigurePipeline( pPipelineManager, pParamManager );
+			pPipelineManager->ApplyPipelineResources();
 
-			pPipelineManager->Draw( *m_sParams.pMaterial->Params[view].pEffect, geometry, pParamManager );
+			// Let the geometry execute its drawing operation.  This includes 
+			// configuring the input to the pipeline, plus calling an appropriate
+			// draw call.
+			m_sParams.Executor->Execute( pPipelineManager, pParamManager );
 		}
 	}
 }

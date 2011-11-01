@@ -25,7 +25,7 @@ ActorGenerator::ActorGenerator( )
 }
 //--------------------------------------------------------------------------------
 Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer, 
-	ResourcePtr resource, MaterialDX11* pMaterial )
+	ResourcePtr resource, MaterialPtr pMaterial )
 {
 	// Create the new actor
 	Actor* pActor = new Actor();
@@ -53,7 +53,7 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 
 	// Use the passed in material to render the visualization.  This allows for 
 	// a user to create customized visualizations for special format textures.
-	pMaterial = new MaterialDX11();
+	pMaterial = MaterialPtr( new MaterialDX11() );
 
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();

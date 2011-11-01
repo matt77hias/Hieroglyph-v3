@@ -21,10 +21,10 @@ MaterialGeneratorDX11::MaterialGeneratorDX11( )
 {
 }
 //--------------------------------------------------------------------------------
-MaterialDX11* MaterialGeneratorDX11::GenerateWireFrame( RendererDX11& Renderer )
+MaterialPtr MaterialGeneratorDX11::GenerateWireFrame( RendererDX11& Renderer )
 {
 	// Create the material that will be returned
-	MaterialDX11* pMaterial = new MaterialDX11();
+	MaterialPtr pMaterial = MaterialPtr( new MaterialDX11() );
 
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
@@ -63,10 +63,10 @@ MaterialDX11* MaterialGeneratorDX11::GenerateWireFrame( RendererDX11& Renderer )
 	return( pMaterial );
 }
 //--------------------------------------------------------------------------------
-MaterialDX11* MaterialGeneratorDX11::GenerateStaticTextured( RendererDX11& Renderer )
+MaterialPtr MaterialGeneratorDX11::GenerateStaticTextured( RendererDX11& Renderer )
 {
 	// Create the material that will be returned
-	MaterialDX11* pMaterial = new MaterialDX11();
+	MaterialPtr pMaterial = MaterialPtr( new MaterialDX11() );
 
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
@@ -96,10 +96,10 @@ MaterialDX11* MaterialGeneratorDX11::GenerateStaticTextured( RendererDX11& Rende
 	return( pMaterial );
 }
 //--------------------------------------------------------------------------------
-MaterialDX11* MaterialGeneratorDX11::GenerateSkinnedTextured( RendererDX11& Renderer )
+MaterialPtr MaterialGeneratorDX11::GenerateSkinnedTextured( RendererDX11& Renderer )
 {
 	// Create the material that will be returned
-	MaterialDX11* pMaterial = new MaterialDX11();
+	MaterialPtr pMaterial = MaterialPtr( new MaterialDX11() );
 
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
@@ -129,10 +129,10 @@ MaterialDX11* MaterialGeneratorDX11::GenerateSkinnedTextured( RendererDX11& Rend
 	return( pMaterial );
 }
 //--------------------------------------------------------------------------------
-MaterialDX11* MaterialGeneratorDX11::GenerateSkinnedSolid( RendererDX11& Renderer )
+MaterialPtr MaterialGeneratorDX11::GenerateSkinnedSolid( RendererDX11& Renderer )
 {
 	// Create the material that will be returned
-	MaterialDX11* pMaterial = new MaterialDX11();
+	MaterialPtr pMaterial = MaterialPtr( new MaterialDX11() );
 
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
@@ -172,10 +172,10 @@ MaterialDX11* MaterialGeneratorDX11::GenerateSkinnedSolid( RendererDX11& Rendere
 	return( pMaterial );
 }
 //--------------------------------------------------------------------------------
-MaterialDX11* MaterialGeneratorDX11::GeneratePhong( RendererDX11& Renderer )
+MaterialPtr MaterialGeneratorDX11::GeneratePhong( RendererDX11& Renderer )
 {
 	// Create the material that will be returned
-	MaterialDX11* pMaterial = new MaterialDX11();
+	MaterialPtr pMaterial = MaterialPtr( new MaterialDX11() );
 
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
@@ -198,10 +198,10 @@ MaterialDX11* MaterialGeneratorDX11::GeneratePhong( RendererDX11& Renderer )
 	return( pMaterial );
 }
 //--------------------------------------------------------------------------------
-MaterialDX11* MaterialGeneratorDX11::GenerateSolidColor( RendererDX11& Renderer )
+MaterialPtr MaterialGeneratorDX11::GenerateSolidColor( RendererDX11& Renderer )
 {
 	// Create the material that will be returned
-	MaterialDX11* pMaterial = new MaterialDX11();
+	MaterialPtr pMaterial = MaterialPtr( new MaterialDX11() );
 
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
@@ -228,10 +228,10 @@ MaterialDX11* MaterialGeneratorDX11::GenerateSolidColor( RendererDX11& Renderer 
 	return( pMaterial );
 }
 //--------------------------------------------------------------------------------
-MaterialDX11* MaterialGeneratorDX11::GenerateFromFile( RendererDX11& Renderer, std::wstring& file, unsigned int shaders )
+MaterialPtr MaterialGeneratorDX11::GenerateFromFile( RendererDX11& Renderer, std::wstring& file, unsigned int shaders )
 {
 	// Create the material that will be returned
-	MaterialDX11* pMaterial = new MaterialDX11();
+	MaterialPtr pMaterial = MaterialPtr( new MaterialDX11() );
 
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
@@ -290,3 +290,4 @@ MaterialDX11* MaterialGeneratorDX11::GenerateFromFile( RendererDX11& Renderer, s
 	return( pMaterial );
 
 }
+//--------------------------------------------------------------------------------

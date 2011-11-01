@@ -46,7 +46,7 @@ protected:
 	Entity3D*				m_pEntity[10];
 	
 	GeometryPtr				m_pGeometry;
-	MaterialDX11*			m_pMaterial;
+	MaterialPtr				m_pMaterial;
 	
 	Vector4f				m_TessParams;
 };

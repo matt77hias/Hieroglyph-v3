@@ -172,9 +172,6 @@
     <ClCompile Include="Utility\GlyphString.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="Utility\ISharedObject.cpp">
-      <Filter>Utility</Filter>
-    </ClCompile>
     <ClCompile Include="Utility\Log.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
@@ -655,9 +652,6 @@
       <Filter>Application</Filter>
     </ClInclude>
     <ClInclude Include="Utility\GlyphString.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="Utility\ISharedObject.h">
       <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="Utility\Log.h">

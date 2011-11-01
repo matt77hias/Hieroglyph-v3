@@ -45,7 +45,7 @@ protected:
 
 	ResourcePtr				m_BackBuffer;
 
-    MaterialDX11*           m_pMaterial;
+    MaterialPtr		        m_pMaterial;
     RenderEffectDX11*       m_pGBufferEffect[GBufferOptMode::NumSettings];
     int					    m_iGBufferDSState;
     int                     m_iGBufferRSState;

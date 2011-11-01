@@ -190,7 +190,7 @@ void App::Initialize()
 	m_pNode = new Node3D();
 	m_pEntity = new Entity3D();
 	m_pEntity->SetGeometry( m_pGeometry );
-	m_pEntity->SetMaterial( m_pMaterial, false );
+	m_pEntity->SetMaterial( m_pMaterial );
 	
 	m_pNode->AttachChild( m_pEntity );
 

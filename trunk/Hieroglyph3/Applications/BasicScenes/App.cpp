@@ -172,7 +172,7 @@ void App::Initialize()
 	{
 		m_pEntity[i] = new Entity3D();
 		m_pEntity[i]->SetGeometry( m_pGeometry );
-		m_pEntity[i]->SetMaterial( m_pMaterial, false );
+		m_pEntity[i]->SetMaterial( m_pMaterial );
 		m_pEntity[i]->Position() = Vector3f( static_cast<float>( i ) * 4.0f, 4.0f * ( i % 2 ) - 2.0f, 0.0f );
 
 		m_pNode->AttachChild( m_pEntity[i] );

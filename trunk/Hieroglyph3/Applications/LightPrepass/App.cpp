@@ -275,7 +275,7 @@ void App::Initialize()
         Log::Get().Write( L"Failed to create rasterizer state" );
 
     // Create the material for rendering the geometry to the G-Buffer and the final pass
-    m_pMaterial = new MaterialDX11();
+    m_pMaterial = MaterialPtr( new MaterialDX11() );
     m_pMaterial->Params[VT_GBUFFER].pEffect = m_pGBufferEffect;
     m_pMaterial->Params[VT_GBUFFER].bRender = true;
     m_pMaterial->Params[VT_FINALPASS].pEffect = m_pFinalPassEffect;
@@ -355,7 +355,7 @@ void App::Initialize()
 	m_pNode = new Node3D();
 	m_pEntity = new Entity3D();
 	m_pEntity->SetGeometry( pGeometry );
-	m_pEntity->SetMaterial( m_pMaterial, false );
+	m_pEntity->SetMaterial( m_pMaterial );
 	m_pEntity->Position() = Vector3f( 0.0f, 0.0f, 0.0f );
 
 	m_pNode->AttachChild( m_pEntity );

@@ -36,7 +36,7 @@ GeometryPtr DiffuseSphereEntity::SphereGeometry = NULL;
 //--------------------------------------------------------------------------------
 DiffuseSphereEntity::DiffuseSphereEntity()
 {
-	MaterialDX11* pMaterial = new MaterialDX11();
+	MaterialPtr pMaterial = MaterialPtr( new MaterialDX11() );
 
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
@@ -47,7 +47,7 @@ DiffuseSphereEntity::DiffuseSphereEntity()
 	pMaterial->Params[VT_DUAL_PARABOLOID_ENVMAP].pEffect = ParabolaEffect;
 
 	this->SetGeometry( SphereGeometry );
-	this->SetMaterial( pMaterial, false );
+	this->SetMaterial( pMaterial );
 
 	// Create a parameter writer to automatically set the desired texture.
 

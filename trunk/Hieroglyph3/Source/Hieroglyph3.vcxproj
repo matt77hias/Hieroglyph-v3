@@ -125,9 +125,6 @@ copy Animation\*.h ..\SDK\Include
     <ClCompile Include="Utility\GlyphString.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Utility\ISharedObject.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Utility\Log.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
@@ -463,7 +460,6 @@ copy Animation\*.h ..\SDK\Include
     <ClInclude Include="Rendering\ParameterContainer.h" />
     <ClInclude Include="Rendering\PipelineExecutorDX11.h" />
     <ClInclude Include="Utility\GlyphString.h" />
-    <ClInclude Include="Utility\ISharedObject.h" />
     <ClInclude Include="Utility\Log.h" />
     <ClInclude Include="Utility\PCH.h" />
     <ClInclude Include="Utility\TArray.h" />

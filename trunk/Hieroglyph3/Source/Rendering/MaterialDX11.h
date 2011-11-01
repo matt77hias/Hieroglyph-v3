@@ -19,7 +19,6 @@
 #include "IRenderView.h"
 #include "RenderEffectDX11.h"
 #include "RenderParameterDX11.h"
-#include "ISharedObject.h"
 #include "ParameterContainer.h"
 #include <memory>
 //--------------------------------------------------------------------------------
@@ -34,7 +33,7 @@ namespace Glyph3
 	};
 
 
-	class MaterialDX11 : public ISharedObject
+	class MaterialDX11
 	{
 	public:
 		MaterialDX11();

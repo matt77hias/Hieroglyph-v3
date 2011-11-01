@@ -39,7 +39,7 @@ ParticleSystemEntity::ParticleSystemEntity()
 	
 
 	// Create the material for use by the entity.
-	MaterialDX11* pMaterial = new MaterialDX11();
+	MaterialPtr pMaterial = MaterialPtr( new MaterialDX11() );
 
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
@@ -118,7 +118,7 @@ ParticleSystemEntity::ParticleSystemEntity()
 
 
 	this->SetGeometry( pGeometry );
-	this->SetMaterial( pMaterial, false );
+	this->SetMaterial( pMaterial );
 
 }
 //--------------------------------------------------------------------------------
@@ -129,23 +129,23 @@ ParticleSystemEntity::~ParticleSystemEntity()
 void ParticleSystemEntity::PreRender( RendererDX11* pRenderer, VIEWTYPE view )
 {
 	// Perform the pre-render function only if the material has been set
-	if ( m_sParams.pMaterial )
-		m_sParams.pMaterial->PreRender( pRenderer, view );
+	if ( m_sParams.Material != NULL )
+		m_sParams.Material->PreRender( pRenderer, view );
 }
 //--------------------------------------------------------------------------------
 void ParticleSystemEntity::Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view )
 {
 	// Test if the entity contains any geometry, and it has a material
-	if ( ( m_sParams.Executor != NULL ) && ( m_sParams.pMaterial ) )
+	if ( ( m_sParams.Executor != NULL ) && ( m_sParams.Material != NULL ) )
 	{
 		// Only render if the material indicates that you should
-		if ( m_sParams.pMaterial->Params[view].bRender )
+		if ( m_sParams.Material->Params[view].bRender )
 		{
 			// Set the material render parameters.  This is done before the entity
 			// render parameters so that unique values can be set by the individual
 			// entities, and still allow the material to set parameters for any
 			// entities that don't specialize the parameters.
-			m_sParams.pMaterial->SetRenderParams( pParamManager, view );
+			m_sParams.Material->SetRenderParams( pParamManager, view );
 
 			// Set the entity render parameters
 			this->SetRenderParams( pParamManager );
@@ -154,7 +154,7 @@ void ParticleSystemEntity::Render( PipelineManagerDX11* pPipelineManager, IParam
 			// This uses the indirect args buffer to determine how many particles
 			// need to be rendered, allowing this entity to be oblivious to how many
 			// particles it currently has...
-			RenderEffectDX11* pEffect = m_sParams.pMaterial->Params[view].pEffect;
+			RenderEffectDX11* pEffect = m_sParams.Material->Params[view].pEffect;
 
 			GeometryPtr geometry = std::dynamic_pointer_cast<GeometryDX11>(m_sParams.Executor);
 

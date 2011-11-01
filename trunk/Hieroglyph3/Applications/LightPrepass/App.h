@@ -53,7 +53,7 @@ protected:
     ResourcePtr             m_ResolveTarget;
 	ResourcePtr				m_BackBuffer;
 
-    MaterialDX11*           m_pMaterial;
+    MaterialPtr				m_pMaterial;
     RenderEffectDX11*       m_pGBufferEffect;
     RenderEffectDX11*       m_pFinalPassEffect;
     int					    m_iGBufferDSState;

@@ -119,7 +119,7 @@ void App::Initialize()
 
 
 	// Create the material for use by the entity.
-	MaterialDX11* pMaterial = new MaterialDX11();
+	MaterialPtr pMaterial = MaterialPtr( new MaterialDX11() );
 
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 	pEffect->m_iVertexShader = 
@@ -193,7 +193,7 @@ void App::Initialize()
 	m_pNode = new Node3D();
 	m_pEntity = new Entity3D();
 	m_pEntity->SetGeometry( pGeometry );
-	m_pEntity->SetMaterial( pMaterial, false );
+	m_pEntity->SetMaterial( pMaterial );
 
 	m_pNode->AttachChild( m_pEntity );
 	m_pScene->AddEntity( m_pNode );

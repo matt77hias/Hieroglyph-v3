@@ -136,7 +136,7 @@ void App::Initialize()
 	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
 	// Create the material for use by the entity.
-	MaterialDX11* pMaterial = new MaterialDX11();
+	MaterialPtr pMaterial = MaterialPtr( new MaterialDX11() );
 
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pDepthEffect = new RenderEffectDX11();
@@ -197,7 +197,7 @@ void App::Initialize()
 	m_pNode = new Node3D();
 	m_pEntity = new Entity3D();
 	m_pEntity->SetGeometry( pGeometry );
-	m_pEntity->SetMaterial( pMaterial, false );
+	m_pEntity->SetMaterial( pMaterial );
 	m_pEntity->Position() = Vector3f( 0.0f, 0.0f, 0.0f );  
 
 	m_pNode->AttachChild( m_pEntity );

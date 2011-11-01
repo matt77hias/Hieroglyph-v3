@@ -115,7 +115,7 @@ void App::Initialize()
 	m_pStaticActor = new Actor();
 	GeometryPtr pStaticGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"box.ms3d" ) );
 	pStaticGeometry->LoadToBuffers();
-	MaterialDX11* pStaticMaterial = MaterialGeneratorDX11::GenerateStaticTextured(*RendererDX11::Get());
+	MaterialPtr pStaticMaterial = MaterialGeneratorDX11::GenerateStaticTextured(*RendererDX11::Get());
 	m_pStaticActor->GetBody()->SetGeometry( pStaticGeometry );
 	m_pStaticActor->GetBody()->SetMaterial( pStaticMaterial );
 

@@ -11,7 +11,7 @@ function Initialize()
 	handle = 0;
 	App.Log( "Handle Value: " .. handle );
 
-	handle = App.CreateActor( "../Data/Models/box.ms3d", "Phong" );
+	handle = App.CreateActor( "box.ms3d", "Phong" );
 	a1 = Actor:Create( handle );
 
 	App.Log( "Handle Value: " .. handle );

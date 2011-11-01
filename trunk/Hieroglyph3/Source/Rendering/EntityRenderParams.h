@@ -26,6 +26,7 @@
 #define EntityRenderParams_h
 //--------------------------------------------------------------------------------
 #include "PipelineExecutorDX11.h"
+#include "MaterialDX11.h"
 #include "Matrix4f.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
@@ -58,7 +59,7 @@ namespace Glyph3
 		ENTITYTYPE				iPass;
 		Matrix4f				WorldMatrix;
 		ExecutorPtr				Executor;
-		MaterialDX11*			pMaterial;
+		MaterialPtr				Material;
 	};
 };
 //--------------------------------------------------------------------------------

@@ -174,7 +174,7 @@ void App::Initialize()
     m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_uStencilRef = 1;
     m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_iRasterizerState = m_iGBufferRSState;
 
-    m_pMaterial = new MaterialDX11();
+    m_pMaterial = MaterialPtr( new MaterialDX11() );
 
     // Load textures. For the diffuse map, we'll specify that we want an sRGB format so that
     // the texture data is gamma-corrected when sampled in the shader
@@ -252,7 +252,7 @@ void App::Initialize()
 	m_pNode = new Node3D();
 	m_pEntity = new Entity3D();
 	m_pEntity->SetGeometry( pGeometry );
-	m_pEntity->SetMaterial( m_pMaterial, false );
+	m_pEntity->SetMaterial( m_pMaterial );
 	m_pEntity->Position() = Vector3f( 0.0f, 0.0f, 0.0f );
 
 	m_pNode->AttachChild( m_pEntity );

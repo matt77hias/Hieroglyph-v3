@@ -58,8 +58,8 @@ namespace Glyph3
 		Matrix4f& WorldMatrix( );
 		Matrix4f GetView( );
 
-		void SetMaterial( MaterialDX11* pMaterial, bool bSingleEntity = true );
-		MaterialDX11* GetMaterial( );
+		void SetMaterial( MaterialPtr pMaterial );
+		MaterialPtr GetMaterial( );
 
 		void SetGeometry( ExecutorPtr executor );
 

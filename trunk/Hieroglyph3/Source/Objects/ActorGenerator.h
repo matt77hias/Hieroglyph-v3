@@ -24,7 +24,7 @@ namespace Glyph3
 	{
 	public:
 		static Actor* GenerateVisualizationTexture2D( RendererDX11& Renderer, 
-			ResourcePtr resource, MaterialDX11* pMaterial );
+			ResourcePtr resource, MaterialPtr pMaterial );
 
 	private:
 		ActorGenerator();
