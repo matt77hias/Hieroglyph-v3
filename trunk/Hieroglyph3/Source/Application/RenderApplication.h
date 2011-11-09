@@ -20,8 +20,13 @@ public:
 	virtual ~RenderApplication();
 	
 public:
-	bool ConfigureRenderingEngineComponents( int width, int height, D3D_FEATURE_LEVEL desiredLevel, D3D_DRIVER_TYPE driverType = D3D_DRIVER_TYPE_HARDWARE );
+	virtual bool ConfigureRenderingEngineComponents( UINT width, UINT height, D3D_FEATURE_LEVEL desiredLevel, D3D_DRIVER_TYPE driverType = D3D_DRIVER_TYPE_HARDWARE );
+	virtual bool ConfigureRenderingSetup();
 
+	virtual void ShutdownRenderingEngineComponents();
+	virtual void ShutdownRenderingSetup();
+
+	virtual void HandleWindowResize( HWND handle, UINT width, UINT height );
 	virtual bool HandleEvent( IEvent* pEvent );
 
 
@@ -30,11 +35,10 @@ protected:
 	RendererDX11*			m_pRenderer11;
 	Win32RenderWindow*		m_pWindow;
 
-	int						m_iWidth;
-	int						m_iHeight;
+	UINT					m_iWidth;
+	UINT					m_iHeight;
 
 	ResourcePtr				m_RenderTarget;
-	ResourcePtr				m_DepthTarget;
 
 	ViewPerspective*		m_pRenderView;
 	ViewTextOverlay*		m_pTextOverlayView;

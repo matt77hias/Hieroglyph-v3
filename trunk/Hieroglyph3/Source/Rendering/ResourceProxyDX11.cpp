@@ -118,6 +118,12 @@ void ResourceProxyDX11::CommonConstructor( UINT BindFlags, int ResourceID, Rende
 {
     // Initialize all indices and pointers to a neutral state.    
     m_iResource = ResourceID;
+	m_iResourceSRV = -1;
+	m_iResourceRTV = -1;
+	m_iResourceDSV = -1;
+	m_iResourceUAV = -1;
+
+
     m_pBufferConfig = NULL;
     m_pTexture1dConfig = NULL;
     m_pTexture2dConfig = NULL;

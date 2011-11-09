@@ -12,6 +12,7 @@
 #include "PCH.h"
 #include "ActorGenerator.h"
 #include "GeometryLoaderDX11.h"
+#include "GeometryGeneratorDX11.h"
 #include "MaterialGeneratorDX11.h"
 #include "ShaderResourceParameterDX11.h"
 #include "IParameterManager.h"
@@ -108,6 +109,28 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 	pSamplerParam->SetValue( sampler );
     pActor->GetBody()->Parameters.AddRenderParameter( pSamplerParam );
 
+
+	return( pActor );
+}
+//--------------------------------------------------------------------------------
+Actor* ActorGenerator::GenerateSphereActor( RendererDX11& Renderer, const Vector3f& center, 
+	const Vector3f& size, MaterialPtr pMaterial )
+{
+	// Create the new actor
+	Actor* pActor = new Actor();
+
+	// Create/load the geometry to put around the visualization (i.e. the picture frame)
+	GeometryPtr Geometry = GeometryPtr( new GeometryDX11 );
+	GeometryGeneratorDX11::GenerateSphere( Geometry, 10, 10, 3.0f );
+	Geometry->LoadToBuffers();
+
+	pActor->GetBody()->SetGeometry( Geometry );
+		
+	// Create the material for the picture frame
+	pActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GeneratePhong( Renderer ) );
+
+	// TODO: Possibly add the corresponding parameter writers to a material when 
+	//       it is created!
 
 	return( pActor );
 }

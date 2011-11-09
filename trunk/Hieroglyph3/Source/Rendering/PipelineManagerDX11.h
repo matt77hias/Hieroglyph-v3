@@ -100,6 +100,8 @@ namespace Glyph3
 		void BindIndexBuffer( ResourcePtr resource );
 		void UnbindIndexBuffer( );
 
+		void ClearPipelineState( );
+
 		// Pipeline execution calls - these are the methods for executing the 
 		// pipeline with the given configuration (supplied by the render effect).
 		// With the dispatch call, the same configuration is used except that you

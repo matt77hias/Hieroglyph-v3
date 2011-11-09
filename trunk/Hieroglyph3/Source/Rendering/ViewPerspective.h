@@ -27,11 +27,12 @@ namespace Glyph3
 	class ViewPerspective : public IRenderView
 	{
 	public:
-		ViewPerspective( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget );
+		ViewPerspective( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget = 0 );
 
 		virtual void Update( float fTime );
 		virtual void PreDraw( RendererDX11* pRenderer );
 		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
+		virtual void Resize( UINT width, UINT height );
 
 		virtual void SetBackColor( Vector4f color );
 		virtual void SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ );

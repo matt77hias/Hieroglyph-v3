@@ -51,6 +51,7 @@ namespace Glyph3
 		virtual void Update( float fTime ) = 0;
 		virtual void PreDraw( RendererDX11* pRenderer ) = 0;
 		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager ) = 0;
+		virtual void Resize( UINT width, UINT height ){};
 
 		// A reference is provided to allow views to reference it's entity's data.
 

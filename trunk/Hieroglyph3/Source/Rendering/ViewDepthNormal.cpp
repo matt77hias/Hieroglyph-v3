@@ -22,15 +22,14 @@
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ViewDepthNormal::ViewDepthNormal( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget )
-: ViewPerspective( Renderer, RenderTarget, DepthTarget )
+	: ViewPerspective( Renderer, RenderTarget, DepthTarget )
 {
 	// This view is the same as a perspective view, with only a different 
-	// rendering type as indicated here.
+	// rendering type as indicated here.  In addition, the render target
+	// that gets passed to this view will serve as the depth/normal buffer
+	// as opposed to the standard render target.
 
 	m_sParams.iViewType = VT_LINEAR_DEPTH_NORMAL;
-
-	DepthNormalBuffer = RenderTarget;
-	m_RenderTarget = DepthNormalBuffer; // This is to set the buffer as the render target.
 
 	m_pDepthNormalBuffer = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"DepthNormalBuffer" ) );
 }
@@ -44,6 +43,6 @@ void ViewDepthNormal::SetUsageParams( IParameterManager* pParamManager )
 	// This view will bind the depth/normal buffer to the "DepthNormalBuffer" shader
 	// resource view parameter, so that other views can make use of it.
 
-	pParamManager->SetShaderResourceParameter( m_pDepthNormalBuffer, DepthNormalBuffer );
+	pParamManager->SetShaderResourceParameter( m_pDepthNormalBuffer, m_RenderTarget );
 }
 //--------------------------------------------------------------------------------

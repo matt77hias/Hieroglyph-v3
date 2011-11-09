@@ -30,6 +30,7 @@ namespace Glyph3
 		D3D11_VIEWPORT			m_ViewPort;
 
 		friend PipelineManagerDX11;
+		friend RendererDX11;
 	};
 };
 //--------------------------------------------------------------------------------

@@ -26,6 +26,9 @@ namespace Glyph3
 		static Actor* GenerateVisualizationTexture2D( RendererDX11& Renderer, 
 			ResourcePtr resource, MaterialPtr pMaterial );
 
+		static Actor* GenerateSphereActor( RendererDX11& Renderer, const Vector3f& center,
+			const Vector3f& size, MaterialPtr pMaterial );
+
 	private:
 		ActorGenerator();
 		

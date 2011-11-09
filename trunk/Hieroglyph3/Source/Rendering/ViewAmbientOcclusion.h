@@ -31,7 +31,7 @@ namespace Glyph3
 	class ViewAmbientOcclusion : public ViewPerspective
 	{
 	public:
-		ViewAmbientOcclusion( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget );
+		ViewAmbientOcclusion( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget = 0 );
 
 		virtual void Update( float fTime );
 		virtual void PreDraw( RendererDX11* pRenderer );

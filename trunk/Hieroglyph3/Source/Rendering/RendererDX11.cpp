@@ -19,6 +19,7 @@
 #include "ConstantBufferDX11.h"
 #include "StructuredBufferDX11.h"
 #include "ByteAddressBufferDX11.h"
+#include "IndirectArgsBufferDX11.h"
 #include "Texture1dDX11.h"
 #include "Texture2dDX11.h"
 #include "Texture3dDX11.h"
@@ -820,6 +821,227 @@ int RendererDX11::CreateUnorderedAccessView( int ResourceID, D3D11_UNORDERED_ACC
 	}
 
 	return( -1 );
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::ResizeTexture( ResourcePtr texture, UINT width, UINT height )
+{
+	// For the texture, and then for each associated resource view create the new
+	// sized versions.  Afterwards, release the old versions and replace them with
+	// the new ones.
+	int rid = texture->m_iResource;
+
+	// Grab the old texture description and update it for the new size.
+	Texture2dDX11* pOldTexture = GetTexture2DByIndex( rid );
+	D3D11_TEXTURE2D_DESC TexDesc = pOldTexture->GetActualDescription();
+	TexDesc.Width = width;
+	TexDesc.Height = height;
+
+	// Create the new texture...
+	ID3D11Texture2D* pTexture = 0;
+	HRESULT hr = m_pDevice->CreateTexture2D( &TexDesc, 0, &pTexture );
+	
+	// Release the old texture, and replace it with the new one.
+	pOldTexture->m_pTexture->Release(); 
+	pOldTexture->m_pTexture = pTexture;
+
+	// Resize each of the resource views, if required.
+	ResizeTextureSRV( rid, texture->m_iResourceSRV, width, height );
+	ResizeTextureRTV( rid, texture->m_iResourceRTV, width, height );
+	ResizeTextureDSV( rid, texture->m_iResourceDSV, width, height );
+	ResizeTextureUAV( rid, texture->m_iResourceUAV, width, height );
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::ResizeTextureSRV( int RID, int SRVID, UINT width, UINT height )
+{
+	// Check to make sure we are supposed to do anything...
+	if ( SRVID == -1 ) {
+		return;
+	}
+
+	int TYPE = RID & 0xFF0000;
+	int ID = RID & 0xFFFF;
+
+	// Check that the input resources / views are legit.
+	if ( !m_vResources.inrange( ID ) || !m_vShaderResourceViews.inrange( SRVID ) || (TYPE != RT_TEXTURE2D ) ) {
+		Log::Get().Write( L"Error trying to resize a SRV!!!!" );
+		return;
+	}
+
+	// Get the existing UAV.
+	ShaderResourceViewDX11* pOldSRV = m_vShaderResourceViews[SRVID];
+
+	// Get its description.
+	D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
+	pOldSRV->m_pShaderResourceView->GetDesc( &SRVDesc );
+	
+	// Create the new one.
+	ID3D11ShaderResourceView* pView = 0;
+	HRESULT hr = m_pDevice->CreateShaderResourceView( m_vResources[ID]->GetResource(), &SRVDesc, &pView );
+
+	// Release the old one and replace it with the new one.
+	pOldSRV->m_pShaderResourceView->Release();
+	pOldSRV->m_pShaderResourceView = pView;
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::ResizeTextureRTV( int RID, int RTVID, UINT width, UINT height )
+{
+	// Check to make sure we are supposed to do anything...
+	if ( RTVID == -1 ) {
+		return;
+	}
+
+	int TYPE = RID & 0xFF0000;
+	int ID = RID & 0xFFFF;
+
+	// Check that the input resources / views are legit.
+	if ( !m_vResources.inrange( ID ) || !m_vRenderTargetViews.inrange( RTVID ) || (TYPE != RT_TEXTURE2D ) ) {
+		Log::Get().Write( L"Error trying to resize a RTV!!!!" );
+		return;
+	}
+
+	// Get the existing UAV.
+	RenderTargetViewDX11* pOldRTV = m_vRenderTargetViews[RTVID];
+
+	// Get its description.
+	D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
+	pOldRTV->m_pRenderTargetView->GetDesc( &RTVDesc );
+	
+	// Create the new one.
+	ID3D11RenderTargetView* pView = 0;
+	HRESULT hr = m_pDevice->CreateRenderTargetView( m_vResources[ID]->GetResource(), &RTVDesc, &pView );
+
+	// Release the old one and replace it with the new one.
+	pOldRTV->m_pRenderTargetView->Release();
+	pOldRTV->m_pRenderTargetView = pView;
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::ResizeTextureDSV( int RID, int DSVID, UINT width, UINT height )
+{
+	// Check to make sure we are supposed to do anything...
+	if ( DSVID == -1 ) {
+		return;
+	}
+
+	int TYPE = RID & 0xFF0000;
+	int ID = RID & 0xFFFF;
+
+	// Check that the input resources / views are legit.
+	if ( !m_vResources.inrange( ID ) || !m_vDepthStencilViews.inrange( DSVID ) || (TYPE != RT_TEXTURE2D ) ) {
+		Log::Get().Write( L"Error trying to resize a DSV!!!!" );
+		return;
+	}
+
+	// Get the existing UAV.
+	DepthStencilViewDX11* pOldDSV = m_vDepthStencilViews[DSVID];
+
+	// Get its description.
+	D3D11_DEPTH_STENCIL_VIEW_DESC DSVDesc;
+	pOldDSV->m_pDepthStencilView->GetDesc( &DSVDesc );
+	
+	// Create the new one.
+	ID3D11DepthStencilView* pView = 0;
+	HRESULT hr = m_pDevice->CreateDepthStencilView( m_vResources[ID]->GetResource(), &DSVDesc, &pView );
+
+	// Release the old one and replace it with the new one.
+	pOldDSV->m_pDepthStencilView->Release();
+	pOldDSV->m_pDepthStencilView = pView;
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::ResizeTextureUAV( int RID, int UAVID, UINT width, UINT height )
+{
+	// Check to make sure we are supposed to do anything...
+	if ( UAVID == -1 ) {
+		return;
+	}
+
+	int TYPE = RID & 0xFF0000;
+	int ID = RID & 0xFFFF;
+
+	// Check that the input resources / views are legit.
+	if ( !m_vResources.inrange( ID ) || !m_vUnorderedAccessViews.inrange( UAVID ) || (TYPE != RT_TEXTURE2D ) ) {
+		Log::Get().Write( L"Error trying to resize a UAV!!!!" );
+		return;
+	}
+
+	// Get the existing UAV.
+	UnorderedAccessViewDX11* pOldUAV = m_vUnorderedAccessViews[UAVID];
+
+	// Get its description.
+	D3D11_UNORDERED_ACCESS_VIEW_DESC UAVDesc;
+	pOldUAV->m_pUnorderedAccessView->GetDesc( &UAVDesc );
+	
+	// Create the new one.
+	ID3D11UnorderedAccessView* pView = 0;
+	HRESULT hr = m_pDevice->CreateUnorderedAccessView( m_vResources[ID]->GetResource(), &UAVDesc, &pView );
+
+	// Release the old one and replace it with the new one.
+	pOldUAV->m_pUnorderedAccessView->Release();
+	pOldUAV->m_pUnorderedAccessView = pView;
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::ResizeSwapChain( int SID, UINT width, UINT height )
+{
+	if ( !m_vSwapChains.inrange( SID ) ) {
+		Log::Get().Write( L"Error trying to resize swap chain!" );
+	}
+
+	SwapChainDX11* pSwapChain = m_vSwapChains[SID];
+
+
+	Texture2dDX11* pBackBuffer = GetTexture2DByIndex( pSwapChain->m_Resource->m_iResource );
+	pBackBuffer->m_pTexture->Release();
+
+	RenderTargetViewDX11* pRTV = m_vRenderTargetViews[pSwapChain->m_Resource->m_iResourceRTV];
+	
+
+
+	// Get its description.
+	D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
+	pRTV->m_pRenderTargetView->GetDesc( &RTVDesc );
+	
+	pRTV->m_pRenderTargetView->Release();
+
+
+
+	this->pImmPipeline->ClearPipelineState();
+	
+	for ( int i = 0; i < NUM_THREADS; i++ ) {
+		g_aPayload[i].pPipeline->ClearPipelineState();
+	}
+
+	// Resize the buffers.
+	HRESULT hr = pSwapChain->m_pSwapChain->ResizeBuffers( 2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 0 );
+
+	if ( FAILED(hr) ) {
+		Log::Get().Write( L"Failed to resize buffers!" );
+	}
+
+	// Re-acquire the back buffer reference.
+	ID3D11Texture2D* pSwapChainBuffer = 0;
+	hr = pSwapChain->m_pSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), 
+		reinterpret_cast< void** >( &pSwapChainBuffer ) );
+
+	pBackBuffer->m_pTexture = pSwapChainBuffer;
+
+
+	// Create the new one.
+	ID3D11RenderTargetView* pView = 0;
+	hr = m_pDevice->CreateRenderTargetView( pSwapChainBuffer, &RTVDesc, &pView );
+
+	// Release the old one and replace it with the new one.
+	pRTV->m_pRenderTargetView = pView;
+
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::ResizeViewport( int ID, UINT width, UINT height )
+{
+	if ( !m_vViewPorts.inrange( ID ) ) {
+		Log::Get().Write( L"Error trying to resize viewport!" );
+	}
+
+	ViewPortDX11* pViewport = m_vViewPorts[ID];
+	pViewport->m_ViewPort.Width = static_cast<float>( width );
+	pViewport->m_ViewPort.Height = static_cast<float>( height );
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstring& function, 
@@ -2164,5 +2386,141 @@ unsigned int WINAPI _RenderViewThreadProc( void* lpParameter )
 	}
 
 	return( 0 );
+}
+//--------------------------------------------------------------------------------
+Texture1dDX11* RendererDX11::GetTexture1DByIndex( int rid )
+{
+	int TYPE = rid & 0xFF0000;
+	int ID = rid & 0xFFFF;
+
+	Texture1dDX11* pResult = 0;
+
+	// Check if this ID is in range, and that the type is correct.
+	if ( !m_vResources.inrange( ID ) || (TYPE != RT_TEXTURE1D ) ) {
+		Log::Get().Write( L"Trying to access a non-texture1D resource!!!!" );
+	} else {
+		pResult = dynamic_cast<Texture1dDX11*>( m_vResources[ID] );
+	}
+
+	return( pResult );
+}
+//--------------------------------------------------------------------------------
+Texture2dDX11* RendererDX11::GetTexture2DByIndex( int rid )
+{
+	int TYPE = rid & 0xFF0000;
+	int ID = rid & 0xFFFF;
+
+	Texture2dDX11* pResult = 0;
+
+	// Check if this ID is in range, and that the type is correct.
+	if ( !m_vResources.inrange( ID ) || (TYPE != RT_TEXTURE2D ) ) {
+		Log::Get().Write( L"Trying to access a non-texture2D resource!!!!" );
+	} else {
+		pResult = dynamic_cast<Texture2dDX11*>( m_vResources[ID] );
+	}
+
+	return( pResult );
+}
+//--------------------------------------------------------------------------------
+Texture3dDX11* RendererDX11::GetTexture3DByIndex( int rid )
+{
+	int TYPE = rid & 0xFF0000;
+	int ID = rid & 0xFFFF;
+
+	Texture3dDX11* pResult = 0;
+
+	// Check if this ID is in range, and that the type is correct.
+	if ( !m_vResources.inrange( ID ) || (TYPE != RT_TEXTURE2D ) ) {
+		Log::Get().Write( L"Trying to access a non-texture3D resource!!!!" );
+	} else {
+		pResult = dynamic_cast<Texture3dDX11*>( m_vResources[ID] );
+	}
+
+	return( pResult );
+}
+//--------------------------------------------------------------------------------
+VertexBufferDX11* RendererDX11::GetVertexBufferByIndex( int rid )
+{
+	int TYPE = rid & 0xFF0000;
+	int ID = rid & 0xFFFF;
+
+	VertexBufferDX11* pResult = 0;
+
+	// Check if this ID is in range, and that the type is correct.
+	if ( !m_vResources.inrange( ID ) || (TYPE != RT_VERTEXBUFFER ) ) {
+		Log::Get().Write( L"Trying to access a non-vertex buffer resource!!!!" );
+	} else {
+		pResult = dynamic_cast<VertexBufferDX11*>( m_vResources[ID] );
+	}
+
+	return( pResult );
+}
+//--------------------------------------------------------------------------------
+IndexBufferDX11* RendererDX11::GetIndexBufferByIndex( int rid )
+{
+	int TYPE = rid & 0xFF0000;
+	int ID = rid & 0xFFFF;
+
+	IndexBufferDX11* pResult = 0;
+
+	// Check if this ID is in range, and that the type is correct.
+	if ( !m_vResources.inrange( ID ) || (TYPE != RT_INDEXBUFFER ) ) {
+		Log::Get().Write( L"Trying to access a non-index buffer resource!!!!" );
+	} else {
+		pResult = dynamic_cast<IndexBufferDX11*>( m_vResources[ID] );
+	}
+
+	return( pResult );
+}
+//--------------------------------------------------------------------------------
+ByteAddressBufferDX11* RendererDX11::GetByteAddressBufferByIndex( int rid )
+{
+	int TYPE = rid & 0xFF0000;
+	int ID = rid & 0xFFFF;
+
+	ByteAddressBufferDX11* pResult = 0;
+
+	// Check if this ID is in range, and that the type is correct.
+	if ( !m_vResources.inrange( ID ) || (TYPE != RT_BYTEADDRESSBUFFER ) ) {
+		Log::Get().Write( L"Trying to access a non-byte address buffer resource!!!!" );
+	} else {
+		pResult = dynamic_cast<ByteAddressBufferDX11*>( m_vResources[ID] );
+	}
+
+	return( pResult );
+}
+//--------------------------------------------------------------------------------
+IndirectArgsBufferDX11*	RendererDX11::GetIndirectArgsBufferByIndex( int rid )
+{
+	int TYPE = rid & 0xFF0000;
+	int ID = rid & 0xFFFF;
+
+	IndirectArgsBufferDX11* pResult = 0;
+
+	// Check if this ID is in range, and that the type is correct.
+	if ( !m_vResources.inrange( ID ) || (TYPE != RT_INDIRECTARGSBUFFER ) ) {
+		Log::Get().Write( L"Trying to access a non-vertex buffer resource!!!!" );
+	} else {
+		pResult = dynamic_cast<IndirectArgsBufferDX11*>( m_vResources[ID] );
+	}
+
+	return( pResult );
+}
+//--------------------------------------------------------------------------------
+StructuredBufferDX11* RendererDX11::GetStructuredBufferByIndex( int rid )
+{
+	int TYPE = rid & 0xFF0000;
+	int ID = rid & 0xFFFF;
+
+	StructuredBufferDX11* pResult = 0;
+
+	// Check if this ID is in range, and that the type is correct.
+	if ( !m_vResources.inrange( ID ) || (TYPE != RT_STRUCTUREDBUFFER ) ) {
+		Log::Get().Write( L"Trying to access a non-structured buffer resource!!!!" );
+	} else {
+		pResult = dynamic_cast<StructuredBufferDX11*>( m_vResources[ID] );
+	}
+
+	return( pResult );
 }
 //--------------------------------------------------------------------------------

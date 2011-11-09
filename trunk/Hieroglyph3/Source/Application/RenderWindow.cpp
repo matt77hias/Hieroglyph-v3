@@ -17,7 +17,7 @@ using namespace Glyph3;
 RenderWindow::RenderWindow( )
 {
 	m_hWnd = 0;
-	m_dStyle = (WS_OVERLAPPEDWINDOW | WS_VISIBLE) & ~WS_THICKFRAME;
+	m_dStyle = (WS_OVERLAPPEDWINDOW | WS_VISIBLE);
 	m_sCaption = L"";
 	m_iWidth = 640;
 	m_iHeight = 480;
@@ -114,6 +114,15 @@ void RenderWindow::SetCaption( std::wstring& caption )
 
 	if ( m_hWnd != 0 )
 		SetWindowText( m_hWnd, m_sCaption.c_str() );
+}
+//--------------------------------------------------------------------------------
+void RenderWindow::ResizeWindow( int width, int height )
+{
+	// This method is called for a WM_SIZE event, so we just update our local
+	// state instead of also calling UpdateWindowState().
+
+	m_iWidth = width;
+	m_iHeight = height;
 }
 //--------------------------------------------------------------------------------
 std::wstring RenderWindow::GetCaption()

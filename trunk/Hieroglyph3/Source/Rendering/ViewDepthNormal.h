@@ -34,10 +34,6 @@ namespace Glyph3
 		virtual void SetUsageParams( IParameterManager* pParamManager );
 
 	protected:
-		int ResolutionX;
-		int ResolutionY;
-
-		ResourcePtr DepthNormalBuffer;
 		ShaderResourceParameterDX11* m_pDepthNormalBuffer;
 	};
 };

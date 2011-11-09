@@ -78,6 +78,10 @@ FirstPersonCamera::FirstPersonCamera() :    m_iLastMouseX( InvalidMousePos ),
     pEventManager->AddEventListener( RENDER_FRAME_START, this );
 }
 //--------------------------------------------------------------------------------
+FirstPersonCamera::~FirstPersonCamera()
+{
+}
+//--------------------------------------------------------------------------------
 bool FirstPersonCamera::HandleEvent( IEvent* pEvent )
 {
     eEVENT e = pEvent->GetEventType();

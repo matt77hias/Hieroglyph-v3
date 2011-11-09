@@ -20,6 +20,9 @@
 #include "Timer.h"
 #include "Log.h"
 
+// Window Events
+#include "EvtWindowResize.h"
+
 // Keyboard Events
 #include "EvtChar.h"
 #include "EvtKeyUp.h"
@@ -132,6 +135,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 				PostQuitMessage(0);
 				return( 0 );
 			} break;
+
+		case WM_SIZE:
+			{				
+                EvtWindowResize* pEvent = new EvtWindowResize( hwnd, wparam, lparam );
+                EventManager::Get()->ProcessEvent( pEvent );
+			} break;
+
 
 		case WM_LBUTTONUP:
 			{				

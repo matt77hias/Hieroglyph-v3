@@ -40,6 +40,8 @@ namespace Glyph3
 		void SetSize( int width, int height );
 		void SetPosition( int left, int top );
 
+		void ResizeWindow( int width, int height );
+
 		int GetSwapChain();
 		void SetSwapChain( int swapchain );
 

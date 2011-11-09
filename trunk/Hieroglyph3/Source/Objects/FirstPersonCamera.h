@@ -28,6 +28,7 @@ namespace Glyph3
     {
     public:
         FirstPersonCamera();
+		virtual ~FirstPersonCamera();
         
         virtual bool HandleEvent( IEvent* pEvent );
         virtual std::wstring GetName();

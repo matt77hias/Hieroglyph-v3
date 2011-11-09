@@ -553,6 +553,33 @@ void PipelineManagerDX11::ClearPipelineResources( )
 	ComputeShaderStage.UnbindResources( m_pContext );
 }
 //--------------------------------------------------------------------------------
+void PipelineManagerDX11::ClearPipelineState( )
+{
+	// TODO: This method needs to update the state of each pipeline stage class!!!
+
+	// Loop through all pipeline stage representations and reset their state...
+
+	//InputAssemblerStage
+	//VertexShaderStage
+	//HullShaderStage
+	//DomainShaderStage
+	//GeometryShaderStage
+	//RasterizerStage
+	//PixelShaderStage
+	//OutputMergerStage
+	//ComputeShaderStage
+	
+	m_pContext->ClearState();
+
+	if ( m_pContext->GetType() == D3D11_DEVICE_CONTEXT_DEFERRED ) {
+		ID3D11CommandList* pList;
+		m_pContext->FinishCommandList( true, &pList );
+		pList->Release();
+	}
+
+	
+}
+//--------------------------------------------------------------------------------
 void PipelineManagerDX11::DrawIndexed( UINT IndexCount, UINT StartIndex, int VertexOffset )
 {
 	m_pContext->DrawIndexed( IndexCount, StartIndex, VertexOffset );

@@ -39,22 +39,21 @@ App::App()
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
 {
-	return( ConfigureRenderingEngineComponents( 800, 600, D3D_FEATURE_LEVEL_11_0 ) );
+	if ( !ConfigureRenderingEngineComponents( 800, 600, D3D_FEATURE_LEVEL_11_0 ) ) {
+		return( false );
+	}
+
+	if ( !ConfigureRenderingSetup() ) {
+		return( false );
+	}
+
+	return( true );
 }
 //--------------------------------------------------------------------------------
 void App::ShutdownEngineComponents()
 {
-	if ( m_pRenderer11 )
-	{
-		m_pRenderer11->Shutdown();
-		delete m_pRenderer11;
-	}
-
-	if ( m_pWindow )
-	{
-		m_pWindow->Shutdown();
-		delete m_pWindow;
-	}
+	ShutdownRenderingSetup();
+	ShutdownRenderingEngineComponents();
 }
 //--------------------------------------------------------------------------------
 void App::Initialize()
@@ -210,7 +209,6 @@ void App::Shutdown()
 	SAFE_DELETE( m_pDisplacedActor );
 	
 	SAFE_DELETE( m_pNode );
-	SAFE_DELETE( m_pCamera );
 
 	// Print the framerate out for the log before shutting down.
 

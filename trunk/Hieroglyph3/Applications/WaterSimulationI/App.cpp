@@ -34,22 +34,15 @@ App::App()
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
 {
-	return( ConfigureRenderingEngineComponents( 800, 600, D3D_FEATURE_LEVEL_10_0 ) );
-}
-//--------------------------------------------------------------------------------
-void App::ShutdownEngineComponents()
-{
-	if ( m_pRenderer11 )
-	{
-		m_pRenderer11->Shutdown();
-		delete m_pRenderer11;
+	if ( !ConfigureRenderingEngineComponents( 800, 600, D3D_FEATURE_LEVEL_10_0 ) ) {
+		return( false );
 	}
 
-	if ( m_pWindow )
-	{
-		m_pWindow->Shutdown();
-		delete m_pWindow;
+	if ( !ConfigureRenderingSetup() ) {
+		return( false );
 	}
+
+	return( true );
 }
 //--------------------------------------------------------------------------------
 void App::Initialize()
@@ -204,13 +197,18 @@ void App::Shutdown()
 {
 	SAFE_DELETE( m_pEntity );
 	SAFE_DELETE( m_pNode );
-	SAFE_DELETE( m_pCamera );
 
 	// Print the framerate out for the log before shutting down.
 
 	std::wstringstream out;
 	out << L"Max FPS: " << m_pTimer->MaxFramerate();
 	Log::Get().Write( out.str() );
+}
+//--------------------------------------------------------------------------------
+void App::ShutdownEngineComponents()
+{
+	ShutdownRenderingSetup();
+	ShutdownRenderingEngineComponents();
 }
 //--------------------------------------------------------------------------------
 bool App::HandleEvent( IEvent* pEvent )

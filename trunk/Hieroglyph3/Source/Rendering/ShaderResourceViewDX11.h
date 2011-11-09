@@ -30,6 +30,7 @@ namespace Glyph3
 		ID3D11ShaderResourceView*			m_pShaderResourceView;
 		
 		friend PipelineManagerDX11;
+		friend RendererDX11;
 	};
 };
 //--------------------------------------------------------------------------------

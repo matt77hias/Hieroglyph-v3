@@ -17,12 +17,12 @@ public:
 	App();
 	
 public:
+	virtual bool ConfigureEngineComponents();
+	virtual void ShutdownEngineComponents();
+
 	virtual void Initialize();
 	virtual void Update();
 	virtual void Shutdown();
-
-	virtual bool ConfigureEngineComponents();
-	virtual void ShutdownEngineComponents();
 
 	virtual bool HandleEvent( IEvent* pEvent );
 	virtual std::wstring GetName( );

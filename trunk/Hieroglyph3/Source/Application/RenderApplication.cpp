@@ -25,6 +25,8 @@
 #include "IParameterManager.h"
 #include "FirstPersonCamera.h"
 
+#include "EvtWindowResize.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 RenderApplication::RenderApplication()
@@ -41,13 +43,16 @@ RenderApplication::RenderApplication()
 	m_pCamera = 0;
 
 	m_bSaveScreenshot = false;
+
+	// Register for window based events here.
+	m_pEventMgr->AddEventListener( WINDOW_RESIZE, this );
 }
 //--------------------------------------------------------------------------------
 RenderApplication::~RenderApplication( )
 {
 }
 //--------------------------------------------------------------------------------
-bool RenderApplication::ConfigureRenderingEngineComponents( int width, int height, D3D_FEATURE_LEVEL desiredLevel, D3D_DRIVER_TYPE driverType )
+bool RenderApplication::ConfigureRenderingEngineComponents( UINT width, UINT height, D3D_FEATURE_LEVEL desiredLevel, D3D_DRIVER_TYPE driverType )
 {
 	// Create the renderer and initialize it for the desired device
 	// type and feature level.
@@ -91,17 +96,17 @@ bool RenderApplication::ConfigureRenderingEngineComponents( int width, int heigh
 	// use later.
 	m_RenderTarget = m_pRenderer11->GetSwapChainResource( m_pWindow->GetSwapChain() );
 
-	// Next we create a depth buffer for use in the traditional rendering
-	// pipeline.
-	Texture2dConfigDX11 DepthConfig;
-	DepthConfig.SetDepthBuffer( m_iWidth, m_iHeight );
-	m_DepthTarget = m_pRenderer11->CreateTexture2D( &DepthConfig, 0 );
+	m_pRenderer11->SetMultiThreadingState( true );
 
-
+	return( true );
+}
+//--------------------------------------------------------------------------------
+bool RenderApplication::ConfigureRenderingSetup()
+{
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
 
-	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
+	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
 
 	m_pTextOverlayView = new ViewTextOverlay( *m_pRenderer11, m_RenderTarget );
@@ -116,9 +121,24 @@ bool RenderApplication::ConfigureRenderingEngineComponents( int width, int heigh
 
 	m_pScene->AddCamera( m_pCamera );
 
-	m_pRenderer11->SetMultiThreadingState( true );
-
 	return( true );
+}
+//--------------------------------------------------------------------------------
+void RenderApplication::ShutdownRenderingEngineComponents()
+{
+	m_pRenderer11->Shutdown();
+	SAFE_DELETE( m_pRenderer11 );
+
+	m_pWindow->Shutdown();
+	SAFE_DELETE( m_pWindow );
+}
+//--------------------------------------------------------------------------------
+void RenderApplication::ShutdownRenderingSetup()
+{
+	SAFE_DELETE( m_pScene );
+	SAFE_DELETE( m_pCamera );
+	//SAFE_DELETE( m_pTextOverlayView );
+	//SAFE_DELETE( m_pRenderView );
 }
 //--------------------------------------------------------------------------------
 bool RenderApplication::HandleEvent( IEvent* pEvent )
@@ -128,8 +148,46 @@ bool RenderApplication::HandleEvent( IEvent* pEvent )
 
 	eEVENT e = pEvent->GetEventType();
 
+	if ( e == WINDOW_RESIZE )
+	{
+		EvtWindowResize* pResize = (EvtWindowResize*)pEvent;
+
+		this->HandleWindowResize( pResize->GetWindowHandle(), pResize->NewWidth(), pResize->NewHeight() );
+
+		return( true );
+	}
+
+
+
 	// Call the parent class's event handler if we haven't handled the event.
 	
 	return( Application::HandleEvent( pEvent ) );
+}
+//--------------------------------------------------------------------------------
+void RenderApplication::HandleWindowResize( HWND handle, UINT width, UINT height )
+{
+	// TODO: are these local width and height members needed???
+	if ( width < 1 ) width = 1;
+	if ( height < 1 ) height = 1;
+	m_iWidth = width;
+	m_iHeight = height;
+
+	// Resize our rendering window state if the handle matches
+	if ( ( m_pWindow != 0 ) && ( m_pWindow->GetHandle() == handle ) ) {
+		m_pWindow->ResizeWindow( width, height );
+		m_pRenderer11->ResizeSwapChain( m_pWindow->GetSwapChain(), width, height );
+	}
+
+	// Update the projection matrix of our camera
+	if ( m_pCamera != 0 ) {
+		m_pCamera->SetProjectionParams( 0.1f, 1000.0f, 
+			static_cast<float>(m_iWidth) / static_cast<float>(m_iHeight), 
+			static_cast<float>( D3DX_PI ) / 4.0f );
+	}
+
+	// Update the render views being used to render the scene
+	if ( m_pRenderView != 0 ) {
+		m_pRenderView->Resize( width, height );
+	}
 }
 //--------------------------------------------------------------------------------

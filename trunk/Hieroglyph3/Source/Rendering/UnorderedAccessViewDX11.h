@@ -30,6 +30,7 @@ namespace Glyph3
 		ID3D11UnorderedAccessView*			m_pUnorderedAccessView;
 		
 		friend PipelineManagerDX11;
+		friend RendererDX11;
 	};
 };
 //--------------------------------------------------------------------------------

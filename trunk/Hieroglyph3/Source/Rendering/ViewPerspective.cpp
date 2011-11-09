@@ -26,8 +26,7 @@ ViewPerspective::ViewPerspective( RendererDX11& Renderer, ResourcePtr RenderTarg
 	m_sParams.iViewType = VT_PERSPECTIVE;
 
 	m_RenderTarget = RenderTarget;
-	m_DepthTarget = DepthTarget;
-
+	
 	ViewMatrix.MakeIdentity();
 	ProjMatrix.MakeIdentity();
 
@@ -40,6 +39,16 @@ ViewPerspective::ViewPerspective( RendererDX11& Renderer, ResourcePtr RenderTarg
 	{
 		Texture2dDX11* pTexture = (Texture2dDX11*)pResource;
 		D3D11_TEXTURE2D_DESC desc = pTexture->GetActualDescription();
+
+		// Next we create a depth buffer for use in the traditional rendering
+		// pipeline.
+		if ( DepthTarget != NULL ) {
+			m_DepthTarget = DepthTarget;
+		} else {
+			Texture2dConfigDX11 DepthConfig;
+			DepthConfig.SetDepthBuffer( desc.Width, desc.Height );
+			m_DepthTarget = Renderer.CreateTexture2D( &DepthConfig, 0 );			
+		}
 
 		// Create a view port to use on the scene.  This basically selects the 
 		// entire floating point area of the render target.
@@ -131,5 +140,11 @@ void ViewPerspective::SetRenderParams( IParameterManager* pParamManager )
 void ViewPerspective::SetUsageParams( IParameterManager* pParamManager )
 {
 
+}
+//--------------------------------------------------------------------------------
+void ViewPerspective::Resize( UINT width, UINT height )
+{
+	RendererDX11::Get()->ResizeTexture( m_DepthTarget, width, height );
+	RendererDX11::Get()->ResizeViewport( m_iViewport, width, height );
 }
 //--------------------------------------------------------------------------------

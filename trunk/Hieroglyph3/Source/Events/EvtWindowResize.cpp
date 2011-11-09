@@ -35,12 +35,12 @@ eEVENT EvtWindowResize::GetEventType( )
 //--------------------------------------------------------------------------------
 int EvtWindowResize::NewWidth()
 {
-	return( m_lparam & 0x00FF );
+	return( m_lparam & 0xFFFF );
 }
 //--------------------------------------------------------------------------------
 int EvtWindowResize::NewHeight()
 {
-	return( m_lparam >> 8 );
+	return( ( m_lparam & 0xFFFF0000 ) >> 16 );
 }
 //--------------------------------------------------------------------------------
 bool EvtWindowResize::IsMaxHide()	// Message is sent to all pop-up windows when some other window is maximized.

@@ -39,6 +39,7 @@ namespace Glyph3
 	class ConstantBufferDX11;
 	class StructuredBufferDX11;
 	class ByteAddressBufferDX11;
+	class IndirectArgsBufferDX11;
 	class Texture1dDX11;
 	class Texture2dDX11;
 	class Texture3dDX11;
@@ -206,6 +207,18 @@ namespace Glyph3
 		ResourcePtr LoadTexture( std::wstring filename, D3DX11_IMAGE_LOAD_INFO* pLoadInfo = NULL );
 		ResourcePtr LoadTexture( void* pData, SIZE_T sizeInBytes, D3DX11_IMAGE_LOAD_INFO* pLoadInfo = NULL );
 
+		// These methods are used to take an existing texture resource and to resize it.  This
+		// will recreate the texture and its associated views with the exact same configuration
+		// except that the size will be updated.
+
+		void ResizeTexture( ResourcePtr texture, UINT width, UINT height );
+		void ResizeTextureSRV( int RID, int SRVID, UINT width, UINT height );
+		void ResizeTextureRTV( int RID, int RTVID, UINT width, UINT height );
+		void ResizeTextureDSV( int RID, int DSVID, UINT width, UINT height );
+		void ResizeTextureUAV( int RID, int UAVID, UINT width, UINT height );
+		void ResizeSwapChain( int ID, UINT width, UINT height );
+		void ResizeViewport( int ID, UINT width, UINT height );
+
 		// These functions are used to convert the enumerated values to human readable text.
 		// This is convenient for logging or displaying various states.
 
@@ -308,6 +321,15 @@ namespace Glyph3
 
 
 	protected:
+		Texture1dDX11*				GetTexture1DByIndex( int rid );
+		Texture2dDX11*				GetTexture2DByIndex( int rid );
+		Texture3dDX11*				GetTexture3DByIndex( int rid );
+		VertexBufferDX11*			GetVertexBufferByIndex( int rid );
+		IndexBufferDX11*			GetIndexBufferByIndex( int rid );
+		ByteAddressBufferDX11*		GetByteAddressBufferByIndex( int rid );
+		IndirectArgsBufferDX11*		GetIndirectArgsBufferByIndex( int rid );
+		StructuredBufferDX11*		GetStructuredBufferByIndex( int rid );
+
 
 		bool									m_bMultiThreadActive;
 		D3D_FEATURE_LEVEL						m_FeatureLevel;

@@ -42,6 +42,7 @@ namespace Glyph3
                                     unsigned int VRes, float Radius );
         static void GenerateCone( GeometryPtr pGeometry, unsigned int URes, 
                                     unsigned int VRes, float Radius, float Height );
+		static void GenerateBox( GeometryPtr pGeometry, Vector3f center, Vector3f size );
 
         static void GenerateWeightedSkinnedCone( GeometryPtr pGeometry, unsigned int URes, 
                                     unsigned int VRes, float Radius, float Height, 

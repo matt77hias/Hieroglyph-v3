@@ -47,7 +47,7 @@ void Win32RenderWindow::Initialize()
 	RegisterClassEx(&wc);
 
 	// Specify the window style
-	m_dStyle = (WS_OVERLAPPEDWINDOW | WS_VISIBLE) & ~WS_THICKFRAME;
+	m_dStyle = (WS_OVERLAPPEDWINDOW | WS_VISIBLE);
 	
 
 	// Record the desired device size

@@ -31,6 +31,7 @@ namespace Glyph3
 		
 		friend PipelineManagerDX11;
 		friend OutputMergerStageDX11;
+		friend RendererDX11;
 	};
 };
 //--------------------------------------------------------------------------------
