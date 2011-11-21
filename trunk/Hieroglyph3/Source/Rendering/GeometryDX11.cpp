@@ -44,11 +44,16 @@ GeometryDX11::~GeometryDX11()
 //--------------------------------------------------------------------------------
 void GeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
 {
+	InputAssemblerStateDX11 state;
+
 	// Set the Input Assembler state, then perform the draw call.
 	int layout = GetInputLayout( pPipeline->ShaderStages[VERTEX_SHADER]->GetShaderIndex() );
-	IAState.SetInputLayout( layout );
+	state.SetInputLayout( layout );
+	state.SetPrimitiveTopology( m_ePrimType );
+	state.SetVertexBuffer( 0, m_VB, 0, m_iVertexSize );
+	state.SetIndexBuffer( m_IB );
 	
-	pPipeline->InputAssemblerStage.SetDesiredState( IAState );
+	pPipeline->InputAssemblerStage.SetDesiredState( state );
 	pPipeline->ApplyInputResources();
 
 	pPipeline->DrawIndexed( GetIndexCount(), 0, 0 );
@@ -234,8 +239,6 @@ int GeometryDX11::GetPrimitiveCount()
 void GeometryDX11::SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY type )
 {
 	m_ePrimType = type;
-
-	IAState.SetPrimitiveTopology( m_ePrimType );
 }
 //--------------------------------------------------------------------------------
 int GeometryDX11::GetVertexCount()
@@ -327,6 +330,7 @@ void GeometryDX11::GenerateInputLayout( int ShaderID )
 		}
 
 		// Create the input layout for the given shader index
+
 		RendererDX11* pRenderer = RendererDX11::Get();
 		if ( m_InputLayouts[ShaderID] == 0 )
 		{
@@ -389,7 +393,6 @@ void GeometryDX11::LoadToBuffers()
 		BufferConfigDX11 vbuffer;
 		vbuffer.SetDefaultVertexBuffer( vertices_length, false );
 		m_VB = RendererDX11::Get()->CreateVertexBuffer( &vbuffer, &data );
-		IAState.SetVertexBuffer( 0, m_VB, 0, m_iVertexSize );
 
 		delete [] pBytes; 
 		// TODO: add error checking here!
@@ -405,10 +408,6 @@ void GeometryDX11::LoadToBuffers()
 	BufferConfigDX11 ibuffer;
 	ibuffer.SetDefaultIndexBuffer( sizeof( UINT ) * GetIndexCount(), false );
 	m_IB = RendererDX11::Get()->CreateIndexBuffer( &ibuffer, &data );
-
-	IAState.SetIndexBuffer( m_IB );
-
-	IAState.SetPrimitiveTopology( m_ePrimType );
 }
 //--------------------------------------------------------------------------------
 UINT GeometryDX11::GetIndexCount()

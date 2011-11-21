@@ -61,7 +61,6 @@ namespace Glyph3
 		int						m_iViewport;
 
 		ResourcePtr				m_RenderTarget;
-		ResourcePtr				m_DepthTarget;
 
 		SpriteFontDX11*			m_pSpriteFont;
 		SpriteRendererDX11*		m_pSpriteRenderer;

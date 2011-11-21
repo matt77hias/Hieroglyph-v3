@@ -93,8 +93,6 @@ namespace Glyph3
 
 		// The type of primitives listed in the index buffer
 		D3D11_PRIMITIVE_TOPOLOGY m_ePrimType;
-
-		InputAssemblerStateDX11 IAState;
 	};
 
 	typedef std::shared_ptr<GeometryDX11> GeometryPtr;

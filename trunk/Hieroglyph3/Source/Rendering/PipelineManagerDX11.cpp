@@ -582,6 +582,8 @@ void PipelineManagerDX11::ClearPipelineState( )
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::DrawIndexed( UINT IndexCount, UINT StartIndex, int VertexOffset )
 {
+	// Get the current configuration on the pipeline and print it
+
 	m_pContext->DrawIndexed( IndexCount, StartIndex, VertexOffset );
 }
 //--------------------------------------------------------------------------------
@@ -1079,7 +1081,7 @@ void PipelineManagerDX11::GenerateCommandList( CommandListDX11* pList )
 {
 	if ( m_pContext->GetType() == D3D11_DEVICE_CONTEXT_DEFERRED )
 	{
-		m_pContext->FinishCommandList( true, &pList->m_pList );
+		m_pContext->FinishCommandList( false, &pList->m_pList );
 
 		// Reset the cached context state to default, since we do that for all
 		// command lists.
@@ -1092,7 +1094,7 @@ void PipelineManagerDX11::GenerateCommandList( CommandListDX11* pList )
 void PipelineManagerDX11::ExecuteCommandList( CommandListDX11* pList )
 {
 	if ( pList->ListAvailable() )
-		m_pContext->ExecuteCommandList( pList->m_pList, true );
+		m_pContext->ExecuteCommandList( pList->m_pList, false );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ResolveSubresource( ResourcePtr DestResource, UINT DstSubresource, 

@@ -77,24 +77,27 @@ void ViewTextOverlay::PreDraw( RendererDX11* pRenderer )
 //--------------------------------------------------------------------------------
 void ViewTextOverlay::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
-	// Set the parameters for rendering this view
-	pPipelineManager->OutputMergerStage.BindRenderTarget( 0, m_RenderTarget );
-	pPipelineManager->ApplyRenderTargets();
+	if ( m_TextEntries.count() > 0 ) {
+		// Set the parameters for rendering this view
+		pPipelineManager->ClearRenderTargets();
+		pPipelineManager->OutputMergerStage.BindRenderTarget( 0, m_RenderTarget );
+		pPipelineManager->ApplyRenderTargets();
 
-	pPipelineManager->SetViewPort( m_iViewport );
+		pPipelineManager->SetViewPort( m_iViewport );
 
-	// Set default states for these stages
-	pPipelineManager->SetRasterizerState( 0 );
-	pPipelineManager->SetDepthStencilState( 0 );
-	pPipelineManager->SetBlendState( 0 );
+		// Set default states for these stages
+		pPipelineManager->SetRasterizerState( 0 );
+		pPipelineManager->SetDepthStencilState( 0 );
+		pPipelineManager->SetBlendState( 0 );
 
-	for ( int i = 0; i < m_TextEntries.count(); i++ )
-	{
-		TextEntry t = m_TextEntries[i];
-		m_pSpriteRenderer->RenderText( pPipelineManager, pParamManager, *m_pSpriteFont, t.text.c_str(), t.xform, t.color );
+		for ( int i = 0; i < m_TextEntries.count(); i++ )
+		{
+			TextEntry t = m_TextEntries[i];
+			m_pSpriteRenderer->RenderText( pPipelineManager, pParamManager, *m_pSpriteFont, t.text.c_str(), t.xform, t.color );
+		}
+
+		m_TextEntries.empty();
 	}
-
-	m_TextEntries.empty();
 }
 //--------------------------------------------------------------------------------
 void ViewTextOverlay::SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ )

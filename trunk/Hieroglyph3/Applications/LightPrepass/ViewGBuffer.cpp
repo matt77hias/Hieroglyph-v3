@@ -81,6 +81,8 @@ ViewGBuffer::ViewGBuffer( RendererDX11& Renderer )
     _ASSERT( m_MaskEffect.m_iPixelShader != -1 );
 
 	m_pGBufferTexture = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"GBufferTexture" ) );
+
+	m_QuadGeometry->GetInputLayout( m_MaskEffect.m_iVertexShader );
 }
 //--------------------------------------------------------------------------------
 ViewGBuffer::~ViewGBuffer()
@@ -144,7 +146,15 @@ void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager
 
         pParamManager->SetShaderResourceParameter( m_pGBufferTexture, m_GBufferTarget );
 
-        pPipelineManager->Draw( m_MaskEffect, m_QuadGeometry, pParamManager );
+		//pPipelineManager->Draw( m_MaskEffect, m_QuadGeometry, pParamManager );
+
+
+		// Use the effect to load all of the pipeline stages here.
+		pPipelineManager->ClearPipelineResources();
+		m_MaskEffect.ConfigurePipeline( pPipelineManager, pParamManager );
+		pPipelineManager->ApplyPipelineResources();
+
+        m_QuadGeometry->Execute( pPipelineManager, pParamManager );
 	}
 }
 //--------------------------------------------------------------------------------

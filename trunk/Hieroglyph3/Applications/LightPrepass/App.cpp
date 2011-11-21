@@ -26,160 +26,63 @@
 #include "DepthStencilViewConfigDX11.h"
 #include "ShaderResourceViewConfigDX11.h"
 
+#include "FirstPersonCamera.h"
+#include "ViewLightPrepassRenderer.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
 //--------------------------------------------------------------------------------
-Vector3f Lerp( const Vector3f& x, const Vector3f& y, const Vector3f& s )
+App::App()
 {
-    return x + s * ( y - x );
-}
-//--------------------------------------------------------------------------------
-App::App() : m_vpWidth( 1024 ), m_vpHeight( 576 )
-{
-	m_bSaveScreenshot = false;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
 {
-	// Create the renderer and initialize it for the desired device
-	// type and feature level.
-
-	m_pRenderer11 = new RendererDX11();
-
-	if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_HARDWARE, D3D_FEATURE_LEVEL_11_0 ) )
-	{
-		Log::Get().Write( L"Could not create hardware device, trying to create the reference device..." );
-
-		if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_REFERENCE, D3D_FEATURE_LEVEL_11_0 ) )
-		{
-			MessageBox( m_pWindow->GetHandle(), L"Could not create a hardware or software Direct3D 11 device - the program will now abort!", L"Hieroglyph 3 Rendering", MB_ICONEXCLAMATION | MB_SYSTEMMODAL );
-			RequestTermination();
-			return( false );
-		}
-
-		// If using the reference device, utilize a fixed time step for any animations.
-		m_pTimer->SetFixedTimeStep( 1.0f / 10.0f );
+	if ( !ConfigureRenderingEngineComponents( 800, 480, D3D_FEATURE_LEVEL_11_0 ) ) {
+		return( false );
 	}
 
-    m_pRenderer11->SetMultiThreadingState( false );
+	if ( !ConfigureRenderingSetup() ) {
+		return( false );
+	}
 
-	// Create the window wrapper class instance.
-	m_pWindow = new Win32RenderWindow();
-	m_pWindow->SetPosition( 50, 50 );
-	m_pWindow->SetSize( m_vpWidth, m_vpHeight );
-	m_pWindow->SetCaption( std::wstring( L"Direct3D 11 Window" ) );
-	m_pWindow->Initialize();
+	return( true );
+}
+//--------------------------------------------------------------------------------
+bool App::ConfigureRenderingSetup()
+{
+	// Create the camera, and the render view that will produce an image of the 
+	// from the camera's point of view of the scene.
 
-	// Create a swap chain for the window.
-	SwapChainConfigDX11 Config;
-	Config.SetWidth( m_pWindow->GetWidth() );
-	Config.SetHeight( m_pWindow->GetHeight() );
-	Config.SetOutputWindow( m_pWindow->GetHandle() );
-	m_pWindow->SetSwapChain( m_pRenderer11->CreateSwapChain( &Config ) );
+	ViewLightPrepassRenderer* pLightPrepassView	= new ViewLightPrepassRenderer( *m_pRenderer11, m_BackBuffer );
+	m_pRenderView = pLightPrepassView;
+	
+	m_pTextOverlayView = new ViewTextOverlay( *m_pRenderer11, m_BackBuffer );
 
-	// We'll keep a copy of the swap chain's render target index to
-	// use later.
-	m_BackBuffer = m_pRenderer11->GetSwapChainResource( m_pWindow->GetSwapChain() );
 
-    // Create render targets
-    int rtWidth = m_vpWidth;
-    int rtHeight = m_vpHeight;
+	m_pCamera = new FirstPersonCamera();
+	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.407f, -0.707f, 0.0f ) );
+	m_pCamera->GetNode()->Position() = Vector3f( 4.0f, 4.5f, -4.0f );
 
-    DXGI_SAMPLE_DESC sampleDesc;
-    sampleDesc.Count =  4;
-    sampleDesc.Quality = 0;
+	m_pCamera->SetCameraView( m_pRenderView );
+	m_pCamera->SetOverlayView( m_pTextOverlayView );
 
-    // Create the render targets for our optimized G-Buffer
-    Texture2dConfigDX11 RTConfig;
-    RTConfig.SetColorBuffer( rtWidth, rtHeight );
-    RTConfig.SetBindFlags( D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET );
-    RTConfig.SetSampleDesc( sampleDesc );
+    const float nearClip = 1.0f;
+    const float farClip = 15.0f;
 
-    // For the G-Buffer we'll use 4-component floating point format for
-    // spheremap-encoded normals, specular albedo, and the coverage mask
-    RTConfig.SetFormat( DXGI_FORMAT_R16G16B16A16_FLOAT );
-    m_GBufferTarget = m_pRenderer11->CreateTexture2D( &RTConfig, NULL );
+	m_pCamera->SetProjectionParams( nearClip, farClip, (float)m_iWidth / (float)m_iHeight, (float)D3DX_PI / 2.0f );
+	pLightPrepassView->SetClipPlanes( nearClip, farClip );
 
-    // For the light buffer we'll use a 4-component floating point format
-    // for storing diffuse RGB + mono specular
-    RTConfig.SetFormat( DXGI_FORMAT_R16G16B16A16_FLOAT );
-    m_LightTarget = m_pRenderer11->CreateTexture2D( &RTConfig, NULL );
-
-    // We need one last render target for the final image
-    RTConfig.SetFormat( DXGI_FORMAT_R10G10B10A2_UNORM );
-    m_FinalTarget = m_pRenderer11->CreateTexture2D( &RTConfig, NULL );
-
-    // Next we create a depth buffer for depth/stencil testing. Typeless formats let us
-    // write depth with one format, and later interpret that depth as a color value using
-    // a shader resource view.
-    Texture2dConfigDX11 DepthTexConfig;
-    DepthTexConfig.SetDepthBuffer( rtWidth, rtHeight );
-    DepthTexConfig.SetFormat( DXGI_FORMAT_R24G8_TYPELESS );
-    DepthTexConfig.SetBindFlags( D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE );
-    DepthTexConfig.SetSampleDesc( sampleDesc );
-
-    DepthStencilViewConfigDX11 DepthDSVConfig;
-    D3D11_TEX2D_DSV DSVTex2D;
-    DSVTex2D.MipSlice = 0;
-    DepthDSVConfig.SetTexture2D( DSVTex2D );
-    DepthDSVConfig.SetFormat( DXGI_FORMAT_D24_UNORM_S8_UINT );
-    DepthDSVConfig.SetViewDimensions( D3D11_DSV_DIMENSION_TEXTURE2DMS );
-
-    ShaderResourceViewConfigDX11 DepthSRVConfig;
-    D3D11_TEX2D_SRV SRVTex2D;
-    SRVTex2D.MipLevels = 1;
-    SRVTex2D.MostDetailedMip = 0;
-    DepthSRVConfig.SetTexture2D( SRVTex2D );
-    DepthSRVConfig.SetFormat( DXGI_FORMAT_R24_UNORM_X8_TYPELESS );
-    DepthSRVConfig.SetViewDimensions( D3D11_SRV_DIMENSION_TEXTURE2DMS );
-
-    m_DepthTarget = m_pRenderer11->CreateTexture2D( &DepthTexConfig, NULL, &DepthSRVConfig, NULL, NULL, &DepthDSVConfig );
-
-    // Now we need to create a depth stencil view with read-only flags set, so
-    // that we can have the same buffer set as both a shader resource view and as
-    // a depth stencil view
-    DepthDSVConfig.SetFlags( D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL );
-    m_ReadOnlyDepthTarget = ResourcePtr( new ResourceProxyDX11( m_DepthTarget->m_iResource,
-                                                                &DepthTexConfig, m_pRenderer11,
-                                                                &DepthSRVConfig, NULL, NULL,
-                                                                &DepthDSVConfig ) );
-
-    // Create a view port to use on the scene.  This basically selects the
-    // entire floating point area of the render target.
-    D3D11_VIEWPORT viewport;
-    viewport.Width = static_cast< float >( rtWidth );
-    viewport.Height = static_cast< float >( rtHeight );
-    viewport.MinDepth = 0.0f;
-    viewport.MaxDepth = 1.0f;
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
-
-    m_iViewport = m_pRenderer11->CreateViewPort( viewport );
-
-    // Create a render target for MSAA resolve
-    Texture2dConfigDX11 resolveConfig;
-    resolveConfig.SetColorBuffer( m_vpWidth, m_vpHeight);
-    resolveConfig.SetFormat( DXGI_FORMAT_R10G10B10A2_UNORM );
-    resolveConfig.SetBindFlags( D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET );
-    m_ResolveTarget = m_pRenderer11->CreateTexture2D( &resolveConfig, NULL );
+	m_pScene->AddCamera( m_pCamera );
 
 	return( true );
 }
 //--------------------------------------------------------------------------------
 void App::ShutdownEngineComponents()
 {
-	if ( m_pRenderer11 )
-	{
-		m_pRenderer11->Shutdown();
-		delete m_pRenderer11;
-	}
-
-	if ( m_pWindow )
-	{
-		m_pWindow->Shutdown();
-		delete m_pWindow;
-	}
+	ShutdownRenderingSetup();
+	ShutdownRenderingEngineComponents();
 }
 //--------------------------------------------------------------------------------
 void App::Initialize()
@@ -279,7 +182,7 @@ void App::Initialize()
     m_pMaterial->Params[VT_GBUFFER].pEffect = m_pGBufferEffect;
     m_pMaterial->Params[VT_GBUFFER].bRender = true;
     m_pMaterial->Params[VT_FINALPASS].pEffect = m_pFinalPassEffect;
-    m_pMaterial->Params[VT_FINALPASS].bRender = false;
+    m_pMaterial->Params[VT_FINALPASS].bRender = true;
 
     // Load textures. For the diffuse map, we'll specify that we want an sRGB format so that
     // the texture data is gamma-corrected when sampled in the shader
@@ -325,28 +228,18 @@ void App::Initialize()
 	pSamplerParam->SetValue( samplerState );
     m_pMaterial->Parameters.AddRenderParameter( pSamplerParam );
 
-	// Create the camera, and the render view that will produce an image of the
-	// from the camera's point of view of the scene.
-	m_pCamera = new Camera();
-	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.407f, -0.707f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( 4.0f, 4.5f, -4.0f );
 
-	m_pGBufferView = new ViewGBuffer( *m_pRenderer11 );
+	// Pre-generate all of the input layout views for our geometry to ensure that
+	// in the parallel processing of the render views we don't try to create one,
+	// which could lead to a multi-threading problem.
 
-    const float nearClip = 1.0f;
-    const float farClip = 15.0f;
-	m_pCamera->SetProjectionParams( nearClip, farClip, (float)m_vpWidth / (float)m_vpHeight, (float)D3DX_PI / 2.0f );
+	for ( int i = 0; i < VT_NUM_VIEW_TYPES; i++ ) {
+		if ( m_pMaterial->Params[i].bRender ) {
+			pGeometry->GetInputLayout( m_pMaterial->Params[i].pEffect->m_iVertexShader );
+		}
+	}
 
-    m_pLightsView = new ViewLights( *m_pRenderer11 );
 
-    // Bind the light view to the camera entity
-    m_pLightsView->SetEntity( m_pCamera->GetBody() );
-    m_pLightsView->SetRoot( m_pCamera->GetNode() );
-    m_pLightsView->SetProjMatrix( m_pCamera->ProjMatrix() );
-    m_pLightsView->SetClipPlanes( nearClip, farClip );
-
-    // Create the final pass view
-    m_pFinalPassView = new ViewFinalPass( *m_pRenderer11 );
 
 	// Create the scene and add the entities to it.  Then add the camera to the
 	// scene so that it will be updated via the scene interface instead of
@@ -361,23 +254,6 @@ void App::Initialize()
 	m_pNode->AttachChild( m_pEntity );
 
 	m_pScene->AddEntity( m_pNode );
-	m_pScene->AddCamera( m_pCamera );
-
-    m_SpriteRenderer.Initialize();
-    m_Font.Initialize( L"Arial", 14, 0, true );
-
-    // Set the the targets for the views
-    m_pGBufferView->SetTargets( m_GBufferTarget,
-                                m_DepthTarget,
-                                m_iViewport );
-    m_pLightsView->SetTargets( m_GBufferTarget,
-                                m_LightTarget,
-                                m_ReadOnlyDepthTarget,
-                                m_iViewport );
-    m_pFinalPassView->SetTargets( m_LightTarget,
-                                    m_FinalTarget,
-                                    m_ReadOnlyDepthTarget,
-                                    m_iViewport );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -399,7 +275,6 @@ void App::Update()
 
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"TimeFactors" ), &TimeFactors );
 
-    SetupLights();
 
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.
@@ -414,55 +289,17 @@ void App::Update()
 	rotation.RotationY( m_pTimer->Elapsed() * 0.2f );
 	m_pNode->Rotation() *= rotation;
 
-    // Set the camera and material to render the G-Buffer pass
-    m_pCamera->SetCameraView( m_pGBufferView );
-    m_pGBufferView->SetProjMatrix( m_pCamera->ProjMatrix() );
-    m_pMaterial->Params[VT_GBUFFER].bRender = true;
-    m_pMaterial->Params[VT_FINALPASS].bRender = false;
 
 	// Update the scene, and then render it to the G-Buffer
 	m_pScene->Update( m_pTimer->Elapsed() );
 	m_pScene->Render( m_pRenderer11 );
 
-    // Render the light pass
-    m_pLightsView->PreDraw( m_pRenderer11 );
-    m_pRenderer11->ProcessRenderViewQueue();
-
-    // Set the render target for the final pass, and clear it
-    PipelineManagerDX11* pImmPipeline = m_pRenderer11->pImmPipeline;
-    pImmPipeline->ClearRenderTargets();
-    pImmPipeline->OutputMergerStage.BindRenderTarget( 0, m_FinalTarget );
-    pImmPipeline->ApplyRenderTargets();
-    pImmPipeline->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
-
-    // Also bind the depth buffer
-    pImmPipeline->OutputMergerStage.BindDepthTarget( m_DepthTarget );
-    pImmPipeline->ApplyRenderTargets();
-
-    // Now set the camera and material to render the final pass
-    m_pCamera->SetCameraView( m_pFinalPassView );
-    m_pFinalPassView->SetProjMatrix( m_pCamera->ProjMatrix() );
-    m_pMaterial->Params[VT_GBUFFER].bRender = false;
-    m_pMaterial->Params[VT_FINALPASS].bRender = true;
-    m_pMaterial->Params[VT_FINALPASS].pEffect = m_pFinalPassEffect;
-    m_pScene->Render( m_pRenderer11 );
-
-    // Render to the backbuffer
-    IParameterManager* pParams = m_pRenderer11->m_pParamMgr;
-    pImmPipeline->ClearRenderTargets();
-    pImmPipeline->OutputMergerStage.BindRenderTarget( 0, m_BackBuffer );
-    pImmPipeline->ApplyRenderTargets();
-    pImmPipeline->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
-
-    // Need to resolve the MSAA target before we can render it
-    pImmPipeline->ResolveSubresource( m_ResolveTarget, 0, m_FinalTarget, 0, DXGI_FORMAT_R10G10B10A2_UNORM );
-
-    m_SpriteRenderer.Render( pImmPipeline, pParams, m_ResolveTarget, Matrix4f::Identity() );
 
     DrawHUD( );
 
 	// Perform the rendering and presentation for the window.
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
+
 
 	// Save a screenshot if desired.  This is done by pressing the 's' key, which
 	// demonstrates how an event is sent and handled by an event listener (which
@@ -471,7 +308,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"LightPrepass_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
@@ -479,7 +316,6 @@ void App::Shutdown()
 {
 	SAFE_DELETE( m_pEntity );
 	SAFE_DELETE( m_pNode );
-	SAFE_DELETE( m_pCamera );
 
 	// Print the framerate out for the log before shutting down.
 
@@ -535,58 +371,20 @@ bool App::HandleEvent( IEvent* pEvent )
 //--------------------------------------------------------------------------------
 std::wstring App::GetName( )
 {
-	return( std::wstring( L"BasicApplication" ) );
+	return( std::wstring( L"LightPrepass" ) );
 }
 //--------------------------------------------------------------------------------
 void App::DrawHUD( )
 {
-    PipelineManagerDX11* pImmPipeline = m_pRenderer11->pImmPipeline;
-    IParameterManager* pParams = m_pRenderer11->m_pParamMgr;
-
     Matrix4f transform = Matrix4f::Identity();
     transform.SetTranslation( Vector3f( 30.0f, 30.0f, 0.0f ) );
     std::wstring text = L"FPS: " + ToString( m_pTimer->Framerate() );
-    m_SpriteRenderer.RenderText( pImmPipeline, pParams, m_Font, text.c_str(), transform );
+    m_pTextOverlayView->WriteText( text, transform, Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
-    float x = 30.0f;
-    float y = m_vpHeight - 100.0f;
-    transform.SetTranslation( Vector3f( x, y, 0.0f ) );
-    text = LightMode::ToString();
-    m_SpriteRenderer.RenderText( pImmPipeline, pParams, m_Font, text.c_str(), transform );
-}
-//--------------------------------------------------------------------------------
-void App::SetupLights( )
-{
-    // Set the lights to render
-    Light light;
-    light.Type = Point;
-    light.Range = 2.0f;
-
-    const int cubeSize = 3 + LightMode::Value * 2;
-    const int cubeMin = -(cubeSize / 2);
-    const int cubeMax = cubeSize / 2;
-
-    const Vector3f minExtents ( -4.0f, 1.0f, -4.0f );
-    const Vector3f maxExtents ( 4.0f, 11.0f, 4.0f );
-    const Vector3f minColor ( 1.0f, 0.0f, 0.0f );
-    const Vector3f maxColor ( 0.0f, 1.0f, 1.0f );
-
-    for ( int x = cubeMin; x <= cubeMax; x++ )
-    {
-        for ( int y = cubeMin; y <= cubeMax; y++ )
-        {
-            for ( int z = cubeMin; z <= cubeMax; z++ )
-            {
-                Vector3f lerp;
-                lerp.x = static_cast<float>( x - cubeMin ) / ( cubeSize - 1 );
-                lerp.y = static_cast<float>( y - cubeMin ) / ( cubeSize - 1 );
-                lerp.z = static_cast<float>( z - cubeMin ) / ( cubeSize - 1 );
-
-                light.Position = Lerp( minExtents, maxExtents, lerp );
-                light.Color = Lerp( minColor, maxColor, lerp ) * 1.5f;
-                m_pLightsView->AddLight( light );
-            }
-        }
-    }
+	float x = 30.0f;
+	float y = m_iHeight - 100.0f;
+	transform.SetTranslation( Vector3f( x, y, 0.0f ) );
+	text = LightMode::ToString();
+	m_pTextOverlayView->WriteText( text, transform, Vector4f( 1.0f, 1.0f, 0.5f, 1.0f ) );
 }
 //--------------------------------------------------------------------------------

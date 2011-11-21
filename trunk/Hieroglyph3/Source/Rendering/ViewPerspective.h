@@ -34,9 +34,6 @@ namespace Glyph3
 		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 		virtual void Resize( UINT width, UINT height );
 
-		virtual void SetBackColor( Vector4f color );
-		virtual void SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ );
-
 		virtual void SetRenderParams( IParameterManager* pParamManager );
 		virtual void SetUsageParams( IParameterManager* pParamManager );
 
@@ -44,8 +41,6 @@ namespace Glyph3
 		virtual ~ViewPerspective();
 
 	protected:
-		Vector4f		m_vColor;
-		int				m_iViewport;
 
 		ResourcePtr		m_RenderTarget;
 		ResourcePtr		m_DepthTarget;

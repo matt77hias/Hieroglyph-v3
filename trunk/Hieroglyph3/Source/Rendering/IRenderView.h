@@ -80,6 +80,9 @@ namespace Glyph3
 		void SetMaxRecurrence( int max );
 		int GetMaxRecurrence( );
 
+		virtual void SetBackColor( Vector4f color );
+		virtual void SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ );
+
 		virtual void SetViewMatrix( const Matrix4f& matrix );
 		Matrix4f GetViewMatrix( );
 		virtual void SetProjMatrix( const Matrix4f& matrix );
@@ -92,6 +95,9 @@ namespace Glyph3
 
 		Entity3D* m_pEntity;
 		Node3D* m_pRoot;
+
+		Vector4f		m_vColor;
+		int				m_iViewport;
 
 		Matrix4f ViewMatrix;
 		Matrix4f ProjMatrix;

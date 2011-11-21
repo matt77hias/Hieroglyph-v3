@@ -102,6 +102,7 @@
     <ClCompile Include="AppSettings.cpp" />
     <ClCompile Include="ViewFinalPass.cpp" />
     <ClCompile Include="ViewGBuffer.cpp" />
+    <ClCompile Include="ViewLightPrepassRenderer.cpp" />
     <ClCompile Include="ViewLights.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -109,6 +110,7 @@
     <ClInclude Include="AppSettings.h" />
     <ClInclude Include="ViewFinalPass.h" />
     <ClInclude Include="ViewGBuffer.h" />
+    <ClInclude Include="ViewLightPrepassRenderer.h" />
     <ClInclude Include="ViewLights.h" />
   </ItemGroup>
   <ItemGroup>

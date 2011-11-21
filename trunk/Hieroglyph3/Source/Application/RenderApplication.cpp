@@ -26,6 +26,7 @@
 #include "FirstPersonCamera.h"
 
 #include "EvtWindowResize.h"
+#include "ViewPerspective.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -94,7 +95,7 @@ bool RenderApplication::ConfigureRenderingEngineComponents( UINT width, UINT hei
 
 	// We'll keep a copy of the swap chain's render target index to 
 	// use later.
-	m_RenderTarget = m_pRenderer11->GetSwapChainResource( m_pWindow->GetSwapChain() );
+	m_BackBuffer = m_pRenderer11->GetSwapChainResource( m_pWindow->GetSwapChain() );
 
 	m_pRenderer11->SetMultiThreadingState( true );
 
@@ -106,10 +107,11 @@ bool RenderApplication::ConfigureRenderingSetup()
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
 
-	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget );
-	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
+	ViewPerspective* pPerspectiveView = new ViewPerspective( *m_pRenderer11, m_BackBuffer );
+	pPerspectiveView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
+	m_pRenderView = pPerspectiveView;
 
-	m_pTextOverlayView = new ViewTextOverlay( *m_pRenderer11, m_RenderTarget );
+	m_pTextOverlayView = new ViewTextOverlay( *m_pRenderer11, m_BackBuffer );
 
 
 	m_pCamera = new FirstPersonCamera();
@@ -137,8 +139,6 @@ void RenderApplication::ShutdownRenderingSetup()
 {
 	SAFE_DELETE( m_pScene );
 	SAFE_DELETE( m_pCamera );
-	//SAFE_DELETE( m_pTextOverlayView );
-	//SAFE_DELETE( m_pRenderView );
 }
 //--------------------------------------------------------------------------------
 bool RenderApplication::HandleEvent( IEvent* pEvent )

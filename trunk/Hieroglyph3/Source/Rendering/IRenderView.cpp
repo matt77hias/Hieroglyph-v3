@@ -142,3 +142,18 @@ Matrix4f IRenderView::GetProjMatrix( )
 	return( ProjMatrix );
 }
 //--------------------------------------------------------------------------------
+void IRenderView::SetBackColor( Vector4f color )
+{
+	m_vColor = color;
+}
+//--------------------------------------------------------------------------------
+void IRenderView::SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ )
+{
+	//m_viewport.X = x;
+	//m_viewport.Y = y;
+	//m_viewport.Width = w;
+	//m_viewport.Height = h;
+	//m_viewport.MinZ = MinZ;
+	//m_viewport.MaxZ = MaxZ;
+}
+//--------------------------------------------------------------------------------

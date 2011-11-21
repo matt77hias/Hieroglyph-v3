@@ -105,7 +105,6 @@ RendererDX11::RendererDX11()
 //--------------------------------------------------------------------------------
 RendererDX11::~RendererDX11()
 {
-	
 }
 //--------------------------------------------------------------------------------
 RendererDX11* RendererDX11::Get()
@@ -1638,9 +1637,10 @@ int RendererDX11::CreateInputLayout( TArray<D3D11_INPUT_ELEMENT_DESC>& elements,
 	// Create the input layout wrapper instance and store it in the renderer's list.
 	InputLayoutDX11* pLayoutWrapper = new InputLayoutDX11( pLayout );
 	m_vInputLayouts.add( pLayoutWrapper );
+	int index = m_vInputLayouts.count() - 1;
 
 	// Return the index for referencing later on.
-	return( m_vInputLayouts.count() - 1 );
+	return( index );
 }
 //--------------------------------------------------------------------------------
 ResourcePtr RendererDX11::LoadTexture( std::wstring filename, D3DX11_IMAGE_LOAD_INFO* pLoadInfo )
@@ -2298,7 +2298,7 @@ void RendererDX11::ProcessRenderViewQueue( )
 
 			for ( int j = 0/*count-1*/; count > 0; count-- )
 			{
-				g_aPayload[j].pPipeline->m_pContext->ClearState();
+				//g_aPayload[j].pPipeline->m_pContext->ClearState();
 				pImmPipeline->ExecuteCommandList( g_aPayload[j].pList );
 				g_aPayload[j].pList->ReleaseList();
 				//j--;

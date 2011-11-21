@@ -38,8 +38,6 @@ namespace Glyph3
 
     protected:
 
-        int					    m_iViewport;
-
         RendererDX11&           m_Renderer;
         ResourcePtr 	        m_LightTarget;
         ResourcePtr 	        m_RenderTarget;

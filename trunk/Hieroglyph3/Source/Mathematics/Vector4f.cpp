@@ -204,7 +204,7 @@ Vector4f Vector4f::operator/ ( const Vector4f& Vector ) const
     quot.x = Vector.x != 0.0f ? x / Vector.x : 0.0f;
     quot.y = Vector.y != 0.0f ? y / Vector.y : 0.0f;
     quot.z = Vector.z != 0.0f ? z / Vector.z : 0.0f;
-    quot.w = Vector.w != 0.0f ? z / Vector.z : 0.0f;
+    quot.w = Vector.w != 0.0f ? w / Vector.w : 0.0f;
 
     return( quot );
 }

@@ -18,7 +18,8 @@
 #include "MaterialGeneratorDX11.h"
 #include "RasterizerStateConfigDX11.h"
 
-#include "ViewAmbientOcclusion.h"
+#include "ViewDeferredRenderer.h"
+#include "FirstPersonCamera.h"
 
 #include "IParameterManager.h"
 #include "SamplerParameterWriterDX11.h"
@@ -32,70 +33,58 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
 //--------------------------------------------------------------------------------
-App::App() : m_vpWidth( 1024 ), m_vpHeight( 576 )
+App::App()
 {
-	m_bSaveScreenshot = false;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
 {
-	// Create the renderer and initialize it for the desired device
-	// type and feature level.
-
-	m_pRenderer11 = new RendererDX11();
-
-	if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_HARDWARE, D3D_FEATURE_LEVEL_11_0 ) )
-	{
-		Log::Get().Write( L"Could not create hardware device, trying to create the reference device..." );
-
-		if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_REFERENCE, D3D_FEATURE_LEVEL_11_0 ) )
-		{
-			MessageBox( m_pWindow->GetHandle(), L"Could not create a hardware or software Direct3D 11 device - the program will now abort!", L"Hieroglyph 3 Rendering", MB_ICONEXCLAMATION | MB_SYSTEMMODAL );
-			RequestTermination();
-			return( false );
-		}
-
-		// If using the reference device, utilize a fixed time step for any animations.
-		m_pTimer->SetFixedTimeStep( 1.0f / 10.0f );
+	if ( !ConfigureRenderingEngineComponents( 800, 480, D3D_FEATURE_LEVEL_11_0 ) ) {
+		return( false );
 	}
 
-    //m_pRenderer11->SetMultiThreadingState( false );
+	if ( !ConfigureRenderingSetup() ) {
+		return( false );
+	}
 
-	// Create the window wrapper class instance.
-	m_pWindow = new Win32RenderWindow();
-	m_pWindow->SetPosition( 50, 50 );
-	m_pWindow->SetSize( m_vpWidth, m_vpHeight );
-	m_pWindow->SetCaption( std::wstring( L"Direct3D 11 Window" ) );
-	m_pWindow->Initialize();
+	m_pRenderer11->SetMultiThreadingState( false );
 
-	// Create a swap chain for the window.
-	SwapChainConfigDX11 Config;
-	Config.SetWidth( m_pWindow->GetWidth() );
-	Config.SetHeight( m_pWindow->GetHeight() );
-	Config.SetOutputWindow( m_pWindow->GetHandle() );
-	m_pWindow->SetSwapChain( m_pRenderer11->CreateSwapChain( &Config ) );
+	return( true );
+}
+//--------------------------------------------------------------------------------
+bool App::ConfigureRenderingSetup()
+{
+	// Create the camera, and the render view that will produce an image of the 
+	// from the camera's point of view of the scene.
 
-	// We'll keep a copy of the swap chain's render target index to
-	// use later.
-	m_BackBuffer = m_pRenderer11->GetSwapChainResource( m_pWindow->GetSwapChain() );
+	ViewDeferredRenderer* pDeferredView	= new ViewDeferredRenderer( *m_pRenderer11, m_BackBuffer );
+	m_pRenderView = pDeferredView;
+	
+	m_pTextOverlayView = new ViewTextOverlay( *m_pRenderer11, m_BackBuffer );
 
+
+	m_pCamera = new FirstPersonCamera();
+	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.407f, -0.707f, 0.0f ) );
+	m_pCamera->GetNode()->Position() = Vector3f( 4.0f, 4.5f, -4.0f );
+
+	m_pCamera->SetCameraView( m_pRenderView );
+	m_pCamera->SetOverlayView( m_pTextOverlayView );
+
+    const float nearClip = 1.0f;
+    const float farClip = 15.0f;
+
+	m_pCamera->SetProjectionParams( nearClip, farClip, (float)m_iWidth / (float)m_iHeight, (float)D3DX_PI / 2.0f );
+	pDeferredView->SetClipPlanes( nearClip, farClip );
+
+	m_pScene->AddCamera( m_pCamera );
 
 	return( true );
 }
 //--------------------------------------------------------------------------------
 void App::ShutdownEngineComponents()
 {
-	if ( m_pRenderer11 )
-	{
-		m_pRenderer11->Shutdown();
-		delete m_pRenderer11;
-	}
-
-	if ( m_pWindow )
-	{
-		m_pWindow->Shutdown();
-		delete m_pWindow;
-	}
+	ShutdownRenderingSetup();
+	ShutdownRenderingEngineComponents();
 }
 //--------------------------------------------------------------------------------
 void App::Initialize()
@@ -223,26 +212,18 @@ void App::Initialize()
 	// Enable the material to render the given view type
 	m_pMaterial->Params[VT_GBUFFER].bRender = true;
 
-	// Create the camera, and the render view that will produce an image of the
-	// from the camera's point of view of the scene.
-	m_pCamera = new Camera();
-	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.407f, -0.707f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( 4.0f, 4.5f, -4.0f );
 
-	m_pDeferredView = new ViewDeferredRenderer( *m_pRenderer11, m_BackBuffer );
-	m_pTextOverlayView = new ViewTextOverlay( *m_pRenderer11, m_BackBuffer );
-	
-	m_pCamera->SetCameraView( m_pDeferredView );
-	m_pCamera->SetOverlayView( m_pTextOverlayView );
+	// Pre-generate all of the input layout views for our geometry to ensure that
+	// in the parallel processing of the render views we don't try to create one,
+	// which could lead to a multi-threading problem.
 
-    const float nearClip = 1.0f;
-    const float farClip = 15.0f;
-	m_pCamera->SetProjectionParams( nearClip, farClip, (float)m_vpWidth / (float)m_vpHeight , (float)D3DX_PI / 2.0f);
+	m_pMaterial->Params[VT_GBUFFER].pEffect = m_pGBufferEffect[GBufferOptMode::Value];
 
-    // Bind the light view to the camera entity
-    m_pDeferredView->SetEntity( m_pCamera->GetBody() );
-    m_pDeferredView->SetRoot( m_pCamera->GetNode() );
-    m_pDeferredView->SetClipPlanes( nearClip, farClip );
+	for ( int i = 0; i < VT_NUM_VIEW_TYPES; i++ ) {
+		if ( m_pMaterial->Params[i].bRender ) {
+			pGeometry->GetInputLayout( m_pMaterial->Params[i].pEffect->m_iVertexShader );
+		}
+	}
 
 
 	// Create the scene and add the entities to it.  Then add the camera to the
@@ -258,10 +239,6 @@ void App::Initialize()
 	m_pNode->AttachChild( m_pEntity );
 
 	m_pScene->AddEntity( m_pNode );
-	m_pScene->AddCamera( m_pCamera );
-
-    m_SpriteRenderer.Initialize();
-    m_Font.Initialize( L"Arial", 14, 0, true );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -283,7 +260,7 @@ void App::Update()
 
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"TimeFactors" ), &TimeFactors );
 
-    //SetupViews();
+
 	m_pMaterial->Params[VT_GBUFFER].pEffect = m_pGBufferEffect[GBufferOptMode::Value];
 
 	// Send an event to everyone that a new frame has started.  This will be used
@@ -306,9 +283,9 @@ void App::Update()
 	m_pScene->Render( m_pRenderer11 );
 
 
-
 	// Perform the rendering and presentation for the window.
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
+
 
 	// Save a screenshot if desired.  This is done by pressing the 's' key, which
 	// demonstrates how an event is sent and handled by an event listener (which
@@ -324,10 +301,7 @@ void App::Update()
 void App::Shutdown()
 {
 	SAFE_DELETE( m_pEntity );
-
 	SAFE_DELETE( m_pNode );
-
-	SAFE_DELETE( m_pCamera );
 
 	// Print the framerate out for the log before shutting down.
 
@@ -419,7 +393,7 @@ void App::DrawHUD( )
 
 
     float x = 30.0f;
-    float y = m_vpHeight - 120.0f;
+    float y = m_iHeight - 120.0f;
     transform.SetTranslation( Vector3f( x, y, 0.0f ) );
     text = DisplayMode::ToString();
     m_pTextOverlayView->WriteText( text, transform, Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );

@@ -61,6 +61,16 @@ void ViewFinalPass::Draw( PipelineManagerDX11* pPipelineManager, IParameterManag
 {
     if ( m_pRoot )
     {
+	    // Set the render target for the final pass, and clear it
+		pPipelineManager->ClearRenderTargets();
+		pPipelineManager->OutputMergerStage.BindRenderTarget( 0, m_RenderTarget );
+		pPipelineManager->ApplyRenderTargets();
+		pPipelineManager->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
+
+		// Also bind the depth buffer
+		pPipelineManager->OutputMergerStage.BindDepthTarget( m_DepthTarget );
+		pPipelineManager->ApplyRenderTargets();
+
         pPipelineManager->SetViewPort( m_iViewport );
 
         // Set this view's render parameters
@@ -93,3 +103,4 @@ void ViewFinalPass::SetTargets( ResourcePtr LightTarget, ResourcePtr RenderTarge
     m_iViewport = Viewport;
     m_DepthTarget = DepthTarget;
 }
+//--------------------------------------------------------------------------------

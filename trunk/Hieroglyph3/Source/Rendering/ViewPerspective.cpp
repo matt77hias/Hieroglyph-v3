@@ -68,11 +68,6 @@ ViewPerspective::~ViewPerspective()
 {
 }
 //--------------------------------------------------------------------------------
-void ViewPerspective::SetBackColor( Vector4f color )
-{
-	m_vColor = color;
-}
-//--------------------------------------------------------------------------------
 void ViewPerspective::Update( float fTime )
 {
 }
@@ -119,16 +114,6 @@ void ViewPerspective::Draw( PipelineManagerDX11* pPipelineManager, IParameterMan
 		// Run through the graph and render each of the entities
 		m_pRoot->Render( pPipelineManager, pParamManager, GetType() );
 	}
-}
-//--------------------------------------------------------------------------------
-void ViewPerspective::SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ )
-{
-	//m_viewport.X = x;
-	//m_viewport.Y = y;
-	//m_viewport.Width = w;
-	//m_viewport.Height = h;
-	//m_viewport.MinZ = MinZ;
-	//m_viewport.MaxZ = MaxZ;
 }
 //--------------------------------------------------------------------------------
 void ViewPerspective::SetRenderParams( IParameterManager* pParamManager )

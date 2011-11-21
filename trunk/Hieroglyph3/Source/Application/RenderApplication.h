@@ -5,7 +5,7 @@
 #include "Win32RenderWindow.h"
 #include "RendererDX11.h"
 
-#include "ViewPerspective.h"
+#include "IRenderView.h"
 #include "ViewTextOverlay.h"
 #include "Camera.h"
 #include "Scene.h"
@@ -38,9 +38,9 @@ protected:
 	UINT					m_iWidth;
 	UINT					m_iHeight;
 
-	ResourcePtr				m_RenderTarget;
+	ResourcePtr				m_BackBuffer;
 
-	ViewPerspective*		m_pRenderView;
+	IRenderView*			m_pRenderView;
 	ViewTextOverlay*		m_pTextOverlayView;
 
 public:

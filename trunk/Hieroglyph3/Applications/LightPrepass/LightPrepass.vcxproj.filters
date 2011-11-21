@@ -6,6 +6,7 @@
     <ClCompile Include="ViewFinalPass.cpp" />
     <ClCompile Include="ViewGBuffer.cpp" />
     <ClCompile Include="ViewLights.cpp" />
+    <ClCompile Include="ViewLightPrepassRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -13,6 +14,7 @@
     <ClInclude Include="ViewFinalPass.h" />
     <ClInclude Include="ViewGBuffer.h" />
     <ClInclude Include="ViewLights.h" />
+    <ClInclude Include="ViewLightPrepassRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">

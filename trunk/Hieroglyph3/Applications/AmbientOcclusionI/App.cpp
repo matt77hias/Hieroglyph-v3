@@ -53,10 +53,10 @@ bool App::ConfigureRenderingSetup()
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
 
-	m_pRenderView = new ViewAmbientOcclusion( *m_pRenderer11, m_RenderTarget );
+	m_pRenderView = new ViewAmbientOcclusion( *m_pRenderer11, m_BackBuffer );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
 
-	m_pTextOverlayView = new ViewTextOverlay( *m_pRenderer11, m_RenderTarget );
+	m_pTextOverlayView = new ViewTextOverlay( *m_pRenderer11, m_BackBuffer );
 
 
 	m_pCamera = new FirstPersonCamera();
@@ -79,14 +79,6 @@ void App::ShutdownEngineComponents()
 //--------------------------------------------------------------------------------
 void App::Initialize()
 {
-	// Get some information about the render target before initializing.
-
-	D3D11_TEXTURE2D_DESC desc = m_RenderTarget->m_pTexture2dConfig->GetTextureDesc();
-
-	unsigned int ResolutionX = desc.Width;
-	unsigned int ResolutionY = desc.Height;
-
-
 	// Create and initialize the geometry to be rendered.  
 
 	GeometryPtr pGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"Sample_Scene.ms3d" ) );
