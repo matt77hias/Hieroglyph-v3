@@ -201,6 +201,6 @@ void FirstPersonCamera::Update()
     m_fRotationY = WrapAngle( m_fRotationY );
 
     // Make a rotation matrix from the X/Y rotation
-    rotation.RotationZYX( Vector3f( m_fRotationX, m_fRotationY, 0.0f ) );    
+    rotation.Rotation( Vector3f( m_fRotationX, m_fRotationY, 0.0f ) );    
 }
 //--------------------------------------------------------------------------------

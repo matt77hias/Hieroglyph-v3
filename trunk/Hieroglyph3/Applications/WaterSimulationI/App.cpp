@@ -101,7 +101,7 @@ void App::Initialize()
 	// the back color of the render view.
 
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.307f, 0.707f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( -70.0f, 30.5f, -75.0f );
+	m_pCamera->GetNode()->Position() = Vector3f( -100.0f, 30.5f, -100.0f );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
 
 	// Create the desired scene and add the entities to it.  Then add the camera to the
