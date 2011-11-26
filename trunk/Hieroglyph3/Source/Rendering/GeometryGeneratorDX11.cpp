@@ -418,9 +418,9 @@ void GeometryGeneratorDX11::GenerateSphere( GeometryPtr pGeometry, unsigned int 
 	}
 
 
-    const unsigned int NumVertexRings = VRes - 1;
+    const unsigned int NumVertexRings = VRes - 2;
     const unsigned int NumVerts = NumVertexRings * URes + 2;
-    const unsigned int NumTriangleRings = VRes - 2;
+    const unsigned int NumTriangleRings = VRes - 1;
     const unsigned int NumTriangles = ( NumTriangleRings + 1 ) * URes * 2;
     const unsigned int NumIndices = NumTriangles * 3;  
 
@@ -474,7 +474,7 @@ void GeometryGeneratorDX11::GenerateSphere( GeometryPtr pGeometry, unsigned int 
     }
 
     // Now the middle rings
-    for ( unsigned int v = 1; v < VRes - 1; ++v )
+    for ( unsigned int v = 1; v < VRes - 2; ++v )
     {
         const unsigned int top = 1 + ( ( v - 1 ) * URes );
         const unsigned int bottom = top + URes;
@@ -487,6 +487,12 @@ void GeometryGeneratorDX11::GenerateSphere( GeometryPtr pGeometry, unsigned int 
             const unsigned int currBottom = bottom + currentU;
             const unsigned int nextBottom = bottom + nextU;
 
+			_ASSERT( currTop <= NumVerts );
+			_ASSERT( currBottom <= NumVerts );
+			_ASSERT( nextBottom <= NumVerts );
+			_ASSERT( nextTop <= NumVerts );
+
+
             face = TriangleIndices( currTop, currBottom, nextBottom );
             pGeometry->AddFace( face );
 
@@ -496,7 +502,7 @@ void GeometryGeneratorDX11::GenerateSphere( GeometryPtr pGeometry, unsigned int 
     }
 
     // Now the bottom ring
-    const unsigned int top = 1 + ( ( VRes - 2 ) * URes );
+    const unsigned int top = 1 + ( ( NumVertexRings - 1 ) * URes );
     const unsigned int bottom = NumVerts - 1;
     for ( unsigned int u = 0; u < URes; ++u )
     {
@@ -504,6 +510,10 @@ void GeometryGeneratorDX11::GenerateSphere( GeometryPtr pGeometry, unsigned int 
         const unsigned int nextU = ( u + 1 ) % URes;
         const unsigned int currTop = top + currentU;
         const unsigned int nextTop = top + nextU;
+
+		_ASSERT( currTop <= NumVerts );
+		_ASSERT( bottom <= NumVerts );
+		_ASSERT( nextTop <= NumVerts );
 
         face = TriangleIndices( currTop, bottom, nextTop );
         pGeometry->AddFace( face );

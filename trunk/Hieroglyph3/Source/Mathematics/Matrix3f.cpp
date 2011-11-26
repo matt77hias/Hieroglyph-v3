@@ -21,7 +21,7 @@ Matrix3f::Matrix3f()
 Matrix3f::Matrix3f( bool bZero )
 {
 	if ( bZero )
-		memset( m_afEntry, 0, 4*4*sizeof(float) );
+		memset( m_afEntry, 0, 3*3*sizeof(float) );
 }
 //----------------------------------------------------------------------------------------------------
 Matrix3f::Matrix3f( const Matrix3f& Matrix )
