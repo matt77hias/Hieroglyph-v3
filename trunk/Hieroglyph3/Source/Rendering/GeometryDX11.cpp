@@ -50,8 +50,8 @@ void GeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterManager* p
 	int layout = GetInputLayout( pPipeline->ShaderStages[VERTEX_SHADER]->GetShaderIndex() );
 	state.SetInputLayout( layout );
 	state.SetPrimitiveTopology( m_ePrimType );
-	state.SetVertexBuffer( 0, m_VB, 0, m_iVertexSize );
-	state.SetIndexBuffer( m_IB );
+	state.SetVertexBuffer( 0, m_VB->m_iResource, 0, m_iVertexSize );
+	state.SetIndexBuffer( m_IB->m_iResource );
 	
 	pPipeline->InputAssemblerStage.SetDesiredState( state );
 	pPipeline->ApplyInputResources();

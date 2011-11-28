@@ -20,32 +20,9 @@
 #include "Timer.h"
 #include "Log.h"
 
-// Window Events
-#include "EvtWindowResize.h"
-
-// Keyboard Events
-#include "EvtChar.h"
-#include "EvtKeyUp.h"
-#include "EvtKeyDown.h"
-
-// Mouse Events
-#include "EvtMouseWheel.h"
-#include "EvtMouseMove.h"
-#include "EvtMouseLeave.h"
-#include "EvtMouseLButtonUp.h"
-#include "EvtMouseLButtonDown.h"
-#include "EvtMouseMButtonUp.h"
-#include "EvtMouseMButtonDown.h"
-#include "EvtMouseRButtonUp.h"
-#include "EvtMouseRButtonDown.h"
-
-
 #include <sstream>
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
-
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-
 
 int WINAPI WinMain(	HINSTANCE h_Inst, HINSTANCE h_PrevInst,	LPSTR lpcmdline, int ncmdshow)
 {
@@ -74,144 +51,17 @@ int WINAPI WinMain(	HINSTANCE h_Inst, HINSTANCE h_PrevInst,	LPSTR lpcmdline, int
 	
 	m_pApp->Initialize();
 
+    
+	// Call the application message loop function - this function
+	// could be overloaded specifically for each the applications.
 
-	MSG msg;
-	bool bLoop = true;
-	
-	while( bLoop )
-	{
-		while ( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
-		{ 
-			if ( msg.message == WM_QUIT )
-			{
-				bLoop = false;
-				break;
-			}
-			TranslateMessage( &msg );
-			DispatchMessage( &msg );
-		}
+	m_pApp->MessageLoop();
 
-		// Call the overloaded application update function.
-		m_pApp->Update();
-	}
-	
+
 	// Call the overloaded application shutdown method.
 	m_pApp->Shutdown();
 	m_pApp->ShutdownEngineComponents();
 
 	return( true );
-}
-//--------------------------------------------------------------------------------
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
-{
-	switch( msg )
-	{	
-		case WM_CREATE: 
-			{
-				// Automatically return 0 to allow the window to proceed in the
-				// creation process.
-
-				return( 0 );
-			} break;
-
-		case WM_PAINT:
-			{
-				// This message is handled by the default handler to avoid a 
-				// repeated sending of the message.  This results in the ability
-				// to process all pending messages at once without getting stuck
-				// in an eternal loop.
-			} break;
-
-		case WM_CLOSE:
-			{
-				// This message is sent when a window or an application should
-				// terminate.
-			} break;
-
-		case WM_DESTROY: 
-			{
-				// This message is sent when a window has been destroyed.
-
-				PostQuitMessage(0);
-				return( 0 );
-			} break;
-
-		case WM_SIZE:
-			{				
-                EvtWindowResize* pEvent = new EvtWindowResize( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
-			} break;
-
-
-		case WM_LBUTTONUP:
-			{				
-                EvtMouseLButtonUp* pEvent = new EvtMouseLButtonUp( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
-			} break;
-
-		case WM_LBUTTONDOWN:
-			{
-                EvtMouseLButtonDown* pEvent = new EvtMouseLButtonDown( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
-			} break;
-			
-		case WM_MBUTTONUP:
-			{
-                EvtMouseMButtonUp* pEvent = new EvtMouseMButtonUp( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
-			} break;
-
-		case WM_MBUTTONDOWN:
-			{
-                EvtMouseMButtonDown* pEvent = new EvtMouseMButtonDown( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
-			} break;
-
-		case WM_RBUTTONUP:
-			{
-                EvtMouseRButtonUp* pEvent = new EvtMouseRButtonUp( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
-			} break;
-
-		case WM_RBUTTONDOWN:
-			{
-                EvtMouseRButtonDown* pEvent = new EvtMouseRButtonDown( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
-			} break;
-
-		case WM_MOUSEMOVE:
-			{
-                EvtMouseMove* pEvent = new EvtMouseMove( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
-			} break;
-
-		case WM_MOUSEWHEEL:
-			{
-                EvtMouseWheel* pEvent = new EvtMouseWheel( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
-			} break;
-
-		case WM_CHAR:
-			{
-				EvtChar* pEvent = new EvtChar( hwnd, wparam, lparam );
-				EventManager::Get()->ProcessEvent( pEvent );
-				//return( 0 );
-			} break;
-
-		case WM_KEYDOWN:
-			{
-				EvtKeyDown* pEvent = new EvtKeyDown( hwnd, wparam, lparam );
-				EventManager::Get()->ProcessEvent( pEvent );
-				//return( 0 );
-			} break;
-
-		case WM_KEYUP:
-			{
-				EvtKeyUp* pEvent = new EvtKeyUp( hwnd, wparam, lparam );
-				EventManager::Get()->ProcessEvent( pEvent );
-				//return( 0 );
-			} break;
-    }
-	return( DefWindowProc( hwnd, msg, wparam, lparam ) );
 }
 //--------------------------------------------------------------------------------

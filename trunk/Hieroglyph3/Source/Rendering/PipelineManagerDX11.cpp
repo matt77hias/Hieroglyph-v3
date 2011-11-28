@@ -607,11 +607,11 @@ void PipelineManagerDX11::Draw( RenderEffectDX11& effect, ResourcePtr vb, Resour
 	
 	// Bind the vertex and index buffers.
 	if ( vb != NULL ) {
-		IAState.SetVertexBuffer( 0, vb, 0, vertexStride );
+		IAState.SetVertexBuffer( 0, vb->m_iResource, 0, vertexStride );
 	}
 
 	if ( ib != NULL ) {
-		IAState.SetIndexBuffer( ib );
+		IAState.SetIndexBuffer( ib->m_iResource );
 	}
 
 	// Bind the input layout.

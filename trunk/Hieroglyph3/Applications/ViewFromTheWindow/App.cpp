@@ -95,8 +95,8 @@ bool App::ConfigureEngineComponents()
 		// Configure the window and initialize it.
 		m_pWindow[i]->SetPosition( x, y );
 		m_pWindow[i]->SetSize( w, h );
-		m_pWindow[i]->SetCaption( std::wstring( L"Direct3D 11 Window" ) );
-		m_pWindow[i]->Initialize();
+		m_pWindow[i]->SetCaption( GetName() );
+		m_pWindow[i]->Initialize( this );
 
 		// Create a swap chain for the window.
 		SwapChainConfigDX11 Config;
@@ -318,6 +318,6 @@ bool App::HandleEvent( IEvent* pEvent )
 //--------------------------------------------------------------------------------
 std::wstring App::GetName( )
 {
-	return( std::wstring( L"BasicApplication" ) );
+	return( std::wstring( L"View From The Window" ) );
 }
 //--------------------------------------------------------------------------------

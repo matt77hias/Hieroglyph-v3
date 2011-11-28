@@ -53,6 +53,11 @@ RenderApplication::~RenderApplication( )
 {
 }
 //--------------------------------------------------------------------------------
+Win32RenderWindow* RenderApplication::CreateRenderWindow( )
+{
+	return( new Win32RenderWindow() );
+}
+//--------------------------------------------------------------------------------
 bool RenderApplication::ConfigureRenderingEngineComponents( UINT width, UINT height, D3D_FEATURE_LEVEL desiredLevel, D3D_DRIVER_TYPE driverType )
 {
 	// Create the renderer and initialize it for the desired device
@@ -80,11 +85,11 @@ bool RenderApplication::ConfigureRenderingEngineComponents( UINT width, UINT hei
 	m_iHeight = height;
 
 	// Create the window wrapper class instance.
-	m_pWindow = new Win32RenderWindow();
+	m_pWindow = CreateRenderWindow();
 	m_pWindow->SetPosition( 20, 20 );
 	m_pWindow->SetSize( m_iWidth, m_iHeight );
 	m_pWindow->SetCaption( GetName() );
-	m_pWindow->Initialize();
+	m_pWindow->Initialize( this );
 
 	// Create a swap chain for the window.
 	SwapChainConfigDX11 Config;

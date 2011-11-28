@@ -108,6 +108,15 @@ void Vector3f::Clamp()
 	if ( z < 0.0f ) z = 0.0f;
 }
 //----------------------------------------------------------------------------------------------------
+Vector3f Vector3f::Random( )
+{
+	float x = static_cast<float>( (double)rand() / RAND_MAX ) * 2.0f - 1.0f;
+	float y = static_cast<float>( (double)rand() / RAND_MAX ) * 2.0f - 1.0f;
+	float z = static_cast<float>( (double)rand() / RAND_MAX ) * 2.0f - 1.0f;
+	
+	return( Vector3f( x, y, z ) );
+}
+//----------------------------------------------------------------------------------------------------
 Vector3f& Vector3f::operator= ( const Vector3f& Vector )
 {
 	x = Vector.x;

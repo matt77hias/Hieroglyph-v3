@@ -7,6 +7,8 @@
 //
 // Copyright (c) 2003-2010 Jason Zink 
 //--------------------------------------------------------------------------------
+// History:
+// Nov 15, 2011  F. Piette added argument IWindowProc to Initialize method
 
 //--------------------------------------------------------------------------------
 // Win32RenderWindow
@@ -16,6 +18,7 @@
 #define Win32RenderWindow_h
 //--------------------------------------------------------------------------------
 #include "RenderWindow.h"
+#include "IWindowProc.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -25,7 +28,7 @@ namespace Glyph3
 		Win32RenderWindow( );
 		virtual ~Win32RenderWindow( );
 
-		virtual void Initialize();
+		virtual void Initialize( IWindowProc* WindowProcObj );
 		virtual void Shutdown();
 		virtual void Paint();
 	};

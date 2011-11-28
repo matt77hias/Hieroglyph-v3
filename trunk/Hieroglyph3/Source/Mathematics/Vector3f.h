@@ -40,6 +40,7 @@ namespace Glyph3
         static float Dot( const Vector3f& A, const Vector3f& B );
         static Vector3f Normalize( const Vector3f& A );
         static Vector3f Perpendicular( const Vector3f& A );
+		static Vector3f Random( );
 
 		// assignment
 		Vector3f& operator= (const Vector3f& Vector);

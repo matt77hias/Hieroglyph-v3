@@ -190,13 +190,15 @@ void App::Update()
 
 	// Update the scene, and then render all cameras within the scene.
 
-	//m_pRenderer11->StartPipelineStatistics();
+	std::wstringstream out;
+	out << L"Hieroglyph 3 : " << GetName() << std::endl;
+	out << L"FPS: " << m_pTimer->Framerate();
+	m_pTextOverlayView->WriteText( out.str(), Matrix4f::TranslationMatrix( 5.0f, 5.0f, 0.0f ),
+		Vector4f( 0.2f, 0.2f, 0.2f, 1.0f ) );
 
 	m_pScene->Update( m_pTimer->Elapsed() );
 	m_pScene->Render( m_pRenderer11 );
 
-	//m_pRenderer11->EndPipelineStatistics();
-	//Log::Get().Write( m_pRenderer11->PrintPipelineStatistics() );
 
 	// Perform the rendering and presentation for the window.
 

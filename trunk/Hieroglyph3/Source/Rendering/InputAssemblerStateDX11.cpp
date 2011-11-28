@@ -29,12 +29,12 @@ void InputAssemblerStateDX11::SetFeautureLevel( D3D_FEATURE_LEVEL level )
 	m_FeatureLevel = level;
 }
 //--------------------------------------------------------------------------------
-void InputAssemblerStateDX11::SetIndexBuffer( ResourcePtr buffer )
+void InputAssemblerStateDX11::SetIndexBuffer( int buffer )
 {
 	IndexBuffer = buffer;
 }
 //--------------------------------------------------------------------------------
-void InputAssemblerStateDX11::SetVertexBuffer( unsigned int slot, ResourcePtr buffer, 
+void InputAssemblerStateDX11::SetVertexBuffer( unsigned int slot, int buffer, 
 												unsigned int offset, unsigned int stride )
 {
 	if ( slot < D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT ) {
@@ -61,7 +61,7 @@ void InputAssemblerStateDX11::ClearState()
 	IndexBuffer = NULL;
 
 	for ( int i = 0; i < D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT; i++ ) {
-		VertexBuffers[i] = NULL;
+		VertexBuffers[i] = -1;
 		VertexStrides[i] = 0;
 		VertexOffsets[i] = 0;
 	}

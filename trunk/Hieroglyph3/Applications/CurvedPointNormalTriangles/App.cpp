@@ -47,7 +47,7 @@ bool App::ConfigureEngineComponents()
 	m_pWindow->SetPosition( 25, 25 );
 	m_pWindow->SetSize( width, height );
 	m_pWindow->SetCaption( GetName( ) );
-	m_pWindow->Initialize();
+	m_pWindow->Initialize( this );
 
 	
 	// Create the renderer and initialize it for the desired device

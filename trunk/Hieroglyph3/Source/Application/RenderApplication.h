@@ -29,6 +29,8 @@ public:
 	virtual void HandleWindowResize( HWND handle, UINT width, UINT height );
 	virtual bool HandleEvent( IEvent* pEvent );
 
+	virtual Win32RenderWindow* CreateRenderWindow();
+
 
 protected:
 

@@ -36,7 +36,6 @@ bool App::ConfigureEngineComponents()
 		return( false );
 	}
 
-	m_pRenderer11->SetMultiThreadingState( false );
 	return( true );
 }
 //--------------------------------------------------------------------------------
@@ -79,20 +78,18 @@ void App::Initialize()
 	m_pNode = new Node3D();
 	
 	m_pDiffuseActor = new Actor();
-	m_pDiffuseActor->GetNode()->AttachController( new RotationController( Vector3f( 1.0f, 0.0f, 0.0f ), 0.5f ) );
+	m_pDiffuseActor->GetNode()->AttachController( new RotationController( Vector3f::Random(), 0.05f ) );
 
     DiffuseSphereEntity::LoadResources();
 	for ( int i = 0; i < 200; i++ )
 	{
-		float x = static_cast<float>( (double)rand() / RAND_MAX ) * 2.0f - 1.0f;
-		float y = static_cast<float>( (double)rand() / RAND_MAX ) * 2.0f - 1.0f;
-		float z = static_cast<float>( (double)rand() / RAND_MAX ) * 2.0f - 1.0f;
-		
-		Vector3f pos = Vector3f( x, y, z );
+		Vector3f pos = Vector3f::Random();
 		pos.Normalize();
 
 		Entity3D* pEntity = new DiffuseSphereEntity();
 		pEntity->Position() = pos * radius;
+		pEntity->AttachController( new RotationController( Vector3f::Random(), 1.0f ) );
+
 		m_pDiffuseActor->GetNode()->AttachChild( pEntity );
 		m_pDiffuseActor->AddElement( pEntity );
 	}
@@ -105,12 +102,17 @@ void App::Initialize()
 		m_pReflector[i] = new ReflectiveSphereEntity();
 		m_pReflector[i]->Position() = Vector3f( -1.0, 1.0f+(i*3), 0.0f );
 		m_pReflector[i]->m_pParaboloidView->SetRoot( m_pScene->GetRoot() );
+		
 		m_pNode->AttachChild( m_pReflector[i] );
 	}
 
 	m_pReflector[0]->Position() = Vector3f( -1.0, 1.0f, 1.0f );
 	m_pReflector[1]->Position() = Vector3f( 1.0, 1.0f, 1.0f );
 	m_pReflector[2]->Position() = Vector3f( 0.0, -1.0f, 1.0f );
+
+	m_pReflector[0]->m_pParaboloidView->SetBackColor( Vector4f( 0.75f, 0.0f, 0.0f, 1.0f ) );
+	m_pReflector[1]->m_pParaboloidView->SetBackColor( Vector4f( 0.0f, 0.75f, 0.0f, 1.0f ) );
+	m_pReflector[2]->m_pParaboloidView->SetBackColor( Vector4f( 0.0f, 0.0f, 0.75f, 1.0f ) );
 
 	m_pNode->AttachChild( m_pDiffuseActor->GetNode() );
 	

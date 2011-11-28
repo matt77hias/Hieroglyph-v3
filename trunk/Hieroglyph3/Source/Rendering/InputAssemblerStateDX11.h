@@ -30,8 +30,8 @@ namespace Glyph3
 
 		void SetFeautureLevel( D3D_FEATURE_LEVEL level );
 
-		void SetIndexBuffer( ResourcePtr buffer );
-		void SetVertexBuffer( unsigned int slot, ResourcePtr buffer, unsigned int offset, unsigned int stride );
+		void SetIndexBuffer( int buffer );
+		void SetVertexBuffer( unsigned int slot, int buffer, unsigned int offset, unsigned int stride );
 		void SetInputLayout( int layout );
 		void SetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY topology );
 
@@ -48,8 +48,8 @@ namespace Glyph3
 
 		D3D_FEATURE_LEVEL				m_FeatureLevel;
 
-		ResourcePtr						IndexBuffer;
-		ResourcePtr						VertexBuffers[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
+		int								IndexBuffer;
+		int								VertexBuffers[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
 		UINT							VertexStrides[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
 		UINT							VertexOffsets[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
 		int								InputLayout;

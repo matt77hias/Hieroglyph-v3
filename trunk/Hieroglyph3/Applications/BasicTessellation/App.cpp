@@ -46,8 +46,8 @@ bool App::ConfigureEngineComponents()
 	m_pWindow = new Win32RenderWindow();
 	m_pWindow->SetPosition( 25, 25 );
 	m_pWindow->SetSize( width, height );
-	m_pWindow->SetCaption( std::wstring( L"Direct3D 11 Window #1" ) );
-	m_pWindow->Initialize();
+	m_pWindow->SetCaption( GetName() );
+	m_pWindow->Initialize( this );
 
 	
 	// Create the renderer and initialize it for the desired device
@@ -219,10 +219,10 @@ void App::Update()
 	// Use a time varying quantity for animation.
 
 	static float fRotation = 0.0f;
-	fRotation += m_pTimer->Elapsed() * 3.14f;
+	fRotation += m_pTimer->Elapsed() * 3.14f * 0.05f;
 
 	static float fTessellation = 3.0f * 3.14f / 2.0f;
-	fTessellation += m_pTimer->Elapsed() * 2.0f * 3.14f;
+	fTessellation += m_pTimer->Elapsed() * 0.2f * 3.14f;
 
 	float factor = sinf( fTessellation ) * 6.0f + 7.0f;
 	m_TessParams = Vector4f( factor, factor, factor, factor );

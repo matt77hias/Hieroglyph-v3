@@ -34,7 +34,7 @@ App::App()
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
 {
-	if ( !ConfigureRenderingEngineComponents( 640, 480, D3D_FEATURE_LEVEL_11_0 ) ) {
+	if ( !ConfigureRenderingEngineComponents( 640, 480, D3D_FEATURE_LEVEL_11_0 /* , D3D_DRIVER_TYPE_REFERENCE */ ) ) {
 		return( false );
 	}
 
@@ -55,6 +55,8 @@ void App::Initialize()
 {
 	m_iImage = 0;
 	m_iAlgorithm = 0;
+
+    m_pRenderer11->SetMultiThreadingState( false );
 
 	// Create render effects for each of the required compute shaders for all of
 	// our various algorithms.

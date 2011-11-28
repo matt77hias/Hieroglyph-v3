@@ -75,9 +75,9 @@ void InputAssemblerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 
 	UINT slot = 0;
 	while ( slot < D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT
-		&& m_DesiredState.VertexBuffers[slot] != NULL )
+		&& m_DesiredState.VertexBuffers[slot] != -1 )
 	{
-		int index = m_DesiredState.VertexBuffers[slot]->m_iResource;
+		int index = m_DesiredState.VertexBuffers[slot];
 
 		// Select only the index portion of the handle.
 		int TYPE	= index & 0x00FF0000;
@@ -94,7 +94,7 @@ void InputAssemblerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 
 
 	// TODO: Add the ability to use different formats and offsets to this function!
-	int index = m_DesiredState.IndexBuffer->m_iResource;
+	int index = m_DesiredState.IndexBuffer;
 
 	// Select only the index portion of the handle.
 	int TYPE	= index & 0x00FF0000;

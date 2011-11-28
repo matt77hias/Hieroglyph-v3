@@ -1122,6 +1122,9 @@
     <ClInclude Include="Rendering\PipelineExecutorDX11.h">
       <Filter>Rendering\Rendering Geometry</Filter>
     </ClInclude>
+    <ClInclude Include="Application\IWindowProc.h">
+      <Filter>Application</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Utility\TArray.inl">

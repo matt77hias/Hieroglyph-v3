@@ -33,11 +33,30 @@
 #include "Timer.h"
 #include "EventManager.h"
 #include "IEventListener.h"
+#include "IWindowProc.h"
 #include "Scene.h"
+// Window Events
+#include "EvtWindowResize.h"
+
+// Keyboard Events
+#include "EvtChar.h"
+#include "EvtKeyUp.h"
+#include "EvtKeyDown.h"
+
+// Mouse Events
+#include "EvtMouseWheel.h"
+#include "EvtMouseMove.h"
+#include "EvtMouseLeave.h"
+#include "EvtMouseLButtonUp.h"
+#include "EvtMouseLButtonDown.h"
+#include "EvtMouseMButtonUp.h"
+#include "EvtMouseMButtonDown.h"
+#include "EvtMouseRButtonUp.h"
+#include "EvtMouseRButtonDown.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class Application : public IEventListener
+	class Application : public IEventListener, public IWindowProc
 	{
 	public:
 		Application();
@@ -52,6 +71,8 @@ namespace Glyph3
 		virtual void Initialize() = 0;
 		virtual void Update() = 0;
 		virtual void Shutdown() = 0;
+		virtual void MessageLoop();
+		virtual LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam); 
 
 		virtual bool HandleEvent( IEvent* pEvent );
 

@@ -13,7 +13,7 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-extern LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+extern LRESULT CALLBACK WindowProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam );
 //--------------------------------------------------------------------------------
 Win32RenderWindow::Win32RenderWindow( )
 {
@@ -25,16 +25,25 @@ Win32RenderWindow::~Win32RenderWindow()
 	Shutdown();
 }
 //--------------------------------------------------------------------------------
-void Win32RenderWindow::Initialize()
+LRESULT CALLBACK InternalWindowProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam )
+{
+	LONG ObjPtr = GetWindowLongPtr(hwnd, 0);
+	if (ObjPtr == 0)
+        return( DefWindowProc( hwnd, msg, wparam, lparam ) );
+	else
+	    return( ((IWindowProc*)ObjPtr)->WindowProc(hwnd, msg, wparam, lparam) );
+}
+//--------------------------------------------------------------------------------
+void Win32RenderWindow::Initialize(IWindowProc* WindowProcObj)
 {
 	WNDCLASSEX wc;
 	
 	// Setup the window class
 	wc.cbSize			= sizeof(WNDCLASSEX);
 	wc.style			= CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc		= WindowProc;
+	wc.lpfnWndProc		= InternalWindowProc;
 	wc.cbClsExtra		= 0;
-	wc.cbWndExtra		= 0;
+	wc.cbWndExtra		= sizeof(WindowProcObj);
 	wc.hInstance		= 0;
 	wc.hIcon			= LoadIcon(NULL, IDI_APPLICATION);
 	wc.hCursor			= LoadCursor(NULL, IDC_ARROW); 
@@ -80,9 +89,14 @@ void Win32RenderWindow::Initialize()
 		NULL,							// instance of this application
 		NULL );							// extra creation parms
 	
-	// Initially display the window
-	ShowWindow( m_hWnd, SW_SHOWNORMAL );
-    UpdateWindow( m_hWnd );
+	if (m_hWnd) {
+		// Set in the "extra" bytes the pointer to the IWindowProc object
+		// which handles messages for the window
+        SetWindowLong(m_hWnd, 0, (LONG)WindowProcObj);
+    	// Initially display the window
+		ShowWindow( m_hWnd, SW_SHOWNORMAL );
+		UpdateWindow( m_hWnd );
+	}
 }
 //--------------------------------------------------------------------------------
 void Win32RenderWindow::Shutdown()

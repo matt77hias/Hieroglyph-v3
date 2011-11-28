@@ -69,8 +69,8 @@ bool App::ConfigureEngineComponents()
 	m_pWindow = new Win32RenderWindow();
 	m_pWindow->SetPosition( 20, 20 );
 	m_pWindow->SetSize( width, height );
-	m_pWindow->SetCaption( std::wstring( L"Direct3D 11 Window" ) );
-	m_pWindow->Initialize();
+	m_pWindow->SetCaption( GetName() );
+	m_pWindow->Initialize( this );
 
 	// Create a swap chain for the window.
 	SwapChainConfigDX11 Config;

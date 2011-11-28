@@ -443,6 +443,7 @@ copy Animation\*.h ..\SDK\Include
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application\IWindowProc.h" />
     <ClInclude Include="Mathematics\Matrix3f.h" />
     <ClInclude Include="Mathematics\Matrix4f.h" />
     <ClInclude Include="Mathematics\PerlinNoise.h" />

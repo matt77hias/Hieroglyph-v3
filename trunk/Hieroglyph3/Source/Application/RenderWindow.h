@@ -14,6 +14,7 @@
 #define RenderWindow_h
 //--------------------------------------------------------------------------------
 #include "PCH.h"
+#include "IWindowProc.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -23,7 +24,7 @@ namespace Glyph3
 		RenderWindow( );
 		virtual ~RenderWindow( );
 
-		virtual void Initialize() = 0;
+		virtual void Initialize( IWindowProc* WindowProcObj ) = 0;
 		virtual void Shutdown() = 0;
 		virtual void Paint() = 0;
 
