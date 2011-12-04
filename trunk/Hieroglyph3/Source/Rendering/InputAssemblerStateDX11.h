@@ -40,7 +40,7 @@ namespace Glyph3
 		UINT GetVertexStride( UINT slot );
 		UINT GetVertexOffset( UINT slot );
 
-
+		int CompareVertexBufferState( InputAssemblerStateDX11& desired );
 
 		void ClearState( );
 

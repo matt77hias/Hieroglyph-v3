@@ -31,7 +31,7 @@ namespace Glyph3
 	protected:
 		ID3D11PixelShader*			m_pPixelShader;
 
-		friend PipelineManagerDX11;
+		friend PixelStageDX11;
 	};
 };
 //--------------------------------------------------------------------------------

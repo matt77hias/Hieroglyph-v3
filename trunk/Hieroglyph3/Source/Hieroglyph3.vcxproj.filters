@@ -80,9 +80,6 @@
     <Filter Include="Rendering\Pipeline">
       <UniqueIdentifier>{d99f0623-8780-4d4b-84a6-958f5bdffab9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Rendering\Pipeline\Shader Programs">
-      <UniqueIdentifier>{b22437a4-23e9-4c6d-82ab-b1f9db28f01e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Rendering\Pipeline\Shader Stages">
       <UniqueIdentifier>{e2dd4465-1101-4e8b-8c3c-8a0d026de8da}</UniqueIdentifier>
     </Filter>
@@ -127,6 +124,15 @@
     </Filter>
     <Filter Include="Events\Rendering Events">
       <UniqueIdentifier>{fdcaa64a-b076-465c-9f59-64f466540be8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline\Shader Stages\Stages">
+      <UniqueIdentifier>{8b2a725c-efa4-49dd-9c67-36e4631cc2a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline\Shader Stages\States">
+      <UniqueIdentifier>{6df9830a-b7fa-41cd-9107-b88a79203bea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline\Shader Stages\Shader Programs">
+      <UniqueIdentifier>{b22437a4-23e9-4c6d-82ab-b1f9db28f01e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -359,46 +365,25 @@
       <Filter>Rendering\Pipeline</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\ComputeShaderDX11.cpp">
-      <Filter>Rendering\Pipeline\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\DomainShaderDX11.cpp">
-      <Filter>Rendering\Pipeline\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\GeometryShaderDX11.cpp">
-      <Filter>Rendering\Pipeline\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\HullShaderDX11.cpp">
-      <Filter>Rendering\Pipeline\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\PixelShaderDX11.cpp">
-      <Filter>Rendering\Pipeline\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\ShaderDX11.cpp">
-      <Filter>Rendering\Pipeline\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\VertexShaderDX11.cpp">
-      <Filter>Rendering\Pipeline\Shader Programs</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\ComputeStageDX11.cpp">
-      <Filter>Rendering\Pipeline\Shader Stages</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\DomainStageDX11.cpp">
-      <Filter>Rendering\Pipeline\Shader Stages</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\GeometryStageDX11.cpp">
-      <Filter>Rendering\Pipeline\Shader Stages</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\HullStageDX11.cpp">
-      <Filter>Rendering\Pipeline\Shader Stages</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\PixelStageDX11.cpp">
-      <Filter>Rendering\Pipeline\Shader Stages</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\ShaderStageDX11.cpp">
-      <Filter>Rendering\Pipeline\Shader Stages</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\VertexStageDX11.cpp">
-      <Filter>Rendering\Pipeline\Shader Stages</Filter>
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\OutputMergerStageDX11.cpp">
       <Filter>Rendering\Pipeline\Fixed Stages</Filter>
@@ -612,6 +597,30 @@
     </ClCompile>
     <ClCompile Include="Rendering\PipelineExecutorDX11.cpp">
       <Filter>Rendering\Rendering Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\ComputeStageDX11.cpp">
+      <Filter>Rendering\Pipeline\Shader Stages\Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\DomainStageDX11.cpp">
+      <Filter>Rendering\Pipeline\Shader Stages\Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\GeometryStageDX11.cpp">
+      <Filter>Rendering\Pipeline\Shader Stages\Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\HullStageDX11.cpp">
+      <Filter>Rendering\Pipeline\Shader Stages\Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\PixelStageDX11.cpp">
+      <Filter>Rendering\Pipeline\Shader Stages\Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\ShaderStageDX11.cpp">
+      <Filter>Rendering\Pipeline\Shader Stages\Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\VertexStageDX11.cpp">
+      <Filter>Rendering\Pipeline\Shader Stages\Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\ShaderStageStateDX11.cpp">
+      <Filter>Rendering\Pipeline\Shader Stages\States</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -862,46 +871,25 @@
       <Filter>Rendering\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ComputeShaderDX11.h">
-      <Filter>Rendering\Pipeline\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\DomainShaderDX11.h">
-      <Filter>Rendering\Pipeline\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\GeometryShaderDX11.h">
-      <Filter>Rendering\Pipeline\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\HullShaderDX11.h">
-      <Filter>Rendering\Pipeline\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\PixelShaderDX11.h">
-      <Filter>Rendering\Pipeline\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ShaderDX11.h">
-      <Filter>Rendering\Pipeline\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\VertexShaderDX11.h">
-      <Filter>Rendering\Pipeline\Shader Programs</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\ComputeStageDX11.h">
-      <Filter>Rendering\Pipeline\Shader Stages</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DomainStageDX11.h">
-      <Filter>Rendering\Pipeline\Shader Stages</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\GeometryStageDX11.h">
-      <Filter>Rendering\Pipeline\Shader Stages</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\HullStageDX11.h">
-      <Filter>Rendering\Pipeline\Shader Stages</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\PixelStageDX11.h">
-      <Filter>Rendering\Pipeline\Shader Stages</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\ShaderStageDX11.h">
-      <Filter>Rendering\Pipeline\Shader Stages</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\VertexStageDX11.h">
-      <Filter>Rendering\Pipeline\Shader Stages</Filter>
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\OutputMergerStageDX11.h">
       <Filter>Rendering\Pipeline\Fixed Stages</Filter>
@@ -1124,6 +1112,30 @@
     </ClInclude>
     <ClInclude Include="Application\IWindowProc.h">
       <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\ShaderStageDX11.h">
+      <Filter>Rendering\Pipeline\Shader Stages\Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\ComputeStageDX11.h">
+      <Filter>Rendering\Pipeline\Shader Stages\Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DomainStageDX11.h">
+      <Filter>Rendering\Pipeline\Shader Stages\Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\GeometryStageDX11.h">
+      <Filter>Rendering\Pipeline\Shader Stages\Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\HullStageDX11.h">
+      <Filter>Rendering\Pipeline\Shader Stages\Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\PixelStageDX11.h">
+      <Filter>Rendering\Pipeline\Shader Stages\Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\VertexStageDX11.h">
+      <Filter>Rendering\Pipeline\Shader Stages\Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\ShaderStageStateDX11.h">
+      <Filter>Rendering\Pipeline\Shader Stages\States</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

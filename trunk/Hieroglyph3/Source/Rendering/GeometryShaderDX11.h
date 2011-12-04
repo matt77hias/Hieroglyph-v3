@@ -31,7 +31,7 @@ namespace Glyph3
 	protected:
 		ID3D11GeometryShader*			m_pGeometryShader;
 
-		friend PipelineManagerDX11;
+		friend GeometryStageDX11;
 	};
 };
 //--------------------------------------------------------------------------------

@@ -31,7 +31,7 @@ namespace Glyph3
 	protected:
 		ID3D11VertexShader*			m_pVertexShader;
 
-		friend PipelineManagerDX11;
+		friend VertexStageDX11;
 	};
 };
 //--------------------------------------------------------------------------------

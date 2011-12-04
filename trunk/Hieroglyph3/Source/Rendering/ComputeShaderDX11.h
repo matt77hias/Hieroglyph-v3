@@ -31,7 +31,7 @@ namespace Glyph3
 	protected:
 		ID3D11ComputeShader*			m_pComputeShader;
 
-		friend PipelineManagerDX11;
+		friend ComputeStageDX11;
 	};
 };
 //--------------------------------------------------------------------------------

@@ -16,7 +16,13 @@ Acknowledgements:
 
 I have been a long-time fan of Dave Eberly, and his WildMagic engine.  Several of the math classes in Hieroglyph are based on his implementations, and his vast engine provides a wealth of knowledge.  If you haven't seen it yet, go to his website and see what you think: www.geometrictools.com
 
-I also use Lua, which is a fanstastic scripting language for use with C/C++.  If you haven't used it before, take the time to look around here: www.lua.org
+I also use Lua, which is a fanstastic scripting language for use with C/C++.  If you haven't used it before, take the time to look around here: www.lua.org.
+
+Hieroglyph 3 is also starting to get contributions from some of its users.  I would like to list the names of the contributors here as a small token of appreciation for their help, and also to provide their contact information if they choose to list it (if you have contributed and would like to be added to the list, please let me know!):
+
+Matt Pettineo
+Jack Hoxley
+Francois Piette, (francois.piette@overbyte.be, www.overbyte.be)
 
 
 Building Instructions:

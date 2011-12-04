@@ -16,6 +16,7 @@
 #define ShaderStageDX11_h
 //--------------------------------------------------------------------------------
 #include "ShaderDX11.h"
+#include "ShaderStageStateDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -27,48 +28,38 @@ namespace Glyph3
 
 		void SetFeatureLevel( D3D_FEATURE_LEVEL level );
 
-		void SetShaderIndex( int index );
-		void SetConstantBuffer( int index, ID3D11Buffer* pBuffer );
-		void SetSamplerState( int index, ID3D11SamplerState* pState );
-		void SetShaderResourceView( int index, ID3D11ShaderResourceView* pSRV );
-		void SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV, unsigned int initial = -1 );
+		void ClearDesiredState( );
+		void ClearCurrentState( );
+		void ApplyDesiredState( ID3D11DeviceContext* pContext );
 
-		int GetShaderIndex();
+		// This method is used to allow each sub-class to identify what type of stage
+		// it is.
+		
 		virtual ShaderType GetType() = 0;
-		void BindResources( ID3D11DeviceContext* pContext );
-		void UnbindResources( ID3D11DeviceContext* pContext );
 
+		// These methods are stubs for the individual stages to implement.  This allows
+		// each stage to use the appropriate ID3D11DeviceContext::XSSetYYY() methods.
+
+		virtual void BindShaderProgram( ID3D11DeviceContext* ) = 0;
 		virtual void BindConstantBuffers( ID3D11DeviceContext* pContext, int count ) = 0;
 		virtual void BindSamplerStates( ID3D11DeviceContext* pContext, int count ) = 0;
 		virtual void BindShaderResourceViews( ID3D11DeviceContext* pContext, int count ) = 0;
 		virtual void BindUnorderedAccessViews( ID3D11DeviceContext* pContext, int count ) = 0;
 
+		// The desired state is a public member that will allow the user of this
+		// class to configure the state as desired before applying the state.
+
+		ShaderStageStateDX11		DesiredState;
 
 	protected:
 
 		D3D_FEATURE_LEVEL			m_FeatureLevel;
 
-		int							m_ShaderIndex;
+		// The current state of the API is used to allow for caching and elimination
+		// of redundant API calls.  This should make it possible to minimize the number
+		// of settings that need to be performed.
 
-		// TODO: Set up some way to selectively record the current state of the 
-		//       pipeline, then only set the needed shader slots instead of always
-		//       setting all of them.
-
-		ID3D11Buffer*				ConstantBuffers[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT];
-		ID3D11SamplerState*			SamplerStates[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT];
-		ID3D11ShaderResourceView*	ShaderResourceViews[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT];
-		ID3D11UnorderedAccessView*	UnorderedAccessViews[D3D11_PS_CS_UAV_REGISTER_COUNT];
-		unsigned int				UAVInitCounts[D3D11_PS_CS_UAV_REGISTER_COUNT];
-
-		int iCurrMaxCB, iNextMaxCB;
-		int iCurrMaxSS, iNextMaxSS;
-		int iCurrMaxSRV, iNextMaxSRV;
-		int iCurrMaxUAV, iNextMaxUAV;
-
-		bool bBuffersDirty;
-		bool bSamplersDirty;
-		bool bShaderResourceViewsDirty;
-		bool bUnorderedAccessViewsDirty;
+		ShaderStageStateDX11		CurrentState;
 	};
 };
 //--------------------------------------------------------------------------------

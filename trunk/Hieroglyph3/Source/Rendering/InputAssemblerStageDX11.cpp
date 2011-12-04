@@ -11,10 +11,11 @@
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "RendererDX11.h"
-#include "ResourceDX11.h"
 #include "Log.h"
 #include "InputAssemblerStageDX11.h"
 #include "InputLayoutDX11.h"
+#include "VertexBufferDX11.h"
+#include "IndexBufferDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -30,25 +31,18 @@ InputAssemblerStageDX11::~InputAssemblerStageDX11()
 void InputAssemblerStageDX11::SetFeautureLevel( D3D_FEATURE_LEVEL level )
 {
 	m_FeatureLevel = level;
-}
-//--------------------------------------------------------------------------------
-void InputAssemblerStageDX11::SetDesiredState( InputAssemblerStateDX11& state )
-{
-	m_DesiredState.IndexBuffer = state.IndexBuffer;
-
-	for ( int i = 0; i < D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT; i++ ) {
-		m_DesiredState.VertexBuffers[i] = state.VertexBuffers[i];
-		m_DesiredState.VertexStrides[i] = state.VertexStrides[i];
-		m_DesiredState.VertexOffsets[i] = state.VertexOffsets[i];
-	}
-
-	m_DesiredState.InputLayout = state.InputLayout;
-	m_DesiredState.PrimitiveTopology = state.PrimitiveTopology;
+	CurrentState.SetFeautureLevel( level );
+	DesiredState.SetFeautureLevel( level );
 }
 //--------------------------------------------------------------------------------
 void InputAssemblerStageDX11::ClearDesiredState()
 {
-	m_DesiredState.ClearState();
+	DesiredState.ClearState();
+}
+//--------------------------------------------------------------------------------
+void InputAssemblerStageDX11::ClearCurrentState()
+{
+	CurrentState.ClearState();
 }
 //--------------------------------------------------------------------------------
 void InputAssemblerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
@@ -56,58 +50,60 @@ void InputAssemblerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 	// Bind the input layout first.
 
 	RendererDX11* pRenderer = RendererDX11::Get();
-	InputLayoutDX11* pLayout = pRenderer->GetInputLayout( m_DesiredState.InputLayout );
 
-	if ( pLayout )
-		pContext->IASetInputLayout( pLayout->m_pInputLayout );
-	else
-		Log::Get().Write( L"Tried to bind an invalid input layout ID!" );
+	// Compare the primitive topology of the desired and current states
+	if ( DesiredState.InputLayout != CurrentState.InputLayout ) {
+		InputLayoutDX11* pLayout = pRenderer->GetInputLayout( DesiredState.InputLayout );
 
+		if ( pLayout )
+			pContext->IASetInputLayout( pLayout->m_pInputLayout );
+		else
+			Log::Get().Write( L"Tried to bind an invalid input layout ID!" );
+	}
 
 	// Bind the primitive topology
-
-	pContext->IASetPrimitiveTopology( m_DesiredState.PrimitiveTopology );
-
+	if ( DesiredState.PrimitiveTopology != CurrentState.PrimitiveTopology ) {
+		pContext->IASetPrimitiveTopology( DesiredState.PrimitiveTopology );
+	}
 
 	// Bind the vertex buffers
 
-	ID3D11Buffer* Buffers[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
+	int vbuffers = CurrentState.CompareVertexBufferState( DesiredState );
+	if ( vbuffers > 0 ) {
 
-	UINT slot = 0;
-	while ( slot < D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT
-		&& m_DesiredState.VertexBuffers[slot] != -1 )
-	{
-		int index = m_DesiredState.VertexBuffers[slot];
+		ID3D11Buffer* Buffers[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
 
-		// Select only the index portion of the handle.
-		int TYPE	= index & 0x00FF0000;
-		int ID		= index & 0x0000FFFF;
+		for ( int i = 0; i <= vbuffers; i++ )
+		{
+			int index = DesiredState.VertexBuffers[i];
 
-		Buffers[slot] = reinterpret_cast<ID3D11Buffer*>( pRenderer->GetResource( ID )->GetResource() );
-		if ( !Buffers[slot] )					
-			Log::Get().Write( L"Tried to bind an invalid vertex buffer ID!" );
+			VertexBufferDX11* pBuffer = pRenderer->GetVertexBufferByIndex( index );
 
-		slot++;
+			if ( pBuffer ) {
+				Buffers[i] = reinterpret_cast<ID3D11Buffer*>( pBuffer->GetResource() );
+			} else {
+				Buffers[i] = 0;
+			}
+		}
+
+		pContext->IASetVertexBuffers( 0, vbuffers, Buffers, DesiredState.VertexStrides, DesiredState.VertexOffsets );
 	}
 
-	pContext->IASetVertexBuffers( 0, slot, Buffers, m_DesiredState.VertexStrides, m_DesiredState.VertexOffsets );
+	if ( DesiredState.IndexBuffer != CurrentState.IndexBuffer ) {
+	
+		// TODO: Add the ability to use different formats and offsets to this function!
+		int index = DesiredState.IndexBuffer;
 
+		IndexBufferDX11* pBuffer = pRenderer->GetIndexBufferByIndex( index );
 
-	// TODO: Add the ability to use different formats and offsets to this function!
-	int index = m_DesiredState.IndexBuffer;
-
-	// Select only the index portion of the handle.
-	int TYPE	= index & 0x00FF0000;
-	int ID		= index & 0x0000FFFF;
-
-	ID3D11Buffer* pBuffer = (ID3D11Buffer*)pRenderer->GetResource( ID )->GetResource();
-
-	// If the resource is in range, then attempt to set it
-	if ( pBuffer ) {
-		pContext->IASetIndexBuffer( pBuffer, DXGI_FORMAT_R32_UINT, 0 );
+		if ( pBuffer ) {
+			ID3D11Buffer* pIndexBuffer = reinterpret_cast<ID3D11Buffer*>( pBuffer->GetResource() );
+			pContext->IASetIndexBuffer( pIndexBuffer, DXGI_FORMAT_R32_UINT, 0 );
+		} else {
+			pContext->IASetIndexBuffer( 0, DXGI_FORMAT_R32_UINT, 0 );
+		}
 	}
-	else {
-		Log::Get().Write( L"Tried to bind an invalid index buffer ID!" );
-	}
+
+	CurrentState = DesiredState;
 }
 //--------------------------------------------------------------------------------

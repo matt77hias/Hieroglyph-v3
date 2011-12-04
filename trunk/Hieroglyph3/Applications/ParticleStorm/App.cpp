@@ -47,6 +47,8 @@ bool App::ConfigureEngineComponents()
 		return( false );
 	}
 
+	//m_pRenderer11->SetMultiThreadingState( false );
+
 	return( true );
 }
 //--------------------------------------------------------------------------------
@@ -75,8 +77,6 @@ void App::Initialize()
 	m_pNode->AttachChild( m_pEntity );
 	m_pScene->AddEntity( m_pNode );
 
-
-	//m_pRenderer11->SetMultiThreadingState( false );
 
 	m_pTimeFactors = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"TimeFactors" ) );
 	m_pEmitterLocation = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"EmitterLocation" ) );
@@ -137,6 +137,12 @@ void App::Update()
 	Log::Get().Write( debugout.str() );
 	*/
 
+	std::wstringstream out;
+	out << L"Hieroglyph 3 : " << GetName() << std::endl;
+	out << L"FPS: " << m_pTimer->Framerate();
+	m_pTextOverlayView->WriteText( out.str(), Matrix4f::TranslationMatrix( 5.0f, 5.0f, 0.0f ),
+		Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
 
 	// Update the scene, and then render all cameras within the scene.
 
@@ -148,11 +154,6 @@ void App::Update()
 	//m_pRenderer11->pImmPipeline->EndPipelineStatistics();
 	//Log::Get().Write( m_pRenderer11->pImmPipeline->PrintPipelineStatistics() );
 
-	std::wstringstream out;
-	out << L"Hieroglyph 3 : " << GetName() << std::endl;
-	out << L"FPS: " << m_pTimer->Framerate();
-	m_pTextOverlayView->WriteText( out.str(), Matrix4f::TranslationMatrix( 5.0f, 5.0f, 0.0f ),
-		Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 
 	// Perform the rendering and presentation for the window.

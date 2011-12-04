@@ -44,7 +44,7 @@
 #include "PixelShaderDX11.h"
 #include "ComputeShaderDX11.h"
 
-
+#include "IndirectArgsBufferDX11.h"
 
 #include <sstream>
 //--------------------------------------------------------------------------------
@@ -94,6 +94,7 @@ void PipelineManagerDX11::SetDeviceContext( ID3D11DeviceContext* pContext, D3D_F
 	ShaderStages[PIXEL_SHADER]->SetFeatureLevel( level );
 	ShaderStages[COMPUTE_SHADER]->SetFeatureLevel( level );
 
+	InputAssemblerStage.SetFeautureLevel( level );
 	OutputMergerStage.SetFeautureLevel( level );
 }
 //--------------------------------------------------------------------------------
@@ -201,7 +202,7 @@ void PipelineManagerDX11::BindConstantBufferParameter( ShaderType type, RenderPa
 				if ( ID >= 0 )
 					pBuffer = (ID3D11Buffer*)pResource->GetResource();
 
-				ShaderStages[type]->SetConstantBuffer( slot, pBuffer );
+				ShaderStages[type]->DesiredState.SetConstantBuffer( slot, pBuffer );
 			}
 			else
 			{
@@ -250,7 +251,7 @@ void PipelineManagerDX11::BindShaderResourceParameter( ShaderType type, RenderPa
 				if ( ID >= 0 )
 					pResourceView = pView->m_pShaderResourceView;
 
-				ShaderStages[type]->SetShaderResourceView( slot, pResourceView );
+				ShaderStages[type]->DesiredState.SetShaderResourceView( slot, pResourceView );
 			}
 			else
 			{
@@ -300,7 +301,7 @@ void PipelineManagerDX11::BindUnorderedAccessParameter( ShaderType type, RenderP
 				if ( ID >= 0 )
 					pResourceView = pView->m_pUnorderedAccessView;
 
-				ShaderStages[type]->SetUnorderedAccessView( slot, pResourceView, initial );
+				ShaderStages[type]->DesiredState.SetUnorderedAccessView( slot, pResourceView, initial );
 			}
 			else
 			{
@@ -349,7 +350,7 @@ void PipelineManagerDX11::BindSamplerStateParameter( ShaderType type, RenderPara
 				if ( ID >= 0 )
 					pSampler = pState->m_pState; 
 
-				ShaderStages[type]->SetSamplerState( slot, pSampler );
+				ShaderStages[type]->DesiredState.SetSamplerState( slot, pSampler );
 			}
 			else
 			{
@@ -366,42 +367,6 @@ void PipelineManagerDX11::BindSamplerStateParameter( ShaderType type, RenderPara
 		Log::Get().Write( L"Tried to set a non-existing parameter as a sampler state!" );
 	}
 }
-//--------------------------------------------------------------------------------
-//void PipelineManagerDX11::BindRenderTargets( int index, ResourcePtr RenderTarget )
-//{
-//	int RenderID = RenderTarget->m_iResourceRTV;
-//
-//	RendererDX11* pRenderer = RendererDX11::Get();
-//	
-//	RenderTargetViewDX11* pView = pRenderer->GetRenderTargetView( RenderID );
-//
-//	if ( pView )
-//	{
-//		ID3D11RenderTargetView* pRenderTarget = { pView->m_pRenderTargetView };
-//
-//		OutputMergerStage.SetRenderTargetView( index, pRenderTarget );
-//	}
-//	else
-//		Log::Get().Write( L"Tried to bind an invalid render target view!" );
-//}
-//--------------------------------------------------------------------------------
-//void PipelineManagerDX11::BindDepthTarget( ResourcePtr DepthTarget )
-//{
-//	int DepthID = DepthTarget->m_iResourceDSV;
-//
-//	RendererDX11* pRenderer = RendererDX11::Get();
-//	
-//	DepthStencilViewDX11* pView = pRenderer->GetDepthStencilView( DepthID );
-//
-//	if ( pView )
-//	{
-//		ID3D11DepthStencilView* pDepthStencilView = pView->m_pDepthStencilView;
-//
-//		OutputMergerStage.SetDepthStencilView( pDepthStencilView );
-//	}
-//	else
-//		Log::Get().Write( L"Tried to bind an invalid depth stencil view!" );
-//}
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ClearRenderTargets( )
 {
@@ -535,39 +500,54 @@ void PipelineManagerDX11::BindIndexBuffer( ResourcePtr resource )
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ApplyPipelineResources( )
 {
-	VertexShaderStage.BindResources( m_pContext );
-	HullShaderStage.BindResources( m_pContext );
-	DomainShaderStage.BindResources( m_pContext );
-	GeometryShaderStage.BindResources( m_pContext );
-	PixelShaderStage.BindResources( m_pContext );
-	ComputeShaderStage.BindResources( m_pContext );
+	VertexShaderStage.ApplyDesiredState( m_pContext );
+	HullShaderStage.ApplyDesiredState( m_pContext );
+	DomainShaderStage.ApplyDesiredState( m_pContext );
+	GeometryShaderStage.ApplyDesiredState( m_pContext );
+	PixelShaderStage.ApplyDesiredState( m_pContext );
+	ComputeShaderStage.ApplyDesiredState( m_pContext );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ClearPipelineResources( )
 {
-	VertexShaderStage.UnbindResources( m_pContext );
-	HullShaderStage.UnbindResources( m_pContext );
-	DomainShaderStage.UnbindResources( m_pContext );
-	GeometryShaderStage.UnbindResources( m_pContext );
-	PixelShaderStage.UnbindResources( m_pContext );
-	ComputeShaderStage.UnbindResources( m_pContext );
+	VertexShaderStage.ClearDesiredState( );
+	HullShaderStage.ClearDesiredState( );
+	DomainShaderStage.ClearDesiredState( );
+	GeometryShaderStage.ClearDesiredState( );
+	PixelShaderStage.ClearDesiredState( );
+	ComputeShaderStage.ClearDesiredState( );
+
+	//this->ApplyPipelineResources( );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ClearPipelineState( )
 {
 	// TODO: This method needs to update the state of each pipeline stage class!!!
 
-	// Loop through all pipeline stage representations and reset their state...
+	InputAssemblerStage.ClearCurrentState();
+	InputAssemblerStage.ClearDesiredState();
 
-	//InputAssemblerStage
-	//VertexShaderStage
-	//HullShaderStage
-	//DomainShaderStage
-	//GeometryShaderStage
+	VertexShaderStage.ClearCurrentState();
+	VertexShaderStage.ClearDesiredState();
+
+	HullShaderStage.ClearCurrentState();
+	HullShaderStage.ClearDesiredState();
+
+	DomainShaderStage.ClearCurrentState();
+	DomainShaderStage.ClearDesiredState();
+
+	GeometryShaderStage.ClearCurrentState();
+	GeometryShaderStage.ClearDesiredState();
+
 	//RasterizerStage
-	//PixelShaderStage
-	//OutputMergerStage
-	//ComputeShaderStage
+
+	PixelShaderStage.ClearCurrentState();
+	PixelShaderStage.ClearDesiredState();
+
+	OutputMergerStage.SetToDefaultState();
+
+	ComputeShaderStage.ClearCurrentState();
+	ComputeShaderStage.ClearDesiredState();
 	
 	m_pContext->ClearState();
 
@@ -596,31 +576,31 @@ void PipelineManagerDX11::Draw( RenderEffectDX11& effect, GeometryPtr geometry,
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::Draw( RenderEffectDX11& effect, ResourcePtr vb, ResourcePtr ib,
-						int inputLayput, D3D11_PRIMITIVE_TOPOLOGY primType,
+						int inputLayout, D3D11_PRIMITIVE_TOPOLOGY primType,
 						UINT vertexStride, UINT numIndices, IParameterManager* pParamManager )
 {
+	InputAssemblerStage.ClearDesiredState();
+
 	// Configure the pipeline input data with the input assembler
 	// state object.
-	InputAssemblerStateDX11 IAState;
 
-	IAState.SetPrimitiveTopology( primType );
+	InputAssemblerStage.DesiredState.SetPrimitiveTopology( primType );
 	
 	// Bind the vertex and index buffers.
 	if ( vb != NULL ) {
-		IAState.SetVertexBuffer( 0, vb->m_iResource, 0, vertexStride );
+		InputAssemblerStage.DesiredState.SetVertexBuffer( 0, vb->m_iResource, 0, vertexStride );
 	}
 
 	if ( ib != NULL ) {
-		IAState.SetIndexBuffer( ib->m_iResource );
+		InputAssemblerStage.DesiredState.SetIndexBuffer( ib->m_iResource );
 	}
 
 	// Bind the input layout.
 	if ( vb != NULL ) {
-		IAState.SetInputLayout( inputLayput );
+		InputAssemblerStage.DesiredState.SetInputLayout( inputLayout );
 	}
 
 	// Set and apply the state in this pipeline manager's input assembler.
-	InputAssemblerStage.SetDesiredState( IAState );
 	InputAssemblerStage.ApplyDesiredState( m_pContext );
 
 	// Use the effect to load all of the pipeline stages here.
@@ -632,21 +612,23 @@ void PipelineManagerDX11::Draw( RenderEffectDX11& effect, ResourcePtr vb, Resour
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::DrawNonIndexed( RenderEffectDX11& effect, ResourcePtr vb, 
-                                           int inputLayput, D3D11_PRIMITIVE_TOPOLOGY primType,
+                                           int inputLayout, D3D11_PRIMITIVE_TOPOLOGY primType,
                                            UINT vertexStride, UINT vertexCount, UINT startVertexLocation,
                                            IParameterManager* pParamManager )
 {
-    // Specify the type of geometry that we will be dealing with.
-    m_pContext->IASetPrimitiveTopology( primType );
+	InputAssemblerStage.ClearDesiredState();
+	
+	// Specify the type of geometry that we will be dealing with.
+    InputAssemblerStage.DesiredState.SetPrimitiveTopology( primType );
 
-    // Bind the vertex bufffer.
-    BindVertexBuffer( vb, vertexStride );
-
-    // Set NULL as the index buffer
-    m_pContext->IASetIndexBuffer( NULL, DXGI_FORMAT_R32_UINT, 0 );
+    // Bind the vertex buffer.
+	InputAssemblerStage.DesiredState.SetVertexBuffer( 0, vb->m_iResource, 0, vertexStride );
 
     // Bind the input layout.
-    BindInputLayout( inputLayput );
+	InputAssemblerStage.DesiredState.SetInputLayout( inputLayout );
+
+	// Set and apply the state in this pipeline manager's input assembler.
+	InputAssemblerStage.ApplyDesiredState( m_pContext );
 
     // Use the effect to load all of the pipeline stages here.
     ClearPipelineResources();
@@ -672,21 +654,23 @@ void PipelineManagerDX11::DrawInstanced( RenderEffectDX11& effect, ResourcePtr v
 								 ResourcePtr instanceData, UINT instanceDataStride,
 								 UINT numInstances, IParameterManager* pParamManager )
 {
+	InputAssemblerStage.ClearDesiredState();
+
 	// Specify the type of geometry that we will be dealing with.
+    InputAssemblerStage.DesiredState.SetPrimitiveTopology( primType );
 
-	m_pContext->IASetPrimitiveTopology( primType );
+    // Bind the vertex buffers.
+	InputAssemblerStage.DesiredState.SetVertexBuffer( 0, vb->m_iResource, 0, vertexStride );
+	InputAssemblerStage.DesiredState.SetVertexBuffer( 1, instanceData->m_iResource, 0, instanceDataStride );
 
-	// Bind the vertex and index buffers.
-	ResourcePtr vertexBuffers[2] = { vb, instanceData };
-	UINT strides[2] = { vertexStride, instanceDataStride };
-	UINT offsets[2] = { 0, 0 };
-	BindVertexBuffers( vertexBuffers, strides, offsets, 0, 2 );
-	BindIndexBuffer( ib );
+	// Bind the index buffer.
+	InputAssemblerStage.DesiredState.SetIndexBuffer( ib->m_iResource );
 
+    // Bind the input layout.
+	InputAssemblerStage.DesiredState.SetInputLayout( inputLayout );
 
-	// Bind the input layout.  The layout will be automatically generated if it
-	// doesn't already exist.
-	BindInputLayout( inputLayout );
+	// Set and apply the state in this pipeline manager's input assembler.
+	InputAssemblerStage.ApplyDesiredState( m_pContext );
 
 	// Use the effect to load all of the pipeline stages here.
 
@@ -732,26 +716,25 @@ void PipelineManagerDX11::DrawIndirect( RenderEffectDX11& effect,
 										UINT vertexStride,
 										IParameterManager* pParamManager )
 {
-	int Type = args->m_iResource & 0x00FF0000;
-	int ID = args->m_iResource & 0x0000FFFF;
+	IndirectArgsBufferDX11* pBuffer = RendererDX11::Get()->GetIndirectArgsBufferByIndex( args->m_iResource );
 
-	if ( Type =! RT_INDIRECTARGSBUFFER )
-	{
-		Log::Get().Write( L"Tried to use the wrong resource type for an indirect drawing!" );
+	if ( !pBuffer ) {
+		Log::Get().Write( L"Failure to get indirect args buffer, aborting call..." );
 		return;
-	}
+	} 
 
-	ID3D11Buffer* pArgsBuffer = (ID3D11Buffer*)RendererDX11::Get()->GetResource( ID )->GetResource();
+	ID3D11Buffer* pArgsBuffer = reinterpret_cast<ID3D11Buffer*>( pBuffer->GetResource() );
 
+	InputAssemblerStage.ClearDesiredState();
 
 	// Specify the type of geometry that we will be dealing with.
-	m_pContext->IASetPrimitiveTopology( primType );
+    InputAssemblerStage.DesiredState.SetPrimitiveTopology( primType );
 
-	UnbindVertexBuffer();
-	UnbindIndexBuffer();
+    // Bind the input layout.
+	InputAssemblerStage.DesiredState.SetInputLayout( inputLayout );
 
-	// Bind the input layout.
-	BindInputLayout( inputLayout );
+	// Set and apply the state in this pipeline manager's input assembler.
+	InputAssemblerStage.ApplyDesiredState( m_pContext );
 
 	// Use the effect to load all of the pipeline stages here.
 	ClearPipelineResources();
@@ -830,58 +813,18 @@ void PipelineManagerDX11::BindShader( ShaderType type, int ID, IParameterManager
 	// Check if the shader has a valid identifier
 	if ( pShaderDX11 )
 	{
-		// Before binding the shader, have it update its required parameters.  These
-		// parameters will then be bound to the pipeline after the shader is bound.
-
-		pShaderDX11->UpdateParameters( this, pParamManager );
-
 		// Perform the actual binding to the pipeline, and then bind all needed
 		// parameters.
 
 		if ( pShaderDX11->GetType() == type )
 		{
-			// Record the shader ID for use later on
-			ShaderStages[type]->SetShaderIndex( ID );
+			// Before binding the shader, have it update its required parameters.  These
+			// parameters will then be bound to the pipeline after the shader is bound.
 
-			switch( type )
-			{
-				case VERTEX_SHADER:
-				{
-					ID3D11VertexShader* pShader = reinterpret_cast<VertexShaderDX11*>( pShaderDX11 )->m_pVertexShader;
-					m_pContext->VSSetShader( pShader, 0, 0 );
-					break;
-				}
-				case HULL_SHADER:
-				{
-					ID3D11HullShader* pShader = reinterpret_cast<HullShaderDX11*>( pShaderDX11 )->m_pHullShader;
-					m_pContext->HSSetShader( pShader, 0, 0 );
-					break;
-				}
-				case DOMAIN_SHADER:
-				{
-					ID3D11DomainShader* pShader = reinterpret_cast<DomainShaderDX11*>( pShaderDX11 )->m_pDomainShader;
-					m_pContext->DSSetShader( pShader, 0, 0 );
-					break;
-				}
-				case GEOMETRY_SHADER:
-				{
-					ID3D11GeometryShader* pShader = reinterpret_cast<GeometryShaderDX11*>( pShaderDX11 )->m_pGeometryShader;
-					m_pContext->GSSetShader( pShader, 0, 0 );
-					break;
-				}
-				case PIXEL_SHADER:
-				{
-					ID3D11PixelShader* pShader = reinterpret_cast<PixelShaderDX11*>( pShaderDX11 )->m_pPixelShader;
-					m_pContext->PSSetShader( pShader, 0, 0 );
-					break;
-				}
-				case COMPUTE_SHADER:
-				{
-					ID3D11ComputeShader* pShader = reinterpret_cast<ComputeShaderDX11*>( pShaderDX11 )->m_pComputeShader;
-					m_pContext->CSSetShader( pShader, 0, 0 );
-					break;
-				}
-			}
+			pShaderDX11->UpdateParameters( this, pParamManager );
+
+			// Record the shader ID for use later on
+			ShaderStages[type]->DesiredState.SetShaderProgram( ID );
 
 			pShaderDX11->BindParameters( this, pParamManager );
 		}
@@ -1087,7 +1030,32 @@ void PipelineManagerDX11::GenerateCommandList( CommandListDX11* pList )
 		// command lists.
 		//
 		// TODO: Add the other stage states here...
+
+		InputAssemblerStage.ClearCurrentState();
+		InputAssemblerStage.ClearDesiredState();
+
+		VertexShaderStage.ClearCurrentState();
+		VertexShaderStage.ClearDesiredState();
+
+		HullShaderStage.ClearCurrentState();
+		HullShaderStage.ClearDesiredState();
+
+		DomainShaderStage.ClearCurrentState();
+		DomainShaderStage.ClearDesiredState();
+
+		GeometryShaderStage.ClearCurrentState();
+		GeometryShaderStage.ClearDesiredState();
+
+		//RasterizerStage
+
+		PixelShaderStage.ClearCurrentState();
+		PixelShaderStage.ClearDesiredState();
+
 		OutputMergerStage.SetToDefaultState();
+
+		ComputeShaderStage.ClearCurrentState();
+		ComputeShaderStage.ClearDesiredState();
+
 	}
 }
 //--------------------------------------------------------------------------------
@@ -1095,6 +1063,31 @@ void PipelineManagerDX11::ExecuteCommandList( CommandListDX11* pList )
 {
 	if ( pList->ListAvailable() )
 		m_pContext->ExecuteCommandList( pList->m_pList, false );
+
+	InputAssemblerStage.ClearCurrentState();
+	InputAssemblerStage.ClearDesiredState();
+
+	VertexShaderStage.ClearCurrentState();
+	VertexShaderStage.ClearDesiredState();
+
+	HullShaderStage.ClearCurrentState();
+	HullShaderStage.ClearDesiredState();
+
+	DomainShaderStage.ClearCurrentState();
+	DomainShaderStage.ClearDesiredState();
+
+	GeometryShaderStage.ClearCurrentState();
+	GeometryShaderStage.ClearDesiredState();
+
+	//RasterizerStage
+
+	PixelShaderStage.ClearCurrentState();
+	PixelShaderStage.ClearDesiredState();
+
+	OutputMergerStage.SetToDefaultState();
+
+	ComputeShaderStage.ClearCurrentState();
+	ComputeShaderStage.ClearDesiredState();
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ResolveSubresource( ResourcePtr DestResource, UINT DstSubresource, 

@@ -16,6 +16,8 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 InputAssemblerStateDX11::InputAssemblerStateDX11()
 {
+	m_FeatureLevel = D3D_FEATURE_LEVEL_9_1;
+
 	ClearState();
 }
 //--------------------------------------------------------------------------------
@@ -58,7 +60,7 @@ void InputAssemblerStateDX11::SetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY top
 //--------------------------------------------------------------------------------
 void InputAssemblerStateDX11::ClearState()
 {
-	IndexBuffer = NULL;
+	IndexBuffer = -1;
 
 	for ( int i = 0; i < D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT; i++ ) {
 		VertexBuffers[i] = -1;
@@ -66,7 +68,7 @@ void InputAssemblerStateDX11::ClearState()
 		VertexOffsets[i] = 0;
 	}
 
-	InputLayout = 0;
+	InputLayout = -1;
 	PrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
 }
 //--------------------------------------------------------------------------------
@@ -95,5 +97,21 @@ UINT InputAssemblerStateDX11::GetVertexOffset( UINT slot )
 	}
 
 	return( offset );
+}
+//--------------------------------------------------------------------------------
+int InputAssemblerStateDX11::CompareVertexBufferState( InputAssemblerStateDX11& desired )
+{
+	int count = 0;
+
+	for ( int i = D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT - 1; i >= 0; i-- ) {
+		if ( VertexBuffers[i] != desired.VertexBuffers[i] 
+			|| VertexStrides[i] != desired.VertexStrides[i] 
+			|| VertexOffsets[i] != desired.VertexOffsets[i] ) {
+			count = i+1; // return the number of buffers to set
+			break;
+		}
+	}
+
+	return( count );
 }
 //--------------------------------------------------------------------------------

@@ -22,7 +22,6 @@
 #ifndef ShaderDX11_h
 #define ShaderDX11_h
 //--------------------------------------------------------------------------------
-//#include "RendererDX11.h"
 #include "TArray.h"
 #include <string>
 #include "GlyphString.h"
@@ -252,6 +251,7 @@ namespace Glyph3
 
 		virtual ShaderType GetType() = 0;
 		
+		void InitializeConstantBuffers( IParameterManager* pParamManager );
 		void UpdateParameters( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager );
 		void BindParameters( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager );
 

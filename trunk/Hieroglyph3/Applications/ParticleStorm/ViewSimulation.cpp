@@ -316,6 +316,11 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterMana
 
 	pPipelineManager->Dispatch( *pParticleUpdate, m_iParticleCount/512, 1, 1, pParamManager );
 
+
+	// Clear out the pipeline resources, so that they can be used elsewhere in the pipeline later on.
+
+	pPipelineManager->ClearPipelineResources();
+	pPipelineManager->ApplyPipelineResources();
 	
 	// To render, we need to only select the particles that exist after the update.
 

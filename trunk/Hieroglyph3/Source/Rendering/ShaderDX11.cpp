@@ -29,6 +29,40 @@ ShaderDX11::~ShaderDX11()
 
 }
 //--------------------------------------------------------------------------------
+void ShaderDX11::InitializeConstantBuffers( IParameterManager* pParamManager )
+{
+	for ( int i = 0; i < ConstantBuffers.count(); i++ )
+	{
+		if ( ConstantBuffers[i].Description.Type == D3D11_CT_CBUFFER )
+		{
+			// Get the index of the constant buffer parameter currently set with 
+			// this name.
+
+			int index = pParamManager->GetConstantBufferParameter( ConstantBuffers[i].pParamRef );
+
+			// If the constant buffer does not exist yet, create a one with 
+			// standard options - writeable by the CPU and only bound as a 
+			// constant buffer.  By automatically creating the constant buffer
+			// we reduce the amount of code to do common tasks, but still allow
+			// the user to create and use a special buffer if they want.
+
+			if ( index == -1 )
+			{
+				// Configure the buffer for the needed size and dynamic updating.
+				BufferConfigDX11 cbuffer;
+				cbuffer.SetDefaultConstantBuffer( ConstantBuffers[i].Description.Size, true );
+
+				// Create the buffer and set it as a constant buffer parameter.  This
+				// creates a parameter object to be used in the future.
+				ResourcePtr resource = RendererDX11::Get()->CreateConstantBuffer( &cbuffer, 0 );
+				index = resource->m_iResource;
+
+				ConstantBuffers[i].pParamRef->InitializeParameterData( &index );
+			}
+		}
+	}
+}
+//--------------------------------------------------------------------------------
 void ShaderDX11::UpdateParameters( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
 {
 	// Renderer will call this function when binding the shader to the pipeline.
@@ -43,7 +77,6 @@ void ShaderDX11::UpdateParameters( PipelineManagerDX11* pPipeline, IParameterMan
 			// this name.
 
 			int index = pParamManager->GetConstantBufferParameter( ConstantBuffers[i].pParamRef );
-//			int index = pParamManager->GetConstantBufferParameter( ConstantBuffers[i].Description.Name );
 
 			// If the constant buffer does not exist yet, create a one with 
 			// standard options - writeable by the CPU and only bound as a 
@@ -63,7 +96,6 @@ void ShaderDX11::UpdateParameters( PipelineManagerDX11* pPipeline, IParameterMan
 				index = resource->m_iResource;
 
 				pParamManager->SetConstantBufferParameter( ConstantBuffers[i].pParamRef, resource );
-				//pParamManager->SetConstantBufferParameter( ConstantBuffers[i].Description.Name, resource );
 			}
 
 			// Test the index to ensure that it is a constant buffer

@@ -318,9 +318,8 @@ namespace Glyph3
 	public:
 		IParameterManager*						m_pParamMgr;
 		PipelineManagerDX11*					pImmPipeline;
-
-
-	protected:
+		
+	
 		Texture1dDX11*				GetTexture1DByIndex( int rid );
 		Texture2dDX11*				GetTexture2DByIndex( int rid );
 		Texture3dDX11*				GetTexture3DByIndex( int rid );
@@ -330,6 +329,7 @@ namespace Glyph3
 		IndirectArgsBufferDX11*		GetIndirectArgsBufferByIndex( int rid );
 		StructuredBufferDX11*		GetStructuredBufferByIndex( int rid );
 
+	protected:
 
 		bool									m_bMultiThreadActive;
 		D3D_FEATURE_LEVEL						m_FeatureLevel;
@@ -341,6 +341,7 @@ namespace Glyph3
 		IndexBufferDX11* GetIndexBuffer( int index );
 
 		friend GeometryDX11;
+		
 	};
 };
 

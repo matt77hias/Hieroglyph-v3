@@ -28,21 +28,25 @@ namespace Glyph3
 
 		void SetFeautureLevel( D3D_FEATURE_LEVEL level );
 
-		// This method allows setting the complete input assember state with a
-		// single call by the user.  This means the user can configure their
-		// state ahead of time and then simply set it all at once.
-		void SetDesiredState( InputAssemblerStateDX11& state );
 		void ClearDesiredState( );
-
-		// This method applies the desired state to the API.
+		void ClearCurrentState( );
 		void ApplyDesiredState( ID3D11DeviceContext* pContext );
+
+
+		// The desired state is a public member that will allow the user of this
+		// class to configure the state as desired before applying the state.
+
+		InputAssemblerStateDX11			DesiredState;
 
 	protected:
 
 		D3D_FEATURE_LEVEL				m_FeatureLevel;
 
-		InputAssemblerStateDX11			m_DesiredState;
-		InputAssemblerStateDX11			m_CurrentState;
+		// The current state of the API is used to allow for caching and elimination
+		// of redundant API calls.  This should make it possible to minimize the number
+		// of settings that need to be performed.
+
+		InputAssemblerStateDX11			CurrentState;
 	};
 };
 //--------------------------------------------------------------------------------

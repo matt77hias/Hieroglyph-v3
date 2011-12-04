@@ -1351,9 +1351,16 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 	pShaderWrapper->pCompiledShader = pCompiledShader;
 
 
-	// Return the index for future referencing.
+
+	// Initialize the constant buffers of this shader, so that they aren't 
+	// lazy created later on...
+
+	pShaderWrapper->InitializeConstantBuffers( m_pParamMgr );
 
 	//pShaderWrapper->PrintShaderDetails();
+
+
+	// Return the index for future referencing.
 
 	return( m_vShaders.count() - 1 );
 
@@ -2395,11 +2402,13 @@ Texture1dDX11* RendererDX11::GetTexture1DByIndex( int rid )
 
 	Texture1dDX11* pResult = 0;
 
-	// Check if this ID is in range, and that the type is correct.
-	if ( !m_vResources.inrange( ID ) || (TYPE != RT_TEXTURE1D ) ) {
-		Log::Get().Write( L"Trying to access a non-texture1D resource!!!!" );
-	} else {
-		pResult = dynamic_cast<Texture1dDX11*>( m_vResources[ID] );
+	if ( rid != -1 ) {
+		// Check if this ID is in range, and that the type is correct.
+		if ( !m_vResources.inrange( ID ) || (TYPE != RT_TEXTURE1D ) ) {
+			Log::Get().Write( L"Trying to access a non-texture1D resource!!!!" );
+		} else {
+			pResult = reinterpret_cast<Texture1dDX11*>( m_vResources[ID] );
+		}
 	}
 
 	return( pResult );
@@ -2412,11 +2421,13 @@ Texture2dDX11* RendererDX11::GetTexture2DByIndex( int rid )
 
 	Texture2dDX11* pResult = 0;
 
-	// Check if this ID is in range, and that the type is correct.
-	if ( !m_vResources.inrange( ID ) || (TYPE != RT_TEXTURE2D ) ) {
-		Log::Get().Write( L"Trying to access a non-texture2D resource!!!!" );
-	} else {
-		pResult = dynamic_cast<Texture2dDX11*>( m_vResources[ID] );
+	if ( rid != -1 ) {
+		// Check if this ID is in range, and that the type is correct.
+		if ( !m_vResources.inrange( ID ) || (TYPE != RT_TEXTURE2D ) ) {
+			Log::Get().Write( L"Trying to access a non-texture2D resource!!!!" );
+		} else {
+			pResult = reinterpret_cast<Texture2dDX11*>( m_vResources[ID] );
+		}
 	}
 
 	return( pResult );
@@ -2429,11 +2440,13 @@ Texture3dDX11* RendererDX11::GetTexture3DByIndex( int rid )
 
 	Texture3dDX11* pResult = 0;
 
-	// Check if this ID is in range, and that the type is correct.
-	if ( !m_vResources.inrange( ID ) || (TYPE != RT_TEXTURE2D ) ) {
-		Log::Get().Write( L"Trying to access a non-texture3D resource!!!!" );
-	} else {
-		pResult = dynamic_cast<Texture3dDX11*>( m_vResources[ID] );
+	if ( rid != -1 ) {
+		// Check if this ID is in range, and that the type is correct.
+		if ( !m_vResources.inrange( ID ) || (TYPE != RT_TEXTURE2D ) ) {
+			Log::Get().Write( L"Trying to access a non-texture3D resource!!!!" );
+		} else {
+			pResult = reinterpret_cast<Texture3dDX11*>( m_vResources[ID] );
+		}
 	}
 
 	return( pResult );
@@ -2446,11 +2459,13 @@ VertexBufferDX11* RendererDX11::GetVertexBufferByIndex( int rid )
 
 	VertexBufferDX11* pResult = 0;
 
-	// Check if this ID is in range, and that the type is correct.
-	if ( !m_vResources.inrange( ID ) || (TYPE != RT_VERTEXBUFFER ) ) {
-		Log::Get().Write( L"Trying to access a non-vertex buffer resource!!!!" );
-	} else {
-		pResult = dynamic_cast<VertexBufferDX11*>( m_vResources[ID] );
+	if ( rid != -1 ) {
+		// Check if this ID is in range, and that the type is correct.
+		if ( !m_vResources.inrange( ID ) || (TYPE != RT_VERTEXBUFFER ) ) {
+			Log::Get().Write( L"Trying to access a non-vertex buffer resource!!!!" );
+		} else {
+			pResult = reinterpret_cast<VertexBufferDX11*>( m_vResources[ID] );
+		}
 	}
 
 	return( pResult );
@@ -2463,11 +2478,13 @@ IndexBufferDX11* RendererDX11::GetIndexBufferByIndex( int rid )
 
 	IndexBufferDX11* pResult = 0;
 
-	// Check if this ID is in range, and that the type is correct.
-	if ( !m_vResources.inrange( ID ) || (TYPE != RT_INDEXBUFFER ) ) {
-		Log::Get().Write( L"Trying to access a non-index buffer resource!!!!" );
-	} else {
-		pResult = dynamic_cast<IndexBufferDX11*>( m_vResources[ID] );
+	if ( rid != -1 ) {
+		// Check if this ID is in range, and that the type is correct.
+		if ( !m_vResources.inrange( ID ) || (TYPE != RT_INDEXBUFFER ) ) {
+			Log::Get().Write( L"Trying to access a non-index buffer resource!!!!" );
+		} else {
+			pResult = reinterpret_cast<IndexBufferDX11*>( m_vResources[ID] );
+		}
 	}
 
 	return( pResult );
@@ -2480,11 +2497,13 @@ ByteAddressBufferDX11* RendererDX11::GetByteAddressBufferByIndex( int rid )
 
 	ByteAddressBufferDX11* pResult = 0;
 
-	// Check if this ID is in range, and that the type is correct.
-	if ( !m_vResources.inrange( ID ) || (TYPE != RT_BYTEADDRESSBUFFER ) ) {
-		Log::Get().Write( L"Trying to access a non-byte address buffer resource!!!!" );
-	} else {
-		pResult = dynamic_cast<ByteAddressBufferDX11*>( m_vResources[ID] );
+	if ( rid != -1 ) {
+		// Check if this ID is in range, and that the type is correct.
+		if ( !m_vResources.inrange( ID ) || (TYPE != RT_BYTEADDRESSBUFFER ) ) {
+			Log::Get().Write( L"Trying to access a non-byte address buffer resource!!!!" );
+		} else {
+			pResult = reinterpret_cast<ByteAddressBufferDX11*>( m_vResources[ID] );
+		}
 	}
 
 	return( pResult );
@@ -2497,11 +2516,13 @@ IndirectArgsBufferDX11*	RendererDX11::GetIndirectArgsBufferByIndex( int rid )
 
 	IndirectArgsBufferDX11* pResult = 0;
 
-	// Check if this ID is in range, and that the type is correct.
-	if ( !m_vResources.inrange( ID ) || (TYPE != RT_INDIRECTARGSBUFFER ) ) {
-		Log::Get().Write( L"Trying to access a non-vertex buffer resource!!!!" );
-	} else {
-		pResult = dynamic_cast<IndirectArgsBufferDX11*>( m_vResources[ID] );
+	if ( rid != -1 ) {
+		// Check if this ID is in range, and that the type is correct.
+		if ( !m_vResources.inrange( ID ) || (TYPE != RT_INDIRECTARGSBUFFER ) ) {
+			Log::Get().Write( L"Trying to access a non-vertex buffer resource!!!!" );
+		} else {
+			pResult = reinterpret_cast<IndirectArgsBufferDX11*>( m_vResources[ID] );
+		}
 	}
 
 	return( pResult );
@@ -2514,11 +2535,13 @@ StructuredBufferDX11* RendererDX11::GetStructuredBufferByIndex( int rid )
 
 	StructuredBufferDX11* pResult = 0;
 
-	// Check if this ID is in range, and that the type is correct.
-	if ( !m_vResources.inrange( ID ) || (TYPE != RT_STRUCTUREDBUFFER ) ) {
-		Log::Get().Write( L"Trying to access a non-structured buffer resource!!!!" );
-	} else {
-		pResult = dynamic_cast<StructuredBufferDX11*>( m_vResources[ID] );
+	if ( rid != -1 ) {
+		// Check if this ID is in range, and that the type is correct.
+		if ( !m_vResources.inrange( ID ) || (TYPE != RT_STRUCTUREDBUFFER ) ) {
+			Log::Get().Write( L"Trying to access a non-structured buffer resource!!!!" );
+		} else {
+			pResult = reinterpret_cast<StructuredBufferDX11*>( m_vResources[ID] );
+		}
 	}
 
 	return( pResult );

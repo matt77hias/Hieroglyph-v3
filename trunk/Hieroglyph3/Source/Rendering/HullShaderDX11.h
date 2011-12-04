@@ -31,7 +31,7 @@ namespace Glyph3
 	protected:
 		ID3D11HullShader*			m_pHullShader;
 
-		friend PipelineManagerDX11;
+		friend HullStageDX11;
 	};
 };
 //--------------------------------------------------------------------------------
