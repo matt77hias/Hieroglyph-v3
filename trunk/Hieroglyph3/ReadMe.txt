@@ -5,7 +5,7 @@ Introduction:
 
 This library has been written by Jason Zink with the intention of promoting the use of Direct3D 11, and at the same time having a common framework with which to make demo programs and quickly prototype new algorithms.
 
-The library itself is written in C++ and utilizes DirectX 11 and Lua.  To run the demo programs, just open the Hieroglyph3.sln file, build the solution, then run the desired demo.  There are a number of demo programs that are intended to be demonstrative of how to use the engine, as well as a growing number of more advanced demos.  
+The library itself is written in C++ and utilizes DirectX 11 and Lua, and has added experimental support for the Kinect sensor as input.  To run the demo programs, just open the Hieroglyph3.sln file, build the solution, then run the desired demo.  There are a number of demo programs that are intended to be demonstrative of how to use the engine, as well as a growing number of more advanced demos.  
 
 The current status of the engine is pre-alpha, but is becoming much more stable.   
 
@@ -32,5 +32,7 @@ Hieroglyph requires the following items to be available to the linker/compiler:
 
 1. DirectX SDK - Hieroglyph is currently being developed and tested with the June 2010 SDK.
 2. Lua - The Lua libraries must be linked in.  I have included a copy of the VS2008 project I use to build Lua in the distribution, along with the source code for Lua v5.1.4.  If you already build Lua on your own, you can change the to your own libraries.  You will need to modify the post build rules to copy the appropriate libs and headers to the SDK output folder if you do so.
+3. Kinect SDK - If you want to use the Kinect sensor as input, then you need to install the latest Kinect SDK Beta (which is Beta 2 at the time of this writing).  Please follow the instructions on the Kinect SDK website, and everything else should be ready to go.  Please note that this requires Windows 7 or 8 to compile the Kinect samples (sorry Vista users)!
 
 Outside of these dependancies, you should also install the latest windows SDK for your target platform.
+

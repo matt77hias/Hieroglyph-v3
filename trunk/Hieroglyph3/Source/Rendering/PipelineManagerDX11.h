@@ -75,7 +75,6 @@ namespace Glyph3
 		void ApplyRenderTargets( );
 
 		void BindShader( ShaderType type, int ID, IParameterManager* pParamManager );
-		void UnbindShader( ShaderType type );
 
 		// The changes made to the pipeline resources with the Bind calls are cached and 
 		// applied or cleared all at once with the following calls.  This reduces the number 
@@ -86,19 +85,6 @@ namespace Glyph3
 
 		void ApplyInputResources( );
 		void ClearInputResources( );
-
-
-		void BindInputLayout( int ID );
-		void UnbindInputLayout( );
-
-		void BindVertexBuffer( ResourcePtr resource, UINT stride, UINT offset = 0 );
-		void BindVertexBuffers( const ResourcePtr* resources, const UINT* strides,
-								const UINT* offsets, UINT startSlot, UINT numBuffers );
-		void UnbindVertexBuffer( );
-		void UnbindAllVertexBuffers( );
-
-		void BindIndexBuffer( ResourcePtr resource );
-		void UnbindIndexBuffer( );
 
 		void ClearPipelineState( );
 

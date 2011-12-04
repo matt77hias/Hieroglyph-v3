@@ -389,115 +389,6 @@ void PipelineManagerDX11::ClearInputResources( )
 	InputAssemblerStage.ApplyDesiredState( m_pContext );
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::UnbindInputLayout( )
-{
-	m_pContext->IASetInputLayout( 0 );
-}
-//--------------------------------------------------------------------------------
-void PipelineManagerDX11::UnbindVertexBuffer( )
-{	
-	ID3D11Buffer* Buffers[] = { 0 };
-	UINT Strides[] = { 0 };
-	UINT Offsets[] = { 0 };
-
-	m_pContext->IASetVertexBuffers( 0, 1, Buffers, Strides, Offsets );
-}
-//--------------------------------------------------------------------------------
-void PipelineManagerDX11::UnbindAllVertexBuffers( )
-{
-	ID3D11Buffer* Buffers[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
-	UINT Strides [D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = { 0 };
-	UINT Offsets [D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = { 0 };
-
-	m_pContext->IASetVertexBuffers( 0, D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT,
-		Buffers, Strides, Offsets );
-}
-//--------------------------------------------------------------------------------
-void PipelineManagerDX11::UnbindIndexBuffer( )
-{
-	m_pContext->IASetIndexBuffer( 0, DXGI_FORMAT_R32_UINT, 0 );
-}
-//--------------------------------------------------------------------------------
-void PipelineManagerDX11::BindInputLayout( int ID )
-{
-	RendererDX11* pRenderer = RendererDX11::Get();
-	InputLayoutDX11* pLayout = pRenderer->GetInputLayout( ID );
-
-	if ( pLayout )
-		m_pContext->IASetInputLayout( pLayout->m_pInputLayout );
-	else
-		Log::Get().Write( L"Tried to bind an invalid input layout ID!" );
-}
-//--------------------------------------------------------------------------------
-void PipelineManagerDX11::BindVertexBuffer( ResourcePtr resource, UINT stride, UINT offset )
-{
-	// TODO: Add the ability to set multiple vertex buffers at once, and to 
-	//       provide an offset to the data contained in the buffers.
-
-	int index = resource->m_iResource;
-
-	// Select only the index portion of the handle.
-	int TYPE	= index & 0x00FF0000;
-	int ID		= index & 0x0000FFFF;
-
-	RendererDX11* pRenderer = RendererDX11::Get();
-	ID3D11Buffer* pBuffer = (ID3D11Buffer*)pRenderer->GetResource( ID )->GetResource();
-	
-	ID3D11Buffer* Buffers[] = { pBuffer };
-	UINT Strides[] = { stride };
-	UINT Offsets[] = { offset };
-
-	if ( pBuffer )
-	{
-		m_pContext->IASetVertexBuffers( 0, 1, Buffers, Strides, Offsets );
-	}
-	else
-		Log::Get().Write( L"Tried to bind an invalid vertex buffer ID!" );
-}
-//--------------------------------------------------------------------------------
-void PipelineManagerDX11::BindVertexBuffers( const ResourcePtr* resources, const UINT* strides,
-									 const UINT* offsets, UINT startSlot, UINT numBuffers )
-{
-	ID3D11Buffer* Buffers[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
-	RendererDX11* pRenderer = RendererDX11::Get();
-
-	for ( UINT i = 0; i < numBuffers; ++i )
-	{
-		int index = resources[i]->m_iResource;
-
-		// Select only the index portion of the handle.
-		int TYPE	= index & 0x00FF0000;
-		int ID		= index & 0x0000FFFF;
-
-		Buffers[i] = reinterpret_cast<ID3D11Buffer*>( pRenderer->GetResource( ID )->GetResource() );
-		if ( !Buffers[i] )					
-			Log::Get().Write( L"Tried to bind an invalid vertex buffer ID!" );
-	}
-
-	m_pContext->IASetVertexBuffers( startSlot, numBuffers, Buffers, strides, offsets );
-}
-//--------------------------------------------------------------------------------
-void PipelineManagerDX11::BindIndexBuffer( ResourcePtr resource )
-{
-	// TODO: Add the ability to use different formats and offsets to this function!
-	int index = resource->m_iResource;
-
-	// Select only the index portion of the handle.
-	int TYPE	= index & 0x00FF0000;
-	int ID		= index & 0x0000FFFF;
-
-	RendererDX11* pRenderer = RendererDX11::Get();
-	ID3D11Buffer* pBuffer = (ID3D11Buffer*)pRenderer->GetResource( ID )->GetResource();
-
-	// If the resource is in range, then attempt to set it
-	if ( pBuffer ) {
-		m_pContext->IASetIndexBuffer( pBuffer, DXGI_FORMAT_R32_UINT, 0 );
-	}
-	else {
-		Log::Get().Write( L"Tried to bind an invalid index buffer ID!" );
-	}
-}
-//--------------------------------------------------------------------------------
 void PipelineManagerDX11::ApplyPipelineResources( )
 {
 	VertexShaderStage.ApplyDesiredState( m_pContext );
@@ -810,6 +701,9 @@ void PipelineManagerDX11::BindShader( ShaderType type, int ID, IParameterManager
 	RendererDX11* pRenderer = RendererDX11::Get();
 	ShaderDX11* pShaderDX11 = pRenderer->GetShader( ID );
 
+	// Record the shader ID for use later on
+	ShaderStages[type]->DesiredState.SetShaderProgram( ID );
+
 	// Check if the shader has a valid identifier
 	if ( pShaderDX11 )
 	{
@@ -822,23 +716,12 @@ void PipelineManagerDX11::BindShader( ShaderType type, int ID, IParameterManager
 			// parameters will then be bound to the pipeline after the shader is bound.
 
 			pShaderDX11->UpdateParameters( this, pParamManager );
-
-			// Record the shader ID for use later on
-			ShaderStages[type]->DesiredState.SetShaderProgram( ID );
-
 			pShaderDX11->BindParameters( this, pParamManager );
 		}
 		else
 		{
 			Log::Get().Write( L"Tried to set the wrong type of shader ID!" );
 		}
-	}
-	else
-	{
-		if ( ID == -1 )
-			this->UnbindShader( type );
-		else
-			Log::Get().Write( L"Tried to set an invalid shader ID!" );
 	}
 }
 //--------------------------------------------------------------------------------
@@ -976,31 +859,6 @@ void PipelineManagerDX11::SaveTextureScreenShot( int index, std::wstring filenam
 
 		if ( FAILED( hr ) )
 			Log::Get().Write( L"D3DX11SaveTextureToFile has failed!" );
-	}
-}
-//--------------------------------------------------------------------------------
-void PipelineManagerDX11::UnbindShader( ShaderType type )
-{
-	switch( type )
-	{
-	case VERTEX_SHADER:
-		m_pContext->VSSetShader( 0, 0, 0 );
-		break;
-	case HULL_SHADER:
-		m_pContext->HSSetShader( 0, 0, 0 );
-		break;
-	case DOMAIN_SHADER:
-		m_pContext->DSSetShader( 0, 0, 0 );
-		break;
-	case GEOMETRY_SHADER:
-		m_pContext->GSSetShader( 0, 0, 0 );
-		break;
-	case PIXEL_SHADER:
-		m_pContext->PSSetShader( 0, 0, 0 );
-		break;
-	case COMPUTE_SHADER:
-		m_pContext->CSSetShader( 0, 0, 0 );
-		break;
 	}
 }
 //--------------------------------------------------------------------------------

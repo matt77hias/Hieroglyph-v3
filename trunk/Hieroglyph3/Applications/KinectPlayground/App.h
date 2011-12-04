@@ -13,8 +13,9 @@
 #include "MaterialDX11.h"
 #include "Camera.h"
 #include "Scene.h"
-#include "SkinnedActor.h"
+
 #include "VectorParameterDX11.h"
+#include "ViewKinect.h"
 
 using namespace Glyph3;
 
@@ -37,11 +38,9 @@ public:
 
 protected:
 
+	ViewKinect*				m_pKinectView;
+
 	Node3D*					m_pNode;
-	
-	SkinnedActor*			m_pSkinnedActor;
-	SkinnedActor*			m_pDisplacedActor;
-	Actor*					m_pStaticActor;
 	
 	VectorParameterDX11*	m_pLightColor;
 	VectorParameterDX11*	m_pLightPosition;
