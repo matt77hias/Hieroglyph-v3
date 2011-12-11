@@ -71,7 +71,8 @@ void ViewFinalPass::Draw( PipelineManagerDX11* pPipelineManager, IParameterManag
 		pPipelineManager->OutputMergerStage.BindDepthTarget( m_DepthTarget );
 		pPipelineManager->ApplyRenderTargets();
 
-        pPipelineManager->SetViewPort( m_iViewport );
+		pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
+		pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iViewport );
 
         // Set this view's render parameters
         SetRenderParams( pParamManager );

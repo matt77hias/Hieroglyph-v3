@@ -16,7 +16,7 @@
 #define ViewPortDX11_h
 //--------------------------------------------------------------------------------
 #include "RendererDX11.h"
-#include "PipelineManagerDX11.h"
+#include "RasterizerStageDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -26,10 +26,13 @@ namespace Glyph3
 		ViewPortDX11( D3D11_VIEWPORT viewport );
 		virtual ~ViewPortDX11();
 
+		float GetWidth() const;
+		float GetHeight() const;
+
 	protected:
 		D3D11_VIEWPORT			m_ViewPort;
 
-		friend PipelineManagerDX11;
+		friend RasterizerStageDX11;
 		friend RendererDX11;
 	};
 };

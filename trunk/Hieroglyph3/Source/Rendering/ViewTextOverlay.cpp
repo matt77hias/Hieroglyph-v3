@@ -83,10 +83,11 @@ void ViewTextOverlay::Draw( PipelineManagerDX11* pPipelineManager, IParameterMan
 		pPipelineManager->OutputMergerStage.BindRenderTarget( 0, m_RenderTarget );
 		pPipelineManager->ApplyRenderTargets();
 
-		pPipelineManager->SetViewPort( m_iViewport );
+		pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
+		pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iViewport );
+		pPipelineManager->RasterizerStage.DesiredState.SetRasterizerState( 0 );
 
 		// Set default states for these stages
-		pPipelineManager->SetRasterizerState( 0 );
 		pPipelineManager->SetDepthStencilState( 0 );
 		pPipelineManager->SetBlendState( 0 );
 

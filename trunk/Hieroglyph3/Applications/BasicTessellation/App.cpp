@@ -47,7 +47,7 @@ bool App::ConfigureEngineComponents()
 {
 	// The application currently supplies the 
 	int width = 640;
-	int height = 320;
+	int height = 480;
 	bool windowed = true;
 
 	// Set the render window parameters and initialize the window
@@ -127,7 +127,8 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftY = 0;
 
 	int ViewPort = m_pRenderer11->CreateViewPort( viewport );
-	m_pRenderer11->pImmPipeline->SetViewPort( ViewPort );
+	m_pRenderer11->pImmPipeline->RasterizerStage.DesiredState.SetViewportCount( 1 );
+	m_pRenderer11->pImmPipeline->RasterizerStage.DesiredState.SetViewport( 0, ViewPort );
 
 	return( true );
 }
@@ -197,7 +198,7 @@ void App::Initialize()
 	D3DXMatrixLookAtLH( (D3DXMATRIX*)&m_ViewMatrix, &vLookFrom, &vLookAt, &vLookUp );
 
 	// Create the projection matrix
-	D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&m_ProjMatrix, static_cast< float >(D3DX_PI) / 2.0f, 1280.0f /  720.0f, 0.1f, 25.0f );
+	D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&m_ProjMatrix, static_cast< float >(D3DX_PI) / 2.0f, 640.0f / 480.0f, 0.1f, 25.0f );
 
 	// Concatenate the view and projection matrices
 	m_ViewProjMatrix = m_ViewMatrix * m_ProjMatrix;

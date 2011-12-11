@@ -120,7 +120,8 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftY = 0;
 
 	int ViewPort = m_pRenderer11->CreateViewPort( viewport );
-	m_pRenderer11->pImmPipeline->SetViewPort( ViewPort );
+	m_pRenderer11->pImmPipeline->RasterizerStage.DesiredState.SetViewportCount( 1 );
+	m_pRenderer11->pImmPipeline->RasterizerStage.DesiredState.SetViewport( 0, ViewPort );
 	
 	return( true );
 }
@@ -215,6 +216,9 @@ void App::Update()
 
 	m_pRenderer11->pImmPipeline->Dispatch( *m_pFilterEffect, 32, 24, 1, m_pRenderer11->m_pParamMgr );
 
+	m_pRenderer11->pImmPipeline->ClearPipelineResources();
+	m_pRenderer11->pImmPipeline->ApplyPipelineResources();
+
 	// Render the texture to the backbuffer.
 
 	m_pRenderer11->pImmPipeline->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ), 1.0f );
@@ -231,7 +235,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"BasicApplication_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
@@ -287,6 +291,6 @@ bool App::HandleEvent( IEvent* pEvent )
 //--------------------------------------------------------------------------------
 std::wstring App::GetName( )
 {
-	return( std::wstring( L"BasicApplication" ) );
+	return( std::wstring( L"BasicComputeShader" ) );
 }
 //--------------------------------------------------------------------------------

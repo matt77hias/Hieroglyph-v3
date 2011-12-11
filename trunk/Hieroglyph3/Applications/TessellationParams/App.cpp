@@ -119,7 +119,8 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftY = 0;
 
 	int ViewPort = m_pRenderer11->CreateViewPort( viewport );
-	m_pRenderer11->pImmPipeline->SetViewPort( ViewPort );
+	m_pRenderer11->pImmPipeline->RasterizerStage.DesiredState.SetViewportCount( 1 );
+	m_pRenderer11->pImmPipeline->RasterizerStage.DesiredState.SetViewport( 0, ViewPort );
 	
 	return( true );
 }
@@ -208,12 +209,12 @@ void App::Update()
 	// Draw the main geometry
 	if( QUAD_MODE == m_bGeometryMode )
 	{
-		m_pQuadEffect->ConfigurePipeline( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr );
+		//m_pQuadEffect->ConfigurePipeline( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr );
 		m_pRenderer11->pImmPipeline->Draw( *m_pQuadEffect, m_pQuadGeometry, m_pRenderer11->m_pParamMgr ); 
 	}
 	else if( TRI_MODE == m_bGeometryMode )
 	{
-		m_pTriangleEffect->ConfigurePipeline( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr );
+		//m_pTriangleEffect->ConfigurePipeline( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr );
 		m_pRenderer11->pImmPipeline->Draw( *m_pTriangleEffect, m_pTriangleGeometry, m_pRenderer11->m_pParamMgr ); 
 	}
 

@@ -134,6 +134,12 @@
     <Filter Include="Rendering\Pipeline\Shader Stages\Shader Programs">
       <UniqueIdentifier>{b22437a4-23e9-4c6d-82ab-b1f9db28f01e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering\Pipeline\Fixed Stages\Stages">
+      <UniqueIdentifier>{4712219c-dedb-40f2-9025-aa5a2f79252e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline\Fixed Stages\States">
+      <UniqueIdentifier>{e7f9e892-c581-4eb0-9969-5e96cdbef663}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Mathematics\Matrix3f.cpp">
@@ -385,9 +391,6 @@
     <ClCompile Include="Rendering\VertexShaderDX11.cpp">
       <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\OutputMergerStageDX11.cpp">
-      <Filter>Rendering\Pipeline\Fixed Stages</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\ParameterManagerDX11.cpp">
       <Filter>Rendering\Parameter System</Filter>
     </ClCompile>
@@ -589,12 +592,6 @@
     <ClCompile Include="Events\EvtFrameStart.cpp">
       <Filter>Events\Rendering Events</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\InputAssemblerStageDX11.cpp">
-      <Filter>Rendering\Pipeline\Fixed Stages</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\InputAssemblerStateDX11.cpp">
-      <Filter>Rendering\Pipeline\Fixed Stages</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\PipelineExecutorDX11.cpp">
       <Filter>Rendering\Rendering Geometry</Filter>
     </ClCompile>
@@ -621,6 +618,24 @@
     </ClCompile>
     <ClCompile Include="Rendering\ShaderStageStateDX11.cpp">
       <Filter>Rendering\Pipeline\Shader Stages\States</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\RasterizerStageStateDX11.cpp">
+      <Filter>Rendering\Pipeline\Fixed Stages\States</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\InputAssemblerStateDX11.cpp">
+      <Filter>Rendering\Pipeline\Fixed Stages\States</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\InputAssemblerStageDX11.cpp">
+      <Filter>Rendering\Pipeline\Fixed Stages\Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\OutputMergerStageDX11.cpp">
+      <Filter>Rendering\Pipeline\Fixed Stages\Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\RasterizerStageDX11.cpp">
+      <Filter>Rendering\Pipeline\Fixed Stages\Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\OutputMergerStageStateDX11.cpp">
+      <Filter>Rendering\Pipeline\Fixed Stages\States</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -891,9 +906,6 @@
     <ClInclude Include="Rendering\VertexShaderDX11.h">
       <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\OutputMergerStageDX11.h">
-      <Filter>Rendering\Pipeline\Fixed Stages</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\IParameterManager.h">
       <Filter>Rendering\Parameter System</Filter>
     </ClInclude>
@@ -1101,12 +1113,6 @@
     <ClInclude Include="Events\EvtFrameStart.h">
       <Filter>Events\Rendering Events</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\InputAssemblerStageDX11.h">
-      <Filter>Rendering\Pipeline\Fixed Stages</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\InputAssemblerStateDX11.h">
-      <Filter>Rendering\Pipeline\Fixed Stages</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\PipelineExecutorDX11.h">
       <Filter>Rendering\Rendering Geometry</Filter>
     </ClInclude>
@@ -1136,6 +1142,24 @@
     </ClInclude>
     <ClInclude Include="Rendering\ShaderStageStateDX11.h">
       <Filter>Rendering\Pipeline\Shader Stages\States</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\RasterizerStageStateDX11.h">
+      <Filter>Rendering\Pipeline\Fixed Stages\States</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\InputAssemblerStateDX11.h">
+      <Filter>Rendering\Pipeline\Fixed Stages\States</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\RasterizerStageDX11.h">
+      <Filter>Rendering\Pipeline\Fixed Stages\Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\InputAssemblerStageDX11.h">
+      <Filter>Rendering\Pipeline\Fixed Stages\Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\OutputMergerStageDX11.h">
+      <Filter>Rendering\Pipeline\Fixed Stages\Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\OutputMergerStageStateDX11.h">
+      <Filter>Rendering\Pipeline\Fixed Stages\States</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

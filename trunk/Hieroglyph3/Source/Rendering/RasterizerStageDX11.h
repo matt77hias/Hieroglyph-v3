@@ -9,30 +9,49 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// RasterizerStateDX11
+// RasterizerStageDX11
 //
 //--------------------------------------------------------------------------------
-#ifndef RasterizerStateDX11_h
-#define RasterizerStateDX11_h
+#ifndef RasterizerStageDX11_h
+#define RasterizerStageDX11_h
 //--------------------------------------------------------------------------------
-#include "RasterizerStageDX11.h"
+#include "PCH.h"
+#include "RasterizerStageStateDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class RasterizerStateDX11
+	class RasterizerStageDX11
 	{
 	public:
-		RasterizerStateDX11( ID3D11RasterizerState* pState );
-		virtual ~RasterizerStateDX11();
+		RasterizerStageDX11();
+		virtual ~RasterizerStageDX11();
+
+		void SetFeautureLevel( D3D_FEATURE_LEVEL level );
+
+		void ClearDesiredState( );
+		void ClearCurrentState( );
+		void ApplyDesiredState( ID3D11DeviceContext* pContext );
+
+		const RasterizerStageStateDX11& GetCurrentState() const;
+
+
+		// The desired state is a public member that will allow the user of this
+		// class to configure the state as desired before applying the state.
+
+		RasterizerStageStateDX11		DesiredState;
 
 	protected:
-		ID3D11RasterizerState*			m_pState;
 
-		friend RasterizerStageDX11;
+		D3D_FEATURE_LEVEL				m_FeatureLevel;
+
+		// The current state of the API is used to allow for caching and elimination
+		// of redundant API calls.  This should make it possible to minimize the number
+		// of settings that need to be performed.
+
+		RasterizerStageStateDX11		CurrentState;
 	};
-	typedef std::shared_ptr<RasterizerStateDX11> RasterizerStatePtr;
 };
 //--------------------------------------------------------------------------------
-#endif // RasterizerStateDX11_h
+#endif // RasterizerStageDX11_h
 //--------------------------------------------------------------------------------
 

@@ -343,7 +343,8 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager*
     pPipelineManager->OutputMergerStage.BindDepthTarget( m_pDepthTarget );
     pPipelineManager->ApplyRenderTargets();
 
-    pPipelineManager->SetViewPort( m_iViewport );
+	pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
+	pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iViewport );
 
     // Set this view's render parameters
     SetRenderParams( pParamManager );

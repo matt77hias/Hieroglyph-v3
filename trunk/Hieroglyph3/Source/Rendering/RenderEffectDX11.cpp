@@ -53,9 +53,9 @@ void RenderEffectDX11::ConfigurePipeline( PipelineManagerDX11* pPipeline, IParam
 		pPipeline->SetDepthStencilState( 0 );
 
 	if ( m_iRasterizerState != -1 )
-		pPipeline->SetRasterizerState( m_iRasterizerState );
+		pPipeline->RasterizerStage.DesiredState.SetRasterizerState( m_iRasterizerState );
 	else
-		pPipeline->SetRasterizerState( 0 );
+		pPipeline->RasterizerStage.DesiredState.SetRasterizerState( 0 );
 
 	// For the shaders, we bind each one even if the shader is not valid in this
 	// render effect.  This allows for various pipeline stages to be disabled when

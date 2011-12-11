@@ -86,6 +86,11 @@ void ShaderDX11::UpdateParameters( PipelineManagerDX11* pPipeline, IParameterMan
 
 			if ( index == -1 )
 			{
+				// This section of the code should never be reached anymore - all CBs should
+				// be initially created when a shader is compiled if it doesn't already exist.
+				// If we do end up here, send a message about it!
+				Log::Get().Write( L"Uh oh - creating a constant buffer in the ShaderDX11::UpdateParameters functions!!!!" );
+
 				// Configure the buffer for the needed size and dynamic updating.
 				BufferConfigDX11 cbuffer;
 				cbuffer.SetDefaultConstantBuffer( ConstantBuffers[i].Description.Size, true );

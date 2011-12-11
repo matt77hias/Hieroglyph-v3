@@ -205,7 +205,8 @@ void ViewDeferredRenderer::Draw( PipelineManagerDX11* pPipelineManager, IParamet
     pPipelineManager->ApplyRenderTargets();
     pPipelineManager->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 
-	pPipelineManager->SetViewPort( m_iCurrentViewport );
+	pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
+	pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iCurrentViewport );
 
     TArray<ResourcePtr>& gBuffer = m_GBuffer[GBufferOptMode::Value][AAMode::Value];
     float scaleFactor = AAMode::Value == AAMode::SSAA ? 0.5f : 1.0f;

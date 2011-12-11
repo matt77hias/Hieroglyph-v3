@@ -284,7 +284,8 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager*
     pPipelineManager->OutputMergerStage.BindDepthTarget( m_DepthTarget );
     pPipelineManager->ApplyRenderTargets();
 
-    pPipelineManager->SetViewPort( m_iViewport );
+	pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
+	pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iViewport );
 
     // Set this view's render parameters
     SetRenderParams( pParamManager );
@@ -343,7 +344,8 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager*
                 D3D11_RECT rect = CalcScissorRect( light.Position, light.Range );
 
                 // Set it
-                pPipelineManager->SetScissorRects( 1, &rect );
+				pPipelineManager->RasterizerStage.DesiredState.SetScissorRectCount( 1 );
+                pPipelineManager->RasterizerStage.DesiredState.SetScissorRect( 0, rect );
             }
 
             pEffect->m_iDepthStencilState = m_iDisabledDSState;

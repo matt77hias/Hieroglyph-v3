@@ -114,8 +114,9 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftY = 0;
 
 	int ViewPort = m_pRenderer11->CreateViewPort( viewport );
-	m_pRenderer11->pImmPipeline->SetViewPort( ViewPort );
-	
+	m_pRenderer11->pImmPipeline->RasterizerStage.DesiredState.SetViewportCount( 1 );
+	m_pRenderer11->pImmPipeline->RasterizerStage.DesiredState.SetViewport( 0, ViewPort );
+
 	return( true );
 }
 //--------------------------------------------------------------------------------

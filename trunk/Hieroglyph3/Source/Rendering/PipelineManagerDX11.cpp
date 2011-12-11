@@ -131,47 +131,47 @@ void PipelineManagerDX11::SetDepthStencilState( int ID, UINT stencilRef )
 	}
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::SetRasterizerState( int ID )
-{
-	RendererDX11* pRenderer = RendererDX11::Get();
-
-	ID3D11RasterizerState* pRasterizerState = pRenderer->GetRasterizerState( ID )->m_pState;
-
-	if ( pRasterizerState )
-	{
-		m_pContext->RSSetState( pRasterizerState );
-	}
-	else
-	{
-		Log::Get().Write( L"Tried to set an invalid rasterizer state ID!" );
-	}
-}
+//void PipelineManagerDX11::SetRasterizerState( int ID )
+//{
+//	RendererDX11* pRenderer = RendererDX11::Get();
+//
+//	ID3D11RasterizerState* pRasterizerState = pRenderer->GetRasterizerState( ID )->m_pState;
+//
+//	if ( pRasterizerState )
+//	{
+//		m_pContext->RSSetState( pRasterizerState );
+//	}
+//	else
+//	{
+//		Log::Get().Write( L"Tried to set an invalid rasterizer state ID!" );
+//	}
+//}
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::SetViewPort( int ID )
-{
-	RendererDX11* pRenderer = RendererDX11::Get();
-
-	ViewPortDX11* pViewport = pRenderer->GetViewPort( ID );
-
-	if ( pViewport )
-		m_pContext->RSSetViewports( 1, &pViewport->m_ViewPort );
-	else
-		Log::Get().Write( L"Tried to set an invalid view port index!" );
-}
+//void PipelineManagerDX11::SetViewPort( int ID )
+//{
+//	RendererDX11* pRenderer = RendererDX11::Get();
+//
+//	ViewPortDX11* pViewport = pRenderer->GetViewPort( ID );
+//
+//	if ( pViewport )
+//		m_pContext->RSSetViewports( 1, &pViewport->m_ViewPort );
+//	else
+//		Log::Get().Write( L"Tried to set an invalid view port index!" );
+//}
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::SetScissorRects( UINT NumRects, const D3D11_RECT* pRects )
-{
-    RendererDX11* pRenderer = RendererDX11::Get();
-    
-    m_pContext->RSSetScissorRects( NumRects, pRects );
-}
+//void PipelineManagerDX11::SetScissorRects( UINT NumRects, const D3D11_RECT* pRects )
+//{
+//    RendererDX11* pRenderer = RendererDX11::Get();
+//    
+//    m_pContext->RSSetScissorRects( NumRects, pRects );
+//}
 //--------------------------------------------------------------------------------
-D3D11_VIEWPORT PipelineManagerDX11::GetCurrentViewport( ) {
-	D3D11_VIEWPORT vp;
-	UINT numVP = 1;
-	m_pContext->RSGetViewports( &numVP, &vp );
-	return vp;
-}
+//D3D11_VIEWPORT PipelineManagerDX11::GetCurrentViewport( ) {
+//	D3D11_VIEWPORT vp;
+//	UINT numVP = 1;
+//	m_pContext->RSGetViewports( &numVP, &vp );
+//	return vp;
+//}
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::BindConstantBufferParameter( ShaderType type, RenderParameterDX11* pParam, UINT slot, 
                                                       IParameterManager* pParamManager )
@@ -397,6 +397,9 @@ void PipelineManagerDX11::ApplyPipelineResources( )
 	GeometryShaderStage.ApplyDesiredState( m_pContext );
 	PixelShaderStage.ApplyDesiredState( m_pContext );
 	ComputeShaderStage.ApplyDesiredState( m_pContext );
+
+	// TODO: this may not be the correct place to set this state!
+	RasterizerStage.ApplyDesiredState( m_pContext );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ClearPipelineResources( )
@@ -430,7 +433,8 @@ void PipelineManagerDX11::ClearPipelineState( )
 	GeometryShaderStage.ClearCurrentState();
 	GeometryShaderStage.ClearDesiredState();
 
-	//RasterizerStage
+	RasterizerStage.ClearCurrentState( );
+	RasterizerStage.ClearDesiredState( );
 
 	PixelShaderStage.ClearCurrentState();
 	PixelShaderStage.ClearDesiredState();
@@ -904,7 +908,8 @@ void PipelineManagerDX11::GenerateCommandList( CommandListDX11* pList )
 		GeometryShaderStage.ClearCurrentState();
 		GeometryShaderStage.ClearDesiredState();
 
-		//RasterizerStage
+		RasterizerStage.ClearCurrentState( );
+		RasterizerStage.ClearDesiredState( );
 
 		PixelShaderStage.ClearCurrentState();
 		PixelShaderStage.ClearDesiredState();
@@ -937,7 +942,8 @@ void PipelineManagerDX11::ExecuteCommandList( CommandListDX11* pList )
 	GeometryShaderStage.ClearCurrentState();
 	GeometryShaderStage.ClearDesiredState();
 
-	//RasterizerStage
+	RasterizerStage.ClearCurrentState( );
+	RasterizerStage.ClearDesiredState( );
 
 	PixelShaderStage.ClearCurrentState();
 	PixelShaderStage.ClearDesiredState();

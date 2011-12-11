@@ -190,7 +190,8 @@ void ViewLightPrepassRenderer::Draw( PipelineManagerDX11* pPipelineManager, IPar
     pPipelineManager->ApplyRenderTargets();
     pPipelineManager->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 
-	pPipelineManager->SetViewPort( m_iViewport );
+	pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
+	pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iViewport );
 
     // Need to resolve the MSAA target before we can render it
     pPipelineManager->ResolveSubresource( m_ResolveTarget, 0, m_FinalTarget, 0, DXGI_FORMAT_R10G10B10A2_UNORM );

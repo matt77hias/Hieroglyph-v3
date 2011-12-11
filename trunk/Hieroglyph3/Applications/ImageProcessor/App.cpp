@@ -241,6 +241,9 @@ void App::Update()
 		m_pInputParameter->InitializeParameterData( &m_Texture[m_iImage]->m_iResourceSRV );
 		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
 		m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceGaussian, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+
+		m_pRenderer11->pImmPipeline->ClearPipelineResources();
+		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
 	}
 
 	// Separable Gaussian
@@ -251,22 +254,35 @@ void App::Update()
 		m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
 		m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableGaussianX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
 
+		m_pRenderer11->pImmPipeline->ClearPipelineResources();
+		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
+		
 		m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
 		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
 		m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableGaussianY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
+
+		m_pRenderer11->pImmPipeline->ClearPipelineResources();
+		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
 	}
 
 	// Cached Gaussian
 	if ( m_iAlgorithm == 2 )
 	{
 		out << L"Cached Separable Gaussian" << std::endl;
+		
 		m_pInputParameter->InitializeParameterData( &m_Texture[m_iImage]->m_iResourceSRV );
 		m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
 		m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
-	
+
+		m_pRenderer11->pImmPipeline->ClearPipelineResources();
+		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
+
 		m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
 		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
 		m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
+
+		m_pRenderer11->pImmPipeline->ClearPipelineResources();
+		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
 	}
 
 	// Brute force Bilateral
@@ -277,13 +293,22 @@ void App::Update()
 		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
 		m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
 
+		m_pRenderer11->pImmPipeline->ClearPipelineResources();
+		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
+
 		m_pInputParameter->InitializeParameterData( &m_Output->m_iResourceSRV );
 		m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
 		m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
 
+		m_pRenderer11->pImmPipeline->ClearPipelineResources();
+		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
+
 		m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
 		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
 		m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+
+		m_pRenderer11->pImmPipeline->ClearPipelineResources();
+		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
 	}
 
 	// Separable Bilateral
@@ -294,9 +319,15 @@ void App::Update()
 		m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
 		m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
 
+		m_pRenderer11->pImmPipeline->ClearPipelineResources();
+		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
+
 		m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
 		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
 		m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
+
+		m_pRenderer11->pImmPipeline->ClearPipelineResources();
+		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
 	}
 
 	m_pTextOverlayView->WriteText( out.str(), Matrix4f::TranslationMatrix( 10.0f, 10.0f, 0.0f ), Vector4f( 1.0f, 1.0f, 0.0f, 1.0f ) );

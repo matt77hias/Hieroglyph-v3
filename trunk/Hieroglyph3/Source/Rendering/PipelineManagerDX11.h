@@ -19,6 +19,7 @@
 #include "HullStageDX11.h"
 #include "DomainStageDX11.h"
 #include "GeometryStageDX11.h"
+#include "RasterizerStageDX11.h"
 #include "PixelStageDX11.h"
 #include "ComputeStageDX11.h"
 #include "InputAssemblerStageDX11.h"
@@ -46,12 +47,12 @@ namespace Glyph3
 
 		void SetBlendState( int ID );
 		void SetDepthStencilState( int ID, UINT stencilRef = 0 );
-		void SetRasterizerState( int ID );
-		void SetViewPort( int ID );
-        void SetScissorRects( UINT NumRects, const D3D11_RECT* pRects ); 
+		//void SetRasterizerState( int ID );
+		//void SetViewPort( int ID );
+        //void SetScissorRects( UINT NumRects, const D3D11_RECT* pRects ); 
 
 		// State accessors
-		D3D11_VIEWPORT GetCurrentViewport( );
+		//D3D11_VIEWPORT GetCurrentViewport( );
 
 		// All of the 'Bind/Unbind' functions below are used to bind various resources to the
 		// pipeline.  Currently only the CS can accept unordered access views.  A method is
@@ -190,6 +191,7 @@ namespace Glyph3
 
 	public:
 		InputAssemblerStageDX11	InputAssemblerStage;
+		RasterizerStageDX11		RasterizerStage;
 		OutputMergerStageDX11	OutputMergerStage;
 
 	};

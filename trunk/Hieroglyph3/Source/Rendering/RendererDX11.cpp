@@ -240,7 +240,7 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	// to keep a copy of it here.
 
 	RasterizerStateConfigDX11 RasterizerState;
-	pImmPipeline->SetRasterizerState( CreateRasterizerState( &RasterizerState ) );
+	pImmPipeline->RasterizerStage.DesiredState.SetRasterizerState( CreateRasterizerState( &RasterizerState ) );
 
 	// Depth Stencil State (DS) - the first state will be index zero, so no need
 	// to keep a copy of it here.
@@ -303,7 +303,7 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 		// Create the pipeline and set the context.
 		g_aPayload[i].pPipeline = new PipelineManagerDX11();
 		g_aPayload[i].pPipeline->SetDeviceContext( pDeferred, m_FeatureLevel );
-		g_aPayload[i].pPipeline->SetRasterizerState( 0 );
+		g_aPayload[i].pPipeline->RasterizerStage.DesiredState.SetRasterizerState( 0 );
 		g_aPayload[i].pPipeline->SetDepthStencilState( 0 );
 		g_aPayload[i].pPipeline->SetBlendState( 0 );
 
@@ -2375,7 +2375,7 @@ unsigned int WINAPI _RenderViewThreadProc( void* lpParameter )
 		WaitForSingleObject( g_aBeginEventHandle[id], INFINITE );
 
 		pPayload->pPipeline->m_pContext->ClearState();
-		pPayload->pPipeline->SetRasterizerState( 0 );
+		pPayload->pPipeline->RasterizerStage.DesiredState.SetRasterizerState( 0 );
 		pPayload->pPipeline->SetDepthStencilState( 0 );
 		pPayload->pPipeline->SetBlendState( 0 );
 

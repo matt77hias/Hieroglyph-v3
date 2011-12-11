@@ -120,10 +120,11 @@ void ViewParaboloidEnvMap::Draw( PipelineManagerDX11* pPipelineManager, IParamet
 		pPipelineManager->OutputMergerStage.BindDepthTarget( m_DepthTarget );
 		pPipelineManager->ApplyRenderTargets();
 
-		pPipelineManager->SetViewPort( m_iViewport );
+		pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
+		pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iViewport );
+		pPipelineManager->RasterizerStage.DesiredState.SetRasterizerState( 0 );
 
 		// Set default states for these stages
-		pPipelineManager->SetRasterizerState( 0 );
 		pPipelineManager->SetDepthStencilState( 0 );
 		pPipelineManager->SetBlendState( 0 );
 

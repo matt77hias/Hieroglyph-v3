@@ -21,6 +21,7 @@
 #include "ParameterManagerDX11.h"
 #include "BufferConfigDX11.h"
 #include "Texture2dConfigDX11.h"
+#include "ViewPortDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -294,9 +295,10 @@ void SpriteRendererDX11::Render( PipelineManagerDX11* pipeline,
 	texAndViewportSize.x = static_cast<float>( desc.Width );
 	texAndViewportSize.y = static_cast<float>( desc.Height );
 
-	D3D11_VIEWPORT vp = pipeline->GetCurrentViewport();
-	texAndViewportSize.z = static_cast<float>( vp.Width );
-	texAndViewportSize.w = static_cast<float>( vp.Height );
+	int viewportID = pipeline->RasterizerStage.GetCurrentState().GetViewport( 0 );
+	ViewPortDX11* vp = RendererDX11::Get()->GetViewPort( viewportID );
+	texAndViewportSize.z = static_cast<float>( vp->GetWidth() );
+	texAndViewportSize.w = static_cast<float>( vp->GetHeight() );
 
 	parameters->SetVectorParameter( L"TexAndViewportSize", &texAndViewportSize );
 

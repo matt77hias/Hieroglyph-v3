@@ -66,7 +66,8 @@ void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager
 		pPipelineManager->OutputMergerStage.BindDepthTarget( m_DepthTarget );
 		pPipelineManager->ApplyRenderTargets();
 
-		pPipelineManager->SetViewPort( m_iViewport );
+		pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
+		pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iViewport );
 
 		// Clear the G-Buffer targets
 		Vector4f color(0.0f, 0.0f, 0.0f, 0.0f);
