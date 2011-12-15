@@ -26,7 +26,7 @@ RasterizerStageDX11::~RasterizerStageDX11()
 	
 }
 //--------------------------------------------------------------------------------
-void RasterizerStageDX11::SetFeautureLevel( D3D_FEATURE_LEVEL level )
+void RasterizerStageDX11::SetFeatureLevel( D3D_FEATURE_LEVEL level )
 {
 	m_FeatureLevel = level;
 	CurrentState.SetFeautureLevel( level );

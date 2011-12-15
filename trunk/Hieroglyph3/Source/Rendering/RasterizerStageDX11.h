@@ -26,7 +26,7 @@ namespace Glyph3
 		RasterizerStageDX11();
 		virtual ~RasterizerStageDX11();
 
-		void SetFeautureLevel( D3D_FEATURE_LEVEL level );
+		void SetFeatureLevel( D3D_FEATURE_LEVEL level );
 
 		void ClearDesiredState( );
 		void ClearCurrentState( );

@@ -17,6 +17,7 @@
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "ResourceProxyDX11.h"
+#include "OutputMergerStageStateDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -30,44 +31,63 @@ namespace Glyph3
 
 		void SetFeautureLevel( D3D_FEATURE_LEVEL level );
 
-		// Each of these set methods will buffer their input views for binding
-		// at a later time when the BindResources method is called.  Until it is,
-		// these views are cached for later use.
-		void BindRenderTarget( int index, ResourcePtr Target );
-		void BindDepthTarget( ResourcePtr DepthTarget );
-		void SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV, unsigned int initial = -1 );
+		void ClearDesiredState( );
+		void ClearCurrentState( );
+		void ApplyDesiredRenderTargetStates( ID3D11DeviceContext* pContext );
+		void ApplyDesiredBlendAndDepthStencilStates( ID3D11DeviceContext* pContext );
+		void ApplyDesiredState( ID3D11DeviceContext* pContext );
 
-		// Binding resources actually binds the currently 'set' views and makes 
-		// them 'bound' views to the API.
-		void BindResources( ID3D11DeviceContext* pContext );
-		
-		// Clearing resources wipes out the currently 'set' views from the buffer.
-		void ClearResources();
-		void UnbindResources( ID3D11DeviceContext* pContext );
+		const OutputMergerStageStateDX11& GetCurrentState() const;
 
-		// This method will set the current cached API state to the default value.
-		// This is commonly used when the context is reset for some reason.
-		void SetToDefaultState();
 
-		// The number of views 'set' indicates how many views will be bound after
-		// the next call to bind resources (i.e. the number of views planned to be
-		// bound).
-		unsigned int GetViewsSetCount();
+		// The desired state is a public member that will allow the user of this
+		// class to configure the state as desired before applying the state.
 
-		// The number of views bound indicates how many views are bound to the pipeline
-		// in the API currently according to the tracked state of the context.
-		unsigned int GetViewsBoundCount();
+		OutputMergerStageStateDX11		DesiredState;
+
+
+
+
+
+
+
+		//// Each of these set methods will buffer their input views for binding
+		//// at a later time when the BindResources method is called.  Until it is,
+		//// these views are cached for later use.
+		//void BindRenderTarget( int index, ResourcePtr Target );
+		//void BindDepthTarget( ResourcePtr DepthTarget );
+		//void SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV, unsigned int initial = -1 );
+
+		//// Binding resources actually binds the currently 'set' views and makes 
+		//// them 'bound' views to the API.
+		//void BindResources( ID3D11DeviceContext* pContext );
+		//
+		//// Clearing resources wipes out the currently 'set' views from the buffer.
+		//void ClearResources();
+		//void UnbindResources( ID3D11DeviceContext* pContext );
+
+		//// This method will set the current cached API state to the default value.
+		//// This is commonly used when the context is reset for some reason.
+		//void SetToDefaultState();
+
+		//// The number of views 'set' indicates how many views will be bound after
+		//// the next call to bind resources (i.e. the number of views planned to be
+		//// bound).
+		//unsigned int GetViewsSetCount();
+
+		//// The number of views bound indicates how many views are bound to the pipeline
+		//// in the API currently according to the tracked state of the context.
+		//unsigned int GetViewsBoundCount();
 
 	protected:
 
 		D3D_FEATURE_LEVEL				m_FeatureLevel;
 
-		ID3D11RenderTargetView*			RenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT];
-		ID3D11RenderTargetView*			APIRenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT];
-		ID3D11DepthStencilView*			DepthTargetViews;
-        ID3D11DepthStencilView*			APIDepthTargetViews;
-		ID3D11UnorderedAccessView*		UnorderedAccessViews[D3D11_PS_CS_UAV_REGISTER_COUNT];
-		unsigned int					UAVInitialCounts[D3D11_PS_CS_UAV_REGISTER_COUNT];
+		// The current state of the API is used to allow for caching and elimination
+		// of redundant API calls.  This should make it possible to minimize the number
+		// of settings that need to be performed.
+
+		OutputMergerStageStateDX11		CurrentState;
 
 		friend PipelineManagerDX11;
 	};

@@ -95,127 +95,44 @@ void PipelineManagerDX11::SetDeviceContext( ID3D11DeviceContext* pContext, D3D_F
 	ShaderStages[COMPUTE_SHADER]->SetFeatureLevel( level );
 
 	InputAssemblerStage.SetFeautureLevel( level );
+	RasterizerStage.SetFeatureLevel( level );
 	OutputMergerStage.SetFeautureLevel( level );
 }
-//--------------------------------------------------------------------------------
-void PipelineManagerDX11::SetBlendState( int ID )
-{
-	RendererDX11* pRenderer = RendererDX11::Get();
-
-	ID3D11BlendState* pBlendState = pRenderer->GetBlendState( ID )->m_pState;
-
-	if ( pBlendState )
-	{
-		float afBlendFactors[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		m_pContext->OMSetBlendState( pBlendState, afBlendFactors, 0xFFFFFFFF );
-	}
-	else
-	{
-		Log::Get().Write( L"Tried to set an invalid blend state ID!" );
-	}
-}
-//--------------------------------------------------------------------------------
-void PipelineManagerDX11::SetDepthStencilState( int ID, UINT stencilRef )
-{
-	RendererDX11* pRenderer = RendererDX11::Get();
-
-	ID3D11DepthStencilState* pDepthState = pRenderer->GetDepthState( ID )->m_pState;
-
-	if ( pDepthState )
-	{
-		m_pContext->OMSetDepthStencilState( pDepthState, stencilRef );
-	}
-	else
-	{
-		Log::Get().Write( L"Tried to set an invalid depth stencil state ID!" );
-	}
-}
-//--------------------------------------------------------------------------------
-//void PipelineManagerDX11::SetRasterizerState( int ID )
-//{
-//	RendererDX11* pRenderer = RendererDX11::Get();
-//
-//	ID3D11RasterizerState* pRasterizerState = pRenderer->GetRasterizerState( ID )->m_pState;
-//
-//	if ( pRasterizerState )
-//	{
-//		m_pContext->RSSetState( pRasterizerState );
-//	}
-//	else
-//	{
-//		Log::Get().Write( L"Tried to set an invalid rasterizer state ID!" );
-//	}
-//}
-//--------------------------------------------------------------------------------
-//void PipelineManagerDX11::SetViewPort( int ID )
-//{
-//	RendererDX11* pRenderer = RendererDX11::Get();
-//
-//	ViewPortDX11* pViewport = pRenderer->GetViewPort( ID );
-//
-//	if ( pViewport )
-//		m_pContext->RSSetViewports( 1, &pViewport->m_ViewPort );
-//	else
-//		Log::Get().Write( L"Tried to set an invalid view port index!" );
-//}
-//--------------------------------------------------------------------------------
-//void PipelineManagerDX11::SetScissorRects( UINT NumRects, const D3D11_RECT* pRects )
-//{
-//    RendererDX11* pRenderer = RendererDX11::Get();
-//    
-//    m_pContext->RSSetScissorRects( NumRects, pRects );
-//}
-//--------------------------------------------------------------------------------
-//D3D11_VIEWPORT PipelineManagerDX11::GetCurrentViewport( ) {
-//	D3D11_VIEWPORT vp;
-//	UINT numVP = 1;
-//	m_pContext->RSGetViewports( &numVP, &vp );
-//	return vp;
-//}
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::BindConstantBufferParameter( ShaderType type, RenderParameterDX11* pParam, UINT slot, 
                                                       IParameterManager* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
-	// TODO: Verify that using GetParameter(...) here is ok for all multithreaded cases! 
-	//RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
-	//RenderParameterDX11* pParameter = pParamManager->GetParameterRef( name );
+
 	unsigned int tID = pParamManager->GetID();
 
-	if ( pParam != 0 )
-	{
+	if ( pParam != 0 ) {
+
 		// Check the type of the parameter
-		if ( pParam->GetParameterType() == CBUFFER )
-		{
+		if ( pParam->GetParameterType() == CBUFFER ) {
 			ConstantBufferParameterDX11* pBuffer = reinterpret_cast<ConstantBufferParameterDX11*>( pParam );
 			int ID = ( pBuffer->GetIndex( tID ) & 0xffff ); 
 
 			ResourceDX11* pResource = pRenderer->GetResource( ID );
 
 			// Allow a range including -1 up to the number of resources
-			if ( pResource || ( ID == -1 ) )
-			{
+			if ( pResource || ( ID == -1 ) ) {
 				// Get the resource to be set, and pass it in to the desired shader type
 				
 				ID3D11Buffer* pBuffer = 0;
 				
-				if ( ID >= 0 )
+				if ( ID >= 0 ) {
 					pBuffer = (ID3D11Buffer*)pResource->GetResource();
+				}
 
 				ShaderStages[type]->DesiredState.SetConstantBuffer( slot, pBuffer );
-			}
-			else
-			{
+			} else {
 				Log::Get().Write( L"Tried to set an invalid constant buffer ID!" );
 			}
-		}
-		else
-		{
+		} else {
 			Log::Get().Write( L"Tried to set a non-constant buffer ID as a constant buffer!" );
 		}
-	}
-	else
-	{
+	} else {
 		Log::Get().Write( L"Tried to set a non-existing parameter as a constant buffer!" );
 	}
 }
@@ -224,47 +141,39 @@ void PipelineManagerDX11::BindShaderResourceParameter( ShaderType type, RenderPa
                                                       IParameterManager* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
-	// TODO: Verify that using GetParameter(...) here is ok for all multithreaded cases! 
-	//RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
-	//RenderParameterDX11* pParameter = pParamManager->GetParameterRef( name );
+
 	unsigned int tID = pParamManager->GetID();
 
-	if ( pParam != 0 )
-	{
+	if ( pParam != 0 ) {
+
 		// Check the type of the parameter
-		if ( pParam->GetParameterType() == SHADER_RESOURCE )
-		{
+		if ( pParam->GetParameterType() == SHADER_RESOURCE ) {
 			ShaderResourceParameterDX11* pResource = 
 				reinterpret_cast<ShaderResourceParameterDX11*>( pParam );
 
 			int ID = pResource->GetIndex( tID ); 
 
-			ShaderResourceViewDX11* pView = pRenderer->GetShaderResourceView( ID );
+			ShaderResourceViewDX11* pView = pRenderer->GetShaderResourceViewByIndex( ID );
 
 			// Allow a range including -1 up to the number of resources views
-			if ( pView || ( ID == -1 ) )
-			{
+			if ( pView || ( ID == -1 ) ) {
+
 				// Get the resource to be set, and pass it in to the desired shader type
 
 				ID3D11ShaderResourceView* pResourceView = 0;
 
-				if ( ID >= 0 )
+				if ( ID >= 0 ) {
 					pResourceView = pView->m_pShaderResourceView;
+				}
 
 				ShaderStages[type]->DesiredState.SetShaderResourceView( slot, pResourceView );
-			}
-			else
-			{
+			} else {
 				Log::Get().Write( L"Tried to set an invalid shader resource ID!" );
 			}
-		}
-		else
-		{
+		} else {
 			Log::Get().Write( L"Tried to set a non-shader resource ID as a shader resource!" );
 		}
-	}
-	else
-	{
+	} else {
 		Log::Get().Write( L"Tried to set a non-existing parameter as a shader resource!" );
 	}
 }
@@ -273,48 +182,41 @@ void PipelineManagerDX11::BindUnorderedAccessParameter( ShaderType type, RenderP
                                                        IParameterManager* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
-	// TODO: Verify that using GetParameter(...) here is ok for all multithreaded cases! 
-	//RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
-	//RenderParameterDX11* pParameter = pParamManager->GetParameterRef( name );
+
 	unsigned int tID = pParamManager->GetID();
 
-	if ( pParam != 0 )
-	{
+	if ( pParam != 0 ) {
+
 		// Check the type of the parameter
-		if ( pParam->GetParameterType() == UNORDERED_ACCESS )
-		{
+		if ( pParam->GetParameterType() == UNORDERED_ACCESS ) {
+
 			UnorderedAccessParameterDX11* pResource = 
 				reinterpret_cast<UnorderedAccessParameterDX11*>( pParam );
 
 			int ID = pResource->GetIndex( tID ); 
 			unsigned int initial = pResource->GetInitialCount( tID );
 
-			UnorderedAccessViewDX11* pView = pRenderer->GetUnorderedAccessView( ID );
+			UnorderedAccessViewDX11* pView = pRenderer->GetUnorderedAccessViewByIndex( ID );
 
 			// Allow a range including -1 up to the number of resources views
-			if ( pView || ( ID == -1 ) )
-			{
+			if ( pView || ( ID == -1 ) ) {
+
 				// Get the resource to be set, and pass it in to the desired shader type
 
 				ID3D11UnorderedAccessView* pResourceView = 0;
 
-				if ( ID >= 0 )
+				if ( ID >= 0 ) {
 					pResourceView = pView->m_pUnorderedAccessView;
+				}
 
 				ShaderStages[type]->DesiredState.SetUnorderedAccessView( slot, pResourceView, initial );
-			}
-			else
-			{
+			} else {
 				Log::Get().Write( L"Tried to set an invalid unordered access ID!" );
-			}
-		}
-		else
-		{
+			} 
+		} else {
 			Log::Get().Write( L"Tried to set a non-unordered access view ID as a unordered access view!" );
 		}
-	}
-	else
-	{
+	} else {
 		Log::Get().Write( L"Tried to set a non-existing parameter as a unordered access view!" );
 	}
 }
@@ -323,16 +225,14 @@ void PipelineManagerDX11::BindSamplerStateParameter( ShaderType type, RenderPara
                                                     IParameterManager* pParamManager )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
-	// TODO: Verify that using GetParameter(...) here is ok for all multithreaded cases! 
-	//RenderParameterDX11* pParameter = pParamManager->m_Parameters[name];
-	//RenderParameterDX11* pParameter = pParamManager->GetParameterRef( name );
+
 	unsigned int tID = pParamManager->GetID();
 
-	if ( pParam != 0 )
-	{
+	if ( pParam != 0 ) {
+
 		// Check the type of the parameter
-		if ( pParam->GetParameterType() == SAMPLER )
-		{
+		if ( pParam->GetParameterType() == SAMPLER ) {
+
 			SamplerParameterDX11* pResource = 
 				reinterpret_cast<SamplerParameterDX11*>( pParam );
 
@@ -341,41 +241,36 @@ void PipelineManagerDX11::BindSamplerStateParameter( ShaderType type, RenderPara
 
 			// Allow a range including -1 up to the number of samplers
 
-			if ( pState || ( ID == -1 ) )
-			{
+			if ( pState || ( ID == -1 ) ) {
+
 				// Get the resource to be set, and pass it in to the desired shader type
 
 				ID3D11SamplerState* pSampler = 0;
 
-				if ( ID >= 0 )
+				if ( ID >= 0 ) {
 					pSampler = pState->m_pState; 
+				}
 
 				ShaderStages[type]->DesiredState.SetSamplerState( slot, pSampler );
-			}
-			else
-			{
+			} else {
 				Log::Get().Write( L"Tried to set an invalid sampler state ID!" );
 			}
-		}
-		else
-		{
+		} else {
 			Log::Get().Write( L"Tried to set a non-sampler state ID as a sampler state!" );
 		}
-	}
-	else
-	{
+	} else {
 		Log::Get().Write( L"Tried to set a non-existing parameter as a sampler state!" );
 	}
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ClearRenderTargets( )
 {
-	OutputMergerStage.UnbindResources( m_pContext );
+	OutputMergerStage.ClearDesiredState();
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ApplyRenderTargets( )
 {
-	OutputMergerStage.BindResources( m_pContext );
+	OutputMergerStage.ApplyDesiredRenderTargetStates( m_pContext );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ApplyInputResources( )
@@ -386,7 +281,6 @@ void PipelineManagerDX11::ApplyInputResources( )
 void PipelineManagerDX11::ClearInputResources( )
 {
 	InputAssemblerStage.ClearDesiredState();
-	InputAssemblerStage.ApplyDesiredState( m_pContext );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ApplyPipelineResources( )
@@ -398,8 +292,11 @@ void PipelineManagerDX11::ApplyPipelineResources( )
 	PixelShaderStage.ApplyDesiredState( m_pContext );
 	ComputeShaderStage.ApplyDesiredState( m_pContext );
 
-	// TODO: this may not be the correct place to set this state!
+	// TODO: this may not be the correct place to set this state! The Rasterizer
+	// state should probably be split into two parts like the OM state.
+
 	RasterizerStage.ApplyDesiredState( m_pContext );
+	OutputMergerStage.ApplyDesiredBlendAndDepthStencilStates( m_pContext );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ClearPipelineResources( )
@@ -410,13 +307,11 @@ void PipelineManagerDX11::ClearPipelineResources( )
 	GeometryShaderStage.ClearDesiredState( );
 	PixelShaderStage.ClearDesiredState( );
 	ComputeShaderStage.ClearDesiredState( );
-
-	//this->ApplyPipelineResources( );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ClearPipelineState( )
 {
-	// TODO: This method needs to update the state of each pipeline stage class!!!
+	// First clear out our cached states.
 
 	InputAssemblerStage.ClearCurrentState();
 	InputAssemblerStage.ClearDesiredState();
@@ -439,11 +334,14 @@ void PipelineManagerDX11::ClearPipelineState( )
 	PixelShaderStage.ClearCurrentState();
 	PixelShaderStage.ClearDesiredState();
 
-	OutputMergerStage.SetToDefaultState();
+	OutputMergerStage.ClearCurrentState();
+	OutputMergerStage.ClearDesiredState();
 
 	ComputeShaderStage.ClearCurrentState();
 	ComputeShaderStage.ClearDesiredState();
 	
+	// After our cached states have been cleared, then we can clear the API state.
+
 	m_pContext->ClearState();
 
 	if ( m_pContext->GetType() == D3D11_DEVICE_CONTEXT_DEFERRED ) {
@@ -451,8 +349,6 @@ void PipelineManagerDX11::ClearPipelineState( )
 		m_pContext->FinishCommandList( true, &pList );
 		pList->Release();
 	}
-
-	
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::DrawIndexed( UINT IndexCount, UINT StartIndex, int VertexOffset )
@@ -664,7 +560,7 @@ void PipelineManagerDX11::CopyStructureCount( ResourcePtr dest, UINT offset, Res
 
 	ID3D11Buffer* pArgsBuffer = (ID3D11Buffer*)RendererDX11::Get()->GetResource( ID )->GetResource();
 
-	UnorderedAccessViewDX11* pView = RendererDX11::Get()->GetUnorderedAccessView( uav->m_iResourceUAV );
+	UnorderedAccessViewDX11* pView = RendererDX11::Get()->GetUnorderedAccessViewByIndex( uav->m_iResourceUAV );
 
 	ID3D11UnorderedAccessView* pSrcView = pView->m_pUnorderedAccessView;
 
@@ -684,19 +580,30 @@ void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth, UINT stenci
 	// For each view that the application thinks is bound, we clear it as requested.  Since
 	// the view count is the number of non-null views, we don't need to check here.
 
-	UINT viewCount = OutputMergerStage.GetViewsSetCount();
+	UINT viewCount = OutputMergerStage.GetCurrentState().GetRenderTargetCount();
 
 	for( UINT i = 0; i < viewCount; ++i )
 	{
 	    float clearColours[] = { color.x, color.y, color.z, color.w }; // RGBA
-	    m_pContext->ClearRenderTargetView( OutputMergerStage.RenderTargetViews[i], clearColours );
+		int rtv = OutputMergerStage.GetCurrentState().GetRenderTarget( i );
+		RenderTargetViewDX11* pRTV = RendererDX11::Get()->GetRenderTargetViewByIndex( rtv );
+		if ( pRTV != 0 ) {
+			pRenderTargetViews[i] = pRTV->m_pRenderTargetView; 
+			m_pContext->ClearRenderTargetView( pRenderTargetViews[i], clearColours );
+		}
 	}
 
 	// Check if the output merger currently has a depth target set, and if so clear it.
 
-	if ( OutputMergerStage.DepthTargetViews != 0 )
+	if ( OutputMergerStage.GetCurrentState().GetDepthStencilTarget() != -1 )
 	{
-		m_pContext->ClearDepthStencilView( OutputMergerStage.DepthTargetViews, D3D11_CLEAR_DEPTH, depth, stencil );
+		int dsv = OutputMergerStage.GetCurrentState().GetDepthStencilTarget();
+		DepthStencilViewDX11* pDSV = RendererDX11::Get()->GetDepthStencilViewByIndex( dsv );
+		if ( pDSV != 0 ) {
+			pDepthStencilView = pDSV->m_pDepthStencilView;
+			m_pContext->ClearDepthStencilView( pDepthStencilView, D3D11_CLEAR_DEPTH, depth, stencil );
+		}
+		
 	}
 }
 //--------------------------------------------------------------------------------
@@ -890,8 +797,6 @@ void PipelineManagerDX11::GenerateCommandList( CommandListDX11* pList )
 
 		// Reset the cached context state to default, since we do that for all
 		// command lists.
-		//
-		// TODO: Add the other stage states here...
 
 		InputAssemblerStage.ClearCurrentState();
 		InputAssemblerStage.ClearDesiredState();
@@ -914,7 +819,8 @@ void PipelineManagerDX11::GenerateCommandList( CommandListDX11* pList )
 		PixelShaderStage.ClearCurrentState();
 		PixelShaderStage.ClearDesiredState();
 
-		OutputMergerStage.SetToDefaultState();
+		OutputMergerStage.ClearCurrentState();
+		OutputMergerStage.ClearDesiredState();
 
 		ComputeShaderStage.ClearCurrentState();
 		ComputeShaderStage.ClearDesiredState();
@@ -948,7 +854,8 @@ void PipelineManagerDX11::ExecuteCommandList( CommandListDX11* pList )
 	PixelShaderStage.ClearCurrentState();
 	PixelShaderStage.ClearDesiredState();
 
-	OutputMergerStage.SetToDefaultState();
+	OutputMergerStage.ClearCurrentState();
+	OutputMergerStage.ClearDesiredState();
 
 	ComputeShaderStage.ClearCurrentState();
 	ComputeShaderStage.ClearDesiredState();

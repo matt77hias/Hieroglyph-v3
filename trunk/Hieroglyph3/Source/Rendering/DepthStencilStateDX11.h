@@ -15,7 +15,7 @@
 #ifndef DepthStencilStateDX11_h
 #define DepthStencilStateDX11_h
 //--------------------------------------------------------------------------------
-#include "PipelineManagerDX11.h"
+#include "OutputMergerStageDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -28,7 +28,7 @@ namespace Glyph3
 	protected:
 		ID3D11DepthStencilState*			m_pState;
 
-		friend PipelineManagerDX11;
+		friend OutputMergerStageDX11;
 	};
 	typedef std::shared_ptr<DepthStencilStateDX11> DepthStencilStatePtr;
 };

@@ -15,7 +15,7 @@
 #ifndef BlendStateDX11_h
 #define BlendStateDX11_h
 //--------------------------------------------------------------------------------
-#include "PipelineManagerDX11.h"
+#include "OutputMergerStageDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -28,7 +28,7 @@ namespace Glyph3
 	protected:
 		ID3D11BlendState*			m_pState;
 
-		friend PipelineManagerDX11;
+		friend OutputMergerStageDX11;
 	};
 	typedef std::shared_ptr<BlendStateDX11> BlendStatePtr;
 };

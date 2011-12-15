@@ -199,6 +199,7 @@ namespace Glyph3
             std::wstring& model, const D3D10_SHADER_MACRO* pDefines, bool enablelogging = true );
 		
 		ResourcePtr GetSwapChainResource( int ID );
+
 		// This is an interim solution to get the resolution of the current
 		// adapter output resolution.
 
@@ -244,11 +245,6 @@ namespace Glyph3
 		RasterizerStatePtr								GetRasterizerState( int index );
 		ViewPortDX11*									GetViewPort( int index );
 		ResourceDX11*									GetResource( int index );
-
-		ShaderResourceViewDX11*							GetShaderResourceView( int index );
-		RenderTargetViewDX11*							GetRenderTargetView( int index );
-		DepthStencilViewDX11*							GetDepthStencilView( int index );
-		UnorderedAccessViewDX11*						GetUnorderedAccessView( int index );
 
 		InputLayoutDX11*								GetInputLayout( int index );
 		SamplerStateDX11*								GetSamplerState( int index );
@@ -328,6 +324,12 @@ namespace Glyph3
 		ByteAddressBufferDX11*		GetByteAddressBufferByIndex( int rid );
 		IndirectArgsBufferDX11*		GetIndirectArgsBufferByIndex( int rid );
 		StructuredBufferDX11*		GetStructuredBufferByIndex( int rid );
+
+		RenderTargetViewDX11*		GetRenderTargetViewByIndex( int rid );
+		DepthStencilViewDX11*		GetDepthStencilViewByIndex( int rid );
+		ShaderResourceViewDX11*		GetShaderResourceViewByIndex( int rid );
+		UnorderedAccessViewDX11*	GetUnorderedAccessViewByIndex( int rid );
+
 
 	protected:
 

@@ -246,13 +246,13 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	// to keep a copy of it here.
 
 	DepthStencilStateConfigDX11 DepthStencilState;
-	pImmPipeline->SetDepthStencilState( CreateDepthStencilState( &DepthStencilState ) );
+	pImmPipeline->OutputMergerStage.DesiredState.SetDepthStencilState( CreateDepthStencilState( &DepthStencilState ) );
 
 	// Output Merger State (OM) - the first state will be index zero, so no need
 	// to keep a copy of it here.
 
 	BlendStateConfigDX11 BlendState;
-	pImmPipeline->SetBlendState( CreateBlendState( &BlendState ) );
+	pImmPipeline->OutputMergerStage.DesiredState.SetBlendState( CreateBlendState( &BlendState ) );
 
 	// Create a query object to be used to gather statistics on the pipeline.
 
@@ -304,8 +304,8 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 		g_aPayload[i].pPipeline = new PipelineManagerDX11();
 		g_aPayload[i].pPipeline->SetDeviceContext( pDeferred, m_FeatureLevel );
 		g_aPayload[i].pPipeline->RasterizerStage.DesiredState.SetRasterizerState( 0 );
-		g_aPayload[i].pPipeline->SetDepthStencilState( 0 );
-		g_aPayload[i].pPipeline->SetBlendState( 0 );
+		g_aPayload[i].pPipeline->OutputMergerStage.DesiredState.SetDepthStencilState( 0 );
+		g_aPayload[i].pPipeline->OutputMergerStage.DesiredState.SetBlendState( 0 );
 
 
 		// Create the command list.
@@ -397,27 +397,15 @@ void RendererDX11::Shutdown()
 //--------------------------------------------------------------------------------
 void RendererDX11::Present( HWND hWnd, int SwapChain )
 {
-	// _) Present to the screen
+	// Present to the window
 
-	if ( ( SwapChain >= 0 ) && ( SwapChain < m_vSwapChains.count() ) )
-	{
-		DXGI_SWAP_CHAIN_DESC desc;
+	if ( ( SwapChain >= 0 ) && ( SwapChain < m_vSwapChains.count() ) ) {
 		SwapChainDX11* pSwapChain = m_vSwapChains[SwapChain];
-		pSwapChain->m_pSwapChain->GetDesc( &desc );
 		pSwapChain->m_pSwapChain->Present( 0, 0 );
 	}
-	else
+	else {
 		Log::Get().Write( L"Tried to present an invalid swap chain index!" );
-
-	//HRESULT presentResult;
-
-	//if ( SwapChain == -1 )
-	//	presentResult = m_pDevice->Present( NULL, NULL, hWnd, NULL );
-	//else
-	//	presentResult = m_vSC[SwapChain]->m_pSwapChain->Present( NULL, NULL, hWnd, NULL, 0 );
-
-	//if ( presentResult == D3DERR_DEVICELOST )
-	//	OnLostDevice();
+	}
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateSwapChain( SwapChainConfigDX11* pConfig )
@@ -2196,26 +2184,6 @@ ResourceDX11* RendererDX11::GetResource( int index )
 	return( m_vResources[index] );
 }
 //--------------------------------------------------------------------------------
-ShaderResourceViewDX11*	RendererDX11::GetShaderResourceView( int index )
-{
-	return( m_vShaderResourceViews[index] );
-}
-//--------------------------------------------------------------------------------
-RenderTargetViewDX11* RendererDX11::GetRenderTargetView( int index )
-{
-	return( m_vRenderTargetViews[index] );
-}
-//--------------------------------------------------------------------------------
-DepthStencilViewDX11* RendererDX11::GetDepthStencilView( int index )
-{
-	return( m_vDepthStencilViews[index] );
-}
-//--------------------------------------------------------------------------------
-UnorderedAccessViewDX11* RendererDX11::GetUnorderedAccessView( int index )
-{
-	return( m_vUnorderedAccessViews[index] );
-}
-//--------------------------------------------------------------------------------
 InputLayoutDX11* RendererDX11::GetInputLayout( int index )
 {
 	return( m_vInputLayouts[index] );
@@ -2376,8 +2344,8 @@ unsigned int WINAPI _RenderViewThreadProc( void* lpParameter )
 
 		pPayload->pPipeline->m_pContext->ClearState();
 		pPayload->pPipeline->RasterizerStage.DesiredState.SetRasterizerState( 0 );
-		pPayload->pPipeline->SetDepthStencilState( 0 );
-		pPayload->pPipeline->SetBlendState( 0 );
+		pPayload->pPipeline->OutputMergerStage.DesiredState.SetDepthStencilState( 0 );
+		pPayload->pPipeline->OutputMergerStage.DesiredState.SetBlendState( 0 );
 
 
 		// Execute the render view with the provided pipeline and parameter managers.
@@ -2541,6 +2509,70 @@ StructuredBufferDX11* RendererDX11::GetStructuredBufferByIndex( int rid )
 			Log::Get().Write( L"Trying to access a non-structured buffer resource!!!!" );
 		} else {
 			pResult = reinterpret_cast<StructuredBufferDX11*>( m_vResources[ID] );
+		}
+	}
+
+	return( pResult );
+}
+//--------------------------------------------------------------------------------
+RenderTargetViewDX11* RendererDX11::GetRenderTargetViewByIndex( int rid )
+{
+	RenderTargetViewDX11* pResult = 0;
+
+	if ( rid != -1 ) {
+		// Check if this ID is in range
+		if ( !m_vRenderTargetViews.inrange( rid ) ) {
+			Log::Get().Write( L"Trying to access a non-render target view!!!!" );
+		} else {
+			pResult = m_vRenderTargetViews[rid];
+		}
+	}
+
+	return( pResult );
+}
+//--------------------------------------------------------------------------------
+DepthStencilViewDX11* RendererDX11::GetDepthStencilViewByIndex( int rid )
+{
+	DepthStencilViewDX11* pResult = 0;
+
+	if ( rid != -1 ) {
+		// Check if this ID is in range
+		if ( !m_vDepthStencilViews.inrange( rid ) ) {
+			Log::Get().Write( L"Trying to access a non-depth stencil view!!!!" );
+		} else {
+			pResult = m_vDepthStencilViews[rid];
+		}
+	}
+
+	return( pResult );
+}
+//--------------------------------------------------------------------------------
+ShaderResourceViewDX11* RendererDX11::GetShaderResourceViewByIndex( int rid )
+{
+	ShaderResourceViewDX11* pResult = 0;
+
+	if ( rid != -1 ) {
+		// Check if this ID is in range
+		if ( !m_vShaderResourceViews.inrange( rid ) ) {
+			Log::Get().Write( L"Trying to access a non-shader resource view!!!!" );
+		} else {
+			pResult = m_vShaderResourceViews[rid];
+		}
+	}
+
+	return( pResult );
+}
+//--------------------------------------------------------------------------------
+UnorderedAccessViewDX11* RendererDX11::GetUnorderedAccessViewByIndex( int rid )
+{
+	UnorderedAccessViewDX11* pResult = 0;
+
+	if ( rid != -1 ) {
+		// Check if this ID is in range
+		if ( !m_vUnorderedAccessViews.inrange( rid ) ) {
+			Log::Get().Write( L"Trying to access a non-unordered access view!!!!" );
+		} else {
+			pResult = m_vUnorderedAccessViews[rid];
 		}
 	}
 

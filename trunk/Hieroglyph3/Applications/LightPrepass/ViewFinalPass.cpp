@@ -63,12 +63,12 @@ void ViewFinalPass::Draw( PipelineManagerDX11* pPipelineManager, IParameterManag
     {
 	    // Set the render target for the final pass, and clear it
 		pPipelineManager->ClearRenderTargets();
-		pPipelineManager->OutputMergerStage.BindRenderTarget( 0, m_RenderTarget );
+		pPipelineManager->OutputMergerStage.DesiredState.SetRenderTarget( 0, m_RenderTarget->m_iResourceRTV );
 		pPipelineManager->ApplyRenderTargets();
 		pPipelineManager->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 
 		// Also bind the depth buffer
-		pPipelineManager->OutputMergerStage.BindDepthTarget( m_DepthTarget );
+		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
 		pPipelineManager->ApplyRenderTargets();
 
 		pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );

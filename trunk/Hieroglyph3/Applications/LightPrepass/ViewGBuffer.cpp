@@ -117,8 +117,8 @@ void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager
 	{
 		// Set the parameters for rendering this view
 		pPipelineManager->ClearRenderTargets();
-		pPipelineManager->OutputMergerStage.BindRenderTarget( 0, m_GBufferTarget );
-		pPipelineManager->OutputMergerStage.BindDepthTarget( m_DepthTarget );
+		pPipelineManager->OutputMergerStage.DesiredState.SetRenderTarget( 0, m_GBufferTarget->m_iResourceRTV );
+		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
 		pPipelineManager->ApplyRenderTargets();
 
 		pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
@@ -142,12 +142,10 @@ void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager
         // leaving a value of 2.
 
         pPipelineManager->ClearRenderTargets();
-        pPipelineManager->OutputMergerStage.BindDepthTarget( m_DepthTarget );
+		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
         pPipelineManager->ApplyRenderTargets();
 
         pParamManager->SetShaderResourceParameter( m_pGBufferTexture, m_GBufferTarget );
-
-		//pPipelineManager->Draw( m_MaskEffect, m_QuadGeometry, pParamManager );
 
 
 		// Use the effect to load all of the pipeline stages here.

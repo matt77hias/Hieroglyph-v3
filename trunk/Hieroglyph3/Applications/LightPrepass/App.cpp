@@ -298,12 +298,12 @@ void App::Update()
 	m_pNode->Rotation() *= rotation;
 
 
+    DrawHUD( );
+
 	// Update the scene, and then render it to the G-Buffer
 	m_pScene->Update( m_pTimer->Elapsed() );
 	m_pScene->Render( m_pRenderer11 );
 
-
-    DrawHUD( );
 
 	// Perform the rendering and presentation for the window.
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );

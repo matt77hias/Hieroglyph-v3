@@ -80,7 +80,7 @@ void ViewTextOverlay::Draw( PipelineManagerDX11* pPipelineManager, IParameterMan
 	if ( m_TextEntries.count() > 0 ) {
 		// Set the parameters for rendering this view
 		pPipelineManager->ClearRenderTargets();
-		pPipelineManager->OutputMergerStage.BindRenderTarget( 0, m_RenderTarget );
+		pPipelineManager->OutputMergerStage.DesiredState.SetRenderTarget( 0, m_RenderTarget->m_iResourceRTV );
 		pPipelineManager->ApplyRenderTargets();
 
 		pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
@@ -88,8 +88,8 @@ void ViewTextOverlay::Draw( PipelineManagerDX11* pPipelineManager, IParameterMan
 		pPipelineManager->RasterizerStage.DesiredState.SetRasterizerState( 0 );
 
 		// Set default states for these stages
-		pPipelineManager->SetDepthStencilState( 0 );
-		pPipelineManager->SetBlendState( 0 );
+		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilState( 0 );
+		pPipelineManager->OutputMergerStage.DesiredState.SetBlendState( 0 );
 
 		for ( int i = 0; i < m_TextEntries.count(); i++ )
 		{

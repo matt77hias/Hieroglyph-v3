@@ -31,123 +31,167 @@ void OutputMergerStageStateDX11::SetFeautureLevel( D3D_FEATURE_LEVEL level )
 	m_FeatureLevel = level;
 }
 //--------------------------------------------------------------------------------
-void OutputMergerStageStateDX11::SetRasterizerState( int state )
+void OutputMergerStageStateDX11::SetBlendState( int state )
 {
-	RasterizerState = state;
+	BlendState = state;
 }
 //--------------------------------------------------------------------------------
-void OutputMergerStageStateDX11::SetViewportCount( int count )
+void OutputMergerStageStateDX11::SetDepthStencilState( int state, unsigned int stencilRef )
 {
-	ViewportCount = count;
+	DepthStencilState = state;
+	StencilRef = stencilRef;
 }
 //--------------------------------------------------------------------------------
-void OutputMergerStageStateDX11::SetViewport( unsigned int slot, int viewport )
+void OutputMergerStageStateDX11::SetRenderTarget( unsigned int slot, int rtv )
 {
-	if ( slot < D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE ) {
-		Viewports[slot] = viewport;
+	if ( slot < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT ) {
+		RenderTargetViews[slot] = rtv;
 	}
 }
 //--------------------------------------------------------------------------------
-void OutputMergerStageStateDX11::SetScissorRectCount( int count )
+void OutputMergerStageStateDX11::SetDepthStencilTarget( int dsv )
 {
-	ScissorRectCount = count;
+	DepthTargetViews = dsv;
 }
 //--------------------------------------------------------------------------------
-void OutputMergerStageStateDX11::SetScissorRect( unsigned int slot, D3D11_RECT& rect )
+void OutputMergerStageStateDX11::SetUnorderedAccessView( unsigned int slot, int uav, unsigned int initCount )
 {
-	if ( slot < D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE ) {
-		ScissorRects[slot] = rect;
+	if ( slot < D3D11_PS_CS_UAV_REGISTER_COUNT )
+	{
+		UnorderedAccessViews[slot] = uav;
+		UAVInitialCounts[slot] = initCount;
 	}
 }
 //--------------------------------------------------------------------------------
-void OutputMergerStageStateDX11::ClearState()
+int OutputMergerStageStateDX11::GetBlendState() const
 {
-	RasterizerState = -1;
-	ViewportCount = 0;
+	return( BlendState );
+}
+//--------------------------------------------------------------------------------
+int OutputMergerStageStateDX11::GetDepthStencilState() const
+{
+	return( DepthStencilState );
+}
+//--------------------------------------------------------------------------------
+unsigned int OutputMergerStageStateDX11::GetStencilReference() const
+{
+	return( StencilRef );
+}
+//--------------------------------------------------------------------------------
+int OutputMergerStageStateDX11::GetRenderTarget( unsigned int slot ) const
+{
+	int result = -1;
 
-	for ( int i = 0; i < D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE; i++ ) {
-		Viewports[i] = -1;
-		ScissorRects[i].bottom = ScissorRects[i].top = ScissorRects[i].right = ScissorRects[i].left = 0;		
-	}
-}
-//--------------------------------------------------------------------------------
-int OutputMergerStageStateDX11::GetRasterizerState() const
-{
-	return( RasterizerState );
-}
-//--------------------------------------------------------------------------------
-int OutputMergerStageStateDX11::GetViewportCount() const
-{
-	return( ViewportCount );
-}
-//--------------------------------------------------------------------------------
-int OutputMergerStageStateDX11::GetViewport( UINT slot ) const
-{
-	int viewport = -1;
-
-	if ( slot < D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE ) {
-		viewport = Viewports[slot];
+	if ( slot < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT ) {
+		result = RenderTargetViews[slot];
 	}
 
-	return( viewport );
+	return( result );
 }
 //--------------------------------------------------------------------------------
-int OutputMergerStageStateDX11::GetScissorRectCount() const
+int OutputMergerStageStateDX11::GetDepthStencilTarget( ) const
 {
-	return( ScissorRectCount );
+	return( DepthTargetViews );
 }
 //--------------------------------------------------------------------------------
-D3D11_RECT OutputMergerStageStateDX11::GetScissorRect( UINT slot ) const
+int OutputMergerStageStateDX11::GetUnorderedAccessView( unsigned int slot ) const
 {
-	D3D11_RECT rect;
-	rect.bottom = rect.top = rect.right = rect.left = 0;
+	int result = -1;
 
-	if ( slot < D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE ) {
-		rect = ScissorRects[slot];
+	if ( slot < D3D11_PS_CS_UAV_REGISTER_COUNT ) {
+		result = UnorderedAccessViews[slot];
 	}
 
-	return( rect );
+	return( result );
 }
 //--------------------------------------------------------------------------------
-int OutputMergerStageStateDX11::CompareRasterizerState( OutputMergerStageStateDX11& desired )
+int OutputMergerStageStateDX11::GetInitialCount( unsigned int slot ) const
 {
-	if ( RasterizerState == desired.RasterizerState )
+	int result = -1;
+
+	if ( slot < D3D11_PS_CS_UAV_REGISTER_COUNT ) {
+		result = UAVInitialCounts[slot];
+	}
+
+	return( result );
+}
+//--------------------------------------------------------------------------------
+int OutputMergerStageStateDX11::GetRenderTargetCount() const
+{
+	unsigned int count = 0;
+
+	for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ )
+	{
+		if ( RenderTargetViews[i] != -1 )
+			count++;
+	}
+
+	return( count );
+}
+//--------------------------------------------------------------------------------
+int OutputMergerStageStateDX11::CompareBlendState( OutputMergerStageStateDX11& desired )
+{
+	if ( BlendState == desired.BlendState )
 		return( 0 );
 	else
 		return( 1 );
 }
 //--------------------------------------------------------------------------------
-int OutputMergerStageStateDX11::CompareViewportState( OutputMergerStageStateDX11& desired )
+int OutputMergerStageStateDX11::CompareDepthStencilState( OutputMergerStageStateDX11& desired )
 {
-	// If any viewport within the desired viewport count is detected, then
-	// the entire array must be set.  Otherwise no setting is needed.
-
-	int viewports = 0;
-
-	for ( int i = 0; i < desired.ViewportCount; i++ ) {
-		if ( Viewports[i] != desired.Viewports[i] ) {
-			viewports = desired.ViewportCount; // return the number of viewports to set
-			break;
-		}
-	}
-
-	return( viewports );	
+	if ( DepthStencilState == desired.DepthStencilState && StencilRef == desired.StencilRef )
+		return( 0 );
+	else
+		return( 1 );
 }
 //--------------------------------------------------------------------------------
-int OutputMergerStageStateDX11::CompareScissorRectState( OutputMergerStageStateDX11& desired )
+int OutputMergerStageStateDX11::CompareRenderTargets( OutputMergerStageStateDX11& desired )
 {
-	// If any scissor rect within the desired scissor rect count is detected, then
-	// the entire array must be set.  Otherwise no setting is needed.
-
-	int rects = 0;
-
-	for ( int i = 0; i < desired.ScissorRectCount; i++ ) {
-		if ( ScissorRects[i] != desired.ScissorRects[i] ) {
-			rects = desired.ScissorRectCount; // return the number of viewports to set
+	int count = 0;
+	for ( int i = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT-1; i >= 0; i-- )
+	{
+		if ( RenderTargetViews[i] != desired.RenderTargetViews[i] )
+		{
+			count = i+1;
 			break;
 		}
 	}
 
-	return( rects );	
+	return( count );
+}
+//--------------------------------------------------------------------------------
+int OutputMergerStageStateDX11::CompareUnorderedAccessViews( OutputMergerStageStateDX11& desired )
+{
+	int count = 0;
+	for ( int i = D3D11_PS_CS_UAV_REGISTER_COUNT-1; i >= 0; i-- )
+	{
+		if ( UnorderedAccessViews[i] != desired.UnorderedAccessViews[i]
+			|| UAVInitialCounts[i] != desired.UAVInitialCounts[i] )
+		{
+			count = i+1;
+			break;
+		}
+	}
+
+	return( count );
+}
+//--------------------------------------------------------------------------------
+void OutputMergerStageStateDX11::ClearState( )
+{
+	BlendState = -1;
+	DepthStencilState = -1;
+	StencilRef = 0;
+
+	for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ ) {
+		RenderTargetViews[i] = -1;
+	}
+
+	DepthTargetViews = -1;
+	
+	for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) {
+		UnorderedAccessViews[i] = -1;
+		UAVInitialCounts[i] = -1;
+	}
+
 }
 //--------------------------------------------------------------------------------

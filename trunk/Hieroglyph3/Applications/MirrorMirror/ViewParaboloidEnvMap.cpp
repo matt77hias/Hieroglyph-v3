@@ -115,9 +115,9 @@ void ViewParaboloidEnvMap::Draw( PipelineManagerDX11* pPipelineManager, IParamet
 	if ( m_pRoot )
 	{
 		// Set the parameters for rendering this view
-		//pPipelineManager->ClearRenderTargets();
-		pPipelineManager->OutputMergerStage.BindRenderTarget( 0, m_RenderTarget );
-		pPipelineManager->OutputMergerStage.BindDepthTarget( m_DepthTarget );
+		pPipelineManager->ClearRenderTargets();
+		pPipelineManager->OutputMergerStage.DesiredState.SetRenderTarget( 0, m_RenderTarget->m_iResourceRTV );
+		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
 		pPipelineManager->ApplyRenderTargets();
 
 		pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
@@ -125,8 +125,8 @@ void ViewParaboloidEnvMap::Draw( PipelineManagerDX11* pPipelineManager, IParamet
 		pPipelineManager->RasterizerStage.DesiredState.SetRasterizerState( 0 );
 
 		// Set default states for these stages
-		pPipelineManager->SetDepthStencilState( 0 );
-		pPipelineManager->SetBlendState( 0 );
+		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilState( 0 );
+		pPipelineManager->OutputMergerStage.DesiredState.SetBlendState( 0 );
 
 		pPipelineManager->ClearBuffers( m_vColor, 1.0f );
 

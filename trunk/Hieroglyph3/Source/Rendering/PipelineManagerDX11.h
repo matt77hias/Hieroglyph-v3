@@ -43,17 +43,6 @@ namespace Glyph3
 
 		void SetDeviceContext( ID3D11DeviceContext* pContext, D3D_FEATURE_LEVEL level );
 
-		// The individual state blocks can be set for use in rendering.
-
-		void SetBlendState( int ID );
-		void SetDepthStencilState( int ID, UINT stencilRef = 0 );
-		//void SetRasterizerState( int ID );
-		//void SetViewPort( int ID );
-        //void SetScissorRects( UINT NumRects, const D3D11_RECT* pRects ); 
-
-		// State accessors
-		//D3D11_VIEWPORT GetCurrentViewport( );
-
 		// All of the 'Bind/Unbind' functions below are used to bind various resources to the
 		// pipeline.  Currently only the CS can accept unordered access views.  A method is
 		// provided to apply the resource changes as an optimization, which allows for the
@@ -64,38 +53,39 @@ namespace Glyph3
 		void BindUnorderedAccessParameter( ShaderType type, RenderParameterDX11* pParam, UINT slot, IParameterManager* pParamManager );
 		void BindSamplerStateParameter( ShaderType type, RenderParameterDX11* pParam, UINT slot, IParameterManager* pParamManager );
 
-		// TODO: Create objects to represent each of the fixed function stages, and 
-		//       utilize this 'Clear', 'Bind', and 'Apply' paradigm.
-
-		// Render targets are bound to the output merger stage, which is represented
-		// as a seperate class (OutputMergerStageDX11).  The array of render targets is cached on
-		// the CPU side prior to actual binding with the API.  This allows a series of
-		// changes to be made to several render targerts prior to actually binding.
-
-		void ClearRenderTargets( );	
-		void ApplyRenderTargets( );
-
 		void BindShader( ShaderType type, int ID, IParameterManager* pParamManager );
 
-		// The changes made to the pipeline resources with the Bind calls are cached and 
-		// applied or cleared all at once with the following calls.  This reduces the number 
-		// of API function calls needed to configure the pipeline.
 
-		void ApplyPipelineResources( );
-		void ClearPipelineResources( );
+		// The pipeline state is managed through the following methods.  The user must 
+		// configure each pipeline stage as they want it, and then utilize these Apply
+		// and Clear methods to manage when the state is actually sent to the API.
+		//
+		// The groups of state are split roughly into the following groups:
+		// 1. Input Resources: These determine the input configuration of the pipeline.
+		// 2. Pipeline Resources: The state for all processing done inside the pipeline.
+		// 3. Render Targets: The state for receiving the output of the pipeline.
+		//
+		// The changes made to the pipeline resources with the Bind calls are cached and 
+		// applied or cleared all at once with these calls.  This reduces the number 
+		// of API function calls needed to configure the pipeline.
 
 		void ApplyInputResources( );
 		void ClearInputResources( );
+		
+		void ApplyPipelineResources( );
+		void ClearPipelineResources( );
 
+		void ClearRenderTargets( );	
+		void ApplyRenderTargets( );
+		
 		void ClearPipelineState( );
+
 
 		// Pipeline execution calls - these are the methods for executing the 
 		// pipeline with the given configuration (supplied by the render effect).
 		// With the dispatch call, the same configuration is used except that you
 		// specify the dimensions of the thread groups to instantiate.
-
-
-
+		
 		void Draw( RenderEffectDX11& effect, GeometryPtr chunk, IParameterManager* pParamManager );
 		void Draw( RenderEffectDX11& effect, ResourcePtr vb, ResourcePtr ib,
 					int inputLayout, D3D11_PRIMITIVE_TOPOLOGY primType,

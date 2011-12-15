@@ -332,7 +332,7 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager*
 {
     // Bind the render target
     pPipelineManager->ClearRenderTargets();
-    pPipelineManager->OutputMergerStage.BindRenderTarget( 0, m_pRenderTarget );
+	pPipelineManager->OutputMergerStage.DesiredState.SetRenderTarget( 0, m_pRenderTarget->m_iResourceRTV );
     pPipelineManager->ApplyRenderTargets();
 
     // Clear the render target
@@ -340,7 +340,7 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager*
     pPipelineManager->ClearBuffers( color, 1.0f, 0 );
 
     // Bind the depth buffer
-    pPipelineManager->OutputMergerStage.BindDepthTarget( m_pDepthTarget );
+	pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_pDepthTarget->m_iResourceDSV );
     pPipelineManager->ApplyRenderTargets();
 
 	pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );

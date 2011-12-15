@@ -43,14 +43,14 @@ void RenderEffectDX11::ConfigurePipeline( PipelineManagerDX11* pPipeline, IParam
 	// been specified before this effect was bound.
 
 	if ( m_iBlendState != -1 )
-		pPipeline->SetBlendState( m_iBlendState );
+		pPipeline->OutputMergerStage.DesiredState.SetBlendState( m_iBlendState );
 	else
-		pPipeline->SetBlendState( 0 );
+		pPipeline->OutputMergerStage.DesiredState.SetBlendState( 0 );
 
 	if ( m_iDepthStencilState != -1 )
-		pPipeline->SetDepthStencilState( m_iDepthStencilState, m_uStencilRef );
+		pPipeline->OutputMergerStage.DesiredState.SetDepthStencilState( m_iDepthStencilState, m_uStencilRef );
 	else
-		pPipeline->SetDepthStencilState( 0 );
+		pPipeline->OutputMergerStage.DesiredState.SetDepthStencilState( 0 );
 
 	if ( m_iRasterizerState != -1 )
 		pPipeline->RasterizerStage.DesiredState.SetRasterizerState( m_iRasterizerState );

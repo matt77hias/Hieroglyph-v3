@@ -186,8 +186,9 @@ void ViewLightPrepassRenderer::Draw( PipelineManagerDX11* pPipelineManager, IPar
 {
     // Render to the backbuffer
     pPipelineManager->ClearRenderTargets();
-    pPipelineManager->OutputMergerStage.BindRenderTarget( 0, m_BackBuffer );
+	pPipelineManager->OutputMergerStage.DesiredState.SetRenderTarget( 0, m_BackBuffer->m_iResourceRTV );
     pPipelineManager->ApplyRenderTargets();
+
     pPipelineManager->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 
 	pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );

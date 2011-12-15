@@ -29,21 +29,26 @@ namespace Glyph3
 
 		void SetFeautureLevel( D3D_FEATURE_LEVEL level );
 
-		void SetRasterizerState( int state );
-		void SetViewportCount( int count );
-		void SetViewport( unsigned int slot, int viewport );
-		void SetScissorRectCount( int count );
-		void SetScissorRect( unsigned int slot, D3D11_RECT& rect );
+		void SetBlendState( int state );
+		void SetDepthStencilState( int state, unsigned int stencilRef = 0 );
+		void SetRenderTarget( unsigned int slot, int rtv );
+		void SetDepthStencilTarget( int dsv );
+		void SetUnorderedAccessView( unsigned int slot, int uav, unsigned int initCount = -1 );
 		
-		int GetRasterizerState() const;
-		int GetViewportCount() const;
-		int GetViewport( UINT slot ) const;
-		int GetScissorRectCount() const;
-		D3D11_RECT GetScissorRect( UINT slot ) const;
+		int GetBlendState() const;
+		int GetDepthStencilState() const;
+		unsigned int GetStencilReference() const;
+		int GetRenderTarget( unsigned int slot ) const;
+		int GetDepthStencilTarget( ) const;
+		int GetUnorderedAccessView( unsigned int slot ) const;
+		int GetInitialCount( unsigned int slot ) const;
 
-		int CompareRasterizerState( OutputMergerStageStateDX11& desired );
-		int CompareViewportState( OutputMergerStageStateDX11& desired );
-		int CompareScissorRectState( OutputMergerStageStateDX11& desired );
+		int GetRenderTargetCount() const;
+
+		int CompareBlendState( OutputMergerStageStateDX11& desired );
+		int CompareDepthStencilState( OutputMergerStageStateDX11& desired );
+		int CompareRenderTargets( OutputMergerStageStateDX11& desired );
+		int CompareUnorderedAccessViews( OutputMergerStageStateDX11& desired );
 
 		void ClearState( );
 
@@ -51,11 +56,13 @@ namespace Glyph3
 
 		D3D_FEATURE_LEVEL				m_FeatureLevel;
 
-		int								RasterizerState;
-		int								ViewportCount;
-		int								Viewports[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
-		int								ScissorRectCount;
-		D3D11_RECT						ScissorRects[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
+		int								BlendState;
+		int								DepthStencilState;
+		unsigned int					StencilRef;
+		int								RenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT];
+		int								DepthTargetViews;
+		int								UnorderedAccessViews[D3D11_PS_CS_UAV_REGISTER_COUNT];
+		unsigned int					UAVInitialCounts[D3D11_PS_CS_UAV_REGISTER_COUNT];
 		
 		friend OutputMergerStageDX11;
 	};
