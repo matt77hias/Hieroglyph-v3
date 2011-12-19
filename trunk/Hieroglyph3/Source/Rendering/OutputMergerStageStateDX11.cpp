@@ -147,17 +147,16 @@ int OutputMergerStageStateDX11::CompareDepthStencilState( OutputMergerStageState
 //--------------------------------------------------------------------------------
 int OutputMergerStageStateDX11::CompareRenderTargets( OutputMergerStageStateDX11& desired )
 {
-	int count = 0;
-	for ( int i = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT-1; i >= 0; i-- )
+	int i = 0;
+	for ( i = 0; i <= D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT-1; i++ )
 	{
 		if ( RenderTargetViews[i] != desired.RenderTargetViews[i] )
 		{
-			count = i+1;
 			break;
 		}
 	}
 
-	return( count );
+	return( i+1 );
 }
 //--------------------------------------------------------------------------------
 int OutputMergerStageStateDX11::CompareUnorderedAccessViews( OutputMergerStageStateDX11& desired )
