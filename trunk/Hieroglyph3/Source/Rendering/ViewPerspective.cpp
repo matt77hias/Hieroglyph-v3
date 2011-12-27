@@ -100,6 +100,8 @@ void ViewPerspective::Draw( PipelineManagerDX11* pPipelineManager, IParameterMan
 		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
 		pPipelineManager->ApplyRenderTargets();
 
+		pPipelineManager->ClearBuffers( m_vColor, 1.0f );
+
 		pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
 		pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iViewport );
 		pPipelineManager->RasterizerStage.DesiredState.SetRasterizerState( 0 );
@@ -107,8 +109,6 @@ void ViewPerspective::Draw( PipelineManagerDX11* pPipelineManager, IParameterMan
 		// Set default states for these stages
 		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilState( 0 );
 		pPipelineManager->OutputMergerStage.DesiredState.SetBlendState( 0 );
-
-		pPipelineManager->ClearBuffers( m_vColor, 1.0f );
 
 		// Set this view's render parameters
 		SetRenderParams( pParamManager );

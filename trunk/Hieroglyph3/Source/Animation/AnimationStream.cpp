@@ -161,4 +161,4 @@ void AnimationStream<T>::PlayAllAnimations( )
 	}
 }
 //--------------------------------------------------------------------------------
-template class AnimationStream<Vector3f>;
+template class Glyph3::AnimationStream<Vector3f>;

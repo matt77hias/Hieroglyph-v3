@@ -30,7 +30,6 @@ namespace Glyph3
         static void LoadResources( );
 
 	public:
-		static ResourcePtr ArgsBuffer;
 		static ResourcePtr ColorTexture;
         static ShaderResourceParameterDX11* TextureParameter;
 		static int LinearSampler;

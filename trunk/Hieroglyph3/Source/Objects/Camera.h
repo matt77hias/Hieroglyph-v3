@@ -33,13 +33,29 @@ namespace Glyph3
 		void SetCameraView( IRenderView* pView );
 		void SetOverlayView( IRenderView* pView );
 		void SetScene( Scene* pScene );
+
+		IRenderView* GetCameraView();
+		IRenderView* GetOverlayView();
+		Scene* GetScene();
+
 		void RenderFrame( RendererDX11* pRenderer );
 
 		void SetProjectionParams( float zn, float zf, float aspect, float fov );
+		void SetClipPlanes( float zn, float zf );
+		void SetAspectRatio( float aspect );
+		void SetFieldOfView( float fov );
+
+		float GetNearClipPlane();
+		float GetFarClipPlane();
+		float GetAspectRatio();
+		float GetFieldOfView();
 
         const Matrix4f& ProjMatrix();
 
 	protected:
+
+		void ApplyProjectionParams();
+
 		IRenderView* m_pCameraView;
 		IRenderView* m_pOverlayView;
 		Scene* m_pScene;

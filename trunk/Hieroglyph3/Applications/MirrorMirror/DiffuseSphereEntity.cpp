@@ -26,7 +26,6 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-ResourcePtr DiffuseSphereEntity::ArgsBuffer;
 ResourcePtr DiffuseSphereEntity::ColorTexture;
 ShaderResourceParameterDX11* DiffuseSphereEntity::TextureParameter = NULL;
 int DiffuseSphereEntity::LinearSampler = -1;

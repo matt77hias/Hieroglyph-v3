@@ -114,7 +114,10 @@ Vector3f Vector3f::Random( )
 	float y = static_cast<float>( (double)rand() / RAND_MAX ) * 2.0f - 1.0f;
 	float z = static_cast<float>( (double)rand() / RAND_MAX ) * 2.0f - 1.0f;
 	
-	return( Vector3f( x, y, z ) );
+	Vector3f random = Vector3f( x, y, z );
+	random.Normalize();
+
+	return( random );
 }
 //----------------------------------------------------------------------------------------------------
 Vector3f& Vector3f::operator= ( const Vector3f& Vector )

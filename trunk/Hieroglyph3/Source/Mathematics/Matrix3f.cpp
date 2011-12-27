@@ -151,6 +151,65 @@ void Matrix3f::RotationEuler( Vector3f& Axis, float Angle )
 	m_afEntry[8] = t*Axis.z*Axis.z + c;
 }
 //----------------------------------------------------------------------------------------------------
+void Matrix3f::Orthonormalize()
+{
+	// This method is taken from the Wild Magic library v3.11, available at
+	// http://www.geometrictools.com.
+
+    // Algorithm uses Gram-Schmidt orthogonalization.  If 'this' matrix is
+    // M = [m0|m1|m2], then orthonormal output matrix is Q = [q0|q1|q2],
+    //
+    //   q0 = m0/|m0|
+    //   q1 = (m1-(q0*m1)q0)/|m1-(q0*m1)q0|
+    //   q2 = (m2-(q0*m2)q0-(q1*m2)q1)/|m2-(q0*m2)q0-(q1*m2)q1|
+    //
+    // where |V| indicates length of vector V and A*B indicates dot
+    // product of vectors A and B.
+
+	//(1.0/sqrt((double)fValue))
+
+    // compute q0
+    float fInvLength = 1.0/sqrt((double)(m_afEntry[0]*m_afEntry[0] +
+        m_afEntry[3]*m_afEntry[3] + m_afEntry[6]*m_afEntry[6]));
+
+    m_afEntry[0] *= fInvLength;
+    m_afEntry[3] *= fInvLength;
+    m_afEntry[6] *= fInvLength;
+
+    // compute q1
+    float fDot0 = m_afEntry[0]*m_afEntry[1] + m_afEntry[3]*m_afEntry[4] +
+        m_afEntry[6]*m_afEntry[7];
+
+    m_afEntry[1] -= fDot0*m_afEntry[0];
+    m_afEntry[4] -= fDot0*m_afEntry[3];
+    m_afEntry[7] -= fDot0*m_afEntry[6];
+
+    fInvLength = 1.0/sqrt((double)(m_afEntry[1]*m_afEntry[1] +
+        m_afEntry[4]*m_afEntry[4] + m_afEntry[7]*m_afEntry[7]));
+
+    m_afEntry[1] *= fInvLength;
+    m_afEntry[4] *= fInvLength;
+    m_afEntry[7] *= fInvLength;
+
+    // compute q2
+    float fDot1 = m_afEntry[1]*m_afEntry[2] + m_afEntry[4]*m_afEntry[5] +
+        m_afEntry[7]*m_afEntry[8];
+
+    fDot0 = m_afEntry[0]*m_afEntry[2] + m_afEntry[3]*m_afEntry[5] +
+        m_afEntry[6]*m_afEntry[8];
+
+    m_afEntry[2] -= fDot0*m_afEntry[0] + fDot1*m_afEntry[1];
+    m_afEntry[5] -= fDot0*m_afEntry[3] + fDot1*m_afEntry[4];
+    m_afEntry[8] -= fDot0*m_afEntry[6] + fDot1*m_afEntry[7];
+
+    fInvLength = 1.0/sqrt((double)(m_afEntry[2]*m_afEntry[2] +
+        m_afEntry[5]*m_afEntry[5] + m_afEntry[8]*m_afEntry[8]));
+
+    m_afEntry[2] *= fInvLength;
+    m_afEntry[5] *= fInvLength;
+    m_afEntry[8] *= fInvLength;
+}
+//----------------------------------------------------------------------------
 float Matrix3f::operator[] ( int iPos ) const
 {
     return( m_afEntry[iPos] );

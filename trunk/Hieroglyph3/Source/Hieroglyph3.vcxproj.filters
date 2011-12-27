@@ -50,9 +50,6 @@
     <Filter Include="Objects\Scene Objects">
       <UniqueIdentifier>{095200c1-4e7a-4108-bb95-b6b995131c4e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Objects\Visualization Objects">
-      <UniqueIdentifier>{310a865a-63af-4938-a473-0b4521f8c110}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Animation">
       <UniqueIdentifier>{fdc38c02-55fb-4827-b2a3-57d57ce1fc69}</UniqueIdentifier>
     </Filter>
@@ -139,6 +136,9 @@
     </Filter>
     <Filter Include="Rendering\Pipeline\Fixed Stages\States">
       <UniqueIdentifier>{e7f9e892-c581-4eb0-9969-5e96cdbef663}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Actor Creation">
+      <UniqueIdentifier>{310a865a-63af-4938-a473-0b4521f8c110}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -548,7 +548,7 @@
       <Filter>Objects\Scene Objects</Filter>
     </ClCompile>
     <ClCompile Include="Objects\ActorGenerator.cpp">
-      <Filter>Objects\Visualization Objects</Filter>
+      <Filter>Objects\Actor Creation</Filter>
     </ClCompile>
     <ClCompile Include="Animation\AnimationStream.cpp">
       <Filter>Animation</Filter>
@@ -1069,7 +1069,7 @@
       <Filter>Objects\Scene Objects</Filter>
     </ClInclude>
     <ClInclude Include="Objects\ActorGenerator.h">
-      <Filter>Objects\Visualization Objects</Filter>
+      <Filter>Objects\Actor Creation</Filter>
     </ClInclude>
     <ClInclude Include="Animation\AnimationStream.h">
       <Filter>Animation</Filter>
@@ -1169,5 +1169,6 @@
     <None Include="Shaders\Sprite.hlsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
 </Project>

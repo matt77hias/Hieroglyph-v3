@@ -63,6 +63,8 @@ ViewTextOverlay::ViewTextOverlay( RendererDX11& Renderer, ResourcePtr RenderTarg
 //--------------------------------------------------------------------------------
 ViewTextOverlay::~ViewTextOverlay()
 {
+	SAFE_DELETE( m_pSpriteFont );
+	SAFE_DELETE( m_pSpriteRenderer );
 }
 //--------------------------------------------------------------------------------
 void ViewTextOverlay::Update( float fTime )

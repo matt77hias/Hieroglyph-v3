@@ -81,6 +81,21 @@ void Camera::SetScene( Scene* pScene )
 	m_pScene = pScene;
 }
 //--------------------------------------------------------------------------------
+IRenderView* Camera::GetCameraView()
+{
+	return( m_pCameraView );
+}
+//--------------------------------------------------------------------------------
+IRenderView* Camera::GetOverlayView()
+{
+	return( m_pOverlayView );
+}
+//--------------------------------------------------------------------------------
+Scene* Camera::GetScene()
+{
+	return( m_pScene );
+}
+//--------------------------------------------------------------------------------
 void Camera::SetProjectionParams( float zn, float zf, float aspect, float fov )
 {
 	m_fNear = zn;
@@ -88,6 +103,53 @@ void Camera::SetProjectionParams( float zn, float zf, float aspect, float fov )
 	m_fAspect = aspect;
 	m_fFov = fov;
 
+	ApplyProjectionParams();
+}
+//--------------------------------------------------------------------------------
+void Camera::SetClipPlanes( float zn, float zf )
+{
+	m_fNear = zn;
+	m_fFar = zf;
+
+	ApplyProjectionParams();
+}
+//--------------------------------------------------------------------------------
+void Camera::SetAspectRatio( float aspect )
+{
+	m_fAspect = aspect;
+
+	ApplyProjectionParams();
+}
+//--------------------------------------------------------------------------------
+void Camera::SetFieldOfView( float fov )
+{
+	m_fFov = fov;
+
+	ApplyProjectionParams();
+}
+//--------------------------------------------------------------------------------
+float Camera::GetNearClipPlane()
+{
+	return( m_fNear );
+}
+//--------------------------------------------------------------------------------
+float Camera::GetFarClipPlane()
+{
+	return( m_fFar );
+}
+//--------------------------------------------------------------------------------
+float Camera::GetAspectRatio()
+{
+	return( m_fAspect );
+}
+//--------------------------------------------------------------------------------
+float Camera::GetFieldOfView()
+{
+	return( m_fFov );
+}
+//--------------------------------------------------------------------------------
+void Camera::ApplyProjectionParams()
+{
     // Calculate and set the projection matrix for the view.
     D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&m_ProjMatrix, m_fFov, 
         m_fAspect, m_fNear, m_fFar );
@@ -100,3 +162,4 @@ const Matrix4f& Camera::ProjMatrix()
 {
     return m_ProjMatrix;
 }
+//--------------------------------------------------------------------------------

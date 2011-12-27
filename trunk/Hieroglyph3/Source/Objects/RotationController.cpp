@@ -42,9 +42,10 @@ void RotationController::Update( float fTime )
 	{
 		Matrix3f delta;
 		delta.RotationEuler( m_kAxis, fTime * m_fSpeed );
+
 		Matrix3f rotation = m_pEntity->Rotation();
-		
 		m_pEntity->Rotation() = rotation * delta;
+		m_pEntity->Rotation().Orthonormalize();
 	}
 
 }

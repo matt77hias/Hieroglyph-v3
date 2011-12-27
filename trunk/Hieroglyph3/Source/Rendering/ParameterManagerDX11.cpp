@@ -39,7 +39,14 @@ ParameterManagerDX11::ParameterManagerDX11( unsigned int ID )
 //--------------------------------------------------------------------------------
 ParameterManagerDX11::~ParameterManagerDX11()
 {
-	
+	// Iterate the list of parameters and release them
+	std::map< std::wstring, RenderParameterDX11* >::iterator iter = m_Parameters.begin();
+	while ( iter != m_Parameters.end() ) {
+		SAFE_DELETE( iter->second );
+		iter++;
+	}
+
+	m_Parameters.clear();
 }
 //--------------------------------------------------------------------------------
 unsigned int ParameterManagerDX11::GetID()

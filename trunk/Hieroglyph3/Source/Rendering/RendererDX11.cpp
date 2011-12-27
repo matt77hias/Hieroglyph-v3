@@ -970,6 +970,7 @@ void RendererDX11::ResizeSwapChain( int SID, UINT width, UINT height )
 {
 	if ( !m_vSwapChains.inrange( SID ) ) {
 		Log::Get().Write( L"Error trying to resize swap chain!" );
+		return;
 	}
 
 	SwapChainDX11* pSwapChain = m_vSwapChains[SID];
