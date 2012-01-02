@@ -33,6 +33,9 @@ namespace Glyph3
 		static MaterialPtr GenerateSolidColor( RendererDX11& Renderer );
 
 		static MaterialPtr GenerateFromFile( RendererDX11& Renderer, std::wstring& file, unsigned int shaders );
+
+		static MaterialPtr GenerateKinectBufferMaterial( RendererDX11& Renderer );
+
 	private:
 		MaterialGeneratorDX11();
 		

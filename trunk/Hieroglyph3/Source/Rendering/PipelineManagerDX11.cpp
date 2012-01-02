@@ -482,7 +482,7 @@ void PipelineManagerDX11::DispatchIndirect( RenderEffectDX11& effect,
 	int Type = args->m_iResource & 0x00FF0000;
 	int ID = args->m_iResource & 0x0000FFFF;
 
-	if ( Type =! RT_INDIRECTARGSBUFFER )
+	if ( Type != RT_INDIRECTARGSBUFFER )
 	{
 		Log::Get().Write( L"Tried to use the wrong resource type for an indirect dispatch!" );
 		return;
@@ -552,7 +552,7 @@ void PipelineManagerDX11::CopyStructureCount( ResourcePtr dest, UINT offset, Res
 	int Type = dest->m_iResource & 0x00FF0000;
 	int ID = dest->m_iResource & 0x0000FFFF;
 
-	if ( Type =! RT_INDIRECTARGSBUFFER )
+	if ( Type != RT_INDIRECTARGSBUFFER )
 	{
 		Log::Get().Write( L"Tried to use the wrong resource type for an indirect drawing!" );
 		return;

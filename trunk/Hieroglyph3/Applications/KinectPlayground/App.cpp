@@ -45,7 +45,7 @@ App::App()
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
 {
-	if ( !ConfigureRenderingEngineComponents( 1024, 560, D3D_FEATURE_LEVEL_11_0 ) ) {
+	if ( !ConfigureRenderingEngineComponents( 800, 480, D3D_FEATURE_LEVEL_11_0 ) ) {
 		return( false );
 	}
 
@@ -79,7 +79,7 @@ void App::Initialize()
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
 
-	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 0.0f, -4.0f );
+	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 2.0f, -7.0f );
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.0f, 0.0f, 0.0f ) );
 	m_pRenderView->SetBackColor( Vector4f( 0.1f, 0.1f, 0.3f, 0.0f ) );
 
@@ -110,13 +110,32 @@ void App::Initialize()
 	DepthActor->GetBody()->GetMaterial()->Params[VT_PERSPECTIVE].vViews.add( m_pKinectView );
 	m_pScene->AddEntity( DepthActor->GetNode() );
 
-	ColorActor->GetNode()->Position() = Vector3f(  2.5f, 0.0f, 3.0f );
-	ColorActor->GetNode()->Rotation().RotationY( 0.2f );
-	DepthActor->GetNode()->Position() = Vector3f( -2.5f, 0.0f, 3.0f );
-	DepthActor->GetNode()->Rotation().RotationY( -0.2f );
+	ColorActor->GetNode()->Position() = Vector3f( -4.0f, 3.0f, 5.0f );
+	ColorActor->GetNode()->Rotation().RotationY( -0.7f );
+	DepthActor->GetNode()->Position() = Vector3f( -4.0f, 0.0f, 5.0f );
+	DepthActor->GetNode()->Rotation().RotationY( -0.7f );
 
 	m_pRenderer11->SetMultiThreadingState( false );
 
+
+	// Create a new entity that will render the depth buffer in 3D as a heightmap
+
+	GeometryPtr pGeometry = GeometryPtr( new GeometryDX11() );
+	GeometryGeneratorDX11::GenerateTexturedPlane( pGeometry, 320, 240 );
+	pGeometry->LoadToBuffers();
+	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+
+	MaterialPtr pMaterial = MaterialGeneratorDX11::GenerateKinectBufferMaterial( *m_pRenderer11 );
+
+	Actor* pDepthMapViewer = new Actor();
+	pDepthMapViewer->GetBody()->Position() = Vector3f( -8.0f, -10.0f, 30.0f );
+	pDepthMapViewer->GetBody()->Rotation().RotationX( -1.5f );
+
+	pDepthMapViewer->GetBody()->SetGeometry( pGeometry );
+	pDepthMapViewer->GetBody()->SetMaterial( pMaterial );
+	pDepthMapViewer->GetBody()->GetMaterial()->Params[VT_PERSPECTIVE].vViews.add( m_pKinectView );
+
+	m_pScene->AddEntity( pDepthMapViewer->GetNode() );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -135,7 +154,7 @@ void App::Update()
 
 	std::wstringstream out;
 	out << L"Hieroglyph 3 : Kinect Playground" << std::endl;
-	out << L"Depth is represented on the left, and the color channels on the right." << std::endl;
+	out << L"Color and depth are represented on the left, with a 3D reconstruction on the right." << std::endl;
 	out << L"FPS: " << m_pTimer->Framerate();
 
 	m_pTextOverlayView->WriteText( out.str(), Matrix4f::Identity(), Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
@@ -197,18 +216,10 @@ bool App::HandleEvent( IEvent* pEvent )
 			this->RequestTermination();
 			return( true );
 		}
-		else if ( key == 0x41 ) // 'A' Key - restart animations
-		{
-			return( true );
-		}
 		else if ( key == 0x53 ) // 'S' Key - Save a screen shot for the next frame
 		{
 			m_bSaveScreenshot = true;
 			return( true );
-		}
-		else
-		{
-			return( false );
 		}
 	}
 

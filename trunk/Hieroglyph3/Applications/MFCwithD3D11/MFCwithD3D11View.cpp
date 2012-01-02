@@ -54,7 +54,7 @@ void CMFCwithD3D11View::OnDraw(CDC* /*pDC*/)
 		return;
 
 	// TODO: add draw code for native data here
-	pDoc->pScene->Update( 0.1f );
+
 	pCamera->SetScene( pDoc->pScene );
 	pCamera->RenderFrame( Glyph3::RendererDX11::Get() );
 

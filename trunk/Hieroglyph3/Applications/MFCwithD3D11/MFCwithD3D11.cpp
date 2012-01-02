@@ -202,7 +202,18 @@ BOOL CMFCwithD3D11App::OnIdle(LONG lCount)
 {
 	// TODO: Add your specialized code here and/or call the base class
 	CWinApp::OnIdle(lCount);
+
+	// Update the timer and then update the current scene with the elapsed time.
 	
+	pTimer->Update();
+
+	Glyph3::Scene* pScene = CMFCwithD3D11Doc::GetDoc()->pScene;
+
+	if ( pScene != NULL ) {
+		pScene->Update( pTimer->Elapsed() );
+	}
+
+	// Update the views to reflect the new state of the scene.
 	AfxGetMainWnd()->Invalidate(false); 
 
 	return TRUE;

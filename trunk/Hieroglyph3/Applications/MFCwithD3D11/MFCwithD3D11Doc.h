@@ -37,6 +37,8 @@ public:
 	Glyph3::Scene*	pScene;
 	Glyph3::Actor*	pActor;
 
+	static CMFCwithD3D11Doc* GetDoc();
+
 // Overrides
 public:
 	virtual BOOL OnNewDocument();

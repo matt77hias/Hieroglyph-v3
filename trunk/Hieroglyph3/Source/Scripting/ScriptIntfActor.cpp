@@ -90,7 +90,7 @@ int ScriptIntfActor::AttachChild( lua_State* pLuaState )
 	Actor* pParent = (Actor*)ScriptManager::Get()->GetObjectPointer( handle1 );
 	Actor* pChild = (Actor*)ScriptManager::Get()->GetObjectPointer( handle2 );
 
-	if ( pParent && pChild )
+	if ( pParent != NULL && pChild != NULL )
 	{
 		pChild->GetNode()->DetachParent();
 		pParent->GetNode()->AttachChild( pChild->GetNode() );
@@ -112,7 +112,7 @@ int ScriptIntfActor::DetachChild( lua_State* pLuaState )
 	Actor* pParent = (Actor*)ScriptManager::Get()->GetObjectPointer( handle1 );
 	Actor* pChild = (Actor*)ScriptManager::Get()->GetObjectPointer( handle2 );
 
-	if ( pParent && pChild )
+	if ( pParent != NULL && pChild != NULL )
 	{
 		pParent->GetNode()->DetachChild( pChild->GetNode() );
 		return( 0 );

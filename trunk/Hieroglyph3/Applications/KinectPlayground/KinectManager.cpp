@@ -283,8 +283,10 @@ void KinectManager::Nui_GotDepthAlert( )
 					BYTE l = 255 - (BYTE)(256*RealDepth/0x0fff);
 
 					pBufferRun++;
-					m_pSysMemDepthBuffer[(x+320*y)] = l;
-					m_pSysMemDepthBuffer[(x+320*y)] = (s&0xff00) >> 8;
+					//m_pSysMemDepthBuffer[(x+320*y)] = l;
+					//m_pSysMemDepthBuffer[(x+320*y)] = (s&0xff00) >> 8;
+					USHORT* pDestBuff = (USHORT*)(&(m_pSysMemDepthBuffer[(x+320*y)*2]));
+					*pDestBuff = RealDepth << 3;
 				}
 			}
 			

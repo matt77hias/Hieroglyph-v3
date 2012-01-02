@@ -280,11 +280,14 @@ void ConsoleWindow::Write(const char *pString)
 			buf[indx] = 0;
 			g_Console->m_stringList.push_front( buf );
 		}
+		
 		InvalidateRect(m_hWnd, NULL, TRUE);
-		delete buf;
+		delete[] buf;
+
+		g_Console->AdjustScrollBar();
 	}
 
-	g_Console->AdjustScrollBar();
+
 }
 //--------------------------------------------------------------------------------
 LRESULT CALLBACK ConsoleWindow::SubclassInputEditProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam ) 

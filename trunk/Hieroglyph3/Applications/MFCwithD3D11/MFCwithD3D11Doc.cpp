@@ -79,7 +79,6 @@ void CMFCwithD3D11Doc::Dump(CDumpContext& dc) const
 }
 #endif //_DEBUG
 //--------------------------------------------------------------------------------
-
 void CMFCwithD3D11Doc::DeleteContents()
 {
 	if ( pActor ) {
@@ -92,3 +91,10 @@ void CMFCwithD3D11Doc::DeleteContents()
 
 	CDocument::DeleteContents();
 }
+//--------------------------------------------------------------------------------
+CMFCwithD3D11Doc* CMFCwithD3D11Doc::GetDoc()
+{
+	CFrameWnd * pFrame = (CFrameWnd *)(AfxGetApp()->m_pMainWnd);
+	return (CMFCwithD3D11Doc*) pFrame->GetActiveDocument();
+}
+//--------------------------------------------------------------------------------

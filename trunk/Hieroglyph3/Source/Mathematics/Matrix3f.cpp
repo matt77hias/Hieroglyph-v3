@@ -169,8 +169,8 @@ void Matrix3f::Orthonormalize()
 	//(1.0/sqrt((double)fValue))
 
     // compute q0
-    float fInvLength = 1.0/sqrt((double)(m_afEntry[0]*m_afEntry[0] +
-        m_afEntry[3]*m_afEntry[3] + m_afEntry[6]*m_afEntry[6]));
+    float fInvLength = static_cast<float>(1.0/sqrt((double)(m_afEntry[0]*m_afEntry[0] +
+        m_afEntry[3]*m_afEntry[3] + m_afEntry[6]*m_afEntry[6])));
 
     m_afEntry[0] *= fInvLength;
     m_afEntry[3] *= fInvLength;
@@ -184,8 +184,8 @@ void Matrix3f::Orthonormalize()
     m_afEntry[4] -= fDot0*m_afEntry[3];
     m_afEntry[7] -= fDot0*m_afEntry[6];
 
-    fInvLength = 1.0/sqrt((double)(m_afEntry[1]*m_afEntry[1] +
-        m_afEntry[4]*m_afEntry[4] + m_afEntry[7]*m_afEntry[7]));
+    fInvLength = static_cast<float>(1.0/sqrt((double)(m_afEntry[1]*m_afEntry[1] +
+        m_afEntry[4]*m_afEntry[4] + m_afEntry[7]*m_afEntry[7])));
 
     m_afEntry[1] *= fInvLength;
     m_afEntry[4] *= fInvLength;
@@ -202,8 +202,8 @@ void Matrix3f::Orthonormalize()
     m_afEntry[5] -= fDot0*m_afEntry[3] + fDot1*m_afEntry[4];
     m_afEntry[8] -= fDot0*m_afEntry[6] + fDot1*m_afEntry[7];
 
-    fInvLength = 1.0/sqrt((double)(m_afEntry[2]*m_afEntry[2] +
-        m_afEntry[5]*m_afEntry[5] + m_afEntry[8]*m_afEntry[8]));
+    fInvLength = static_cast<float>(1.0/sqrt((double)(m_afEntry[2]*m_afEntry[2] +
+        m_afEntry[5]*m_afEntry[5] + m_afEntry[8]*m_afEntry[8])));
 
     m_afEntry[2] *= fInvLength;
     m_afEntry[5] *= fInvLength;

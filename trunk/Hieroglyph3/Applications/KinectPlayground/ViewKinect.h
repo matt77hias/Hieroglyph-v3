@@ -52,6 +52,9 @@ namespace Glyph3
 
 		BYTE* m_pSysMemColor;
 		BYTE* m_pSysMemDepth;
+
+		ShaderResourceParameterDX11* m_pKinectDepthBufferParameter;
+		ShaderResourceParameterDX11* m_pKinectColorBufferParameter;
 	};
 };
 //--------------------------------------------------------------------------------

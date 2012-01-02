@@ -44,7 +44,6 @@ GeometryPtr GeometryLoaderDX11::loadMS3DFile2( std::wstring filename )
 	MS3DGroup* pMS3DGroups = NULL;
 	MS3DMaterial* pMS3DMaterials = NULL;
 
-	int i;
 	std::ifstream fin;
 	MS3DHeader header;
 
@@ -58,7 +57,7 @@ GeometryPtr GeometryLoaderDX11::loadMS3DFile2( std::wstring filename )
 	// Load all the vertices
 	fin.read((char*)(&usVertexCount), sizeof(unsigned short));
 	pMS3DVertices = new MS3DVertex[usVertexCount];
-	for (i=0; i < usVertexCount; i++)
+	for (int i = 0; i < usVertexCount; i++)
 	{
 		fin.read((char*)&(pMS3DVertices[i].flags), sizeof(unsigned char));
 		fin.read((char*)&(pMS3DVertices[i].vertex[0]), sizeof(float));
@@ -71,7 +70,7 @@ GeometryPtr GeometryLoaderDX11::loadMS3DFile2( std::wstring filename )
 	// Load all the triangle indices
 	fin.read((char*)(&usTriangleCount), sizeof(unsigned short));
 	pMS3DTriangles = new MS3DTriangle[usTriangleCount];
-	for (i=0; i < usTriangleCount; i++)
+	for (int i = 0; i < usTriangleCount; i++)
 	{
 		fin.read((char*)&(pMS3DTriangles[i].flags),sizeof(unsigned short));
 		fin.read((char*)&(pMS3DTriangles[i].vertexIndices[0]), sizeof(unsigned short)); //3*sizeof(unsigned short));
@@ -89,7 +88,7 @@ GeometryPtr GeometryLoaderDX11::loadMS3DFile2( std::wstring filename )
 	// Load all the group information
 	fin.read((char*)(&usGroupCount), sizeof(unsigned short));
 	pMS3DGroups = new MS3DGroup[usGroupCount];
-	for (i=0; i < usGroupCount; i++)
+	for (int i = 0; i < usGroupCount; i++)
 	{
 		fin.read((char*)&(pMS3DGroups[i].flags), sizeof(unsigned char));
 		fin.read((char*)&(pMS3DGroups[i].name), sizeof(char[32]));
@@ -103,7 +102,7 @@ GeometryPtr GeometryLoaderDX11::loadMS3DFile2( std::wstring filename )
 	// Load all the material information
 	fin.read((char*)(&usMaterialCount),sizeof(unsigned short));
 	pMS3DMaterials = new MS3DMaterial[usMaterialCount];
-	for (i=0; i < usMaterialCount; i++)
+	for (int i = 0; i < usMaterialCount; i++)
 	{
 		fin.read((char*)&(pMS3DMaterials[i].name), sizeof(char[32]));
 		fin.read((char*)&(pMS3DMaterials[i].ambient), 4 * sizeof(float));
@@ -221,7 +220,7 @@ GeometryPtr GeometryLoaderDX11::loadMS3DFile2( std::wstring filename )
 	// Delete temporary groups and their indices
 	if (pMS3DGroups != NULL)
 	{
-		for (i = 0; i < usGroupCount; i++)
+		for (int i = 0; i < usGroupCount; i++)
 		{
 			if (pMS3DGroups[i].triangleIndices != NULL)
 			{

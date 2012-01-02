@@ -122,12 +122,9 @@ D3D_FEATURE_LEVEL RendererDX11::GetAvailableFeatureLevel( D3D_DRIVER_TYPE Driver
 	// without creating the device.  The application can then do whatever it needs
 	// to for a given feature level.
 
-	if ( m_pDevice )
-	{
+	if ( m_pDevice ) {
 		FeatureLevel = m_pDevice->GetFeatureLevel();
-	}
-	else
-	{
+	} else {
 		hr = D3D11CreateDevice(
 			NULL,
 			DriverType,
@@ -139,11 +136,11 @@ D3D_FEATURE_LEVEL RendererDX11::GetAvailableFeatureLevel( D3D_DRIVER_TYPE Driver
 			NULL,
 			&FeatureLevel,
 			NULL );
-	}
 
-	if ( FAILED( hr ) )
-	{
-		Log::Get().Write( L"Failed to determine the available hardware feature level!" );
+		if ( FAILED( hr ) ) {
+			Log::Get().Write( L"Failed to determine the available hardware feature level!" );
+		}
+
 	}
 
 	return( FeatureLevel );
@@ -1240,13 +1237,13 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 	{
 		ID3D11ShaderReflectionConstantBuffer* pConstBuffer = pReflector->GetConstantBufferByIndex( i );
 		
-		D3D11_SHADER_BUFFER_DESC desc;
-		pConstBuffer->GetDesc( &desc );
+		D3D11_SHADER_BUFFER_DESC bufferDesc;
+		pConstBuffer->GetDesc( &bufferDesc );
 		
-		if ( desc.Type == D3D_CT_CBUFFER || desc.Type == D3D_CT_TBUFFER )
+		if ( bufferDesc.Type == D3D_CT_CBUFFER || bufferDesc.Type == D3D_CT_TBUFFER )
 		{
 			ConstantBufferLayout BufferLayout;
-			BufferLayout.Description = ShaderBufferDesc( desc );
+			BufferLayout.Description = ShaderBufferDesc( bufferDesc );
 			BufferLayout.pParamRef = m_pParamMgr->GetConstantBufferParameterRef( BufferLayout.Description.Name );
 
 			// Load the description of each variable for use later on when binding a buffer

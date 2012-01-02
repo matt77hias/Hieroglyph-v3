@@ -28,7 +28,7 @@ ViewKinect::ViewKinect( RendererDX11& Renderer )
 	// Prepare some intial height data for the simulation.
 
 	m_pSysMemColor = new BYTE[640*480*4];
-	m_pSysMemDepth = new BYTE[320*240*1];
+	m_pSysMemDepth = new BYTE[320*240*2];
 
 	D3D11_SUBRESOURCE_DATA InitialData;
 	InitialData.pSysMem				= 0;
@@ -42,7 +42,7 @@ ViewKinect::ViewKinect( RendererDX11& Renderer )
 	config.SetDefaults();
 	config.SetWidth( 320 );
 	config.SetHeight( 240 );
-	config.SetFormat( DXGI_FORMAT_R8_UNORM );
+	config.SetFormat( DXGI_FORMAT_R16_UNORM );
 	config.SetUsage( D3D11_USAGE_STAGING );
 	config.SetBindFlags( 0 );
 	config.SetCPUAccessFlags( D3D11_CPU_ACCESS_WRITE );
@@ -80,10 +80,11 @@ ViewKinect::ViewKinect( RendererDX11& Renderer )
 
 	// TODO: Add error checking here.
 
-	// Get references to the parameters that will be updated throughout the simulation.
-	//m_pCurrentWaterState = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"CurrentWaterState" ) );
-	//m_pNewWaterState = Renderer.m_pParamMgr->GetUnorderedAccessParameterRef( std::wstring( L"NewWaterState" ) );
-	//m_pDispatchSize = Renderer.m_pParamMgr->GetVectorParameterRef( std::wstring( L"DispatchSize" ) );
+	m_pKinectDepthBufferParameter = 
+		Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"KinectDepthBuffer" ) );
+
+	m_pKinectColorBufferParameter =
+		Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"KinectColorBuffer" ) );
 }
 //--------------------------------------------------------------------------------
 ViewKinect::~ViewKinect()
@@ -153,8 +154,8 @@ void ViewKinect::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager*
 		BYTE* pRunner = m_pSysMemDepth; 
 		BYTE* pResource = (BYTE*)resource.pData;
 		for ( int y = 0; y < 240; y++ ) {
-			memcpy( pResource, pRunner, sizeof(BYTE)*320*1 );
-			pRunner += sizeof(BYTE)*320*1;
+			memcpy( pResource, pRunner, sizeof(BYTE)*320*2 );
+			pRunner += sizeof(BYTE)*320*2;
 			pResource += resource.RowPitch;
 		}
 		pPipelineManager->UnMapResource( KinectDepthStaging->m_iResource, 0 );
@@ -200,13 +201,10 @@ void ViewKinect::SetRenderParams( IParameterManager* pParamManager )
 //--------------------------------------------------------------------------------
 void ViewKinect::SetUsageParams( IParameterManager* pParamManager )
 {
-	// Set the parameters for allowing an application to use the current state
-	// as a height map via a shader resource view.
+	// Set the two resulting buffers as shader resource parameters.
 
-	//Vector4f DispatchSize = Vector4f( 16.0f, 16.0f, 16.0f * 16.0f, 16.0f * 16.0f );
-
-	//pParamManager->SetShaderResourceParameter( m_pCurrentWaterState, WaterState[0] );
-	//pParamManager->SetVectorParameter( m_pDispatchSize, &DispatchSize );
+	pParamManager->SetShaderResourceParameter( m_pKinectDepthBufferParameter, KinectDepth );
+	pParamManager->SetShaderResourceParameter( m_pKinectColorBufferParameter, KinectColor );
 }
 //--------------------------------------------------------------------------------
 ResourcePtr ViewKinect::GetColorResource()
