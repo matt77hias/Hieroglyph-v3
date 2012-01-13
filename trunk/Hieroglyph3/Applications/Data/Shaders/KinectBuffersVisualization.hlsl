@@ -14,14 +14,16 @@
 // Copyright (C) 2012 Jason Zink.  All rights reserved.
 //--------------------------------------------------------------------------------
 
-Texture2D<float>       KinectDepthBuffer;
-Texture2D<float4>       KinectColorBuffer;
+Texture2D<uint>       KinectDepthBuffer;
+Texture2D<float4>      KinectColorBuffer;
+Texture2D<uint2>       KinectOffsetBuffer;
+
+SamplerState    LinearSampler : register( s0 );
 
 cbuffer Transforms
 {
 	matrix WorldViewProjMatrix;	
 };
-
 
 struct VS_INPUT
 {
@@ -34,9 +36,12 @@ struct VS_OUTPUT
 	float4 position : SV_POSITION;
 	float4 color : COLOR;
 	float  height : HEIGHT;
+	float2 colorCoords : TEXCOORDS;
+	float2 colorOffset : TEXCOORDS2;
 };
-
+//--------------------------------------------------------------------------------
 float3 ComputeNormal( int2 coords ) {
+
 	int2 o00 = coords + int2( -1, -1 );
 	int2 o10 = coords + int2(  0, -1 );
 	int2 o20 = coords + int2(  1, -1 );
@@ -71,12 +76,15 @@ float3 ComputeNormal( int2 coords ) {
 	// Make sure the returned normal is of unit length
 	return normalize( float3( 2.0f * Gx, 2.0f * Gy, Gz ) );
 }
-
+//--------------------------------------------------------------------------------
 VS_OUTPUT VSMAIN( in VS_INPUT v)
 {
 	VS_OUTPUT o;
 
-	float fHeight = KinectDepthBuffer[ int2( v.coords.x, 240-v.coords.y ) ] * 500.0f;
+	// Multiplying the retrieved depth by 8 is done to 
+	float fDepth = ((float)KinectDepthBuffer[ int2( v.coords.x, 240-v.coords.y ) ]) *0.001f;//*8.0f;
+	uint2 uiOffsets = KinectOffsetBuffer[ int2( v.coords.x, 240-v.coords.y ) ];
+	o.colorOffset = float2( (float)uiOffsets.x / 640.0f, (float)uiOffsets.y / 480.0f );
 
 	float3 normal = ComputeNormal( int2( v.coords.x, 240-v.coords.y ) );
 
@@ -84,23 +92,36 @@ VS_OUTPUT VSMAIN( in VS_INPUT v)
 	
 
 	// Transform the new position to clipspace.
-	float4 SampledPosition = float4( v.position.x, 1.0f-fHeight, v.position.z, 1.0f );
-	SampledPosition.xyz = SampledPosition.xyz * 0.1f;
+	// x_meters = (x_pixelcoord - 160) * NUI_CAMERA_DEPTH_IMAGE_TO_SKELETON_MULTIPLIER_320x240 * z_meters;
+    // y_meters = (y_pixelcoord - 120) * NUI_CAMERA_DEPTH_IMAGE_TO_SKELETON_MULTIPLIER_320x240 * z_meters;
 
-	o.position = mul( SampledPosition, WorldViewProjMatrix );
+	float x_meters = (v.coords.x-160) * 0.003501f * fDepth;
+	float y_meters = (v.coords.y-120) * 0.003501f * fDepth;
+	float4 DepthCamViewSpace = float4( x_meters, y_meters, fDepth, 1.0f );
+
+
+	// x_pixelcoord = (x_meters) * NUI_CAMERA_SKELETON_TO_DEPTH_IMAGE_MULTIPLIER_320x240 / z_meters + 160;
+	// y_pixelcoord = (y_meters) * NUI_CAMERA_SKELETON_TO_DEPTH_IMAGE_MULTIPLIER_320x240 / z_meters + 120;
+
+	float4 ColorCamViewSpace = DepthCamViewSpace + float4( 0.03f, -0.035f, 0.0f, 0.0f );
+
+	o.colorCoords.x = (ColorCamViewSpace.x * 531.15f / ColorCamViewSpace.z + 320) / 640.0f;
+	o.colorCoords.y = 1.0f - (ColorCamViewSpace.y * 531.15f / ColorCamViewSpace.z + 240) / 480.0f;
+	//o.colorCoords.x = v.coords.x;
+	//o.colorCoords.y = v.coords.y;
+
+	o.position = mul( DepthCamViewSpace, WorldViewProjMatrix );
 
 	o.color = diffuse * lerp( float4(1.0f, 1.0f, 0.0f, 1.0f), float4(0.2f, 0.0f, 0.0f, 1.0f), diffuse*2-1.0f );
-	if ( fHeight == 0.0f ) {
+	if ( fDepth == 0.0f ) {
 		o.color = float4( 0.0f, 0.0f, 0.0f, 0.0f );
 	}
 
-	o.height = fHeight;
-
-//	o.color = float4( 0.0f, 1.0f, 0.0f, 1.0f );
+	o.height = fDepth;
 
 	return o;
 }
-
+//--------------------------------------------------------------------------------
 [maxvertexcount(3)]
 void GSMAIN( triangle VS_OUTPUT input[3],
              inout TriangleStream<VS_OUTPUT> OutputStream )
@@ -111,7 +132,7 @@ void GSMAIN( triangle VS_OUTPUT input[3],
 	float maxLength = max( length( abs(input[0].height - input[1].height) ), length( abs(input[1].height - input[2].height) ) );
 	maxLength = max( maxLength, length( abs(input[2].height - input[0].height) ) );
 
-	if (( minHeight > 0.0f ) && ( maxLength < 20.0f ))  {
+	if (( minHeight > 0.1f ) && ( maxLength < 0.075f ))  {
 		for ( int i = 0; i < 3; i++ ) {
 		        OutputStream.Append(input[i]);
 		}
@@ -119,14 +140,15 @@ void GSMAIN( triangle VS_OUTPUT input[3],
 
 	OutputStream.RestartStrip();
 }
-
-
+//--------------------------------------------------------------------------------
 float4 PSMAIN( in VS_OUTPUT input ) : SV_Target
 {
+	float4 vValues = KinectColorBuffer.Sample( LinearSampler, input.colorOffset );
+	//float4 vValues = KinectColorBuffer.Sample( LinearSampler, input.colorCoords );
 	
-//	float4 vValues = KinectColorBuffer.Sample( LinearSampler, input.tex );
-	
-	float4 color = input.color;
-	return( color );
-}
+	return( vValues );
 
+	//float4 color = input.color;
+	//return( color );
+}
+//--------------------------------------------------------------------------------

@@ -45,7 +45,7 @@ App::App()
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
 {
-	if ( !ConfigureRenderingEngineComponents( 800, 480, D3D_FEATURE_LEVEL_11_0 ) ) {
+	if ( !ConfigureRenderingEngineComponents( 1024, 800, D3D_FEATURE_LEVEL_11_0 ) ) {
 		return( false );
 	}
 
@@ -76,66 +76,76 @@ void App::Initialize()
 	m_pLightPosition->InitializeParameterData( &LightPosition );
 
 
-	// Create the camera, and the render view that will produce an image of the 
+	// Configure the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
 
-	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 2.0f, -7.0f );
-	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.0f, 0.0f, 0.0f ) );
+	m_pCamera->GetNode()->Position() = Vector3f( 7.0f, 7.0f, -10.0f );
+	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.3f, -0.4f, 0.0f ) );
 	m_pRenderView->SetBackColor( Vector4f( 0.1f, 0.1f, 0.3f, 0.0f ) );
 
 
-	// Create the scene and add the entities to it.  Then add the camera to the
-	// scene so that it will be updated via the scene interface instead of 
-	// manually manipulating it.
-
-	m_pNode = new Node3D();
-
-
-
-	// Attach the actors to the scene, so that they will be rendered all together.
-
-	m_pScene->AddEntity( m_pNode );
-
-
+	// Create a Kinect render view, and then attach it to the color and depth
+	// visualization actors.  This will ensure that the render view is executed
+	// prior to being used by either actor.
 
 	m_pKinectView = new ViewKinect( *m_pRenderer11 );
 
-	Actor* ColorActor = ActorGenerator::GenerateVisualizationTexture2D( 
+	m_pColorActor = ActorGenerator::GenerateVisualizationTexture2D( 
 		*m_pRenderer11, m_pKinectView->GetColorResource(), 0 );
-	ColorActor->GetBody()->GetMaterial()->Params[VT_PERSPECTIVE].vViews.add( m_pKinectView );
-	m_pScene->AddEntity( ColorActor->GetNode() );
-
-	Actor* DepthActor = ActorGenerator::GenerateVisualizationTexture2D( 
-		*m_pRenderer11, m_pKinectView->GetDepthResource(), 0 );
-	DepthActor->GetBody()->GetMaterial()->Params[VT_PERSPECTIVE].vViews.add( m_pKinectView );
-	m_pScene->AddEntity( DepthActor->GetNode() );
-
-	ColorActor->GetNode()->Position() = Vector3f( -4.0f, 3.0f, 5.0f );
-	ColorActor->GetNode()->Rotation().RotationY( -0.7f );
-	DepthActor->GetNode()->Position() = Vector3f( -4.0f, 0.0f, 5.0f );
-	DepthActor->GetNode()->Rotation().RotationY( -0.7f );
-
-	m_pRenderer11->SetMultiThreadingState( false );
+	m_pDepthActor = ActorGenerator::GenerateVisualizationTexture2D( 
+		*m_pRenderer11, m_pKinectView->GetDepthResource(),
+		MaterialGeneratorDX11::GenerateKinectDepthBufferMaterial(*m_pRenderer11) );
+	
+	m_pColorActor->GetBody()->GetMaterial()->Params[VT_PERSPECTIVE].vViews.add( m_pKinectView );
+	m_pDepthActor->GetBody()->GetMaterial()->Params[VT_PERSPECTIVE].vViews.add( m_pKinectView );
+	
+	m_pColorActor->GetNode()->Position() = Vector3f( -5.5f, 5.5f, 5.0f );
+	m_pColorActor->GetNode()->Rotation().RotationY( -0.7f );
+	m_pDepthActor->GetNode()->Position() = Vector3f( -5.5f, 0.0f, 5.0f );
+	m_pDepthActor->GetNode()->Rotation().RotationY( -0.7f );
 
 
-	// Create a new entity that will render the depth buffer in 3D as a heightmap
+
+	// Create an actor to represent the 3D reconstruction of the scene.
+
+	Actor* m_pDepthMapViewer = new Actor();
 
 	GeometryPtr pGeometry = GeometryPtr( new GeometryDX11() );
 	GeometryGeneratorDX11::GenerateTexturedPlane( pGeometry, 320, 240 );
 	pGeometry->LoadToBuffers();
 	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
-	MaterialPtr pMaterial = MaterialGeneratorDX11::GenerateKinectBufferMaterial( *m_pRenderer11 );
+	MaterialPtr pMaterial = MaterialGeneratorDX11::GenerateKinectReconstructionMaterial( *m_pRenderer11 );
 
-	Actor* pDepthMapViewer = new Actor();
-	pDepthMapViewer->GetBody()->Position() = Vector3f( -8.0f, -10.0f, 30.0f );
-	pDepthMapViewer->GetBody()->Rotation().RotationX( -1.5f );
+	m_pDepthMapViewer->GetBody()->SetGeometry( pGeometry );
+	m_pDepthMapViewer->GetBody()->SetMaterial( pMaterial );
+	m_pDepthMapViewer->GetBody()->GetMaterial()->Params[VT_PERSPECTIVE].vViews.add( m_pKinectView );
 
-	pDepthMapViewer->GetBody()->SetGeometry( pGeometry );
-	pDepthMapViewer->GetBody()->SetMaterial( pMaterial );
-	pDepthMapViewer->GetBody()->GetMaterial()->Params[VT_PERSPECTIVE].vViews.add( m_pKinectView );
+	m_pDepthMapViewer->GetNode()->Position() = Vector3f( 1.0f, 0.0f, 2.0f );
+	m_pDepthMapViewer->GetNode()->Rotation().RotationX( 0.0f );
+	m_pDepthMapViewer->GetNode()->Scale() = 7.0f;
 
-	m_pScene->AddEntity( pDepthMapViewer->GetNode() );
+
+
+	// Create a skeleton actor to show the joint tracking in the 3D representation.
+	// It is then bound to the kinect render view for updating its values from the
+	// SDK calculated joints.  It is then connected to the depth map viewer so that
+	// any scaling applied matched between both of them.
+
+	m_pSkeletonActor = new KinectSkeletonActor();
+	m_pKinectView->SetSkeletonActor( m_pSkeletonActor );
+	m_pDepthMapViewer->GetNode()->AttachChild( m_pSkeletonActor->GetNode() );
+
+
+	// Add all our objects to the scene for rendering.
+
+	m_pScene->AddEntity( m_pColorActor->GetNode() );
+	m_pScene->AddEntity( m_pDepthActor->GetNode() );
+	m_pScene->AddEntity( m_pDepthMapViewer->GetNode() );
+
+	
+
+	m_pRenderer11->SetMultiThreadingState( false );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -183,7 +193,9 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pNode );
+	SAFE_DELETE( m_pColorActor );
+	SAFE_DELETE( m_pDepthActor );
+	SAFE_DELETE( m_pSkeletonActor );
 	SAFE_DELETE( m_pKinectView );
 
 	// Print the framerate out for the log before shutting down.
@@ -203,7 +215,7 @@ bool App::HandleEvent( IEvent* pEvent )
 
 		unsigned int key = pKeyDown->GetCharacterCode();
 
-		return( true );
+		//return( true );
 	}
 	else if ( e == SYSTEM_KEYBOARD_KEYUP )
 	{
@@ -216,7 +228,7 @@ bool App::HandleEvent( IEvent* pEvent )
 			this->RequestTermination();
 			return( true );
 		}
-		else if ( key == 0x53 ) // 'S' Key - Save a screen shot for the next frame
+		else if ( key == VK_SPACE ) // 'Space' Key - Save a screen shot for the next frame
 		{
 			m_bSaveScreenshot = true;
 			return( true );

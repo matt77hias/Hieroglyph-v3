@@ -11,12 +11,19 @@
 //--------------------------------------------------------------------------------
 // KinectManager
 //
+// This class provides a simple abstraction layer between the Kinect API and the
+// Hieroglyph 3 classes that use it.  This effectively contains any changes to the 
+// API within this class.
+//
+// This code was based on the skeletal viewer sample from the Kinect for Windows
+// Beta 1 SDK.
 //--------------------------------------------------------------------------------
 #ifndef KinectManager_h
 #define KinectManager_h
 //--------------------------------------------------------------------------------
-#include <Windows.h>
 #include "PCH.h"
+#include <Windows.h>
+#include "MSR_NuiApi.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -35,22 +42,28 @@ namespace Glyph3
 
 		void SetSysMemColorBuffer( BYTE* pBuffer );
 		void SetSysMemDepthBuffer( BYTE* pBuffer );
+		void SetSysMemSkeletonBuffer( BYTE* pBuffer );
+
 		BYTE* GetSysMemColorBuffer( );
 		BYTE* GetSysMemDepthBuffer( );
+		BYTE* GetSysMemSkeletonBuffer( );
 
 	private:
 		static DWORD WINAPI     Nui_ProcessThread(LPVOID pParam);
 
-	    HANDLE        m_hThNuiProcess;
-	    HANDLE        m_hEvNuiProcessStop;
-	    HANDLE        m_hNextDepthFrameEvent;
-		HANDLE        m_hNextVideoFrameEvent;
-		HANDLE        m_hNextSkeletonEvent;
-		HANDLE        m_pDepthStreamHandle;
-		HANDLE        m_pVideoStreamHandle;
+	    HANDLE      m_hThNuiProcess;
+	    HANDLE      m_hEvNuiProcessStop;
+	    
+		HANDLE      m_hNextDepthFrameEvent;
+		HANDLE      m_hNextVideoFrameEvent;
+		HANDLE      m_hNextSkeletonEvent;
+
+		HANDLE      m_pDepthStreamHandle;
+		HANDLE      m_pVideoStreamHandle;
 
 		BYTE*		m_pSysMemColorBuffer;
 		BYTE*		m_pSysMemDepthBuffer;
+		BYTE*		m_pSysMemSkeletonBuffer;
 	};
 }
 //--------------------------------------------------------------------------------

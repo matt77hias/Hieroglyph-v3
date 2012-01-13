@@ -16,6 +16,7 @@
 
 #include "VectorParameterDX11.h"
 #include "ViewKinect.h"
+#include "KinectSkeletonActor.h"
 
 using namespace Glyph3;
 
@@ -44,4 +45,9 @@ protected:
 	
 	VectorParameterDX11*	m_pLightColor;
 	VectorParameterDX11*	m_pLightPosition;
+
+	KinectSkeletonActor*	m_pSkeletonActor;
+	Actor*					m_pDepthMapViewer;
+	Actor*					m_pColorActor;
+	Actor*					m_pDepthActor;
 };

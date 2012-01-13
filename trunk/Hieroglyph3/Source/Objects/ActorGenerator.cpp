@@ -54,26 +54,29 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 
 	// Use the passed in material to render the visualization.  This allows for 
 	// a user to create customized visualizations for special format textures.
-	pMaterial = MaterialPtr( new MaterialDX11() );
 
-	// Create and fill the effect that will be used for this view type
-	RenderEffectDX11* pEffect = new RenderEffectDX11();
+	if ( pMaterial == NULL ) {
 
-	pEffect->m_iVertexShader = 
-		Renderer.LoadShader( VERTEX_SHADER,
-		std::wstring( L"ObjectTexturedVS.hlsl" ),
-		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	pEffect->m_iPixelShader = 
-		Renderer.LoadShader( PIXEL_SHADER,
-		std::wstring( L"ObjectTexturedPS.hlsl" ),
-		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
+		pMaterial = MaterialPtr( new MaterialDX11() );
 
-	// Enable the material to render the given view type, and set its effect.
-	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
-	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
+		// Create and fill the effect that will be used for this view type
+		RenderEffectDX11* pEffect = new RenderEffectDX11();
 
+		pEffect->m_iVertexShader = 
+			Renderer.LoadShader( VERTEX_SHADER,
+			std::wstring( L"ObjectTexturedVS.hlsl" ),
+			std::wstring( L"VSMAIN" ),
+			std::wstring( L"vs_5_0" ) );
+		pEffect->m_iPixelShader = 
+			Renderer.LoadShader( PIXEL_SHADER,
+			std::wstring( L"ObjectTexturedPS.hlsl" ),
+			std::wstring( L"PSMAIN" ),
+			std::wstring( L"ps_5_0" ) );
+
+		// Enable the material to render the given view type, and set its effect.
+		pMaterial->Params[VT_PERSPECTIVE].bRender = true;
+		pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
+	}
 
 	pActor->GetBody()->SetMaterial( pMaterial );
 	pActor->GetNode()->Position() = Vector3f( 0.0f, 2.0f, 0.0f );

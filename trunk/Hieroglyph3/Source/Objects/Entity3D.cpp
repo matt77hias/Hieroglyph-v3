@@ -35,6 +35,7 @@ Entity3D::Entity3D()
 
 	m_vTranslation.MakeZero();
 	m_mRotation.MakeIdentity();
+	m_fScale = 1.0f;
 
 	m_mWorld.MakeIdentity();
 	m_mLocal.MakeIdentity();
@@ -45,9 +46,6 @@ Entity3D::Entity3D()
 
 	m_pComposite = new CompositeShape();
 
-	//UpdateLocal( 0.0f );
-	//UpdateWorld( );
- 
 	m_bHidden = false;
 	m_bCalcLocal = true;
 }
@@ -69,6 +67,11 @@ Vector3f& Entity3D::Position()
 Matrix3f& Entity3D::Rotation()
 {
 	return( m_mRotation );
+}
+//--------------------------------------------------------------------------------
+float& Entity3D::Scale( )
+{
+	return( m_fScale );
 }
 //--------------------------------------------------------------------------------
 bool Entity3D::IsHidden()
@@ -136,9 +139,13 @@ void Entity3D::UpdateLocal( float fTime )
 
 	if ( m_bCalcLocal )
 	{
-		m_mLocal.MakeIdentity( );
+		Matrix4f scale;
+		scale.Scale( m_fScale );
+		
+		m_mLocal.MakeIdentity();
 		m_mLocal.SetRotation( m_mRotation );
 		m_mLocal.SetTranslation( m_vTranslation );
+		m_mLocal = scale * m_mLocal;
 	}
 }
 //--------------------------------------------------------------------------------

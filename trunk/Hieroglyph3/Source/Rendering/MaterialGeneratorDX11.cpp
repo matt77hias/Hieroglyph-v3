@@ -191,6 +191,13 @@ MaterialPtr MaterialGeneratorDX11::GeneratePhong( RendererDX11& Renderer )
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 
+	RasterizerStateConfigDX11 RS;
+	//RS.FillMode = D3D11_FILL_WIREFRAME;
+	//RS.CullMode = D3D11_CULL_NONE;
+
+	//pEffect->m_iRasterizerState = 
+	//	Renderer.CreateRasterizerState( &RS );
+
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
 	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
@@ -291,7 +298,7 @@ MaterialPtr MaterialGeneratorDX11::GenerateFromFile( RendererDX11& Renderer, std
 
 }
 //--------------------------------------------------------------------------------
-MaterialPtr MaterialGeneratorDX11::GenerateKinectBufferMaterial( RendererDX11& Renderer )
+MaterialPtr MaterialGeneratorDX11::GenerateKinectReconstructionMaterial( RendererDX11& Renderer )
 {
 	// Use the passed in material to render the visualization.  This allows for 
 	// a user to create customized visualizations for special format textures.
@@ -318,6 +325,46 @@ MaterialPtr MaterialGeneratorDX11::GenerateKinectBufferMaterial( RendererDX11& R
 
 	RasterizerStateConfigDX11 RS;
 	RS.FillMode = D3D11_FILL_WIREFRAME;
+	//RS.CullMode = D3D11_CULL_NONE;
+
+	//pEffect->m_iRasterizerState = 
+	//	Renderer.CreateRasterizerState( &RS );
+
+	DepthStencilStateConfigDX11 ds;
+	ds.DepthEnable = false;
+	pEffect->m_iDepthStencilState = Renderer.CreateDepthStencilState( &ds );
+
+
+	// Enable the material to render the given view type, and set its effect.
+	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
+	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
+
+	return( pMaterial );
+}
+//--------------------------------------------------------------------------------
+MaterialPtr MaterialGeneratorDX11::GenerateKinectDepthBufferMaterial( RendererDX11& Renderer )
+{
+	// Create the material that will be returned
+	MaterialPtr pMaterial = MaterialPtr( new MaterialDX11() );
+
+	// Create and fill the effect that will be used for this view type
+	RenderEffectDX11* pEffect = new RenderEffectDX11();
+
+	pEffect->m_iVertexShader = 
+		Renderer.LoadShader( VERTEX_SHADER,
+		std::wstring( L"ObjectTexturedVS.hlsl" ),
+		std::wstring( L"VSMAIN" ),
+		std::wstring( L"vs_5_0" ) );
+	pEffect->m_iPixelShader = 
+		Renderer.LoadShader( PIXEL_SHADER,
+		std::wstring( L"ObjectTexturedIntPS.hlsl" ),
+		std::wstring( L"PSMAIN" ),
+		std::wstring( L"ps_5_0" ) );
+
+
+	//RasterizerStateConfigDX11 RS;
+	//RS.FillMode = D3D11_FILL_WIREFRAME;
+	//RS.CullMode = D3D11_CULL_NONE;
 
 	//pEffect->m_iRasterizerState = 
 	//	Renderer.CreateRasterizerState( &RS );
