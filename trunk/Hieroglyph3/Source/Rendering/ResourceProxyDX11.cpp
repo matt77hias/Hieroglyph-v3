@@ -140,19 +140,19 @@ void ResourceProxyDX11::CommonConstructor( UINT BindFlags, int ResourceID, Rende
         *m_pSRVConfig = *pSRVConfig;
     }
 
-    if ( m_pRTVConfig )
+    if ( pRTVConfig )
     {
         m_pRTVConfig = new RenderTargetViewConfigDX11();
         *m_pRTVConfig = *pRTVConfig;
     }
 
-    if ( m_pUAVConfig )
+    if ( pUAVConfig )
     {
         m_pUAVConfig = new UnorderedAccessViewConfigDX11();
         *m_pUAVConfig = *pUAVConfig;
     }
 
-    if ( m_pDSVConfig )
+    if ( pDSVConfig )
     {
         m_pDSVConfig = new DepthStencilViewConfigDX11();
         *m_pDSVConfig = *pDSVConfig;
