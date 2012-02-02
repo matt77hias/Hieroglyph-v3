@@ -12,7 +12,6 @@
 // ResourceViewDX11
 //
 //
-// Copyright (C) 2003-2009 Jason Zink
 //--------------------------------------------------------------------------------
 #ifndef ResourceViewDX11_h
 #define ResourceViewDX11_h

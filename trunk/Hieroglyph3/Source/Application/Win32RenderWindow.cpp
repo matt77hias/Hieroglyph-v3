@@ -25,13 +25,22 @@ Win32RenderWindow::~Win32RenderWindow()
 	Shutdown();
 }
 //--------------------------------------------------------------------------------
+// This free function is used as a hook into the window's messaging system.  When
+// the window is initialized, the owner passes a pointer to a IWindowProc 
+// implementation.  When Windows sends a message to this window, we call this 
+// handler function - which will either call the default processor (when no valid
+// pointer is there) or call the IWindowProc method (when a valid one is 
+// available).
+//--------------------------------------------------------------------------------
 LRESULT CALLBACK InternalWindowProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam )
 {
 	LONG ObjPtr = GetWindowLongPtr(hwnd, 0);
-	if (ObjPtr == 0)
+
+	if (ObjPtr == 0) {
         return( DefWindowProc( hwnd, msg, wparam, lparam ) );
-	else
+	} else {
 	    return( ((IWindowProc*)ObjPtr)->WindowProc(hwnd, msg, wparam, lparam) );
+	}
 }
 //--------------------------------------------------------------------------------
 void Win32RenderWindow::Initialize(IWindowProc* WindowProcObj)

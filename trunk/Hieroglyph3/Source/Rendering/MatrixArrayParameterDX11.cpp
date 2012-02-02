@@ -77,6 +77,19 @@ void MatrixArrayParameterDX11::SetParameterData( void* pData, unsigned int threa
 	//m_Matrix = *reinterpret_cast<Matrix4f*>( pData );
 }
 //--------------------------------------------------------------------------------
+void MatrixArrayParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
+{
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	// TODO: This method doesn't do anything at the moment - it doesn't make sense
+	//       to reset a resource that just holds data (this mechanism is intended
+	//       for resource parameters...).
+
+	//memcpy( m_pMatrices[threadID], pData, m_iMatrixCount * sizeof( Matrix4f ) );
+	//m_Matrix = *reinterpret_cast<Matrix4f*>( pData );
+}
+//--------------------------------------------------------------------------------
 const ParameterType MatrixArrayParameterDX11::GetParameterType()
 {
 	return( MATRIX_ARRAY );

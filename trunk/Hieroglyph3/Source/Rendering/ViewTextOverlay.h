@@ -46,6 +46,7 @@ namespace Glyph3
 		virtual void Update( float fTime );
 		virtual void PreDraw( RendererDX11* pRenderer );
 		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
+		virtual void Resize( UINT width, UINT height );
 
 		virtual void SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ );
 

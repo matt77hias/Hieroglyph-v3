@@ -626,7 +626,6 @@ copy Animation\*.h ..\SDK\Include
     <ClInclude Include="Animation\AnimationStream.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
     <None Include="Utility\TArray.inl" />
     <None Include="Shaders\Sprite.hlsl" />
   </ItemGroup>

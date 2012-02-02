@@ -126,6 +126,8 @@
     <None Include="..\Data\Shaders\GaussianBruteForceCS.hlsl" />
     <None Include="..\Data\Shaders\GaussianCachedCS.hlsl" />
     <None Include="..\Data\Shaders\GaussianSeparableCS.hlsl" />
+    <None Include="..\Data\Shaders\ImageViewerPS.hlsl" />
+    <None Include="..\Data\Shaders\ImageViewerVS.hlsl" />
     <None Include="..\Data\Shaders\TexturePS.hlsl" />
     <None Include="..\Data\Shaders\TextureVS.hlsl" />
   </ItemGroup>

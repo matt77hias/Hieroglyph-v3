@@ -40,19 +40,42 @@ namespace Glyph3
 
 		RenderParameterDX11* CreateCopy();
 
-		void InitializeParameterData( void* pData );
-
-		virtual void SetParameterData( void* pData, unsigned int threadID = 0 ) = 0;
-		virtual const ParameterType GetParameterType() = 0;
-
 		void SetName( const std::wstring& name );
 		std::wstring& GetName();
 
+		// Each parameter type will implement this method for a simple way
+		// to tell what kind of data it uses.  This is important for handling
+		// the parameters in a generic way, but still being able to perform
+		// type checking.
+
+		virtual const ParameterType GetParameterType() = 0;
+
+		// Initializing parameter data sets all copies of this resource with
+		// the provided data.  Internally this calls the SetParameterData() 
+		// method on each thread's data copy, which is specialized by each 
+		// concrete subclass.  The uninitialize method will reset the parameter
+		// to a default value if the parameter's data matches the passed in data.
+
+		void InitializeParameterData( void* pData );
+		void UnInitializeParameterData( void* pData );
+
+		// Setting parameter data does what it sounds like - it takes a pointer
+		// to the data and sets it in the data copy indicated by its thread ID.
+		// Reset will default the data if the current data matches the passed in
+		// data.
+
+		virtual void SetParameterData( void* pData, unsigned int threadID = 0 ) = 0;
+		virtual void ResetParameterData( void* pData, unsigned int threadID = 0 ) = 0;
+
+		// This update function is a convenience function to allow 
+		// RenderParameterDX11 subclasses to be referred to by their parent class
+		// and automatically update the parameter stored in the parameter
+		// manager.
+		
 		virtual void UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID = 0 ) = 0;
 
 	protected:
 		std::wstring	m_sParameterName;
-		ParameterType	m_iParameterType;
 	};
 };
 //--------------------------------------------------------------------------------

@@ -194,5 +194,10 @@ void RenderApplication::HandleWindowResize( HWND handle, UINT width, UINT height
 	if ( m_pRenderView != 0 ) {
 		m_pRenderView->Resize( width, height );
 	}
+
+	// Update the text render view being used to render the scene
+	if ( m_pTextOverlayView != 0 ) {
+		m_pTextOverlayView->Resize( width, height );
+	}
 }
 //--------------------------------------------------------------------------------

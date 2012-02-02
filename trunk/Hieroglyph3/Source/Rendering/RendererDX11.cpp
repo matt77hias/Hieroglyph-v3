@@ -383,8 +383,10 @@ void RendererDX11::Shutdown()
 	for ( int i = 0; i < m_vResources.count(); i++ )
 		delete m_vResources[i];
 
-	for ( int i = 0; i < m_vSwapChains.count(); i++ )
+	for ( int i = 0; i < m_vSwapChains.count(); i++ ) {
+		m_vSwapChains[i]->m_pSwapChain->SetFullscreenState( false, NULL );
 		delete m_vSwapChains[i];
+	}
 
 	// Clear the context and the device
 

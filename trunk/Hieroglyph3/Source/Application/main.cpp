@@ -27,6 +27,7 @@ using namespace Glyph3;
 int WINAPI WinMain(	HINSTANCE h_Inst, HINSTANCE h_PrevInst,	LPSTR lpcmdline, int ncmdshow)
 {
 	// The instance of the app must already be created by now
+
 	Application* m_pApp = Application::GetApplication();
 	if (!m_pApp)
 	{
@@ -59,6 +60,7 @@ int WINAPI WinMain(	HINSTANCE h_Inst, HINSTANCE h_PrevInst,	LPSTR lpcmdline, int
 
 
 	// Call the overloaded application shutdown method.
+
 	m_pApp->Shutdown();
 	m_pApp->ShutdownEngineComponents();
 

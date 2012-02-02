@@ -44,6 +44,19 @@ void UnorderedAccessParameterDX11::SetParameterData( void* pData, unsigned int t
 	m_ParameterData[threadID] = *reinterpret_cast<UAVParameterData*>( pData );
 }
 //--------------------------------------------------------------------------------
+void UnorderedAccessParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
+{
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	if ( m_ParameterData[threadID].m_iUnorderedAccessView 
+		== (*reinterpret_cast<UAVParameterData*>( pData )).m_iUnorderedAccessView ) {
+
+		m_ParameterData[threadID].m_iUnorderedAccessView = -1;
+		m_ParameterData[threadID].m_iInitialCount = -1;
+	}
+}
+//--------------------------------------------------------------------------------
 const ParameterType UnorderedAccessParameterDX11::GetParameterType()
 {
 	return( UNORDERED_ACCESS );

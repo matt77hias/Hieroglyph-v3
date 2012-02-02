@@ -33,5 +33,11 @@
     <None Include="..\Data\Shaders\TextureVS.hlsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\Data\Shaders\ImageViewerPS.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Data\Shaders\ImageViewerVS.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -25,7 +25,8 @@
 #include "MaterialGeneratorDX11.h"
 #include "RasterizerStateConfigDX11.h"
 #include "Texture2dConfigDX11.h"
-
+#include "SamplerStateConfigDX11.h"
+#include "Texture2dDX11.h"
 #include "IParameterManager.h"
 
 using namespace Glyph3;
@@ -38,11 +39,71 @@ App AppInstance; // Provides an instance of the application
 App::App()
 {
 	m_bSaveScreenshot = false;
+	m_bAppInitialized = false;
+	m_bAppShuttingDown = false;
+}
+//--------------------------------------------------------------------------------
+void App::MessageLoop()
+{
+	//Application::MessageLoop();
+    MSG msg;
+
+	while (GetMessage( &msg, NULL, 0, 0 ))
+	{
+		TranslateMessage( &msg );
+		DispatchMessage( &msg );
+	}
+}
+//--------------------------------------------------------------------------------
+LRESULT App::WindowProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam )
+{
+	//return( RenderApplication::WindowProc( hwnd, msg, wparam, lparam ) );
+
+	switch( msg )
+	{	
+		case WM_PAINT:
+			{
+				PAINTSTRUCT ps;
+				HDC hdc = BeginPaint(hwnd, &ps);
+				EndPaint(hwnd, &ps);
+				
+				if ( m_bAppInitialized && !m_bAppShuttingDown ) {
+					Update();
+				}
+
+				return 0;
+
+			} break;
+		case  WM_MOUSEMOVE:
+			{
+				// we do our own mouse move handling before letting the framework do it
+				return( HandleMouseMove( hwnd, wparam, lparam ) );  
+
+				// Now we let the framework handle the mouse move as it likes
+				//return RenderApplication::WindowProc( hwnd, msg, wparam, lparam );
+			} break;
+		case  WM_SIZE:
+			{
+				if ( m_bAppInitialized && !m_bAppShuttingDown ) {
+					HandleResize( hwnd, wparam, lparam );  
+					return RenderApplication::WindowProc( hwnd, msg, wparam, lparam );
+				}
+
+				// Now we let the framework handle the mouse move as it likes
+				return 0;
+			} break;
+		default:
+			{
+				// If we haven't defined a handler for a message, then we pass it 
+				// to our base class to be handled.
+				return RenderApplication::WindowProc( hwnd, msg, wparam, lparam );
+			}
+	}
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
 {
-	if ( !ConfigureRenderingEngineComponents( 640, 480, D3D_FEATURE_LEVEL_11_0 /* , D3D_DRIVER_TYPE_REFERENCE */ ) ) {
+	if ( !ConfigureRenderingEngineComponents( 1024, 640, D3D_FEATURE_LEVEL_11_0 ) ) {
 		return( false );
 	}
 
@@ -61,7 +122,14 @@ void App::ShutdownEngineComponents()
 //--------------------------------------------------------------------------------
 void App::Initialize()
 {
-	m_iImage = 0;
+	m_UIData.LMouseDown = false;
+	m_UIData.RMouseDown = false;
+	m_UIData.LastMouseX = -1;
+	m_UIData.LastMouseY = -1;
+	m_UIData.MouseDeltaX = 0;
+	m_UIData.MouseDeltaY = 0;
+
+	m_iImage = -1;
 	m_iAlgorithm = 0;
 
     m_pRenderer11->SetMultiThreadingState( false );
@@ -133,12 +201,12 @@ void App::Initialize()
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 	pEffect->m_iVertexShader = 
 		m_pRenderer11->LoadShader( VERTEX_SHADER,
-		std::wstring( L"TextureVS.hlsl" ),
+		std::wstring( L"ImageViewerVS.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_5_0" ) );
 	pEffect->m_iPixelShader = 
 		m_pRenderer11->LoadShader( PIXEL_SHADER,
-		std::wstring( L"TexturePS.hlsl" ),
+		std::wstring( L"ImageViewerPS.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) );
 
@@ -162,6 +230,8 @@ void App::Initialize()
 	m_Texture[0] = m_pRenderer11->LoadTexture( L"Outcrop.png" );
 	m_Texture[1] = m_pRenderer11->LoadTexture( L"fruit.png" );
 	m_Texture[2] = m_pRenderer11->LoadTexture( L"Hex.png" );
+	m_Texture[3] = m_pRenderer11->LoadTexture( L"EyeOfHorus.png" );
+	m_Texture[4] = m_pRenderer11->LoadTexture( L"Tiles.png" );
 	
 
 	// Create the texture for output of the compute shader.
@@ -179,7 +249,24 @@ void App::Initialize()
 	m_pColorMapParameter = m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorMap00" ) );
 	m_pInputParameter = m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"InputMap" ) );
 	m_pOutputParameter = m_pRenderer11->m_pParamMgr->GetUnorderedAccessParameterRef( std::wstring( L"OutputMap" ) );
+	m_pWindowSizeParameter = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"WindowSize" ) );
+	m_pImageSizeParameter = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"ImageSize" ) );
+	m_pViewingParamsParameter = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"ViewingParams" ) );
 
+	WindowSize = Vector4f( (float)m_iWidth, (float)m_iHeight, 0.0f, 0.0f );
+	m_pWindowSizeParameter->InitializeParameterData( &WindowSize );
+
+	ImageSize = Vector4f( 640.0f, 480.0f, 0.0f, 0.0f );
+	m_pImageSizeParameter->InitializeParameterData( &ImageSize );
+
+	ViewingParams = Vector4f( 0.5f, 0.5f, 1.0f, 1.0f );
+	m_pViewingParamsParameter->InitializeParameterData( &ViewingParams );
+
+	SamplerStateConfigDX11 SamplerConfig;
+	int LinearSampler = RendererDX11::Get()->CreateSamplerState( &SamplerConfig );
+	SamplerParameterDX11* pSamplerParameter = 
+		RendererDX11::Get()->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"LinearSampler" ) );
+	pSamplerParameter->InitializeParameterData( &LinearSampler );
 
 	// Since this one won't be changing, it can be initialized here once, and then
 	// not updated again later.
@@ -206,6 +293,39 @@ void App::Initialize()
 
 	m_pNode->AttachChild( m_pEntity );
 	m_pScene->AddEntity( m_pNode );
+
+	SelectNextImage(); 
+
+	// This will trigger a WM_PAINT which when handled will render the image as we have set it up.
+	InvalidateRect(m_pWindow->GetHandle(), NULL, TRUE);
+
+	m_bAppInitialized = true;
+}
+//--------------------------------------------------------------------------------
+void App::SelectNextImage()
+{
+	// Select the next image index.
+	m_iImage++;
+	if ( m_iImage > 4 ) m_iImage = 0;
+
+	// Get the description of the new image.
+	Texture2dDX11* pTexture = m_pRenderer11->GetTexture2DByIndex( m_Texture[m_iImage]->m_iResource );
+	D3D11_TEXTURE2D_DESC desc = pTexture->GetActualDescription();
+
+	// Update the rendering parameters for image size.
+	ImageSize.x = (float)desc.Width;
+	ImageSize.y = (float)desc.Height;
+	m_pImageSizeParameter->InitializeParameterData( &ImageSize );
+
+	// Resize the resources used for processing.
+	m_pRenderer11->ResizeTexture( this->m_Intermediate, desc.Width, desc.Height );
+	m_pRenderer11->ResizeTexture( this->m_Output, desc.Width, desc.Height );
+}
+//--------------------------------------------------------------------------------
+void App::SelectNextAlgorithm()
+{
+	m_iAlgorithm++;
+	if ( m_iAlgorithm > 4 ) m_iAlgorithm = 0;
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -237,10 +357,13 @@ void App::Update()
 	// Brute force Gaussian
 	if ( m_iAlgorithm == 0 )
 	{
+		UINT DispatchX = (UINT)( ceil( ImageSize.x / 32.0f ) );
+		UINT DispatchY = (UINT)( ceil( ImageSize.y / 32.0f ) );
+
 		out << L"Brute Force Gaussian" << std::endl;
 		m_pInputParameter->InitializeParameterData( &m_Texture[m_iImage]->m_iResourceSRV );
 		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
-		m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceGaussian, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceGaussian, DispatchX, DispatchY, 1, m_pRenderer11->m_pParamMgr );
 
 		m_pRenderer11->pImmPipeline->ClearPipelineResources();
 		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
@@ -249,17 +372,23 @@ void App::Update()
 	// Separable Gaussian
 	if ( m_iAlgorithm == 1 )
 	{
+		UINT DispatchX = (UINT)( ceil( ImageSize.x / 640.0f ) );
+		UINT DispatchY = (UINT)( ImageSize.y );
+		
 		out << L"Separable Gaussian" << std::endl;
 		m_pInputParameter->InitializeParameterData( &m_Texture[m_iImage]->m_iResourceSRV );
 		m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
-		m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableGaussianX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableGaussianX, DispatchX, DispatchY, 1, m_pRenderer11->m_pParamMgr );
 
 		m_pRenderer11->pImmPipeline->ClearPipelineResources();
 		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
-		
+
+		DispatchX = (UINT)( ImageSize.x );
+		DispatchY = (UINT)( ceil( ImageSize.y / 480.0f ) );
+
 		m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
 		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
-		m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableGaussianY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableGaussianY, DispatchX, DispatchY, 1, m_pRenderer11->m_pParamMgr );
 
 		m_pRenderer11->pImmPipeline->ClearPipelineResources();
 		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
@@ -268,18 +397,24 @@ void App::Update()
 	// Cached Gaussian
 	if ( m_iAlgorithm == 2 )
 	{
+		UINT DispatchX = (UINT)( ceil( ImageSize.x / 640.0f ) );
+		UINT DispatchY = (UINT)( ImageSize.y );
+
 		out << L"Cached Separable Gaussian" << std::endl;
 		
 		m_pInputParameter->InitializeParameterData( &m_Texture[m_iImage]->m_iResourceSRV );
 		m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
-		m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianX, DispatchX, DispatchY, 1, m_pRenderer11->m_pParamMgr );
 
 		m_pRenderer11->pImmPipeline->ClearPipelineResources();
 		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
 
+		DispatchX = (UINT)( ImageSize.x );
+		DispatchY = (UINT)( ceil( ImageSize.y / 480.0f ) );
+
 		m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
 		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
-		m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pCachedGaussianY, DispatchX, DispatchY, 1, m_pRenderer11->m_pParamMgr );
 
 		m_pRenderer11->pImmPipeline->ClearPipelineResources();
 		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
@@ -288,24 +423,13 @@ void App::Update()
 	// Brute force Bilateral
 	if ( m_iAlgorithm == 3 )
 	{
+		UINT DispatchX = (UINT)( ceil( ImageSize.x / 32.0f ) );
+		UINT DispatchY = (UINT)( ceil( ImageSize.y / 32.0f ) );
+
 		out << L"Brute Force Bilateral" << std::endl;
 		m_pInputParameter->InitializeParameterData( &m_Texture[m_iImage]->m_iResourceSRV );
 		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
-		m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
-
-		m_pRenderer11->pImmPipeline->ClearPipelineResources();
-		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
-
-		m_pInputParameter->InitializeParameterData( &m_Output->m_iResourceSRV );
-		m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
-		m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
-
-		m_pRenderer11->pImmPipeline->ClearPipelineResources();
-		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
-
-		m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
-		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
-		m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, 20, 15, 1, m_pRenderer11->m_pParamMgr );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pBruteForceBilateral, DispatchX, DispatchY, 1, m_pRenderer11->m_pParamMgr );
 
 		m_pRenderer11->pImmPipeline->ClearPipelineResources();
 		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
@@ -314,17 +438,23 @@ void App::Update()
 	// Separable Bilateral
 	if ( m_iAlgorithm == 4 )
 	{
+		UINT DispatchX = (UINT)( ceil( ImageSize.x / 640.0f ) );
+		UINT DispatchY = (UINT)( ImageSize.y );
+
 		out << L"Separable Bilateral" << std::endl;
 		m_pInputParameter->InitializeParameterData( &m_Texture[m_iImage]->m_iResourceSRV );
 		m_pOutputParameter->InitializeParameterData( &m_Intermediate->m_iResourceUAV );
-		m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralX, 1, 480, 1, m_pRenderer11->m_pParamMgr );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralX, DispatchX, DispatchY, 1, m_pRenderer11->m_pParamMgr );
 
 		m_pRenderer11->pImmPipeline->ClearPipelineResources();
 		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
 
+		DispatchX = (UINT)( ImageSize.x );
+		DispatchY = (UINT)( ceil( ImageSize.y / 480.0f ) );
+
 		m_pInputParameter->InitializeParameterData( &m_Intermediate->m_iResourceSRV );
 		m_pOutputParameter->InitializeParameterData( &m_Output->m_iResourceUAV );
-		m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralY, 640, 1, 1, m_pRenderer11->m_pParamMgr );
+		m_pRenderer11->pImmPipeline->Dispatch( *m_pSeparableBilateralY, DispatchX, DispatchY, 1, m_pRenderer11->m_pParamMgr );
 
 		m_pRenderer11->pImmPipeline->ClearPipelineResources();
 		m_pRenderer11->pImmPipeline->ApplyPipelineResources();
@@ -354,6 +484,8 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
+	m_bAppShuttingDown = true;
+
 	SAFE_DELETE( m_pEntity );
 	SAFE_DELETE( m_pNode );
 
@@ -362,6 +494,102 @@ void App::Shutdown()
 	std::wstringstream out;
 	out << L"Max FPS: " << m_pTimer->MaxFramerate();
 	Log::Get().Write( out.str() );
+}
+//--------------------------------------------------------------------------------
+bool App::HandleResize( HWND hwnd, WPARAM wparam, LPARAM lparam )
+{
+	EvtWindowResize e( hwnd, wparam, lparam );
+
+	WindowSize.x = (float)e.NewWidth();
+	WindowSize.y = (float)e.NewHeight();
+	m_pWindowSizeParameter->InitializeParameterData( &WindowSize );
+	
+	return( true );
+}
+//--------------------------------------------------------------------------------
+bool App::HandleMouseMove( HWND hwnd, WPARAM wparam, LPARAM lparam )
+{
+	EvtMouseMove e( hwnd, wparam, lparam );
+
+	// If LBUTTON is down, then we are panning
+	if ( e.LButtonDown() ) {		
+
+		// Initialize the data for starting the panning event if this is
+		// the first mouse move event with the button down.  Otherwise we
+		// update the data live to keep up with the mouse movement.
+		
+		if ( !m_UIData.LMouseDown ) {
+			m_UIData.LMouseDown = true;
+			m_UIData.RMouseDown = false;
+			m_UIData.LastMouseX = e.GetX();
+			m_UIData.LastMouseY = e.GetY();
+			m_UIData.MouseDeltaX = 0;
+			m_UIData.MouseDeltaY = 0;
+		} else {
+			m_UIData.MouseDeltaX = m_UIData.LastMouseX - e.GetX();
+			m_UIData.MouseDeltaY = m_UIData.LastMouseY - e.GetY();
+			m_UIData.LastMouseX = e.GetX();
+			m_UIData.LastMouseY = e.GetY();
+		}
+
+		// Here we translate the observed mouse movement into a change in
+		// the offset to view the images with.
+		ViewingParams.x += ((float)m_UIData.MouseDeltaX) / ViewingParams.z; 
+		ViewingParams.y += ((float)m_UIData.MouseDeltaY) / ViewingParams.w; 
+		m_pViewingParamsParameter->InitializeParameterData( &ViewingParams );
+
+	} else {
+
+		// LBUTTON is not down, so reset its flags and data.
+		if ( m_UIData.LMouseDown ) {
+			m_UIData.LMouseDown = false;
+			m_UIData.MouseDeltaX = 0;
+			m_UIData.MouseDeltaY = 0;
+		}
+
+		// If RBUTTON is down, then we are zooming
+		if ( e.RButtonDown() ) {	
+
+			// Initialize the data for starting the zooming event if this is
+			// the first mouse move event with the button down.  Otherwise we
+			// update the data live to keep up with the mouse movement.
+			
+			if ( !m_UIData.RMouseDown ) {
+				m_UIData.RMouseDown = true;
+				m_UIData.LastMouseX = e.GetX();
+				m_UIData.LastMouseY = e.GetY();
+				m_UIData.MouseDeltaX = 0;
+				m_UIData.MouseDeltaY = 0;
+			} else {
+				m_UIData.MouseDeltaX = m_UIData.LastMouseX - e.GetX();
+				m_UIData.MouseDeltaY = m_UIData.LastMouseY - e.GetY();
+				m_UIData.LastMouseX = e.GetX();
+				m_UIData.LastMouseY = e.GetY();
+			}
+
+			ViewingParams.z += ((float)m_UIData.MouseDeltaY) * 0.001f;
+			ViewingParams.w += ((float)m_UIData.MouseDeltaY) * 0.001f;
+			m_pViewingParamsParameter->InitializeParameterData( &ViewingParams );
+
+		} else {
+
+			// RBUTTON is not down, so reset its flags and data.
+			if ( m_UIData.RMouseDown ) {
+				m_UIData.RMouseDown = false;
+				m_UIData.MouseDeltaX = 0;
+				m_UIData.MouseDeltaY = 0;
+			}
+		} 
+	} 
+
+
+
+
+
+
+	InvalidateRect(m_pWindow->GetHandle(), NULL, FALSE);
+
+	return( true );
 }
 //--------------------------------------------------------------------------------
 bool App::HandleEvent( IEvent* pEvent )
@@ -392,17 +620,17 @@ bool App::HandleEvent( IEvent* pEvent )
 			m_bSaveScreenshot = true;
 			return( true );
 		}
-		else if ( key == 0x4E ) // 'N' Key - Save a screen shot for the next frame
+		else if ( key == 0x4E ) // 'N' Key - Switch to the next algorithm
 		{
-			m_iAlgorithm++;
-			if ( m_iAlgorithm > 4 ) m_iAlgorithm = 0;
+			SelectNextAlgorithm();
+			InvalidateRect(m_pWindow->GetHandle(), NULL, FALSE);
 
 			return( true );
 		}
-		else if ( key == 0x49 ) // 'I' Key - Save a screen shot for the next frame
+		else if ( key == 0x49 ) // 'I' Key - Switch to the next image
 		{
-			m_iImage++;
-			if ( m_iImage > 2 ) m_iImage = 0;
+			SelectNextImage();			
+			InvalidateRect(m_pWindow->GetHandle(), NULL, FALSE);
 
 			return( true );
 		}

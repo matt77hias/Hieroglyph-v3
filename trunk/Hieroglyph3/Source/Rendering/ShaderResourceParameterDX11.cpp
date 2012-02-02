@@ -38,6 +38,16 @@ void ShaderResourceParameterDX11::SetParameterData( void* pData, unsigned int th
 	m_iShaderResourceView[threadID] = *reinterpret_cast<int*>( pData );
 }
 //--------------------------------------------------------------------------------
+void ShaderResourceParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
+{
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	if ( m_iShaderResourceView[threadID] == *reinterpret_cast<int*>( pData ) ) {
+		m_iShaderResourceView[threadID] = -1;
+	}
+}
+//--------------------------------------------------------------------------------
 const ParameterType ShaderResourceParameterDX11::GetParameterType()
 {
 	return( SHADER_RESOURCE );

@@ -1169,6 +1169,5 @@
     <None Include="Shaders\Sprite.hlsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
 </Project>

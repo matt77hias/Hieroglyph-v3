@@ -129,3 +129,8 @@ void ViewTextOverlay::WriteText( std::wstring& text, Matrix4f& xform, Vector4f& 
 	m_TextEntries.add( TextEntry( text, xform, color ) );
 }
 //--------------------------------------------------------------------------------
+void ViewTextOverlay::Resize( UINT width, UINT height )
+{
+	RendererDX11::Get()->ResizeViewport( m_iViewport, width, height );
+}
+//--------------------------------------------------------------------------------

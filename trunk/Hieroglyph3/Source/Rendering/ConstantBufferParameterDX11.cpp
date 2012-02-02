@@ -38,6 +38,16 @@ void ConstantBufferParameterDX11::SetParameterData( void* pData, unsigned int th
 	m_iCBuffer[threadID] = *reinterpret_cast<int*>( pData );
 }
 //--------------------------------------------------------------------------------
+void ConstantBufferParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
+{
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	if ( m_iCBuffer[threadID] == *reinterpret_cast<int*>( pData ) ) {
+		m_iCBuffer[threadID] = -1;
+	}
+}
+//--------------------------------------------------------------------------------
 const ParameterType ConstantBufferParameterDX11::GetParameterType()
 {
 	return( CBUFFER );

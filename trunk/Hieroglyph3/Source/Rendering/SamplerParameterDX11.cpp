@@ -38,6 +38,16 @@ void SamplerParameterDX11::SetParameterData( void* pData, unsigned int threadID 
 	m_iSampler[threadID] = *reinterpret_cast<int*>( pData );
 }
 //--------------------------------------------------------------------------------
+void SamplerParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
+{
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	if ( m_iSampler[threadID] == *reinterpret_cast<int*>( pData ) ) {
+		m_iSampler[threadID] = -1;
+	}
+}
+//--------------------------------------------------------------------------------
 const ParameterType SamplerParameterDX11::GetParameterType()
 {
 	return( SAMPLER );

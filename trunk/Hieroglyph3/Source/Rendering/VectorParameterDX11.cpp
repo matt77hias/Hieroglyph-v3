@@ -38,6 +38,16 @@ void VectorParameterDX11::SetParameterData( void* pData, unsigned int threadID )
 	m_Vector[threadID] = *reinterpret_cast<Vector4f*>( pData );
 }
 //--------------------------------------------------------------------------------
+void VectorParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
+{
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	if ( m_Vector[threadID] == *reinterpret_cast<Vector4f*>( pData ) ) {
+		m_Vector[threadID].MakeZero();
+	}
+}
+//--------------------------------------------------------------------------------
 const ParameterType VectorParameterDX11::GetParameterType()
 {
 	return( VECTOR );

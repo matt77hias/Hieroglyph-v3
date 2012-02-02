@@ -38,6 +38,16 @@ void MatrixParameterDX11::SetParameterData( void* pData, unsigned int threadID )
 	m_Matrix[threadID] = *reinterpret_cast<Matrix4f*>( pData );
 }
 //--------------------------------------------------------------------------------
+void MatrixParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
+{
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	if ( m_Matrix[threadID] == *reinterpret_cast<Matrix4f*>( pData ) ) {
+		m_Matrix[threadID].MakeIdentity();
+	}
+}
+//--------------------------------------------------------------------------------
 const ParameterType MatrixParameterDX11::GetParameterType()
 {
 	return( MATRIX );
