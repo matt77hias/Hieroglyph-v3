@@ -23,7 +23,8 @@
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 #include <Windows.h>
-#include "MSR_NuiApi.h"
+#include "NuiApi.h"
+#include "Timer.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -64,6 +65,10 @@ namespace Glyph3
 		BYTE*		m_pSysMemColorBuffer;
 		BYTE*		m_pSysMemDepthBuffer;
 		BYTE*		m_pSysMemSkeletonBuffer;
+
+		Timer		m_DepthFrameTimer;
+		Timer		m_ColorFrameTimer;
+		Timer		m_SkeletonFrameTimer;
 	};
 }
 //--------------------------------------------------------------------------------

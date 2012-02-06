@@ -7,6 +7,9 @@
 //
 // Copyright (c) 2003-2010 Jason Zink 
 //--------------------------------------------------------------------------------
+// 06.02.2012: BeforeRegisterWindowClass default implementation added by Francois
+//             Piette.
+//--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "Application.h"
 #include "EvtInfoMessage.h"
@@ -116,6 +119,11 @@ void Application::MessageLoop()
 		// Call the overloaded application update function.
 		Update();
 	}
+}
+//--------------------------------------------------------------------------------
+void Application::BeforeRegisterWindowClass( WNDCLASSEX &wc )
+{
+	// This function is intended to be overriden in dervived classes
 }
 //--------------------------------------------------------------------------------
 LRESULT Application::WindowProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam )

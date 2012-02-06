@@ -18,6 +18,8 @@
 #include "IParameterManager.h"
 #include "Texture2dConfigDX11.h"
 #include "KinectManager.h"
+
+#include "ArmsForwardPose.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -269,6 +271,9 @@ void ViewKinect::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager*
 				if ( m_pSkeletonActor != NULL ) {
 					m_pSkeletonActor->UpdateSkeleton( &(((NUI_SKELETON_FRAME*)m_pSysSkeleton)->SkeletonData[i]) );
 				}
+
+				ArmsForwardPose pose;
+				pose.TestPose( ((NUI_SKELETON_FRAME*)m_pSysSkeleton)->SkeletonData[i] );
 			}
 		}
 

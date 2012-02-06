@@ -30,6 +30,11 @@ KinectManager::KinectManager(void)
 //--------------------------------------------------------------------------------
 KinectManager::~KinectManager(void)
 {
+	std::wstringstream out;
+	out << L"Color Framerate: current - " << m_ColorFrameTimer.Framerate() << L", max - " << m_ColorFrameTimer.MaxFramerate() << std::endl;
+	out << L"Depth Framerate: current - " << m_DepthFrameTimer.Framerate() << L", max - " << m_DepthFrameTimer.MaxFramerate() << std::endl;
+	out << L"Color Framerate: current - " << m_SkeletonFrameTimer.Framerate() << L", max - " << m_SkeletonFrameTimer.MaxFramerate() << std::endl;
+	Log::Get().Write( out.str() );
 }
 //--------------------------------------------------------------------------------
 bool KinectManager::Initialize()
@@ -87,6 +92,10 @@ bool KinectManager::Initialize()
     m_hEvNuiProcessStop=CreateEvent(NULL,FALSE,FALSE,NULL);
     m_hThNuiProcess=CreateThread(NULL,0,Nui_ProcessThread,this,0,NULL);
 
+
+	m_DepthFrameTimer.Update();
+	m_ColorFrameTimer.Update();
+	m_SkeletonFrameTimer.Update();
 
 	return true;
 }
@@ -205,6 +214,7 @@ void KinectManager::Nui_GotVideoAlert( )
 
 			//OutputDebugString( L"Color image processed...\r\n" );
 
+			m_ColorFrameTimer.Update();
 			m_pSysMemColorBuffer = NULL;
 		}
     } else {
@@ -253,6 +263,7 @@ void KinectManager::Nui_GotDepthAlert( )
 				}
 			}
 			
+			m_DepthFrameTimer.Update();
 			m_pSysMemDepthBuffer = NULL;
 			//OutputDebugString( L"Depth image processed...\r\n" );
 		}
@@ -296,6 +307,7 @@ void KinectManager::Nui_GotSkeletonAlert( )
 				memcpy( m_pSysMemSkeletonBuffer, &SkeletonFrame, sizeof(NUI_SKELETON_FRAME) );
 
 				m_pSysMemSkeletonBuffer = NULL;
+				m_SkeletonFrameTimer.Update();
 			}
         }
     }

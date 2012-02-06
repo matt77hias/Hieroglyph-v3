@@ -41,11 +41,11 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(DXSDK_DIR)Utilities\bin\x86;$(ExecutablePath)</ExecutablePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(DXSDK_DIR)Include;$(KINECTSDK_DIR)\inc;$(IncludePath)</IncludePath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(DXSDK_DIR)Lib\x86;$(KINECTSDK_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(DXSDK_DIR)Include;$(KINECTSDK10_DIR)\inc;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(DXSDK_DIR)Lib\x86;$(KINECTSDK10_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(DXSDK_DIR)Utilities\bin\x86;$(ExecutablePath)</ExecutablePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(DXSDK_DIR)Include;$(MSRKINECTSDK)\inc;$(KINECTSDK_DIR)\inc;$(IncludePath)</IncludePath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(DXSDK_DIR)Lib\x86;$(KINECTSDK_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(DXSDK_DIR)Include;$(KINECTSDK10_DIR)\inc;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(DXSDK_DIR)Lib\x86;$(KINECTSDK10_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -62,7 +62,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Hieroglyph3.lib;d3dcompiler.lib;dxerr.lib;dxguid.lib;winmm.lib;comctl32.lib;dxgi.lib;d3dx11.lib;MSRKinectNUI.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Hieroglyph3.lib;d3dcompiler.lib;dxerr.lib;dxguid.lib;winmm.lib;comctl32.lib;dxgi.lib;d3dx11.lib;Kinect10.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\SDK\Library\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName)</ProgramDatabaseFile>
@@ -94,7 +94,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Hieroglyph3.lib;d3dcompiler.lib;dxerr.lib;dxguid.lib;winmm.lib;comctl32.lib;dxgi.lib;d3dx11.lib;MSRKinectNUI.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Hieroglyph3.lib;d3dcompiler.lib;dxerr.lib;dxguid.lib;winmm.lib;comctl32.lib;dxgi.lib;d3dx11.lib;Kinect10.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\SDK\Library\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName)</ProgramDatabaseFile>
@@ -110,13 +110,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="ArmsForwardPose.cpp" />
     <ClCompile Include="KinectManager.cpp" />
+    <ClCompile Include="KinectPose.cpp" />
     <ClCompile Include="KinectSkeletonActor.cpp" />
     <ClCompile Include="ViewKinect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="ArmsForwardPose.h" />
     <ClInclude Include="KinectManager.h" />
+    <ClInclude Include="KinectPose.h" />
     <ClInclude Include="KinectSkeletonActor.h" />
     <ClInclude Include="ViewKinect.h" />
   </ItemGroup>

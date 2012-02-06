@@ -19,6 +19,8 @@
 // The application currently supports Input, Sound, Rendering, Logging, Timing, 
 // and profiling.  These are all available to the user when building an 
 // application.
+//
+// 06.02.2012: BeforeRegisterWindowClass method added by Francois Piette.
 //--------------------------------------------------------------------------------
 #ifndef Application_h
 #define Application_h
@@ -73,6 +75,7 @@ namespace Glyph3
 		virtual void Shutdown() = 0;
 		virtual void MessageLoop();
 		virtual LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam); 
+        virtual void BeforeRegisterWindowClass(WNDCLASSEX &wc);
 
 		virtual bool HandleEvent( IEvent* pEvent );
 

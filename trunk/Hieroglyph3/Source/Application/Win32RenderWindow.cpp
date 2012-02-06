@@ -7,6 +7,8 @@
 //
 // Copyright (c) 2003-2010 Jason Zink 
 //--------------------------------------------------------------------------------
+// 06.02.2012: Initialization of WNDCLASSEX structure to zero added by Francois
+//             Piette.
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "Win32RenderWindow.h"
@@ -48,6 +50,7 @@ void Win32RenderWindow::Initialize(IWindowProc* WindowProcObj)
 	WNDCLASSEX wc;
 	
 	// Setup the window class
+	memset(&wc,0, sizeof(wc));
 	wc.cbSize			= sizeof(WNDCLASSEX);
 	wc.style			= CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc		= InternalWindowProc;
@@ -58,8 +61,9 @@ void Win32RenderWindow::Initialize(IWindowProc* WindowProcObj)
 	wc.hCursor			= LoadCursor(NULL, IDC_ARROW); 
 	wc.hbrBackground	= (HBRUSH)GetStockObject(BLACK_BRUSH);
 	wc.lpszMenuName		= NULL;
-	wc.lpszClassName	= L"HeiroglyphWin32";
+	wc.lpszClassName	= L"HieroglyphWin32";
 	wc.hIconSm			= LoadIcon(NULL, IDI_APPLICATION);
+	WindowProcObj->BeforeRegisterWindowClass(wc);
 	
 	// Register the window class
 	RegisterClassEx(&wc);
@@ -87,10 +91,10 @@ void Win32RenderWindow::Initialize(IWindowProc* WindowProcObj)
 	// Create an instance of the window
 	m_hWnd = CreateWindowEx(
 		NULL,							// extended style
-		L"HeiroglyphWin32",				// class name
+		wc.lpszClassName, 				// class name
 		m_sCaption.c_str(),				// instance title
 		m_dStyle,						// window style
-		lleft,ltop,						// initial x,y
+		lleft, ltop,					// initial x, y
 		lwidth,							// initial width
 		lheight,						// initial height
 		NULL,							// handle to parent 
