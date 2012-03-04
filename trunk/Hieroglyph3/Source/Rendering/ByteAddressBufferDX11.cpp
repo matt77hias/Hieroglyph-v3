@@ -24,13 +24,8 @@ ByteAddressBufferDX11::~ByteAddressBufferDX11()
 	// Buffer is released in the BufferDX11 destructor
 }
 //--------------------------------------------------------------------------------
-//void ByteAddressBufferDX11::SetVertexSize( int size )
-//{
-//	m_iVertexSize = size;
-//}
-////--------------------------------------------------------------------------------
-//void ByteAddressBufferDX11::SetVertexCount( int count )
-//{
-//	m_iVertexCount = count;
-//}
-////--------------------------------------------------------------------------------
+ResourceType ByteAddressBufferDX11::GetType()
+{
+	return( RT_BYTEADDRESSBUFFER );
+}
+//--------------------------------------------------------------------------------

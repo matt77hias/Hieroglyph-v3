@@ -35,7 +35,7 @@ ViewTextOverlay::ViewTextOverlay( RendererDX11& Renderer, ResourcePtr RenderTarg
 
 	ResourceDX11* pResource = Renderer.GetResource( m_RenderTarget->m_iResource & 0x0000ffff );
 
-	if ( pResource->GetType() == D3D11_RESOURCE_DIMENSION_TEXTURE2D )
+	if ( pResource->GetType() == RT_TEXTURE2D )
 	{
 		Texture2dDX11* pTexture = (Texture2dDX11*)pResource;
 		D3D11_TEXTURE2D_DESC desc = pTexture->GetActualDescription();

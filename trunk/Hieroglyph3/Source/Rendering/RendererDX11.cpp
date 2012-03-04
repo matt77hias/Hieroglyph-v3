@@ -159,7 +159,7 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	// Create a factory to enumerate all of the hardware in the system.
 
 	IDXGIFactory1* pFactory = 0;
-	hr = CreateDXGIFactory( __uuidof(IDXGIFactory), (void**)(&pFactory) );
+	hr = CreateDXGIFactory1( __uuidof(IDXGIFactory), (void**)(&pFactory) );
 
 
 	// Enumerate all of the adapters in the current system.  This includes all
@@ -583,9 +583,9 @@ ResourcePtr RendererDX11::CreateIndirectArgsBuffer( BufferConfigDX11* pConfig,  
 
 	if ( pBuffer )
 	{
-		ByteAddressBufferDX11* pByteAddressBuffer = new ByteAddressBufferDX11( pBuffer );
-		pByteAddressBuffer->SetDesiredDescription( pConfig->m_State );
-		m_vResources.add( pByteAddressBuffer );
+		IndirectArgsBufferDX11* pIndirectArgsBuffer = new IndirectArgsBufferDX11( pBuffer );
+		pIndirectArgsBuffer->SetDesiredDescription( pConfig->m_State );
+		m_vResources.add( pIndirectArgsBuffer );
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
@@ -1777,22 +1777,6 @@ int RendererDX11::CreateViewPort( D3D11_VIEWPORT viewport )
 	return( m_vViewPorts.count() - 1 );
 }
 //--------------------------------------------------------------------------------
-VertexBufferDX11* RendererDX11::GetVertexBuffer( int index )
-{
-	if ( ( index > -1 ) && ( index < m_vResources.count() ) )
-		return( (VertexBufferDX11*)m_vResources[index] );
-	else
-		return( 0 );
-}
-//--------------------------------------------------------------------------------
-IndexBufferDX11* RendererDX11::GetIndexBuffer( int index )
-{
-	if ( ( index > -1 ) && ( index < m_vResources.count() ) )
-		return( (IndexBufferDX11*)m_vResources[index] );
-	else
-		return( 0 );
-}
-//--------------------------------------------------------------------------------
 ResourcePtr RendererDX11::GetSwapChainResource( int ID )
 {
 	if ( ( ID >= 0 ) && ( m_vSwapChains.count() ) )
@@ -2181,7 +2165,15 @@ ViewPortDX11* RendererDX11::GetViewPort( int index )
 //--------------------------------------------------------------------------------
 ResourceDX11* RendererDX11::GetResource( int index )
 {
-	return( m_vResources[index] );
+	ResourceDX11* pResource = 0;
+
+	int id = index & 0xffff;
+
+	if ( m_vResources.inrange( id ) ) {
+		pResource = m_vResources[id];
+	}
+
+	return( pResource );
 }
 //--------------------------------------------------------------------------------
 InputLayoutDX11* RendererDX11::GetInputLayout( int index )
@@ -2365,17 +2357,15 @@ unsigned int WINAPI _RenderViewThreadProc( void* lpParameter )
 //--------------------------------------------------------------------------------
 Texture1dDX11* RendererDX11::GetTexture1DByIndex( int rid )
 {
-	int TYPE = rid & 0xFF0000;
-	int ID = rid & 0xFFFF;
-
 	Texture1dDX11* pResult = 0;
 
-	if ( rid != -1 ) {
-		// Check if this ID is in range, and that the type is correct.
-		if ( !m_vResources.inrange( ID ) || (TYPE != RT_TEXTURE1D ) ) {
+	ResourceDX11* pResource = GetResource(rid);
+
+	if ( pResource != NULL ) {
+		if ( pResource->GetType() != RT_TEXTURE1D ) {
 			Log::Get().Write( L"Trying to access a non-texture1D resource!!!!" );
 		} else {
-			pResult = reinterpret_cast<Texture1dDX11*>( m_vResources[ID] );
+			pResult = reinterpret_cast<Texture1dDX11*>( pResource );
 		}
 	}
 
@@ -2384,17 +2374,15 @@ Texture1dDX11* RendererDX11::GetTexture1DByIndex( int rid )
 //--------------------------------------------------------------------------------
 Texture2dDX11* RendererDX11::GetTexture2DByIndex( int rid )
 {
-	int TYPE = rid & 0xFF0000;
-	int ID = rid & 0xFFFF;
-
 	Texture2dDX11* pResult = 0;
 
-	if ( rid != -1 ) {
-		// Check if this ID is in range, and that the type is correct.
-		if ( !m_vResources.inrange( ID ) || (TYPE != RT_TEXTURE2D ) ) {
+	ResourceDX11* pResource = GetResource(rid);
+
+	if ( pResource != NULL ) {
+		if ( pResource->GetType() != RT_TEXTURE2D ) {
 			Log::Get().Write( L"Trying to access a non-texture2D resource!!!!" );
 		} else {
-			pResult = reinterpret_cast<Texture2dDX11*>( m_vResources[ID] );
+			pResult = reinterpret_cast<Texture2dDX11*>( pResource );
 		}
 	}
 
@@ -2403,17 +2391,37 @@ Texture2dDX11* RendererDX11::GetTexture2DByIndex( int rid )
 //--------------------------------------------------------------------------------
 Texture3dDX11* RendererDX11::GetTexture3DByIndex( int rid )
 {
-	int TYPE = rid & 0xFF0000;
-	int ID = rid & 0xFFFF;
-
 	Texture3dDX11* pResult = 0;
 
-	if ( rid != -1 ) {
-		// Check if this ID is in range, and that the type is correct.
-		if ( !m_vResources.inrange( ID ) || (TYPE != RT_TEXTURE2D ) ) {
+	ResourceDX11* pResource = GetResource(rid);
+	
+	if ( pResource != NULL ) {
+		if ( pResource->GetType() != RT_TEXTURE3D ) {
 			Log::Get().Write( L"Trying to access a non-texture3D resource!!!!" );
 		} else {
-			pResult = reinterpret_cast<Texture3dDX11*>( m_vResources[ID] );
+			pResult = reinterpret_cast<Texture3dDX11*>( pResource );
+		}
+	}
+
+	return( pResult );
+}
+//--------------------------------------------------------------------------------
+BufferDX11* RendererDX11::GetGenericBufferByIndex( int rid )
+{
+	// This method returns a BufferDX11 pointer, which is useful for methods that
+	// can operate on more than one type of buffer.  As long as the underlying
+	// resource is not a texture, then the pointer is returned, otherwise null
+	// is returned.
+
+	BufferDX11* pResult = 0;
+
+	ResourceDX11* pResource = GetResource(rid);
+	
+	if ( pResource != NULL ) {
+		if ( pResource->GetType() == RT_TEXTURE1D || pResource->GetType() == RT_TEXTURE2D || pResource->GetType() == RT_TEXTURE3D ) {
+			Log::Get().Write( L"Trying to access a non-buffer resource!!!!" );
+		} else {
+			pResult = reinterpret_cast<BufferDX11*>( pResource );
 		}
 	}
 
@@ -2422,17 +2430,15 @@ Texture3dDX11* RendererDX11::GetTexture3DByIndex( int rid )
 //--------------------------------------------------------------------------------
 VertexBufferDX11* RendererDX11::GetVertexBufferByIndex( int rid )
 {
-	int TYPE = rid & 0xFF0000;
-	int ID = rid & 0xFFFF;
-
 	VertexBufferDX11* pResult = 0;
 
-	if ( rid != -1 ) {
-		// Check if this ID is in range, and that the type is correct.
-		if ( !m_vResources.inrange( ID ) || (TYPE != RT_VERTEXBUFFER ) ) {
+	ResourceDX11* pResource = GetResource(rid);
+	
+	if ( pResource != NULL ) {
+		if ( pResource->GetType() != RT_VERTEXBUFFER ) {
 			Log::Get().Write( L"Trying to access a non-vertex buffer resource!!!!" );
 		} else {
-			pResult = reinterpret_cast<VertexBufferDX11*>( m_vResources[ID] );
+			pResult = reinterpret_cast<VertexBufferDX11*>( pResource );
 		}
 	}
 
@@ -2441,17 +2447,15 @@ VertexBufferDX11* RendererDX11::GetVertexBufferByIndex( int rid )
 //--------------------------------------------------------------------------------
 IndexBufferDX11* RendererDX11::GetIndexBufferByIndex( int rid )
 {
-	int TYPE = rid & 0xFF0000;
-	int ID = rid & 0xFFFF;
-
 	IndexBufferDX11* pResult = 0;
 
-	if ( rid != -1 ) {
-		// Check if this ID is in range, and that the type is correct.
-		if ( !m_vResources.inrange( ID ) || (TYPE != RT_INDEXBUFFER ) ) {
+	ResourceDX11* pResource = GetResource(rid);
+
+	if ( pResource != NULL ) {
+		if ( pResource->GetType() != RT_INDEXBUFFER ) {
 			Log::Get().Write( L"Trying to access a non-index buffer resource!!!!" );
 		} else {
-			pResult = reinterpret_cast<IndexBufferDX11*>( m_vResources[ID] );
+			pResult = reinterpret_cast<IndexBufferDX11*>( pResource );
 		}
 	}
 
@@ -2460,17 +2464,15 @@ IndexBufferDX11* RendererDX11::GetIndexBufferByIndex( int rid )
 //--------------------------------------------------------------------------------
 ByteAddressBufferDX11* RendererDX11::GetByteAddressBufferByIndex( int rid )
 {
-	int TYPE = rid & 0xFF0000;
-	int ID = rid & 0xFFFF;
-
 	ByteAddressBufferDX11* pResult = 0;
 
-	if ( rid != -1 ) {
-		// Check if this ID is in range, and that the type is correct.
-		if ( !m_vResources.inrange( ID ) || (TYPE != RT_BYTEADDRESSBUFFER ) ) {
+	ResourceDX11* pResource = GetResource(rid);
+
+	if ( pResource != NULL ) {
+		if ( pResource->GetType() != RT_BYTEADDRESSBUFFER ) {
 			Log::Get().Write( L"Trying to access a non-byte address buffer resource!!!!" );
 		} else {
-			pResult = reinterpret_cast<ByteAddressBufferDX11*>( m_vResources[ID] );
+			pResult = reinterpret_cast<ByteAddressBufferDX11*>( pResource );
 		}
 	}
 
@@ -2479,17 +2481,15 @@ ByteAddressBufferDX11* RendererDX11::GetByteAddressBufferByIndex( int rid )
 //--------------------------------------------------------------------------------
 IndirectArgsBufferDX11*	RendererDX11::GetIndirectArgsBufferByIndex( int rid )
 {
-	int TYPE = rid & 0xFF0000;
-	int ID = rid & 0xFFFF;
-
 	IndirectArgsBufferDX11* pResult = 0;
 
-	if ( rid != -1 ) {
-		// Check if this ID is in range, and that the type is correct.
-		if ( !m_vResources.inrange( ID ) || (TYPE != RT_INDIRECTARGSBUFFER ) ) {
-			Log::Get().Write( L"Trying to access a non-vertex buffer resource!!!!" );
+	ResourceDX11* pResource = GetResource(rid);			
+			
+	if ( pResource != NULL ) {
+		if ( pResource->GetType() != RT_INDIRECTARGSBUFFER ) {
+			Log::Get().Write( L"Trying to access a non-indirect args buffer resource!!!!" );
 		} else {
-			pResult = reinterpret_cast<IndirectArgsBufferDX11*>( m_vResources[ID] );
+			pResult = reinterpret_cast<IndirectArgsBufferDX11*>( pResource );
 		}
 	}
 
@@ -2498,17 +2498,15 @@ IndirectArgsBufferDX11*	RendererDX11::GetIndirectArgsBufferByIndex( int rid )
 //--------------------------------------------------------------------------------
 StructuredBufferDX11* RendererDX11::GetStructuredBufferByIndex( int rid )
 {
-	int TYPE = rid & 0xFF0000;
-	int ID = rid & 0xFFFF;
-
 	StructuredBufferDX11* pResult = 0;
 
-	if ( rid != -1 ) {
-		// Check if this ID is in range, and that the type is correct.
-		if ( !m_vResources.inrange( ID ) || (TYPE != RT_STRUCTUREDBUFFER ) ) {
+	ResourceDX11* pResource = GetResource(rid);
+
+	if ( pResource != NULL ) {
+		if ( pResource->GetType() != RT_STRUCTUREDBUFFER ) {
 			Log::Get().Write( L"Trying to access a non-structured buffer resource!!!!" );
 		} else {
-			pResult = reinterpret_cast<StructuredBufferDX11*>( m_vResources[ID] );
+			pResult = reinterpret_cast<StructuredBufferDX11*>( pResource );
 		}
 	}
 

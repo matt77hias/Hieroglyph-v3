@@ -27,6 +27,11 @@ Texture1dDX11::~Texture1dDX11()
 	SAFE_RELEASE( m_pTexture );
 }
 //--------------------------------------------------------------------------------
+ResourceType Texture1dDX11::GetType()
+{
+	return( RT_TEXTURE1D );
+}
+//--------------------------------------------------------------------------------
 D3D11_TEXTURE1D_DESC Texture1dDX11::GetActualDescription()
 {
 	ZeroMemory( &m_ActualDesc, sizeof( D3D11_TEXTURE1D_DESC ) );
@@ -45,17 +50,6 @@ D3D11_TEXTURE1D_DESC Texture1dDX11::GetDesiredDescription()
 void Texture1dDX11::SetDesiredDescription( D3D11_TEXTURE1D_DESC description )
 {
 	m_DesiredDesc = description;
-}
-//--------------------------------------------------------------------------------
-D3D11_RESOURCE_DIMENSION Texture1dDX11::GetType()
-{
-	D3D11_RESOURCE_DIMENSION dim;
-	ZeroMemory( &dim, sizeof( D3D11_RESOURCE_DIMENSION ) );
-	
-	if ( m_pTexture )
-		m_pTexture->GetType( &dim );
-
-	return( dim );
 }
 //--------------------------------------------------------------------------------
 ID3D11Resource* Texture1dDX11::GetResource()

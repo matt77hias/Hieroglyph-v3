@@ -24,6 +24,11 @@ VertexBufferDX11::~VertexBufferDX11()
 	// Buffer is released in the BufferDX11 destructor
 }
 //--------------------------------------------------------------------------------
+ResourceType VertexBufferDX11::GetType()
+{
+	return( RT_VERTEXBUFFER );
+}
+//--------------------------------------------------------------------------------
 void VertexBufferDX11::SetVertexSize( int size )
 {
 	m_iVertexSize = size;

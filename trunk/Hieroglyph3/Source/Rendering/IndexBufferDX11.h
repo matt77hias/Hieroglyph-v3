@@ -25,6 +25,8 @@ namespace Glyph3
 		IndexBufferDX11( ID3D11Buffer* pBuffer );
 		virtual ~IndexBufferDX11();
 
+		virtual ResourceType				GetType();
+
 		void						SetIndexSize( int size );
 		void						SetIndexCount( int count );
 

@@ -34,6 +34,7 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
+	class BufferDX11;
 	class VertexBufferDX11;
 	class IndexBufferDX11;
 	class ConstantBufferDX11;
@@ -315,21 +316,27 @@ namespace Glyph3
 		IParameterManager*						m_pParamMgr;
 		PipelineManagerDX11*					pImmPipeline;
 		
-	
+		// Texture resource accessors
+		
 		Texture1dDX11*				GetTexture1DByIndex( int rid );
 		Texture2dDX11*				GetTexture2DByIndex( int rid );
 		Texture3dDX11*				GetTexture3DByIndex( int rid );
+
+		// Buffer resource accessors
+
+		BufferDX11*					GetGenericBufferByIndex( int rid );
 		VertexBufferDX11*			GetVertexBufferByIndex( int rid );
 		IndexBufferDX11*			GetIndexBufferByIndex( int rid );
 		ByteAddressBufferDX11*		GetByteAddressBufferByIndex( int rid );
 		IndirectArgsBufferDX11*		GetIndirectArgsBufferByIndex( int rid );
 		StructuredBufferDX11*		GetStructuredBufferByIndex( int rid );
 
+		// Resource view accessors
+
 		RenderTargetViewDX11*		GetRenderTargetViewByIndex( int rid );
 		DepthStencilViewDX11*		GetDepthStencilViewByIndex( int rid );
 		ShaderResourceViewDX11*		GetShaderResourceViewByIndex( int rid );
 		UnorderedAccessViewDX11*	GetUnorderedAccessViewByIndex( int rid );
-
 
 	protected:
 
@@ -338,12 +345,7 @@ namespace Glyph3
 
 		TArray<IRenderView*>					m_vQueuedViews;
 
-		// Internal API for friends to use - only the rendering system should use these!
-		VertexBufferDX11* GetVertexBuffer( int index );
-		IndexBufferDX11* GetIndexBuffer( int index );
-
 		friend GeometryDX11;
-		
 	};
 };
 

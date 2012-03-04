@@ -25,12 +25,9 @@ namespace Glyph3
 		ByteAddressBufferDX11( ID3D11Buffer* pBuffer );
 		virtual ~ByteAddressBufferDX11();
 
-		//void						SetVertexSize( int size );
-		//void						SetVertexCount( int count );
+		virtual ResourceType				GetType();
 
 	protected:
-		//int							m_iVertexSize;
-		//int							m_iVertexCount;
 
 		friend RendererDX11;
 	};

@@ -29,9 +29,9 @@ bool Log::Open()
 {
 	FileSystem fs;
 
-	std::wstring filename = fs.GetLogFolder() + L"Log.txt";
+	std::wstring filename = fs.GetLogFolder() + L"\\Log.txt";
 	AppLog.open( filename.c_str() );
-	//AppLog.open( "Log.txt" );
+
 	Write( L"Log file opened." );
 
 	return( true );

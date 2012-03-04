@@ -128,17 +128,6 @@ void BufferDX11::UnMap()
 {
 }
 //--------------------------------------------------------------------------------
-D3D11_RESOURCE_DIMENSION BufferDX11::GetType()
-{
-	D3D11_RESOURCE_DIMENSION dim;
-	ZeroMemory( &dim, sizeof( D3D11_RESOURCE_DIMENSION ) );
-	
-	if ( m_pBuffer )
-		m_pBuffer->GetType( &dim );
-
-	return( dim );
-}
-//--------------------------------------------------------------------------------
 ID3D11Resource*	BufferDX11::GetResource()
 {
 	return( m_pBuffer );

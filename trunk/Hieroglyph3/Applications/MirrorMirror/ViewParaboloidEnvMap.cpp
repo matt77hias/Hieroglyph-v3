@@ -39,11 +39,9 @@ ViewParaboloidEnvMap::ViewParaboloidEnvMap( RendererDX11& Renderer, ResourcePtr 
 	
 	// Set up a viewport based on the dimensions of the resource.
 
-	ResourceDX11* pResource = Renderer.GetResource( m_RenderTarget->m_iResource & 0x0000ffff );
+	Texture2dDX11* pTexture = Renderer.GetTexture2DByIndex( m_RenderTarget->m_iResource );
 
-	if ( pResource->GetType() == D3D11_RESOURCE_DIMENSION_TEXTURE2D )
-	{
-		Texture2dDX11* pTexture = (Texture2dDX11*)pResource;
+	if ( pTexture != NULL ) {
 		D3D11_TEXTURE2D_DESC desc = pTexture->GetActualDescription();
 
 		// Create a view port to use on the scene.  This basically selects the 
@@ -57,7 +55,10 @@ ViewParaboloidEnvMap::ViewParaboloidEnvMap( RendererDX11& Renderer, ResourcePtr 
 		viewport.TopLeftY = 0;
 
 		m_iViewport = Renderer.CreateViewPort( viewport );
+	} else {
+		// TODO: Fail here...
 	}
+
 
 	
 	// Get references to the parameters that will be used.

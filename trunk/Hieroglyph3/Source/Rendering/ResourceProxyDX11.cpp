@@ -75,12 +75,13 @@ ResourceProxyDX11::ResourceProxyDX11( int ResourceID, Texture3dConfigDX11* pConf
                                      RenderTargetViewConfigDX11* pRTVConfig,
                                      UnorderedAccessViewConfigDX11* pUAVConfig )
 {
-    // Retain the renderer's resource ID and configuration.
-    m_pTexture3dConfig = new Texture3dConfigDX11();
-    *m_pTexture3dConfig = *pConfig;	
-
     D3D11_TEXTURE3D_DESC desc = pConfig->GetTextureDesc();
     CommonConstructor( desc.BindFlags, ResourceID, pRenderer, pSRVConfig, pRTVConfig, pUAVConfig );	
+
+    // Retain the renderer's configuration.
+
+    m_pTexture3dConfig = new Texture3dConfigDX11();
+    *m_pTexture3dConfig = *pConfig;	
 }
 //--------------------------------------------------------------------------------
 ResourceProxyDX11::ResourceProxyDX11()

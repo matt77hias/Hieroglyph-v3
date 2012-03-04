@@ -549,23 +549,23 @@ void PipelineManagerDX11::Dispatch( RenderEffectDX11& effect, UINT x, UINT y, UI
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::CopyStructureCount( ResourcePtr dest, UINT offset, ResourcePtr uav )
 {
-	int Type = dest->m_iResource & 0x00FF0000;
-	int ID = dest->m_iResource & 0x0000FFFF;
+	int id = dest->m_iResource;
 
-	if ( Type != RT_INDIRECTARGSBUFFER )
-	{
-		Log::Get().Write( L"Tried to use the wrong resource type for an indirect drawing!" );
-		return;
+	BufferDX11* pArgsBuffer = RendererDX11::Get()->GetGenericBufferByIndex( id );
+	ID3D11Buffer* pRawArgsBuffer = 0;
+
+	if ( pArgsBuffer ) {
+		pRawArgsBuffer = (ID3D11Buffer*)pArgsBuffer->GetResource(); // TODO: add ID3D11Buffer accessor to the buffer resource classes!
 	}
 
-	ID3D11Buffer* pArgsBuffer = (ID3D11Buffer*)RendererDX11::Get()->GetResource( ID )->GetResource();
-
 	UnorderedAccessViewDX11* pView = RendererDX11::Get()->GetUnorderedAccessViewByIndex( uav->m_iResourceUAV );
+	ID3D11UnorderedAccessView* pRawView = 0;
 
-	ID3D11UnorderedAccessView* pSrcView = pView->m_pUnorderedAccessView;
+	if ( pView ) {
+		pRawView = pView->m_pUnorderedAccessView;
+	}
 
-	m_pContext->CopyStructureCount( pArgsBuffer, offset, pSrcView );
-
+	m_pContext->CopyStructureCount( pRawArgsBuffer, offset, pRawView );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth, UINT stencil )
@@ -865,11 +865,9 @@ void PipelineManagerDX11::ResolveSubresource( ResourcePtr DestResource, UINT Dst
                                               ResourcePtr SrcResource, UINT SrcSubresource, 
                                               DXGI_FORMAT format )
 {
-    int DestType = DestResource->m_iResource & 0x00FF0000;
     int DestID = DestResource->m_iResource & 0x0000FFFF;
     ID3D11Resource* pDestResource = RendererDX11::Get()->GetResource(DestID)->GetResource();
 
-    int SrcType = SrcResource->m_iResource & 0x00FF0000;
     int SrcID = SrcResource->m_iResource & 0x0000FFFF;
     ID3D11Resource* pSrcResource = RendererDX11::Get()->GetResource(SrcID)->GetResource();
  

@@ -52,7 +52,6 @@ namespace Glyph3
 		void*						Map();
 		void						UnMap();
 
-		virtual D3D11_RESOURCE_DIMENSION	GetType();
 		virtual ID3D11Resource*				GetResource();
 
 		virtual UINT						GetEvictionPriority();

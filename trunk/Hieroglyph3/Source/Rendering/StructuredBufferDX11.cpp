@@ -24,3 +24,8 @@ StructuredBufferDX11::~StructuredBufferDX11()
 	// Buffer is released in the BufferDX11 destructor
 }
 //--------------------------------------------------------------------------------
+ResourceType StructuredBufferDX11::GetType()
+{
+	return( RT_STRUCTUREDBUFFER );
+}
+//--------------------------------------------------------------------------------

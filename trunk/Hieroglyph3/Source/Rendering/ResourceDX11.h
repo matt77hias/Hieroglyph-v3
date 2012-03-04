@@ -29,7 +29,7 @@ namespace Glyph3
 	public:
 		virtual ~ResourceDX11() {};
 
-		virtual D3D11_RESOURCE_DIMENSION	GetType() = 0;
+		virtual ResourceType				GetType() = 0;
 		virtual ID3D11Resource*				GetResource() = 0;
 
 		virtual UINT						GetEvictionPriority() = 0;

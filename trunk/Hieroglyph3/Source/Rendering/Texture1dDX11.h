@@ -29,7 +29,7 @@ namespace Glyph3
 		D3D11_TEXTURE1D_DESC		GetDesiredDescription();
 		void						SetDesiredDescription( D3D11_TEXTURE1D_DESC description );
 
-		virtual D3D11_RESOURCE_DIMENSION	GetType();
+		virtual ResourceType				GetType();
 		virtual ID3D11Resource*				GetResource();
 
 		virtual UINT						GetEvictionPriority();

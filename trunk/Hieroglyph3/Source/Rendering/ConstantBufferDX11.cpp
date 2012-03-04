@@ -25,6 +25,11 @@ ConstantBufferDX11::~ConstantBufferDX11()
 	// Buffer is released in the BufferDX11 destructor
 }
 //--------------------------------------------------------------------------------
+ResourceType ConstantBufferDX11::GetType()
+{
+	return( RT_CONSTANTBUFFER );
+}
+//--------------------------------------------------------------------------------
 void ConstantBufferDX11::SetConstantSize( int size )
 {
 	m_iConstantSize = size;

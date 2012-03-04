@@ -25,6 +25,7 @@ namespace Glyph3
 		IndirectArgsBufferDX11( ID3D11Buffer* pBuffer );
 		virtual ~IndirectArgsBufferDX11();
 
+		virtual ResourceType				GetType();
 
 	protected:
 

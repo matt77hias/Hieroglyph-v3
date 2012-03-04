@@ -25,6 +25,8 @@ namespace Glyph3
 		ConstantBufferDX11( ID3D11Buffer* pBuffer );
 		virtual ~ConstantBufferDX11();
 
+		virtual ResourceType				GetType();
+
 		void						SetConstantSize( int size );
 		void						SetConstantCount( int count );
 		void						SetAutoUpdate( bool enable );

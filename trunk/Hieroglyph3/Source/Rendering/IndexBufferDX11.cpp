@@ -24,6 +24,11 @@ IndexBufferDX11::~IndexBufferDX11()
 	// Buffer is released in the BufferDX11 destructor
 }
 //--------------------------------------------------------------------------------
+ResourceType IndexBufferDX11::GetType()
+{
+	return( RT_INDEXBUFFER );
+}
+//--------------------------------------------------------------------------------
 void IndexBufferDX11::SetIndexSize( int size )
 {
 	m_iIndexSize = size;

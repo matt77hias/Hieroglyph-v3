@@ -25,6 +25,8 @@ namespace Glyph3
 		StructuredBufferDX11( ID3D11Buffer* pBuffer );
 		virtual ~StructuredBufferDX11();
 
+		virtual ResourceType				GetType();
+
 	protected:
 
 		friend RendererDX11;
