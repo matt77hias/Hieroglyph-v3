@@ -245,7 +245,6 @@ namespace Glyph3
 		DepthStencilStatePtr							GetDepthState( int index );
 		RasterizerStatePtr								GetRasterizerState( int index );
 		ViewPortDX11*									GetViewPort( int index );
-		ResourceDX11*									GetResource( int index );
 
 		InputLayoutDX11*								GetInputLayout( int index );
 		SamplerStateDX11*								GetSamplerState( int index );
@@ -315,7 +314,9 @@ namespace Glyph3
 	public:
 		IParameterManager*						m_pParamMgr;
 		PipelineManagerDX11*					pImmPipeline;
-		
+
+		ResourceDX11*				GetResourceByIndex( int index );
+
 		// Texture resource accessors
 		
 		Texture1dDX11*				GetTexture1DByIndex( int rid );
@@ -325,6 +326,7 @@ namespace Glyph3
 		// Buffer resource accessors
 
 		BufferDX11*					GetGenericBufferByIndex( int rid );
+		ConstantBufferDX11*			GetConstantBufferByIndex( int rid );
 		VertexBufferDX11*			GetVertexBufferByIndex( int rid );
 		IndexBufferDX11*			GetIndexBufferByIndex( int rid );
 		ByteAddressBufferDX11*		GetByteAddressBufferByIndex( int rid );

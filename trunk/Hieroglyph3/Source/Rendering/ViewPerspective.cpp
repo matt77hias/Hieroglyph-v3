@@ -33,7 +33,7 @@ ViewPerspective::ViewPerspective( RendererDX11& Renderer, ResourcePtr RenderTarg
 	m_pEntity = 0;
 	m_vColor.MakeZero();
 
-	ResourceDX11* pResource = Renderer.GetResource( m_RenderTarget->m_iResource & 0x0000ffff );
+	ResourceDX11* pResource = Renderer.GetResourceByIndex( m_RenderTarget->m_iResource );
 
 	if ( pResource->GetType() == RT_TEXTURE2D )
 	{

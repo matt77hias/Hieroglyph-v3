@@ -103,12 +103,14 @@ void ShaderDX11::UpdateParameters( PipelineManagerDX11* pPipeline, IParameterMan
 				pParamManager->SetConstantBufferParameter( ConstantBuffers[i].pParamRef, resource );
 			}
 
-			// Test the index to ensure that it is a constant buffer
-			if ( (index & 0x00FF0000) == RT_CONSTANTBUFFER ) 
+
+			// Check if the resource is a constant buffer before accessing it!
+			ConstantBufferDX11* pBuffer = RendererDX11::Get()->GetConstantBufferByIndex( index );
+
+			// Test the index to ensure that it is a constant buffer.  If the method above returns
+			// a non-null result, then this is a constant buffer.
+			if ( pBuffer ) 
 			{
-				// TODO: Check if the resource is a constant buffer before accessing it!
-				ConstantBufferDX11* pBuffer = (ConstantBufferDX11*)RendererDX11::Get()->GetResource( index & 0x0000FFFF );
-				
 				if ( pBuffer->GetAutoUpdate() )
 				{
 					// Map the constant buffer into system memory.  We map the buffer 

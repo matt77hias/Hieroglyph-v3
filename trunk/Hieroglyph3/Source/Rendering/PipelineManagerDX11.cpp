@@ -111,9 +111,9 @@ void PipelineManagerDX11::BindConstantBufferParameter( ShaderType type, RenderPa
 		// Check the type of the parameter
 		if ( pParam->GetParameterType() == CBUFFER ) {
 			ConstantBufferParameterDX11* pBuffer = reinterpret_cast<ConstantBufferParameterDX11*>( pParam );
-			int ID = ( pBuffer->GetIndex( tID ) & 0xffff ); 
+			int ID = pBuffer->GetIndex( tID ); 
 
-			ResourceDX11* pResource = pRenderer->GetResource( ID );
+			ResourceDX11* pResource = pRenderer->GetResourceByIndex( ID );
 
 			// Allow a range including -1 up to the number of resources
 			if ( pResource || ( ID == -1 ) ) {
@@ -479,16 +479,15 @@ void PipelineManagerDX11::DispatchIndirect( RenderEffectDX11& effect,
 {
 	// Use the effect to load all of the pipeline stages here.
 
-	int Type = args->m_iResource & 0x00FF0000;
-	int ID = args->m_iResource & 0x0000FFFF;
+	BufferDX11* pBuffer = RendererDX11::Get()->GetIndirectArgsBufferByIndex( args->m_iResource );
 
-	if ( Type != RT_INDIRECTARGSBUFFER )
-	{
+
+	if ( pBuffer == NULL ) 	{
 		Log::Get().Write( L"Tried to use the wrong resource type for an indirect dispatch!" );
 		return;
 	}
 
-	ID3D11Buffer* pArgsBuffer = (ID3D11Buffer*)RendererDX11::Get()->GetResource( ID )->GetResource();
+	ID3D11Buffer* pArgsBuffer = (ID3D11Buffer*)pBuffer->GetResource();
 
 
 	ClearPipelineResources();
@@ -638,13 +637,10 @@ void PipelineManagerDX11::BindShader( ShaderType type, int ID, IParameterManager
 //--------------------------------------------------------------------------------
 D3D11_MAPPED_SUBRESOURCE PipelineManagerDX11::MapResource( int index, UINT subresource, D3D11_MAP actions, UINT flags )
 {
-	int TYPE	= index & 0x00FF0000;
-	int ID		= index & 0x0000FFFF;
-
 	ID3D11Resource* pResource = 0;
 	D3D11_MAPPED_SUBRESOURCE Data;
 
-	pResource = RendererDX11::Get()->GetResource( ID )->GetResource();
+	pResource = RendererDX11::Get()->GetResourceByIndex( index )->GetResource();
 
 	// Map the resource
 	HRESULT hr = m_pContext->Map( pResource, subresource, actions, flags, &Data );
@@ -657,12 +653,9 @@ D3D11_MAPPED_SUBRESOURCE PipelineManagerDX11::MapResource( int index, UINT subre
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::UnMapResource( int index, UINT subresource )
 {
-	int TYPE	= index & 0x00FF0000;
-	int ID		= index & 0x0000FFFF;
-
 	ID3D11Resource* pResource = 0;
 
-	pResource = RendererDX11::Get()->GetResource( ID )->GetResource();
+	pResource = RendererDX11::Get()->GetResourceByIndex( index )->GetResource();
 
 	// Unmap the resource - there is no HRESULT returned, so trust that it works...
 	m_pContext->Unmap( pResource, subresource );
@@ -712,12 +705,8 @@ std::wstring PipelineManagerDX11::PrintPipelineStatistics( )
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::SaveTextureScreenShot( int index, std::wstring filename, D3DX11_IMAGE_FILE_FORMAT format )
 {
-	// Get the index from the handle
-	int TYPE	= index & 0x00FF0000;
-	int ID		= index & 0x0000FFFF;
-
 	// Get the texture as a resource and save it to file
-	ID3D11Resource* pResource = RendererDX11::Get()->GetResource( ID )->GetResource();
+	ID3D11Resource* pResource = RendererDX11::Get()->GetResourceByIndex( index )->GetResource();
 
 	if ( pResource )
 	{
@@ -773,17 +762,11 @@ void PipelineManagerDX11::SaveTextureScreenShot( int index, std::wstring filenam
 	}
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::CopySubresourceRegion( ResourcePtr DestResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ,
-	ResourcePtr SrcResource, UINT SrcSubresource, D3D11_BOX* pSrcBox )
+void PipelineManagerDX11::CopySubresourceRegion( ResourcePtr DestResource, UINT DstSubresource, 
+	UINT DstX, UINT DstY, UINT DstZ, ResourcePtr SrcResource, UINT SrcSubresource, D3D11_BOX* pSrcBox )
 {
-	int DestType = DestResource->m_iResource & 0x00FF0000;
-	int DestID = DestResource->m_iResource & 0x0000FFFF;
-	ID3D11Resource* pDestResource = RendererDX11::Get()->GetResource(DestID)->GetResource();
-
-
-	int SrcType = SrcResource->m_iResource & 0x00FF0000;
-	int SrcID = SrcResource->m_iResource & 0x0000FFFF;
-	ID3D11Resource* pSrcResource = RendererDX11::Get()->GetResource(SrcID)->GetResource();
+	ID3D11Resource* pDestResource = RendererDX11::Get()->GetResourceByIndex(DestResource->m_iResource)->GetResource();
+	ID3D11Resource* pSrcResource = RendererDX11::Get()->GetResourceByIndex(SrcResource->m_iResource)->GetResource();
 
 	m_pContext->CopySubresourceRegion( pDestResource, DstSubresource, DstX, DstY, DstZ,
 		pSrcResource, SrcSubresource, pSrcBox );
@@ -865,11 +848,11 @@ void PipelineManagerDX11::ResolveSubresource( ResourcePtr DestResource, UINT Dst
                                               ResourcePtr SrcResource, UINT SrcSubresource, 
                                               DXGI_FORMAT format )
 {
-    int DestID = DestResource->m_iResource & 0x0000FFFF;
-    ID3D11Resource* pDestResource = RendererDX11::Get()->GetResource(DestID)->GetResource();
+    int DestID = DestResource->m_iResource;
+    ID3D11Resource* pDestResource = RendererDX11::Get()->GetResourceByIndex(DestID)->GetResource();
 
-    int SrcID = SrcResource->m_iResource & 0x0000FFFF;
-    ID3D11Resource* pSrcResource = RendererDX11::Get()->GetResource(SrcID)->GetResource();
+    int SrcID = SrcResource->m_iResource;
+    ID3D11Resource* pSrcResource = RendererDX11::Get()->GetResourceByIndex(SrcID)->GetResource();
  
     m_pContext->ResolveSubresource( pDestResource, DstSubresource, pSrcResource, SrcSubresource, format );
 }

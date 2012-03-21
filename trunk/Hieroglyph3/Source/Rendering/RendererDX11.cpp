@@ -461,7 +461,7 @@ int RendererDX11::CreateSwapChain( SwapChainConfigDX11* pConfig )
 	// If we get here, then we succeeded in creating our swap chain and it's constituent parts.
 	// Now we create the wrapper object and store the result in our container.
 
-	int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE2D;
+	int ResourceID = ( m_vResources.count() - 1 );
 	Texture2dConfigDX11 TextureConfig;
 	pSwapChainBuffer->GetDesc( &TextureConfig.m_State );
 
@@ -490,7 +490,7 @@ ResourcePtr RendererDX11::CreateVertexBuffer( BufferConfigDX11* pConfig,  D3D11_
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
 
-		int ResourceID = ( m_vResources.count() - 1 ) + RT_VERTEXBUFFER;
+		int ResourceID = ( m_vResources.count() - 1 );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
 
 		return( Proxy );
@@ -515,7 +515,7 @@ ResourcePtr RendererDX11::CreateIndexBuffer( BufferConfigDX11* pConfig,  D3D11_S
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
 
-		int ResourceID = ( m_vResources.count() - 1 ) + RT_INDEXBUFFER;
+		int ResourceID = ( m_vResources.count() - 1 );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
 
 		return( Proxy );
@@ -540,7 +540,7 @@ ResourcePtr RendererDX11::CreateStructuredBuffer( BufferConfigDX11* pConfig,  D3
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
 
-		int ResourceID = ( m_vResources.count() - 1 ) + RT_STRUCTUREDBUFFER;
+		int ResourceID = ( m_vResources.count() - 1 );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
 
 		return( Proxy );
@@ -565,7 +565,7 @@ ResourcePtr RendererDX11::CreateByteAddressBuffer( BufferConfigDX11* pConfig,  D
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
 
-		int ResourceID = ( m_vResources.count() - 1 ) + RT_BYTEADDRESSBUFFER;
+		int ResourceID = ( m_vResources.count() - 1 );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
 
 		return( Proxy );
@@ -590,7 +590,7 @@ ResourcePtr RendererDX11::CreateIndirectArgsBuffer( BufferConfigDX11* pConfig,  
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
 
-		int ResourceID = ( m_vResources.count() - 1 ) + RT_INDIRECTARGSBUFFER;
+		int ResourceID = ( m_vResources.count() - 1 );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
 
 		return( Proxy );
@@ -616,7 +616,7 @@ ResourcePtr RendererDX11::CreateConstantBuffer( BufferConfigDX11* pConfig,  D3D1
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		int ResourceID = ( m_vResources.count() - 1 ) + RT_CONSTANTBUFFER;
+		int ResourceID = ( m_vResources.count() - 1 );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
 
 		return( Proxy );
@@ -641,7 +641,7 @@ ResourcePtr RendererDX11::CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_S
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE1D;
+		int ResourceID = ( m_vResources.count() - 1 );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this, pSRVConfig, pRTVConfig, pUAVConfig ) );
 
 		return( Proxy );
@@ -667,7 +667,7 @@ ResourcePtr RendererDX11::CreateTexture2D( Texture2dConfigDX11* pConfig, D3D11_S
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE2D;
+		int ResourceID = ( m_vResources.count() - 1 );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this, pSRVConfig, pRTVConfig, pUAVConfig, pDSVConfig ) );
 
 		return( Proxy );
@@ -692,7 +692,7 @@ ResourcePtr RendererDX11::CreateTexture3D( Texture3dConfigDX11* pConfig, D3D11_S
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE3D;
+		int ResourceID = ( m_vResources.count() - 1 );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this, pSRVConfig, pRTVConfig, pUAVConfig ) );
 
 		return( Proxy );
@@ -703,25 +703,22 @@ ResourcePtr RendererDX11::CreateTexture3D( Texture3dConfigDX11* pConfig, D3D11_S
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateShaderResourceView( int ResourceID, D3D11_SHADER_RESOURCE_VIEW_DESC* pDesc )
 {
-	int TYPE = ResourceID & 0xFF0000;
-	int ID = ResourceID & 0xFFFF;
-	ID3D11Resource* pResource = 0;
+	ID3D11Resource* pRawResource = 0;
+	ResourceDX11* pResource = GetResourceByIndex( ResourceID );
+	
+	if ( pResource ) {
+		pRawResource = pResource->GetResource();
 
-	// Check if this ID is in range
-	if ( m_vResources.inrange( ID ) )
-		pResource = m_vResources[ID]->GetResource();
+		if ( pRawResource ) {
+			ID3D11ShaderResourceView* pView = 0;
+			HRESULT hr = m_pDevice->CreateShaderResourceView( pRawResource, pDesc, &pView );
 
-	if ( pResource )
-	{
-		ID3D11ShaderResourceView* pView = 0;
-		HRESULT hr = m_pDevice->CreateShaderResourceView( pResource, pDesc, &pView );
+			if ( pView ) {
+				ShaderResourceViewDX11* pShaderResource = new ShaderResourceViewDX11( pView );
+				m_vShaderResourceViews.add( pShaderResource );
 
-		if ( pView )
-		{
-			ShaderResourceViewDX11* pShaderResource = new ShaderResourceViewDX11( pView );
-			m_vShaderResourceViews.add( pShaderResource );
-
-			return( m_vShaderResourceViews.count() - 1 );
+				return( m_vShaderResourceViews.count() - 1 );
+			}
 		}
 	}
 
@@ -730,25 +727,22 @@ int RendererDX11::CreateShaderResourceView( int ResourceID, D3D11_SHADER_RESOURC
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateRenderTargetView( int ResourceID, D3D11_RENDER_TARGET_VIEW_DESC* pDesc )
 {
-	int TYPE = ResourceID & 0xFF0000;
-	int ID = ResourceID & 0xFFFF;
-	ID3D11Resource* pResource = 0;
+	ID3D11Resource* pRawResource = 0;
+	ResourceDX11* pResource = GetResourceByIndex( ResourceID );
+	
+	if ( pResource ) {
+		pRawResource = pResource->GetResource();
 
-	// Check if this ID is in range
-	if ( m_vResources.inrange( ID ) )
-		pResource = m_vResources[ID]->GetResource();
+		if ( pRawResource ) {
+			ID3D11RenderTargetView* pView = 0;
+			HRESULT hr = m_pDevice->CreateRenderTargetView( pRawResource, pDesc, &pView );
 
-	if ( pResource )
-	{
-		ID3D11RenderTargetView* pView = 0;
-		HRESULT hr = m_pDevice->CreateRenderTargetView( pResource, pDesc, &pView );
+			if ( pView ) {
+				RenderTargetViewDX11* pRenderTarget = new RenderTargetViewDX11( pView );
+				m_vRenderTargetViews.add( pRenderTarget );
 
-		if ( pView )
-		{
-			RenderTargetViewDX11* pRenderTarget = new RenderTargetViewDX11( pView );
-			m_vRenderTargetViews.add( pRenderTarget );
-
-			return( m_vRenderTargetViews.count() - 1 );
+				return( m_vRenderTargetViews.count() - 1 );
+			}
 		}
 	}
 
@@ -757,25 +751,23 @@ int RendererDX11::CreateRenderTargetView( int ResourceID, D3D11_RENDER_TARGET_VI
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateDepthStencilView( int ResourceID, D3D11_DEPTH_STENCIL_VIEW_DESC* pDesc )
 {
-	int TYPE = ResourceID & 0x00FF0000;
-	int ID = ResourceID & 0x0000FFFF;
-	ID3D11Resource* pResource = 0;
+	ID3D11Resource* pRawResource = 0;
+	ResourceDX11* pResource = GetResourceByIndex( ResourceID );
+	
+	if ( pResource ) {
+		pRawResource = pResource->GetResource();
 
-	// Check if this ID is in range
-	if ( m_vResources.inrange( ID ) )
-		pResource = m_vResources[ID]->GetResource();
+		if ( pRawResource ) {
 
-	if ( pResource )
-	{
-		ID3D11DepthStencilView* pView = 0;
-		HRESULT hr = m_pDevice->CreateDepthStencilView( pResource, pDesc, &pView );
+			ID3D11DepthStencilView* pView = 0;
+			HRESULT hr = m_pDevice->CreateDepthStencilView( pRawResource, pDesc, &pView );
 
-		if ( pView )
-		{
-			DepthStencilViewDX11* pDepthStencil = new DepthStencilViewDX11( pView );
-			m_vDepthStencilViews.add( pDepthStencil );
+			if ( pView ) {
+				DepthStencilViewDX11* pDepthStencil = new DepthStencilViewDX11( pView );
+				m_vDepthStencilViews.add( pDepthStencil );
 
-			return( m_vDepthStencilViews.count() - 1 );
+				return( m_vDepthStencilViews.count() - 1 );
+			}
 		}
 	}
 
@@ -784,25 +776,22 @@ int RendererDX11::CreateDepthStencilView( int ResourceID, D3D11_DEPTH_STENCIL_VI
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateUnorderedAccessView( int ResourceID, D3D11_UNORDERED_ACCESS_VIEW_DESC* pDesc )
 {
-	int TYPE = ResourceID & 0xFF0000;
-	int ID = ResourceID & 0xFFFF;
-	ID3D11Resource* pResource = 0;
+	ID3D11Resource* pRawResource = 0;
+	ResourceDX11* pResource = GetResourceByIndex( ResourceID );
+	
+	if ( pResource ) {
+		pRawResource = pResource->GetResource();
 
-	// Check if this ID is in range
-	if ( m_vResources.inrange( ID ) )
-		pResource = m_vResources[ID]->GetResource();
+		if ( pRawResource ) {
+			ID3D11UnorderedAccessView* pView = 0;
+			HRESULT hr = m_pDevice->CreateUnorderedAccessView( pRawResource, pDesc, &pView );
 
-	if ( pResource )
-	{
-		ID3D11UnorderedAccessView* pView = 0;
-		HRESULT hr = m_pDevice->CreateUnorderedAccessView( pResource, pDesc, &pView );
+			if ( pView ) {
+				UnorderedAccessViewDX11* pUnorderedAccess = new UnorderedAccessViewDX11( pView );
+				m_vUnorderedAccessViews.add( pUnorderedAccess );
 
-		if ( pView )
-		{
-			UnorderedAccessViewDX11* pUnorderedAccess = new UnorderedAccessViewDX11( pView );
-			m_vUnorderedAccessViews.add( pUnorderedAccess );
-
-			return( m_vUnorderedAccessViews.count() - 1 );
+				return( m_vUnorderedAccessViews.count() - 1 );
+			}
 		}
 	}
 
@@ -844,11 +833,10 @@ void RendererDX11::ResizeTextureSRV( int RID, int SRVID, UINT width, UINT height
 		return;
 	}
 
-	int TYPE = RID & 0xFF0000;
-	int ID = RID & 0xFFFF;
+	ResourceDX11* pResource = GetResourceByIndex( RID );
 
 	// Check that the input resources / views are legit.
-	if ( !m_vResources.inrange( ID ) || !m_vShaderResourceViews.inrange( SRVID ) || (TYPE != RT_TEXTURE2D ) ) {
+	if ( !pResource || !m_vShaderResourceViews.inrange( SRVID ) || (pResource->GetType() != RT_TEXTURE2D ) ) {
 		Log::Get().Write( L"Error trying to resize a SRV!!!!" );
 		return;
 	}
@@ -862,7 +850,7 @@ void RendererDX11::ResizeTextureSRV( int RID, int SRVID, UINT width, UINT height
 	
 	// Create the new one.
 	ID3D11ShaderResourceView* pView = 0;
-	HRESULT hr = m_pDevice->CreateShaderResourceView( m_vResources[ID]->GetResource(), &SRVDesc, &pView );
+	HRESULT hr = m_pDevice->CreateShaderResourceView( pResource->GetResource(), &SRVDesc, &pView );
 
 	// Release the old one and replace it with the new one.
 	pOldSRV->m_pShaderResourceView->Release();
@@ -876,11 +864,10 @@ void RendererDX11::ResizeTextureRTV( int RID, int RTVID, UINT width, UINT height
 		return;
 	}
 
-	int TYPE = RID & 0xFF0000;
-	int ID = RID & 0xFFFF;
+	ResourceDX11* pResource = GetResourceByIndex( RID );
 
 	// Check that the input resources / views are legit.
-	if ( !m_vResources.inrange( ID ) || !m_vRenderTargetViews.inrange( RTVID ) || (TYPE != RT_TEXTURE2D ) ) {
+	if ( !pResource || !m_vRenderTargetViews.inrange( RTVID ) || (pResource->GetType() != RT_TEXTURE2D ) ) {
 		Log::Get().Write( L"Error trying to resize a RTV!!!!" );
 		return;
 	}
@@ -894,7 +881,7 @@ void RendererDX11::ResizeTextureRTV( int RID, int RTVID, UINT width, UINT height
 	
 	// Create the new one.
 	ID3D11RenderTargetView* pView = 0;
-	HRESULT hr = m_pDevice->CreateRenderTargetView( m_vResources[ID]->GetResource(), &RTVDesc, &pView );
+	HRESULT hr = m_pDevice->CreateRenderTargetView( pResource->GetResource(), &RTVDesc, &pView );
 
 	// Release the old one and replace it with the new one.
 	pOldRTV->m_pRenderTargetView->Release();
@@ -908,11 +895,10 @@ void RendererDX11::ResizeTextureDSV( int RID, int DSVID, UINT width, UINT height
 		return;
 	}
 
-	int TYPE = RID & 0xFF0000;
-	int ID = RID & 0xFFFF;
+	ResourceDX11* pResource = GetResourceByIndex( RID );
 
 	// Check that the input resources / views are legit.
-	if ( !m_vResources.inrange( ID ) || !m_vDepthStencilViews.inrange( DSVID ) || (TYPE != RT_TEXTURE2D ) ) {
+	if ( !pResource || !m_vDepthStencilViews.inrange( DSVID ) || (pResource->GetType() != RT_TEXTURE2D ) ) {
 		Log::Get().Write( L"Error trying to resize a DSV!!!!" );
 		return;
 	}
@@ -926,7 +912,7 @@ void RendererDX11::ResizeTextureDSV( int RID, int DSVID, UINT width, UINT height
 	
 	// Create the new one.
 	ID3D11DepthStencilView* pView = 0;
-	HRESULT hr = m_pDevice->CreateDepthStencilView( m_vResources[ID]->GetResource(), &DSVDesc, &pView );
+	HRESULT hr = m_pDevice->CreateDepthStencilView( pResource->GetResource(), &DSVDesc, &pView );
 
 	// Release the old one and replace it with the new one.
 	pOldDSV->m_pDepthStencilView->Release();
@@ -940,11 +926,10 @@ void RendererDX11::ResizeTextureUAV( int RID, int UAVID, UINT width, UINT height
 		return;
 	}
 
-	int TYPE = RID & 0xFF0000;
-	int ID = RID & 0xFFFF;
+	ResourceDX11* pResource = GetResourceByIndex( RID );
 
 	// Check that the input resources / views are legit.
-	if ( !m_vResources.inrange( ID ) || !m_vUnorderedAccessViews.inrange( UAVID ) || (TYPE != RT_TEXTURE2D ) ) {
+	if ( !pResource || !m_vUnorderedAccessViews.inrange( UAVID ) || (pResource->GetType() != RT_TEXTURE2D ) ) {
 		Log::Get().Write( L"Error trying to resize a UAV!!!!" );
 		return;
 	}
@@ -958,7 +943,7 @@ void RendererDX11::ResizeTextureUAV( int RID, int UAVID, UINT width, UINT height
 	
 	// Create the new one.
 	ID3D11UnorderedAccessView* pView = 0;
-	HRESULT hr = m_pDevice->CreateUnorderedAccessView( m_vResources[ID]->GetResource(), &UAVDesc, &pView );
+	HRESULT hr = m_pDevice->CreateUnorderedAccessView( pResource->GetResource(), &UAVDesc, &pView );
 
 	// Release the old one and replace it with the new one.
 	pOldUAV->m_pUnorderedAccessView->Release();
@@ -2163,7 +2148,7 @@ ViewPortDX11* RendererDX11::GetViewPort( int index )
 	return( m_vViewPorts[index] );
 }
 //--------------------------------------------------------------------------------
-ResourceDX11* RendererDX11::GetResource( int index )
+ResourceDX11* RendererDX11::GetResourceByIndex( int index )
 {
 	ResourceDX11* pResource = 0;
 
@@ -2359,7 +2344,7 @@ Texture1dDX11* RendererDX11::GetTexture1DByIndex( int rid )
 {
 	Texture1dDX11* pResult = 0;
 
-	ResourceDX11* pResource = GetResource(rid);
+	ResourceDX11* pResource = GetResourceByIndex(rid);
 
 	if ( pResource != NULL ) {
 		if ( pResource->GetType() != RT_TEXTURE1D ) {
@@ -2376,7 +2361,7 @@ Texture2dDX11* RendererDX11::GetTexture2DByIndex( int rid )
 {
 	Texture2dDX11* pResult = 0;
 
-	ResourceDX11* pResource = GetResource(rid);
+	ResourceDX11* pResource = GetResourceByIndex(rid);
 
 	if ( pResource != NULL ) {
 		if ( pResource->GetType() != RT_TEXTURE2D ) {
@@ -2393,7 +2378,7 @@ Texture3dDX11* RendererDX11::GetTexture3DByIndex( int rid )
 {
 	Texture3dDX11* pResult = 0;
 
-	ResourceDX11* pResource = GetResource(rid);
+	ResourceDX11* pResource = GetResourceByIndex(rid);
 	
 	if ( pResource != NULL ) {
 		if ( pResource->GetType() != RT_TEXTURE3D ) {
@@ -2415,7 +2400,7 @@ BufferDX11* RendererDX11::GetGenericBufferByIndex( int rid )
 
 	BufferDX11* pResult = 0;
 
-	ResourceDX11* pResource = GetResource(rid);
+	ResourceDX11* pResource = GetResourceByIndex(rid);
 	
 	if ( pResource != NULL ) {
 		if ( pResource->GetType() == RT_TEXTURE1D || pResource->GetType() == RT_TEXTURE2D || pResource->GetType() == RT_TEXTURE3D ) {
@@ -2428,11 +2413,28 @@ BufferDX11* RendererDX11::GetGenericBufferByIndex( int rid )
 	return( pResult );
 }
 //--------------------------------------------------------------------------------
+ConstantBufferDX11* RendererDX11::GetConstantBufferByIndex( int rid )
+{
+	ConstantBufferDX11* pResult = 0;
+
+	ResourceDX11* pResource = GetResourceByIndex(rid);
+	
+	if ( pResource != NULL ) {
+		if ( pResource->GetType() != RT_CONSTANTBUFFER ) {
+			Log::Get().Write( L"Trying to access a non-vertex buffer resource!!!!" );
+		} else {
+			pResult = reinterpret_cast<ConstantBufferDX11*>( pResource );
+		}
+	}
+
+	return( pResult );
+}
+//--------------------------------------------------------------------------------
 VertexBufferDX11* RendererDX11::GetVertexBufferByIndex( int rid )
 {
 	VertexBufferDX11* pResult = 0;
 
-	ResourceDX11* pResource = GetResource(rid);
+	ResourceDX11* pResource = GetResourceByIndex(rid);
 	
 	if ( pResource != NULL ) {
 		if ( pResource->GetType() != RT_VERTEXBUFFER ) {
@@ -2449,7 +2451,7 @@ IndexBufferDX11* RendererDX11::GetIndexBufferByIndex( int rid )
 {
 	IndexBufferDX11* pResult = 0;
 
-	ResourceDX11* pResource = GetResource(rid);
+	ResourceDX11* pResource = GetResourceByIndex(rid);
 
 	if ( pResource != NULL ) {
 		if ( pResource->GetType() != RT_INDEXBUFFER ) {
@@ -2466,7 +2468,7 @@ ByteAddressBufferDX11* RendererDX11::GetByteAddressBufferByIndex( int rid )
 {
 	ByteAddressBufferDX11* pResult = 0;
 
-	ResourceDX11* pResource = GetResource(rid);
+	ResourceDX11* pResource = GetResourceByIndex(rid);
 
 	if ( pResource != NULL ) {
 		if ( pResource->GetType() != RT_BYTEADDRESSBUFFER ) {
@@ -2483,7 +2485,7 @@ IndirectArgsBufferDX11*	RendererDX11::GetIndirectArgsBufferByIndex( int rid )
 {
 	IndirectArgsBufferDX11* pResult = 0;
 
-	ResourceDX11* pResource = GetResource(rid);			
+	ResourceDX11* pResource = GetResourceByIndex(rid);			
 			
 	if ( pResource != NULL ) {
 		if ( pResource->GetType() != RT_INDIRECTARGSBUFFER ) {
@@ -2500,7 +2502,7 @@ StructuredBufferDX11* RendererDX11::GetStructuredBufferByIndex( int rid )
 {
 	StructuredBufferDX11* pResult = 0;
 
-	ResourceDX11* pResource = GetResource(rid);
+	ResourceDX11* pResource = GetResourceByIndex(rid);
 
 	if ( pResource != NULL ) {
 		if ( pResource->GetType() != RT_STRUCTUREDBUFFER ) {
