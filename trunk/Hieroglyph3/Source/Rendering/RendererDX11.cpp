@@ -381,7 +381,7 @@ void RendererDX11::Shutdown()
 		delete m_vUnorderedAccessViews[i];
 
 	for ( int i = 0; i < m_vResources.count(); i++ )
-		delete m_vResources[i];
+		SAFE_DELETE( m_vResources[i] );
 
 	for ( int i = 0; i < m_vSwapChains.count(); i++ ) {
 		m_vSwapChains[i]->m_pSwapChain->SetFullscreenState( false, NULL );
@@ -455,13 +455,12 @@ int RendererDX11::CreateSwapChain( SwapChainConfigDX11* pConfig )
 	// Add the swap chain's back buffer texture and render target views to the internal data
 	// structures to allow setting them later on.
 
-	m_vResources.add( new Texture2dDX11( pSwapChainBuffer ) );
-
+	int ResourceID = StoreNewResource( new Texture2dDX11( pSwapChainBuffer ) );
+	
 
 	// If we get here, then we succeeded in creating our swap chain and it's constituent parts.
 	// Now we create the wrapper object and store the result in our container.
 
-	int ResourceID = ( m_vResources.count() - 1 );
 	Texture2dConfigDX11 TextureConfig;
 	pSwapChainBuffer->GetDesc( &TextureConfig.m_State );
 
@@ -485,12 +484,11 @@ ResourcePtr RendererDX11::CreateVertexBuffer( BufferConfigDX11* pConfig,  D3D11_
 	{
 		VertexBufferDX11* pVertexBuffer = new VertexBufferDX11( pBuffer );
 		pVertexBuffer->SetDesiredDescription( pConfig->m_State );
-		m_vResources.add( pVertexBuffer );
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
 
-		int ResourceID = ( m_vResources.count() - 1 );
+		int ResourceID = StoreNewResource( pVertexBuffer );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
 
 		return( Proxy );
@@ -510,12 +508,11 @@ ResourcePtr RendererDX11::CreateIndexBuffer( BufferConfigDX11* pConfig,  D3D11_S
 	{
 		IndexBufferDX11* pIndexBuffer = new IndexBufferDX11( pBuffer );
 		pIndexBuffer->SetDesiredDescription( pConfig->m_State );
-		m_vResources.add( pIndexBuffer );
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
 
-		int ResourceID = ( m_vResources.count() - 1 );
+		int ResourceID = StoreNewResource( pIndexBuffer );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
 
 		return( Proxy );
@@ -535,12 +532,11 @@ ResourcePtr RendererDX11::CreateStructuredBuffer( BufferConfigDX11* pConfig,  D3
 	{
 		StructuredBufferDX11* pStructuredBuffer = new StructuredBufferDX11( pBuffer );
 		pStructuredBuffer->SetDesiredDescription( pConfig->m_State );
-		m_vResources.add( pStructuredBuffer );
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
 
-		int ResourceID = ( m_vResources.count() - 1 );
+		int ResourceID = StoreNewResource( pStructuredBuffer );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
 
 		return( Proxy );
@@ -560,12 +556,11 @@ ResourcePtr RendererDX11::CreateByteAddressBuffer( BufferConfigDX11* pConfig,  D
 	{
 		ByteAddressBufferDX11* pByteAddressBuffer = new ByteAddressBufferDX11( pBuffer );
 		pByteAddressBuffer->SetDesiredDescription( pConfig->m_State );
-		m_vResources.add( pByteAddressBuffer );
-
+		
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
 
-		int ResourceID = ( m_vResources.count() - 1 );
+		int ResourceID = StoreNewResource( pByteAddressBuffer );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
 
 		return( Proxy );
@@ -585,12 +580,11 @@ ResourcePtr RendererDX11::CreateIndirectArgsBuffer( BufferConfigDX11* pConfig,  
 	{
 		IndirectArgsBufferDX11* pIndirectArgsBuffer = new IndirectArgsBufferDX11( pBuffer );
 		pIndirectArgsBuffer->SetDesiredDescription( pConfig->m_State );
-		m_vResources.add( pIndirectArgsBuffer );
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
 
-		int ResourceID = ( m_vResources.count() - 1 );
+		int ResourceID = StoreNewResource( pIndirectArgsBuffer );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
 
 		return( Proxy );
@@ -612,11 +606,10 @@ ResourcePtr RendererDX11::CreateConstantBuffer( BufferConfigDX11* pConfig,  D3D1
 		ConstantBufferDX11* pConstantBuffer = new ConstantBufferDX11( pBuffer );
 		pConstantBuffer->SetDesiredDescription( pConfig->m_State );
 		pConstantBuffer->SetAutoUpdate( bAutoUpdate );
-		m_vResources.add( pConstantBuffer );
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		int ResourceID = ( m_vResources.count() - 1 );
+		int ResourceID = StoreNewResource( pConstantBuffer );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this ) );
 
 		return( Proxy );
@@ -637,11 +630,10 @@ ResourcePtr RendererDX11::CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_S
 	{
 		Texture1dDX11* pTex = new Texture1dDX11( pTexture );
 		pTex->SetDesiredDescription( pConfig->GetTextureDesc() );
-		m_vResources.add( pTex );
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		int ResourceID = ( m_vResources.count() - 1 );
+		int ResourceID = StoreNewResource( pTex );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this, pSRVConfig, pRTVConfig, pUAVConfig ) );
 
 		return( Proxy );
@@ -663,11 +655,10 @@ ResourcePtr RendererDX11::CreateTexture2D( Texture2dConfigDX11* pConfig, D3D11_S
 	{
 		Texture2dDX11* pTex = new Texture2dDX11( pTexture );
 		pTex->SetDesiredDescription( pConfig->GetTextureDesc() );
-		m_vResources.add( pTex );
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		int ResourceID = ( m_vResources.count() - 1 );
+		int ResourceID = StoreNewResource( pTex );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this, pSRVConfig, pRTVConfig, pUAVConfig, pDSVConfig ) );
 
 		return( Proxy );
@@ -688,11 +679,10 @@ ResourcePtr RendererDX11::CreateTexture3D( Texture3dConfigDX11* pConfig, D3D11_S
 	{
 		Texture3dDX11* pTex = new Texture3dDX11( pTexture );
 		pTex->SetDesiredDescription( pConfig->GetTextureDesc() );
-		m_vResources.add( pTex );
 
 		// Return an index with the lower 16 bits of index, and the upper
 		// 16 bits to identify the resource type.
-		int ResourceID = ( m_vResources.count() - 1 );
+		int ResourceID = StoreNewResource( pTex );
 		ResourcePtr Proxy( new ResourceProxyDX11( ResourceID, pConfig, this, pSRVConfig, pRTVConfig, pUAVConfig ) );
 
 		return( Proxy );
@@ -1645,9 +1635,8 @@ ResourcePtr RendererDX11::LoadTexture( std::wstring filename, D3DX11_IMAGE_LOAD_
 		return( ResourcePtr( new ResourceProxyDX11() ) );
 	}
 
-	m_vResources.add( new Texture2dDX11( reinterpret_cast< ID3D11Texture2D* >( pTexture ) ) );
+	int ResourceID = StoreNewResource( new Texture2dDX11( reinterpret_cast< ID3D11Texture2D* >( pTexture ) ) );
 
-	int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE2D;
 	Texture2dConfigDX11 TextureConfig;
 	reinterpret_cast< ID3D11Texture2D* >( pTexture )->GetDesc( &TextureConfig.m_State );
 
@@ -1674,9 +1663,8 @@ ResourcePtr RendererDX11::LoadTexture( void* pData, SIZE_T sizeInBytes, D3DX11_I
 		return( ResourcePtr( new ResourceProxyDX11() ) );
 	}
 
-	m_vResources.add( new Texture2dDX11( reinterpret_cast< ID3D11Texture2D* >( pTexture ) ) );
+	int ResourceID = StoreNewResource( new Texture2dDX11( reinterpret_cast< ID3D11Texture2D* >( pTexture ) ) );
 
-	int ResourceID = ( m_vResources.count() - 1 ) + RT_TEXTURE2D;
 	Texture2dConfigDX11 TextureConfig;
 	reinterpret_cast< ID3D11Texture2D* >( pTexture )->GetDesc( &TextureConfig.m_State );
 
@@ -2153,9 +2141,14 @@ ResourceDX11* RendererDX11::GetResourceByIndex( int index )
 	ResourceDX11* pResource = 0;
 
 	int id = index & 0xffff;
+	int innerID = ( index & 0xffff0000 ) >> 16;
 
 	if ( m_vResources.inrange( id ) ) {
 		pResource = m_vResources[id];
+
+		if ( pResource->GetInnerID() != innerID ) {
+			Log::Get().Write( L"Inner ID doesn't match resource index!!!" );
+		}
 	}
 
 	return( pResource );
@@ -2577,5 +2570,63 @@ UnorderedAccessViewDX11* RendererDX11::GetUnorderedAccessViewByIndex( int rid )
 	}
 
 	return( pResult );
+}
+//--------------------------------------------------------------------------------
+int	RendererDX11::GetUnusedResourceIndex()
+{
+	// Initialize return index to -1.
+	int index = -1;
+	
+	// Search for a NULL index location.
+	for ( int i = 0; i < m_vResources.count(); i++ ) {
+		if ( m_vResources[i] == NULL ) {
+			index = i;
+			break;
+		}
+	}
+
+	// Return either an empty location, or -1 if none exist.
+	return( index );
+}
+//--------------------------------------------------------------------------------
+int	RendererDX11::StoreNewResource( ResourceDX11* pResource )
+{
+	// This method either finds an empty spot in the list, or just appends the
+	// resource to the end of it if none are available.
+
+	int index = GetUnusedResourceIndex();
+
+	if ( index == -1 ) {
+		m_vResources.add( pResource );
+		index = m_vResources.count() - 1;
+	} else {
+		m_vResources[index] = pResource;
+	}
+
+	// Shift the inner ID to the upper 16 bits.
+	int innerID = (int)pResource->GetInnerID() << 16;
+	index = index + innerID;
+
+	return( index );
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::DeleteResource( ResourcePtr ptr )
+{
+	// This is a convenience method that just passes the resource index to
+	// the delete function.
+
+	DeleteResource( ptr->m_iResource );
+}
+//--------------------------------------------------------------------------------
+void RendererDX11::DeleteResource( int index )
+{
+	// Here the resource is looked up, then deleted if it was found.  After 
+	// being deleted, it is 
+	ResourceDX11* pResource = GetResourceByIndex( index );
+
+	if ( pResource != NULL ) {
+		delete pResource;
+		m_vResources[index & 0xffff] = NULL;
+	}
 }
 //--------------------------------------------------------------------------------

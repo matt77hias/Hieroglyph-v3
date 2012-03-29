@@ -637,6 +637,9 @@
     <ClCompile Include="Rendering\OutputMergerStageStateDX11.cpp">
       <Filter>Rendering\Pipeline\Fixed Stages\States</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\ResourceDX11.cpp">
+      <Filter>Rendering\Resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mathematics\Matrix3f.h">

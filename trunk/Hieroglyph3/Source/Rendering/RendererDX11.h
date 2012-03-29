@@ -162,6 +162,9 @@ namespace Glyph3
                                         RenderTargetViewConfigDX11* pRTVConfig = NULL,
                                         UnorderedAccessViewConfigDX11* pUAVConfig = NULL );
 
+		void DeleteResource( ResourcePtr ptr );
+		void DeleteResource( int index );
+
 		// The resources created in the above function calls can only be accessed by
 		// the rendering pipeline when they are bound with resource views.  The following
 		// functions provide the interface for creating the views, and returns an index
@@ -341,6 +344,9 @@ namespace Glyph3
 		UnorderedAccessViewDX11*	GetUnorderedAccessViewByIndex( int rid );
 
 	protected:
+
+		int							GetUnusedResourceIndex();
+		int							StoreNewResource( ResourceDX11* pResource );
 
 		bool									m_bMultiThreadActive;
 		D3D_FEATURE_LEVEL						m_FeatureLevel;

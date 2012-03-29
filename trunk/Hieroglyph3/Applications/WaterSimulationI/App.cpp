@@ -26,6 +26,7 @@
 #include "RasterizerStateConfigDX11.h"
 
 #include "ViewSimulation.h"
+#include "BufferConfigDX11.h"
 
 #include "IParameterManager.h"
 
@@ -57,6 +58,7 @@ void App::Initialize()
 {
 	// Create and initialize the geometry to be rendered.  This represents a 
 	// heightmap that will be displaced with the water state at each vertex.
+
 
 	const int DispatchSizeX = 16;
 	const int DispatchSizeZ = 16;

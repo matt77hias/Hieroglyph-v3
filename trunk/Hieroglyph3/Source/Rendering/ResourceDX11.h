@@ -27,14 +27,22 @@ namespace Glyph3
 	class ResourceDX11
 	{
 	public:
-		virtual ~ResourceDX11() {};
+		ResourceDX11();
+
+		virtual ~ResourceDX11();
 
 		virtual ResourceType				GetType() = 0;
 		virtual ID3D11Resource*				GetResource() = 0;
 
 		virtual UINT						GetEvictionPriority() = 0;
 		virtual void						SetEvictionPriority( UINT EvictionPriority ) = 0;
+
+		unsigned short						GetInnerID();
+
+		static unsigned short				s_usResourceUID;
+		unsigned short						m_usInnerID;
 	};
+
 };
 //--------------------------------------------------------------------------------
 #endif // ResourceDX11_h
