@@ -32,8 +32,6 @@ groupshared float2 horizontalpoints[totalsize_x];
 
 void CS_Horizontal( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThreadID, uint3 GroupThreadID : SV_GroupThreadID, uint GroupIndex : SV_GroupIndex )
 {
-	int textureindex = DispatchThreadID.x + DispatchThreadID.y * totalsize_x;
-
 	// Each thread will load its own depth/occlusion values
 	float fCenterDepth = DepthMap.Load( DispatchThreadID ).w;
 	float fCenterOcclusion = AmbientOcclusionTarget[DispatchThreadID.xy].x;
@@ -78,8 +76,6 @@ groupshared float2 verticalpoints[totalsize_y];
 
 void CS_Vertical( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThreadID, uint3 GroupThreadID : SV_GroupThreadID, uint GroupIndex : SV_GroupIndex )
 {
-	int textureindex = DispatchThreadID.x + DispatchThreadID.y * totalsize_x;
-
 	// Each thread will load its own depth/occlusion values
 	float fCenterDepth = DepthMap.Load(DispatchThreadID).w;
 	float fCenterOcclusion = AmbientOcclusionTarget[DispatchThreadID.xy].x;

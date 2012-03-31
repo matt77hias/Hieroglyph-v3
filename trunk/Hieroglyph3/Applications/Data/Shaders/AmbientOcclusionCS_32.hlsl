@@ -10,9 +10,6 @@
 // This version of the shader operates on the texture one thread group at a
 // time.  The constants defined below need to be updated as follows:
 // 
-// gridsize_x and gridsize_y : the number of groups in your dispatch call
-// size_x and size_y : the size of your texture divided by the gridsize
-//
 // For example, for a 128x128 texture set, if I use 8x8 gridsize for my dispatch
 // call, then the size parameters would be 16x16.  The other definitions are 
 // based on these two, so no other changes are needed.
@@ -31,20 +28,20 @@ SamplerState DepthSampler
 	AddressW		= CLAMP;
 };
 
+cbuffer OcclusionDataBuffer
+{
+	float4 Resolution;	// x:width, y:height, z:1/width, w:1/height
+	float4 Perspective; // x:fov, y:aspect, z:yn, w:xn
+	float4 Frustum;     // x:znear, y:zfar, znear/zfar, zfar/zfar
+};
+
+
 #define kernel_x 16
 #define kernel_y 16
 
-// Grid size - this should match your dispatch call!
-#define gridsize_x 20
-#define gridsize_y 15
-
-// The total texture size
-#define totalsize_x 640
-#define totalsize_y 480
-
 // Group size
-#define size_x (totalsize_x / gridsize_x)
-#define size_y (totalsize_y / gridsize_y)
+#define size_x 32
+#define size_y 32
 
 // Group size with the extra perimeter
 #define padded_x (kernel_x + size_x + kernel_x)
@@ -58,32 +55,14 @@ groupshared float LoadedDepths[padded_x][padded_y];
 #endif
 
 
-// x,y resolution of buffer
-#define xres 640.0f
-#define yres 480.0f
-
-// Vertical field of view and aspect ration
-#define fov (3.1495f / 2.0f)
-#define aspect (xres / yres)
-	
-// Near, far depth plane distance
-#define zn 1.0f
-#define zf 25.0f
-#define zn_normalized (zn / zf)
-#define zf_normalized (zf / zf)
-
-// World space units in x,y direction of near plane
-#define yn (2.0f * zn_normalized * tan( fov / 2.0f ))
-#define xn (aspect * yn)
-
 // vRecipDepthBufferSize = 1.0 / depth buffer width and height in pixels.
 // p_vCameraFrustrumSize = Full width and height of camera frustum at the 
 // camera’s near plane in world space.
 //--------------------------------------------------------------------------------
 float3 ScreenPosToViewPos( uint3 DispatchID, float fDepth )
 {
-	const float2 vRecipDepthBufferSize = float2( 1.0f/xres, 1.0f/yres );
-	const float2 vCameraFrustrumSize = float2( xn, yn );
+	const float2 vRecipDepthBufferSize = float2( Resolution.z, Resolution.w );
+	const float2 vCameraFrustrumSize = float2( Perspective.w, Perspective.z );
 	
 	float2 vViewSpaceUV = (float2)DispatchID.xy * vRecipDepthBufferSize;
     
@@ -96,15 +75,15 @@ float3 ScreenPosToViewPos( uint3 DispatchID, float fDepth )
 //--------------------------------------------------------------------------------
 uint3 ViewPosToScreenPos( float3 ViewPos )
 {
-	const float2 p_vRecipDepthBufferSize = float2( 1.0f/xres, 1.0f/yres );
-	const float2 p_vCameraFrustrumSize = float2( xn, yn );
+	const float2 p_vRecipDepthBufferSize = float2( Resolution.z, Resolution.w );
+	const float2 p_vCameraFrustrumSize = float2( Perspective.w, Perspective.z );
 
 	float2 SamplePoint = ViewPos.xy / ViewPos.z;
 
 	SamplePoint = SamplePoint / ( p_vCameraFrustrumSize * 0.5f );
 	SamplePoint = SamplePoint + float2( 1.0f, -1.0f );
 	SamplePoint = SamplePoint * float2( 0.5f, -0.5f );
-	SamplePoint = SamplePoint * float2( xres, yres );
+	SamplePoint = SamplePoint * float2( Resolution.x, Resolution.y );
 
 	return( uint3( (uint)SamplePoint.x, (uint)SamplePoint.y, 0 ) );
 };
@@ -131,8 +110,7 @@ void CSMAIN( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThr
 	int3 globaltexturelocation = int3( 0, 0, 0 );
 	globaltexturelocation = DispatchThreadID;
 	
-	int3 texturelocation = clamp( globaltexturelocation, int3( 0, 0, 0 ), int3( totalsize_x-1, totalsize_y-1, 0 ) );
-	int textureindex = texturelocation.x + texturelocation.y * totalsize_x;
+	int3 texturelocation = globaltexturelocation;
 
 #ifdef USE_GSM
 	// Load the required depth samples the group shared memory ()
@@ -144,29 +122,28 @@ void CSMAIN( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThr
 	int3 OffsetLocation = int3( GroupID.x * size_x - kernel_x, GroupID.y * size_y - kernel_y, 0 );
 	int3 ThreadLocation = GroupThreadID * 2;
 	
-#define USE_GATHER
+//#define USE_GATHER
 #ifndef USE_GATHER
 	int3 Sample0 = ThreadLocation + OffsetLocation;
-	Sample0 = clamp( Sample0, int3( 0, 0, 0 ), int3( totalsize_x-1, totalsize_y-1, 0 ) );
-	LoadedDepths[ThreadLocation.x][ThreadLocation.y] =  DepthNormalBuffer.Load(Sample0).w * zf;
+	LoadedDepths[ThreadLocation.x][ThreadLocation.y] =  DepthNormalBuffer.Load(Sample0).w * Frustum.y;
 
 	ThreadLocation = ThreadLocation + int3(1,0,0);
 	int3 Sample1 = ThreadLocation + OffsetLocation;
-	LoadedDepths[ThreadLocation.x][ThreadLocation.y] =  DepthNormalBuffer.Load(Sample1).w * zf;
+	LoadedDepths[ThreadLocation.x][ThreadLocation.y] =  DepthNormalBuffer.Load(Sample1).w * Frustum.y;
 	
 	ThreadLocation = ThreadLocation + int3(-1,1,0);
 	int3 Sample2 = ThreadLocation + OffsetLocation;
-	LoadedDepths[ThreadLocation.x][ThreadLocation.y] =  DepthNormalBuffer.Load(Sample2).w * zf;
+	LoadedDepths[ThreadLocation.x][ThreadLocation.y] =  DepthNormalBuffer.Load(Sample2).w * Frustum.y;
 
 	ThreadLocation = ThreadLocation + int3(1,0,0);
 	int3 Sample3 = ThreadLocation + OffsetLocation;
-	LoadedDepths[ThreadLocation.x][ThreadLocation.y] =  DepthNormalBuffer.Load(Sample3).w * zf;
+	LoadedDepths[ThreadLocation.x][ThreadLocation.y] =  DepthNormalBuffer.Load(Sample3).w * Frustum.y;
 #else
 	float2 fGatherSample;
-	fGatherSample.x = ((float)GroupID.x * (float)size_x - (float)kernel_x + (float)GroupThreadID.x * 2.0f ) / xres;
-	fGatherSample.y = ((float)GroupID.y * (float)size_y - (float)kernel_y + (float)GroupThreadID.y * 2.0f ) / yres;
+	fGatherSample.x = ((float)GroupID.x * (float)size_x - (float)kernel_x + (float)GroupThreadID.x * 2.0f ) / Resolution.x;
+	fGatherSample.y = ((float)GroupID.y * (float)size_y - (float)kernel_y + (float)GroupThreadID.y * 2.0f ) / Resolution.y;
 	
-	float4 fDepths = DepthNormalBuffer.GatherAlpha( DepthSampler, fGatherSample + float2( 0.5f / (float)xres, 0.5f / (float)yres ) ) * zf;
+	float4 fDepths = DepthNormalBuffer.GatherAlpha( DepthSampler, fGatherSample + float2( 0.5f / Resolution.x, 0.5f / Resolution.y ) ) * Frustum.y;
 	LoadedDepths[ThreadLocation.x][ThreadLocation.y] = fDepths.w;
 	LoadedDepths[ThreadLocation.x+1][ThreadLocation.y] = fDepths.z;
 	LoadedDepths[ThreadLocation.x+1][ThreadLocation.y+1] = fDepths.y;
@@ -232,7 +209,7 @@ void CSMAIN( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThr
 	float fResults = 0.0f;
 	
 	float4 fPixelData = DepthNormalBuffer.Load( texturelocation );
-	float fPixelDepth = fPixelData.w * zf;
+	float fPixelDepth = fPixelData.w * Frustum.y;
 	float3 fPixelNormal = fPixelData.xyz * 2.0f - 1.0f;
 
 	// Find the view space 3D position of the pixel
@@ -268,7 +245,7 @@ void CSMAIN( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThr
 			int3 iNewOffset = ViewPosToScreenPos( Sample3D );
 	
 #ifndef USE_GSM
-			float fSample = DepthNormalBuffer.Load( iNewOffset ).w * zf;
+			float fSample = DepthNormalBuffer.Load( iNewOffset ).w * Frustum.y;
 #else
 			float fSample = LoadDepth( iNewOffset - OffsetLocation );
 #endif // USE_GSM

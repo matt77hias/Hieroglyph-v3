@@ -116,6 +116,21 @@ void ViewAmbientOcclusion::Draw( PipelineManagerDX11* pPipelineManager, IParamet
 	}
 }
 //--------------------------------------------------------------------------------
+void ViewAmbientOcclusion::Resize( UINT width, UINT height )
+{
+	ResolutionX = width;
+	ResolutionY = height;
+
+	RendererDX11::Get()->ResizeTexture( m_DepthTarget, width, height );
+	RendererDX11::Get()->ResizeTexture( DepthNormalBuffer, width, height );
+	RendererDX11::Get()->ResizeTexture( OcclusionBuffer, width, height );
+	RendererDX11::Get()->ResizeTexture( BilateralBuffer, width, height );
+	RendererDX11::Get()->ResizeViewport( m_iViewport, width, height );
+
+	pDepthNormalView->Resize( width, height );
+	pOcclusionView->Resize( width, height );
+}
+//--------------------------------------------------------------------------------
 void ViewAmbientOcclusion::SetRenderParams( IParameterManager* pParamManager )
 {
 	// Set the parameters for this view to be able to perform its processing

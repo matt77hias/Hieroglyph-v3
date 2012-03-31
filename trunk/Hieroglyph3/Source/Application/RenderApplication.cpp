@@ -185,9 +185,7 @@ void RenderApplication::HandleWindowResize( HWND handle, UINT width, UINT height
 
 	// Update the projection matrix of our camera
 	if ( m_pCamera != 0 ) {
-		m_pCamera->SetProjectionParams( 0.1f, 1000.0f, 
-			static_cast<float>(m_iWidth) / static_cast<float>(m_iHeight), 
-			static_cast<float>( D3DX_PI ) / 4.0f );
+		m_pCamera->SetAspectRatio( static_cast<float>(m_iWidth) / static_cast<float>(m_iHeight) );
 	}
 
 	// Update the render views being used to render the scene

@@ -57,6 +57,25 @@ void ParameterContainer::AddRenderParameter( ParameterWriter* pWriter )
 	}
 }
 //--------------------------------------------------------------------------------
+ParameterWriter* ParameterContainer::GetRenderParameter( const std::wstring& name )
+{
+	ParameterWriter* pResult = NULL;
+
+	for ( int i = 0; i < m_RenderParameters.count(); i++ ) {
+		ParameterWriter* pParameterWriter = m_RenderParameters[i];
+		
+		RenderParameterDX11* pParameter = pParameterWriter->GetRenderParameterRef();
+		if ( pParameter != NULL ) {
+			if ( name.compare( pParameter->GetName() ) == 0 ) {
+				pResult = pParameterWriter;
+				break;
+			}
+		}
+	}
+
+	return( pResult );
+}
+//--------------------------------------------------------------------------------
 void ParameterContainer::SetRenderParams( IParameterManager* pParamManager )
 {
 	// Scroll through each parameter and set it in the renderer

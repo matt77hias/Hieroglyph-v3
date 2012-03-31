@@ -127,6 +127,7 @@
     <None Include="..\Data\Shaders\DepthVS.hlsl" />
     <None Include="..\Data\Shaders\FinalPS.hlsl" />
     <None Include="..\Data\Shaders\FinalVS.hlsl" />
+    <None Include="..\Data\Shaders\SeparableBilateralCS.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

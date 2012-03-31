@@ -27,8 +27,13 @@ namespace Glyph3
 		ParameterContainer( );
 		virtual ~ParameterContainer( );
 
+		// Adding a parameter writer to this container.
 		void AddRenderParameter( ParameterWriter* pWriter );
-		//void UpdateRenderParameter( RenderParameterDX11* pParameter );
+
+		// Retrieve a parameter writer that was added to this container earlier.
+		ParameterWriter* GetRenderParameter( const std::wstring& name );
+
+		// Apply the parameters in this container to a parameter manager.
 		void SetRenderParams( IParameterManager* pParamManager );
 		
 	protected:

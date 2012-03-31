@@ -50,6 +50,7 @@ namespace Glyph3
 		VT_GBUFFER,
 		VT_LIGHTS,
         VT_FINALPASS,
+		VT_OCCLUSION,
 		VT_NUM_VIEW_TYPES
 	};    
 

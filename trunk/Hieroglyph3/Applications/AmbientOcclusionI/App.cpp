@@ -31,6 +31,9 @@
 #include "IParameterManager.h"
 #include "FirstPersonCamera.h"
 
+#include "SamplerStateConfigDX11.h"
+#include "SamplerParameterDX11.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
@@ -53,6 +56,8 @@ bool App::ConfigureEngineComponents()
 		return( false );
 	}
 
+	m_pRenderer11->SetMultiThreadingState( false );
+
 	return( true );
 }
 //--------------------------------------------------------------------------------
@@ -72,7 +77,7 @@ bool App::ConfigureRenderingSetup()
 	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 6.0f, -8.0f );
 	m_pCamera->SetCameraView( m_pRenderView );
 	m_pCamera->SetOverlayView( m_pTextOverlayView );
-	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>(m_iWidth) / static_cast<float>(m_iHeight), static_cast<float>( D3DX_PI ) / 4.0f );
+	m_pCamera->SetProjectionParams( 1.0f, 25.0f, static_cast<float>(m_iWidth) / static_cast<float>(m_iHeight), static_cast<float>( D3DX_PI ) / 4.0f );
 
 	m_pScene->AddCamera( m_pCamera );
 
@@ -132,6 +137,13 @@ void App::Initialize()
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
 	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
 
+	SamplerStateConfigDX11 SamplerConfig;
+	int LinearSampler = RendererDX11::Get()->CreateSamplerState( &SamplerConfig );
+	SamplerParameterDX11* pSamplerParameter = 
+		RendererDX11::Get()->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"DepthSampler" ) );
+	pSamplerParameter->InitializeParameterData( &LinearSampler );
+
+
 	// Create the scene and add the entities to it.  Then add the camera to the
 	// scene so that it will be updated via the scene interface instead of 
 	// manually manipulating it.
@@ -160,6 +172,8 @@ void App::Initialize()
 	Vector4f LightPosition = Vector4f( 10.0f, 20.0f, -20.0f, 0.0f );
 	m_pLightPosition = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightPositionWS" ) );
 	m_pLightPosition->InitializeParameterData( &LightPosition );
+
+	UpdateParameters();
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -273,7 +287,45 @@ bool App::HandleEvent( IEvent* pEvent )
 
 	// Call the parent class's event handler if we haven't handled the event.
 
-	return( Application::HandleEvent( pEvent ) );
+	return( RenderApplication::HandleEvent( pEvent ) );
+}
+//--------------------------------------------------------------------------------
+void App::UpdateParameters()
+{
+	float x = (float)m_iWidth;
+	float y = (float)m_iHeight;
+	float zn = m_pCamera->GetNearClipPlane();
+	float zf = m_pCamera->GetFarClipPlane();
+	float zn_normalized = zn / zf;
+	float zf_normalized = zf / zf;
+	float aspect = x / y;
+	float fov = m_pCamera->GetFieldOfView();
+	float yn = 2.0f * zn_normalized * tan( fov / 2.0f );
+	float xn = aspect * yn;
+
+	Vector4f Resolution = Vector4f( x, y, 1.0f / x, 1.0f / y );
+	m_pResolution = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Resolution" ) );
+	m_pResolution->InitializeParameterData( &Resolution );
+
+	Vector4f Perspective = Vector4f( fov, aspect, yn, xn );
+	m_pPerspective = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Perspective" ) );
+	m_pPerspective->InitializeParameterData( &Perspective );
+
+	Vector4f Frustum = Vector4f( zn, zf, zn_normalized, zf_normalized );
+	m_pFrustum = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Frustum" ) );
+	m_pFrustum->InitializeParameterData( &Frustum );
+}
+//--------------------------------------------------------------------------------
+void App::HandleWindowResize( HWND handle, UINT width, UINT height )
+{
+	// Call the parent class handler to do the resize...
+
+	RenderApplication::HandleWindowResize( handle, width, height );
+
+
+	// With the new size set, update our relevant rendering parameters here...
+
+	UpdateParameters();
 }
 //--------------------------------------------------------------------------------
 std::wstring App::GetName( )

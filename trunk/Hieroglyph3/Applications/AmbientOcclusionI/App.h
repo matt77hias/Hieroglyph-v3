@@ -42,7 +42,10 @@ public:
 	virtual void Shutdown();
 
 	virtual bool HandleEvent( IEvent* pEvent );
+	virtual void HandleWindowResize( HWND handle, UINT width, UINT height );
 	virtual std::wstring GetName( );
+
+	void UpdateParameters();
 
 protected:
 
@@ -54,4 +57,8 @@ protected:
 	VectorParameterDX11*	m_pFinalColor;
 	VectorParameterDX11*	m_pLightColor;
 	VectorParameterDX11*	m_pLightPosition;
+
+	VectorParameterDX11*	m_pResolution;
+	VectorParameterDX11*	m_pPerspective;
+	VectorParameterDX11*	m_pFrustum;
 };

@@ -30,5 +30,8 @@
     <None Include="..\Data\Shaders\FinalVS.hlsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\Data\Shaders\SeparableBilateralCS.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

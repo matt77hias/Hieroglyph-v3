@@ -33,6 +33,8 @@
 #include "IParameterManager.h"
 #include "ParticleSystemEntity.h"
 
+#include "ShaderResourceParameterWriterDX11.h"
+
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 App AppInstance; // Provides an instance of the application
@@ -218,6 +220,18 @@ bool App::HandleEvent( IEvent* pEvent )
 		else if ( key == 0x53 ) // 'S' Key - Save a screen shot for the next frame
 		{
 			m_bSaveScreenshot = true;
+			return( true );
+		}
+		else if ( key == 0x20 ) // 'Space' Key - Save a screen shot for the next frame
+		{
+			// Load a new texture and set it for the particle texture.
+			ResourcePtr ParticleTexture = m_pRenderer11->LoadTexture( L"EyeOfHorus_128.png" );
+
+			ShaderResourceParameterWriterDX11* pWriter = 
+				(ShaderResourceParameterWriterDX11*)m_pEntity->Parameters.GetRenderParameter( std::wstring( L"ParticleTexture" ) );
+
+			pWriter->SetValue( ParticleTexture );
+
 			return( true );
 		}
 		else

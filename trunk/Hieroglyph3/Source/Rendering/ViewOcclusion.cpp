@@ -22,6 +22,8 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ViewOcclusion::ViewOcclusion( RendererDX11& Renderer, ResourcePtr OcclusionTarget, ResourcePtr BlurTarget, ResourcePtr DepthNormalTarget )
 {
+	m_sParams.iViewType = VT_OCCLUSION;
+
 	D3D11_TEXTURE2D_DESC desc = OcclusionTarget->m_pTexture2dConfig->GetTextureDesc();
 
 	ResolutionX = desc.Width;
@@ -68,6 +70,14 @@ ViewOcclusion::~ViewOcclusion()
 	SAFE_DELETE( pBilateralYEffect );
 }
 //--------------------------------------------------------------------------------
+void ViewOcclusion::Resize( UINT width, UINT height )
+{
+	// The resources themselves will be resized by the parent view, but we just
+	// need to record how big of a render target we will be processing.
+	ResolutionX = width;
+	ResolutionY = height;
+}
+//--------------------------------------------------------------------------------
 void ViewOcclusion::Update( float fTime )
 {
 }
@@ -89,11 +99,20 @@ void ViewOcclusion::Draw( PipelineManagerDX11* pPipelineManager, IParameterManag
 	SetRenderParams( pParamManager );
 
 	// Execute the compute shader to calculate the raw occlusion buffer.
-	pPipelineManager->Dispatch( *pOcclusionEffect, ResolutionX / 32, ResolutionY / 32, 1, pParamManager );
+	UINT DispatchX = (UINT)( ceil( ResolutionX / 32.0f ) );
+	UINT DispatchY = (UINT)( ceil( ResolutionY / 32.0f ) );
+
+	pPipelineManager->Dispatch( *pOcclusionEffect, DispatchX, DispatchY, 1, pParamManager );
 
 	// Perform the blurring operations next.
-	pPipelineManager->Dispatch( *pBilateralXEffect, 1, ResolutionY, 1, pParamManager );
-	pPipelineManager->Dispatch( *pBilateralYEffect, ResolutionX, 1, 1, pParamManager );
+	DispatchX = (UINT)( ceil( ResolutionX / 640.0f ) );
+	DispatchY = (UINT)( ceil( ResolutionY / 480.0f ) );
+
+	pPipelineManager->Dispatch( *pBilateralXEffect, DispatchX, ResolutionY, 1, pParamManager );
+	pPipelineManager->Dispatch( *pBilateralYEffect, ResolutionX, DispatchY, 1, pParamManager );
+
+	pPipelineManager->ClearPipelineResources();
+	pPipelineManager->ApplyPipelineResources();
 }
 //--------------------------------------------------------------------------------
 void ViewOcclusion::SetRenderParams( IParameterManager* pParamManager )
