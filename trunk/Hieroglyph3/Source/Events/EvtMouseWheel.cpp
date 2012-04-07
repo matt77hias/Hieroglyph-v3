@@ -35,6 +35,6 @@ eEVENT EvtMouseWheel::GetEventType( )
 //--------------------------------------------------------------------------------
 int EvtMouseWheel::GetWheelDelta()
 {
-	return( ( 0xffff0000 & m_wparam ) >> 16 );
+	return( (short)(( 0xffff0000 & m_wparam ) >> 16 ) );
 }
 //--------------------------------------------------------------------------------

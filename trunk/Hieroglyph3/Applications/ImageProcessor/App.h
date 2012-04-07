@@ -44,9 +44,11 @@ public:
 
 	virtual bool HandleResize( HWND hwnd, WPARAM wparam, LPARAM lparam );
 	virtual bool HandleMouseMove( HWND hwnd, WPARAM wparam, LPARAM lparam );
+	virtual bool HandleMouseWheel( HWND hwnd, WPARAM wparam, LPARAM lparam );
 
 	void SelectNextImage();
 	void SelectNextAlgorithm();
+	void SelectNextSampler();
 
 	virtual std::wstring GetName( );
 
@@ -58,6 +60,8 @@ protected:
 	ResourcePtr				m_Texture[5];
 	ResourcePtr				m_Intermediate;
 	ResourcePtr				m_Output;
+
+	int						m_Samplers[2];
 
 	Node3D*					m_pNode;
 	Entity3D*				m_pEntity;
@@ -86,6 +90,7 @@ protected:
 
 	int						m_iAlgorithm;
 	int						m_iImage;
+	int						m_iSampler;
 
 	struct UserInteractionData
 	{

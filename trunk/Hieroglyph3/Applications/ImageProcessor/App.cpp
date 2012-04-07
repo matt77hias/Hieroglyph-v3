@@ -17,6 +17,7 @@
 #include "EvtChar.h"
 #include "EvtKeyUp.h"
 #include "EvtKeyDown.h"
+#include "EvtMouseWheel.h"
 
 #include "ScriptManager.h"
 
@@ -82,6 +83,14 @@ LRESULT App::WindowProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam )
 				// Now we let the framework handle the mouse move as it likes
 				//return RenderApplication::WindowProc( hwnd, msg, wparam, lparam );
 			} break;
+		case  WM_MOUSEWHEEL:
+			{
+				// we do our own mouse move handling before letting the framework do it
+				return( HandleMouseWheel( hwnd, wparam, lparam ) );  
+
+				// Now we let the framework handle the mouse move as it likes
+				//return RenderApplication::WindowProc( hwnd, msg, wparam, lparam );
+			} break;
 		case  WM_SIZE:
 			{
 				if ( m_bAppInitialized && !m_bAppShuttingDown ) {
@@ -131,6 +140,7 @@ void App::Initialize()
 
 	m_iImage = -1;
 	m_iAlgorithm = 0;
+	m_iSampler = 0;
 
     m_pRenderer11->SetMultiThreadingState( false );
 
@@ -262,11 +272,24 @@ void App::Initialize()
 	ViewingParams = Vector4f( 0.5f, 0.5f, 1.0f, 1.0f );
 	m_pViewingParamsParameter->InitializeParameterData( &ViewingParams );
 
+	// Create a sampler with wrapping texture address mode.
 	SamplerStateConfigDX11 SamplerConfig;
-	int LinearSampler = RendererDX11::Get()->CreateSamplerState( &SamplerConfig );
+	m_Samplers[0] = RendererDX11::Get()->CreateSamplerState( &SamplerConfig );
+
+	// Create a sampler with border texture address mode.
+	SamplerConfig.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	SamplerConfig.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	SamplerConfig.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	SamplerConfig.BorderColor[0] = 0.0f;
+	SamplerConfig.BorderColor[1] = 0.0f;
+	SamplerConfig.BorderColor[2] = 0.0f;
+	SamplerConfig.BorderColor[3] = 0.0f;
+
+	m_Samplers[1] = RendererDX11::Get()->CreateSamplerState( &SamplerConfig );
+
 	SamplerParameterDX11* pSamplerParameter = 
 		RendererDX11::Get()->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"LinearSampler" ) );
-	pSamplerParameter->InitializeParameterData( &LinearSampler );
+	pSamplerParameter->InitializeParameterData( &m_iSampler );
 
 	// Since this one won't be changing, it can be initialized here once, and then
 	// not updated again later.
@@ -328,6 +351,16 @@ void App::SelectNextAlgorithm()
 	if ( m_iAlgorithm > 4 ) m_iAlgorithm = 0;
 }
 //--------------------------------------------------------------------------------
+void App::SelectNextSampler()
+{
+	m_iSampler++;
+	if ( m_iSampler > 1 ) m_iSampler = 0;
+
+	SamplerParameterDX11* pSamplerParameter = 
+		RendererDX11::Get()->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"LinearSampler" ) );
+	pSamplerParameter->InitializeParameterData( &m_Samplers[m_iSampler] );
+}
+//--------------------------------------------------------------------------------
 void App::Update()
 {
 	// Update the timer to determine the elapsed time since last frame.  This can 
@@ -345,9 +378,17 @@ void App::Update()
 
 	std::wstringstream out;
 	out << L"Hieroglyph 3 : ImageProcessor\nFPS: " << m_pTimer->Framerate() << std::endl;
-	out << L"Press I to select the next image" << std::endl;
-	out << L"Press N to select the next algorithm" << std::endl;
-	out << L"Current Algorithm: ";
+	out << L"Press I to select the next image." << std::endl;
+	out << L"Press N to select the next algorithm." << std::endl;
+	out << L"Press SPACE to select the next texture sampling mode." << std::endl;
+	out << std::endl;
+	out << L"Drag the left mouse button to pan." << std::endl;
+	out << L"Drag the right mouse button up or down to zoom." << std::endl;
+	out << L"Mouse wheel can also be used to zoom." << std::endl;
+	out << std::endl;
+	out << L"Current Window Size: " << WindowSize.x << L", " << WindowSize.y << std::endl;
+	out << L"Current Image Size: " << ImageSize.x << L", " << ImageSize.y << std::endl;
+	out << L"Current Algorithm: " << std::endl;
 
 
 	// Perform the filtering with the compute shader.  The assumption in this case
@@ -582,10 +623,26 @@ bool App::HandleMouseMove( HWND hwnd, WPARAM wparam, LPARAM lparam )
 		} 
 	} 
 
+	InvalidateRect(m_pWindow->GetHandle(), NULL, FALSE);
 
+	return( true );
+}
+//--------------------------------------------------------------------------------
+bool App::HandleMouseWheel( HWND hwnd, WPARAM wparam, LPARAM lparam )
+{
+	EvtMouseWheel e( hwnd, wparam, lparam );
 
+	// Get the wheel delta.  This is a short value (16-bit, positive or negative)
+	// that is stored in a int.  It is 120 value increments unless there is a
+	// high precision mouse in use.  We just scale the values and then apply
+	// them to our zoom factor, then re-render the scene by invalidating the
+	// window area.
 
+	int delta = e.GetWheelDelta();
 
+	ViewingParams.z += ((float)delta) * 0.0001f;
+	ViewingParams.w += ((float)delta) * 0.0001f;
+	m_pViewingParamsParameter->InitializeParameterData( &ViewingParams );
 
 	InvalidateRect(m_pWindow->GetHandle(), NULL, FALSE);
 
@@ -630,6 +687,13 @@ bool App::HandleEvent( IEvent* pEvent )
 		else if ( key == 0x49 ) // 'I' Key - Switch to the next image
 		{
 			SelectNextImage();			
+			InvalidateRect(m_pWindow->GetHandle(), NULL, FALSE);
+
+			return( true );
+		}
+		else if ( key == VK_SPACE ) // 'Space' Key - Switch to the next sampler
+		{
+			SelectNextSampler();			
 			InvalidateRect(m_pWindow->GetHandle(), NULL, FALSE);
 
 			return( true );
