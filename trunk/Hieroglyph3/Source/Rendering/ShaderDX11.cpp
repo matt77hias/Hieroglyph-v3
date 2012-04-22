@@ -17,6 +17,7 @@
 #include "IParameterManager.h"
 #include "PipelineManagerDX11.h"
 #include "ConstantBufferDX11.h"
+#include "D3DEnumConversion.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -237,7 +238,7 @@ void ShaderDX11::PrintShaderDetails()
 	s << L"----------------------------------------------------------------------" << std::endl;
 
 	s << L"Shader Description: " << std::endl;
-	s << RendererDX11::Print_D3D11_SHADER_DESC( this->ShaderDescription );
+	s << TO_STRING_D3D11_SHADER_DESC( this->ShaderDescription );
 	
 	s << std::endl;
 
@@ -247,8 +248,8 @@ void ShaderDX11::PrintShaderDetails()
 		s << L"  Semantic Name: " << InputSignatureParameters[i].SemanticName;
 		s << L", Semantic Index: " << InputSignatureParameters[i].SemanticIndex;
 		s << L", Register: " << InputSignatureParameters[i].Register;
-		s << L", System Value Type: " << RendererDX11::TranslateSystemVariableName( InputSignatureParameters[i].SystemValueType ); 
-		s << L", Component Type: " << RendererDX11::TranslateRegisterComponentType( InputSignatureParameters[i].ComponentType );
+		s << L", System Value Type: " << TO_STRING_D3D_NAME( InputSignatureParameters[i].SystemValueType ); 
+		s << L", Component Type: " << TO_STRING_D3D_REGISTER_COMPONENT_TYPE( InputSignatureParameters[i].ComponentType );
 		s << L", Mask: " << (unsigned int)InputSignatureParameters[i].Mask;
 		s << L", Read/Write Mask: " << (unsigned int)InputSignatureParameters[i].ReadWriteMask;
 		s << std::endl;
@@ -261,8 +262,8 @@ void ShaderDX11::PrintShaderDetails()
 		s << L"  Semantic Name: " << OutputSignatureParameters[i].SemanticName;
 		s << L", Semantic Index: " << OutputSignatureParameters[i].SemanticIndex;
 		s << L", Register: " << OutputSignatureParameters[i].Register;
-		s << L", System Value Type: " << RendererDX11::TranslateSystemVariableName( OutputSignatureParameters[i].SystemValueType );  
-		s << L", Component Type: " << RendererDX11::TranslateRegisterComponentType( OutputSignatureParameters[i].ComponentType );
+		s << L", System Value Type: " << TO_STRING_D3D_NAME( OutputSignatureParameters[i].SystemValueType );  
+		s << L", Component Type: " << TO_STRING_D3D_REGISTER_COMPONENT_TYPE( OutputSignatureParameters[i].ComponentType );
 		s << L", Mask: " << (unsigned int)OutputSignatureParameters[i].Mask;
 		s << L", Read/Write Mask: " << (unsigned int)OutputSignatureParameters[i].ReadWriteMask;
 		s << std::endl;
@@ -273,7 +274,7 @@ void ShaderDX11::PrintShaderDetails()
 	for ( int i = 0; i < ConstantBuffers.count(); i++ )
 	{
 		s << L"  Buffer Name: " << ConstantBuffers[i].Description.Name;
-		s << L", Buffer Type: " << RendererDX11::TranslateCBufferType( ConstantBuffers[i].Description.Type );
+		s << L", Buffer Type: " << TO_STRING_D3D_CBUFFER_TYPE( ConstantBuffers[i].Description.Type );
 		s << L", Variables: " << ConstantBuffers[i].Description.Variables;
 		s << L", Size: " << ConstantBuffers[i].Description.Size;
 		s << L", Flags: " << ConstantBuffers[i].Description.uFlags;
@@ -296,8 +297,8 @@ void ShaderDX11::PrintShaderDetails()
 		{
 			s << std::endl << L"    ";
 			s << L"Variable Type Name: " << ConstantBuffers[i].Types[j].Name;
-			s << L", Class: " << RendererDX11::TranslateShaderVariableClass( ConstantBuffers[i].Types[j].Class );
-			s << L", Type: " << RendererDX11::TranslateShaderVariableType( ConstantBuffers[i].Types[j].Type );			
+			s << L", Class: " << TO_STRING_D3D_SHADER_VARIABLE_CLASS( ConstantBuffers[i].Types[j].Class );
+			s << L", Type: " << TO_STRING_D3D_SHADER_VARIABLE_TYPE( ConstantBuffers[i].Types[j].Type );			
 			s << L", Rows: " << ConstantBuffers[i].Types[j].Rows;
 			s << L", Columns: " << ConstantBuffers[i].Types[j].Columns;
 			s << L", Elements: " << ConstantBuffers[i].Types[j].Elements;
@@ -313,11 +314,11 @@ void ShaderDX11::PrintShaderDetails()
 	for ( int i = 0; i < ResourceBindings.count(); i++ )
 	{
 		s << L"  Name: " << ResourceBindings[i].Name;
-		s << L", Type: " << RendererDX11::TranslateShaderInputType( ResourceBindings[i].Type );
+		s << L", Type: " << TO_STRING_D3D_SHADER_INPUT_TYPE( ResourceBindings[i].Type );
 		s << L", Bind Point: " << ResourceBindings[i].BindPoint;
 		s << L", Bind Count: " << ResourceBindings[i].BindCount;
 		s << L", Flags: " << ResourceBindings[i].uFlags;
-		s << L", Resource Return Type: " << RendererDX11::TranslateResourceReturnType( ResourceBindings[i].ReturnType );
+		s << L", Resource Return Type: " << TO_STRING_D3D_RESOURCE_RETURN_TYPE( ResourceBindings[i].ReturnType );
 		s << L", Dimension: " << ResourceBindings[i].Dimension;
 		s << L", Number of Samples: " << ResourceBindings[i].NumSamples;
 		s << std::endl;

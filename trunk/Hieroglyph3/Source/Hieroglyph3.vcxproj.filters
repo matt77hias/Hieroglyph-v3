@@ -140,6 +140,9 @@
     <Filter Include="Objects\Actor Creation">
       <UniqueIdentifier>{310a865a-63af-4938-a473-0b4521f8c110}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering\Utility">
+      <UniqueIdentifier>{835f1b65-4607-4680-b5ad-6dd4eedaf246}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Mathematics\Matrix3f.cpp">
@@ -639,6 +642,9 @@
     </ClCompile>
     <ClCompile Include="Rendering\ResourceDX11.cpp">
       <Filter>Rendering\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\D3DEnumConversion.cpp">
+      <Filter>Rendering\Utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1163,6 +1169,9 @@
     </ClInclude>
     <ClInclude Include="Rendering\OutputMergerStageStateDX11.h">
       <Filter>Rendering\Pipeline\Fixed Stages\States</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\D3DEnumConversion.h">
+      <Filter>Rendering\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

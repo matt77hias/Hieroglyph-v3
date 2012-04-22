@@ -224,25 +224,6 @@ namespace Glyph3
 		void ResizeSwapChain( int ID, UINT width, UINT height );
 		void ResizeViewport( int ID, UINT width, UINT height );
 
-		// These functions are used to convert the enumerated values to human readable text.
-		// This is convenient for logging or displaying various states.
-
-		static const char* TranslateShaderVariableClass( D3D10_SHADER_VARIABLE_CLASS varclass );
-		static const char* TranslateShaderVariableType( D3D10_SHADER_VARIABLE_TYPE vartype );
-		static const char* TranslateSystemVariableName( D3D10_NAME name );
-		static const char* TranslateRegisterComponentType( D3D10_REGISTER_COMPONENT_TYPE type );
-		static const char* TranslateCBufferType( D3D11_CBUFFER_TYPE type );
-		static const char* TranslateShaderInputType( D3D10_SHADER_INPUT_TYPE type );
-		static const char* TranslateResourceReturnType( D3D11_RESOURCE_RETURN_TYPE type );
-
-		static std::wstring Print_D3D11_SHADER_DESC( D3D11_SHADER_DESC description );
-		static std::wstring Print_D3D10_PRIMITIVE_TOPOLOGY( D3D10_PRIMITIVE_TOPOLOGY topology );
-		static std::wstring Print_D3D10_PRIMITIVE( D3D10_PRIMITIVE primitive );
-		static std::wstring Print_D3D11_PRIMITIVE( D3D11_PRIMITIVE primitive );
-		static std::wstring Print_D3D11_TESSELLATOR_OUTPUT_PRIMITIVE( D3D11_TESSELLATOR_OUTPUT_PRIMITIVE primitive );
-		static std::wstring Print_D3D11_TESSELLATOR_PARTITIONING( D3D11_TESSELLATOR_PARTITIONING partitioning );
-		static std::wstring Print_D3D11_TESSELLATOR_DOMAIN( D3D11_TESSELLATOR_DOMAIN domain );
-
 		// Provide access to the pipeline states.
 		BlendStatePtr									GetBlendState( int index );
 		DepthStencilStatePtr							GetDepthState( int index );
