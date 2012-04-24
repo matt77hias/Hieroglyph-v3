@@ -200,7 +200,7 @@ namespace Glyph3
 			std::wstring& model, bool enablelogging = true );
 
         int LoadShader( ShaderType type, std::wstring& filename, std::wstring& function,
-            std::wstring& model, const D3D10_SHADER_MACRO* pDefines, bool enablelogging = true );
+            std::wstring& model, const D3D_SHADER_MACRO* pDefines, bool enablelogging = true );
 		
 		ResourcePtr GetSwapChainResource( int ID );
 

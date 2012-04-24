@@ -128,18 +128,17 @@ void ShaderDX11::UpdateParameters( PipelineManagerDX11* pPipeline, IParameterMan
 					for ( int j = 0; j < ConstantBuffers[i].Variables.count(); j++ )
 					{
 						RenderParameterDX11* pParam = ConstantBuffers[i].Parameters[j];
-						//const std::wstring& name = ConstantBuffers[i].Variables[j].Name;
 						int offset = ConstantBuffers[i].Variables[j].StartOffset;
 						UINT size = ConstantBuffers[i].Variables[j].Size;
 						
-						if ( ConstantBuffers[i].Types[j].Class == D3D10_SVC_VECTOR )
+						if ( ConstantBuffers[i].Types[j].Class == D3D_SVC_VECTOR )
 						{
 							Vector4f vector = pParamManager->GetVectorParameter( pParam );
 							Vector4f* pBuf = (Vector4f*)((char*)resource.pData + offset);
 							*pBuf = vector;
 						}
-						else if ( ( ConstantBuffers[i].Types[j].Class == D3D10_SVC_MATRIX_ROWS ) ||
-							( ConstantBuffers[i].Types[j].Class == D3D10_SVC_MATRIX_COLUMNS ) )
+						else if ( ( ConstantBuffers[i].Types[j].Class == D3D_SVC_MATRIX_ROWS ) ||
+							( ConstantBuffers[i].Types[j].Class == D3D_SVC_MATRIX_COLUMNS ) )
 						{
 							// Check if it is an array of matrices first...
 							unsigned int count = ConstantBuffers[i].Types[j].Elements;
@@ -184,45 +183,44 @@ void ShaderDX11::BindParameters( PipelineManagerDX11* pPipeline, IParameterManag
 
 	for ( int i = 0; i < ResourceBindings.count(); i++ )
 	{
-		//const std::wstring& name = ResourceBindings[i].Name;
 		UINT slot = ResourceBindings[i].BindPoint;
 
 		switch ( ResourceBindings[i].Type )
 		{
-		case D3D10_SIT_CBUFFER:
+		case D3D_SIT_CBUFFER:
 			pPipeline->BindConstantBufferParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
-		case D3D10_SIT_TBUFFER:
+		case D3D_SIT_TBUFFER:
 			pPipeline->BindConstantBufferParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
-		case D3D10_SIT_TEXTURE:
+		case D3D_SIT_TEXTURE:
 			pPipeline->BindShaderResourceParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
-		case D3D10_SIT_SAMPLER:
+		case D3D_SIT_SAMPLER:
 			pPipeline->BindSamplerStateParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
-		case D3D11_SIT_UAV_RWTYPED:
+		case D3D_SIT_UAV_RWTYPED:
 			pPipeline->BindUnorderedAccessParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
-		case D3D11_SIT_STRUCTURED:
+		case D3D_SIT_STRUCTURED:
 			pPipeline->BindShaderResourceParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
-		case D3D11_SIT_UAV_RWSTRUCTURED:
+		case D3D_SIT_UAV_RWSTRUCTURED:
 			pPipeline->BindUnorderedAccessParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
-		case D3D11_SIT_BYTEADDRESS:
+		case D3D_SIT_BYTEADDRESS:
 			pPipeline->BindShaderResourceParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
-		case D3D11_SIT_UAV_RWBYTEADDRESS:
+		case D3D_SIT_UAV_RWBYTEADDRESS:
 			pPipeline->BindUnorderedAccessParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
-		case D3D11_SIT_UAV_APPEND_STRUCTURED:
+		case D3D_SIT_UAV_APPEND_STRUCTURED:
 			pPipeline->BindUnorderedAccessParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
-		case D3D11_SIT_UAV_CONSUME_STRUCTURED:
+		case D3D_SIT_UAV_CONSUME_STRUCTURED:
 			pPipeline->BindUnorderedAccessParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
-		case D3D11_SIT_UAV_RWSTRUCTURED_WITH_COUNTER:
+		case D3D_SIT_UAV_RWSTRUCTURED_WITH_COUNTER:
 			pPipeline->BindUnorderedAccessParameter( GetType(), ResourceBindings[i].pParamRef, slot, pParamManager );
 			break;
 		}

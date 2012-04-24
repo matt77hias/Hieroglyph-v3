@@ -1016,7 +1016,7 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstring& function, 
-                                std::wstring& model, const D3D10_SHADER_MACRO* pDefines, bool enablelogging )
+                                std::wstring& model, const D3D_SHADER_MACRO* pDefines, bool enablelogging )
 {
 	HRESULT hr = S_OK;
 

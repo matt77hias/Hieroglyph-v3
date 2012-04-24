@@ -72,8 +72,8 @@ namespace Glyph3
 			SemanticName = std::wstring( L"" );
 			SemanticIndex = 0;
 			Register = 0;
-			SystemValueType = D3D10_NAME_UNDEFINED;
-			ComponentType = D3D10_REGISTER_COMPONENT_UNKNOWN;
+			SystemValueType = D3D_NAME_UNDEFINED;
+			ComponentType = D3D_REGISTER_COMPONENT_UNKNOWN;
 			Mask = 0;
 			ReadWriteMask = 0;
 		};
@@ -81,8 +81,8 @@ namespace Glyph3
 		std::wstring SemanticName;
 		UINT SemanticIndex;
 		UINT Register;
-		D3D10_NAME SystemValueType;
-		D3D10_REGISTER_COMPONENT_TYPE ComponentType;
+		D3D_NAME SystemValueType;
+		D3D_REGISTER_COMPONENT_TYPE ComponentType;
 		BYTE Mask;
 		BYTE ReadWriteMask;
 	};
@@ -171,8 +171,8 @@ namespace Glyph3
 		};
 		ShaderTypeDesc()
 		{
-			Class = D3D10_SVC_SCALAR;
-			Type = D3D10_SVT_VOID;
+			Class = D3D_SVC_SCALAR;
+			Type = D3D_SVT_VOID;
 			Rows = 0;         
 			Columns = 0;      
 			Elements = 0;     
@@ -181,8 +181,8 @@ namespace Glyph3
 			Name = std::wstring( L"" );  
 		};
 
-		D3D10_SHADER_VARIABLE_CLASS Class;		// Variable class (e.g. object, matrix, etc.)
-	    D3D10_SHADER_VARIABLE_TYPE  Type;		// Variable type (e.g. float, sampler, etc.)
+		D3D_SHADER_VARIABLE_CLASS Class;		// Variable class (e.g. object, matrix, etc.)
+	    D3D_SHADER_VARIABLE_TYPE  Type;			// Variable type (e.g. float, sampler, etc.)
 	    UINT Rows;								// Number of rows (for matrices, 1 for other numeric, 0 if not applicable)
 	    UINT Columns;							// Number of columns (for vectors & matrices, 1 for other numeric, 0 if not applicable)
 	    UINT Elements;							// Number of elements (0 if not an array)
@@ -209,23 +209,23 @@ namespace Glyph3
 		ShaderInputBindDesc()
 		{
 			Name = std::wstring( L"" );
-			Type = D3D10_SIT_CBUFFER;
+			Type = D3D_SIT_CBUFFER;
 			BindPoint = 0;
 			BindCount = 0;
 			uFlags = 0;
 			ReturnType = D3D11_RETURN_TYPE_UNORM;
-			Dimension = D3D10_SRV_DIMENSION_UNKNOWN;
+			Dimension = D3D_SRV_DIMENSION_UNKNOWN;
 			NumSamples = 0;
 			pParamRef = 0;
 		};
 
 		std::wstring Name;
-		D3D10_SHADER_INPUT_TYPE Type;
+		D3D_SHADER_INPUT_TYPE Type;
 		UINT BindPoint;
 		UINT BindCount;
 		UINT uFlags;
 		D3D11_RESOURCE_RETURN_TYPE ReturnType;
-		D3D10_SRV_DIMENSION Dimension;
+		D3D_SRV_DIMENSION Dimension;
 		UINT NumSamples;
 		RenderParameterDX11* pParamRef;
 	};
