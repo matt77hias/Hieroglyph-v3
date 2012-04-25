@@ -120,7 +120,7 @@ void CMFCwithD3D11View::OnInitialUpdate()
 	pCamera->GetNode()->Position() = Glyph3::Vector3f( 30.0f, 30.0f, -30.0f );
 	pCamera->SetCameraView( pPerspectiveView );
 	pCamera->SetOverlayView( pTextOverlayView );
-	pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>(width) / static_cast<float>(height), static_cast<float>( D3DX_PI ) / 4.0f );
+	pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>(width) / static_cast<float>(height), static_cast<float>( GLYPH_PI ) / 4.0f );
 
 	GetDocument()->pScene->AddEntity( pCamera->GetNode() );
 

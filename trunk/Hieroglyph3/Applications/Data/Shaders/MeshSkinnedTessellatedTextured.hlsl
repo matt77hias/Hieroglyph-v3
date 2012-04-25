@@ -100,7 +100,7 @@ HS_PATCH_OUTPUT HSPATCH(
 	//
 	//output.Inside = EdgeFactors.w; //2.0f;
 
-	const float factor = 32.0f;
+	const float factor = 5.0f;
 
 	output.Edges[0] = factor;
 	output.Edges[1] = factor;

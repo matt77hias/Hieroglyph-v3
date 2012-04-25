@@ -151,16 +151,16 @@ void App::Initialize()
 	// the focus of this demo. Initialize and store these variables here.
 
 	Matrix4f mView;
-	D3DXVECTOR3 vLookAt = D3DXVECTOR3( 0.0f, 0.0f, 0.0f );
-	D3DXVECTOR3 vLookFrom = D3DXVECTOR3( -2.0f, 2.0f, -2.0f );
-	D3DXVECTOR3 vLookUp = D3DXVECTOR3( 0.0f, 1.0f, 0.0f );
-	D3DXMatrixLookAtLH( reinterpret_cast<D3DXMATRIX*>(&mView), &vLookFrom, &vLookAt, &vLookUp );
+	Vector3f vLookAt = Vector3f( 0.0f, 0.0f, 0.0f );
+	Vector3f vLookFrom = Vector3f( -2.0f, 2.0f, -2.0f );
+	Vector3f vLookUp = Vector3f( 0.0f, 1.0f, 0.0f );
+	mView = Matrix4f::LookAtLHMatrix( vLookFrom, vLookAt, vLookUp );
 
 	Matrix4f mWorld;
-	D3DXMatrixIdentity( reinterpret_cast<D3DXMATRIX*>(&mWorld) );
+	mWorld.MakeIdentity();
 
 	Matrix4f mProj;
-	D3DXMatrixPerspectiveFovLH( reinterpret_cast<D3DXMATRIX*>(&mProj), static_cast< float >(D3DX_PI) / 4.0f, 640.0f /  480.0f, 0.1f, 50.0f );
+	mProj = Matrix4f::PerspectiveFovLHMatrix( static_cast< float >(GLYPH_PI) / 4.0f, 640.0f /  480.0f, 0.1f, 50.0f );
 
 	// Composite together for the final transform
 	Matrix4f mViewProj = mView * mProj;
@@ -285,7 +285,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"TessParamsDemo_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------

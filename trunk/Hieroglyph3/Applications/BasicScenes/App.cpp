@@ -169,7 +169,7 @@ void App::Initialize()
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
-	m_pCamera->SetProjectionParams( 0.1f, 100.0f, 640.0f / 320.0f, static_cast<float>( D3DX_PI ) / 2.0f );
+	m_pCamera->SetProjectionParams( 0.1f, 100.0f, 640.0f / 320.0f, static_cast<float>( GLYPH_PI ) / 2.0f );
 
 	// Create the scene and add the entities to it.  Then add the camera to the
 	// scene so that it will be updated via the scene interface instead of 
@@ -227,7 +227,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"BasicScenes_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
@@ -288,6 +288,6 @@ bool App::HandleEvent( IEvent* pEvent )
 //--------------------------------------------------------------------------------
 std::wstring App::GetName( )
 {
-	return( std::wstring( L"BasicApplication" ) );
+	return( std::wstring( L"BasicScenes" ) );
 }
 //--------------------------------------------------------------------------------

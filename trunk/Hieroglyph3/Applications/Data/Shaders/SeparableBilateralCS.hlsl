@@ -71,8 +71,8 @@ void CS_Horizontal( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_Disp
 		float fDelta = fCenterDepth - fSampleDepth;
 		float fRange = exp( ( -1.0f * fDelta * fDelta ) / ( 2.0f * rsigma * rsigma ) );
 
-		fBilateral += fSampleOcclusion * fRange * avKernel[x+3];
-		fWeight += fRange * avKernel[x+3];
+		fBilateral += fSampleOcclusion * fRange * avKernel[x];
+		fWeight += fRange * avKernel[x];
 	}
 
 	AmbientOcclusionTarget[DispatchThreadID.xy] = fBilateral / fWeight;
@@ -136,8 +136,8 @@ void CS_Vertical( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_Dispat
 		float fDelta = fCenterDepth - fSampleDepth;
 		float fRange = exp( ( -1.0f * fDelta * fDelta ) / ( 2.0f * rsigma * rsigma ) );
 
-		fBilateral += fSampleOcclusion * fRange * avKernel[y+3];
-		fWeight += fRange * avKernel[y+3];
+		fBilateral += fSampleOcclusion * fRange * avKernel[y];
+		fWeight += fRange * avKernel[y];
 	}
 
 	AmbientOcclusionTarget[DispatchThreadID.xy] = fBilateral / fWeight;

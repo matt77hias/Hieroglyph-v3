@@ -180,8 +180,6 @@ Matrix4f& Entity3D::LocalMatrix()
 //--------------------------------------------------------------------------------
 Matrix4f Entity3D::GetView()
 {
-	Matrix4f Ret;
-
 	Vector3f Eye;
 	Vector3f At;
 	Vector3f Up;
@@ -190,12 +188,7 @@ Matrix4f Entity3D::GetView()
 	At = m_mWorld.GetTranslation() + m_mWorld.GetBasisZ();
 	Up = m_mWorld.GetBasisY();
 
-	D3DXMatrixLookAtLH((D3DXMATRIX*)&Ret, 
-		(D3DXVECTOR3*)&Eye,
-		(D3DXVECTOR3*)&At,
-		(D3DXVECTOR3*)&Up);
-
-	return( Ret );
+	return( Matrix4f::LookAtLHMatrix( Eye, At, Up ) );
 }
 //--------------------------------------------------------------------------------
 void Entity3D::PreRender( RendererDX11* pRenderer, VIEWTYPE view )

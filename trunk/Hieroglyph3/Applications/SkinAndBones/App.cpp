@@ -66,7 +66,6 @@ void App::ShutdownEngineComponents()
 //--------------------------------------------------------------------------------
 void App::Initialize()
 {
-
 	// Create the light parameters for use with this effect
 
 	Vector4f LightParams = Vector4f( 0.2f, 0.7f, 0.2f, 0.7f );
@@ -122,7 +121,7 @@ void App::Initialize()
 	m_pStaticActor = new Actor();
 	GeometryPtr pStaticGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"box.ms3d" ) );
 	pStaticGeometry->LoadToBuffers();
-	MaterialPtr pStaticMaterial = MaterialGeneratorDX11::GenerateStaticTextured(*RendererDX11::Get());
+	MaterialPtr pStaticMaterial = MaterialGeneratorDX11::GenerateStaticTextured( *m_pRenderer11 );
 	m_pStaticActor->GetBody()->SetGeometry( pStaticGeometry );
 	m_pStaticActor->GetBody()->SetMaterial( pStaticMaterial );
 

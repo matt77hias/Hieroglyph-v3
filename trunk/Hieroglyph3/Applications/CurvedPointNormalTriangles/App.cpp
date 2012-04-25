@@ -254,7 +254,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"CurvedPNTri_" ), D3DX11_IFF_PNG );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_PNG );
 	}
 }
 //--------------------------------------------------------------------------------
@@ -437,28 +437,24 @@ void App::UpdateViewState()
 	// Create the world matrix
 	Matrix4f mWorld, mWorldScale, mWorldRotation;
 	
-	D3DXMatrixIdentity( reinterpret_cast<D3DXMATRIX*>(&mWorld) );
+	mWorld.MakeIdentity();
 	
 	// Geometry is defined in the [-0.5,+0.5] range on the XZ plane
-
-	//D3DXMatrixScaling( reinterpret_cast<D3DXMATRIX*>(&mWorldScale), 15.0f, 1.0f, 15.0f ); // Domain Shader controls Y scale, not here!
-	//D3DXMatrixMultiply( reinterpret_cast<D3DXMATRIX*>(&mWorld), reinterpret_cast<D3DXMATRIX*>(&mWorld), reinterpret_cast<D3DXMATRIX*>(&mWorldScale) );
 
 	// Create the inverse transpose world matrix
 	Matrix4f mInvTPoseWorld;
 
-	D3DXMatrixInverse( reinterpret_cast<D3DXMATRIX*>(&mInvTPoseWorld), NULL, reinterpret_cast<D3DXMATRIX*>(&mWorld) );
-	D3DXMatrixTranspose( reinterpret_cast<D3DXMATRIX*>(&mInvTPoseWorld), reinterpret_cast<D3DXMATRIX*>(&mInvTPoseWorld) );
-
+	mInvTPoseWorld = mWorld.Inverse();
+	mInvTPoseWorld = mInvTPoseWorld.Transpose();
 	
-	D3DXVECTOR3 vLookAt = D3DXVECTOR3( 0.0f, 0.0f, 0.0f );
-	D3DXVECTOR3 vLookFrom = D3DXVECTOR3( 0.0f, 0.0f, 0.0f );
-	D3DXVECTOR3 vLookUp = D3DXVECTOR3( 0.0f, 1.0f, 0.0f );
+	Vector3f vLookAt = Vector3f( 0.0f, 0.0f, 0.0f );
+	Vector3f vLookFrom = Vector3f( 0.0f, 0.0f, 0.0f );
+	Vector3f vLookUp = Vector3f( 0.0f, 1.0f, 0.0f );
 
 	// based on time, determine where the camera is at and where it should look to
 	float distance = time / 30.0f; // 30 seconds to do a single circuit
-	float fromAngle = fmodf( distance * 2.0f * static_cast<float>(D3DX_PI), 2.0f * static_cast<float>(D3DX_PI));
-	//float toAngle = fmodf( (distance + 0.08f) * 2.0f * static_cast<float>(D3DX_PI), 2.0f * static_cast<float>(D3DX_PI)); // ~30 degrees in front
+	float fromAngle = fmodf( distance * 2.0f * static_cast<float>(GLYPH_PI), 2.0f * static_cast<float>(GLYPH_PI));
+	//float toAngle = fmodf( (distance + 0.08f) * 2.0f * static_cast<float>(GLYPH_PI), 2.0f * static_cast<float>(GLYPH_PI)); // ~30 degrees in front
 
 	//vLookFrom.x = 4.5f;//sinf(fromAngle) * 2.5f;
 	//vLookFrom.y = 5.25f;
@@ -475,12 +471,11 @@ void App::UpdateViewState()
 	*/
 
 	// Create the view matrix
-	Matrix4f mView;
-	D3DXMatrixLookAtLH( reinterpret_cast<D3DXMATRIX*>(&mView), &vLookFrom, &vLookAt, &vLookUp );
+	Matrix4f mView = Matrix4f::LookAtLHMatrix( vLookFrom, vLookAt, vLookUp );
 
 	// Create the projection matrix
-	Matrix4f mProj;
-	D3DXMatrixPerspectiveFovLH( reinterpret_cast<D3DXMATRIX*>(&mProj), static_cast< float >(D3DX_PI) / 3.0f, static_cast<float>(m_pWindow->GetWidth()) /  static_cast<float>(m_pWindow->GetHeight()), 1.0f, 25.0f );
+	Matrix4f mProj = Matrix4f::PerspectiveFovLHMatrix( static_cast< float >(GLYPH_PI) / 3.0f, 
+		static_cast<float>(m_pWindow->GetWidth()) /  static_cast<float>(m_pWindow->GetHeight()), 1.0f, 25.0f );
 
 	// Composite together for the final transform
 	Matrix4f mViewProj = mView * mProj;

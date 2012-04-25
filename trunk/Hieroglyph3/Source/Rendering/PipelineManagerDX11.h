@@ -116,7 +116,6 @@ namespace Glyph3
 
 
 
-		void CopyStructureCount( ResourcePtr dest, UINT offset, ResourcePtr uav );
 
 		// The pipeline state can be modified with command lists.  This allows
 		// the renderer to generate a command list on a deferred context, and
@@ -125,14 +124,54 @@ namespace Glyph3
 		void GenerateCommandList( CommandListDX11* pList );
 		void ExecuteCommandList( CommandListDX11* pList );
 
-		void ClearBuffers( Vector4f color, float depth = 1.0f, UINT stencil = 0 );
 
-		// Resources can be mapped in order to manually modify or read their
-		// contents.  The returned structure provides information about the
-		// resource including the pitch and width to be used in accessing it.
+		//--------------------------------------------------------------------------------------
+		// Each of the following methods are used to modify resources in some way.  The user is
+		// required to understand the implications of using these methods on both immediate
+		// contexts and deferred contexts - this means for immediate that the command is carried
+		// out more or less right away (placed in the instruction queue of the driver anyways)
+		// while the deferred context command goes into a command list to be executed later on.
+		// Please check to make sure what you are trying to do will work in both contexts!!!
+		//--------------------------------------------------------------------------------------
+
+		// Clear buffers does what it says - the currently bound render target views and depth
+		// stencil view are cleared to the provided values.
+
+		void ClearBuffers( Vector4f color, float depth = 1.0f, UINT stencil = 0 );
+		
+		// Resources can be mapped in order to manually modify or read their contents.  The 
+		// returned structure provides information about the resource including the pitch and
+		// width to be used in accessing it.
 
 		D3D11_MAPPED_SUBRESOURCE	MapResource( int index, UINT subresource, D3D11_MAP actions, UINT flags );
 		void						UnMapResource( int index, UINT subresource );
+
+		// This is an alternative method to mapping for updating resources.  In certain 
+		// situations one method may or may not be more efficient than the other, so it is
+		// worth trying both to see which is more performant in a given situation.
+
+		void UpdateSubresource( int rid, UINT DstSubresource, const D3D11_BOX *pDstBox, const void *pSrcData,
+			UINT SrcRowPitch, UINT SrcDepthPitch );
+
+		// Copy from one resource to another resource.  Check the documentation for restrictions
+		// if you get errors when performing the copying.
+
+		void CopySubresourceRegion( ResourcePtr DestResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ,
+			ResourcePtr SrcResource, UINT SrcSubresource, D3D11_BOX* pSrcBox );
+
+        // Resolve a subresource from a MSAA texture to a non-MSAA texture.
+        
+        void ResolveSubresource ( ResourcePtr DestResource, UINT DstSubresource, 
+                                    ResourcePtr SrcResource, UINT SrcSubresource,
+                                    DXGI_FORMAT format );
+
+		// Copy the internal counter variable from a UAV (either from Append/Consume 
+		// functionality, or directly a StructuredBuffer internal counter) to the specified
+		// output buffer.
+
+		void CopyStructureCount( ResourcePtr dest, UINT offset, ResourcePtr uav );
+
+
 
 		// Pipeline statistics are available through the query objects in D3D11.
 		// Call start, do some rendering, call end, and then print the results to
@@ -144,17 +183,6 @@ namespace Glyph3
 
 		void SaveTextureScreenShot( int ID, std::wstring filename, D3DX11_IMAGE_FILE_FORMAT format = D3DX11_IFF_PNG );
 
-		// Copy from one resource to another resource.
-
-		void CopySubresourceRegion( ResourcePtr DestResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ,
-			ResourcePtr SrcResource, UINT SrcSubresource, D3D11_BOX* pSrcBox );
-
-
-        // Resolve a subresource
-        
-        void ResolveSubresource ( ResourcePtr DestResource, UINT DstSubresource, 
-                                    ResourcePtr SrcResource, UINT SrcSubresource,
-                                    DXGI_FORMAT format );
 
 		D3D_FEATURE_LEVEL			m_FeatureLevel;
 

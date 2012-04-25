@@ -324,10 +324,110 @@ Matrix4f Matrix4f::ScaleMatrix( float fScale )
 	return( ret );
 }
 //----------------------------------------------------------------------------------------------------
+Matrix4f Matrix4f::ScaleMatrixXYZ( float fX, float fY, float fZ )
+{
+	Matrix4f ret;
+
+	ret.m_afEntry[ 0] = fX;
+	ret.m_afEntry[ 1] = 0.0f;
+	ret.m_afEntry[ 2] = 0.0f;
+	ret.m_afEntry[ 3] = 0.0f;
+
+	ret.m_afEntry[ 4] = 0.0f;
+	ret.m_afEntry[ 5] = fY;
+	ret.m_afEntry[ 6] = 0.0f;
+	ret.m_afEntry[ 7] = 0.0f;
+
+	ret.m_afEntry[ 8] = 0.0f;
+	ret.m_afEntry[ 9] = 0.0f;
+	ret.m_afEntry[10] = fZ;
+	ret.m_afEntry[11] = 0.0f;
+
+	ret.m_afEntry[12] = 0.0f;
+	ret.m_afEntry[13] = 0.0f;
+	ret.m_afEntry[14] = 0.0f;
+	ret.m_afEntry[15] = 1.0f;
+	
+	return( ret );
+}
+//----------------------------------------------------------------------------------------------------
 Matrix4f Matrix4f::TranslationMatrix( float fX, float fY, float fZ )
 {
 	Matrix4f ret;
 	ret.Translate( fX, fY, fZ );
+	return( ret );
+}
+//----------------------------------------------------------------------------------------------------
+Matrix4f Matrix4f::LookAtLHMatrix( Vector3f& eye, Vector3f& at, Vector3f& up )
+{
+	// This method is based on the method of the same name from the D3DX library.
+
+	Matrix4f ret;
+
+	Vector3f zaxis = at - eye; 
+	zaxis.Normalize();
+	
+	Vector3f xaxis = up.Cross( zaxis );
+	xaxis.Normalize();
+
+	Vector3f yaxis = zaxis.Cross( xaxis );
+
+	ret.m_afEntry[ 0] = xaxis.x;
+	ret.m_afEntry[ 1] = yaxis.x;
+	ret.m_afEntry[ 2] = zaxis.x;
+	ret.m_afEntry[ 3] = 0.0f;
+
+	ret.m_afEntry[ 4] = xaxis.y;
+	ret.m_afEntry[ 5] = yaxis.y;
+	ret.m_afEntry[ 6] = zaxis.y;
+	ret.m_afEntry[ 7] = 0.0f;
+
+	ret.m_afEntry[ 8] = xaxis.z;
+	ret.m_afEntry[ 9] = yaxis.z;
+	ret.m_afEntry[10] = zaxis.z;
+	ret.m_afEntry[11] = 0.0f;
+
+	ret.m_afEntry[12] = -(xaxis.Dot(eye));
+	ret.m_afEntry[13] = -(yaxis.Dot(eye));
+	ret.m_afEntry[14] = -(zaxis.Dot(eye));
+	ret.m_afEntry[15] = 1.0f;
+
+	return( ret );
+}
+//----------------------------------------------------------------------------------------------------
+Matrix4f Matrix4f::PerspectiveFovLHMatrix( float fovy, float aspect, float zn, float zf )
+{
+	// This method is based on the method of the same name from the D3DX library.
+
+	Matrix4f ret;
+
+	float tanY = tan( fovy / 2.0f );
+	if ( 0.0f == tanY ) tanY = 0.001f;
+	float yScale = 1.0f / tanY;
+
+	if ( 0.0f == aspect ) aspect = 0.001f;
+	float xScale = yScale / aspect;
+
+	ret.m_afEntry[ 0] = xScale;
+	ret.m_afEntry[ 1] = 0.0f;
+	ret.m_afEntry[ 2] = 0.0f;
+	ret.m_afEntry[ 3] = 0.0f;
+
+	ret.m_afEntry[ 4] = 0.0f;
+	ret.m_afEntry[ 5] = yScale;
+	ret.m_afEntry[ 6] = 0.0f;
+	ret.m_afEntry[ 7] = 0.0f;
+
+	ret.m_afEntry[ 8] = 0.0f;
+	ret.m_afEntry[ 9] = 0.0f;
+	ret.m_afEntry[10] = zf / ( zf-zn );
+	ret.m_afEntry[11] = 1.0f;
+
+	ret.m_afEntry[12] = 0.0f;
+	ret.m_afEntry[13] = 0.0f;
+	ret.m_afEntry[14] = -zn*zf / ( zf-zn );
+	ret.m_afEntry[15] = 0.0f;
+
 	return( ret );
 }
 //----------------------------------------------------------------------------------------------------

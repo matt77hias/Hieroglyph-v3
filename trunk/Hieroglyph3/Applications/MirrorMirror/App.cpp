@@ -74,7 +74,7 @@ void App::Initialize()
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
 
-	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( static_cast<float>( D3DX_PI ) / 6.0f, static_cast<float>( D3DX_PI ) / 4.0f, 0.0f ) );
+	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( static_cast<float>( GLYPH_PI ) / 6.0f, static_cast<float>( GLYPH_PI ) / 4.0f, 0.0f ) );
 	m_pCamera->GetNode()->Position() = Vector3f( -5.0f, 5.0f, -5.0f );
 	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.2f, 0.2f ) );
 

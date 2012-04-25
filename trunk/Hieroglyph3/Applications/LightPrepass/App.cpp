@@ -81,7 +81,7 @@ bool App::ConfigureRenderingSetup()
     const float nearClip = 1.0f;
     const float farClip = 15.0f;
 
-	m_pCamera->SetProjectionParams( nearClip, farClip, (float)m_iWidth / (float)m_iHeight, (float)D3DX_PI / 2.0f );
+	m_pCamera->SetProjectionParams( nearClip, farClip, static_cast<float>(m_iWidth) / static_cast<float>(m_iHeight), static_cast<float>(GLYPH_PI) / 2.0f );
 	pLightPrepassView->SetClipPlanes( nearClip, farClip );
 
 	m_pScene->AddCamera( m_pCamera );

@@ -1028,15 +1028,16 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 	WideCharToMultiByte(CP_ACP, 0, function.c_str(), -1, AsciiFunction, 1024, NULL, NULL);
 	WideCharToMultiByte(CP_ACP, 0, model.c_str(), -1, AsciiModel, 1024, NULL, NULL);
 
-    UINT flags = D3D10_SHADER_PACK_MATRIX_ROW_MAJOR;
+    UINT flags = D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
 #ifdef _DEBUG
-    flags |= D3D10_SHADER_DEBUG | D3D10_SHADER_SKIP_OPTIMIZATION | D3D10_SHADER_WARNINGS_ARE_ERRORS;
+    flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION | D3DCOMPILE_WARNINGS_ARE_ERRORS;
 #endif
 
 	// Get the current path to the shader folders, and add the filename to it.
 
 	FileSystem fs;
 	filename = fs.GetShaderFolder() + filename;
+
 
 	if ( FAILED( hr = D3DX11CompileFromFile(
 		filename.c_str(),

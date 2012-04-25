@@ -41,7 +41,10 @@ void Vector3f::MakeZero( )
 //----------------------------------------------------------------------------------------------------
 void Vector3f::Normalize( )
 {
-	float fInvMag = ( 1.0f / Magnitude() );
+	float Mag = Magnitude();
+	if ( 0.0f == Mag ) Mag = 0.0001f;
+
+	float fInvMag = ( 1.0f / Mag );
 
 	x *= fInvMag;
 	y *= fInvMag;

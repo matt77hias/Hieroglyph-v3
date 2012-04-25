@@ -635,30 +635,86 @@ void PipelineManagerDX11::BindShader( ShaderType type, int ID, IParameterManager
 	}
 }
 //--------------------------------------------------------------------------------
-D3D11_MAPPED_SUBRESOURCE PipelineManagerDX11::MapResource( int index, UINT subresource, D3D11_MAP actions, UINT flags )
+D3D11_MAPPED_SUBRESOURCE PipelineManagerDX11::MapResource( int rid, UINT subresource, D3D11_MAP actions, UINT flags )
 {
-	ID3D11Resource* pResource = 0;
 	D3D11_MAPPED_SUBRESOURCE Data;
+	Data.pData = NULL;
+	Data.DepthPitch = Data.RowPitch = 0;
 
-	pResource = RendererDX11::Get()->GetResourceByIndex( index )->GetResource();
+	// Acquire the engine's resource wrapper.
+	ResourceDX11* pGlyphResource = 0; 
+	pGlyphResource = RendererDX11::Get()->GetResourceByIndex( rid );
 
-	// Map the resource
+	if ( NULL == pGlyphResource ) {
+		Log::Get().Write( L"Trying to map a subresource that doesn't exist!!!" );
+		return( Data );
+	}
+
+	// Acquire the native resource pointer.
+	ID3D11Resource* pResource = 0;
+	pResource = pGlyphResource->GetResource();
+
+	if ( NULL == pResource ) {
+		Log::Get().Write( L"Trying to map a subresource that has no native resource in it!!!" );
+		return( Data );
+	}
+
+	// Perform the mapping of the resource.
 	HRESULT hr = m_pContext->Map( pResource, subresource, actions, flags, &Data );
 	
-	if ( FAILED( hr ) )
+	if ( FAILED( hr ) ) {
 		Log::Get().Write( L"Failed to map resource!" );
+	}
 
 	return( Data );
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::UnMapResource( int index, UINT subresource )
+void PipelineManagerDX11::UnMapResource( int rid, UINT subresource )
 {
-	ID3D11Resource* pResource = 0;
+	// Acquire the engine's resource wrapper.
+	ResourceDX11* pGlyphResource = 0; 
+	pGlyphResource = RendererDX11::Get()->GetResourceByIndex( rid );
 
-	pResource = RendererDX11::Get()->GetResourceByIndex( index )->GetResource();
+	if ( NULL == pGlyphResource ) {
+		Log::Get().Write( L"Trying to unmap a subresource that doesn't exist!!!" );
+		return;
+	}
+
+	// Acquire the native resource pointer.
+	ID3D11Resource* pResource = 0;
+	pResource = pGlyphResource->GetResource();
+
+	if ( NULL == pResource ) {
+		Log::Get().Write( L"Trying to unmap a subresource that has no native resource in it!!!" );
+		return;
+	}
 
 	// Unmap the resource - there is no HRESULT returned, so trust that it works...
 	m_pContext->Unmap( pResource, subresource );
+}
+//--------------------------------------------------------------------------------
+void PipelineManagerDX11::UpdateSubresource( int rid, UINT DstSubresource, const D3D11_BOX *pDstBox, const void *pSrcData, UINT SrcRowPitch, UINT SrcDepthPitch )
+{
+	// Acquire the engine's resource wrapper.
+	ResourceDX11* pGlyphResource = 0; 
+	pGlyphResource = RendererDX11::Get()->GetResourceByIndex( rid );
+
+	if ( NULL == pGlyphResource ) {
+		Log::Get().Write( L"Trying to update a subresource that doesn't exist!!!" );
+		return;
+	}
+
+	// Acquire the native resource pointer.
+	ID3D11Resource* pResource = 0;
+	pResource = pGlyphResource->GetResource();
+
+	if ( NULL == pResource ) {
+		Log::Get().Write( L"Trying to update a subresource that has no native resource in it!!!" );
+		return;
+	}
+
+	// Perform the update of the resource.
+	m_pContext->UpdateSubresource( pResource, DstSubresource, pDstBox, pSrcData, SrcRowPitch, SrcDepthPitch );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::StartPipelineStatistics( )

@@ -164,8 +164,7 @@ void App::Initialize()
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );
 
-	Matrix4f proj;
-	D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&proj, static_cast<float>( D3DX_PI ) / 4, 640.0f / 320.0f, 0.1f, 100.0f );
+	Matrix4f proj = Matrix4f::PerspectiveFovLHMatrix( static_cast<float>( GLYPH_PI ) / 4.0f, 640.0f / 320.0f, 0.1f, 100.0f );
 
 	m_pRenderView->SetProjMatrix( proj );
 
@@ -220,7 +219,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"BasicApplication_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
@@ -284,6 +283,6 @@ bool App::HandleEvent( IEvent* pEvent )
 //--------------------------------------------------------------------------------
 std::wstring App::GetName( )
 {
-	return( std::wstring( L"BasicApplication" ) );
+	return( std::wstring( L"BasicRenderViews" ) );
 }
 //--------------------------------------------------------------------------------

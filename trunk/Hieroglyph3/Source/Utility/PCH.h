@@ -38,12 +38,14 @@
 #include <assert.h>
 
 // DirectX SDK includes
+#include <D3Dcommon.h>
 #include <dxgi.h>
 #include <d3d11.h>
 #include <d3dCompiler.h>
 #include <d3dx11.h>
-#include <D3DX10core.h>
-#include <D3D11Shader.h>
+//#include <D3DX10core.h>
+//#include <D3D11Shader.h>
+
 #include <d3d9.h>
 
 // Windows SDK includes
@@ -68,5 +70,8 @@
 
 // Define the number of threads to use for 
 #define NUM_THREADS 4
+
+#define GLYPH_PI 3.14159265
+
 
 #endif // PCH_h

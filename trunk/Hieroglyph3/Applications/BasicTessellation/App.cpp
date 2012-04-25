@@ -190,16 +190,16 @@ void App::Initialize()
 	// Build the world, view, and projection matrices
 
 	// Create the world matrix
-	D3DXMatrixIdentity( (D3DXMATRIX*)&m_WorldMatrix );
+	m_WorldMatrix.MakeIdentity();
 
 	// Create the view matrix
-	D3DXVECTOR3 vLookAt = D3DXVECTOR3( 0.0f, 0.75f, 0.0f );
-	D3DXVECTOR3 vLookFrom = D3DXVECTOR3( 5.0f, 5.5f, -5.0f );
-	D3DXVECTOR3 vLookUp = D3DXVECTOR3( 0.0f, 1.0f, 0.0f );
-	D3DXMatrixLookAtLH( (D3DXMATRIX*)&m_ViewMatrix, &vLookFrom, &vLookAt, &vLookUp );
+	Vector3f vLookAt = Vector3f( 0.0f, 0.75f, 0.0f );
+	Vector3f vLookFrom = Vector3f( 5.0f, 5.5f, -5.0f );
+	Vector3f vLookUp = Vector3f( 0.0f, 1.0f, 0.0f );
+	m_ViewMatrix = Matrix4f::LookAtLHMatrix( vLookFrom, vLookAt, vLookUp );
 
 	// Create the projection matrix
-	D3DXMatrixPerspectiveFovLH( (D3DXMATRIX*)&m_ProjMatrix, static_cast< float >(D3DX_PI) / 2.0f, 640.0f / 480.0f, 0.1f, 25.0f );
+	m_ProjMatrix = Matrix4f::PerspectiveFovLHMatrix( static_cast< float >(GLYPH_PI) / 2.0f, 640.0f / 480.0f, 0.1f, 25.0f );
 
 	// Concatenate the view and projection matrices
 	m_ViewProjMatrix = m_ViewMatrix * m_ProjMatrix;
@@ -255,7 +255,7 @@ void App::Update()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, std::wstring( L"BasicTessellation_" ), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
 	}
 }
 //--------------------------------------------------------------------------------
@@ -319,6 +319,6 @@ bool App::HandleEvent( IEvent* pEvent )
 //--------------------------------------------------------------------------------
 std::wstring App::GetName( )
 {
-	return( std::wstring( L"BasicApplication" ) );
+	return( std::wstring( L"BasicTessellation" ) );
 }
 //--------------------------------------------------------------------------------
