@@ -143,6 +143,9 @@
     <Filter Include="Rendering\Utility">
       <UniqueIdentifier>{835f1b65-4607-4680-b5ad-6dd4eedaf246}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering\Pipeline\Shader Stages\Shader Programs\Reflection">
+      <UniqueIdentifier>{459e32db-dd34-4f16-b136-ce4bb25028fe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Mathematics\Matrix3f.cpp">
@@ -645,6 +648,12 @@
     </ClCompile>
     <ClCompile Include="Rendering\D3DEnumConversion.cpp">
       <Filter>Rendering\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\ShaderReflectionDX11.cpp">
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\ShaderReflectionFactoryDX11.cpp">
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs\Reflection</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1172,6 +1181,12 @@
     </ClInclude>
     <ClInclude Include="Rendering\D3DEnumConversion.h">
       <Filter>Rendering\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\ShaderReflectionDX11.h">
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\ShaderReflectionFactoryDX11.h">
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs\Reflection</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

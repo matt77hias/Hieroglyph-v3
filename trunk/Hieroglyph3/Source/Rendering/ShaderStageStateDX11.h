@@ -36,6 +36,10 @@ namespace Glyph3
 
 		void SetFeautureLevel( D3D_FEATURE_LEVEL level );
 
+		// These methods are provided to allow the user to 'set' particular states.  These states are
+		// then tracked for minimizing API calls later on, as well as reducing the number of states 
+		// which are compared on the CPU side.
+
 		void SetShaderProgram( int index );
 		void SetConstantBuffer( int index, ID3D11Buffer* pBuffer );
 		void SetSamplerState( int index, ID3D11SamplerState* pState );
@@ -46,6 +50,7 @@ namespace Glyph3
 		
 		// These comparison methods are used to determine if two states are the same or not.  The result
 		// can then be used to set the appropriate amount of states, or none at all if the result is 0.
+		
 		int CompareShaderProgramState( ShaderStageStateDX11& desired );
 		int CompareConstantBufferState( ShaderStageStateDX11& desired );
 		int CompareSamplerStateState( ShaderStageStateDX11& desired );
@@ -53,6 +58,10 @@ namespace Glyph3
 		int CompareUnorderedAccessViewState( ShaderStageStateDX11& desired );
 		
 		void ClearState( );
+
+		void SetSisterState( ShaderStageStateDX11* pState );
+		void ResetUpdateFlags( );
+
 
 	protected:
 
@@ -64,6 +73,15 @@ namespace Glyph3
 		ID3D11ShaderResourceView*	ShaderResourceViews[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT];
 		ID3D11UnorderedAccessView*	UnorderedAccessViews[D3D11_PS_CS_UAV_REGISTER_COUNT];
 		unsigned int				UAVInitCounts[D3D11_PS_CS_UAV_REGISTER_COUNT];
+
+		ShaderStageStateDX11*		m_pSisterState;
+
+		bool						m_bUpdateShaderIndex;
+		bool						m_bUpdateConstantBuffers;
+		bool						m_bUpdateSamplerStates;
+		bool						m_bUpdateSRVs;
+		bool						m_bUpdateUAVs;
+		bool						m_bUpdateUAVCounts;
 
 		friend VertexStageDX11;
 		friend HullStageDX11;

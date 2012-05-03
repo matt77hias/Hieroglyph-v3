@@ -142,7 +142,7 @@ bool App::ConfigureEngineComponents()
 		std::wstring( L"ps_4_0" ),
 		true);
 
-	m_pRenderer11->GetShader(m_Effect.m_iVertexShader)->PrintShaderDetails();
+	m_pRenderer11->GetShader(m_Effect.m_iVertexShader)->GetReflection()->PrintShaderDetails();
 
 	// just use default states
 

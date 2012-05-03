@@ -384,6 +384,7 @@ void PipelineManagerDX11::Draw( RenderEffectDX11& effect, ResourcePtr vb, Resour
 
 	if ( ib != NULL ) {
 		InputAssemblerStage.DesiredState.SetIndexBuffer( ib->m_iResource );
+		InputAssemblerStage.DesiredState.SetIndexBufferFormat( DXGI_FORMAT_R32_UINT );
 	}
 
 	// Bind the input layout.
@@ -456,6 +457,7 @@ void PipelineManagerDX11::DrawInstanced( RenderEffectDX11& effect, ResourcePtr v
 
 	// Bind the index buffer.
 	InputAssemblerStage.DesiredState.SetIndexBuffer( ib->m_iResource );
+	InputAssemblerStage.DesiredState.SetIndexBufferFormat( DXGI_FORMAT_R32_UINT );
 
     // Bind the input layout.
 	InputAssemblerStage.DesiredState.SetInputLayout( inputLayout );
@@ -625,8 +627,8 @@ void PipelineManagerDX11::BindShader( ShaderType type, int ID, IParameterManager
 			// Before binding the shader, have it update its required parameters.  These
 			// parameters will then be bound to the pipeline after the shader is bound.
 
-			pShaderDX11->UpdateParameters( this, pParamManager );
-			pShaderDX11->BindParameters( this, pParamManager );
+			pShaderDX11->GetReflection()->UpdateParameters( this, pParamManager );
+			pShaderDX11->GetReflection()->BindParameters( type, this, pParamManager );
 		}
 		else
 		{

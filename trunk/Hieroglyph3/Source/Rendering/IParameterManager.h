@@ -16,16 +16,16 @@
 #define IParameterManager_h
 //--------------------------------------------------------------------------------
 #include "RendererDX11.h"
+#include "ConstantBufferParameterDX11.h"
+#include "MatrixParameterDX11.h"
+#include "MatrixArrayParameterDX11.h"
+#include "SamplerParameterDX11.h"
+#include "ShaderResourceParameterDX11.h"
+#include "UnorderedAccessParameterDX11.h"
+#include "VectorParameterDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class VectorParameterDX11;
-	class MatrixParameterDX11;
-	class ShaderResourceParameterDX11;
-	class UnorderedAccessParameterDX11;
-	class ConstantBufferParameterDX11;
-	class SamplerParameterDX11;
-	class MatrixArrayParameterDX11;
 
 	class IParameterManager
 	{

@@ -54,6 +54,8 @@
 #include "GeometryShaderDX11.h"
 #include "PixelShaderDX11.h"
 #include "ComputeShaderDX11.h"
+#include "ShaderReflectionDX11.h"
+#include "ShaderReflectionFactoryDX11.h"
 
 #include "VectorParameterDX11.h"
 #include "MatrixParameterDX11.h"
@@ -1038,7 +1040,6 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 	FileSystem fs;
 	filename = fs.GetShaderFolder() + filename;
 
-
 	if ( FAILED( hr = D3DX11CompileFromFile(
 		filename.c_str(),
 		pDefines,
@@ -1170,161 +1171,24 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 	m_vShaders.add( pShaderWrapper );
 
 
-	// Create the reflection interface to query information about the shader.  Note that
-	// this reflection interface does not depend on the shader type!
 
-	ID3D11ShaderReflection* pReflector = NULL;
-	hr = D3DReflect( pCompiledShader->GetBufferPointer(), pCompiledShader->GetBufferSize(),
-		IID_ID3D11ShaderReflection, (void**) &pReflector);
-
-	if ( FAILED( hr ) )
-	{
-		Log::Get().Write( L"Failed to create shader reflection interface!" );
-		return( -1 );
-	}
-
-
-	// Get the top level shader information, including the number of constant buffers,
-	// as well as the number bound resources (constant buffers + other objects), the
-	// number of input elements, and the number of output elements for the shader.
-
-	D3D11_SHADER_DESC desc;
-	pReflector->GetDesc( &desc );
-	pShaderWrapper->ShaderDescription = desc;
-
-
-	// Get the input and output signature description arrays.  These can be used later
-	// for verification of linking shader stages together.
-	for ( UINT i = 0; i < desc.InputParameters; i++ )
-	{
-		D3D11_SIGNATURE_PARAMETER_DESC input_desc;
-		pReflector->GetInputParameterDesc( i, &input_desc );
-		SignatureParameterDesc d(input_desc);
-		pShaderWrapper->InputSignatureParameters.add( d );
-	}
-	for ( UINT i = 0; i < desc.OutputParameters; i++ )
-	{
-		D3D11_SIGNATURE_PARAMETER_DESC output_desc;
-		pReflector->GetOutputParameterDesc( i, &output_desc );
-		SignatureParameterDesc d(output_desc);
-		pShaderWrapper->OutputSignatureParameters.add( d );
-	}
-
-
-	// Get the constant buffer information, which will be used for setting parameters
-	// for use by this shader at rendering time.
-
-	for ( UINT i = 0; i < desc.ConstantBuffers; i++ )
-	{
-		ID3D11ShaderReflectionConstantBuffer* pConstBuffer = pReflector->GetConstantBufferByIndex( i );
-		
-		D3D11_SHADER_BUFFER_DESC bufferDesc;
-		pConstBuffer->GetDesc( &bufferDesc );
-		
-		if ( bufferDesc.Type == D3D_CT_CBUFFER || bufferDesc.Type == D3D_CT_TBUFFER )
-		{
-			ConstantBufferLayout BufferLayout;
-			BufferLayout.Description = ShaderBufferDesc( bufferDesc );
-			BufferLayout.pParamRef = m_pParamMgr->GetConstantBufferParameterRef( BufferLayout.Description.Name );
-
-			// Load the description of each variable for use later on when binding a buffer
-			for ( UINT j = 0; j < BufferLayout.Description.Variables; j++ )
-			{
-				// Get the variable description and store it
-				ID3D11ShaderReflectionVariable* pVariable = pConstBuffer->GetVariableByIndex( j );
-				D3D11_SHADER_VARIABLE_DESC var_desc;
-				pVariable->GetDesc( &var_desc );
-				ShaderVariableDesc variabledesc( var_desc );
-
-				BufferLayout.Variables.add( variabledesc );
-
-				// Get the variable type description and store it
-				ID3D11ShaderReflectionType* pType = pVariable->GetType();
-				D3D11_SHADER_TYPE_DESC type_desc;
-				pType->GetDesc( &type_desc );
-				ShaderTypeDesc typedesc( type_desc );
-
-				BufferLayout.Types.add( typedesc );
-
-				// Get references to the parameters for binding to these variables.
-				RenderParameterDX11* pParam = 0;
-				if ( typedesc.Class == D3D10_SVC_VECTOR )
-				{
-					pParam = m_pParamMgr->GetVectorParameterRef( variabledesc.Name );
-				}
-				else if ( ( typedesc.Class == D3D10_SVC_MATRIX_ROWS ) ||
-							( typedesc.Class == D3D10_SVC_MATRIX_COLUMNS ) )
-				{
-					// Check if it is an array of matrices first...
-					unsigned int count = typedesc.Elements;
-					if ( count == 0 ) 
-					{
-						pParam = m_pParamMgr->GetMatrixParameterRef( variabledesc.Name );
-					}
-					else
-					{
-						pParam = m_pParamMgr->GetMatrixArrayParameterRef( variabledesc.Name, count );
-					}
-				}
-
-				BufferLayout.Parameters.add( pParam );
-			}
-
-			pShaderWrapper->ConstantBuffers.add( BufferLayout );
-		}
-	}
-
-
-	// Get the overall resource binding information for this shader.  This includes
-	// the constant buffers, plus all of the other objects that can be bound to the
-	// pipeline with resource views (shader resource views and unordered access views).
-
-	for ( UINT i = 0; i < desc.BoundResources; i++ )
-	{
-		D3D11_SHADER_INPUT_BIND_DESC resource_desc;
-		pReflector->GetResourceBindingDesc( i, &resource_desc );
-		ShaderInputBindDesc binddesc( resource_desc );
-
-		if ( resource_desc.Type == D3D10_SIT_CBUFFER || resource_desc.Type == D3D10_SIT_TBUFFER )
-		{
-			binddesc.pParamRef = m_pParamMgr->GetConstantBufferParameterRef( binddesc.Name );
-		}
-		else if ( resource_desc.Type == D3D10_SIT_TEXTURE || resource_desc.Type == D3D11_SIT_STRUCTURED )
-		{
-			binddesc.pParamRef = m_pParamMgr->GetShaderResourceParameterRef( binddesc.Name );
-		}
-		else if ( resource_desc.Type == D3D10_SIT_SAMPLER )
-		{
-			binddesc.pParamRef = m_pParamMgr->GetSamplerStateParameterRef( binddesc.Name );
-		}
-		else if ( resource_desc.Type == D3D11_SIT_UAV_RWTYPED || resource_desc.Type == D3D11_SIT_UAV_RWSTRUCTURED
-			|| resource_desc.Type == D3D11_SIT_BYTEADDRESS || resource_desc.Type == D3D11_SIT_UAV_RWBYTEADDRESS
-			|| resource_desc.Type == D3D11_SIT_UAV_APPEND_STRUCTURED || resource_desc.Type == D3D11_SIT_UAV_CONSUME_STRUCTURED
-			|| resource_desc.Type == D3D11_SIT_UAV_RWSTRUCTURED_WITH_COUNTER )
-		{
-			binddesc.pParamRef = m_pParamMgr->GetUnorderedAccessParameterRef( binddesc.Name );
-		}
-
-
-		pShaderWrapper->ResourceBindings.add( binddesc );
-	}
-
-
-	// Release the shader reflection interface
-	pReflector->Release();
 
 	// Store the compiled shader in the shader wrapper for use later on in creating
 	// and checking input and output signatures.
 	pShaderWrapper->pCompiledShader = pCompiledShader;
 
 
+	ShaderReflectionDX11* pReflection = ShaderReflectionFactoryDX11::GenerateReflection( *pShaderWrapper );
+
 
 	// Initialize the constant buffers of this shader, so that they aren't 
 	// lazy created later on...
 
-	pShaderWrapper->InitializeConstantBuffers( m_pParamMgr );
+	pReflection->InitializeConstantBuffers( m_pParamMgr );
 
-	//pShaderWrapper->PrintShaderDetails();
+	pShaderWrapper->SetReflection( pReflection );
+
+	//pReflection->PrintShaderDetails();
 
 
 	// Return the index for future referencing.

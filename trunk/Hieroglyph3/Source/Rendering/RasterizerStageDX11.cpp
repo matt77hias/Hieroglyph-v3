@@ -19,6 +19,8 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 RasterizerStageDX11::RasterizerStageDX11()
 {
+	// Link the two states together to monitor their changes.
+	DesiredState.SetSisterState( &CurrentState );
 }
 //--------------------------------------------------------------------------------
 RasterizerStageDX11::~RasterizerStageDX11()
@@ -50,30 +52,33 @@ const RasterizerStageStateDX11& RasterizerStageDX11::GetCurrentState() const
 //--------------------------------------------------------------------------------
 void RasterizerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 {
-	// Bind the rasterizer state first.
-
 	RendererDX11* pRenderer = RendererDX11::Get();
 
 	// Compare the current state vs. the desired state and set it if necesary.
-	if ( CurrentState.CompareRasterizerState( DesiredState ) == 1 ) {
-		// TODO: this rasterizer state getting doesn't allow for a null return value...
-		ID3D11RasterizerState* pRasterizerState = pRenderer->GetRasterizerState( DesiredState.GetRasterizerState() )->m_pState;
-		pContext->RSSetState( pRasterizerState );
+	if ( true == DesiredState.m_bUpdateRasterizerState ) {
+		
+		RasterizerStatePtr pGlyphRasterizerState = pRenderer->GetRasterizerState( DesiredState.GetRasterizerState() );
+		
+		if ( pGlyphRasterizerState != nullptr ) {
+			ID3D11RasterizerState* pRasterizerState = pGlyphRasterizerState->m_pState;
+			pContext->RSSetState( pRasterizerState );
+		}
 	}
 
 	// Compare the viewport state and set it if necesary.
-	int viewports = CurrentState.CompareViewportState( DesiredState );
+	int viewports = 0;
 	
-	if ( viewports > 0 ) {
+	if ( true == DesiredState.m_bUpdateViewportState ) {
 		
 		D3D11_VIEWPORT aViewports[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
 		
-		for ( int i = 0; i < viewports; i++ ) {
+		for ( int i = 0; i < D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE; i++ ) {
 
 			ViewPortDX11* pViewport = pRenderer->GetViewPort( DesiredState.Viewports[i] );
 			
 			if ( pViewport ) {
 				aViewports[i] = pViewport->m_ViewPort; 
+				viewports++;
 			}
 		}
 
@@ -82,19 +87,19 @@ void RasterizerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 
 
 	// Compare the scissor rect state and set it if necesary.
-	int rects = CurrentState.CompareScissorRectState( DesiredState );
 	
-	if ( rects > 0 ) {
+	if ( true == DesiredState.m_bUpdateScissorRectState ) {
 		
 		D3D11_RECT aRects[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
 		
-		for ( int i = 0; i < rects; i++ ) {
+		for ( int i = 0; i < D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE; i++ ) {
 			aRects[i] = DesiredState.ScissorRects[i]; 
 		}
 
-		pContext->RSSetScissorRects( rects, aRects );
+		pContext->RSSetScissorRects( D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE, aRects );
 	}
 
+	DesiredState.ResetUpdateFlags();
 	CurrentState = DesiredState;
 }
 //--------------------------------------------------------------------------------

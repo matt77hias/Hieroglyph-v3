@@ -71,7 +71,7 @@ namespace Glyph3
 
 	class RenderEffectDX11;
 
-	class RenderParameterDX11;
+	//class RenderParameterDX11;
 
 	class IParameterManager;
 	class PipelineManagerDX11;

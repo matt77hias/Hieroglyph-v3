@@ -1,0 +1,331 @@
+//--------------------------------------------------------------------------------
+// This file is a portion of the Hieroglyph 3 Rendering Engine.  It is distributed
+// under the MIT License, available in the root of this distribution and 
+// at the following URL:
+//
+// http://www.opensource.org/licenses/mit-license.php
+//
+// Copyright (c) 2003-2010 Jason Zink 
+//--------------------------------------------------------------------------------
+#pragma warning( disable : 4244 )
+//--------------------------------------------------------------------------------
+#include "PCH.h"
+#include "ShaderReflectionDX11.h"
+#include "BufferConfigDX11.h"
+#include "Log.h"
+#include "GlyphString.h"
+#include "IParameterManager.h"
+#include "PipelineManagerDX11.h"
+#include "ConstantBufferDX11.h"
+#include "D3DEnumConversion.h"
+#include "ShaderReflectionFactoryDX11.h"
+//--------------------------------------------------------------------------------
+using namespace Glyph3;
+//--------------------------------------------------------------------------------
+ShaderReflectionDX11::ShaderReflectionDX11( )
+{
+}
+//--------------------------------------------------------------------------------
+ShaderReflectionDX11::~ShaderReflectionDX11()
+{
+}
+//--------------------------------------------------------------------------------
+void ShaderReflectionDX11::SetName( const std::wstring& name )
+{
+	Name = name;
+}
+//--------------------------------------------------------------------------------
+std::wstring ShaderReflectionDX11::GetName( )
+{
+	return( Name );
+}
+//--------------------------------------------------------------------------------
+void ShaderReflectionDX11::InitializeConstantBuffers( IParameterManager* pParamManager )
+{
+	for ( int i = 0; i < ConstantBuffers.count(); i++ )
+	{
+		if ( ConstantBuffers[i].Description.Type == D3D11_CT_CBUFFER )
+		{
+			// Get the index of the constant buffer parameter currently set with 
+			// this name.
+
+			int index = pParamManager->GetConstantBufferParameter( ConstantBuffers[i].pParamRef );
+
+			// If the constant buffer does not exist yet, create a one with 
+			// standard options - writeable by the CPU and only bound as a 
+			// constant buffer.  By automatically creating the constant buffer
+			// we reduce the amount of code to do common tasks, but still allow
+			// the user to create and use a special buffer if they want.
+
+			if ( index == -1 )
+			{
+				// Configure the buffer for the needed size and dynamic updating.
+				BufferConfigDX11 cbuffer;
+				cbuffer.SetDefaultConstantBuffer( ConstantBuffers[i].Description.Size, true );
+
+				// Create the buffer and set it as a constant buffer parameter.  This
+				// creates a parameter object to be used in the future.
+				ResourcePtr resource = RendererDX11::Get()->CreateConstantBuffer( &cbuffer, 0 );
+				index = resource->m_iResource;
+
+				ConstantBuffers[i].pParamRef->InitializeParameterData( &index );
+			}
+		}
+	}
+}
+//--------------------------------------------------------------------------------
+void ShaderReflectionDX11::UpdateParameters( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
+{
+	// Renderer will call this function when binding the shader to the pipeline.
+	// This function will then call renderer functions to update each constant
+	// buffer needed for the shader.
+
+	for ( int i = 0; i < ConstantBuffers.count(); i++ )
+	{
+		if ( ConstantBuffers[i].Description.Type == D3D11_CT_CBUFFER )
+		{
+			// Get the index of the constant buffer parameter currently set with 
+			// this name.
+
+			int index = pParamManager->GetConstantBufferParameter( ConstantBuffers[i].pParamRef );
+
+			// If the constant buffer does not exist yet, create a one with 
+			// standard options - writeable by the CPU and only bound as a 
+			// constant buffer.  By automatically creating the constant buffer
+			// we reduce the amount of code to do common tasks, but still allow
+			// the user to create and use a special buffer if they want.
+
+			if ( index == -1 )
+			{
+				// This section of the code should never be reached anymore - all CBs should
+				// be initially created when a shader is compiled if it doesn't already exist.
+				// If we do end up here, send a message about it!
+				Log::Get().Write( L"Uh oh - creating a constant buffer in the ShaderDX11::UpdateParameters functions!!!!" );
+
+				// Configure the buffer for the needed size and dynamic updating.
+				BufferConfigDX11 cbuffer;
+				cbuffer.SetDefaultConstantBuffer( ConstantBuffers[i].Description.Size, true );
+
+				// Create the buffer and set it as a constant buffer parameter.  This
+				// creates a parameter object to be used in the future.
+				ResourcePtr resource = RendererDX11::Get()->CreateConstantBuffer( &cbuffer, 0 );
+				index = resource->m_iResource;
+
+				pParamManager->SetConstantBufferParameter( ConstantBuffers[i].pParamRef, resource );
+			}
+
+
+			// Check if the resource is a constant buffer before accessing it!
+			ConstantBufferDX11* pBuffer = RendererDX11::Get()->GetConstantBufferByIndex( index );
+
+			// Test the index to ensure that it is a constant buffer.  If the method above returns
+			// a non-null result, then this is a constant buffer.
+			if ( pBuffer ) 
+			{
+				if ( pBuffer->GetAutoUpdate() )
+				{
+					// Map the constant buffer into system memory.  We map the buffer 
+					// with the discard write flag since we don't care what was in the
+					// buffer already.
+
+					D3D11_MAPPED_SUBRESOURCE resource = 
+						pPipeline->MapResource( index, 0, D3D11_MAP_WRITE_DISCARD, 0 );
+
+					// Update each variable in the constant buffer.  These variables are identified
+					// by their type, and are currently allowed to be Vector4f, Matrix4f, or Matrix4f
+					// arrays.  Additional types will be added as they are needed...
+
+					for ( int j = 0; j < ConstantBuffers[i].Variables.count(); j++ )
+					{
+						RenderParameterDX11* pParam = ConstantBuffers[i].Parameters[j];
+						int offset = ConstantBuffers[i].Variables[j].StartOffset;
+						UINT size = ConstantBuffers[i].Variables[j].Size;
+						
+						if ( ConstantBuffers[i].Types[j].Class == D3D_SVC_VECTOR )
+						{
+							Vector4f vector = pParamManager->GetVectorParameter( pParam );
+							Vector4f* pBuf = (Vector4f*)((char*)resource.pData + offset);
+							*pBuf = vector;
+						}
+						else if ( ( ConstantBuffers[i].Types[j].Class == D3D_SVC_MATRIX_ROWS ) ||
+							( ConstantBuffers[i].Types[j].Class == D3D_SVC_MATRIX_COLUMNS ) )
+						{
+							// Check if it is an array of matrices first...
+							unsigned int count = ConstantBuffers[i].Types[j].Elements;
+							if ( count == 0 ) 
+							{
+								Matrix4f matrix = pParamManager->GetMatrixParameter( pParam );
+								Matrix4f* pBuf = (Matrix4f*)((char*)resource.pData + offset);
+								*pBuf = matrix;
+							}
+							else 
+							{
+								// If a matrix array, then use the corresponding parameter type.
+								// TODO: If the shader expects a different number of matrices than are present
+								//       from the matrix array parameter, then this causes an exception!
+								Matrix4f* pMatrices = pParamManager->GetMatrixArrayParameter( pParam );
+								memcpy( ((char*)resource.pData + offset), (char*)pMatrices, ConstantBuffers[i].Variables[j].Size );
+							}
+						}
+						else
+						{
+							Log::Get().Write( L"Non vector or matrix parameter specified in a constant buffer!  This will not be updated!" );
+						}
+					}
+
+					pPipeline->UnMapResource( index, 0 );
+				}
+			}
+			else
+			{
+				Log::Get().Write( L"Trying to update a constant buffer that isn't a constant buffer!" );
+			}
+		}
+	}
+}
+//--------------------------------------------------------------------------------
+void ShaderReflectionDX11::BindParameters( ShaderType type, PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
+{
+	// Here the shader will attempt to bind each parameter needed by the pipeline.
+	// The renderer supplies methods for binding a parameter based on the name
+	// and type of parameter, in addition to the pipeline stage to bind the 
+	// parameter to.
+
+	for ( int i = 0; i < ResourceBindings.count(); i++ )
+	{
+		UINT slot = ResourceBindings[i].BindPoint;
+
+		switch ( ResourceBindings[i].Type )
+		{
+		case D3D_SIT_CBUFFER:
+		case D3D_SIT_TBUFFER:
+			pPipeline->BindConstantBufferParameter( type, ResourceBindings[i].pParamRef, slot, pParamManager );
+			break;
+		case D3D_SIT_SAMPLER:
+			pPipeline->BindSamplerStateParameter( type, ResourceBindings[i].pParamRef, slot, pParamManager );
+			break;
+		case D3D_SIT_TEXTURE:
+		case D3D_SIT_STRUCTURED:
+		case D3D_SIT_BYTEADDRESS:
+			pPipeline->BindShaderResourceParameter( type, ResourceBindings[i].pParamRef, slot, pParamManager );
+			break;
+		case D3D_SIT_UAV_RWSTRUCTURED:
+		case D3D_SIT_UAV_RWTYPED:
+		case D3D_SIT_UAV_RWBYTEADDRESS:
+		case D3D_SIT_UAV_APPEND_STRUCTURED:
+		case D3D_SIT_UAV_CONSUME_STRUCTURED:
+		case D3D_SIT_UAV_RWSTRUCTURED_WITH_COUNTER:
+			pPipeline->BindUnorderedAccessParameter( type, ResourceBindings[i].pParamRef, slot, pParamManager );
+			break;
+		}
+	}
+}
+//--------------------------------------------------------------------------------
+void ShaderReflectionDX11::PrintShaderDetails()
+{
+	std::wstringstream s;
+
+	s << L"----------------------------------------------------------------------" << std::endl;
+	s << L"Shader details printout for: " << Name << std::endl;
+	s << L"----------------------------------------------------------------------" << std::endl;
+
+	s << L"Shader Description: " << std::endl;
+	s << TO_STRING_D3D11_SHADER_DESC( this->ShaderDescription );
+	
+	s << std::endl;
+
+	s << L"Number of Input Signature Elements: " << InputSignatureParameters.count() << std::endl;
+	for ( int i = 0; i < InputSignatureParameters.count(); i++ )
+	{
+		s << L"  Semantic Name: " << InputSignatureParameters[i].SemanticName;
+		s << L", Semantic Index: " << InputSignatureParameters[i].SemanticIndex;
+		s << L", Register: " << InputSignatureParameters[i].Register;
+		s << L", System Value Type: " << TO_STRING_D3D_NAME( InputSignatureParameters[i].SystemValueType ); 
+		s << L", Component Type: " << TO_STRING_D3D_REGISTER_COMPONENT_TYPE( InputSignatureParameters[i].ComponentType );
+		s << L", Mask: " << (unsigned int)InputSignatureParameters[i].Mask;
+		s << L", Read/Write Mask: " << (unsigned int)InputSignatureParameters[i].ReadWriteMask;
+		s << std::endl;
+	}
+	s << std::endl;
+
+	s << L"Number of Output Signature Elements: " << OutputSignatureParameters.count() << std::endl;
+	for ( int i = 0; i < OutputSignatureParameters.count(); i++ )
+	{
+		s << L"  Semantic Name: " << OutputSignatureParameters[i].SemanticName;
+		s << L", Semantic Index: " << OutputSignatureParameters[i].SemanticIndex;
+		s << L", Register: " << OutputSignatureParameters[i].Register;
+		s << L", System Value Type: " << TO_STRING_D3D_NAME( OutputSignatureParameters[i].SystemValueType );  
+		s << L", Component Type: " << TO_STRING_D3D_REGISTER_COMPONENT_TYPE( OutputSignatureParameters[i].ComponentType );
+		s << L", Mask: " << (unsigned int)OutputSignatureParameters[i].Mask;
+		s << L", Read/Write Mask: " << (unsigned int)OutputSignatureParameters[i].ReadWriteMask;
+		s << std::endl;
+	}
+	s << std::endl;
+
+	s << L"Number of Constant Buffer Descriptions: " << ConstantBuffers.count() << std::endl;
+	for ( int i = 0; i < ConstantBuffers.count(); i++ )
+	{
+		s << L"  Buffer Name: " << ConstantBuffers[i].Description.Name;
+		s << L", Buffer Type: " << TO_STRING_D3D_CBUFFER_TYPE( ConstantBuffers[i].Description.Type );
+		s << L", Variables: " << ConstantBuffers[i].Description.Variables;
+		s << L", Size: " << ConstantBuffers[i].Description.Size;
+		s << L", Flags: " << ConstantBuffers[i].Description.uFlags;
+		
+		for ( int j = 0; j < ConstantBuffers[i].Variables.count(); j++ )
+		{
+			s << std::endl << L"    ";
+			s << L"Variable Name: " << ConstantBuffers[i].Variables[j].Name;
+			s << L", Start Offset: " << ConstantBuffers[i].Variables[j].StartOffset;
+			s << L", Size: " << ConstantBuffers[i].Variables[j].Size;
+			s << L", Flags: " << ConstantBuffers[i].Variables[j].uFlags;
+			s << L", Start Texture: " << (int)ConstantBuffers[i].Variables[j].StartTexture;
+			s << L", Texture Size: " << ConstantBuffers[i].Variables[j].TextureSize;
+			s << L", Start Sampler: " << (int)ConstantBuffers[i].Variables[j].StartSampler;
+			s << L", Sampler Size: " << ConstantBuffers[i].Variables[j].SamplerSize;
+		}
+
+
+		for ( int j = 0; j < ConstantBuffers[i].Types.count(); j++ )
+		{
+			s << std::endl << L"    ";
+			s << L"Variable Type Name: " << ConstantBuffers[i].Types[j].Name;
+			s << L", Class: " << TO_STRING_D3D_SHADER_VARIABLE_CLASS( ConstantBuffers[i].Types[j].Class );
+			s << L", Type: " << TO_STRING_D3D_SHADER_VARIABLE_TYPE( ConstantBuffers[i].Types[j].Type );			
+			s << L", Rows: " << ConstantBuffers[i].Types[j].Rows;
+			s << L", Columns: " << ConstantBuffers[i].Types[j].Columns;
+			s << L", Elements: " << ConstantBuffers[i].Types[j].Elements;
+			s << L", Members: " << ConstantBuffers[i].Types[j].Members;
+			s << L", Offset: " << ConstantBuffers[i].Types[j].Offset;
+		}
+		
+		s << std::endl;
+	}
+	s << std::endl;
+
+	s << L"Number of Resource Binding Descriptions: " << ResourceBindings.count() << std::endl;
+	for ( int i = 0; i < ResourceBindings.count(); i++ )
+	{
+		s << L"  Name: " << ResourceBindings[i].Name;
+		s << L", Type: " << TO_STRING_D3D_SHADER_INPUT_TYPE( ResourceBindings[i].Type );
+		s << L", Bind Point: " << ResourceBindings[i].BindPoint;
+		s << L", Bind Count: " << ResourceBindings[i].BindCount;
+		s << L", Flags: " << ResourceBindings[i].uFlags;
+		s << L", Resource Return Type: " << TO_STRING_D3D_RESOURCE_RETURN_TYPE( ResourceBindings[i].ReturnType );
+		s << L", Dimension: " << ResourceBindings[i].Dimension;
+		s << L", Number of Samples: " << ResourceBindings[i].NumSamples;
+		s << std::endl;
+	}
+
+	s << std::endl;
+
+	//LPVOID pBlobBuffer = pCompiledShader->GetBufferPointer();
+	//const char* pMessage = (const char*)pBlobBuffer;
+	
+	//s << pMessage << std::endl;
+
+	s << L"----------------------------------------------------------------------" << std::endl;
+
+	Log::Get().Write( s.str() );
+
+}
+//--------------------------------------------------------------------------------

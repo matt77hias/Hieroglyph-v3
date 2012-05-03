@@ -17,6 +17,7 @@ using namespace Glyph3;
 OutputMergerStageStateDX11::OutputMergerStageStateDX11()
 {
 	m_FeatureLevel = D3D_FEATURE_LEVEL_9_1;
+	m_pSisterState = nullptr;
 
 	ClearState();
 }
@@ -33,33 +34,77 @@ void OutputMergerStageStateDX11::SetFeautureLevel( D3D_FEATURE_LEVEL level )
 //--------------------------------------------------------------------------------
 void OutputMergerStageStateDX11::SetBlendState( int state )
 {
+	// Set the desired state.
 	BlendState = state;
+
+	// Test if an update is needed.
+	if ( nullptr != m_pSisterState ) {
+		if ( m_pSisterState->BlendState != BlendState ) {
+			m_bUpdateBlendState = true;
+		}
+	}
 }
 //--------------------------------------------------------------------------------
 void OutputMergerStageStateDX11::SetDepthStencilState( int state, unsigned int stencilRef )
 {
+	// Set the desired state.
 	DepthStencilState = state;
 	StencilRef = stencilRef;
+	
+	// Test if an update is needed.
+	if ( nullptr != m_pSisterState ) {
+		if ( m_pSisterState->DepthStencilState != DepthStencilState
+			|| m_pSisterState->StencilRef != StencilRef ) {
+				m_bUpdateDepthStencilState = true;
+		}
+	}
 }
 //--------------------------------------------------------------------------------
 void OutputMergerStageStateDX11::SetRenderTarget( unsigned int slot, int rtv )
 {
 	if ( slot < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT ) {
+
+		// Update the desired state.
 		RenderTargetViews[slot] = rtv;
+
+		// Test if an update is needed.
+		if ( nullptr != m_pSisterState ) {
+			if ( m_pSisterState->RenderTargetViews[slot] != RenderTargetViews[slot] ) {
+				m_bUpdateRenderTargetState = true;
+			}
+		}
 	}
 }
 //--------------------------------------------------------------------------------
 void OutputMergerStageStateDX11::SetDepthStencilTarget( int dsv )
 {
+	// Update the desired state.
 	DepthTargetViews = dsv;
+
+	// Test if an update is needed.
+	if ( nullptr != m_pSisterState ) {
+		if ( m_pSisterState->DepthTargetViews != DepthTargetViews ) {
+			m_bUpdateDepthStencilTarget = true;
+		}
+	}
 }
 //--------------------------------------------------------------------------------
 void OutputMergerStageStateDX11::SetUnorderedAccessView( unsigned int slot, int uav, unsigned int initCount )
 {
 	if ( slot < D3D11_PS_CS_UAV_REGISTER_COUNT )
 	{
+		// Update the desired state.
 		UnorderedAccessViews[slot] = uav;
 		UAVInitialCounts[slot] = initCount;
+
+		// Test if an update is needed.
+		if ( nullptr != m_pSisterState ) {
+			if ( m_pSisterState->UnorderedAccessViews[slot] != UnorderedAccessViews[slot]
+				|| m_pSisterState->UAVInitialCounts[slot] != UAVInitialCounts[slot] ) {
+			
+				m_bUpdateUnorderedAccessState = true;
+			}
+		}
 	}
 }
 //--------------------------------------------------------------------------------
@@ -177,20 +222,31 @@ int OutputMergerStageStateDX11::CompareUnorderedAccessViews( OutputMergerStageSt
 //--------------------------------------------------------------------------------
 void OutputMergerStageStateDX11::ClearState( )
 {
-	BlendState = -1;
-	DepthStencilState = -1;
-	StencilRef = 0;
+	SetBlendState( -1 );
+	SetDepthStencilState( -1, 0 );
 
 	for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ ) {
-		RenderTargetViews[i] = -1;
+		SetRenderTarget( i, -1 );
 	}
 
-	DepthTargetViews = -1;
+	SetDepthStencilTarget( -1 );
 	
 	for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) {
-		UnorderedAccessViews[i] = -1;
-		UAVInitialCounts[i] = -1;
+		this->SetUnorderedAccessView( i, -1, -1 );
 	}
-
+}
+//--------------------------------------------------------------------------------
+void OutputMergerStageStateDX11::SetSisterState( OutputMergerStageStateDX11* pState )
+{
+	m_pSisterState = pState;
+}
+//--------------------------------------------------------------------------------
+void OutputMergerStageStateDX11::ResetUpdateFlags( )
+{
+	m_bUpdateBlendState = false;
+	m_bUpdateDepthStencilState = false;
+	m_bUpdateRenderTargetState = false;
+	m_bUpdateUnorderedAccessState = false;
+	m_bUpdateDepthStencilTarget = false;
 }
 //--------------------------------------------------------------------------------

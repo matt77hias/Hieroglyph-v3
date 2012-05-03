@@ -47,6 +47,9 @@ namespace Glyph3
 
 		void ClearState( );
 
+		void SetSisterState( RasterizerStageStateDX11* pState );
+		void ResetUpdateFlags( );
+
 	protected:
 
 		D3D_FEATURE_LEVEL				m_FeatureLevel;
@@ -57,6 +60,12 @@ namespace Glyph3
 		int								ScissorRectCount;
 		D3D11_RECT						ScissorRects[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
 		
+		RasterizerStageStateDX11*		m_pSisterState;
+
+		bool							m_bUpdateRasterizerState;
+		bool							m_bUpdateViewportState;
+		bool							m_bUpdateScissorRectState;
+
 		friend RasterizerStageDX11;
 	};
 };

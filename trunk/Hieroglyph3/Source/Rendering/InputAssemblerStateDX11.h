@@ -31,6 +31,7 @@ namespace Glyph3
 		void SetFeautureLevel( D3D_FEATURE_LEVEL level );
 
 		void SetIndexBuffer( int buffer );
+		void SetIndexBufferFormat( DXGI_FORMAT format );
 		void SetVertexBuffer( unsigned int slot, int buffer, unsigned int offset, unsigned int stride );
 		void SetInputLayout( int layout );
 		void SetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY topology );
@@ -44,16 +45,30 @@ namespace Glyph3
 
 		void ClearState( );
 
+		void SetSisterState( InputAssemblerStateDX11* pState );
+		void ResetUpdateFlags( );
+
 	protected:
 
 		D3D_FEATURE_LEVEL				m_FeatureLevel;
 
 		int								IndexBuffer;
+		DXGI_FORMAT						IndexBufferFormat;
 		int								VertexBuffers[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
 		UINT							VertexStrides[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
 		UINT							VertexOffsets[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
 		int								InputLayout;
 		D3D11_PRIMITIVE_TOPOLOGY		PrimitiveTopology;
+
+		unsigned int					AvailableSlotCount;
+
+
+		InputAssemblerStateDX11*		m_pSisterState;
+
+		bool							m_bUpdateIndexBuffer;
+		bool							m_bUpdateVertexBuffers;
+		bool							m_bUpdateInputLayout;
+		bool							m_bUpdateUpdatePrimitiveTopology;
 
 		friend InputAssemblerStageDX11;
 	};

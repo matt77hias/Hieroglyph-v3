@@ -9,27 +9,30 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
+// ShaderReflectionFactoryDX11
+//
+//--------------------------------------------------------------------------------
+#ifndef ShaderReflectionFactoryDX11_h
+#define ShaderReflectionFactoryDX11_h
+//--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "ShaderDX11.h"
+#include "ShaderReflectionDX11.h"
 //--------------------------------------------------------------------------------
-using namespace Glyph3;
-//--------------------------------------------------------------------------------
-ShaderDX11::ShaderDX11()
+namespace Glyph3
 {
-}
-//--------------------------------------------------------------------------------
-ShaderDX11::~ShaderDX11()
-{
+	class ShaderReflectionFactoryDX11
+	{
+	public:
+		~ShaderReflectionFactoryDX11();
 
-}
-//--------------------------------------------------------------------------------
-void ShaderDX11::SetReflection( ShaderReflectionDX11* pReflection )
-{
-	m_pReflection = pReflection;
-}
-//--------------------------------------------------------------------------------
-ShaderReflectionDX11* ShaderDX11::GetReflection( )
-{
-	return( m_pReflection );
-}
-//--------------------------------------------------------------------------------
+		static ShaderReflectionDX11* GenerateReflection( ShaderDX11& shader );
+
+	private:
+		ShaderReflectionFactoryDX11();
+	};
+
+};
+#endif // ShaderReflectionFactoryDX11_h
+
+

@@ -20,6 +20,7 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 OutputMergerStageDX11::OutputMergerStageDX11()
 {
+	DesiredState.SetSisterState( &CurrentState );
 }
 //--------------------------------------------------------------------------------
 OutputMergerStageDX11::~OutputMergerStageDX11()
@@ -51,10 +52,10 @@ void OutputMergerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 //--------------------------------------------------------------------------------
 void OutputMergerStageDX11::ApplyDesiredRenderTargetStates( ID3D11DeviceContext* pContext )
 {
-	int rtvCount = CurrentState.CompareRenderTargets( DesiredState );
-	int uavCount = CurrentState.CompareUnorderedAccessViews( DesiredState );
+	int rtvCount = 0; //CurrentState.CompareRenderTargets( DesiredState );
+	int uavCount = 0; //CurrentState.CompareUnorderedAccessViews( DesiredState );
 
-	if ( rtvCount > 0 || uavCount > 0 ) {
+	if ( DesiredState.m_bUpdateRenderTargetState || DesiredState.m_bUpdateUnorderedAccessState || DesiredState.m_bUpdateDepthStencilTarget ) {
 
 		RendererDX11* pRenderer = RendererDX11::Get();
 
@@ -73,7 +74,6 @@ void OutputMergerStageDX11::ApplyDesiredRenderTargetStates( ID3D11DeviceContext*
 				rtvs[i] = 0;
 			}
 		}
-
 
 		for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) {
 
@@ -112,38 +112,51 @@ void OutputMergerStageDX11::ApplyDesiredRenderTargetStates( ID3D11DeviceContext*
 		}
 
 		CurrentState.SetDepthStencilTarget( DesiredState.GetDepthStencilTarget() );
+
+		DesiredState.m_bUpdateRenderTargetState = false;
+		DesiredState.m_bUpdateUnorderedAccessState = false;
+		DesiredState.m_bUpdateDepthStencilTarget = false;
 	}
-	
 }
 //--------------------------------------------------------------------------------
 void OutputMergerStageDX11::ApplyDesiredBlendAndDepthStencilStates( ID3D11DeviceContext* pContext )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
 
-	if ( CurrentState.CompareBlendState( DesiredState ) == 1 ) {
+	if ( true == DesiredState.m_bUpdateBlendState ) {
 
-		ID3D11BlendState* pBlendState = pRenderer->GetBlendState( DesiredState.GetBlendState() )->m_pState;
+		BlendStatePtr pGlyphBlendState = pRenderer->GetBlendState( DesiredState.GetBlendState() );
 
-		// TODO: Add in the blend factors as states to the OutputMergerStageStateDX11 class!
-		if ( pBlendState )
-		{
-			float afBlendFactors[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-			pContext->OMSetBlendState( pBlendState, afBlendFactors, 0xFFFFFFFF );
+		if ( nullptr != pGlyphBlendState ) {
+			
+			ID3D11BlendState* pBlendState = pRenderer->GetBlendState( DesiredState.GetBlendState() )->m_pState;
+
+			// TODO: Add in the blend factors as states to the OutputMergerStageStateDX11 class!
+			if ( pBlendState ) {
+				float afBlendFactors[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+				pContext->OMSetBlendState( pBlendState, afBlendFactors, 0xFFFFFFFF );
+			}
+
+			CurrentState.SetBlendState( DesiredState.GetBlendState() );
+			DesiredState.m_bUpdateBlendState = false;
 		}
-
-		CurrentState.SetBlendState( DesiredState.GetBlendState() );
 	}
 
-	if ( CurrentState.CompareDepthStencilState( DesiredState ) == 1 ) {
+	if ( true == DesiredState.m_bUpdateDepthStencilState ) {
 
-		ID3D11DepthStencilState* pDepthState = pRenderer->GetDepthState( DesiredState.GetDepthStencilState() )->m_pState;
+		DepthStencilStatePtr pGlyphDepthStencilState = pRenderer->GetDepthState( DesiredState.GetDepthStencilState() );
+		
+		if ( nullptr != pGlyphDepthStencilState ) {
 
-		if ( pDepthState )
-		{
-			pContext->OMSetDepthStencilState( pDepthState, DesiredState.GetStencilReference() );
+			ID3D11DepthStencilState* pDepthState = pGlyphDepthStencilState->m_pState;
+
+			if ( pDepthState ) {
+				pContext->OMSetDepthStencilState( pDepthState, DesiredState.GetStencilReference() );
+			}
+
+			CurrentState.SetDepthStencilState( DesiredState.GetDepthStencilState(), DesiredState.GetStencilReference() );
+			DesiredState.m_bUpdateDepthStencilState = false;
 		}
-
-		CurrentState.SetDepthStencilState( DesiredState.GetDepthStencilState(), DesiredState.GetStencilReference() );
 	}
 }
 //--------------------------------------------------------------------------------
@@ -152,87 +165,3 @@ const OutputMergerStageStateDX11& OutputMergerStageDX11::GetCurrentState() const
 	return( CurrentState );
 }
 //--------------------------------------------------------------------------------
-//
-////--------------------------------------------------------------------------------
-//void OutputMergerStageDX11::BindResources( ID3D11DeviceContext* pContext )
-//{
-//	// Update all of the render targets and depth stencil targets
-//	
-//	// Find the highest index that doesn't match.
-//	int max = 0;
-//	for ( int i = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT-1; i >= 0; i-- )
-//	{
-//		if ( RenderTargetViews[i] != APIRenderTargetViews[i] )
-//		{
-//			max = i+1;
-//			break;
-//		}
-//	}
-//
-//    if ( DepthTargetViews != APIDepthTargetViews )
-//        max++;
-//
-//	// If any targets are different then copy them over.
-//	if ( max > 0 )
-//		pContext->OMSetRenderTargets( D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, RenderTargetViews, DepthTargetViews );
-//	
-//	// Update the API views to know what to update next time.
-//	for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ )
-//		APIRenderTargetViews[i] = RenderTargetViews[i];
-//
-//    APIDepthTargetViews = DepthTargetViews;
-//}
-////--------------------------------------------------------------------------------
-//void OutputMergerStageDX11::SetToDefaultState()
-//{
-//	memset( APIRenderTargetViews, 0, D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT * sizeof( APIRenderTargetViews[0] ) );
-//}
-////--------------------------------------------------------------------------------
-//void OutputMergerStageDX11::ClearResources()
-//{
-//	// Clear out all array elements in our cached arrays.  This will be used to 
-//	// write nulls into the context later on.
-//
-//	memset( RenderTargetViews, 0, D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT * sizeof( RenderTargetViews[0] ) );
-//	DepthTargetViews = 0;
-//	memset( UnorderedAccessViews, 0, sizeof( UnorderedAccessViews[0] ) * D3D11_PS_CS_UAV_REGISTER_COUNT );
-//	for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) UAVInitialCounts[i] = -1;
-//}
-////--------------------------------------------------------------------------------
-//void OutputMergerStageDX11::UnbindResources( ID3D11DeviceContext* pContext )
-//{
-//	// Clear out the resource settings.
-//
-//	ClearResources();
-//
-//	// Bind the changes to the pipeline.
-//
-//	BindResources( pContext );
-//}
-////--------------------------------------------------------------------------------
-//unsigned int OutputMergerStageDX11::GetViewsSetCount()
-//{
-//	unsigned int count = 0;
-//
-//	for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ )
-//	{
-//		if ( RenderTargetViews[i] != 0 )
-//			count++;
-//	}
-//
-//	return( count );
-//}
-////--------------------------------------------------------------------------------
-//unsigned int OutputMergerStageDX11::GetViewsBoundCount()
-//{
-//	unsigned int count = 0;
-//
-//	for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ )
-//	{
-//		if ( APIRenderTargetViews[i] != 0 )
-//			count++;
-//	}
-//
-//	return( count );
-//}
-////--------------------------------------------------------------------------------

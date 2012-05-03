@@ -52,6 +52,7 @@ void GeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterManager* p
 	pPipeline->InputAssemblerStage.DesiredState.SetPrimitiveTopology( m_ePrimType );
 	pPipeline->InputAssemblerStage.DesiredState.SetVertexBuffer( 0, m_VB->m_iResource, 0, m_iVertexSize );
 	pPipeline->InputAssemblerStage.DesiredState.SetIndexBuffer( m_IB->m_iResource );
+	pPipeline->InputAssemblerStage.DesiredState.SetIndexBufferFormat( DXGI_FORMAT_R32_UINT );
 	
 	pPipeline->ApplyInputResources();
 

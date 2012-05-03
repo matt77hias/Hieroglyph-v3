@@ -21,6 +21,7 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 InputAssemblerStageDX11::InputAssemblerStageDX11()
 {
+	DesiredState.SetSisterState( &CurrentState );
 }
 //--------------------------------------------------------------------------------
 InputAssemblerStageDX11::~InputAssemblerStageDX11()
@@ -52,44 +53,43 @@ void InputAssemblerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 	RendererDX11* pRenderer = RendererDX11::Get();
 
 	// Compare the primitive topology of the desired and current states
-	if ( DesiredState.InputLayout != CurrentState.InputLayout ) {
+	if ( true == DesiredState.m_bUpdateInputLayout ) {
 		InputLayoutDX11* pLayout = pRenderer->GetInputLayout( DesiredState.InputLayout );
 
-		if ( pLayout )
+		if ( pLayout ) {
 			pContext->IASetInputLayout( pLayout->m_pInputLayout );
-		else
+		} else {
 			Log::Get().Write( L"Tried to bind an invalid input layout ID!" );
+		}
 	}
 
 	// Bind the primitive topology
-	if ( DesiredState.PrimitiveTopology != CurrentState.PrimitiveTopology ) {
+	if ( true == DesiredState.m_bUpdateUpdatePrimitiveTopology ) {
 		pContext->IASetPrimitiveTopology( DesiredState.PrimitiveTopology );
 	}
 
 	// Bind the vertex buffers
-
-	int vbuffers = CurrentState.CompareVertexBufferState( DesiredState );
-	if ( vbuffers > 0 ) {
+	if ( true == DesiredState.m_bUpdateVertexBuffers ) {
 
 		ID3D11Buffer* Buffers[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
 
-		for ( int i = 0; i <= vbuffers; i++ )
+		for ( int i = 0; i <= DesiredState.AvailableSlotCount-1; i++ )
 		{
 			int index = DesiredState.VertexBuffers[i];
 
 			VertexBufferDX11* pBuffer = pRenderer->GetVertexBufferByIndex( index );
 
 			if ( pBuffer ) {
-				Buffers[i] = reinterpret_cast<ID3D11Buffer*>( pBuffer->GetResource() );
+				Buffers[i] = static_cast<ID3D11Buffer*>( pBuffer->GetResource() );
 			} else {
 				Buffers[i] = 0;
 			}
 		}
 
-		pContext->IASetVertexBuffers( 0, vbuffers, Buffers, DesiredState.VertexStrides, DesiredState.VertexOffsets );
+		pContext->IASetVertexBuffers( 0, DesiredState.AvailableSlotCount, Buffers, DesiredState.VertexStrides, DesiredState.VertexOffsets );
 	}
 
-	if ( DesiredState.IndexBuffer != CurrentState.IndexBuffer ) {
+	if ( true == DesiredState.m_bUpdateIndexBuffer ) {
 	
 		// TODO: Add the ability to use different formats and offsets to this function!
 		int index = DesiredState.IndexBuffer;
@@ -98,12 +98,13 @@ void InputAssemblerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 
 		if ( pBuffer ) {
 			ID3D11Buffer* pIndexBuffer = reinterpret_cast<ID3D11Buffer*>( pBuffer->GetResource() );
-			pContext->IASetIndexBuffer( pIndexBuffer, DXGI_FORMAT_R32_UINT, 0 );
+			pContext->IASetIndexBuffer( pIndexBuffer, DesiredState.IndexBufferFormat, 0 );
 		} else {
-			pContext->IASetIndexBuffer( 0, DXGI_FORMAT_R32_UINT, 0 );
+			pContext->IASetIndexBuffer( 0, DesiredState.IndexBufferFormat, 0 );
 		}
 	}
 
+	DesiredState.ResetUpdateFlags();
 	CurrentState = DesiredState;
 }
 //--------------------------------------------------------------------------------
