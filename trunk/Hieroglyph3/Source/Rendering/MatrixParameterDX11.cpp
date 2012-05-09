@@ -35,7 +35,10 @@ void MatrixParameterDX11::SetParameterData( void* pData, unsigned int threadID )
 	assert( threadID >= 0 );
 	assert( threadID < NUM_THREADS+1 );
 
-	m_Matrix[threadID] = *reinterpret_cast<Matrix4f*>( pData );
+	if ( 0 != memcmp( pData, &(m_Matrix[threadID]), sizeof(Matrix4f) ) ) {
+		m_auiValueID[threadID]++;
+		m_Matrix[threadID] = *reinterpret_cast<Matrix4f*>( pData );
+	}
 }
 //--------------------------------------------------------------------------------
 void MatrixParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
@@ -44,6 +47,7 @@ void MatrixParameterDX11::ResetParameterData( void* pData, unsigned int threadID
 	assert( threadID < NUM_THREADS+1 );
 
 	if ( m_Matrix[threadID] == *reinterpret_cast<Matrix4f*>( pData ) ) {
+		m_auiValueID[threadID]++;
 		m_Matrix[threadID].MakeIdentity();
 	}
 }
@@ -71,7 +75,11 @@ void MatrixParameterDX11::UpdateValue( RenderParameterDX11* pParameter, unsigned
 		if ( ( pParameter->GetParameterType() == MATRIX ) && ( pParameter->GetName() == this->GetName() ) )
 		{
 			MatrixParameterDX11* pBuffer = (MatrixParameterDX11*)pParameter;
-			m_Matrix[threadID] = pBuffer->GetMatrix( threadID );
+
+			if ( m_Matrix[threadID] != pBuffer->GetMatrix( threadID ) ) {
+				m_auiValueID[threadID]++;
+				m_Matrix[threadID] = pBuffer->GetMatrix( threadID );
+			}
 		}
 	}
 }

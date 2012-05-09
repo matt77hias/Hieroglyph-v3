@@ -19,23 +19,37 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
+	struct ConstantBufferMapping
+	{
+		RenderParameterDX11*		pParameter;
+		unsigned int				offset;
+		unsigned int				size;
+		D3D_SHADER_VARIABLE_CLASS	varclass;
+		unsigned int				elements;
+		unsigned int				valueID;
+	};
+
+
+
 	class ConstantBufferDX11 : public BufferDX11
 	{
 	public:
 		ConstantBufferDX11( ID3D11Buffer* pBuffer );
 		virtual ~ConstantBufferDX11();
 
-		virtual ResourceType				GetType();
+		virtual ResourceType				GetType( );
 
-		void						SetConstantSize( int size );
-		void						SetConstantCount( int count );
+		void						AddMapping( ConstantBufferMapping& mapping );
+		void						EmptyMappings( );
+		void						EvaluateMappings( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager );
+
 		void						SetAutoUpdate( bool enable );
-		bool						GetAutoUpdate();
+		bool						GetAutoUpdate( );
 
 	protected:
-		int							m_iConstantSize;
-		int							m_iConstantCount;
 		bool						m_bAutoUpdate;
+
+		TArray< ConstantBufferMapping >	m_Mappings;
 
 		friend RendererDX11;
 	};

@@ -69,16 +69,15 @@ void DiffuseSphereEntity::LoadResources()
     SphereGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
     RenderEffect = new RenderEffectDX11();
-    RenderEffect->m_iVertexShader = 
-        pRenderer11->LoadShader( VERTEX_SHADER,
-        std::wstring( L"ObjectTexturedVS.hlsl" ),
-        std::wstring( L"VSMAIN" ),
-        std::wstring( L"vs_5_0" ) );
-    RenderEffect->m_iPixelShader = 
-        pRenderer11->LoadShader( PIXEL_SHADER,
-        std::wstring( L"ObjectTexturedPS.hlsl" ),
-        std::wstring( L"PSMAIN" ),
-        std::wstring( L"ps_5_0" ) );
+    RenderEffect->SetVertexShader( pRenderer11->LoadShader( VERTEX_SHADER,     
+		std::wstring( L"ObjectTexturedVS.hlsl" ),
+		std::wstring( L"VSMAIN" ),
+		std::wstring( L"vs_5_0" ) ) );
+
+	RenderEffect->SetPixelShader( pRenderer11->LoadShader( PIXEL_SHADER,
+		std::wstring( L"ObjectTexturedPS.hlsl" ),
+		std::wstring( L"PSMAIN" ),
+		std::wstring( L"ps_5_0" ) ) );
 
     // Create and fill the effect that will be used for a diffuse object 
     // to be rendered into a paraboloid map, which will use the paraboloid
@@ -86,21 +85,20 @@ void DiffuseSphereEntity::LoadResources()
 
     ParabolaEffect = new RenderEffectDX11();
 
-    ParabolaEffect->m_iVertexShader = 
-        pRenderer11->LoadShader( VERTEX_SHADER,
-        std::wstring( L"DualParaboloidEnvMapGen.hlsl" ),
-        std::wstring( L"VSMAIN" ),
-        std::wstring( L"vs_5_0" ) );
-    ParabolaEffect->m_iGeometryShader = 
-        pRenderer11->LoadShader( GEOMETRY_SHADER,
-        std::wstring( L"DualParaboloidEnvMapGen.hlsl" ),
-        std::wstring( L"GSMAIN" ),
-        std::wstring( L"gs_5_0" ) );
-    ParabolaEffect->m_iPixelShader = 
-        pRenderer11->LoadShader( PIXEL_SHADER,
-        std::wstring( L"DualParaboloidEnvMapGen.hlsl" ),
-        std::wstring( L"PSMAIN" ),
-        std::wstring( L"ps_5_0" ) );
+    ParabolaEffect->SetVertexShader( pRenderer11->LoadShader( VERTEX_SHADER,
+		std::wstring( L"DualParaboloidEnvMapGen.hlsl" ),
+		std::wstring( L"VSMAIN" ),
+		std::wstring( L"vs_5_0" ) ) );
+
+    ParabolaEffect->SetGeometryShader( pRenderer11->LoadShader( GEOMETRY_SHADER,
+	    std::wstring( L"DualParaboloidEnvMapGen.hlsl" ),
+		std::wstring( L"GSMAIN" ),
+		std::wstring( L"gs_5_0" ) ) );
+
+    ParabolaEffect->SetPixelShader( pRenderer11->LoadShader( PIXEL_SHADER,
+	    std::wstring( L"DualParaboloidEnvMapGen.hlsl" ),
+		std::wstring( L"PSMAIN" ),
+		std::wstring( L"ps_5_0" ) ) );
 
     //RasterizerStateConfigDX11 RS;
     //RS.FillMode = D3D11_FILL_WIREFRAME;
@@ -109,8 +107,8 @@ void DiffuseSphereEntity::LoadResources()
     //ParabolaEffect->m_iRasterizerState = 
     //	pRenderer11->CreateRasterizerState( &RS );
 
-	SphereGeometry->GenerateInputLayout( RenderEffect->m_iVertexShader );
-	SphereGeometry->GenerateInputLayout( ParabolaEffect->m_iVertexShader );
+	SphereGeometry->GenerateInputLayout( RenderEffect->GetVertexShader() );
+	SphereGeometry->GenerateInputLayout( ParabolaEffect->GetVertexShader() );
 
 	RenderEffect->ConfigurePipeline( pRenderer11->pImmPipeline, pRenderer11->m_pParamMgr );
 	ParabolaEffect->ConfigurePipeline( pRenderer11->pImmPipeline, pRenderer11->m_pParamMgr );

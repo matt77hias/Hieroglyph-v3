@@ -163,30 +163,28 @@ void App::Initialize()
 	// shader pipeline use the RenderEffect to configure itself.
 
 	m_pFilterEffect = new RenderEffectDX11();
-	m_pFilterEffect->m_iComputeShader = 
-		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
+	m_pFilterEffect->SetComputeShader( m_pRenderer11->LoadShader( COMPUTE_SHADER, 
 		std::wstring( L"InvertColorCS.hlsl" ),
 		std::wstring( L"CSMAIN" ),
-		std::wstring( L"cs_5_0" ) );
+		std::wstring( L"cs_5_0" ) ) );
 
 	m_pTextureEffect = new RenderEffectDX11();
-	m_pTextureEffect->m_iVertexShader = 
-		m_pRenderer11->LoadShader( VERTEX_SHADER,
+	m_pTextureEffect->SetVertexShader( m_pRenderer11->LoadShader( VERTEX_SHADER,
 		std::wstring( L"TextureVS.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	m_pTextureEffect->m_iPixelShader = 
-		m_pRenderer11->LoadShader( PIXEL_SHADER,
+		std::wstring( L"vs_5_0" ) ) );
+
+	m_pTextureEffect->SetPixelShader( m_pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"TexturePS.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
+		std::wstring( L"ps_5_0" ) ) );
 
 	// Create a full screen quad for rendering the texture to the backbuffer.
 
 	m_pFullScreen = GeometryPtr( new GeometryDX11() );
 	GeometryGeneratorDX11::GenerateFullScreenQuad( m_pFullScreen );
 
-	m_pFullScreen->GenerateInputLayout( m_pTextureEffect->m_iVertexShader );
+	m_pFullScreen->GenerateInputLayout( m_pTextureEffect->GetVertexShader() );
 	m_pFullScreen->LoadToBuffers();
 
 	// Specify the bindings for the resources.  These take as input a parameter

@@ -75,16 +75,15 @@ void App::Initialize()
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 
-	pEffect->m_iVertexShader = 
-		m_pRenderer11->LoadShader( VERTEX_SHADER,
+	pEffect->SetVertexShader( m_pRenderer11->LoadShader( VERTEX_SHADER,
 		std::wstring( L"HeightmapVisualization.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_4_0" ) );
-	pEffect->m_iPixelShader = 
-		m_pRenderer11->LoadShader( PIXEL_SHADER,
+		std::wstring( L"vs_4_0" ) ) );
+
+	pEffect->SetPixelShader( m_pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"HeightmapVisualization.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_4_0" ) );
+		std::wstring( L"ps_4_0" ) ) );
 
 	RasterizerStateConfigDX11 RS;
 	RS.FillMode = D3D11_FILL_WIREFRAME;

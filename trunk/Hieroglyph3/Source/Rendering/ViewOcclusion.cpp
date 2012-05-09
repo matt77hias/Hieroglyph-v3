@@ -37,25 +37,25 @@ ViewOcclusion::ViewOcclusion( RendererDX11& Renderer, ResourcePtr OcclusionTarge
 	// the bilateral filters.
 
 	pOcclusionEffect = new RenderEffectDX11();
-	pOcclusionEffect->m_iComputeShader = 
+	pOcclusionEffect->SetComputeShader( 
 		Renderer.LoadShader( COMPUTE_SHADER,
-		std::wstring( L"AmbientOcclusionCS_32.hlsl" ),
-		std::wstring( L"CSMAIN" ),
-		std::wstring( L"cs_5_0" ) );
+			std::wstring( L"AmbientOcclusionCS_32.hlsl" ),
+			std::wstring( L"CSMAIN" ),
+			std::wstring( L"cs_5_0" ) ) );
 
 	pBilateralXEffect = new RenderEffectDX11();
-	pBilateralXEffect->m_iComputeShader = 
+	pBilateralXEffect->SetComputeShader( 
 		Renderer.LoadShader( COMPUTE_SHADER,
-		std::wstring( L"SeparableBilateralCS.hlsl" ),
-		std::wstring( L"CS_Horizontal" ),
-		std::wstring( L"cs_5_0" ) );
+			std::wstring( L"SeparableBilateralCS.hlsl" ),
+			std::wstring( L"CS_Horizontal" ),
+			std::wstring( L"cs_5_0" ) ) );
 
 	pBilateralYEffect = new RenderEffectDX11();
-	pBilateralYEffect->m_iComputeShader = 
+	pBilateralYEffect->SetComputeShader( 
 		Renderer.LoadShader( COMPUTE_SHADER,
-		std::wstring( L"SeparableBilateralCS.hlsl" ),
-		std::wstring( L"CS_Vertical" ),
-		std::wstring( L"cs_5_0" ) );
+			std::wstring( L"SeparableBilateralCS.hlsl" ),
+			std::wstring( L"CS_Vertical" ),
+			std::wstring( L"cs_5_0" ) ) );
 
 	m_pDepthNormalBuffer = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"DepthNormalBuffer" ) );
 	m_pAmbientOcclusionBuffer = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"AmbientOcclusionBuffer" ) );

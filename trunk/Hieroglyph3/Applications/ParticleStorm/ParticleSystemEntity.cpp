@@ -44,21 +44,20 @@ ParticleSystemEntity::ParticleSystemEntity()
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 
-	pEffect->m_iVertexShader = 
-		pRenderer11->LoadShader( VERTEX_SHADER,
+	pEffect->SetVertexShader( pRenderer11->LoadShader( VERTEX_SHADER,
 		std::wstring( L"ParticleSystemRender.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	pEffect->m_iGeometryShader = 
-		pRenderer11->LoadShader( GEOMETRY_SHADER,
+		std::wstring( L"vs_5_0" ) ) );
+
+	pEffect->SetGeometryShader( pRenderer11->LoadShader( GEOMETRY_SHADER,
 		std::wstring( L"ParticleSystemRender.hlsl" ),
 		std::wstring( L"GSMAIN" ),
-		std::wstring( L"gs_5_0" ) );
-	pEffect->m_iPixelShader = 
-		pRenderer11->LoadShader( PIXEL_SHADER,
+		std::wstring( L"gs_5_0" ) ) );
+
+	pEffect->SetPixelShader( pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"ParticleSystemRender.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
+		std::wstring( L"ps_5_0" ) ) );
 
 	// We will use additive blending, so configure each state appropriately.
 	// TODO: Should add a preconfigured method to the BlendStateConfigDX11 for
@@ -162,7 +161,7 @@ void ParticleSystemEntity::Render( PipelineManagerDX11* pPipelineManager, IParam
 				*pEffect, 
 				m_pSimulation->GetParticleCountIndirectArgsBuffer(),
 				0,
-				geometry->GetInputLayout( pEffect->m_iVertexShader ),
+				geometry->GetInputLayout( pEffect->GetVertexShader() ),
 				geometry->m_ePrimType,
 				geometry->GetVertexSize(),
 				pParamManager );

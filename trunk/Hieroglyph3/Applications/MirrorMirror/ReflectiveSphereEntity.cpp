@@ -44,16 +44,15 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 
-	pEffect->m_iVertexShader = 
-		pRenderer11->LoadShader( VERTEX_SHADER,
+	pEffect->SetVertexShader( pRenderer11->LoadShader( VERTEX_SHADER,
 		std::wstring( L"DualParaboloidEnvMapLookup.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	pEffect->m_iPixelShader = 
-		pRenderer11->LoadShader( PIXEL_SHADER,
+		std::wstring( L"vs_5_0" ) ) );
+
+	pEffect->SetPixelShader( pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"DualParaboloidEnvMapLookup.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
+		std::wstring( L"ps_5_0" ) ) );
 
 	// Specify the size of the paraboloid maps to use.
 
@@ -95,21 +94,20 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 	
 	RenderEffectDX11* pParabGenEffect = new RenderEffectDX11();
 
-	pParabGenEffect->m_iVertexShader = 
-		pRenderer11->LoadShader( VERTEX_SHADER,
+	pParabGenEffect->SetVertexShader( pRenderer11->LoadShader( VERTEX_SHADER,
 		std::wstring( L"DualParaboloidEnvMapLookupGen.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	pParabGenEffect->m_iGeometryShader = 
-		pRenderer11->LoadShader( GEOMETRY_SHADER,
+		std::wstring( L"vs_5_0" ) ) );
+
+	pParabGenEffect->SetGeometryShader(	pRenderer11->LoadShader( GEOMETRY_SHADER,
 		std::wstring( L"DualParaboloidEnvMapLookupGen.hlsl" ),
 		std::wstring( L"GSMAIN" ),
-		std::wstring( L"gs_5_0" ) );
-	pParabGenEffect->m_iPixelShader = 
-		pRenderer11->LoadShader( PIXEL_SHADER,
+		std::wstring( L"gs_5_0" ) ) );
+	
+	pParabGenEffect->SetPixelShader( pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"DualParaboloidEnvMapLookupGen.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
+		std::wstring( L"ps_5_0" ) ) );
 
 	// Enable the material to render the given view type, and set its effect.
 	
@@ -136,8 +134,8 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 	// These operations are performed here at initialization time to ensure 
 	// that the multithreading systems don't create any contention scenarios.
 
-	pGeometry->GenerateInputLayout( pEffect->m_iVertexShader );
-	pGeometry->GenerateInputLayout( pParabGenEffect->m_iVertexShader );
+	pGeometry->GenerateInputLayout( pEffect->GetVertexShader() );
+	pGeometry->GenerateInputLayout( pParabGenEffect->GetVertexShader() );
 
 	pEffect->ConfigurePipeline( pRenderer11->pImmPipeline, pRenderer11->m_pParamMgr );
 	pParabGenEffect->ConfigurePipeline( pRenderer11->pImmPipeline, pRenderer11->m_pParamMgr );

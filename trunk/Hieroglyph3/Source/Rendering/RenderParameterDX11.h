@@ -72,8 +72,17 @@ namespace Glyph3
 		
 		virtual void UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID = 0 ) = 0;
 
+		// The value ID is used to efficiently determine when a parameter's value
+		// has been changed.  Each parameter type will increment the value ID
+		// after it has been changed to indicate that it should be re-evaluated.
+		// This is especially important for updating constant buffer contents
+		// only when needed.
+
+		unsigned int GetValueID( unsigned int threadID = 0 );
+
 	protected:
 		std::wstring	m_sParameterName;
+		unsigned int	m_auiValueID[NUM_THREADS+1];
 	};
 };
 //--------------------------------------------------------------------------------

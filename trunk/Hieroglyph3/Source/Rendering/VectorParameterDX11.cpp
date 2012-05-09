@@ -35,7 +35,10 @@ void VectorParameterDX11::SetParameterData( void* pData, unsigned int threadID )
 	assert( threadID >= 0 );
 	assert( threadID < NUM_THREADS+1 );
 
-	m_Vector[threadID] = *reinterpret_cast<Vector4f*>( pData );
+	if ( 0 != memcmp( pData, &(m_Vector[threadID]), sizeof(Vector4f) ) ) {
+		m_auiValueID[threadID]++;
+		m_Vector[threadID] = *reinterpret_cast<Vector4f*>( pData );
+	}
 }
 //--------------------------------------------------------------------------------
 void VectorParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
@@ -44,6 +47,7 @@ void VectorParameterDX11::ResetParameterData( void* pData, unsigned int threadID
 	assert( threadID < NUM_THREADS+1 );
 
 	if ( m_Vector[threadID] == *reinterpret_cast<Vector4f*>( pData ) ) {
+		m_auiValueID[threadID]++;
 		m_Vector[threadID].MakeZero();
 	}
 }
@@ -63,7 +67,10 @@ Vector4f VectorParameterDX11::GetVector( unsigned int threadID )
 //--------------------------------------------------------------------------------
 void VectorParameterDX11::SetVector( Vector4f v, unsigned int threadID )
 {
-	m_Vector[threadID] = v;
+	if ( v != m_Vector[threadID] ) {
+		m_auiValueID[threadID]++;
+		m_Vector[threadID] = v;
+	}
 }
 //--------------------------------------------------------------------------------
 void VectorParameterDX11::UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID )
@@ -76,7 +83,10 @@ void VectorParameterDX11::UpdateValue( RenderParameterDX11* pParameter, unsigned
 		if ( ( pParameter->GetParameterType() == VECTOR ) && ( pParameter->GetName() == this->GetName() ) )
 		{
 			VectorParameterDX11* pVector = (VectorParameterDX11*)pParameter;
-			m_Vector[threadID] = pVector->GetVector();
+			if ( m_Vector[threadID] != pVector->GetVector( threadID ) ) {
+				m_auiValueID[threadID]++;
+				m_Vector[threadID] = pVector->GetVector();
+			}
 		}
 	}
 }

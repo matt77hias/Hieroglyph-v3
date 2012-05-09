@@ -148,77 +148,67 @@ void App::Initialize()
 	// our various algorithms.
 
 	m_pBruteForceGaussian = new RenderEffectDX11();
-	m_pBruteForceGaussian->m_iComputeShader = 
-		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
+	m_pBruteForceGaussian->SetComputeShader( m_pRenderer11->LoadShader( COMPUTE_SHADER, 
 		std::wstring( L"GaussianBruteForceCS.hlsl" ),
 		std::wstring( L"CSMAIN" ),
-		std::wstring( L"cs_5_0" ) );
+		std::wstring( L"cs_5_0" ) ) );
 
 	m_pSeparableGaussianX = new RenderEffectDX11();
-	m_pSeparableGaussianX->m_iComputeShader = 
-		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
+	m_pSeparableGaussianX->SetComputeShader( m_pRenderer11->LoadShader( COMPUTE_SHADER, 
 		std::wstring( L"GaussianSeparableCS.hlsl" ),
 		std::wstring( L"CSMAINX" ),
-		std::wstring( L"cs_5_0" ) );
+		std::wstring( L"cs_5_0" ) ) );
 
 	m_pSeparableGaussianY = new RenderEffectDX11();
-	m_pSeparableGaussianY->m_iComputeShader = 
-		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
+	m_pSeparableGaussianY->SetComputeShader( m_pRenderer11->LoadShader( COMPUTE_SHADER, 
 		std::wstring( L"GaussianSeparableCS.hlsl" ),
 		std::wstring( L"CSMAINY" ),
-		std::wstring( L"cs_5_0" ) );
+		std::wstring( L"cs_5_0" ) ) );
 
 	m_pCachedGaussianX = new RenderEffectDX11();
-	m_pCachedGaussianX->m_iComputeShader = 
-		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
+	m_pCachedGaussianX->SetComputeShader( m_pRenderer11->LoadShader( COMPUTE_SHADER, 
 		std::wstring( L"GaussianCachedCS.hlsl" ),
 		std::wstring( L"CSMAINX" ),
-		std::wstring( L"cs_5_0" ) );
+		std::wstring( L"cs_5_0" ) ) );
 
 	m_pCachedGaussianY = new RenderEffectDX11();
-	m_pCachedGaussianY->m_iComputeShader = 
-		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
+	m_pCachedGaussianY->SetComputeShader( m_pRenderer11->LoadShader( COMPUTE_SHADER, 
 		std::wstring( L"GaussianCachedCS.hlsl" ),
 		std::wstring( L"CSMAINY" ),
-		std::wstring( L"cs_5_0" ) );
+		std::wstring( L"cs_5_0" ) ) );
 
 
 	m_pBruteForceBilateral = new RenderEffectDX11();
-	m_pBruteForceBilateral->m_iComputeShader = 
-		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
+	m_pBruteForceBilateral->SetComputeShader( m_pRenderer11->LoadShader( COMPUTE_SHADER, 
 		std::wstring( L"BilateralBruteForceCS.hlsl" ),
 		std::wstring( L"CSMAIN" ),
-		std::wstring( L"cs_5_0" ) );
+		std::wstring( L"cs_5_0" ) ) );
 
 	m_pSeparableBilateralX = new RenderEffectDX11();
-	m_pSeparableBilateralX->m_iComputeShader = 
-		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
+	m_pSeparableBilateralX->SetComputeShader( m_pRenderer11->LoadShader( COMPUTE_SHADER, 
 		std::wstring( L"BilateralSeparableCS.hlsl" ),
 		std::wstring( L"CSMAINX" ),
-		std::wstring( L"cs_5_0" ) );
+		std::wstring( L"cs_5_0" ) ) );
 
 	m_pSeparableBilateralY = new RenderEffectDX11();
-	m_pSeparableBilateralY->m_iComputeShader = 
-		m_pRenderer11->LoadShader( COMPUTE_SHADER, 
+	m_pSeparableBilateralY->SetComputeShader( m_pRenderer11->LoadShader( COMPUTE_SHADER, 
 		std::wstring( L"BilateralSeparableCS.hlsl" ),
 		std::wstring( L"CSMAINY" ),
-		std::wstring( L"cs_5_0" ) );
+		std::wstring( L"cs_5_0" ) ) );
 
 
 	// Create the material for use by the entity.
 	MaterialPtr pMaterial = MaterialPtr( new MaterialDX11() );
 
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
-	pEffect->m_iVertexShader = 
-		m_pRenderer11->LoadShader( VERTEX_SHADER,
+	pEffect->SetVertexShader( m_pRenderer11->LoadShader( VERTEX_SHADER,
 		std::wstring( L"ImageViewerVS.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	pEffect->m_iPixelShader = 
-		m_pRenderer11->LoadShader( PIXEL_SHADER,
+		std::wstring( L"vs_5_0" ) ) );
+	pEffect->SetPixelShader( m_pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"ImageViewerPS.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
+		std::wstring( L"ps_5_0" ) ) );
 
 	// Enable the material to render the given view type, and set its effect.
 

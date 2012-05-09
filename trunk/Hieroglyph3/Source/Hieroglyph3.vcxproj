@@ -130,6 +130,7 @@ copy Animation\*.h ..\SDK\Include
     <ClCompile Include="Rendering\RasterizerStageDX11.cpp" />
     <ClCompile Include="Rendering\RasterizerStageStateDX11.cpp" />
     <ClCompile Include="Rendering\ResourceDX11.cpp" />
+    <ClCompile Include="Rendering\ShaderFactoryDX11.cpp" />
     <ClCompile Include="Rendering\ShaderReflectionDX11.cpp" />
     <ClCompile Include="Rendering\ShaderReflectionFactoryDX11.cpp" />
     <ClCompile Include="Rendering\ShaderStageStateDX11.cpp" />
@@ -475,6 +476,7 @@ copy Animation\*.h ..\SDK\Include
     <ClInclude Include="Rendering\PipelineExecutorDX11.h" />
     <ClInclude Include="Rendering\RasterizerStageDX11.h" />
     <ClInclude Include="Rendering\RasterizerStageStateDX11.h" />
+    <ClInclude Include="Rendering\ShaderFactoryDX11.h" />
     <ClInclude Include="Rendering\ShaderReflectionDX11.h" />
     <ClInclude Include="Rendering\ShaderReflectionFactoryDX11.h" />
     <ClInclude Include="Rendering\ShaderStageStateDX11.h" />

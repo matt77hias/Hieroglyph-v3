@@ -201,18 +201,16 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 	// Set up the render effect for actually updating the simulation.
 
 	pParticleUpdate = new RenderEffectDX11();
-	pParticleUpdate->m_iComputeShader = 
-		Renderer.LoadShader( COMPUTE_SHADER,
+	pParticleUpdate->SetComputeShader( Renderer.LoadShader( COMPUTE_SHADER,
 		std::wstring( L"ParticleSystemUpdateCS.hlsl" ),
 		std::wstring( L"CSMAIN" ),
-		std::wstring( L"cs_5_0" ) );
+		std::wstring( L"cs_5_0" ) ) );
 
 	pParticleInsertion = new RenderEffectDX11();
-	pParticleInsertion->m_iComputeShader = 
-		Renderer.LoadShader( COMPUTE_SHADER,
+	pParticleInsertion->SetComputeShader( Renderer.LoadShader( COMPUTE_SHADER,
 		std::wstring( L"ParticleSystemInsertCS.hlsl" ),
 		std::wstring( L"CSMAIN" ),
-		std::wstring( L"cs_5_0" ) );
+		std::wstring( L"cs_5_0" ) ) );
 
 	
 	// Get handles to all of the rendering parameters that we will be using.

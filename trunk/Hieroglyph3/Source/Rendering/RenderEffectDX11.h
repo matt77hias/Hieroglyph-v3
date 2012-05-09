@@ -19,7 +19,7 @@
 #ifndef RenderEffectDX11_h
 #define RenderEffectDX11_h
 //--------------------------------------------------------------------------------
-
+#include "ShaderDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -32,20 +32,35 @@ namespace Glyph3
 		RenderEffectDX11();
 		virtual ~RenderEffectDX11();
 
-		void ConfigurePipeline( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager );
+		void SetVertexShader( int index );
+		void SetHullShader( int index );
+		void SetDomainShader( int index );
+		void SetGeometryShader( int index );
+		void SetPixelShader( int index );
+		void SetComputeShader( int index );
 
-	public:
-		int		m_iVertexShader;
-		int		m_iHullShader;
-		int		m_iDomainShader;
-		int		m_iGeometryShader;
-		int		m_iPixelShader;
-		int		m_iComputeShader;
+		int GetVertexShader( );
+		int GetHullShader( );
+		int GetDomainShader( );
+		int GetGeometryShader( );
+		int GetPixelShader( );
+		int GetComputeShader( );
+
+		void ConfigurePipeline( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager );
 
 		int		m_iBlendState;
 		int		m_iDepthStencilState;
 		int		m_iRasterizerState;
         UINT    m_uStencilRef; 
+
+	protected:
+
+		void UpdateConstantBufferList( );
+
+		int					m_aiIndices[6];
+		ShaderDX11*			m_apShaders[6];
+
+		TArray< RenderParameterDX11* > m_uniqueConstBuffers;
 	};
 };
 //--------------------------------------------------------------------------------

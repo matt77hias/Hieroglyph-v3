@@ -23,6 +23,9 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 RenderParameterDX11::RenderParameterDX11()
 {
+	for ( int i = 0; i < NUM_THREADS+1; i++ ) {
+		m_auiValueID[i] = 0;
+	}
 }
 //--------------------------------------------------------------------------------
 RenderParameterDX11::RenderParameterDX11( RenderParameterDX11& copy )
@@ -54,6 +57,14 @@ void RenderParameterDX11::UnInitializeParameterData( void* pData )
 {
 	for ( int i = 0; i <= NUM_THREADS; i++ )
 		ResetParameterData( pData, i );
+}
+//--------------------------------------------------------------------------------
+unsigned int RenderParameterDX11::GetValueID( unsigned int threadID )
+{
+	assert( threadID >= 0 );
+	assert( threadID < NUM_THREADS+1 );
+
+	return( m_auiValueID[threadID] );
 }
 //--------------------------------------------------------------------------------
 //RenderParameterDX11* RenderParameterDX11::CreateCopy()

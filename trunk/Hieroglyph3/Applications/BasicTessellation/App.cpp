@@ -154,26 +154,25 @@ void App::Initialize()
 	// Load the shaders and state for the tessellation effects
 
 	m_pTessellationEffect = new RenderEffectDX11();
-	m_pTessellationEffect->m_iVertexShader = 
-		m_pRenderer11->LoadShader( VERTEX_SHADER,
+	m_pTessellationEffect->SetVertexShader( m_pRenderer11->LoadShader( VERTEX_SHADER,
 		std::wstring( L"BasicTessellation.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	m_pTessellationEffect->m_iHullShader =
-		m_pRenderer11->LoadShader( HULL_SHADER,
+		std::wstring( L"vs_5_0" ) ) );
+
+	m_pTessellationEffect->SetHullShader( m_pRenderer11->LoadShader( HULL_SHADER,
 		std::wstring( L"BasicTessellation.hlsl" ),
 		std::wstring( L"HSMAIN" ),
-		std::wstring( L"hs_5_0" ) );
-	m_pTessellationEffect->m_iDomainShader =
-		m_pRenderer11->LoadShader( DOMAIN_SHADER,
+		std::wstring( L"hs_5_0" ) ) );
+
+	m_pTessellationEffect->SetDomainShader( m_pRenderer11->LoadShader( DOMAIN_SHADER,
 		std::wstring( L"BasicTessellation.hlsl" ),
 		std::wstring( L"DSMAIN" ),
-		std::wstring( L"ds_5_0" ) );
-	m_pTessellationEffect->m_iPixelShader = 
-		m_pRenderer11->LoadShader( PIXEL_SHADER,
+		std::wstring( L"ds_5_0" ) ) );
+
+	m_pTessellationEffect->SetPixelShader( m_pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"BasicTessellation.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
+		std::wstring( L"ps_5_0" ) ) );
 
 	RasterizerStateConfigDX11 RS;
 	RS.FillMode = D3D11_FILL_WIREFRAME;

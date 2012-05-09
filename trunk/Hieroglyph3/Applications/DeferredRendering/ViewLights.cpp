@@ -139,7 +139,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
             {
 
                 // We'll create permutations of our shaders bases on optimization mods
-                D3D10_SHADER_MACRO defines[7];
+                D3D_SHADER_MACRO defines[7];
                 defines[0].Name = "POINTLIGHT";
                 defines[0].Definition = "1";
                 defines[1].Name = "SPOTLIGHT";
@@ -156,21 +156,21 @@ ViewLights::ViewLights( RendererDX11& Renderer)
                 defines[6].Definition = NULL;
 
                 // Point light shaders
-                m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader =
+                m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].SetVertexShader(
                     Renderer.LoadShader( VERTEX_SHADER,
                     std::wstring( L"Lights.hlsl" ),
                     std::wstring( L"VSMain" ),
                     std::wstring( L"vs_5_0" ),
-                    defines );
-                _ASSERT( m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader != -1 );
+                    defines ) );
+                _ASSERT( m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].GetVertexShader() != -1 );
 
-                m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iPixelShader =
-                    Renderer.LoadShader( PIXEL_SHADER,
+                m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].SetPixelShader(
+					Renderer.LoadShader( PIXEL_SHADER,
                     std::wstring( L"Lights.hlsl" ),
                     std::wstring( L"PSMain" ),
                     std::wstring( L"ps_5_0" ),
-                    defines );
-                _ASSERT( m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iPixelShader != -1 );
+                    defines ) );
+                _ASSERT( m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].GetPixelShader() != -1 );
 
                 m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iBlendState = m_iBlendState;
                 m_PointLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iDepthStencilState = m_iDisabledDSState;
@@ -181,21 +181,21 @@ ViewLights::ViewLights( RendererDX11& Renderer)
                 defines[0].Definition = "0";
                 defines[1].Definition = "1";
 
-                m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader =
+                m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].SetVertexShader(
                     Renderer.LoadShader( VERTEX_SHADER,
                     std::wstring( L"Lights.hlsl" ),
                     std::wstring( L"VSMain" ),
                     std::wstring( L"vs_5_0" ),
-                    defines );
-                _ASSERT( m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader != -1 );
+                    defines ) );
+                _ASSERT( m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].GetVertexShader() != -1 );
 
-                m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iPixelShader =
+                m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].SetPixelShader(
                     Renderer.LoadShader( PIXEL_SHADER,
                     std::wstring( L"Lights.hlsl" ),
                     std::wstring( L"PSMain" ),
                     std::wstring( L"ps_5_0" ),
-                    defines );
-                _ASSERT( m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iPixelShader != -1 );
+                    defines ) );
+                _ASSERT( m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].GetPixelShader() != -1 );
 
                 m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iBlendState = m_iBlendState;
                 m_SpotLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iDepthStencilState = m_iDisabledDSState;
@@ -206,21 +206,21 @@ ViewLights::ViewLights( RendererDX11& Renderer)
                 defines[1].Definition = "0";
                 defines[2].Definition = "1";
 
-                m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader =
+                m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].SetVertexShader(
                     Renderer.LoadShader( VERTEX_SHADER,
                     std::wstring( L"Lights.hlsl" ),
                     std::wstring( L"VSMain" ),
                     std::wstring( L"vs_5_0" ),
-                    defines );
-                _ASSERT( m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iVertexShader != -1 );
+                    defines ) );
+                _ASSERT( m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].GetVertexShader() != -1 );
 
-                m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iPixelShader =
+                m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].SetPixelShader(
                     Renderer.LoadShader( PIXEL_SHADER,
                     std::wstring( L"Lights.hlsl" ),
                     std::wstring( L"PSMain" ),
                     std::wstring( L"ps_5_0" ),
-                    defines );
-                _ASSERT( m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iPixelShader != -1 );
+                    defines ) );
+                _ASSERT( m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].GetPixelShader() != -1 );
 
                 m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iBlendState = m_iBlendState;
                 m_DirectionalLightEffect[gBufferOptMode][lightOptMode][aaMode].m_iDepthStencilState = m_iDisabledDSState;

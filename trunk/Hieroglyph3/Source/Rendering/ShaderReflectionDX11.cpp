@@ -19,6 +19,7 @@
 #include "ConstantBufferDX11.h"
 #include "D3DEnumConversion.h"
 #include "ShaderReflectionFactoryDX11.h"
+#include "ConstantBufferDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -59,16 +60,43 @@ void ShaderReflectionDX11::InitializeConstantBuffers( IParameterManager* pParamM
 
 			if ( index == -1 )
 			{
-				// Configure the buffer for the needed size and dynamic updating.
-				BufferConfigDX11 cbuffer;
-				cbuffer.SetDefaultConstantBuffer( ConstantBuffers[i].Description.Size, true );
+				// Here we create one constant buffer for each thread that could potentially
+				// be rendering, and then set each one accordingly within the parameter 
+				// reference that we have for this buffer.
 
-				// Create the buffer and set it as a constant buffer parameter.  This
-				// creates a parameter object to be used in the future.
-				ResourcePtr resource = RendererDX11::Get()->CreateConstantBuffer( &cbuffer, 0 );
-				index = resource->m_iResource;
+				for ( int thread = 0; thread < NUM_THREADS + 1; thread++ )
+				{
+					// Configure the buffer for the needed size and dynamic updating.
+					BufferConfigDX11 cbuffer;
+					cbuffer.SetDefaultConstantBuffer( ConstantBuffers[i].Description.Size, true );
 
-				ConstantBuffers[i].pParamRef->InitializeParameterData( &index );
+					// Create the buffer and set it as a constant buffer parameter.  This
+					// creates a parameter object to be used in the future.
+					ResourcePtr resource = RendererDX11::Get()->CreateConstantBuffer( &cbuffer, 0 );
+					index = resource->m_iResource;
+
+					//ConstantBuffers[i].pParamRef->InitializeParameterData( &index );
+					ConstantBuffers[i].pParamRef->SetParameterData( &index, thread );
+
+					// Now we load the variable information into each of the constant
+					// buffers.  This allows the buffer to know how to update itself
+					// with the parameter system.
+
+					for ( int j = 0; j < ConstantBuffers[i].Variables.count(); j++ )
+					{
+						ConstantBufferMapping mapping;
+
+						mapping.pParameter = ConstantBuffers[i].Parameters[j];
+						mapping.offset = ConstantBuffers[i].Variables[j].StartOffset;
+						mapping.size = ConstantBuffers[i].Variables[j].Size;
+						mapping.elements = ConstantBuffers[i].Types[j].Elements;
+						mapping.varclass = ConstantBuffers[i].Types[j].Class;
+						mapping.valueID = 1;
+
+						ConstantBufferDX11* constBuffer = RendererDX11::Get()->GetConstantBufferByIndex( resource->m_iResource );
+						constBuffer->AddMapping( mapping );
+					}
+				}
 			}
 		}
 	}
@@ -116,68 +144,22 @@ void ShaderReflectionDX11::UpdateParameters( PipelineManagerDX11* pPipeline, IPa
 
 
 			// Check if the resource is a constant buffer before accessing it!
+
 			ConstantBufferDX11* pBuffer = RendererDX11::Get()->GetConstantBufferByIndex( index );
 
 			// Test the index to ensure that it is a constant buffer.  If the method above returns
 			// a non-null result, then this is a constant buffer.
-			if ( pBuffer ) 
-			{
-				if ( pBuffer->GetAutoUpdate() )
-				{
-					// Map the constant buffer into system memory.  We map the buffer 
-					// with the discard write flag since we don't care what was in the
-					// buffer already.
 
-					D3D11_MAPPED_SUBRESOURCE resource = 
-						pPipeline->MapResource( index, 0, D3D11_MAP_WRITE_DISCARD, 0 );
+			if ( pBuffer ) {
 
-					// Update each variable in the constant buffer.  These variables are identified
-					// by their type, and are currently allowed to be Vector4f, Matrix4f, or Matrix4f
-					// arrays.  Additional types will be added as they are needed...
+				// Here all of the individual variables from the reflection data are used to
+				// update the data held by the constant buffer.
 
-					for ( int j = 0; j < ConstantBuffers[i].Variables.count(); j++ )
-					{
-						RenderParameterDX11* pParam = ConstantBuffers[i].Parameters[j];
-						int offset = ConstantBuffers[i].Variables[j].StartOffset;
-						UINT size = ConstantBuffers[i].Variables[j].Size;
-						
-						if ( ConstantBuffers[i].Types[j].Class == D3D_SVC_VECTOR )
-						{
-							Vector4f vector = pParamManager->GetVectorParameter( pParam );
-							Vector4f* pBuf = (Vector4f*)((char*)resource.pData + offset);
-							*pBuf = vector;
-						}
-						else if ( ( ConstantBuffers[i].Types[j].Class == D3D_SVC_MATRIX_ROWS ) ||
-							( ConstantBuffers[i].Types[j].Class == D3D_SVC_MATRIX_COLUMNS ) )
-						{
-							// Check if it is an array of matrices first...
-							unsigned int count = ConstantBuffers[i].Types[j].Elements;
-							if ( count == 0 ) 
-							{
-								Matrix4f matrix = pParamManager->GetMatrixParameter( pParam );
-								Matrix4f* pBuf = (Matrix4f*)((char*)resource.pData + offset);
-								*pBuf = matrix;
-							}
-							else 
-							{
-								// If a matrix array, then use the corresponding parameter type.
-								// TODO: If the shader expects a different number of matrices than are present
-								//       from the matrix array parameter, then this causes an exception!
-								Matrix4f* pMatrices = pParamManager->GetMatrixArrayParameter( pParam );
-								memcpy( ((char*)resource.pData + offset), (char*)pMatrices, ConstantBuffers[i].Variables[j].Size );
-							}
-						}
-						else
-						{
-							Log::Get().Write( L"Non vector or matrix parameter specified in a constant buffer!  This will not be updated!" );
-						}
-					}
-
-					pPipeline->UnMapResource( index, 0 );
+				if ( pBuffer->GetAutoUpdate() ) {
+					pBuffer->EvaluateMappings( pPipeline, pParamManager );
 				}
-			}
-			else
-			{
+
+			} else {
 				Log::Get().Write( L"Trying to update a constant buffer that isn't a constant buffer!" );
 			}
 		}

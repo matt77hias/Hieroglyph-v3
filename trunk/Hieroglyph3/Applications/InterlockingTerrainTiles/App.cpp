@@ -327,14 +327,14 @@ bool App::HandleEvent( IEvent* pEvent )
 				case LodDebugView:	m_smCurrentShading = SolidColour; break;
 			}
 
-			m_pTerrainEffect->m_iDomainShader = m_TerrainDomainShaders[ m_smCurrentShading ];
+			m_pTerrainEffect->SetDomainShader( m_TerrainDomainShaders[ m_smCurrentShading ] );
 		}
 		else if ( 'L' == key )
 		{
 			// Toggle between simple and CS-based LOD
 			m_bSimpleComplexity = !m_bSimpleComplexity;
 
-			m_pTerrainEffect->m_iHullShader = m_bSimpleComplexity ? m_iSimpleHullShader : m_iComplexHullShader;
+			m_pTerrainEffect->SetHullShader( m_bSimpleComplexity ? m_iSimpleHullShader : m_iComplexHullShader );
 		}
 		else if ( 'A' == key )
 		{
@@ -451,12 +451,11 @@ void App::CreateTerrainShaders()
 	m_pTerrainEffect = new RenderEffectDX11();
 
 	// Create the vertex shader
-	m_pTerrainEffect->m_iVertexShader = 
-		m_pRenderer11->LoadShader( VERTEX_SHADER,
+	m_pTerrainEffect->SetVertexShader( m_pRenderer11->LoadShader( VERTEX_SHADER,
 		std::wstring( L"InterlockingTerrainTiles.hlsl" ),
 		std::wstring( L"vsMain" ),
-		std::wstring( L"vs_5_0" ) );
-	_ASSERT( -1 != m_pTerrainEffect->m_iVertexShader );
+		std::wstring( L"vs_5_0" ) ) );
+	_ASSERT( -1 != m_pTerrainEffect->GetVertexShader() );
 	
 	Log::Get().Write( L"... vertex shader created" );
 
@@ -473,45 +472,43 @@ void App::CreateTerrainShaders()
 							std::wstring( L"hs_5_0" ) );
 	_ASSERT( -1 != m_iComplexHullShader );
 
-	m_pTerrainEffect->m_iHullShader = m_bSimpleComplexity ? m_iSimpleHullShader : m_iComplexHullShader;
+	m_pTerrainEffect->SetHullShader( m_bSimpleComplexity ? m_iSimpleHullShader : m_iComplexHullShader );
 
 	Log::Get().Write( L"... hull shader created" );
 
 	// Create the domain shaders
 
-	D3D10_SHADER_MACRO dsSolid[2] = { "SHADING_SOLID", "1", NULL, NULL };
+	D3D_SHADER_MACRO dsSolid[2] = { "SHADING_SOLID", "1", NULL, NULL };
 	m_TerrainDomainShaders[SolidColour] = m_pRenderer11->LoadShader( DOMAIN_SHADER, std::wstring( L"InterlockingTerrainTiles.hlsl" ), std::wstring( L"dsMain" ), std::wstring( L"ds_5_0" ), dsSolid );
 	_ASSERT( -1 != m_TerrainDomainShaders[SolidColour] );
 
-	D3D10_SHADER_MACRO dsShaded[2] = { "SHADING_SIMPLE", "1", NULL, NULL };
+	D3D_SHADER_MACRO dsShaded[2] = { "SHADING_SIMPLE", "1", NULL, NULL };
 	m_TerrainDomainShaders[SimpleShading] = m_pRenderer11->LoadShader( DOMAIN_SHADER, std::wstring( L"InterlockingTerrainTiles.hlsl" ), std::wstring( L"dsMain" ), std::wstring( L"ds_5_0" ), dsShaded );
 	_ASSERT( -1 != m_TerrainDomainShaders[SimpleShading] );
 
-	D3D10_SHADER_MACRO dsDebug[2] = { "SHADING_DEBUG_LOD", "1", NULL, NULL };
+	D3D_SHADER_MACRO dsDebug[2] = { "SHADING_DEBUG_LOD", "1", NULL, NULL };
 	m_TerrainDomainShaders[LodDebugView] = m_pRenderer11->LoadShader( DOMAIN_SHADER, std::wstring( L"InterlockingTerrainTiles.hlsl" ), std::wstring( L"dsMain" ), std::wstring( L"ds_5_0" ), dsDebug );
 	_ASSERT( -1 != m_TerrainDomainShaders[LodDebugView] );
 
-	m_pTerrainEffect->m_iDomainShader = m_TerrainDomainShaders[ m_smCurrentShading ];
+	m_pTerrainEffect->SetDomainShader( m_TerrainDomainShaders[ m_smCurrentShading ] );
 
 	Log::Get().Write( L"... domain shaders created" );
 
 	// Create the geometry shader
-	m_pTerrainEffect->m_iGeometryShader = 
-		m_pRenderer11->LoadShader( GEOMETRY_SHADER,
+	m_pTerrainEffect->SetGeometryShader( m_pRenderer11->LoadShader( GEOMETRY_SHADER,
 		std::wstring( L"InterlockingTerrainTiles.hlsl" ),
 		std::wstring( L"gsMain" ),
-		std::wstring( L"gs_5_0" ) );
-	_ASSERT( -1 != m_pTerrainEffect->m_iGeometryShader );
+		std::wstring( L"gs_5_0" ) ) );
+	_ASSERT( -1 != m_pTerrainEffect->GetGeometryShader() );
 
 	Log::Get().Write( L"... geometry shader created" );
 
 	// Create the pixel shader
-	m_pTerrainEffect->m_iPixelShader = 
-		m_pRenderer11->LoadShader( PIXEL_SHADER,
+	m_pTerrainEffect->SetPixelShader( m_pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"InterlockingTerrainTiles.hlsl" ),
 		std::wstring( L"psMain" ),
-		std::wstring( L"ps_5_0" ) );
-	_ASSERT( -1 != m_pTerrainEffect->m_iPixelShader );
+		std::wstring( L"ps_5_0" ) ) );
+	_ASSERT( -1 != m_pTerrainEffect->GetPixelShader() );
 
 	Log::Get().Write( L"... pixel shader created" );
 
@@ -659,12 +656,11 @@ void App::CreateComputeShaderResources()
 	m_pComputeShaderEffect = new RenderEffectDX11( );
 
 	// Compile the compute shader
-	m_pComputeShaderEffect->m_iComputeShader = 
-		m_pRenderer11->LoadShader( COMPUTE_SHADER,
+	m_pComputeShaderEffect->SetComputeShader( m_pRenderer11->LoadShader( COMPUTE_SHADER,
 		std::wstring( L"InterlockingTerrainTilesComputeShader.hlsl" ),
 		std::wstring( L"csMain" ),
-		std::wstring( L"cs_5_0" ) );
-	_ASSERT( -1 != m_pComputeShaderEffect->m_iComputeShader );
+		std::wstring( L"cs_5_0" ) ) );
+	_ASSERT( -1 != m_pComputeShaderEffect->GetComputeShader() );
 
 	Log::Get().Write( L"Compute Shader Resources Created" );
 }

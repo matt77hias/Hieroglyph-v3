@@ -106,33 +106,31 @@ void App::Initialize()
 
 	// Create an effect for filling the G-Buffer
     m_pGBufferEffect = new RenderEffectDX11();
-    m_pGBufferEffect->m_iVertexShader =
-        m_pRenderer11->LoadShader( VERTEX_SHADER,
+    m_pGBufferEffect->SetVertexShader( m_pRenderer11->LoadShader( VERTEX_SHADER,
         std::wstring( L"GBufferLP.hlsl" ),
         std::wstring( L"VSMain" ),
-        std::wstring( L"vs_5_0" ) );
-    _ASSERT( m_pGBufferEffect->m_iVertexShader != -1 );
-    m_pGBufferEffect->m_iPixelShader =
-        m_pRenderer11->LoadShader( PIXEL_SHADER,
+        std::wstring( L"vs_5_0" ) ) );
+    _ASSERT( m_pGBufferEffect->GetVertexShader() != -1 );
+
+    m_pGBufferEffect->SetPixelShader( m_pRenderer11->LoadShader( PIXEL_SHADER,
         std::wstring( L"GBufferLP.hlsl" ),
         std::wstring( L"PSMain" ),
-        std::wstring( L"ps_5_0" ) );
-    _ASSERT( m_pGBufferEffect->m_iPixelShader != -1 );
+        std::wstring( L"ps_5_0" ) ) );
+    _ASSERT( m_pGBufferEffect->GetPixelShader() != -1 );
 
     // Create an effect for rendering the final pass
     m_pFinalPassEffect = new RenderEffectDX11();
-    m_pFinalPassEffect->m_iVertexShader =
-        m_pRenderer11->LoadShader( VERTEX_SHADER,
+    m_pFinalPassEffect->SetVertexShader( m_pRenderer11->LoadShader( VERTEX_SHADER,
         std::wstring( L"FinalPassLP.hlsl" ),
         std::wstring( L"VSMain" ),
-        std::wstring( L"vs_5_0" ) );
-    _ASSERT( m_pFinalPassEffect->m_iVertexShader != -1 );
-    m_pFinalPassEffect->m_iPixelShader =
-        m_pRenderer11->LoadShader( PIXEL_SHADER,
+        std::wstring( L"vs_5_0" ) ) );
+    _ASSERT( m_pFinalPassEffect->GetVertexShader() != -1 );
+
+    m_pFinalPassEffect->SetPixelShader( m_pRenderer11->LoadShader( PIXEL_SHADER,
         std::wstring( L"FinalPassLP.hlsl" ),
         std::wstring( L"PSMain" ),
-        std::wstring( L"ps_5_0" ) );
-    _ASSERT( m_pFinalPassEffect->m_iPixelShader != -1 );
+        std::wstring( L"ps_5_0" ) ) );
+    _ASSERT( m_pFinalPassEffect->GetPixelShader() != -1 );
 
     // Create a depth stencil state for the G-Buffer effect. We'll enable depth
     // writes and depth tests. We'll also enable stencil writes, and set
@@ -245,7 +243,7 @@ void App::Initialize()
 
 	for ( int i = 0; i < VT_NUM_VIEW_TYPES; i++ ) {
 		if ( m_pMaterial->Params[i].bRender ) {
-			pGeometry->GetInputLayout( m_pMaterial->Params[i].pEffect->m_iVertexShader );
+			pGeometry->GetInputLayout( m_pMaterial->Params[i].pEffect->GetVertexShader() );
 		}
 	}
 

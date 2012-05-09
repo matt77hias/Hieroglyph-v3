@@ -66,23 +66,21 @@ ViewGBuffer::ViewGBuffer( RendererDX11& Renderer )
     m_QuadGeometry->LoadToBuffers();
 
     // Load shaders for generating the mask
-    m_MaskEffect.m_iVertexShader =
-        Renderer.LoadShader( VERTEX_SHADER,
+    m_MaskEffect.SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
         std::wstring( L"MaskLP.hlsl" ),
         std::wstring( L"VSMain" ),
-        std::wstring( L"vs_5_0" ) );
-    _ASSERT( m_MaskEffect.m_iVertexShader != -1 );
+        std::wstring( L"vs_5_0" ) ) );
+    _ASSERT( m_MaskEffect.GetVertexShader() != -1 );
 
-    m_MaskEffect.m_iPixelShader =
-        Renderer.LoadShader( PIXEL_SHADER,
+    m_MaskEffect.SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
         std::wstring( L"MaskLP.hlsl" ),
         std::wstring( L"PSMain" ),
-        std::wstring( L"ps_5_0" ) );
-    _ASSERT( m_MaskEffect.m_iPixelShader != -1 );
+        std::wstring( L"ps_5_0" ) ) );
+    _ASSERT( m_MaskEffect.GetPixelShader() != -1 );
 
 	m_pGBufferTexture = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"GBufferTexture" ) );
 
-	m_QuadGeometry->GetInputLayout( m_MaskEffect.m_iVertexShader );
+	m_QuadGeometry->GetInputLayout( m_MaskEffect.GetVertexShader() );
 }
 //--------------------------------------------------------------------------------
 ViewGBuffer::~ViewGBuffer()

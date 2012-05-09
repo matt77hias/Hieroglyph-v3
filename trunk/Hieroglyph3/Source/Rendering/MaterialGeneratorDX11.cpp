@@ -29,26 +29,25 @@ MaterialPtr MaterialGeneratorDX11::GenerateWireFrame( RendererDX11& Renderer )
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 
-	pEffect->m_iVertexShader = 
-		Renderer.LoadShader( VERTEX_SHADER,
+	pEffect->SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
 		std::wstring( L"BasicTessellation.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	pEffect->m_iHullShader =
-		Renderer.LoadShader( HULL_SHADER,
+		std::wstring( L"vs_5_0" ) ) );
+
+	pEffect->SetHullShader( Renderer.LoadShader( HULL_SHADER,
 		std::wstring( L"BasicTessellation.hlsl" ),
 		std::wstring( L"HSMAIN" ),
-		std::wstring( L"hs_5_0" ) );
-	pEffect->m_iDomainShader =
-		Renderer.LoadShader( DOMAIN_SHADER,
+		std::wstring( L"hs_5_0" ) ) );
+
+	pEffect->SetDomainShader( Renderer.LoadShader( DOMAIN_SHADER,
 		std::wstring( L"BasicTessellation.hlsl" ),
 		std::wstring( L"DSMAIN" ),
-		std::wstring( L"ds_5_0" ) );
-	pEffect->m_iPixelShader = 
-		Renderer.LoadShader( PIXEL_SHADER,
+		std::wstring( L"ds_5_0" ) ) );
+	
+	pEffect->SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
 		std::wstring( L"BasicTessellation.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
+		std::wstring( L"ps_5_0" ) ) );
 
 	RasterizerStateConfigDX11 RS;
 	RS.FillMode = D3D11_FILL_WIREFRAME;
@@ -71,16 +70,15 @@ MaterialPtr MaterialGeneratorDX11::GenerateStaticTextured( RendererDX11& Rendere
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 
-	pEffect->m_iVertexShader = 
-		Renderer.LoadShader( VERTEX_SHADER,
+	pEffect->SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
 		std::wstring( L"MeshStaticTextured.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	pEffect->m_iPixelShader = 
-		Renderer.LoadShader( PIXEL_SHADER,
+		std::wstring( L"vs_5_0" ) ) );
+
+	pEffect->SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
 		std::wstring( L"MeshStaticTextured.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
+		std::wstring( L"ps_5_0" ) ) );
 
 	RasterizerStateConfigDX11 RS;
 	//RS.FillMode = D3D11_FILL_WIREFRAME;
@@ -104,16 +102,15 @@ MaterialPtr MaterialGeneratorDX11::GenerateSkinnedTextured( RendererDX11& Render
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 
-	pEffect->m_iVertexShader = 
-		Renderer.LoadShader( VERTEX_SHADER,
+	pEffect->SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
 		std::wstring( L"MeshSkinnedTextured.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	pEffect->m_iPixelShader = 
-		Renderer.LoadShader( PIXEL_SHADER,
+		std::wstring( L"vs_5_0" ) ) );
+
+	pEffect->SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
 		std::wstring( L"MeshSkinnedTextured.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
+		std::wstring( L"ps_5_0" ) ) );
 
 	RasterizerStateConfigDX11 RS;
 	//RS.FillMode = D3D11_FILL_WIREFRAME;
@@ -137,26 +134,25 @@ MaterialPtr MaterialGeneratorDX11::GenerateSkinnedSolid( RendererDX11& Renderer 
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 
-	pEffect->m_iVertexShader = 
-		Renderer.LoadShader( VERTEX_SHADER,
+	pEffect->SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
 		std::wstring( L"MeshSkinnedTessellatedTextured.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	pEffect->m_iHullShader = 
-		Renderer.LoadShader( HULL_SHADER,
+		std::wstring( L"vs_5_0" ) ) );
+
+	pEffect->SetHullShader( Renderer.LoadShader( HULL_SHADER,
 		std::wstring( L"MeshSkinnedTessellatedTextured.hlsl" ),
 		std::wstring( L"HSMAIN" ),
-		std::wstring( L"hs_5_0" ) );
-	pEffect->m_iDomainShader = 
-		Renderer.LoadShader( DOMAIN_SHADER,
+		std::wstring( L"hs_5_0" ) ) );
+
+	pEffect->SetDomainShader( Renderer.LoadShader( DOMAIN_SHADER,
 		std::wstring( L"MeshSkinnedTessellatedTextured.hlsl" ),
 		std::wstring( L"DSMAIN" ),
-		std::wstring( L"ds_5_0" ) );
-	pEffect->m_iPixelShader = 
-		Renderer.LoadShader( PIXEL_SHADER,
+		std::wstring( L"ds_5_0" ) ) );
+
+	pEffect->SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
 		std::wstring( L"MeshSkinnedTessellatedTextured.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
+		std::wstring( L"ps_5_0" ) ) );
 
 	RasterizerStateConfigDX11 RS;
 	//RS.FillMode = D3D11_FILL_WIREFRAME;
@@ -180,16 +176,15 @@ MaterialPtr MaterialGeneratorDX11::GeneratePhong( RendererDX11& Renderer )
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 
-	pEffect->m_iVertexShader = 
-		Renderer.LoadShader( VERTEX_SHADER,
+	pEffect->SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
 		std::wstring( L"PhongShading.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	pEffect->m_iPixelShader = 
-		Renderer.LoadShader( PIXEL_SHADER,
+		std::wstring( L"vs_5_0" ) ) );
+
+	pEffect->SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
 		std::wstring( L"PhongShading.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
+		std::wstring( L"ps_5_0" ) ) );
 
 	RasterizerStateConfigDX11 RS;
 	//RS.FillMode = D3D11_FILL_WIREFRAME;
@@ -213,16 +208,15 @@ MaterialPtr MaterialGeneratorDX11::GenerateSolidColor( RendererDX11& Renderer )
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 
-	pEffect->m_iVertexShader = 
-		Renderer.LoadShader( VERTEX_SHADER,
+	pEffect->SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
 		std::wstring( L"VertexColor.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_4_0" ) );
-	pEffect->m_iPixelShader = 
-		Renderer.LoadShader( PIXEL_SHADER,
+		std::wstring( L"vs_4_0" ) ) );
+
+	pEffect->SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
 		std::wstring( L"VertexColor.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_4_0" ) );
+		std::wstring( L"ps_4_0" ) ) );
 
 	DepthStencilStateConfigDX11 ds;
 	ds.DepthEnable = false;
@@ -248,47 +242,42 @@ MaterialPtr MaterialGeneratorDX11::GenerateFromFile( RendererDX11& Renderer, std
 	// future by selectively logging the faults...
 
 	if ( shaders & VERTEX_SHADER_MSK )
-		pEffect->m_iVertexShader = 
-			Renderer.LoadShader( VERTEX_SHADER,
+		pEffect->SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
 			file,
 			std::wstring( L"VSMAIN" ),
 			std::wstring( L"vs_5_0" ),
-			false );
+			false ) );
 
 	if ( shaders & HULL_SHADER_MSK )
-		pEffect->m_iHullShader = 
-			Renderer.LoadShader( HULL_SHADER,
+		pEffect->SetHullShader( Renderer.LoadShader( HULL_SHADER,
 			file,
 			std::wstring( L"HSMAIN" ),
-			std::wstring( L"hs_5_0" ) );
+			std::wstring( L"hs_5_0" ) ) );
 
 	if ( shaders & DOMAIN_SHADER_MSK )
-		pEffect->m_iDomainShader = 
+		pEffect->SetDomainShader(
 			Renderer.LoadShader( DOMAIN_SHADER,
 			file,
 			std::wstring( L"DSMAIN" ),
-			std::wstring( L"ds_5_0" ) );
+			std::wstring( L"ds_5_0" ) ) );
 
 	if ( shaders & GEOMETRY_SHADER_MSK )
-		pEffect->m_iGeometryShader = 
-			Renderer.LoadShader( GEOMETRY_SHADER,
+		pEffect->SetGeometryShader( Renderer.LoadShader( GEOMETRY_SHADER,
 			file,
 			std::wstring( L"GSMAIN" ),
-			std::wstring( L"gs_5_0" ) );
+			std::wstring( L"gs_5_0" ) ) );
 
 	if ( shaders & PIXEL_SHADER_MSK )
-		pEffect->m_iPixelShader = 
-			Renderer.LoadShader( PIXEL_SHADER,
+		pEffect->SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
 			file,
 			std::wstring( L"PSMAIN" ),
-			std::wstring( L"ps_5_0" ) );
+			std::wstring( L"ps_5_0" ) ) );
 
 	if ( shaders & COMPUTE_SHADER_MSK )
-		pEffect->m_iComputeShader = 
-			Renderer.LoadShader( COMPUTE_SHADER,
+		pEffect->SetComputeShader( Renderer.LoadShader( COMPUTE_SHADER,
 			file,
 			std::wstring( L"CSMAIN" ),
-			std::wstring( L"cs_5_0" ) );
+			std::wstring( L"cs_5_0" ) ) );
 
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
@@ -307,21 +296,20 @@ MaterialPtr MaterialGeneratorDX11::GenerateKinectReconstructionMaterial( Rendere
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 
-	pEffect->m_iVertexShader = 
-		Renderer.LoadShader( VERTEX_SHADER,
+	pEffect->SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
 		std::wstring( L"KinectBuffersVisualization.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	pEffect->m_iGeometryShader = 
-		Renderer.LoadShader( GEOMETRY_SHADER,
+		std::wstring( L"vs_5_0" ) ) );
+
+	pEffect->SetGeometryShader( Renderer.LoadShader( GEOMETRY_SHADER,
 		std::wstring( L"KinectBuffersVisualization.hlsl" ),
 		std::wstring( L"GSMAIN" ),
-		std::wstring( L"gs_5_0" ) );
-	pEffect->m_iPixelShader = 
-		Renderer.LoadShader( PIXEL_SHADER,
+		std::wstring( L"gs_5_0" ) ) );
+
+	pEffect->SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
 		std::wstring( L"KinectBuffersVisualization.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
+		std::wstring( L"ps_5_0" ) ) );
 
 	RasterizerStateConfigDX11 RS;
 	RS.FillMode = D3D11_FILL_WIREFRAME;
@@ -350,16 +338,15 @@ MaterialPtr MaterialGeneratorDX11::GenerateKinectDepthBufferMaterial( RendererDX
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 
-	pEffect->m_iVertexShader = 
-		Renderer.LoadShader( VERTEX_SHADER,
+	pEffect->SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
 		std::wstring( L"ObjectTexturedVS.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	pEffect->m_iPixelShader = 
-		Renderer.LoadShader( PIXEL_SHADER,
+		std::wstring( L"vs_5_0" ) ) );
+
+	pEffect->SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
 		std::wstring( L"ObjectTexturedIntPS.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
+		std::wstring( L"ps_5_0" ) ) );
 
 
 	//RasterizerStateConfigDX11 RS;

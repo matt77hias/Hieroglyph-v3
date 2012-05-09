@@ -655,6 +655,9 @@
     <ClCompile Include="Rendering\ShaderReflectionFactoryDX11.cpp">
       <Filter>Rendering\Pipeline\Shader Stages\Shader Programs\Reflection</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\ShaderFactoryDX11.cpp">
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mathematics\Matrix3f.h">
@@ -1187,6 +1190,9 @@
     </ClInclude>
     <ClInclude Include="Rendering\ShaderReflectionFactoryDX11.h">
       <Filter>Rendering\Pipeline\Shader Stages\Shader Programs\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\ShaderFactoryDX11.h">
+      <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

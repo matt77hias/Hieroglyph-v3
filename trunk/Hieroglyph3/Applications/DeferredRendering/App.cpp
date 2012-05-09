@@ -106,32 +106,30 @@ void App::Initialize()
 
 	// We'll make 2 effects for filling the G-Buffer: one without optimizations, and one with
     m_pGBufferEffect[GBufferOptMode::OptDisabled] = new RenderEffectDX11();
-	m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_iVertexShader =
-		m_pRenderer11->LoadShader( VERTEX_SHADER,
+	m_pGBufferEffect[GBufferOptMode::OptDisabled]->SetVertexShader( m_pRenderer11->LoadShader( VERTEX_SHADER,
 		std::wstring( L"GBuffer.hlsl" ),
 		std::wstring( L"VSMain" ),
-		std::wstring( L"vs_5_0" ) );
-    _ASSERT( m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_iVertexShader != -1 );
-	m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_iPixelShader =
-		m_pRenderer11->LoadShader( PIXEL_SHADER,
+		std::wstring( L"vs_5_0" ) ) );
+    _ASSERT( m_pGBufferEffect[GBufferOptMode::OptDisabled]->GetVertexShader() != -1 );
+
+	m_pGBufferEffect[GBufferOptMode::OptDisabled]->SetPixelShader( m_pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"GBuffer.hlsl" ),
 		std::wstring( L"PSMain" ),
-		std::wstring( L"ps_5_0" ) );
-    _ASSERT( m_pGBufferEffect[GBufferOptMode::OptDisabled]->m_iPixelShader != -1 );
+		std::wstring( L"ps_5_0" ) ) );
+    _ASSERT( m_pGBufferEffect[GBufferOptMode::OptDisabled]->GetPixelShader() != -1 );
 
     m_pGBufferEffect[GBufferOptMode::OptEnabled] = new RenderEffectDX11();
-    m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_iVertexShader =
-        m_pRenderer11->LoadShader( VERTEX_SHADER,
+    m_pGBufferEffect[GBufferOptMode::OptEnabled]->SetVertexShader( m_pRenderer11->LoadShader( VERTEX_SHADER,
         std::wstring( L"GBuffer.hlsl" ),
         std::wstring( L"VSMainOptimized" ),
-        std::wstring( L"vs_5_0" ) );
-    _ASSERT( m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_iVertexShader != -1 );
-    m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_iPixelShader =
-        m_pRenderer11->LoadShader( PIXEL_SHADER,
+        std::wstring( L"vs_5_0" ) ) );
+    _ASSERT( m_pGBufferEffect[GBufferOptMode::OptEnabled]->GetVertexShader() != -1 );
+
+    m_pGBufferEffect[GBufferOptMode::OptEnabled]->SetPixelShader( m_pRenderer11->LoadShader( PIXEL_SHADER,
         std::wstring( L"GBuffer.hlsl" ),
         std::wstring( L"PSMainOptimized" ),
-        std::wstring( L"ps_5_0" ) );
-    _ASSERT( m_pGBufferEffect[GBufferOptMode::OptEnabled]->m_iPixelShader != -1 );
+        std::wstring( L"ps_5_0" ) ) );
+    _ASSERT( m_pGBufferEffect[GBufferOptMode::OptEnabled]->GetPixelShader() != -1 );
 
     // Create a depth stencil state for the G-Buffer material
     // Create the depth stencil view. We'll enable depth writes and depth tests.
@@ -229,7 +227,7 @@ void App::Initialize()
 
 	for ( int i = 0; i < VT_NUM_VIEW_TYPES; i++ ) {
 		if ( m_pMaterial->Params[i].bRender ) {
-			pGeometry->GetInputLayout( m_pMaterial->Params[i].pEffect->m_iVertexShader );
+			pGeometry->GetInputLayout( m_pMaterial->Params[i].pEffect->GetVertexShader() );
 		}
 	}
 

@@ -110,12 +110,12 @@ ShaderReflectionDX11* ShaderReflectionFactoryDX11::GenerateReflection( ShaderDX1
 
 				// Get references to the parameters for binding to these variables.
 				RenderParameterDX11* pParam = 0;
-				if ( type_desc.Class == D3D10_SVC_VECTOR )
+				if ( type_desc.Class == D3D_SVC_VECTOR )
 				{
 					pParam = pParamMgr->GetVectorParameterRef( GlyphString::ToUnicode( std::string( var_desc.Name ) ) );
 				}
-				else if ( ( type_desc.Class == D3D10_SVC_MATRIX_ROWS ) ||
-							( type_desc.Class == D3D10_SVC_MATRIX_COLUMNS ) )
+				else if ( ( type_desc.Class == D3D_SVC_MATRIX_ROWS ) ||
+							( type_desc.Class == D3D_SVC_MATRIX_COLUMNS ) )
 				{
 					// Check if it is an array of matrices first...
 					unsigned int count = type_desc.Elements;
@@ -147,22 +147,22 @@ ShaderReflectionDX11* ShaderReflectionFactoryDX11::GenerateReflection( ShaderDX1
 		pReflector->GetResourceBindingDesc( i, &resource_desc );
 		ShaderInputBindDesc binddesc( resource_desc );
 
-		if ( resource_desc.Type == D3D10_SIT_CBUFFER || resource_desc.Type == D3D10_SIT_TBUFFER )
+		if ( resource_desc.Type == D3D_SIT_CBUFFER || resource_desc.Type == D3D_SIT_TBUFFER )
 		{
 			binddesc.pParamRef = pParamMgr->GetConstantBufferParameterRef( binddesc.Name );
 		}
-		else if ( resource_desc.Type == D3D10_SIT_TEXTURE || resource_desc.Type == D3D11_SIT_STRUCTURED )
+		else if ( resource_desc.Type == D3D_SIT_TEXTURE || resource_desc.Type == D3D_SIT_STRUCTURED )
 		{
 			binddesc.pParamRef = pParamMgr->GetShaderResourceParameterRef( binddesc.Name );
 		}
-		else if ( resource_desc.Type == D3D10_SIT_SAMPLER )
+		else if ( resource_desc.Type == D3D_SIT_SAMPLER )
 		{
 			binddesc.pParamRef = pParamMgr->GetSamplerStateParameterRef( binddesc.Name );
 		}
-		else if ( resource_desc.Type == D3D11_SIT_UAV_RWTYPED || resource_desc.Type == D3D11_SIT_UAV_RWSTRUCTURED
-			|| resource_desc.Type == D3D11_SIT_BYTEADDRESS || resource_desc.Type == D3D11_SIT_UAV_RWBYTEADDRESS
-			|| resource_desc.Type == D3D11_SIT_UAV_APPEND_STRUCTURED || resource_desc.Type == D3D11_SIT_UAV_CONSUME_STRUCTURED
-			|| resource_desc.Type == D3D11_SIT_UAV_RWSTRUCTURED_WITH_COUNTER )
+		else if ( resource_desc.Type == D3D_SIT_UAV_RWTYPED || resource_desc.Type == D3D_SIT_UAV_RWSTRUCTURED
+			|| resource_desc.Type == D3D_SIT_BYTEADDRESS || resource_desc.Type == D3D_SIT_UAV_RWBYTEADDRESS
+			|| resource_desc.Type == D3D_SIT_UAV_APPEND_STRUCTURED || resource_desc.Type == D3D_SIT_UAV_CONSUME_STRUCTURED
+			|| resource_desc.Type == D3D_SIT_UAV_RWSTRUCTURED_WITH_COUNTER )
 		{
 			binddesc.pParamRef = pParamMgr->GetUnorderedAccessParameterRef( binddesc.Name );
 		}

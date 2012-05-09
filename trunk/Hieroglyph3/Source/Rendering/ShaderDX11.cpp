@@ -16,11 +16,13 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ShaderDX11::ShaderDX11()
 {
+	pCompiledShader = nullptr;
+	m_pReflection = nullptr;
 }
 //--------------------------------------------------------------------------------
 ShaderDX11::~ShaderDX11()
 {
-
+	SAFE_RELEASE( pCompiledShader );
 }
 //--------------------------------------------------------------------------------
 void ShaderDX11::SetReflection( ShaderReflectionDX11* pReflection )

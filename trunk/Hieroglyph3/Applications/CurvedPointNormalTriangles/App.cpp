@@ -310,7 +310,7 @@ bool App::HandleEvent( IEvent* pEvent )
 		{
 			// Toggle adaptive/uniform
 			m_bDefaultComplexity = !m_bDefaultComplexity;
-			m_pEffect->m_iHullShader = m_bDefaultComplexity ? m_iDefaultHullShader : m_iSilhouetteHullShader;
+			m_pEffect->SetHullShader( m_bDefaultComplexity ? m_iDefaultHullShader : m_iSilhouetteHullShader );
 		}
 		else if ( VK_ADD == key )
 		{
@@ -356,12 +356,11 @@ void App::CreateShaders()
 	m_pEffect = new RenderEffectDX11();
 
 	// Create the vertex shader
-	m_pEffect->m_iVertexShader = 
-		m_pRenderer11->LoadShader( VERTEX_SHADER,
+	m_pEffect->SetVertexShader( m_pRenderer11->LoadShader( VERTEX_SHADER,
 		std::wstring( L"CurvedPointNormalTriangles.hlsl" ),
 		std::wstring( L"vsMain" ),
-		std::wstring( L"vs_5_0" ) );
-	_ASSERT( -1 != m_pEffect->m_iVertexShader );
+		std::wstring( L"vs_5_0" ) ) );
+	_ASSERT( -1 != m_pEffect->GetVertexShader() );
 	
 	Log::Get().Write( L"... vertex shader created" );
 
@@ -378,37 +377,34 @@ void App::CreateShaders()
 							std::wstring( L"hs_5_0" ) );
 	_ASSERT( -1 != m_iSilhouetteHullShader );
 
-	m_pEffect->m_iHullShader = m_bDefaultComplexity ? m_iDefaultHullShader : m_iSilhouetteHullShader;
+	m_pEffect->SetHullShader( m_bDefaultComplexity ? m_iDefaultHullShader : m_iSilhouetteHullShader );
 
 	Log::Get().Write( L"... hull shader created" );
 
 	// Create the domain shader
-	m_pEffect->m_iDomainShader = 
-		m_pRenderer11->LoadShader( DOMAIN_SHADER,
+	m_pEffect->SetDomainShader( m_pRenderer11->LoadShader( DOMAIN_SHADER,
 		std::wstring( L"CurvedPointNormalTriangles.hlsl" ),
 		std::wstring( L"dsMain" ),
-		std::wstring( L"ds_5_0" ) );
-	_ASSERT( -1 != m_pEffect->m_iDomainShader );
+		std::wstring( L"ds_5_0" ) ) );
+	_ASSERT( -1 != m_pEffect->GetDomainShader() );
 
 	Log::Get().Write( L"... domain shader created" );
 
 	// Create the geometry shader
-	m_pEffect->m_iGeometryShader = 
-		m_pRenderer11->LoadShader( GEOMETRY_SHADER,
+	m_pEffect->SetGeometryShader( m_pRenderer11->LoadShader( GEOMETRY_SHADER,
 		std::wstring( L"CurvedPointNormalTriangles.hlsl" ),
 		std::wstring( L"gsMain" ),
-		std::wstring( L"gs_5_0" ) );
-	_ASSERT( -1 != m_pEffect->m_iGeometryShader );
+		std::wstring( L"gs_5_0" ) ) );
+	_ASSERT( -1 != m_pEffect->GetGeometryShader() );
 
 	Log::Get().Write( L"... geometry shader created" );
 
 	// Create the pixel shader
-	m_pEffect->m_iPixelShader = 
-		m_pRenderer11->LoadShader( PIXEL_SHADER,
+	m_pEffect->SetPixelShader( m_pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"CurvedPointNormalTriangles.hlsl" ),
 		std::wstring( L"psMain" ),
-		std::wstring( L"ps_5_0" ) );
-	_ASSERT( -1 != m_pEffect->m_iPixelShader );
+		std::wstring( L"ps_5_0" ) ) );
+	_ASSERT( -1 != m_pEffect->GetPixelShader() );
 
 	Log::Get().Write( L"... pixel shader created" );
 

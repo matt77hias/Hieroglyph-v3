@@ -121,28 +121,25 @@ bool App::ConfigureEngineComponents()
 	m_pRenderer11->pImmPipeline->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
 	m_pRenderer11->pImmPipeline->ApplyRenderTargets();
 
-	m_Effect.m_iVertexShader =
-		m_pRenderer11->LoadShader( VERTEX_SHADER,
+	m_Effect.SetVertexShader( m_pRenderer11->LoadShader( VERTEX_SHADER,
 		std::wstring( L"RotatingCube.hlsl" ),
 		std::wstring( L"VSMain" ),
 		std::wstring( L"vs_4_0" ),
-		true);
+		true ) );
 
-	m_Effect.m_iGeometryShader =
-		m_pRenderer11->LoadShader( GEOMETRY_SHADER,
+	m_Effect.SetGeometryShader( m_pRenderer11->LoadShader( GEOMETRY_SHADER,
 		std::wstring( L"RotatingCube.hlsl" ),
 		std::wstring( L"GSMain" ),
 		std::wstring( L"gs_4_0" ),
-		true);
+		true ) );
 
-	m_Effect.m_iPixelShader =
-		m_pRenderer11->LoadShader( PIXEL_SHADER,
+	m_Effect.SetPixelShader( m_pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"RotatingCube.hlsl" ),
 		std::wstring( L"PSMain" ),
 		std::wstring( L"ps_4_0" ),
-		true);
+		true ) );
 
-	m_pRenderer11->GetShader(m_Effect.m_iVertexShader)->GetReflection()->PrintShaderDetails();
+	m_pRenderer11->GetShader( m_Effect.GetVertexShader() )->GetReflection()->PrintShaderDetails();
 
 	// just use default states
 
@@ -184,7 +181,7 @@ bool App::ConfigureEngineComponents()
 	TArray<D3D11_INPUT_ELEMENT_DESC> layout;
 	layout.add(desc[0]);
 	layout.add(desc[1]);
-	m_VertexLayout = m_pRenderer11->CreateInputLayout(layout, m_Effect.m_iVertexShader);
+	m_VertexLayout = m_pRenderer11->CreateInputLayout(layout, m_Effect.GetVertexShader());
 	if (m_VertexLayout == -1) {
 		Log::Get().Write( L"Failed to create vertex layout" );
 		assert(false);

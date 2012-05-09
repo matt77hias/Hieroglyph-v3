@@ -9,48 +9,33 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// ShaderDX11
+// ShaderFactoryDX11
 //
-// The shader base class provides the mechanics of linking state information to
-// a given shader.  Each type of shader utilizes various resources which are 
-// managed by the renderer.  The specific resources are determined at shader load
-// time via the reflection API and stored in the lists shown below.
-//
-// When a shader is bound to the pipeline, it's needed resources are updated if
-// needed and then loaded into the corresponding shader stage.
 //--------------------------------------------------------------------------------
-#ifndef ShaderDX11_h
-#define ShaderDX11_h
+#ifndef ShaderFactoryDX11_h
+#define ShaderFactoryDX11_h
 //--------------------------------------------------------------------------------
 #include "PCH.h"
-#include "TArray.h"
-#include "ShaderReflectionDX11.h"
+#include "ShaderDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-
-	class ShaderDX11
+	class ShaderFactoryDX11
 	{
 	public:
-		ShaderDX11();
-		virtual ~ShaderDX11();
+		~ShaderFactoryDX11();
 
-		virtual ShaderType GetType() = 0;
-		
+		static ID3DBlob* GenerateShader( ShaderType type, std::wstring& filename, std::wstring& function,
+            std::wstring& model, const D3D_SHADER_MACRO* pDefines, bool enablelogging = true );
 
-		void SetReflection( ShaderReflectionDX11* pReflection );
-		ShaderReflectionDX11* GetReflection( );
+		static ID3DBlob* GenerateShader( std::wstring& filename );
 
-
-	public:
-		std::wstring							FileName;
-		std::string								ShaderText;
-		ID3DBlob*								pCompiledShader;
-
-		ShaderReflectionDX11*					m_pReflection;
+	private:
+		ShaderFactoryDX11();
 	};
+
 };
 //--------------------------------------------------------------------------------
-#endif // ShaderDX11_h
+#endif // ShaderFactoryDX11_h
 //--------------------------------------------------------------------------------
 

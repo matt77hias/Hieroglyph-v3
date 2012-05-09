@@ -73,8 +73,11 @@ void MatrixArrayParameterDX11::SetParameterData( void* pData, unsigned int threa
 	// TODO: This isn't very safe - the caller could supply less than the correct 
 	//       amount of matrices...  I need a better way to set this parameter data.
 
-	memcpy( m_pMatrices[threadID], pData, m_iMatrixCount * sizeof( Matrix4f ) );
-	//m_Matrix = *reinterpret_cast<Matrix4f*>( pData );
+	if ( 0 != memcmp( pData, &(m_pMatrices[threadID]), m_iMatrixCount * sizeof( Matrix4f ) ) ) {
+		m_auiValueID[threadID]++;
+		memcpy( m_pMatrices[threadID], pData, m_iMatrixCount * sizeof( Matrix4f ) );
+	}
+	
 }
 //--------------------------------------------------------------------------------
 void MatrixArrayParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
@@ -86,6 +89,7 @@ void MatrixArrayParameterDX11::ResetParameterData( void* pData, unsigned int thr
 	//       to reset a resource that just holds data (this mechanism is intended
 	//       for resource parameters...).
 
+	//m_auiValueID[threadID]++;
 	//memcpy( m_pMatrices[threadID], pData, m_iMatrixCount * sizeof( Matrix4f ) );
 	//m_Matrix = *reinterpret_cast<Matrix4f*>( pData );
 }
@@ -117,7 +121,10 @@ void MatrixArrayParameterDX11::UpdateValue( RenderParameterDX11* pParameter, uns
 			MatrixArrayParameterDX11* pBuffer = (MatrixArrayParameterDX11*)pParameter;
 			if ( this->GetMatrixCount() == pBuffer->GetMatrixCount() )
 			{
-				memcpy( (void*)m_pMatrices, (void*)pBuffer->GetMatrices( threadID ), m_iMatrixCount * sizeof( Matrix4f ) );
+				if ( 0 != memcmp( pBuffer->GetMatrices( threadID ), &(m_pMatrices[threadID]), m_iMatrixCount * sizeof( Matrix4f ) ) ) {
+					m_auiValueID[threadID]++;
+					memcpy( (void*)m_pMatrices, (void*)pBuffer->GetMatrices( threadID ), m_iMatrixCount * sizeof( Matrix4f ) );
+				}
 			}
 		}
 	}

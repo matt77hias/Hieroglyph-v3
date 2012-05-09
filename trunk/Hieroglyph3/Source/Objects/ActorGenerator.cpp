@@ -62,16 +62,15 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 		// Create and fill the effect that will be used for this view type
 		RenderEffectDX11* pEffect = new RenderEffectDX11();
 
-		pEffect->m_iVertexShader = 
-			Renderer.LoadShader( VERTEX_SHADER,
+		pEffect->SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
 			std::wstring( L"ObjectTexturedVS.hlsl" ),
 			std::wstring( L"VSMAIN" ),
-			std::wstring( L"vs_5_0" ) );
-		pEffect->m_iPixelShader = 
-			Renderer.LoadShader( PIXEL_SHADER,
+			std::wstring( L"vs_5_0" ) ) );
+
+		pEffect->SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
 			std::wstring( L"ObjectTexturedPS.hlsl" ),
 			std::wstring( L"PSMAIN" ),
-			std::wstring( L"ps_5_0" ) );
+			std::wstring( L"ps_5_0" ) ) );
 
 		// Enable the material to render the given view type, and set its effect.
 		pMaterial->Params[VT_PERSPECTIVE].bRender = true;

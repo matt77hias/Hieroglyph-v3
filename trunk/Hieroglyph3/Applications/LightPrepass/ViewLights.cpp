@@ -151,7 +151,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
         UINT stencilRef = ( i == 0 ) ? 1 : 2;
 
         // We'll create permutations of our shaders based on the light types
-        D3D10_SHADER_MACRO defines[4];
+        D3D_SHADER_MACRO defines[4];
         defines[0].Name = "POINTLIGHT";
         defines[0].Definition = "1";
         defines[1].Name = "SPOTLIGHT";
@@ -162,29 +162,26 @@ ViewLights::ViewLights( RendererDX11& Renderer)
         defines[3].Definition = NULL;
 
         // Point light shaders
-        m_PointLightEffect[i].m_iVertexShader =
-            Renderer.LoadShader( VERTEX_SHADER,
+        m_PointLightEffect[i].SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
             std::wstring( L"LightsLP.hlsl" ),
             std::wstring( L"VSMain" ),
             std::wstring( L"vs_5_0" ),
-            defines );
-        _ASSERT( m_PointLightEffect[i].m_iVertexShader != -1 );
+            defines ) );
+        _ASSERT( m_PointLightEffect[i].GetVertexShader() != -1 );
 
-        m_PointLightEffect[i].m_iGeometryShader =
-            Renderer.LoadShader( GEOMETRY_SHADER,
+        m_PointLightEffect[i].SetGeometryShader( Renderer.LoadShader( GEOMETRY_SHADER,
             std::wstring( L"LightsLP.hlsl" ),
             std::wstring( L"GSMain" ),
             std::wstring( L"gs_5_0" ),
-            defines );
-        _ASSERT( m_PointLightEffect[i].m_iVertexShader != -1 );
+            defines ) );
+        _ASSERT( m_PointLightEffect[i].GetGeometryShader() != -1 );
 
-        m_PointLightEffect[i].m_iPixelShader =
-            Renderer.LoadShader( PIXEL_SHADER,
+        m_PointLightEffect[i].SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
             std::wstring( L"LightsLP.hlsl" ),
             psEntry,
             std::wstring( L"ps_5_0" ),
-            defines );
-        _ASSERT( m_PointLightEffect[i].m_iPixelShader != -1 );
+            defines ) );
+        _ASSERT( m_PointLightEffect[i].GetPixelShader() != -1 );
 
         m_PointLightEffect[i].m_iBlendState = m_iBlendState;
         m_PointLightEffect[i].m_iDepthStencilState = m_iGreaterThanDSState;
@@ -195,29 +192,26 @@ ViewLights::ViewLights( RendererDX11& Renderer)
         defines[0].Definition = "0";
         defines[1].Definition = "1";
 
-        m_SpotLightEffect[i].m_iVertexShader =
-            Renderer.LoadShader( VERTEX_SHADER,
+        m_SpotLightEffect[i].SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
             std::wstring( L"LightsLP.hlsl" ),
             std::wstring( L"VSMain" ),
             std::wstring( L"vs_5_0" ),
-            defines );
-        _ASSERT( m_SpotLightEffect[i].m_iVertexShader != -1 );
+            defines ) );
+        _ASSERT( m_SpotLightEffect[i].GetVertexShader() != -1 );
 
-        m_SpotLightEffect[i].m_iGeometryShader =
-            Renderer.LoadShader( GEOMETRY_SHADER,
+        m_SpotLightEffect[i].SetGeometryShader( Renderer.LoadShader( GEOMETRY_SHADER,
             std::wstring( L"LightsLP.hlsl" ),
             std::wstring( L"GSMain" ),
             std::wstring( L"gs_5_0" ),
-            defines );
-        _ASSERT( m_SpotLightEffect[i].m_iVertexShader != -1 );
+            defines ) );
+        _ASSERT( m_SpotLightEffect[i].GetGeometryShader() != -1 );
 
-        m_SpotLightEffect[i].m_iPixelShader =
-            Renderer.LoadShader( PIXEL_SHADER,
+        m_SpotLightEffect[i].SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
             std::wstring( L"LightsLP.hlsl" ),
             psEntry,
             std::wstring( L"ps_5_0" ),
-            defines );
-        _ASSERT( m_SpotLightEffect[i].m_iPixelShader != -1 );
+            defines ) );
+        _ASSERT( m_SpotLightEffect[i].GetPixelShader() != -1 );
 
         m_SpotLightEffect[i].m_iBlendState = m_iBlendState;
         m_SpotLightEffect[i].m_iDepthStencilState = m_iGreaterThanDSState;
@@ -228,29 +222,26 @@ ViewLights::ViewLights( RendererDX11& Renderer)
         defines[1].Definition = "0";
         defines[2].Definition = "1";
 
-        m_DirectionalLightEffect[i].m_iVertexShader =
-            Renderer.LoadShader( VERTEX_SHADER,
+        m_DirectionalLightEffect[i].SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
             std::wstring( L"LightsLP.hlsl" ),
             std::wstring( L"VSMain" ),
             std::wstring( L"vs_5_0" ),
-            defines );
-        _ASSERT( m_DirectionalLightEffect[i].m_iVertexShader != -1 );
+            defines ) );
+        _ASSERT( m_DirectionalLightEffect[i].GetVertexShader() != -1 );
 
-        m_DirectionalLightEffect[i].m_iGeometryShader =
-            Renderer.LoadShader( GEOMETRY_SHADER,
+        m_DirectionalLightEffect[i].SetGeometryShader( Renderer.LoadShader( GEOMETRY_SHADER,
             std::wstring( L"LightsLP.hlsl" ),
             std::wstring( L"GSMain" ),
             std::wstring( L"gs_5_0" ),
-            defines );
-        _ASSERT( m_DirectionalLightEffect[i].m_iVertexShader != -1 );
+            defines ) );
+        _ASSERT( m_DirectionalLightEffect[i].GetGeometryShader() != -1 );
 
-        m_DirectionalLightEffect[i].m_iPixelShader =
-            Renderer.LoadShader( PIXEL_SHADER,
+        m_DirectionalLightEffect[i].SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
             std::wstring( L"LightsLP.hlsl" ),
             psEntry,
             std::wstring( L"ps_5_0" ),
-            defines );
-        _ASSERT( m_DirectionalLightEffect[i].m_iPixelShader != -1 );
+            defines ) );
+        _ASSERT( m_DirectionalLightEffect[i].GetPixelShader() != -1 );
 
         m_DirectionalLightEffect[i].m_iBlendState = m_iBlendState;
         m_DirectionalLightEffect[i].m_iDepthStencilState = m_iDisabledDSState;
@@ -291,9 +282,9 @@ ViewLights::ViewLights( RendererDX11& Renderer)
     element.Format = DXGI_FORMAT_R32G32_FLOAT;
     inputElements.add( element) ; 
 
-    m_iPointLightIL = Renderer.CreateInputLayout( inputElements, m_PointLightEffect[0].m_iVertexShader );
-    m_iSpotLightIL = Renderer.CreateInputLayout( inputElements, m_SpotLightEffect[0].m_iVertexShader );
-    m_iDirectionalLightIL = Renderer.CreateInputLayout( inputElements, m_DirectionalLightEffect[0].m_iVertexShader );
+    m_iPointLightIL = Renderer.CreateInputLayout( inputElements, m_PointLightEffect[0].GetVertexShader() );
+    m_iSpotLightIL = Renderer.CreateInputLayout( inputElements, m_SpotLightEffect[0].GetVertexShader() );
+    m_iDirectionalLightIL = Renderer.CreateInputLayout( inputElements, m_DirectionalLightEffect[0].GetVertexShader() );
 
     if( m_iPointLightIL == -1 || m_iSpotLightIL == -1 || m_iDirectionalLightIL == -1 )
         Log::Get().Write( L"Failed to create light input layout" );

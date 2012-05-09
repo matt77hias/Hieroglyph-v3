@@ -11,6 +11,9 @@
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "ConstantBufferDX11.h"
+#include "PipelineManagerDX11.h"
+#include "IParameterManager.h"
+#include "Log.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -30,14 +33,104 @@ ResourceType ConstantBufferDX11::GetType()
 	return( RT_CONSTANTBUFFER );
 }
 //--------------------------------------------------------------------------------
-void ConstantBufferDX11::SetConstantSize( int size )
+void ConstantBufferDX11::AddMapping( ConstantBufferMapping& mapping )
 {
-	m_iConstantSize = size;
+	m_Mappings.add( mapping );
 }
 //--------------------------------------------------------------------------------
-void ConstantBufferDX11::SetConstantCount( int count )
+void ConstantBufferDX11::EmptyMappings( )
 {
-	m_iConstantCount = count;
+	m_Mappings.empty();
+}
+//--------------------------------------------------------------------------------
+void ConstantBufferDX11::EvaluateMappings( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
+{
+	// Test the index to ensure that it is a constant buffer.  If the method above returns
+	// a non-null result, then this is a constant buffer.
+	if ( m_pBuffer ) 
+	{
+		if ( GetAutoUpdate() )
+		{
+			// Check the parameters that go into this constant buffer, and see if they have
+			// new values that need to be loaded into the buffer for this frame.  If not,
+			// then we can safely skip the update of this buffer.
+
+			bool doUpdate = false;
+
+			for ( int j = 0; j < m_Mappings.count(); j++ ) {
+				if ( m_Mappings[j].pParameter->GetValueID( pParamManager->GetID() ) 
+					!= m_Mappings[j].valueID ) {
+					doUpdate = true;
+					break;
+				}
+			}
+
+			if ( doUpdate ) {
+
+				// Map the constant buffer into system memory.  We map the buffer 
+				// with the discard write flag since we don't care what was in the
+				// buffer already.
+
+				D3D11_MAPPED_SUBRESOURCE resource = 
+					pPipeline->MapResource( this, 0, D3D11_MAP_WRITE_DISCARD, 0 );
+
+				// Update each variable in the constant buffer.  These variables are identified
+				// by their type, and are currently allowed to be Vector4f, Matrix4f, or Matrix4f
+				// arrays.  Additional types will be added as they are needed...
+
+				for ( int j = 0; j < m_Mappings.count(); j++ )
+				{
+					RenderParameterDX11* pParam		= m_Mappings[j].pParameter;
+					unsigned int offset				= m_Mappings[j].offset;
+					unsigned int size				= m_Mappings[j].size;
+					unsigned int elements			= m_Mappings[j].elements;
+					unsigned int valueID			= m_Mappings[j].valueID;
+					unsigned int threadID			= pParamManager->GetID();
+
+
+					m_Mappings[j].valueID = pParam->GetValueID( threadID );
+
+					if ( m_Mappings[j].varclass == D3D_SVC_VECTOR )
+					{
+						Vector4f vector = pParamManager->GetVectorParameter( pParam );
+						Vector4f* pBuf = (Vector4f*)((char*)resource.pData + offset);
+						*pBuf = vector;
+					}
+					else if ( ( m_Mappings[j].varclass == D3D_SVC_MATRIX_ROWS ) ||
+						( m_Mappings[j].varclass == D3D_SVC_MATRIX_COLUMNS ) )
+					{
+						// Check if it is an array of matrices first...
+						if ( elements == 0 ) 
+						{
+							Matrix4f matrix = pParamManager->GetMatrixParameter( pParam );
+							Matrix4f* pBuf = (Matrix4f*)((char*)resource.pData + offset);
+							*pBuf = matrix;
+						}
+						else 
+						{
+							// If a matrix array, then use the corresponding parameter type.
+							if ( size == elements * sizeof( Matrix4f ) ) {
+								Matrix4f* pMatrices = pParamManager->GetMatrixArrayParameter( pParam );
+								memcpy( ((char*)resource.pData + offset), (char*)pMatrices, size );
+							} else {
+								Log::Get().Write( L"Mismatch in matrix array count, update will not be performed!!!" );
+							}
+						}
+					}
+					else
+					{
+						Log::Get().Write( L"Non vector or matrix parameter specified in a constant buffer!  This will not be updated!" );
+					}
+				}
+
+				pPipeline->UnMapResource( this, 0 );
+			}
+		}
+	}
+	else
+	{
+		Log::Get().Write( L"Trying to update a constant buffer that isn't a constant buffer!" );
+	}
 }
 //--------------------------------------------------------------------------------
 void ConstantBufferDX11::SetAutoUpdate( bool enable )

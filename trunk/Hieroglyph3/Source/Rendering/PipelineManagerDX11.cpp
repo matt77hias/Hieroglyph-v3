@@ -362,7 +362,7 @@ void PipelineManagerDX11::Draw( RenderEffectDX11& effect, GeometryPtr geometry,
 										IParameterManager* pParamManager )
 {
 	Draw( effect, geometry->m_VB, geometry->m_IB,
-		geometry->GetInputLayout( effect.m_iVertexShader ), geometry->m_ePrimType,
+		geometry->GetInputLayout( effect.GetVertexShader() ), geometry->m_ePrimType,
 		geometry->GetVertexSize(), geometry->GetIndexCount(), pParamManager );
 }
 //--------------------------------------------------------------------------------
@@ -435,7 +435,7 @@ void PipelineManagerDX11::DrawInstanced( RenderEffectDX11& effect, GeometryPtr g
 								 UINT numInstances, IParameterManager* pParamManager )
 {
 	DrawInstanced( effect, geometry->m_VB, geometry->m_ePrimType, geometry->m_IB,
-		geometry->GetInputLayout( effect.m_iVertexShader ),
+		geometry->GetInputLayout( effect.GetVertexShader() ),
 		geometry->GetVertexSize(), geometry->GetIndexCount(),
 		instanceData, instanceDataStride, numInstances, pParamManager );
 }
@@ -627,7 +627,7 @@ void PipelineManagerDX11::BindShader( ShaderType type, int ID, IParameterManager
 			// Before binding the shader, have it update its required parameters.  These
 			// parameters will then be bound to the pipeline after the shader is bound.
 
-			pShaderDX11->GetReflection()->UpdateParameters( this, pParamManager );
+			//pShaderDX11->GetReflection()->UpdateParameters( this, pParamManager );
 			pShaderDX11->GetReflection()->BindParameters( type, this, pParamManager );
 		}
 		else
@@ -639,13 +639,27 @@ void PipelineManagerDX11::BindShader( ShaderType type, int ID, IParameterManager
 //--------------------------------------------------------------------------------
 D3D11_MAPPED_SUBRESOURCE PipelineManagerDX11::MapResource( int rid, UINT subresource, D3D11_MAP actions, UINT flags )
 {
-	D3D11_MAPPED_SUBRESOURCE Data;
-	Data.pData = NULL;
-	Data.DepthPitch = Data.RowPitch = 0;
-
 	// Acquire the engine's resource wrapper.
 	ResourceDX11* pGlyphResource = 0; 
 	pGlyphResource = RendererDX11::Get()->GetResourceByIndex( rid );
+
+	return( MapResource( pGlyphResource, subresource, actions, flags ) );
+}
+//--------------------------------------------------------------------------------
+void PipelineManagerDX11::UnMapResource( int rid, UINT subresource )
+{
+	// Acquire the engine's resource wrapper.
+	ResourceDX11* pGlyphResource = 0; 
+	pGlyphResource = RendererDX11::Get()->GetResourceByIndex( rid );
+
+	UnMapResource( pGlyphResource, subresource );
+}
+//--------------------------------------------------------------------------------
+D3D11_MAPPED_SUBRESOURCE PipelineManagerDX11::MapResource( ResourceDX11* pGlyphResource, UINT subresource, D3D11_MAP actions, UINT flags )
+{
+	D3D11_MAPPED_SUBRESOURCE Data;
+	Data.pData = NULL;
+	Data.DepthPitch = Data.RowPitch = 0;
 
 	if ( NULL == pGlyphResource ) {
 		Log::Get().Write( L"Trying to map a subresource that doesn't exist!!!" );
@@ -671,12 +685,8 @@ D3D11_MAPPED_SUBRESOURCE PipelineManagerDX11::MapResource( int rid, UINT subreso
 	return( Data );
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::UnMapResource( int rid, UINT subresource )
+void PipelineManagerDX11::UnMapResource( ResourceDX11* pGlyphResource, UINT subresource )
 {
-	// Acquire the engine's resource wrapper.
-	ResourceDX11* pGlyphResource = 0; 
-	pGlyphResource = RendererDX11::Get()->GetResourceByIndex( rid );
-
 	if ( NULL == pGlyphResource ) {
 		Log::Get().Write( L"Trying to unmap a subresource that doesn't exist!!!" );
 		return;

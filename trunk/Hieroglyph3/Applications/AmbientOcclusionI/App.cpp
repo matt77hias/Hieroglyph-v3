@@ -104,16 +104,15 @@ void App::Initialize()
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pDepthEffect = new RenderEffectDX11();
 
-	pDepthEffect->m_iVertexShader = 
-		m_pRenderer11->LoadShader( VERTEX_SHADER,
+	pDepthEffect->SetVertexShader( m_pRenderer11->LoadShader( VERTEX_SHADER,
 		std::wstring( L"DepthVS.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	pDepthEffect->m_iPixelShader = 
-		m_pRenderer11->LoadShader( PIXEL_SHADER,
+		std::wstring( L"vs_5_0" ) ) );
+
+	pDepthEffect->SetPixelShader( m_pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"DepthPS.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
+		std::wstring( L"ps_5_0" ) ) );
 
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_LINEAR_DEPTH_NORMAL].bRender = true;
@@ -122,16 +121,15 @@ void App::Initialize()
 	// Create and fill the effect that will be used for this view type
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 
-	pEffect->m_iVertexShader = 
-		m_pRenderer11->LoadShader( VERTEX_SHADER,
+	pEffect->SetVertexShader( m_pRenderer11->LoadShader( VERTEX_SHADER,
 		std::wstring( L"FinalVS.hlsl" ),
 		std::wstring( L"VSMAIN" ),
-		std::wstring( L"vs_5_0" ) );
-	pEffect->m_iPixelShader = 
-		m_pRenderer11->LoadShader( PIXEL_SHADER,
+		std::wstring( L"vs_5_0" ) ) );
+
+	pEffect->SetPixelShader( m_pRenderer11->LoadShader( PIXEL_SHADER,
 		std::wstring( L"FinalPS.hlsl" ),
 		std::wstring( L"PSMAIN" ),
-		std::wstring( L"ps_5_0" ) );
+		std::wstring( L"ps_5_0" ) ) );
 
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;

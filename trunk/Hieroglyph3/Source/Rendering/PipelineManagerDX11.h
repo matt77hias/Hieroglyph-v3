@@ -27,6 +27,7 @@
 #include "GeometryDX11.h"
 #include "RenderEffectDX11.h"
 #include "ResourceProxyDX11.h"
+#include "ResourceDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -145,6 +146,10 @@ namespace Glyph3
 
 		D3D11_MAPPED_SUBRESOURCE	MapResource( int index, UINT subresource, D3D11_MAP actions, UINT flags );
 		void						UnMapResource( int index, UINT subresource );
+
+		D3D11_MAPPED_SUBRESOURCE	MapResource( ResourceDX11* pGlyphResource, UINT subresource, D3D11_MAP actions, UINT flags );
+		void						UnMapResource( ResourceDX11* pGlyphResource, UINT subresource );
+
 
 		// This is an alternative method to mapping for updating resources.  In certain 
 		// situations one method may or may not be more efficient than the other, so it is

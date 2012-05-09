@@ -79,11 +79,10 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX, int SizeY )
 	// Set up the render effect for actually updating the simulation.
 
 	pWaterEffect = new RenderEffectDX11();
-	pWaterEffect->m_iComputeShader = 
-		Renderer.LoadShader( COMPUTE_SHADER,
+	pWaterEffect->SetComputeShader( Renderer.LoadShader( COMPUTE_SHADER,
 		std::wstring( L"WaterSimulation.hlsl" ),
 		std::wstring( L"CSMAIN" ),
-		std::wstring( L"cs_4_0" ) );
+		std::wstring( L"cs_4_0" ) ) );
 
 	// Get references to the parameters that will be updated throughout the simulation.
 	m_pCurrentWaterState = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"CurrentWaterState" ) );

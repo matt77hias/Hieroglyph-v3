@@ -45,23 +45,23 @@ bool SpriteRendererDX11::Initialize()
 	RendererDX11* renderer = RendererDX11::Get();
 
 	// Load the shaders
-	m_effect.m_iVertexShader = renderer->LoadShader( VERTEX_SHADER,
+	m_effect.SetVertexShader( renderer->LoadShader( VERTEX_SHADER,
 		std::wstring( L"Sprite.hlsl" ),
 		std::wstring( L"SpriteVS" ),
-		std::wstring( L"vs_4_0" ) );
+		std::wstring( L"vs_4_0" ) ) );
 
-	if ( m_effect.m_iVertexShader == -1 )
+	if ( m_effect.GetVertexShader() == -1 )
 	{
 		Log::Get().Write( L"Failed to load sprite vertex shader" );
 		return false;
 	}
 
-	m_effect.m_iPixelShader = renderer->LoadShader( PIXEL_SHADER,
+	m_effect.SetPixelShader( renderer->LoadShader( PIXEL_SHADER,
 		std::wstring( L"Sprite.hlsl" ),
 		std::wstring( L"SpritePS" ),
-		std::wstring( L"ps_4_0" ) );
+		std::wstring( L"ps_4_0" ) ) );
 
-	if ( m_effect.m_iPixelShader == -1 )
+	if ( m_effect.GetPixelShader() == -1 )
 	{
 		Log::Get().Write( L"Failed to load sprite vertex shader" );
 		return false;
@@ -83,9 +83,9 @@ bool SpriteRendererDX11::Initialize()
 	for ( int i = 0; i < sizeof(elementsArray) / sizeof(D3D11_INPUT_ELEMENT_DESC); ++i)
 		elements.add( elementsArray[i] );
 
-	m_iInputLayout = renderer->CreateInputLayout( elements, m_effect.m_iVertexShader );
+	m_iInputLayout = renderer->CreateInputLayout( elements, m_effect.GetVertexShader() );
 
-	if ( m_effect.m_iPixelShader == -1 )
+	if ( m_iInputLayout == -1 )
 	{
 		Log::Get().Write( L"Failed to create sprite input layout" );
 		return false;
