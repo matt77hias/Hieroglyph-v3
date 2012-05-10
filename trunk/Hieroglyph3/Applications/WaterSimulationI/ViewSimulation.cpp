@@ -114,6 +114,8 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterMana
 
 	// Perform the dispatch call to update the simulation state.
 	pPipelineManager->Dispatch( *pWaterEffect, ThreadGroupsX, ThreadGroupsY, 1, pParamManager );
+	pPipelineManager->ClearPipelineResources();
+	pPipelineManager->ApplyPipelineResources();
 
 	// Switch the two resources so that the current state is maintained in slot 0.
 	ResourcePtr TempState = WaterState[0];

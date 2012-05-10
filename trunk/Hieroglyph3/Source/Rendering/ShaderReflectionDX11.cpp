@@ -91,7 +91,7 @@ void ShaderReflectionDX11::InitializeConstantBuffers( IParameterManager* pParamM
 						mapping.size = ConstantBuffers[i].Variables[j].Size;
 						mapping.elements = ConstantBuffers[i].Types[j].Elements;
 						mapping.varclass = ConstantBuffers[i].Types[j].Class;
-						mapping.valueID = 1;
+						mapping.valueID = -1;
 
 						ConstantBufferDX11* constBuffer = RendererDX11::Get()->GetConstantBufferByIndex( resource->m_iResource );
 						constBuffer->AddMapping( mapping );
