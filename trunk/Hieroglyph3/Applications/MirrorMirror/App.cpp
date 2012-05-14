@@ -104,25 +104,24 @@ void App::Initialize()
 		m_pDiffuseActor->AddElement( pEntity );
 	}
 
-	m_pReflectiveActor = new Actor();		
-	
 
 	for ( int i = 0; i < 3; i++ )
 	{
-		m_pReflector[i] = new ReflectiveSphereEntity();
-		m_pReflector[i]->Position() = Vector3f( -1.0, 1.0f+(i*3), 0.0f );
-		m_pReflector[i]->m_pParaboloidView->SetRoot( m_pScene->GetRoot() );
-		
-		m_pNode->AttachChild( m_pReflector[i] );
+		ReflectiveSphereEntity* pReflector = new ReflectiveSphereEntity();
+		pReflector->Position() = Vector3f( -1.0, 1.0f+(i*3), 0.0f );
+		pReflector->m_pParaboloidView->SetRoot( m_pScene->GetRoot() );
+		m_vReflectors.add( pReflector );
+
+		m_pNode->AttachChild( pReflector );
 	}
 
-	m_pReflector[0]->Position() = Vector3f( -1.0, 1.0f, 1.0f );
-	m_pReflector[1]->Position() = Vector3f( 1.0, 1.0f, 1.0f );
-	m_pReflector[2]->Position() = Vector3f( 0.0, -1.0f, 1.0f );
+	m_vReflectors[0]->Position() = Vector3f( -1.0, 1.0f, 1.0f );
+	m_vReflectors[1]->Position() = Vector3f( 1.0, 1.0f, 1.0f );
+	m_vReflectors[2]->Position() = Vector3f( 0.0, -1.0f, 1.0f );
 
-	m_pReflector[0]->m_pParaboloidView->SetBackColor( Vector4f( 0.75f, 0.0f, 0.0f, 1.0f ) );
-	m_pReflector[1]->m_pParaboloidView->SetBackColor( Vector4f( 0.0f, 0.75f, 0.0f, 1.0f ) );
-	m_pReflector[2]->m_pParaboloidView->SetBackColor( Vector4f( 0.0f, 0.0f, 0.75f, 1.0f ) );
+	m_vReflectors[0]->m_pParaboloidView->SetBackColor( Vector4f( 0.75f, 0.0f, 0.0f, 1.0f ) );
+	m_vReflectors[1]->m_pParaboloidView->SetBackColor( Vector4f( 0.0f, 0.75f, 0.0f, 1.0f ) );
+	m_vReflectors[2]->m_pParaboloidView->SetBackColor( Vector4f( 0.0f, 0.0f, 0.75f, 1.0f ) );
 
 	m_pNode->AttachChild( m_pDiffuseActor->GetNode() );
 	
@@ -200,10 +199,13 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pEntity );
 	SAFE_DELETE( m_pNode );
 
-	// TODO: Delete the remaining entities and actors...
+	for ( int i = 0; i < m_vReflectors.count(); i++ ) {
+		SAFE_DELETE( m_vReflectors[i] );
+	}
+
+	SAFE_DELETE( m_pDiffuseActor );
 
 	// Print the framerate out for the log before shutting down.
 

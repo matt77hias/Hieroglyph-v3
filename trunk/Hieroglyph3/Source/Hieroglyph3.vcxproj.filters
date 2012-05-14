@@ -658,6 +658,9 @@
     <ClCompile Include="Rendering\ShaderFactoryDX11.cpp">
       <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
     </ClCompile>
+    <ClCompile Include="Application\FileLoader.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mathematics\Matrix3f.h">
@@ -1193,6 +1196,9 @@
     </ClInclude>
     <ClInclude Include="Rendering\ShaderFactoryDX11.h">
       <Filter>Rendering\Pipeline\Shader Stages\Shader Programs</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\FileLoader.h">
+      <Filter>Application</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

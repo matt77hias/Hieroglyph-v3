@@ -63,6 +63,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <CompileAsManaged>
       </CompileAsManaged>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <PostBuildEvent>
       <Command>copy Application\*.h ..\SDK\Include
@@ -91,6 +92,7 @@ copy Animation\*.h ..\SDK\Include
       <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <PostBuildEvent>
       <Command>copy Application\*.h ..\SDK\Include
@@ -108,6 +110,7 @@ copy Animation\*.h ..\SDK\Include
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application\FileLoader.cpp" />
     <ClCompile Include="Mathematics\Matrix3f.cpp" />
     <ClCompile Include="Mathematics\Matrix4f.cpp" />
     <ClCompile Include="Mathematics\PerlinNoise.cpp" />
@@ -455,6 +458,7 @@ copy Animation\*.h ..\SDK\Include
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application\FileLoader.h" />
     <ClInclude Include="Application\IWindowProc.h" />
     <ClInclude Include="Mathematics\Matrix3f.h" />
     <ClInclude Include="Mathematics\Matrix4f.h" />

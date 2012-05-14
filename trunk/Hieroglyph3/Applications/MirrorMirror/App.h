@@ -47,18 +47,16 @@ public:
 
 protected:
 
-	Node3D*					m_pNode;
-	DiffuseSphereEntity*	m_pEntity;
-	ReflectiveSphereEntity*	m_pReflector[16];
-	
-	Actor*					m_pDiffuseActor;
-	Actor*					m_pReflectiveActor;
+	Node3D*								m_pNode;
+	TArray<ReflectiveSphereEntity*>		m_vReflectors;
+	Actor*								m_pDiffuseActor;
 
-	Vector4f				m_LightParams;
-	Vector4f				m_LightPosition;
 
-	VectorParameterDX11*	m_pLightColor;
-	VectorParameterDX11*	m_pLightPosition;
-	VectorParameterDX11*	m_pTimeFactors;
-	VectorParameterDX11*	m_pViewPosition;
+	Vector4f							m_LightParams;
+	Vector4f							m_LightPosition;
+
+	VectorParameterDX11*				m_pLightColor;
+	VectorParameterDX11*				m_pLightPosition;
+	VectorParameterDX11*				m_pTimeFactors;
+	VectorParameterDX11*				m_pViewPosition;
 };

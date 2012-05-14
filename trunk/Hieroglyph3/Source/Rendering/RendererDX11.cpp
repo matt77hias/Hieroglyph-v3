@@ -1024,55 +1024,6 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 	HRESULT hr = S_OK;
 
 	ID3DBlob* pCompiledShader = NULL;
-//	ID3DBlob* pErrorMessages = NULL;
-//
-//	char AsciiFunction[1024];
-//	char AsciiModel[1024];
-//	WideCharToMultiByte(CP_ACP, 0, function.c_str(), -1, AsciiFunction, 1024, NULL, NULL);
-//	WideCharToMultiByte(CP_ACP, 0, model.c_str(), -1, AsciiModel, 1024, NULL, NULL);
-//
-//    UINT flags = D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
-//#ifdef _DEBUG
-//    flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION | D3DCOMPILE_WARNINGS_ARE_ERRORS;
-//#endif
-//
-//	// Get the current path to the shader folders, and add the filename to it.
-//
-//	FileSystem fs;
-//	filename = fs.GetShaderFolder() + filename;
-//
-//	if ( FAILED( hr = D3DX11CompileFromFile(
-//		filename.c_str(),
-//		pDefines,
-//		0,
-//		AsciiFunction,
-//		AsciiModel,
-//		flags,
-//		0,//UINT Flags2,
-//		0,
-//		&pCompiledShader,
-//		&pErrorMessages,
-//		&hr
-//		) ) )
-//	{
-//
-//		std::wstringstream message;
-//
-//		message << L"Error compiling shader program: " << filename << std::endl << std::endl;
-//		message << L"The following error was reported:" << std::endl;
-//
-//		if ( ( enablelogging ) && ( pErrorMessages != 0 ) )
-//		{
-//			LPVOID pCompileErrors = pErrorMessages->GetBufferPointer();
-//			const char* pMessage = (const char*)pCompileErrors;
-//			message << GlyphString::ToUnicode( std::string( pMessage ) );
-//			Log::Get().Write( message.str() );
-//		}
-//
-//		EventManager::Get()->ProcessEvent( new EvtErrorMessage( message.str() ) );
-//
-//		return( -1 );
-//	}
 
 	pCompiledShader = ShaderFactoryDX11::GenerateShader( type, filename, function, model, pDefines, enablelogging );
 

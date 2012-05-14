@@ -15,6 +15,7 @@
 #include "FileSystem.h"
 #include "EventManager.h"
 #include "EvtErrorMessage.h"
+#include "FileLoader.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -30,6 +31,8 @@ ID3DBlob* ShaderFactoryDX11::GenerateShader( ShaderType type, std::wstring& file
             std::wstring& model, const D3D_SHADER_MACRO* pDefines, bool enablelogging )
 {
 	HRESULT hr = S_OK;
+
+	std::wstringstream message;
 
 	ID3DBlob* pCompiledShader = nullptr;
 	ID3DBlob* pErrorMessages = nullptr;
@@ -49,23 +52,43 @@ ID3DBlob* ShaderFactoryDX11::GenerateShader( ShaderType type, std::wstring& file
 	FileSystem fs;
 	filename = fs.GetShaderFolder() + filename;
 
-	if ( FAILED( hr = D3DX11CompileFromFile(
-		filename.c_str(),
+	// Load the file into memory
+
+	FileLoader SourceFile;
+	if ( !SourceFile.Open( filename ) ) {
+		message << "Unable to load shader from file: " << filename;
+		EventManager::Get()->ProcessEvent( new EvtErrorMessage( message.str() ) );
+		return( nullptr );
+	}
+
+
+	if ( FAILED( hr = D3DCompile( 
+		SourceFile.GetDataPtr(),
+		SourceFile.GetDataSize(),
+		nullptr,
 		pDefines,
-		0,
+		nullptr,
 		AsciiFunction,
 		AsciiModel,
 		flags,
-		0,//UINT Flags2,
 		0,
 		&pCompiledShader,
-		&pErrorMessages,
-		&hr
-		) ) )
+		&pErrorMessages ) ) )
+
+	//if ( FAILED( hr = D3DX11CompileFromFile(
+	//	filename.c_str(),
+	//	pDefines,
+	//	0,
+	//	AsciiFunction,
+	//	AsciiModel,
+	//	flags,
+	//	0,//UINT Flags2,
+	//	0,
+	//	&pCompiledShader,
+	//	&pErrorMessages,
+	//	&hr
+	//	) ) )
 	{
-
-		std::wstringstream message;
-
 		message << L"Error compiling shader program: " << filename << std::endl << std::endl;
 		message << L"The following error was reported:" << std::endl;
 
@@ -90,94 +113,42 @@ ID3DBlob* ShaderFactoryDX11::GenerateShader( ShaderType type, std::wstring& file
 	return( pCompiledShader );
 }
 //--------------------------------------------------------------------------------
-ID3DBlob* ShaderFactoryDX11::GenerateShader( std::wstring& filename )
+ID3DBlob* ShaderFactoryDX11::GeneratePrecompiledShader( std::wstring& filename )
 {
-	// Load the pre-compiled shader to memory
-	
-#if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
-    HANDLE hFile = CreateFile2( filename.c_str(),
-                                GENERIC_READ,
-                                FILE_SHARE_READ,
-                                OPEN_EXISTING,
-                                nullptr );
-#else
-    HANDLE hFile = CreateFileW( filename.c_str(),
-                                GENERIC_READ,
-                                FILE_SHARE_READ,
-                                nullptr,
-                                OPEN_EXISTING,
-                                FILE_ATTRIBUTE_NORMAL,
-                                nullptr
-                              );
-#endif
+	std::wstringstream message;
 
-    if (INVALID_HANDLE_VALUE == hFile) {
-        return( nullptr );
-    }
+	// Determine where to look for the shader file
 
-    // Get the file size
-    LARGE_INTEGER FileSize = { 0 };
+	FileSystem fs;
+	filename = fs.GetShaderFolder() + filename;
 
-#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
-    FILE_STANDARD_INFO fileInfo;
-    if ( !GetFileInformationByHandleEx( hFile, FileStandardInfo, &fileInfo, sizeof(fileInfo) ) ) {
-        CloseHandle( hFile );
-        return( nullptr );
-    }
-    FileSize = fileInfo.EndOfFile;
-#else
-    GetFileSizeEx( hFile, &FileSize );
-#endif
+	// Load the file into memory
 
-    // File is too big for 32-bit allocation, so reject read
-    if (FileSize.HighPart > 0) {
-        CloseHandle( hFile );
-        return( nullptr );
-    }
-
-    // create enough space for the file data
-    char* pData = new char[ FileSize.LowPart ];
-    if (!(pData)) {
-        CloseHandle( hFile );
-        return( nullptr );
-    }
-
-    // read the data in
-    DWORD BytesRead = 0;
-    if (!ReadFile( hFile,
-                   pData,
-                   FileSize.LowPart,
-                   &BytesRead,
-                   nullptr
-                 )) {
-        CloseHandle( hFile );
-        delete [] pData;
-        pData = nullptr;
-        return( nullptr );
-    }
-
-	CloseHandle( hFile );
-
-    if (BytesRead < FileSize.LowPart) {
-        delete [] pData;
-        pData = nullptr;
-        return( nullptr );
-    }
-
+	FileLoader CompiledObjectFile;
+	if ( !CompiledObjectFile.Open( filename ) ) {
+		message << "Unable to load shader from file: " << filename;
+		EventManager::Get()->ProcessEvent( new EvtErrorMessage( message.str() ) );
+		return( nullptr );
+	}
 
 	// Create a blob to store the object code in
 	
 	ID3DBlob* pBlob = nullptr;
-	HRESULT hr = D3DCreateBlob( FileSize.LowPart, &pBlob );
+	HRESULT hr = D3DCreateBlob( CompiledObjectFile.GetDataSize(), &pBlob );
 
-	// TODO: check for failure here...
+	if ( FAILED( hr ) ) {
+		message << "Unable to create a D3DBlob of size: " << CompiledObjectFile.GetDataSize() << L" while compiling shader: " << filename;
+		EventManager::Get()->ProcessEvent( new EvtErrorMessage( message.str() ) );
+		return( nullptr );
+	}
 
 
 	// Copy the file data into the blob
-	memcpy( pBlob->GetBufferPointer(), pData, pBlob->GetBufferSize() );
+	memcpy( pBlob->GetBufferPointer(), CompiledObjectFile.GetDataPtr(), pBlob->GetBufferSize() );
 
-	// Release the system memory and return the blob
-	delete [] pData;
+	// The file object will automatically be released when it goes out of scope,
+	// and hence will free its loaded contents automatically also.
+
 	return( pBlob );
 }
 //--------------------------------------------------------------------------------

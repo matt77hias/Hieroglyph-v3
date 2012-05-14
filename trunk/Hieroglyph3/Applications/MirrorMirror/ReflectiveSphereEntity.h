@@ -26,16 +26,9 @@ namespace Glyph3
 		ReflectiveSphereEntity( );
 		virtual ~ReflectiveSphereEntity( );
 
-		virtual void PreRender( RendererDX11* pRenderer, VIEWTYPE view );
-		virtual void Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view );
-
-
 	public:
-		ResourcePtr ArgsBuffer;
-		ViewParaboloidEnvMap* m_pParaboloidView;
-
-		ResourcePtr ParticleTexture;
-		int			ParaboloidSampler;
+		ViewParaboloidEnvMap*	m_pParaboloidView;
+		int						m_iParaboloidSampler;
 	};
 };
 //--------------------------------------------------------------------------------

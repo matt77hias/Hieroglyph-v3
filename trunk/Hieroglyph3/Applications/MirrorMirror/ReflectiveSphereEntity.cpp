@@ -122,13 +122,13 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 	SamplerConfig.BorderColor[1] = 0.0f;
 	SamplerConfig.BorderColor[2] = 0.0f;
 	SamplerConfig.BorderColor[3] = 0.0f;
-	ParaboloidSampler = pRenderer11->CreateSamplerState( &SamplerConfig );
+	m_iParaboloidSampler = pRenderer11->CreateSamplerState( &SamplerConfig );
 
 
 	// Create the sampler parameter to specify the desired sampling method.
 
 	SamplerParameterDX11* pSamplerParameter = pRenderer11->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"ParaboloidSampler" ) );
-    pSamplerParameter->InitializeParameterData( &ParaboloidSampler );
+    pSamplerParameter->InitializeParameterData( &m_iParaboloidSampler );
 
 
 	// These operations are performed here at initialization time to ensure 
@@ -146,42 +146,6 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 //--------------------------------------------------------------------------------
 ReflectiveSphereEntity::~ReflectiveSphereEntity()
 {
-}
-//--------------------------------------------------------------------------------
-void ReflectiveSphereEntity::PreRender( RendererDX11* pRenderer, VIEWTYPE view )
-{
-	// Perform the pre-render function only if the material has been set
-	if ( m_sParams.Material != NULL )
-		m_sParams.Material->PreRender( pRenderer, view );
-}
-//--------------------------------------------------------------------------------
-void ReflectiveSphereEntity::Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view )
-{
-	// Test if the entity contains any geometry, and it has a material
-	if ( ( m_sParams.Executor != NULL ) && ( m_sParams.Material != NULL ) )
-	{
-		// Only render if the material indicates that you should
-		if ( m_sParams.Material->Params[view].bRender )
-		{
-			// Set the material render parameters.  This is done before the entity
-			// render parameters so that unique values can be set by the individual
-			// entities, and still allow the material to set parameters for any
-			// entities that don't specialize the parameters.
-			m_sParams.Material->SetRenderParams( pParamManager, view );
-
-			// Set the entity render parameters
-			this->SetRenderParams( pParamManager );
-
-			// Configure the pipeline with the render effect supplied by the material.
-			pPipelineManager->ClearPipelineResources();
-			m_sParams.Material->Params[view].pEffect->ConfigurePipeline( pPipelineManager, pParamManager );
-			pPipelineManager->ApplyPipelineResources();
-
-			// Let the geometry execute its drawing operation.  This includes 
-			// configuring the input to the pipeline, plus calling an appropriate
-			// draw call.
-			m_sParams.Executor->Execute( pPipelineManager, pParamManager );
-		}
-	}
+	SAFE_DELETE( m_pParaboloidView );
 }
 //--------------------------------------------------------------------------------
