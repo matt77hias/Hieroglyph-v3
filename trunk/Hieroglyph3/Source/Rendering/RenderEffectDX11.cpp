@@ -164,6 +164,8 @@ void RenderEffectDX11::UpdateConstantBufferList()
 				// If it isn't already included, then add it to the list.
 				if ( !m_uniqueConstBuffers.contains( pParameter ) ) {
 					m_uniqueConstBuffers.add( pParameter );
+				} else {
+					Log::Get().Write( L"Skipped adding a duplicate constant buffer..." );
 				}
 
 			}

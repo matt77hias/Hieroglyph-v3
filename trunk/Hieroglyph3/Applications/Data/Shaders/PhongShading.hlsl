@@ -9,7 +9,7 @@
 //--------------------------------------------------------------------------------
 // Resources
 //--------------------------------------------------------------------------------
-cbuffer Transforms
+cbuffer WorldAndClipTransforms
 {
 	matrix WorldMatrix;	
 	matrix WorldViewProjMatrix;

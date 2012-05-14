@@ -116,9 +116,7 @@ void ConstantBufferDX11::EvaluateMappings( PipelineManagerDX11* pPipeline, IPara
 								Log::Get().Write( L"Mismatch in matrix array count, update will not be performed!!!" );
 							}
 						}
-					}
-					else
-					{
+					} else {
 						Log::Get().Write( L"Non vector or matrix parameter specified in a constant buffer!  This will not be updated!" );
 					}
 				}
@@ -126,11 +124,30 @@ void ConstantBufferDX11::EvaluateMappings( PipelineManagerDX11* pPipeline, IPara
 				pPipeline->UnMapResource( this, 0 );
 			}
 		}
-	}
-	else
-	{
+	} else {
 		Log::Get().Write( L"Trying to update a constant buffer that isn't a constant buffer!" );
 	}
+}
+//--------------------------------------------------------------------------------
+bool ConstantBufferDX11::ContainsMapping( int index, const ConstantBufferMapping& mapping )
+{
+	bool result = false;
+
+	// First retrieve the internal mapping
+
+	if ( this->m_Mappings.inrange( index ) ) {
+		ConstantBufferMapping internalMapping = m_Mappings[index];
+
+		if ( internalMapping.pParameter == mapping.pParameter 
+			&& internalMapping.offset == mapping.offset 
+			&& internalMapping.size == mapping.size
+			&& internalMapping.varclass == mapping.varclass
+			&& internalMapping.elements == mapping.elements ) {
+			result = true;
+		}
+	}
+
+	return( result );
 }
 //--------------------------------------------------------------------------------
 void ConstantBufferDX11::SetAutoUpdate( bool enable )

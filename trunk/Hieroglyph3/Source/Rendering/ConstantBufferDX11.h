@@ -42,6 +42,7 @@ namespace Glyph3
 		void						AddMapping( ConstantBufferMapping& mapping );
 		void						EmptyMappings( );
 		void						EvaluateMappings( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager );
+		bool						ContainsMapping( int index, const ConstantBufferMapping& mapping );
 
 		void						SetAutoUpdate( bool enable );
 		bool						GetAutoUpdate( );

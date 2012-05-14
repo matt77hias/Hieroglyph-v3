@@ -35,7 +35,7 @@
 #include <stdlib.h>
 //#include <stdint.h>
 #include <math.h>
-#include <memory.h>
+#include <memory>
 #include <assert.h>
 
 // DirectX SDK includes

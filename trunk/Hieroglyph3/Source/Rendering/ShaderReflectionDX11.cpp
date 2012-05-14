@@ -20,6 +20,8 @@
 #include "D3DEnumConversion.h"
 #include "ShaderReflectionFactoryDX11.h"
 #include "ConstantBufferDX11.h"
+#include "EvtErrorMessage.h"
+#include "EventManager.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -95,6 +97,47 @@ void ShaderReflectionDX11::InitializeConstantBuffers( IParameterManager* pParamM
 
 						ConstantBufferDX11* constBuffer = RendererDX11::Get()->GetConstantBufferByIndex( resource->m_iResource );
 						constBuffer->AddMapping( mapping );
+					}
+				}
+			} else {
+				
+				// If we get here, that means we are trying to initialize a constant buffer
+				// that has already been set as a parameter before.  We need to compare if this
+				// constant buffer has the same variables in it as the reflection data that we
+				// are currently working with.  This can be done by getting the buffer, then
+				// examining its mapping data and comparing that with the current reflection
+				// provided mapping data.
+				//
+				// It is sufficient to check only one of the parameter's constant buffers, since
+				// all of the buffers for multiple threads should be identical (as created above).
+
+				ConstantBufferDX11* pConstBuffer = RendererDX11::Get()->GetConstantBufferByIndex( index );
+
+				for ( int j = 0; j < ConstantBuffers[i].Variables.count(); j++ )
+				{
+					ConstantBufferMapping mapping;
+
+					mapping.pParameter = ConstantBuffers[i].Parameters[j];
+					mapping.offset = ConstantBuffers[i].Variables[j].StartOffset;
+					mapping.size = ConstantBuffers[i].Variables[j].Size;
+					mapping.elements = ConstantBuffers[i].Types[j].Elements;
+					mapping.varclass = ConstantBuffers[i].Types[j].Class;
+					mapping.valueID = -1;
+
+					if ( !pConstBuffer->ContainsMapping( j, mapping ) ) {
+
+						std::wstringstream message;
+						message << L"Constant buffer by this name is already mapped, but with a different mapping!" << std::endl;
+						message << L"See constant buffer: " << ConstantBuffers[i].pParamRef->GetName() << std::endl;
+						message << L" - parameter: " << mapping.pParameter->GetName() << std::endl;
+						message << L" - offset: "  << mapping.offset << std::endl;
+						message << L" - size: " << mapping.size << std::endl;
+						message << L" - elements: " << mapping.elements << std::endl;
+						message << L" - class: " << TO_STRING_D3D_SHADER_VARIABLE_CLASS(mapping.varclass) << std::endl << std::endl;
+
+						Log::Get().Write( message.str() );
+						EventManager::Get()->ProcessEvent( new EvtErrorMessage( message.str() ) );
+
 					}
 				}
 			}
