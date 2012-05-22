@@ -15,12 +15,21 @@
 #ifndef PipelineExecutorDX11_h
 #define PipelineExecutorDX11_h
 //--------------------------------------------------------------------------------
-#include <memory>
+#include "PCH.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
 	class PipelineManagerDX11;
 	class IParameterManager;
+
+	// This simple structure provides the mapping between a vertex shader program
+	// and the corresponding input layout.
+
+	struct InputLayoutKey
+	{
+		int shader;
+		int layout;
+	};
 
 	class PipelineExecutorDX11
 	{
@@ -29,6 +38,13 @@ namespace Glyph3
 		virtual ~PipelineExecutorDX11();
 
 		virtual void Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager ) = 0;
+
+		virtual void GenerateInputLayout( int ShaderID ) = 0;
+		int GetInputLayout( int ShaderID );
+
+	protected:
+		std::map<int,InputLayoutKey*> m_InputLayouts;
+
 	};
 
 	typedef std::shared_ptr<PipelineExecutorDX11> ExecutorPtr;

@@ -113,14 +113,15 @@ ID3DBlob* ShaderFactoryDX11::GenerateShader( ShaderType type, std::wstring& file
 	return( pCompiledShader );
 }
 //--------------------------------------------------------------------------------
-ID3DBlob* ShaderFactoryDX11::GeneratePrecompiledShader( std::wstring& filename )
+ID3DBlob* ShaderFactoryDX11::GeneratePrecompiledShader( std::wstring& filename, std::wstring& function,
+            std::wstring& model )
 {
 	std::wstringstream message;
 
 	// Determine where to look for the shader file
 
 	FileSystem fs;
-	filename = fs.GetShaderFolder() + filename;
+	filename = fs.GetShaderFolder() + filename + L"_" + function + L"_" + model + L".cso";
 
 	// Load the file into memory
 

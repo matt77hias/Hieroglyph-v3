@@ -8,15 +8,8 @@
 // Copyright (c) 2003-2010 Jason Zink 
 //--------------------------------------------------------------------------------
 #include "RenderApplication.h"
-
-#include "GeometryDX11.h"
-#include "MaterialDX11.h"
-#include "Camera.h"
-#include "Scene.h"
-
-#include "VectorParameterDX11.h"
-#include "GlyphKinect\ViewKinect.h"
-#include "GlyphKinect\KinectSkeletonActor.h"
+#include "Actor.h"
+#include "ImmediateGeometryDX11.h"
 
 using namespace Glyph3;
 
@@ -39,15 +32,9 @@ public:
 
 protected:
 
-	ViewKinect*				m_pKinectView;
+	Actor*					m_pActor;
 
-	Node3D*					m_pNode;
-	
-	VectorParameterDX11*	m_pLightColor;
-	VectorParameterDX11*	m_pLightPosition;
+	ImmediateGeometryPtr	m_pGeometry;
 
-	KinectSkeletonActor*	m_pSkeletonActor;
-	Actor*					m_pDepthMapViewer;
-	Actor*					m_pColorActor;
-	Actor*					m_pDepthActor;
+//	VectorParameterDX11*	m_pTimeFactors;
 };

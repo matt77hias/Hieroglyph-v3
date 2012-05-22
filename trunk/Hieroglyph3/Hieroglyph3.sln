@@ -44,6 +44,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MirrorMirror", "Applications\MirrorMirror\MirrorMirror.vcxproj", "{75C388EB-7F70-4B62-98D9-9B9B18EDF11E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KinectPlayground", "Applications\KinectPlayground\KinectPlayground.vcxproj", "{D2D05566-CC48-4CE5-9626-70D9053080EB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{84EBB79E-C96B-44CC-BFBA-D9DB46583071} = {84EBB79E-C96B-44CC-BFBA-D9DB46583071}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MFCwithD3D11", "Applications\MFCwithD3D11\MFCwithD3D11.vcxproj", "{9593BD9C-1948-47F0-A9E9-FBE14A65FEB1}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -55,6 +58,13 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LuaLibLib", "Dependencies\lua-5.1.4\vc90_build\LuaLibLib\LuaLibLib.vcxproj", "{036DBAF4-D87B-4F38-A8B2-2D3C7F71A7B1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RotatingCube", "Applications\RotatingCube\RotatingCube.vcxproj", "{DDE5DE3F-7E35-4405-A947-24B04AEF3499}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImmediateRenderer", "Applications\ImmediateRenderer\ImmediateRenderer.vcxproj", "{872AE5E0-5E4A-4BDB-8749-D3D40CA61948}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GlyphKinect", "Extensions\GlyphKinect\GlyphKinect.vcxproj", "{84EBB79E-C96B-44CC-BFBA-D9DB46583071}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF} = {D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -306,6 +316,26 @@ Global
 		{DDE5DE3F-7E35-4405-A947-24B04AEF3499}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{DDE5DE3F-7E35-4405-A947-24B04AEF3499}.Release|Win32.ActiveCfg = Release|Win32
 		{DDE5DE3F-7E35-4405-A947-24B04AEF3499}.Release|Win32.Build.0 = Release|Win32
+		{872AE5E0-5E4A-4BDB-8749-D3D40CA61948}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{872AE5E0-5E4A-4BDB-8749-D3D40CA61948}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{872AE5E0-5E4A-4BDB-8749-D3D40CA61948}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{872AE5E0-5E4A-4BDB-8749-D3D40CA61948}.Debug|Win32.ActiveCfg = Debug|Win32
+		{872AE5E0-5E4A-4BDB-8749-D3D40CA61948}.Debug|Win32.Build.0 = Debug|Win32
+		{872AE5E0-5E4A-4BDB-8749-D3D40CA61948}.Release|Any CPU.ActiveCfg = Release|Win32
+		{872AE5E0-5E4A-4BDB-8749-D3D40CA61948}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{872AE5E0-5E4A-4BDB-8749-D3D40CA61948}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{872AE5E0-5E4A-4BDB-8749-D3D40CA61948}.Release|Win32.ActiveCfg = Release|Win32
+		{872AE5E0-5E4A-4BDB-8749-D3D40CA61948}.Release|Win32.Build.0 = Release|Win32
+		{84EBB79E-C96B-44CC-BFBA-D9DB46583071}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{84EBB79E-C96B-44CC-BFBA-D9DB46583071}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{84EBB79E-C96B-44CC-BFBA-D9DB46583071}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{84EBB79E-C96B-44CC-BFBA-D9DB46583071}.Debug|Win32.ActiveCfg = Debug|Win32
+		{84EBB79E-C96B-44CC-BFBA-D9DB46583071}.Debug|Win32.Build.0 = Debug|Win32
+		{84EBB79E-C96B-44CC-BFBA-D9DB46583071}.Release|Any CPU.ActiveCfg = Release|Win32
+		{84EBB79E-C96B-44CC-BFBA-D9DB46583071}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{84EBB79E-C96B-44CC-BFBA-D9DB46583071}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{84EBB79E-C96B-44CC-BFBA-D9DB46583071}.Release|Win32.ActiveCfg = Release|Win32
+		{84EBB79E-C96B-44CC-BFBA-D9DB46583071}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

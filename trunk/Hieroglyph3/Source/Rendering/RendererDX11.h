@@ -26,7 +26,6 @@
 #include "Matrix4f.h"
 
 #include "ResourceProxyDX11.h"
-#include <memory>
 #include "ShaderDX11.h"
 #include "BlendStateDX11.h"
 #include "DepthStencilStateDX11.h"

@@ -113,6 +113,7 @@ namespace Glyph3
 		// These draw calls are thin wrappers around the basic API draw calls.  They are intended
 		// to be used by the PipelineExecutorDX11 subclasses to invoke the pipeline.
 
+		void Draw( UINT VertexCount, UINT StartVertex );
 		void DrawIndexed( UINT IndexCount, UINT StartIndex, int VertexOffset ); 
 
 
@@ -146,6 +147,9 @@ namespace Glyph3
 
 		D3D11_MAPPED_SUBRESOURCE	MapResource( int index, UINT subresource, D3D11_MAP actions, UINT flags );
 		void						UnMapResource( int index, UINT subresource );
+
+		D3D11_MAPPED_SUBRESOURCE	MapResource( ResourcePtr pGlyphResource, UINT subresource, D3D11_MAP actions, UINT flags );
+		void						UnMapResource( ResourcePtr pGlyphResource, UINT subresource );
 
 		D3D11_MAPPED_SUBRESOURCE	MapResource( ResourceDX11* pGlyphResource, UINT subresource, D3D11_MAP actions, UINT flags );
 		void						UnMapResource( ResourceDX11* pGlyphResource, UINT subresource );

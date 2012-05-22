@@ -1026,6 +1026,7 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 	ID3DBlob* pCompiledShader = NULL;
 
 	pCompiledShader = ShaderFactoryDX11::GenerateShader( type, filename, function, model, pDefines, enablelogging );
+	//pCompiledShader = ShaderFactoryDX11::GeneratePrecompiledShader( filename, function, model );
 
 	if ( pCompiledShader == nullptr ) {
 		return( -1 );

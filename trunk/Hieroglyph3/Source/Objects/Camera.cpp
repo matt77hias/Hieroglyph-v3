@@ -24,7 +24,7 @@ Camera::Camera()
 	m_fNear = 0.1f;
 	m_fFar = 100.0f;
 	m_fAspect = 1280.0f / 800.0f;
-	m_fFov = GLYPH_PI / 4.0f;
+	m_fFov = static_cast<float>( GLYPH_PI ) / 4.0f;
 
     m_ProjMatrix.MakeIdentity();
 }

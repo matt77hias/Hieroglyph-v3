@@ -37,6 +37,9 @@ namespace Glyph3
 		static MaterialPtr GenerateKinectReconstructionMaterial( RendererDX11& Renderer );
 		static MaterialPtr GenerateKinectDepthBufferMaterial( RendererDX11& Renderer );
 
+		static MaterialPtr GenerateImmediateGeometrySolidMaterial( RendererDX11& Renderer );
+		static MaterialPtr GenerateImmediateGeometryTexturedMaterial( RendererDX11& Renderer );
+
 	private:
 		MaterialGeneratorDX11();
 		

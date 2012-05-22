@@ -73,7 +73,7 @@ void InputAssemblerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 
 		ID3D11Buffer* Buffers[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
 
-		for ( int i = 0; i <= DesiredState.AvailableSlotCount-1; i++ )
+		for ( unsigned int i = 0; i <= DesiredState.AvailableSlotCount-1; i++ )
 		{
 			int index = DesiredState.VertexBuffers[i];
 

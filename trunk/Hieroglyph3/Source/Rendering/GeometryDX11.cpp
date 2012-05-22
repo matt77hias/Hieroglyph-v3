@@ -36,10 +36,6 @@ GeometryDX11::~GeometryDX11()
 		if ( m_vElements[i] != NULL )
 			delete m_vElements[i];
 	}
-
-	std::map<int, InputLayoutKey*>::iterator it = m_InputLayouts.begin();
-	for( ; it != m_InputLayouts.end(); it++ )
-        SAFE_DELETE( (*it).second );
 }
 //--------------------------------------------------------------------------------
 void GeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
@@ -340,21 +336,6 @@ void GeometryDX11::GenerateInputLayout( int ShaderID )
 			m_InputLayouts[ShaderID] = pKey;
 		}
 	}
-}
-//--------------------------------------------------------------------------------
-int GeometryDX11::GetInputLayout( int ShaderID )
-{
-	int layout = -1;
-
-	// Automatically generate the layout if it doesn't already exist.
-
-	if ( m_InputLayouts[ShaderID] == 0 )
-		GenerateInputLayout( ShaderID );
-	
-	// The layout should be created now...
-	layout = m_InputLayouts[ShaderID]->layout;
-
-	return( layout );
 }
 //--------------------------------------------------------------------------------
 void GeometryDX11::LoadToBuffers()

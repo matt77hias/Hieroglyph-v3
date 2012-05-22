@@ -33,3 +33,4 @@ std::wstring GlyphString::ToUnicode( std::string& s )
 	return temp; 
 }
 //--------------------------------------------------------------------------------
+

@@ -353,9 +353,12 @@ void PipelineManagerDX11::ClearPipelineState( )
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::DrawIndexed( UINT IndexCount, UINT StartIndex, int VertexOffset )
 {
-	// Get the current configuration on the pipeline and print it
-
 	m_pContext->DrawIndexed( IndexCount, StartIndex, VertexOffset );
+}
+//--------------------------------------------------------------------------------
+void PipelineManagerDX11::Draw( UINT VertexCount, UINT StartVertex )
+{
+	m_pContext->Draw( VertexCount, StartVertex );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::Draw( RenderEffectDX11& effect, GeometryPtr geometry, 
@@ -655,13 +658,31 @@ void PipelineManagerDX11::UnMapResource( int rid, UINT subresource )
 	UnMapResource( pGlyphResource, subresource );
 }
 //--------------------------------------------------------------------------------
+D3D11_MAPPED_SUBRESOURCE PipelineManagerDX11::MapResource( ResourcePtr pResource, UINT subresource, D3D11_MAP actions, UINT flags )
+{
+	// Acquire the engine's resource wrapper.
+	ResourceDX11* pGlyphResource = 0; 
+	pGlyphResource = RendererDX11::Get()->GetResourceByIndex( pResource->m_iResource );
+
+	return( MapResource( pGlyphResource, subresource, actions, flags ) );
+}
+//--------------------------------------------------------------------------------
+void PipelineManagerDX11::UnMapResource( ResourcePtr pResource, UINT subresource )
+{
+	// Acquire the engine's resource wrapper.
+	ResourceDX11* pGlyphResource = 0; 
+	pGlyphResource = RendererDX11::Get()->GetResourceByIndex( pResource->m_iResource );
+
+	UnMapResource( pGlyphResource, subresource );
+}
+//--------------------------------------------------------------------------------
 D3D11_MAPPED_SUBRESOURCE PipelineManagerDX11::MapResource( ResourceDX11* pGlyphResource, UINT subresource, D3D11_MAP actions, UINT flags )
 {
 	D3D11_MAPPED_SUBRESOURCE Data;
 	Data.pData = NULL;
 	Data.DepthPitch = Data.RowPitch = 0;
 
-	if ( NULL == pGlyphResource ) {
+	if ( nullptr == pGlyphResource ) {
 		Log::Get().Write( L"Trying to map a subresource that doesn't exist!!!" );
 		return( Data );
 	}
@@ -670,7 +691,7 @@ D3D11_MAPPED_SUBRESOURCE PipelineManagerDX11::MapResource( ResourceDX11* pGlyphR
 	ID3D11Resource* pResource = 0;
 	pResource = pGlyphResource->GetResource();
 
-	if ( NULL == pResource ) {
+	if ( nullptr == pResource ) {
 		Log::Get().Write( L"Trying to map a subresource that has no native resource in it!!!" );
 		return( Data );
 	}

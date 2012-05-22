@@ -661,6 +661,9 @@
     <ClCompile Include="Application\FileLoader.cpp">
       <Filter>Application</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\ImmediateGeometryDX11.cpp">
+      <Filter>Rendering\Rendering Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mathematics\Matrix3f.h">
@@ -1199,6 +1202,9 @@
     </ClInclude>
     <ClInclude Include="Application\FileLoader.h">
       <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\ImmediateGeometryDX11.h">
+      <Filter>Rendering\Rendering Geometry</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

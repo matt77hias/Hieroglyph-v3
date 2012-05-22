@@ -16,6 +16,7 @@
 #ifndef GeometryDX11_h
 #define GeometryDX11_h
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "VertexElementDX11.h"
 #include "TriangleIndices.h"
 #include "LineIndices.h"
@@ -23,18 +24,11 @@
 #include "PipelineExecutorDX11.h"
 #include "InputAssemblerStateDX11.h"
 #include "TArray.h"
-#include <memory>
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
 	class VertexBufferDX11;
 	class IndexBufferDX11;
-
-	struct InputLayoutKey
-	{
-		int shader;
-		int layout;
-	};
 
 	class GeometryDX11 : public PipelineExecutorDX11
 	{
@@ -70,7 +64,6 @@ namespace Glyph3
 		int CalculateVertexCount();
 
 		void GenerateInputLayout( int ShaderID );
-		int GetInputLayout( int ShaderID );
 
 		void LoadToBuffers( );
 
@@ -82,8 +75,6 @@ namespace Glyph3
 		TArray<VertexElementDX11*> m_vElements;
 		TArray<UINT> m_vIndices;
 		
-		std::map<int,InputLayoutKey*> m_InputLayouts;
-
 		ResourcePtr m_VB;
 		ResourcePtr m_IB;
 
