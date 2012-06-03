@@ -81,6 +81,7 @@ namespace Glyph3
 		int GetMaxRecurrence( );
 
 		virtual void SetBackColor( Vector4f color );
+		virtual void SetViewPort( int viewport );
 		virtual void SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ );
 
 		virtual void SetViewMatrix( const Matrix4f& matrix );

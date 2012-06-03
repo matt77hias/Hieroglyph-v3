@@ -82,6 +82,12 @@ void ViewFinalPass::Draw( PipelineManagerDX11* pPipelineManager, IParameterManag
     }
 }
 //--------------------------------------------------------------------------------
+void ViewFinalPass::Resize( UINT width, UINT height )
+{
+	// Nothing needed here, since the main render view handles the resizing of
+	// the resources and the viewports.
+}
+//--------------------------------------------------------------------------------
 void ViewFinalPass::SetRenderParams( IParameterManager* pParamManager )
 {
     pParamManager->SetViewMatrixParameter( &ViewMatrix );

@@ -809,11 +809,18 @@ void RendererDX11::ResizeTexture( ResourcePtr texture, UINT width, UINT height )
 
 	// Create the new texture...
 	ID3D11Texture2D* pTexture = 0;
-	HRESULT hr = m_pDevice->CreateTexture2D( &TexDesc, 0, &pTexture );
+	if ( FAILED( m_pDevice->CreateTexture2D( &TexDesc, 0, &pTexture ) ) ) {
+		Log::Get().Write( L"Error trying to resize texture..." );
+	}
 	
 	// Release the old texture, and replace it with the new one.
 	pOldTexture->m_pTexture->Release(); 
 	pOldTexture->m_pTexture = pTexture;
+
+	// Update the description of the texture for future reference.
+	pOldTexture->m_ActualDesc = TexDesc;
+	pOldTexture->m_DesiredDesc = TexDesc;
+	texture->m_pTexture2dConfig->m_State = TexDesc; 
 
 	// Resize each of the resource views, if required.
 	ResizeTextureSRV( rid, texture->m_iResourceSRV, width, height );
@@ -846,7 +853,9 @@ void RendererDX11::ResizeTextureSRV( int RID, int SRVID, UINT width, UINT height
 	
 	// Create the new one.
 	ID3D11ShaderResourceView* pView = 0;
-	HRESULT hr = m_pDevice->CreateShaderResourceView( pResource->GetResource(), &SRVDesc, &pView );
+	if ( FAILED( m_pDevice->CreateShaderResourceView( pResource->GetResource(), &SRVDesc, &pView ) ) ) {
+		Log::Get().Write( L"Error trying to resize a SRV!!!!" );
+	}
 
 	// Release the old one and replace it with the new one.
 	pOldSRV->m_pShaderResourceView->Release();
@@ -877,7 +886,9 @@ void RendererDX11::ResizeTextureRTV( int RID, int RTVID, UINT width, UINT height
 	
 	// Create the new one.
 	ID3D11RenderTargetView* pView = 0;
-	HRESULT hr = m_pDevice->CreateRenderTargetView( pResource->GetResource(), &RTVDesc, &pView );
+	if ( FAILED( m_pDevice->CreateRenderTargetView( pResource->GetResource(), &RTVDesc, &pView ) ) ) {
+		Log::Get().Write( L"Error trying to resize a RTV!!!!" );
+	}
 
 	// Release the old one and replace it with the new one.
 	pOldRTV->m_pRenderTargetView->Release();
@@ -908,7 +919,9 @@ void RendererDX11::ResizeTextureDSV( int RID, int DSVID, UINT width, UINT height
 	
 	// Create the new one.
 	ID3D11DepthStencilView* pView = 0;
-	HRESULT hr = m_pDevice->CreateDepthStencilView( pResource->GetResource(), &DSVDesc, &pView );
+	if ( FAILED(  m_pDevice->CreateDepthStencilView( pResource->GetResource(), &DSVDesc, &pView ) ) ) {
+		Log::Get().Write( L"Error trying to resize a DSV!!!!" );
+	}
 
 	// Release the old one and replace it with the new one.
 	pOldDSV->m_pDepthStencilView->Release();
@@ -939,7 +952,9 @@ void RendererDX11::ResizeTextureUAV( int RID, int UAVID, UINT width, UINT height
 	
 	// Create the new one.
 	ID3D11UnorderedAccessView* pView = 0;
-	HRESULT hr = m_pDevice->CreateUnorderedAccessView( pResource->GetResource(), &UAVDesc, &pView );
+	if ( FAILED( m_pDevice->CreateUnorderedAccessView( pResource->GetResource(), &UAVDesc, &pView ) ) ) {
+		Log::Get().Write( L"Error trying to resize a UAV!!!!" );
+	}
 
 	// Release the old one and replace it with the new one.
 	pOldUAV->m_pUnorderedAccessView->Release();

@@ -157,3 +157,8 @@ void IRenderView::SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, f
 	//m_viewport.MaxZ = MaxZ;
 }
 //--------------------------------------------------------------------------------
+void IRenderView::SetViewPort( int viewport )
+{
+	m_iViewport = viewport;
+}
+//--------------------------------------------------------------------------------

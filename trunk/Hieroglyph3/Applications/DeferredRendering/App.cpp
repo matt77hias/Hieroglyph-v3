@@ -55,7 +55,7 @@ bool App::ConfigureEngineComponents()
 		return( false );
 	}
 
-	m_pRenderer11->SetMultiThreadingState( false );
+	//m_pRenderer11->SetMultiThreadingState( false );
 
 	return( true );
 }
@@ -382,7 +382,7 @@ bool App::HandleEvent( IEvent* pEvent )
 
 	// Call the parent class's event handler if we haven't handled the event.
 
-	return( Application::HandleEvent( pEvent ) );
+	return( RenderApplication::HandleEvent( pEvent ) );
 }
 //--------------------------------------------------------------------------------
 std::wstring App::GetName( )

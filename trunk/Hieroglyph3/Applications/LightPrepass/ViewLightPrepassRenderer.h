@@ -30,7 +30,6 @@
 #include "ViewLights.h"
 #include "ViewFinalPass.h"
 #include "SpriteRendererDX11.h"
-#include "SpriteFontDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -44,6 +43,7 @@ namespace Glyph3
 		virtual void Update( float fTime );
 		virtual void PreDraw( RendererDX11* pRenderer );
 		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
+		virtual void Resize( UINT width, UINT height );
 
 		virtual void SetEntity( Entity3D* pEntity );
 		virtual void SetRoot( Node3D* pRoot );
@@ -72,8 +72,8 @@ namespace Glyph3
 		ResourcePtr				m_DepthTarget;
 		ResourcePtr             m_ReadOnlyDepthTarget;
 		ResourcePtr             m_FinalTarget;
-
 		ResourcePtr             m_ResolveTarget;
+
 		ResourcePtr				m_BackBuffer;
 
 		ViewGBuffer*			m_pGBufferView;
@@ -81,7 +81,6 @@ namespace Glyph3
 		ViewFinalPass*          m_pFinalPassView;
 
 		SpriteRendererDX11		m_SpriteRenderer;
-		SpriteFontDX11			m_Font;
 	};
 };
 //--------------------------------------------------------------------------------

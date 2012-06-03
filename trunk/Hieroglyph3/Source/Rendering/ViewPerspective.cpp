@@ -118,6 +118,12 @@ void ViewPerspective::Draw( PipelineManagerDX11* pPipelineManager, IParameterMan
 	}
 }
 //--------------------------------------------------------------------------------
+void ViewPerspective::Resize( UINT width, UINT height )
+{
+	RendererDX11::Get()->ResizeTexture( m_DepthTarget, width, height );
+	RendererDX11::Get()->ResizeViewport( m_iViewport, width, height );
+}
+//--------------------------------------------------------------------------------
 void ViewPerspective::SetRenderParams( IParameterManager* pParamManager )
 {
 	pParamManager->SetViewMatrixParameter( &ViewMatrix );
@@ -127,11 +133,5 @@ void ViewPerspective::SetRenderParams( IParameterManager* pParamManager )
 void ViewPerspective::SetUsageParams( IParameterManager* pParamManager )
 {
 
-}
-//--------------------------------------------------------------------------------
-void ViewPerspective::Resize( UINT width, UINT height )
-{
-	RendererDX11::Get()->ResizeTexture( m_DepthTarget, width, height );
-	RendererDX11::Get()->ResizeViewport( m_iViewport, width, height );
 }
 //--------------------------------------------------------------------------------

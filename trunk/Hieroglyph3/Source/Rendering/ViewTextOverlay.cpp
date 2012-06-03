@@ -103,6 +103,11 @@ void ViewTextOverlay::Draw( PipelineManagerDX11* pPipelineManager, IParameterMan
 	}
 }
 //--------------------------------------------------------------------------------
+void ViewTextOverlay::Resize( UINT width, UINT height )
+{
+	RendererDX11::Get()->ResizeViewport( m_iViewport, width, height );
+}
+//--------------------------------------------------------------------------------
 void ViewTextOverlay::SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ )
 {
 	//m_viewport.X = x;
@@ -127,10 +132,5 @@ void ViewTextOverlay::SetUsageParams( IParameterManager* pParamManager )
 void ViewTextOverlay::WriteText( std::wstring& text, Matrix4f& xform, Vector4f& color )
 {
 	m_TextEntries.add( TextEntry( text, xform, color ) );
-}
-//--------------------------------------------------------------------------------
-void ViewTextOverlay::Resize( UINT width, UINT height )
-{
-	RendererDX11::Get()->ResizeViewport( m_iViewport, width, height );
 }
 //--------------------------------------------------------------------------------

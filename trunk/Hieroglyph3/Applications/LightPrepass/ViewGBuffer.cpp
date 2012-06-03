@@ -155,6 +155,12 @@ void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager
 	}
 }
 //--------------------------------------------------------------------------------
+void ViewGBuffer::Resize( UINT width, UINT height )
+{
+	// Nothing needed here, since the main render view handles the resizing of
+	// the resources and the viewports.
+}
+//--------------------------------------------------------------------------------
 void ViewGBuffer::SetRenderParams( IParameterManager* pParamManager )
 {
 	pParamManager->SetViewMatrixParameter( &ViewMatrix );

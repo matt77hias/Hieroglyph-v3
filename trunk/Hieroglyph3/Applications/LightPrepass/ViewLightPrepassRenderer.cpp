@@ -139,7 +139,6 @@ ViewLightPrepassRenderer::ViewLightPrepassRenderer( RendererDX11& Renderer, Reso
 
 
     m_SpriteRenderer.Initialize();
-    m_Font.Initialize( L"Arial", 14, 0, true );
 }
 //--------------------------------------------------------------------------------
 ViewLightPrepassRenderer::~ViewLightPrepassRenderer()
@@ -198,6 +197,39 @@ void ViewLightPrepassRenderer::Draw( PipelineManagerDX11* pPipelineManager, IPar
     pPipelineManager->ResolveSubresource( m_ResolveTarget, 0, m_FinalTarget, 0, DXGI_FORMAT_R10G10B10A2_UNORM );
 
     m_SpriteRenderer.Render( pPipelineManager, pParamManager, m_ResolveTarget, Matrix4f::Identity() );
+}
+//--------------------------------------------------------------------------------
+void ViewLightPrepassRenderer::Resize( UINT width, UINT height )
+{
+	ResolutionX = width;
+	ResolutionY = height;
+
+	// First resize the depth target...
+	RendererDX11::Get()->ResizeTexture( m_DepthTarget, width, height );
+
+	// ...then the read only depth target.  In this case, we need to resize the
+	// resource views manually instead of letting the RendererDX11::ResizeTexture
+	// method do it for us.
+	RendererDX11::Get()->ResizeTextureSRV( m_DepthTarget->m_iResource, m_ReadOnlyDepthTarget->m_iResourceSRV, width, height );
+	RendererDX11::Get()->ResizeTextureDSV( m_DepthTarget->m_iResource, m_ReadOnlyDepthTarget->m_iResourceDSV, width, height );
+
+	// Resize each of the remaining textures accordingly.
+	RendererDX11::Get()->ResizeTexture( m_GBufferTarget, width, height );
+	RendererDX11::Get()->ResizeTexture( m_LightTarget, width, height );
+	RendererDX11::Get()->ResizeTexture( m_FinalTarget, width, height );
+	RendererDX11::Get()->ResizeTexture( m_ResolveTarget, width, height );
+
+	// Resize the viewport.
+	RendererDX11::Get()->ResizeViewport( m_iViewport, width, height );
+
+	m_pGBufferView->Resize( width, height );
+	m_pLightsView->Resize( width, height );
+	m_pFinalPassView->Resize( width, height );
+
+	// Set the the targets for the views
+    m_pGBufferView->SetViewPort( m_iViewport );
+    m_pLightsView->SetViewPort( m_iViewport );
+    m_pFinalPassView->SetViewPort( m_iViewport );
 }
 //--------------------------------------------------------------------------------
 void ViewLightPrepassRenderer::SetRenderParams( IParameterManager* pParamManager )
