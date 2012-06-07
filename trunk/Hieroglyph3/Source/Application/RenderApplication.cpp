@@ -45,6 +45,9 @@ RenderApplication::RenderApplication()
 
 	m_bSaveScreenshot = false;
 
+	// Default to multithreaded rendering.
+	m_bMultithreadedMode = true;
+
 	// Register for window based events here.
 	m_pEventMgr->AddEventListener( WINDOW_RESIZE, this );
 }
@@ -102,7 +105,7 @@ bool RenderApplication::ConfigureRenderingEngineComponents( UINT width, UINT hei
 	// use later.
 	m_BackBuffer = m_pRenderer11->GetSwapChainResource( m_pWindow->GetSwapChain() );
 
-	m_pRenderer11->SetMultiThreadingState( true );
+	SetMultiThreadedMode( true );
 
 	return( true );
 }
@@ -161,8 +164,23 @@ bool RenderApplication::HandleEvent( IEvent* pEvent )
 
 		return( true );
 	}
+	else if ( e == SYSTEM_KEYBOARD_KEYUP )
+	{
+		EvtKeyUp* pKeyUp = (EvtKeyUp*)pEvent;
 
+		unsigned int key = pKeyUp->GetCharacterCode();
 
+		if ( key == VK_ESCAPE ) // 'Esc' Key - Exit the application
+		{
+			this->RequestTermination();
+			return( true );
+		}
+		else if ( key == VK_F1 ) // 'F1' Key - Toggle the multithreading state
+		{
+			ToggleMultiThreadedMode();
+			return( true );
+		}
+	}
 
 	// Call the parent class's event handler if we haven't handled the event.
 	
@@ -197,5 +215,22 @@ void RenderApplication::HandleWindowResize( HWND handle, UINT width, UINT height
 	if ( m_pTextOverlayView != 0 ) {
 		m_pTextOverlayView->Resize( width, height );
 	}
+}
+//--------------------------------------------------------------------------------
+void RenderApplication::ToggleMultiThreadedMode()
+{
+	m_bMultithreadedMode = !m_bMultithreadedMode;
+	m_pRenderer11->SetMultiThreadingState( m_bMultithreadedMode );
+}
+//--------------------------------------------------------------------------------
+void RenderApplication::SetMultiThreadedMode( bool mode )
+{
+	m_bMultithreadedMode = mode;
+	m_pRenderer11->SetMultiThreadingState( m_bMultithreadedMode );
+}
+//--------------------------------------------------------------------------------
+bool RenderApplication::GetMultiThreadedMode()
+{
+	return( m_bMultithreadedMode );
 }
 //--------------------------------------------------------------------------------

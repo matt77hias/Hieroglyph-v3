@@ -426,6 +426,12 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager*
     m_Lights.empty();
 }
 //--------------------------------------------------------------------------------
+void ViewLights::Resize( UINT width, UINT height )
+{
+	// Nothing needed here, since the main render view handles the resizing of
+	// the resources and the viewports.
+}
+//--------------------------------------------------------------------------------
 void ViewLights::SetRenderParams( IParameterManager* pParamManager )
 {
     pParamManager->SetViewMatrixParameter( &ViewMatrix );

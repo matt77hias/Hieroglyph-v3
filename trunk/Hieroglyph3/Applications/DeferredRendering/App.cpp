@@ -374,10 +374,6 @@ bool App::HandleEvent( IEvent* pEvent )
 			m_bSaveScreenshot = true;
 			return( true );
 		}
-		else
-		{
-			return( false );
-		}
 	}
 
 	// Call the parent class's event handler if we haven't handled the event.

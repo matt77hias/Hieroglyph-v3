@@ -267,6 +267,62 @@ void ViewDeferredRenderer::Draw( PipelineManagerDX11* pPipelineManager, IParamet
     }
 }
 //--------------------------------------------------------------------------------
+void ViewDeferredRenderer::Resize( UINT width, UINT height )
+{
+	RendererDX11* pRenderer = RendererDX11::Get();
+
+	// Remember the new dimensions of the render view.
+	ResolutionX = width;
+	ResolutionY = height;
+
+    // Resize the resources for all AA modes.
+    for ( int aaMode = 0; aaMode < AAMode::NumSettings; ++aaMode )
+    {
+        int rtWidth = ResolutionX;
+        int rtHeight = ResolutionY;
+
+		// Super-sampling requires a larger set of render targets.
+        if ( aaMode == AAMode::SSAA ) {
+            rtWidth *= 2;
+            rtHeight *= 2;
+        }
+
+		// First resize the depth target...
+		pRenderer->ResizeTexture( m_DepthTarget[aaMode], rtWidth, rtHeight );
+
+		// ...then the read only depth target.  In this case, we need to resize the
+		// resource views manually instead of letting the RendererDX11::ResizeTexture
+		// method do it for us.
+		pRenderer->ResizeTextureSRV( m_DepthTarget[aaMode]->m_iResource, m_ReadOnlyDepthTarget[aaMode]->m_iResourceSRV, rtWidth, rtHeight );
+		pRenderer->ResizeTextureDSV( m_DepthTarget[aaMode]->m_iResource, m_ReadOnlyDepthTarget[aaMode]->m_iResourceDSV, rtWidth, rtHeight );
+
+		// Resize each of the G-Buffers for optimization disabled mode.
+		for( int i = 0; i < m_GBuffer[GBufferOptMode::OptDisabled][aaMode].count(); ++i ) {
+            pRenderer->ResizeTexture( m_GBuffer[GBufferOptMode::OptDisabled][aaMode][i], rtWidth, rtHeight );
+		}
+        
+		// Resize each of the G-Buffers for optimization enabled mode.
+		for ( int i = 0; i < m_GBuffer[GBufferOptMode::OptEnabled][aaMode].count(); i++ ) {
+	        pRenderer->ResizeTexture( m_GBuffer[GBufferOptMode::OptEnabled][aaMode][i], rtWidth, rtHeight );
+		}
+
+		// Resize the final render target.
+		pRenderer->ResizeTexture( m_FinalTarget[aaMode], rtWidth, rtHeight );
+
+		// Resize the viewport.
+		pRenderer->ResizeViewport( m_iViewport[aaMode], rtWidth, rtHeight );
+    }
+
+	// Resize the resolve render target.
+    pRenderer->ResizeTexture( m_ResolveTarget, ResolutionX, ResolutionY );
+
+	// Notify each of the sub-render views that they must resize.  In this case,
+	// they don't do anything, but should be called anyway to ensure correct
+	// behavior in the future.
+	m_pGBufferView->Resize( width, height );
+	m_pLightsView->Resize( width, height );
+}
+//--------------------------------------------------------------------------------
 void ViewDeferredRenderer::SetRenderParams( IParameterManager* pParamManager )
 {
 	// Set the parameters for this view to be able to perform its processing

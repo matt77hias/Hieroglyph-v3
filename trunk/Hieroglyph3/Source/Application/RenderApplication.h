@@ -40,6 +40,9 @@ namespace Glyph3
 
 		virtual Win32RenderWindow* CreateRenderWindow();
 
+		void ToggleMultiThreadedMode();
+		void SetMultiThreadedMode( bool mode );
+		bool GetMultiThreadedMode();
 
 	protected:
 
@@ -53,6 +56,8 @@ namespace Glyph3
 
 		IRenderView*			m_pRenderView;
 		ViewTextOverlay*		m_pTextOverlayView;
+
+		bool					m_bMultithreadedMode;
 
 	public:
 		Camera*					m_pCamera;
