@@ -29,7 +29,7 @@
 #ifndef ViewKinect_h
 #define ViewKinect_h
 //--------------------------------------------------------------------------------
-#include "PCH.h"
+//#include "PCH.h"
 #include "IRenderView.h"
 #include "UnorderedAccessParameterDX11.h"
 #include "ShaderResourceParameterDX11.h"

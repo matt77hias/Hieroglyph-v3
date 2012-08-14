@@ -102,6 +102,8 @@ void App::Update()
 	// In this case, I am animating a paraboloid shape as well as its color.
 	//
 	
+	m_pGeometry->ResetGeometry();
+
 	const int GRIDSIZE = 20;
 	const float fGRIDSIZE = static_cast<float>( GRIDSIZE );
 	const float ELEMSIZE = 1.0f;

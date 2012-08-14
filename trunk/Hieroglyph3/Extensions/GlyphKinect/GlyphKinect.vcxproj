@@ -83,7 +83,8 @@
       <AdditionalLibraryDirectories>..\..\SDK\Library\Debug</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>copy *.h ..\..\SDK\Include\GlyphKinect</Command>
+      <Command>md ..\..\SDK\Include\GlyphKinect
+copy *.h ..\..\SDK\Include\GlyphKinect</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -108,7 +109,8 @@
       <AdditionalLibraryDirectories>..\..\SDK\Library\Release</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>copy *.h ..\..\SDK\Include\GlyphKinect</Command>
+      <Command>md ..\..\SDK\Include\GlyphKinect
+copy *.h ..\..\SDK\Include\GlyphKinect</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

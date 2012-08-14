@@ -62,6 +62,8 @@ namespace Glyph3
 	
 		virtual void Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager );
 
+		void ResetGeometry();
+
 		void AddVertex( const ImmediateVertexDX11& vertex );
 		void AddVertex( const Vector3f& position );
 		void AddVertex( const Vector3f& position, const Vector4f& color );

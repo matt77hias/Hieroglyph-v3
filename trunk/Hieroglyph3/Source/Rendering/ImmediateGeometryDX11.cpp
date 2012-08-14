@@ -89,10 +89,13 @@ void ImmediateGeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterM
 		pPipeline->ApplyInputResources();
 
 		pPipeline->Draw( m_uiVertexCount, 0 );
-
-		// Reset the vertex count here to prepare for the next drawing pass.
-		m_uiVertexCount = 0;
 	}
+}
+//--------------------------------------------------------------------------------
+void ImmediateGeometryDX11::ResetGeometry()
+{
+	// Reset the vertex count here to prepare for the next drawing pass.
+	m_uiVertexCount = 0;
 }
 //--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::UploadData( PipelineManagerDX11* pPipeline )
