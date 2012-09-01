@@ -68,7 +68,7 @@ void App::Initialize()
 
 	m_pActor = new Actor();
 	m_pScene->AddEntity( m_pActor->GetNode() );
-
+	m_pActor->GetNode()->Position() = Vector3f( -3.0, 0.0f, 0.0f );
 
 	m_pGeometry = ImmediateGeometryPtr( new ImmediateGeometryDX11() );
 	m_pGeometry->SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
@@ -82,6 +82,23 @@ void App::Initialize()
 	RotationController* pRotController = new RotationController();
 	m_pActor->GetNode()->AttachController( pRotController );
 
+
+
+	m_pIndexedActor = new Actor();
+	m_pScene->AddEntity( m_pIndexedActor->GetNode() );
+	m_pIndexedActor->GetNode()->Position() = Vector3f( 3.0, 0.0f, 0.0f );
+
+	m_pIndexedGeometry = IndexedImmediateGeometryPtr( new IndexedImmediateGeometryDX11() );
+	m_pIndexedGeometry->SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_pIndexedGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	
+	m_pIndexedActor->GetBody()->SetGeometry( m_pIndexedGeometry );
+	//m_pIndexedActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *m_pRenderer11 ) );
+	m_pIndexedActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( *m_pRenderer11 ) );
+
+	// Throw a rotation onto the actor to slowly rotate it about the Y-axis.
+	RotationController* pIndexedRotController = new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), -0.1f );
+	m_pIndexedActor->GetNode()->AttachController( pIndexedRotController );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -100,7 +117,6 @@ void App::Update()
 	// dynamically produce than it is to determine before hand what you need...
 	//
 	// In this case, I am animating a paraboloid shape as well as its color.
-	//
 	
 	m_pGeometry->ResetGeometry();
 
@@ -150,6 +166,62 @@ void App::Update()
 
 		}
 	}
+
+
+	// Do some indexed immediate rendering by creating a grid of vertices first...
+
+	m_pIndexedGeometry->ResetGeometry();
+
+	for ( int z = 0; z < GRIDSIZE; z++ ) {
+		for ( int x = 0; x < GRIDSIZE; x++ ) {
+			
+			float fX = static_cast<float>( x );
+			float fZ = static_cast<float>( z );
+
+			v0.x = fX - GRIDSIZE / 2;
+			v0.z = fZ - GRIDSIZE / 2;
+			v0.y = ( 5.0f - 0.2f * ( v0.x*v0.x + v0.z*v0.z ) ) * fScaling;
+			uv0.x =        ( fX ) / ( fGRIDSIZE-1 );
+			uv0.y = 1.0f - ( fZ ) / ( fGRIDSIZE-1 );
+
+			m_pIndexedGeometry->AddVertex( v0 * fSIZESCALE, uv0 );
+		}
+	}
+
+	// ... followed by creating the associated group of indices that reference
+	// those vertices.
+
+	for ( int z = 0; z < GRIDSIZE-1; z++ ) {
+		for ( int x = 0; x < GRIDSIZE-1; x++ ) {
+
+			m_pIndexedGeometry->AddIndex( (z*GRIDSIZE + x) );
+			m_pIndexedGeometry->AddIndex( (z*GRIDSIZE + x) + GRIDSIZE );
+			m_pIndexedGeometry->AddIndex( (z*GRIDSIZE + x) + 1 );
+
+			m_pIndexedGeometry->AddIndex( (z*GRIDSIZE + x) + 1 );
+			m_pIndexedGeometry->AddIndex( (z*GRIDSIZE + x) + GRIDSIZE );
+			m_pIndexedGeometry->AddIndex( (z*GRIDSIZE + x) + GRIDSIZE + 1 );
+		}
+	}
+
+
+
+
+
+//	m_pIndexedGeometry->AddVertex( Vector3f( -5.0f, 0.0f, -5.0f ), Vector4f( 1.0f, 0.0f, 0.0f, 1.0f ) );
+//	m_pIndexedGeometry->AddVertex( Vector3f( -5.0f, 0.0f,  5.0f ), Vector4f( 0.0f, 1.0f, 0.0f, 1.0f ) );
+//	m_pIndexedGeometry->AddVertex( Vector3f(  5.0f, 0.0f,  5.0f ), Vector4f( 0.0f, 0.0f, 1.0f, 1.0f ) );
+//	m_pIndexedGeometry->AddVertex( Vector3f(  5.0f, 0.0f, -5.0f ), Vector4f( 1.0f, 1.0f, 0.0f, 1.0f ) );
+	
+//	m_pIndexedGeometry->AddIndex( 0 );
+//	m_pIndexedGeometry->AddIndex( 1 );
+//	m_pIndexedGeometry->AddIndex( 2 );
+
+//	m_pIndexedGeometry->AddIndex( 0 );
+//	m_pIndexedGeometry->AddIndex( 2 );
+//	m_pIndexedGeometry->AddIndex( 3 );
+
+
 
 	// Print a message to show the framerate and sample name.
 

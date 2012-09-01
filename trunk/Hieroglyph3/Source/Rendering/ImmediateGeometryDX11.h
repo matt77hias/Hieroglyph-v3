@@ -61,8 +61,7 @@ namespace Glyph3
 		virtual ~ImmediateGeometryDX11( );
 	
 		virtual void Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager );
-
-		void ResetGeometry();
+		virtual void ResetGeometry();
 
 		void AddVertex( const ImmediateVertexDX11& vertex );
 		void AddVertex( const Vector3f& position );
@@ -76,22 +75,22 @@ namespace Glyph3
 		void SetColor( const Vector4f& color );
 		Vector4f GetColor( );
 
-		void SetMaxSize( unsigned int maxVertices );
-		unsigned int GetMaxSize();
+		void SetMaxVertexCount( unsigned int maxVertices );
+		unsigned int GetMaxVertexCount();
 
 		unsigned int GetVertexCount();
-		unsigned int GetPrimitiveCount();
+		virtual unsigned int GetPrimitiveCount();
 
 		void GenerateInputLayout( int ShaderID );
 
 	protected:
 		
-		void UploadData( PipelineManagerDX11* pPipeline );
+		void UploadVertexData( PipelineManagerDX11* pPipeline );
 
 		ResourcePtr m_VB;
 
 		// The sizes
-		unsigned int m_uiMaxSize;
+		unsigned int m_uiMaxVertexCount;
 		unsigned int m_uiVertexCount;
 
 		Vector4f m_Color;

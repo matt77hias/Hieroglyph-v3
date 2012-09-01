@@ -384,6 +384,14 @@ MaterialPtr MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( Rende
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_4_0" ) ) );
 
+	RasterizerStateConfigDX11 RS;
+	RS.FillMode = D3D11_FILL_WIREFRAME;
+	RS.CullMode = D3D11_CULL_NONE;
+
+	//pEffect->m_iRasterizerState = 
+	//	Renderer.CreateRasterizerState( &RS );
+
+
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
 	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
@@ -418,7 +426,7 @@ MaterialPtr MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( Re
 	// Load a texture to initialize with.  Then add a parameter writer to the 
 	// material which will be used to set the texture for usage with this material.
 
-	ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"EyeOfHorus.png" );
+	ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"EyeOfHorus_128.png" );
 							
 	ShaderResourceParameterWriterDX11* pColorWriter = new ShaderResourceParameterWriterDX11();
 	pColorWriter->SetRenderParameterRef( RendererDX11::Get()->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) ) );
@@ -432,7 +440,7 @@ MaterialPtr MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( Re
 	SamplerStateConfigDX11 SamplerConfig;
 	SamplerConfig.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	SamplerConfig.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	SamplerConfig.Filter = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+	SamplerConfig.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	SamplerConfig.MaxAnisotropy = 0;
 
 	int LinearSampler = RendererDX11::Get()->CreateSamplerState( &SamplerConfig );

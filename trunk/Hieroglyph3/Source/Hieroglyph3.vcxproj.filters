@@ -664,6 +664,9 @@
     <ClCompile Include="Rendering\ImmediateGeometryDX11.cpp">
       <Filter>Rendering\Rendering Geometry</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\IndexedImmediateGeometryDX11.cpp">
+      <Filter>Rendering\Rendering Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mathematics\Matrix3f.h">
@@ -1204,6 +1207,9 @@
       <Filter>Application</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ImmediateGeometryDX11.h">
+      <Filter>Rendering\Rendering Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\IndexedImmediateGeometryDX11.h">
       <Filter>Rendering\Rendering Geometry</Filter>
     </ClInclude>
   </ItemGroup>

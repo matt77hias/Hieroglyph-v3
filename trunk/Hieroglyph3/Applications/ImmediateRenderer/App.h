@@ -10,6 +10,7 @@
 #include "RenderApplication.h"
 #include "Actor.h"
 #include "ImmediateGeometryDX11.h"
+#include "IndexedImmediateGeometryDX11.h"
 
 using namespace Glyph3;
 
@@ -32,9 +33,9 @@ public:
 
 protected:
 
-	Actor*					m_pActor;
+	Actor*						m_pActor;
+	ImmediateGeometryPtr		m_pGeometry;
 
-	ImmediateGeometryPtr	m_pGeometry;
-
-//	VectorParameterDX11*	m_pTimeFactors;
+	Actor*						m_pIndexedActor;
+	IndexedImmediateGeometryPtr m_pIndexedGeometry;
 };

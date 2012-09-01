@@ -10,8 +10,8 @@
 
 //--------------------------------------------------------------------------------
 #include "PCH.h"
-#include "ImmediateGeometryDX11.h"
-#include "VertexBufferDX11.h"
+#include "IndexedImmediateGeometryDX11.h"
+#include "IndexBufferDX11.h"
 #include "BufferConfigDX11.h"
 #include "Log.h"
 #include "GlyphString.h"
@@ -19,64 +19,26 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-ImmediateGeometryDX11::ImmediateGeometryDX11( )
+IndexedImmediateGeometryDX11::IndexedImmediateGeometryDX11( )
+	: m_uiMaxIndexCount( 0 ),
+	  m_uiIndexCount( 0 ),
+	  m_pIndexArray( nullptr )
 {
-	m_uiMaxVertexCount = 0;
-	m_uiVertexCount = 0;
-	m_Color = Vector4f( 0.0f, 1.0f, 0.0f, 1.0f );
-	m_ePrimType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-
-	m_pVertexArray = nullptr;
-
 	// Initialize our buffer to a reasonable size
-	SetMaxVertexCount( 1024 );
-
-
-	// Fill in the vertex element descriptions based on each element of our format
-
-	D3D11_INPUT_ELEMENT_DESC e1;
-	D3D11_INPUT_ELEMENT_DESC e2;
-	D3D11_INPUT_ELEMENT_DESC e3;
-
-	e1.SemanticName = "POSITION";
-	e1.SemanticIndex = 0;
-	e1.Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	e1.InputSlot = 0;
-	e1.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	e1.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	e1.InstanceDataStepRate = 0;
-
-	e2.SemanticName = "COLOR";
-	e2.SemanticIndex = 0;
-	e2.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	e2.InputSlot = 0;
-	e2.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	e2.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	e2.InstanceDataStepRate = 0;
-
-	e3.SemanticName = "TEXCOORD";
-	e3.SemanticIndex = 0;
-	e3.Format = DXGI_FORMAT_R32G32_FLOAT;
-	e3.InputSlot = 0;
-	e3.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	e3.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	e3.InstanceDataStepRate = 0;
-
-	m_elements.add( e1 );
-	m_elements.add( e2 );
-	m_elements.add( e3 );
+	SetMaxIndexCount( 4096 );
 }
 //--------------------------------------------------------------------------------
-ImmediateGeometryDX11::~ImmediateGeometryDX11()
+IndexedImmediateGeometryDX11::~IndexedImmediateGeometryDX11()
 {
-	SAFE_DELETE_ARRAY( m_pVertexArray );
+	SAFE_DELETE_ARRAY( m_pIndexArray );
 }
 //--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
+void IndexedImmediateGeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
 {
-	if ( m_uiVertexCount > 0 ) {
+	if ( m_uiIndexCount > 0 ) {
 
 		UploadVertexData( pPipeline );
+		UploadIndexData( pPipeline );
 	
 		pPipeline->InputAssemblerStage.ClearDesiredState();
 
@@ -85,148 +47,110 @@ void ImmediateGeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterM
 		pPipeline->InputAssemblerStage.DesiredState.SetInputLayout( layout );
 		pPipeline->InputAssemblerStage.DesiredState.SetPrimitiveTopology( m_ePrimType );
 		pPipeline->InputAssemblerStage.DesiredState.SetVertexBuffer( 0, m_VB->m_iResource, 0, sizeof( ImmediateVertexDX11 ) );
-	
+		pPipeline->InputAssemblerStage.DesiredState.SetIndexBuffer( m_IB->m_iResource );
+
 		pPipeline->ApplyInputResources();
 
-		pPipeline->Draw( m_uiVertexCount, 0 );
+		pPipeline->DrawIndexed( m_uiIndexCount, 0, 0 );
 	}
 }
 //--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::ResetGeometry()
+void IndexedImmediateGeometryDX11::ResetGeometry()
 {
-	// Reset the vertex count here to prepare for the next drawing pass.
-	m_uiVertexCount = 0;
+	// Reset the vertex and index count here to prepare for the next drawing pass.
+
+	ImmediateGeometryDX11::ResetGeometry();
+	m_uiIndexCount = 0;
 }
 //--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::UploadVertexData( PipelineManagerDX11* pPipeline )
+void IndexedImmediateGeometryDX11::UploadIndexData( PipelineManagerDX11* pPipeline )
 {
 
-	if ( m_uiVertexCount > 0 ) {
-		// Map the vertex buffer for writing
+	if ( m_uiIndexCount > 0 ) {
+		
+		// Map the index buffer for writing
 
 		D3D11_MAPPED_SUBRESOURCE resource = 
-			pPipeline->MapResource( m_VB, 0, D3D11_MAP_WRITE_DISCARD, 0 );
+			pPipeline->MapResource( m_IB, 0, D3D11_MAP_WRITE_DISCARD, 0 );
 
 		// Only copy as much of the data as you actually have filled up
 	
-		memcpy( resource.pData, m_pVertexArray, m_uiVertexCount * sizeof( ImmediateVertexDX11 ) );
+		memcpy( resource.pData, m_pIndexArray, m_uiIndexCount * sizeof( unsigned int ) );
 
 		// Unmap the vertex buffer
 
-		pPipeline->UnMapResource( m_VB, 0 );
+		pPipeline->UnMapResource( m_IB, 0 );
 	}
 }
 //--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::AddVertex( const ImmediateVertexDX11& vertex )
+void IndexedImmediateGeometryDX11::AddIndex( const unsigned int index )
 {
-	if ( m_uiVertexCount < m_uiMaxVertexCount ) {
-		m_pVertexArray[m_uiVertexCount] = vertex;
-		m_uiVertexCount++;
+	// This method does not check the value that is passed as an index against
+	// the number of vertices that are out there.  Instead it only checks that
+	// we don't exceed the array of indices.  User's are allowed to do what they
+	// want with this data, but have to ensure that the indices are correct!
+
+	if ( m_uiIndexCount < m_uiMaxIndexCount ) {
+		m_pIndexArray[m_uiIndexCount] = index;
+		m_uiIndexCount++;
 	}
 }
 //--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::AddVertex( const Vector3f& position )
+void IndexedImmediateGeometryDX11::AddIndices( const unsigned int i1, const unsigned int i2 )
 {
-	if ( m_uiVertexCount < m_uiMaxVertexCount ) {
-		m_pVertexArray[m_uiVertexCount].position = position;
-		m_pVertexArray[m_uiVertexCount].color = m_Color;
-		m_pVertexArray[m_uiVertexCount].texcoords = Vector2f( 0.0f, 0.0f );
-		m_uiVertexCount++;
-	}
+	AddIndex( i1 );
+	AddIndex( i2 );
 }
 //--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector4f& color )
+void IndexedImmediateGeometryDX11::AddIndices( const unsigned int i1, const unsigned int i2, const unsigned int i3 )
 {
-	if ( m_uiVertexCount < m_uiMaxVertexCount ) {
-		m_pVertexArray[m_uiVertexCount].position = position;
-		m_pVertexArray[m_uiVertexCount].color = color;
-		m_pVertexArray[m_uiVertexCount].texcoords = Vector2f( 0.0f, 0.0f );
-		m_uiVertexCount++;
-	}
+	AddIndex( i1 );
+	AddIndex( i2 );
+	AddIndex( i3 );
 }
 //--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector2f& texcoords )
-{
-	if ( m_uiVertexCount < m_uiMaxVertexCount ) {
-		m_pVertexArray[m_uiVertexCount].position = position;
-		m_pVertexArray[m_uiVertexCount].color = m_Color;
-		m_pVertexArray[m_uiVertexCount].texcoords = texcoords;
-		m_uiVertexCount++;
-	}
-}
-//--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector4f& color, const Vector2f& texcoords )
-{
-	if ( m_uiVertexCount < m_uiMaxVertexCount ) {
-		m_pVertexArray[m_uiVertexCount].position = position;
-		m_pVertexArray[m_uiVertexCount].color = color;
-		m_pVertexArray[m_uiVertexCount].texcoords = texcoords;
-		m_uiVertexCount++;
-	}
-}
-//--------------------------------------------------------------------------------
-D3D11_PRIMITIVE_TOPOLOGY ImmediateGeometryDX11::GetPrimitiveType()
-{
-	return( m_ePrimType );
-}
-//--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY type )
-{
-	m_ePrimType = type;
-}
-//--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::SetColor( const Vector4f& color )
-{
-	m_Color = color;
-}
-//--------------------------------------------------------------------------------
-Vector4f ImmediateGeometryDX11::GetColor( )
-{
-	return( m_Color );
-}
-//--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::SetMaxVertexCount( unsigned int maxVertices )
+void IndexedImmediateGeometryDX11::SetMaxIndexCount( unsigned int maxIndices )
 {
 	// if this is different than the current size, then release the existing
 	// local array, plus resize the resource.
 
-	if ( maxVertices != m_uiMaxVertexCount ) {
+	if ( maxIndices != m_uiMaxIndexCount ) {
 
 		// Remember the maximum number of vertices to allow
-		m_uiMaxVertexCount = maxVertices;
-		m_uiVertexCount = 0;
+		m_uiMaxIndexCount = maxIndices;
+		m_uiIndexCount = 0;
 
 		// Release system memory for the old array so that we can create a new one
-		SAFE_DELETE_ARRAY( m_pVertexArray );
-		m_pVertexArray = new ImmediateVertexDX11[m_uiMaxVertexCount];
+		SAFE_DELETE_ARRAY( m_pIndexArray );
+		m_pIndexArray = new unsigned int[m_uiMaxIndexCount];
 
 		// Delete the existing resource if it already existed
-		if ( nullptr != m_VB ) {
-			RendererDX11::Get()->DeleteResource( m_VB );
-			m_VB = nullptr;
+		if ( nullptr != m_IB ) {
+			RendererDX11::Get()->DeleteResource( m_IB );
+			m_IB = nullptr;
 		}
 
 		// Create the new vertex buffer, with the dynamic flag set to true
-		BufferConfigDX11 vbuffer;
-		vbuffer.SetDefaultVertexBuffer( m_uiMaxVertexCount * sizeof( ImmediateVertexDX11 ), true );
-		m_VB = RendererDX11::Get()->CreateVertexBuffer( &vbuffer, nullptr );
+		BufferConfigDX11 ibuffer;
+		ibuffer.SetDefaultIndexBuffer( m_uiMaxIndexCount * sizeof( unsigned int ), true );
+		m_IB = RendererDX11::Get()->CreateIndexBuffer( &ibuffer, nullptr );
 	}
 }
 //--------------------------------------------------------------------------------
-unsigned int ImmediateGeometryDX11::GetMaxVertexCount()
+unsigned int IndexedImmediateGeometryDX11::GetMaxIndexCount()
 {
-	return( m_uiMaxVertexCount );
+	return( m_uiMaxIndexCount );
 }
 //--------------------------------------------------------------------------------
-unsigned int ImmediateGeometryDX11::GetVertexCount()
+unsigned int IndexedImmediateGeometryDX11::GetIndexCount()
 {
-	return( m_uiVertexCount );
+	return( m_uiIndexCount );
 }
 //--------------------------------------------------------------------------------
-unsigned int ImmediateGeometryDX11::GetPrimitiveCount()
+unsigned int IndexedImmediateGeometryDX11::GetPrimitiveCount()
 {
 	unsigned int count = 0;
-	unsigned int referencedVertices = m_uiVertexCount;
+	unsigned int referencedVertices = m_uiIndexCount;
 
 	switch ( m_ePrimType )
 	{
@@ -317,19 +241,5 @@ unsigned int ImmediateGeometryDX11::GetPrimitiveCount()
 	}
 
 	return( count );
-}
-//--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::GenerateInputLayout( int ShaderID )
-{
-	// Create the input layout for the given shader index
-
-	RendererDX11* pRenderer = RendererDX11::Get();
-	if ( m_InputLayouts[ShaderID] == 0 )
-	{
-		InputLayoutKey* pKey = new InputLayoutKey();
-		pKey->shader = ShaderID;
-		pKey->layout = pRenderer->CreateInputLayout( m_elements, ShaderID );
-		m_InputLayouts[ShaderID] = pKey;
-	}
 }
 //--------------------------------------------------------------------------------
