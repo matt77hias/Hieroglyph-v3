@@ -58,6 +58,7 @@ namespace Glyph3
 	protected:
 		
 		void UploadIndexData( PipelineManagerDX11* pPipeline );
+		void EnsureIndexCapacity( );
 
 		ResourcePtr m_IB;
 

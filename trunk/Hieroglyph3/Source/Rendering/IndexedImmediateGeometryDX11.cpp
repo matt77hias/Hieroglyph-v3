@@ -25,7 +25,7 @@ IndexedImmediateGeometryDX11::IndexedImmediateGeometryDX11( )
 	  m_pIndexArray( nullptr )
 {
 	// Initialize our buffer to a reasonable size
-	SetMaxIndexCount( 4096 );
+	SetMaxIndexCount( 128 );
 }
 //--------------------------------------------------------------------------------
 IndexedImmediateGeometryDX11::~IndexedImmediateGeometryDX11()
@@ -83,17 +83,24 @@ void IndexedImmediateGeometryDX11::UploadIndexData( PipelineManagerDX11* pPipeli
 	}
 }
 //--------------------------------------------------------------------------------
+void IndexedImmediateGeometryDX11::EnsureIndexCapacity( )
+{
+	// If the next vertex would put us over the limit, then resize the array.
+	if ( m_uiIndexCount + 1 >= m_uiMaxIndexCount ) {
+		SetMaxIndexCount( m_uiMaxIndexCount + 1024 );
+	}
+}
+//--------------------------------------------------------------------------------
 void IndexedImmediateGeometryDX11::AddIndex( const unsigned int index )
 {
 	// This method does not check the value that is passed as an index against
-	// the number of vertices that are out there.  Instead it only checks that
-	// we don't exceed the array of indices.  User's are allowed to do what they
+	// the number of vertices that are out there. User's are allowed to do what they
 	// want with this data, but have to ensure that the indices are correct!
 
-	if ( m_uiIndexCount < m_uiMaxIndexCount ) {
-		m_pIndexArray[m_uiIndexCount] = index;
-		m_uiIndexCount++;
-	}
+	EnsureIndexCapacity( );
+
+	m_pIndexArray[m_uiIndexCount] = index;
+	m_uiIndexCount++;
 }
 //--------------------------------------------------------------------------------
 void IndexedImmediateGeometryDX11::AddIndices( const unsigned int i1, const unsigned int i2 )
@@ -116,13 +123,26 @@ void IndexedImmediateGeometryDX11::SetMaxIndexCount( unsigned int maxIndices )
 
 	if ( maxIndices != m_uiMaxIndexCount ) {
 
-		// Remember the maximum number of vertices to allow
-		m_uiMaxIndexCount = maxIndices;
-		m_uiIndexCount = 0;
+		// Create the new array, temporarily in a local variable.
+		unsigned int* pNewArray = new unsigned int[maxIndices];
 
+		// Truncate the index count if more than the new max are already loaded 
+		// which could happen if the array is being shrunken.
+		if ( m_uiIndexCount > maxIndices ) {
+			m_uiIndexCount = maxIndices;
+		}
+
+		// Copy the existing index data over, if any has been added.
+		if ( m_uiIndexCount > 0 ) {
+			memcpy( pNewArray, m_pIndexArray, m_uiIndexCount * sizeof(unsigned int) );
+		}
+
+		// Remember the maximum number of indices to allow
+		m_uiMaxIndexCount = maxIndices;
+		
 		// Release system memory for the old array so that we can create a new one
 		SAFE_DELETE_ARRAY( m_pIndexArray );
-		m_pIndexArray = new unsigned int[m_uiMaxIndexCount];
+		m_pIndexArray = pNewArray;
 
 		// Delete the existing resource if it already existed
 		if ( nullptr != m_IB ) {

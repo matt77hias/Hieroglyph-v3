@@ -35,6 +35,8 @@ public:
 	virtual bool ConfigureEngineComponents();
 	virtual void ShutdownEngineComponents();
 
+	virtual void TakeScreenShot();
+
 	virtual bool HandleEvent( IEvent* pEvent );
 	virtual std::wstring GetName( );
 
@@ -59,8 +61,6 @@ protected:
 
 	SpriteFontDX11*			m_pFont;
 	SpriteRendererDX11*		m_pSpriteRenderer;
-
-	bool					m_bSaveScreenshot;
 
 	bool					m_bEdgeOrInsideMode;
 	static const bool		EDGE_MODE = true;

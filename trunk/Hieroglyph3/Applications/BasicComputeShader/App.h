@@ -30,6 +30,8 @@ public:
 	virtual bool ConfigureEngineComponents();
 	virtual void ShutdownEngineComponents();
 
+	virtual void TakeScreenShot();
+
 	virtual bool HandleEvent( IEvent* pEvent );
 	virtual std::wstring GetName( );
 
@@ -55,6 +57,4 @@ protected:
 	// the resulting texture to the backbuffer.
 	RenderEffectDX11*		m_pFilterEffect;
 	RenderEffectDX11*		m_pTextureEffect;
-
-	bool					m_bSaveScreenshot;
 };

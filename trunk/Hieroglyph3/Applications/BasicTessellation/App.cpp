@@ -40,7 +40,6 @@ App AppInstance; // Provides an instance of the application
 //--------------------------------------------------------------------------------
 App::App()
 {
-	m_bSaveScreenshot = false;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
@@ -209,8 +208,6 @@ void App::Initialize()
 
 	m_TessParams = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( std::wstring( L"EdgeFactors" ), &m_TessParams );
-
-	m_pRenderer11->SetMultiThreadingState( true );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -247,15 +244,6 @@ void App::Update()
 
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
 
-	// Save a screenshot if desired.  This is done by pressing the 's' key, which
-	// demonstrates how an event is sent and handled by an event listener (which
-	// in this case is the application object itself).
-
-	if ( m_bSaveScreenshot  )
-	{
-		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
-	}
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()
@@ -270,6 +258,15 @@ void App::Shutdown()
 	Log::Get().Write( out.str() );
 }
 //--------------------------------------------------------------------------------
+void App::TakeScreenShot()
+{
+	if ( m_bSaveScreenshot  )
+	{
+		m_bSaveScreenshot = false;
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
+	}
+}
+//--------------------------------------------------------------------------------
 bool App::HandleEvent( IEvent* pEvent )
 {
 	eEVENT e = pEvent->GetEventType();
@@ -279,36 +276,12 @@ bool App::HandleEvent( IEvent* pEvent )
 		EvtKeyDown* pKeyDown = (EvtKeyDown*)pEvent;
 
 		unsigned int key = pKeyDown->GetCharacterCode();
-
-		return( true );
 	}
 	else if ( e == SYSTEM_KEYBOARD_KEYUP )
 	{
 		EvtKeyUp* pKeyUp = (EvtKeyUp*)pEvent;
 
 		unsigned int key = pKeyUp->GetCharacterCode();
-
-		if ( key == VK_ESCAPE ) // 'Esc' Key - Exit the application
-		{
-			this->RequestTermination();
-			return( true );
-		}
-		else if ( key == 0x53 ) // 'S' Key - Save a screen shot for the next frame
-		{
-			m_bSaveScreenshot = true;
-			return( true );
-		}
-		//else if ( key == 0x31 ) // '1' Key
-		//{
-		//	m_pWindow->SetPosition( 50, 50 );
-		//	m_pWindow->SetWidth( 200 );
-		//	m_pWindow->SetCaption( std::wstring( L"New Caption Update!!" ) );
-		//	return( true );
-		//}
-		else
-		{
-			return( false );
-		}
 	}
 
 	// Call the parent class's event handler if we haven't handled the event.

@@ -37,6 +37,7 @@
 #include "IEventListener.h"
 #include "IWindowProc.h"
 #include "Scene.h"
+
 // Window Events
 #include "EvtWindowResize.h"
 
@@ -81,6 +82,7 @@ namespace Glyph3
 
 		// Request an exit from windows
 		void RequestTermination();
+		virtual void TakeScreenShot() = 0;
 
 		// Helpers
 		Timer* m_pTimer;
@@ -89,6 +91,8 @@ namespace Glyph3
 		EventManager* m_pEventMgr;
 
 		Scene* m_pScene;
+
+		bool m_bSaveScreenshot;
 
 	protected:
 		// CApplication pointer to ensure single instance

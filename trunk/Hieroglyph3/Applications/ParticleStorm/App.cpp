@@ -44,7 +44,6 @@ App AppInstance; // Provides an instance of the application
 //--------------------------------------------------------------------------------
 App::App()
 {
-	m_bSaveScreenshot = false;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
@@ -170,16 +169,6 @@ void App::Update()
 
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
 
-
-	// Save a screenshot if desired.  This is done by pressing the 's' key, which
-	// demonstrates how an event is sent and handled by an event listener (which
-	// in this case is the application object itself).
-
-	if ( m_bSaveScreenshot  )
-	{
-		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
-	}
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()
@@ -203,8 +192,6 @@ bool App::HandleEvent( IEvent* pEvent )
 		EvtKeyDown* pKeyDown = (EvtKeyDown*)pEvent;
 
 		unsigned int key = pKeyDown->GetCharacterCode();
-
-		return( true );
 	}
 	else if ( e == SYSTEM_KEYBOARD_KEYUP )
 	{
@@ -212,17 +199,7 @@ bool App::HandleEvent( IEvent* pEvent )
 
 		unsigned int key = pKeyUp->GetCharacterCode();
 
-		if ( key == VK_ESCAPE ) // 'Esc' Key - Exit the application
-		{
-			this->RequestTermination();
-			return( true );
-		}
-		else if ( key == 0x53 ) // 'S' Key - Save a screen shot for the next frame
-		{
-			m_bSaveScreenshot = true;
-			return( true );
-		}
-		else if ( key == 0x20 ) // 'Space' Key - Save a screen shot for the next frame
+		if ( key == 0x20 ) // 'Space' Key - Save a screen shot for the next frame
 		{
 			// Load a new texture and set it for the particle texture.
 			ResourcePtr ParticleTexture = m_pRenderer11->LoadTexture( L"EyeOfHorus_128.png" );
@@ -233,10 +210,6 @@ bool App::HandleEvent( IEvent* pEvent )
 			pWriter->SetValue( ParticleTexture );
 
 			return( true );
-		}
-		else
-		{
-			return( false );
 		}
 	}
 

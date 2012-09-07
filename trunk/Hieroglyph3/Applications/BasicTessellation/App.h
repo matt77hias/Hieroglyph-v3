@@ -28,6 +28,8 @@ public:
 	virtual bool ConfigureEngineComponents();
 	virtual void ShutdownEngineComponents();
 
+	virtual void TakeScreenShot();
+
 	virtual bool HandleEvent( IEvent* pEvent );
 	virtual std::wstring GetName( );
 
@@ -39,8 +41,6 @@ protected:
 	int						m_iSwapChain;
 	ResourcePtr				m_RenderTarget;
 	ResourcePtr				m_DepthTarget;
-
-	bool					m_bSaveScreenshot;
 
 	RenderEffectDX11*		m_pTessellationEffect;
 	GeometryPtr				m_pGeometry;

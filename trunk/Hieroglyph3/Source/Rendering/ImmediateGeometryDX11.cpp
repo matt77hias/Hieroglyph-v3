@@ -29,7 +29,7 @@ ImmediateGeometryDX11::ImmediateGeometryDX11( )
 	m_pVertexArray = nullptr;
 
 	// Initialize our buffer to a reasonable size
-	SetMaxVertexCount( 1024 );
+	SetMaxVertexCount( 128 );
 
 
 	// Fill in the vertex element descriptions based on each element of our format
@@ -37,6 +37,7 @@ ImmediateGeometryDX11::ImmediateGeometryDX11( )
 	D3D11_INPUT_ELEMENT_DESC e1;
 	D3D11_INPUT_ELEMENT_DESC e2;
 	D3D11_INPUT_ELEMENT_DESC e3;
+	D3D11_INPUT_ELEMENT_DESC e4;
 
 	e1.SemanticName = "POSITION";
 	e1.SemanticIndex = 0;
@@ -46,25 +47,34 @@ ImmediateGeometryDX11::ImmediateGeometryDX11( )
 	e1.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	e1.InstanceDataStepRate = 0;
 
-	e2.SemanticName = "COLOR";
+	e2.SemanticName = "NORMAL";
 	e2.SemanticIndex = 0;
-	e2.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	e2.Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	e2.InputSlot = 0;
 	e2.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 	e2.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	e2.InstanceDataStepRate = 0;
 
-	e3.SemanticName = "TEXCOORD";
+	e3.SemanticName = "COLOR";
 	e3.SemanticIndex = 0;
-	e3.Format = DXGI_FORMAT_R32G32_FLOAT;
+	e3.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	e3.InputSlot = 0;
 	e3.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 	e3.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	e3.InstanceDataStepRate = 0;
 
+	e4.SemanticName = "TEXCOORD";
+	e4.SemanticIndex = 0;
+	e4.Format = DXGI_FORMAT_R32G32_FLOAT;
+	e4.InputSlot = 0;
+	e4.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	e4.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	e4.InstanceDataStepRate = 0;
+
 	m_elements.add( e1 );
 	m_elements.add( e2 );
 	m_elements.add( e3 );
+	m_elements.add( e4 );
 }
 //--------------------------------------------------------------------------------
 ImmediateGeometryDX11::~ImmediateGeometryDX11()
@@ -100,7 +110,6 @@ void ImmediateGeometryDX11::ResetGeometry()
 //--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::UploadVertexData( PipelineManagerDX11* pPipeline )
 {
-
 	if ( m_uiVertexCount > 0 ) {
 		// Map the vertex buffer for writing
 
@@ -117,52 +126,108 @@ void ImmediateGeometryDX11::UploadVertexData( PipelineManagerDX11* pPipeline )
 	}
 }
 //--------------------------------------------------------------------------------
+void ImmediateGeometryDX11::EnsureVertexCapacity( )
+{
+	// If the next vertex would put us over the limit, then resize the array.
+	if ( m_uiVertexCount + 1 >= m_uiMaxVertexCount ) {
+		SetMaxVertexCount( m_uiMaxVertexCount + 1024 );
+	}
+}
+//--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::AddVertex( const ImmediateVertexDX11& vertex )
 {
-	if ( m_uiVertexCount < m_uiMaxVertexCount ) {
-		m_pVertexArray[m_uiVertexCount] = vertex;
-		m_uiVertexCount++;
-	}
+	EnsureVertexCapacity( );
+
+	m_pVertexArray[m_uiVertexCount] = vertex;
+	m_uiVertexCount++;
 }
 //--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::AddVertex( const Vector3f& position )
 {
-	if ( m_uiVertexCount < m_uiMaxVertexCount ) {
-		m_pVertexArray[m_uiVertexCount].position = position;
-		m_pVertexArray[m_uiVertexCount].color = m_Color;
-		m_pVertexArray[m_uiVertexCount].texcoords = Vector2f( 0.0f, 0.0f );
-		m_uiVertexCount++;
-	}
+	EnsureVertexCapacity( );
+
+	m_pVertexArray[m_uiVertexCount].position = position;
+	m_pVertexArray[m_uiVertexCount].normal = Vector3f( 0.0f, 1.0f, 0.0f );
+	m_pVertexArray[m_uiVertexCount].color = m_Color;
+	m_pVertexArray[m_uiVertexCount].texcoords = Vector2f( 0.0f, 0.0f );
+	m_uiVertexCount++;
 }
 //--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector4f& color )
 {
-	if ( m_uiVertexCount < m_uiMaxVertexCount ) {
-		m_pVertexArray[m_uiVertexCount].position = position;
-		m_pVertexArray[m_uiVertexCount].color = color;
-		m_pVertexArray[m_uiVertexCount].texcoords = Vector2f( 0.0f, 0.0f );
-		m_uiVertexCount++;
-	}
+	EnsureVertexCapacity( );
+
+	m_pVertexArray[m_uiVertexCount].position = position;
+	m_pVertexArray[m_uiVertexCount].normal = Vector3f( 0.0f, 1.0f, 0.0f );
+	m_pVertexArray[m_uiVertexCount].color = color;
+	m_pVertexArray[m_uiVertexCount].texcoords = Vector2f( 0.0f, 0.0f );
+	m_uiVertexCount++;
 }
 //--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector2f& texcoords )
 {
-	if ( m_uiVertexCount < m_uiMaxVertexCount ) {
-		m_pVertexArray[m_uiVertexCount].position = position;
-		m_pVertexArray[m_uiVertexCount].color = m_Color;
-		m_pVertexArray[m_uiVertexCount].texcoords = texcoords;
-		m_uiVertexCount++;
-	}
+	EnsureVertexCapacity( );
+
+	m_pVertexArray[m_uiVertexCount].position = position;
+	m_pVertexArray[m_uiVertexCount].normal = Vector3f( 0.0f, 1.0f, 0.0f );
+	m_pVertexArray[m_uiVertexCount].color = m_Color;
+	m_pVertexArray[m_uiVertexCount].texcoords = texcoords;
+	m_uiVertexCount++;
 }
 //--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector4f& color, const Vector2f& texcoords )
 {
-	if ( m_uiVertexCount < m_uiMaxVertexCount ) {
-		m_pVertexArray[m_uiVertexCount].position = position;
-		m_pVertexArray[m_uiVertexCount].color = color;
-		m_pVertexArray[m_uiVertexCount].texcoords = texcoords;
-		m_uiVertexCount++;
-	}
+	EnsureVertexCapacity( );
+
+	m_pVertexArray[m_uiVertexCount].position = position;
+	m_pVertexArray[m_uiVertexCount].normal = Vector3f( 0.0f, 1.0f, 0.0f );
+	m_pVertexArray[m_uiVertexCount].color = color;
+	m_pVertexArray[m_uiVertexCount].texcoords = texcoords;
+	m_uiVertexCount++;
+}
+//--------------------------------------------------------------------------------
+void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector3f& normal )
+{
+	EnsureVertexCapacity( );
+
+	m_pVertexArray[m_uiVertexCount].position = position;
+	m_pVertexArray[m_uiVertexCount].normal = normal;
+	m_pVertexArray[m_uiVertexCount].color = m_Color;
+	m_pVertexArray[m_uiVertexCount].texcoords = Vector2f( 0.0f, 0.0f );
+	m_uiVertexCount++;
+}
+//--------------------------------------------------------------------------------
+void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector3f& normal, const Vector4f& color )
+{
+	EnsureVertexCapacity( );
+
+	m_pVertexArray[m_uiVertexCount].position = position;
+	m_pVertexArray[m_uiVertexCount].normal = normal;
+	m_pVertexArray[m_uiVertexCount].color = color;
+	m_pVertexArray[m_uiVertexCount].texcoords = Vector2f( 0.0f, 0.0f );
+	m_uiVertexCount++;
+}
+//--------------------------------------------------------------------------------
+void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector3f& normal, const Vector2f& texcoords )
+{
+	EnsureVertexCapacity( );
+
+	m_pVertexArray[m_uiVertexCount].position = position;
+	m_pVertexArray[m_uiVertexCount].normal = normal;
+	m_pVertexArray[m_uiVertexCount].color = m_Color;
+	m_pVertexArray[m_uiVertexCount].texcoords = texcoords;
+	m_uiVertexCount++;
+}
+//--------------------------------------------------------------------------------
+void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector3f& normal, const Vector4f& color, const Vector2f& texcoords )
+{
+	EnsureVertexCapacity( );
+
+	m_pVertexArray[m_uiVertexCount].position = position;
+	m_pVertexArray[m_uiVertexCount].normal = normal;
+	m_pVertexArray[m_uiVertexCount].color = color;
+	m_pVertexArray[m_uiVertexCount].texcoords = texcoords;
+	m_uiVertexCount++;
 }
 //--------------------------------------------------------------------------------
 D3D11_PRIMITIVE_TOPOLOGY ImmediateGeometryDX11::GetPrimitiveType()
@@ -192,13 +257,27 @@ void ImmediateGeometryDX11::SetMaxVertexCount( unsigned int maxVertices )
 
 	if ( maxVertices != m_uiMaxVertexCount ) {
 
-		// Remember the maximum number of vertices to allow
-		m_uiMaxVertexCount = maxVertices;
-		m_uiVertexCount = 0;
+		// Create the new array, temporarily in a local variable.
+		ImmediateVertexDX11* pNewArray = new ImmediateVertexDX11[maxVertices];
 
-		// Release system memory for the old array so that we can create a new one
+		// Truncate the vertex count if more than the new max are already loaded 
+		// which could happen if the array is being shrunken.
+		if ( m_uiVertexCount > maxVertices ) {
+			m_uiVertexCount = maxVertices;
+		}
+
+		// Copy the existing vertex data over, if any has been added.
+		if ( m_uiVertexCount > 0 ) {
+			memcpy( pNewArray, m_pVertexArray, m_uiVertexCount * sizeof(ImmediateVertexDX11) );
+		}
+
+		// Remember the maximum number of vertices to allow, and the 
+		// current count of vertices is left as it is.
+		m_uiMaxVertexCount = maxVertices;
+
+		// Release system memory for the old array so that we can set a new one
 		SAFE_DELETE_ARRAY( m_pVertexArray );
-		m_pVertexArray = new ImmediateVertexDX11[m_uiMaxVertexCount];
+		m_pVertexArray = pNewArray;
 
 		// Delete the existing resource if it already existed
 		if ( nullptr != m_VB ) {

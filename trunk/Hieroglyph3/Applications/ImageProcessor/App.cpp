@@ -39,7 +39,6 @@ App AppInstance; // Provides an instance of the application
 //--------------------------------------------------------------------------------
 App::App()
 {
-	m_bSaveScreenshot = false;
 	m_bAppInitialized = false;
 	m_bAppShuttingDown = false;
 }
@@ -142,7 +141,7 @@ void App::Initialize()
 	m_iAlgorithm = 0;
 	m_iSampler = 0;
 
-    m_pRenderer11->SetMultiThreadingState( false );
+    SetMultiThreadedMode( false );
 
 	// Create render effects for each of the required compute shaders for all of
 	// our various algorithms.
@@ -501,16 +500,6 @@ void App::Update()
 
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
 
-
-	// Save a screenshot if desired.  This is done by pressing the 's' key, which
-	// demonstrates how an event is sent and handled by an event listener (which
-	// in this case is the application object itself).
-
-	if ( m_bSaveScreenshot  )
-	{
-		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
-	}
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()
@@ -656,18 +645,8 @@ bool App::HandleEvent( IEvent* pEvent )
 		EvtKeyUp* pKeyUp = (EvtKeyUp*)pEvent;
 
 		unsigned int key = pKeyUp->GetCharacterCode();
-
-		if ( key == VK_ESCAPE ) // 'Esc' Key - Exit the application
-		{
-			this->RequestTermination();
-			return( true );
-		}
-		else if ( key == 0x53 ) // 'S' Key - Save a screen shot for the next frame
-		{
-			m_bSaveScreenshot = true;
-			return( true );
-		}
-		else if ( key == 0x4E ) // 'N' Key - Switch to the next algorithm
+		
+		if ( key == 0x4E ) // 'N' Key - Switch to the next algorithm
 		{
 			SelectNextAlgorithm();
 			InvalidateRect(m_pWindow->GetHandle(), NULL, FALSE);
@@ -687,10 +666,6 @@ bool App::HandleEvent( IEvent* pEvent )
 			InvalidateRect(m_pWindow->GetHandle(), NULL, FALSE);
 
 			return( true );
-		}
-		else
-		{
-			return( false );
 		}
 	}
 

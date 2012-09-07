@@ -19,6 +19,7 @@
 
 #include "IRenderer.h"
 #include "TArray.h"
+#include "TConfiguration.h"
 
 #include "Vector2f.h"
 #include "Vector3f.h"
@@ -30,6 +31,8 @@
 #include "BlendStateDX11.h"
 #include "DepthStencilStateDX11.h"
 #include "RasterizerStateDX11.h"
+
+#include "IEventListener.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -103,7 +106,7 @@ namespace Glyph3
 
 
 
-	class RendererDX11 : public IRenderer
+	class RendererDX11 : public IRenderer, public IEventListener
 	{
 	public:
 		RendererDX11();
@@ -242,9 +245,6 @@ namespace Glyph3
 		static void PIXBeginEvent( const wchar_t* name );
 		static void PIXEndEvent();
 
-		// Basic controls over the threading system
-		void SetMultiThreadingState( bool enable );
-
 	protected:
 
 		// The main API interfaces used in the renderer.
@@ -323,12 +323,17 @@ namespace Glyph3
 		ShaderResourceViewDX11*		GetShaderResourceViewByIndex( int rid );
 		UnorderedAccessViewDX11*	GetUnorderedAccessViewByIndex( int rid );
 
+		TConfiguration<bool>		MultiThreadingConfig;
+
+		virtual std::wstring GetName( );
+		virtual bool HandleEvent( IEvent* pEvent );
+
+
 	protected:
 
 		int							GetUnusedResourceIndex();
 		int							StoreNewResource( ResourceDX11* pResource );
 
-		bool									m_bMultiThreadActive;
 		D3D_FEATURE_LEVEL						m_FeatureLevel;
 
 		TArray<IRenderView*>					m_vQueuedViews;

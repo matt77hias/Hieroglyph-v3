@@ -105,8 +105,13 @@ RendererDX11::RendererDX11()
 	m_pParamMgr = 0;
 	pImmPipeline = 0;
 
-	m_bMultiThreadActive = true;			// Initialize this to always use MT!
+	// Initialize this to always use MT!
+	MultiThreadingConfig.SetConfiguration( true );
+
 	m_FeatureLevel = D3D_FEATURE_LEVEL_9_1; // Initialize this to only support 9.1...
+
+	EventManager* pEventManager = EventManager::Get( );
+	pEventManager->AddEventListener( RENDER_FRAME_START, this );
 }
 //--------------------------------------------------------------------------------
 RendererDX11::~RendererDX11()
@@ -186,7 +191,6 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	}
 
 	// Specify debug
-    //UINT CreateDeviceFlags = D3D11_CREATE_DEVICE_SINGLETHREADED; // not interested in multi-threading for now
 	UINT CreateDeviceFlags = 0;
 #ifdef _DEBUG
     CreateDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
@@ -1442,7 +1446,7 @@ void RendererDX11::QueueRenderView( IRenderView* pRenderView )
 //--------------------------------------------------------------------------------
 void RendererDX11::ProcessRenderViewQueue( )
 {
-	if ( !m_bMultiThreadActive )
+	if ( MultiThreadingConfig.GetConfiguration() == false )
 	{
 		for ( int i = m_vQueuedViews.count()-1; i >= 0; i-=NUM_THREADS )
         {
@@ -1464,7 +1468,7 @@ void RendererDX11::ProcessRenderViewQueue( )
 
 		m_vQueuedViews.empty();
 	}
-	//if ( !m_bMultiThreadActive )
+	//if ( MultiThreadingConfig.GetConfiguration() == false )
 	//{
 	//	for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
  //       {
@@ -1545,11 +1549,7 @@ void RendererDX11::PIXEndEvent( )
 	D3DPERF_EndEvent();
 }
 //--------------------------------------------------------------------------------
-void RendererDX11::SetMultiThreadingState( bool enable )
-{
-	m_bMultiThreadActive = enable;
-}
-//--------------------------------------------------------------------------------
+
 
 //--------------------------------------------------------------------------------
 // Here is the render view process for each thread.  The intention here is to 
@@ -1891,5 +1891,27 @@ void RendererDX11::DeleteResource( int index )
 		delete pResource;
 		m_vResources[index & 0xffff] = NULL;
 	}
+}
+//--------------------------------------------------------------------------------
+std::wstring RendererDX11::GetName( )
+{
+	return( std::wstring( L"RendererDX11" ) );
+}
+//--------------------------------------------------------------------------------
+bool RendererDX11::HandleEvent( IEvent* pEvent )
+{
+	eEVENT e = pEvent->GetEventType();
+
+	// Start of a rendering frame
+	if ( e == RENDER_FRAME_START )
+	{
+		// Apply any changes to the multithreading state.
+		MultiThreadingConfig.ApplyConfiguration();
+
+		// Return false to ensure other listeners can react accordingly.
+		return( false );
+	}
+
+	return( false );
 }
 //--------------------------------------------------------------------------------

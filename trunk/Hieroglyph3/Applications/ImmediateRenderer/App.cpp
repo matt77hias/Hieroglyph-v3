@@ -31,7 +31,6 @@ App AppInstance; // Provides an instance of the application
 //--------------------------------------------------------------------------------
 App::App()
 {
-	m_bSaveScreenshot = false;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
@@ -43,8 +42,6 @@ bool App::ConfigureEngineComponents()
 	if ( !ConfigureRenderingSetup() ) {
 		return( false );
 	}
-
-	m_pRenderer11->SetMultiThreadingState( false );
 
 	return( true );
 }
@@ -99,6 +96,19 @@ void App::Initialize()
 	// Throw a rotation onto the actor to slowly rotate it about the Y-axis.
 	RotationController* pIndexedRotController = new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), -0.1f );
 	m_pIndexedActor->GetNode()->AttachController( pIndexedRotController );
+
+
+
+	m_pGeometryActor = new GeometryActor();
+	m_pScene->AddEntity( m_pGeometryActor->GetNode() );
+	m_pGeometryActor->GetNode()->Position() = Vector3f( 0.0f, 2.5f, 0.0f );
+
+	m_pGeometryActor->SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_pGeometryActor->DrawSphere( Vector3f( 0.0f, 0.0f, 0.0f ), 1.5f, 40, 60 );
+
+	RotationController* pGeometryRotController = new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), -0.4f );
+	m_pGeometryActor->GetNode()->AttachController( pGeometryRotController );
+
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -205,24 +215,6 @@ void App::Update()
 	}
 
 
-
-
-
-//	m_pIndexedGeometry->AddVertex( Vector3f( -5.0f, 0.0f, -5.0f ), Vector4f( 1.0f, 0.0f, 0.0f, 1.0f ) );
-//	m_pIndexedGeometry->AddVertex( Vector3f( -5.0f, 0.0f,  5.0f ), Vector4f( 0.0f, 1.0f, 0.0f, 1.0f ) );
-//	m_pIndexedGeometry->AddVertex( Vector3f(  5.0f, 0.0f,  5.0f ), Vector4f( 0.0f, 0.0f, 1.0f, 1.0f ) );
-//	m_pIndexedGeometry->AddVertex( Vector3f(  5.0f, 0.0f, -5.0f ), Vector4f( 1.0f, 1.0f, 0.0f, 1.0f ) );
-	
-//	m_pIndexedGeometry->AddIndex( 0 );
-//	m_pIndexedGeometry->AddIndex( 1 );
-//	m_pIndexedGeometry->AddIndex( 2 );
-
-//	m_pIndexedGeometry->AddIndex( 0 );
-//	m_pIndexedGeometry->AddIndex( 2 );
-//	m_pIndexedGeometry->AddIndex( 3 );
-
-
-
 	// Print a message to show the framerate and sample name.
 
 	std::wstringstream out;
@@ -244,16 +236,6 @@ void App::Update()
 
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
 
-
-	// Save a screenshot if desired.  This is done by pressing the 's' key, which
-	// demonstrates how an event is sent and handled by an event listener (which
-	// in this case is the application object itself).
-
-	if ( m_bSaveScreenshot  )
-	{
-		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
-	}
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()
@@ -276,29 +258,12 @@ bool App::HandleEvent( IEvent* pEvent )
 		EvtKeyDown* pKeyDown = (EvtKeyDown*)pEvent;
 
 		unsigned int key = pKeyDown->GetCharacterCode();
-
-		return( true );
 	}
 	else if ( e == SYSTEM_KEYBOARD_KEYUP )
 	{
 		EvtKeyUp* pKeyUp = (EvtKeyUp*)pEvent;
 
 		unsigned int key = pKeyUp->GetCharacterCode();
-
-		if ( key == VK_ESCAPE ) // 'Esc' Key - Exit the application
-		{
-			this->RequestTermination();
-			return( true );
-		}
-		else if ( key == 0x53 ) // 'S' Key - Save a screen shot for the next frame
-		{
-			m_bSaveScreenshot = true;
-			return( true );
-		}
-		else
-		{
-			return( false );
-		}
 	}
 
 	// Call the parent class's event handler if we haven't handled the event.

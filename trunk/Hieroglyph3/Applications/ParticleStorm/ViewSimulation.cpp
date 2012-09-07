@@ -397,8 +397,6 @@ bool ViewSimulation::HandleEvent( IEvent* pEvent )
 		return( false );
 	}
 
-	IRenderView::HandleEvent( pEvent );
-
-	return( false );
+	return( IRenderView::HandleEvent( pEvent ) );
 }
 //--------------------------------------------------------------------------------

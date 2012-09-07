@@ -124,6 +124,7 @@ copy Animation\*.h ..\SDK\Include
     <ClCompile Include="Application\RenderApplication.cpp" />
     <ClCompile Include="Application\RenderWindow.cpp" />
     <ClCompile Include="Application\Win32RenderWindow.cpp" />
+    <ClCompile Include="Objects\GeometryActor.cpp" />
     <ClCompile Include="Rendering\D3DEnumConversion.cpp" />
     <ClCompile Include="Rendering\ImmediateGeometryDX11.cpp" />
     <ClCompile Include="Rendering\IndexedImmediateGeometryDX11.cpp" />
@@ -474,6 +475,7 @@ copy Animation\*.h ..\SDK\Include
     <ClInclude Include="Application\RenderApplication.h" />
     <ClInclude Include="Application\RenderWindow.h" />
     <ClInclude Include="Application\Win32RenderWindow.h" />
+    <ClInclude Include="Objects\GeometryActor.h" />
     <ClInclude Include="Rendering\D3DEnumConversion.h" />
     <ClInclude Include="Rendering\ImmediateGeometryDX11.h" />
     <ClInclude Include="Rendering\IndexedImmediateGeometryDX11.h" />
@@ -492,6 +494,7 @@ copy Animation\*.h ..\SDK\Include
     <ClInclude Include="Utility\Log.h" />
     <ClInclude Include="Utility\PCH.h" />
     <ClInclude Include="Utility\TArray.h" />
+    <ClInclude Include="Utility\TConfiguration.h" />
     <ClInclude Include="Utility\Timer.h" />
     <ClInclude Include="Events\EventManager.h" />
     <ClInclude Include="Events\IEvent.h" />
@@ -645,6 +648,7 @@ copy Animation\*.h ..\SDK\Include
   <ItemGroup>
     <None Include="Utility\TArray.inl" />
     <None Include="Shaders\Sprite.hlsl" />
+    <None Include="Utility\TConfiguration.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

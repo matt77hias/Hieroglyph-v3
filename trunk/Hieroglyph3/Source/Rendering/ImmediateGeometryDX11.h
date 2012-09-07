@@ -50,6 +50,7 @@ namespace Glyph3
 
 	struct ImmediateVertexDX11 {
 		Vector3f position;
+		Vector3f normal;
 		Vector4f color;
 		Vector2f texcoords;
 	};
@@ -69,6 +70,11 @@ namespace Glyph3
 		void AddVertex( const Vector3f& position, const Vector2f& texcoords );
 		void AddVertex( const Vector3f& position, const Vector4f& color, const Vector2f& texcoords );
 
+		void AddVertex( const Vector3f& position, const Vector3f& normal );
+		void AddVertex( const Vector3f& position, const Vector3f& normal, const Vector4f& color );
+		void AddVertex( const Vector3f& position, const Vector3f& normal, const Vector2f& texcoords );
+		void AddVertex( const Vector3f& position, const Vector3f& normal, const Vector4f& color, const Vector2f& texcoords );
+
 		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveType();
 		void SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY type );
 
@@ -86,6 +92,7 @@ namespace Glyph3
 	protected:
 		
 		void UploadVertexData( PipelineManagerDX11* pPipeline );
+		void EnsureVertexCapacity( );
 
 		ResourcePtr m_VB;
 

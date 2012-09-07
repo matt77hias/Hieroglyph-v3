@@ -31,6 +31,7 @@
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 RenderApplication::RenderApplication()
+	: m_bMultithreadedMode( false )
 {
 	m_pRenderer11 = 0;
 	m_pWindow = 0;
@@ -42,11 +43,6 @@ RenderApplication::RenderApplication()
 	m_pTextOverlayView = 0;
 
 	m_pCamera = 0;
-
-	m_bSaveScreenshot = false;
-
-	// Default to multithreaded rendering.
-	m_bMultithreadedMode = true;
 
 	// Register for window based events here.
 	m_pEventMgr->AddEventListener( WINDOW_RESIZE, this );
@@ -170,12 +166,7 @@ bool RenderApplication::HandleEvent( IEvent* pEvent )
 
 		unsigned int key = pKeyUp->GetCharacterCode();
 
-		if ( key == VK_ESCAPE ) // 'Esc' Key - Exit the application
-		{
-			this->RequestTermination();
-			return( true );
-		}
-		else if ( key == VK_F1 ) // 'F1' Key - Toggle the multithreading state
+		if ( key == VK_F1 ) // 'F1' Key - Toggle the multithreading state
 		{
 			ToggleMultiThreadedMode();
 			return( true );
@@ -219,18 +210,33 @@ void RenderApplication::HandleWindowResize( HWND handle, UINT width, UINT height
 //--------------------------------------------------------------------------------
 void RenderApplication::ToggleMultiThreadedMode()
 {
-	m_bMultithreadedMode = !m_bMultithreadedMode;
-	m_pRenderer11->SetMultiThreadingState( m_bMultithreadedMode );
+	// Here we set the desired state as the opposite of the current state.
+	// Please note that this only takes effect once this configuration is
+	// 'applied'.
+
+	bool bCurrentState = m_pRenderer11->MultiThreadingConfig.GetConfiguration();
+	m_pRenderer11->MultiThreadingConfig.SetConfiguration( !bCurrentState );
 }
 //--------------------------------------------------------------------------------
 void RenderApplication::SetMultiThreadedMode( bool mode )
 {
-	m_bMultithreadedMode = mode;
-	m_pRenderer11->SetMultiThreadingState( m_bMultithreadedMode );
+	// As above, this method only sets the desired state but it won't be used
+	// until the configuration is 'applied'.
+
+	m_pRenderer11->MultiThreadingConfig.SetConfiguration( mode );
 }
 //--------------------------------------------------------------------------------
 bool RenderApplication::GetMultiThreadedMode()
 {
-	return( m_bMultithreadedMode );
+	return( m_pRenderer11->MultiThreadingConfig.GetConfiguration() );
+}
+//--------------------------------------------------------------------------------
+void RenderApplication::TakeScreenShot()
+{
+	if ( m_bSaveScreenshot  )
+	{
+		m_bSaveScreenshot = false;
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
+	}
 }
 //--------------------------------------------------------------------------------

@@ -66,7 +66,7 @@ BOOL CMFCwithD3D11App::InitInstance()
 		pTimer->SetFixedTimeStep( 1.0f / 10.0f );
 	}
 
-	pRenderer->SetMultiThreadingState( false );
+	pRenderer->MultiThreadingConfig.SetConfiguration( false );
 
 
 

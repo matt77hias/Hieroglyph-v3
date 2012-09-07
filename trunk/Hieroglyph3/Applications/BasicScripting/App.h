@@ -37,6 +37,8 @@ public:
 	virtual bool ConfigureEngineComponents();
 	virtual void ShutdownEngineComponents();
 
+	virtual void TakeScreenShot();
+
 	virtual bool HandleEvent( IEvent* pEvent );
 	virtual std::wstring GetName( );
 
@@ -56,6 +58,4 @@ protected:
 	Camera*					m_pCamera;
 
 	AnimationStream<Vector3f>*	m_pAnimationStream;
-
-	bool					m_bSaveScreenshot;
 };

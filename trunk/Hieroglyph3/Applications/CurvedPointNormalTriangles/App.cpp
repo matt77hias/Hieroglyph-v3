@@ -37,7 +37,6 @@ App AppInstance; // Provides an instance of the application
 //--------------------------------------------------------------------------------
 App::App()
 {
-	m_bSaveScreenshot			= false;
 	m_bSolidRender				= false;
 	m_bDefaultComplexity		= true;
 	m_fTessFactor				= 3.0f;
@@ -245,17 +244,7 @@ void App::Update()
 #ifdef _DEBUG
 	Log::Get().Write( m_pRenderer11->pImmPipeline->PrintPipelineStatistics() );
 #endif
-	
 
-	// Save a screenshot if desired.  This is done by pressing the 's' key, which
-	// demonstrates how an event is sent and handled by an event listener (which
-	// in this case is the application object itself).
-
-	if ( m_bSaveScreenshot  )
-	{
-		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_PNG );
-	}
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()
@@ -272,6 +261,15 @@ void App::Shutdown()
 	Log::Get().Write( out.str() );
 }
 //--------------------------------------------------------------------------------
+void App::TakeScreenShot()
+{
+	if ( m_bSaveScreenshot  )
+	{
+		m_bSaveScreenshot = false;
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
+	}
+}
+//--------------------------------------------------------------------------------
 bool App::HandleEvent( IEvent* pEvent )
 {
 	eEVENT e = pEvent->GetEventType();
@@ -281,8 +279,6 @@ bool App::HandleEvent( IEvent* pEvent )
 		EvtKeyDown* pKeyDown = (EvtKeyDown*)pEvent;
 
 		unsigned int key = pKeyDown->GetCharacterCode();
-
-		return( true );
 	}
 	else if ( e == SYSTEM_KEYBOARD_KEYUP )
 	{
@@ -290,17 +286,7 @@ bool App::HandleEvent( IEvent* pEvent )
 
 		unsigned int key = pKeyUp->GetCharacterCode();
 
-		if ( key == VK_ESCAPE ) // 'Esc' Key - Exit the application
-		{
-			this->RequestTermination();
-			return( true );
-		}
-		else if ( key == 0x53 ) // 'S' Key - Save a screen shot for the next frame
-		{
-			m_bSaveScreenshot = true;
-			return( true );
-		}
-		else if ( 'W' == key )
+		if ( 'W' == key )
 		{
 			// Toggle Wireframe
 			m_bSolidRender = !m_bSolidRender;
@@ -331,10 +317,6 @@ bool App::HandleEvent( IEvent* pEvent )
 
 			Vector4f tessParams = Vector4f( m_fTessFactor, m_fTessFactor, m_fTessFactor, m_fTessFactor );
 			m_pRenderer11->m_pParamMgr->SetVectorParameter( m_pEdgeFactors, &tessParams );
-		}
-		else
-		{
-			return( false );
 		}
 	}
 

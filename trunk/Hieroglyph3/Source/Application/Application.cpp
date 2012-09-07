@@ -21,6 +21,7 @@ using namespace Glyph3;
 Application* Application::ms_pApplication = NULL;
 //--------------------------------------------------------------------------------
 Application::Application()
+	: m_bSaveScreenshot( false )
 {
 	// Record the this pointer to provide access to the WinMain function.
 
@@ -87,14 +88,30 @@ bool Application::HandleEvent( IEvent* pEvent )
 		EvtInfoMessage* pInfoMessage = dynamic_cast<EvtInfoMessage*>( pEvent );
 		MessageBox( 0, pInfoMessage->GetInfoMessage().c_str(), L"Hieroglyph 3 :: Info Message", MB_ICONINFORMATION | MB_SYSTEMMODAL );
 	}
-
 	else if ( e == ERROR_MESSAGE )
 	{
 		EvtErrorMessage* pErrorMessage = dynamic_cast<EvtErrorMessage*>( pEvent );
 		MessageBox( 0, pErrorMessage->GetErrorMessage().c_str(), L"Hieroglyph 3 :: Error Message", MB_ICONERROR | MB_SYSTEMMODAL );
 		RequestTermination();
 	}
-	
+	else if ( e == SYSTEM_KEYBOARD_KEYUP )
+	{
+		EvtKeyUp* pKeyUp = (EvtKeyUp*)pEvent;
+
+		unsigned int key = pKeyUp->GetCharacterCode();
+
+		if ( key == VK_ESCAPE ) // 'Esc' Key - Exit the application
+		{
+			this->RequestTermination();
+			return( true );
+		}
+		else if ( key == VK_SPACE ) // 'SPACE' Key - Take a screenshot
+		{
+			m_bSaveScreenshot = true;
+			return( true );
+		}
+	}
+
 	return( false );
 }
 //--------------------------------------------------------------------------------
@@ -118,6 +135,7 @@ void Application::MessageLoop()
 
 		// Call the overloaded application update function.
 		Update();
+		TakeScreenShot();
 	}
 }
 //--------------------------------------------------------------------------------

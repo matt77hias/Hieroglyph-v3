@@ -44,7 +44,6 @@ App AppInstance; // Provides an instance of the application
 //--------------------------------------------------------------------------------
 App::App()
 {
-	m_bSaveScreenshot = false;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
@@ -217,16 +216,6 @@ void App::Update()
 
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
 
-
-	// Save a screenshot if desired.  This is done by pressing the 's' key, which
-	// demonstrates how an event is sent and handled by an event listener (which
-	// in this case is the application object itself).
-
-	if ( m_bSaveScreenshot  )
-	{
-		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
-	}
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()
@@ -243,6 +232,15 @@ void App::Shutdown()
 	std::wstringstream out;
 	out << L"Max FPS: " << m_pTimer->MaxFramerate();
 	Log::Get().Write( out.str() );
+}
+//--------------------------------------------------------------------------------
+void App::TakeScreenShot()
+{
+	if ( m_bSaveScreenshot  )
+	{
+		m_bSaveScreenshot = false;
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
+	}
 }
 //--------------------------------------------------------------------------------
 bool App::HandleEvent( IEvent* pEvent )
@@ -263,21 +261,6 @@ bool App::HandleEvent( IEvent* pEvent )
 		EvtKeyUp* pKeyUp = (EvtKeyUp*)pEvent;
 
 		unsigned int key = pKeyUp->GetCharacterCode();
-
-		if ( key == VK_ESCAPE ) // 'Esc' Key - Exit the application
-		{
-			this->RequestTermination();
-			return( true );
-		}
-		else if ( key == 0x53 ) // 'S' Key - Save a screen shot for the next frame
-		{
-			m_bSaveScreenshot = true;
-			return( true );
-		}
-		else
-		{
-			return( false );
-		}
 	}
 
 	// Call the parent class's event handler if we haven't handled the event.

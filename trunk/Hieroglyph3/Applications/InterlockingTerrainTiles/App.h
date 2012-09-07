@@ -41,6 +41,8 @@ public:
 	virtual bool ConfigureEngineComponents();
 	virtual void ShutdownEngineComponents();
 
+	virtual void TakeScreenShot();
+
 	virtual bool HandleEvent( IEvent* pEvent );
 	virtual std::wstring GetName( );
 
@@ -49,7 +51,6 @@ protected:
 	RendererDX11*				m_pRenderer11;
 	Win32RenderWindow*			m_pWindow;
 
-	bool						m_bSaveScreenshot;
 	bool						m_bViewPointInAutoMode;
 	bool						m_bSolidRender;
 	bool						m_bSimpleComplexity;

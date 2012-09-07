@@ -44,6 +44,8 @@ namespace Glyph3
 		void SetMultiThreadedMode( bool mode );
 		bool GetMultiThreadedMode();
 
+		virtual void TakeScreenShot();
+
 	protected:
 
 		RendererDX11*			m_pRenderer11;
@@ -61,7 +63,5 @@ namespace Glyph3
 
 	public:
 		Camera*					m_pCamera;
-
-		bool					m_bSaveScreenshot;
 	};
 };

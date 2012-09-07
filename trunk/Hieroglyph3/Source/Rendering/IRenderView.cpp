@@ -28,9 +28,6 @@ IRenderView::IRenderView( )
 	
 	EventManager* pEventManager = EventManager::Get( );
 	pEventManager->AddEventListener( RENDER_FRAME_START, this );
-
-	// Register this view with the Renderer for future reference
-	//CRendererDX9::Get()->RegisterView( this );
 }
 //--------------------------------------------------------------------------------
 IRenderView::~IRenderView( )
