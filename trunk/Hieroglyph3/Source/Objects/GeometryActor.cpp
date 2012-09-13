@@ -37,12 +37,12 @@ void GeometryActor::ResetGeometry()
 	m_pGeometry->ResetGeometry();
 }
 //--------------------------------------------------------------------------------
-void GeometryActor::SetColor( Vector4f& color )
+void GeometryActor::SetColor( const Vector4f& color )
 {
 	m_pGeometry->SetColor( color );
 }
 //--------------------------------------------------------------------------------
-void GeometryActor::DrawSphere( Vector3f& center, float radius, unsigned int stacks, unsigned int slices )
+void GeometryActor::DrawSphere( const Vector3f& center, float radius, unsigned int stacks, unsigned int slices )
 {
 	if ( stacks < 2 ) stacks = 2;
 	if ( slices < 4 ) slices = 4;
@@ -50,10 +50,12 @@ void GeometryActor::DrawSphere( Vector3f& center, float radius, unsigned int sta
 	float sliceStep = static_cast<float>( 2.0 * GLYPH_PI ) / static_cast<float>( slices );
 	float stackStep = static_cast<float>( GLYPH_PI ) / static_cast<float>( stacks );
 
-	float uStep = 4.0f / static_cast<float>( slices );
+	float uStep = 2.0f / static_cast<float>( slices );
 	float vStep = 2.0f / static_cast<float>( stacks );
 
 	// Generate all of the vertices according to the specified input parameters.
+
+	unsigned int baseVertex = m_pGeometry->GetVertexCount() + 1;
 
 	for ( unsigned int stack = 0; stack <= stacks; stack++ ) {
 		for ( unsigned int slice = 0; slice <= slices; slice++ ) {
@@ -83,21 +85,87 @@ void GeometryActor::DrawSphere( Vector3f& center, float radius, unsigned int sta
 	for ( unsigned int z = 0; z < stacks; z++ ) {
 		for ( unsigned int x = 0; x < slices; x++ ) {
 
-			m_pGeometry->AddIndex( (z+0)*(slices+1) + x+0 );
-			m_pGeometry->AddIndex( (z+0)*(slices+1) + x+1 );
-			m_pGeometry->AddIndex( (z+1)*(slices+1) + x+0 );
+			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+0 );
+			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+1 );
+			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+0 );
 
-			m_pGeometry->AddIndex( (z+0)*(slices+1) + x+1 );
-			m_pGeometry->AddIndex( (z+1)*(slices+1) + x+1 );
-			m_pGeometry->AddIndex( (z+1)*(slices+1) + x+0 );
+			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+1 );
+			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+1 );
+			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+0 );
 
-			//m_pGeometry->AddIndex( (z*slices + x) );
-			//m_pGeometry->AddIndex( (z*slices + x) + 1 );
-			//m_pGeometry->AddIndex( (z*slices + x) + slices );
+		}
+	}
 
-			//m_pGeometry->AddIndex( (z*slices + x) + 1 );
-			//m_pGeometry->AddIndex( (z*slices + x) + slices + 1 );
-			//m_pGeometry->AddIndex( (z*slices + x) + slices );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::DrawCylinder( const Vector3f& p1, const Vector3f& p2, float r1, float r2, unsigned int stacks, unsigned int slices )
+{
+	if ( stacks < 2 ) stacks = 2;
+	if ( slices < 4 ) slices = 4;
+
+	// Define the axis of the cylinder, and find its length.
+	Vector3f v = p1 - p2;
+	Vector3f vnorm = Vector3f::Normalize( v );
+	float l = v.Magnitude();
+
+	Vector3f up = Vector3f( 0.0f, 1.0f, 0.0f );
+
+	// Find the unit vector perpendicular to the axis, that is pointing closest to the (0,1,0) direction.
+	// If the axis points in the (0,1,0) direction, then use (1,0,0) as the unit vector.
+	Vector3f unit;
+	if ( vnorm == up || vnorm == -up ) {
+		unit = Vector3f( 1.0f, 0.0f, 0.0f );
+	} else {
+		Vector3f temp = Vector3f::Cross( vnorm, up );
+		unit = Vector3f::Cross( temp, vnorm );
+	}
+
+	float sliceStep = static_cast<float>( 2.0 * GLYPH_PI ) / static_cast<float>( slices );
+	float stackStep = l / static_cast<float>( stacks );
+	float radiusStep = ( r1 - r2 ) / static_cast<float>( stacks );
+
+	float uStep = 2.0f / static_cast<float>( slices );
+	float vStep = 2.0f / static_cast<float>( stacks );
+
+	// Generate all of the vertices according to the specified input parameters.
+
+	unsigned int baseVertex = m_pGeometry->GetVertexCount() + 1;
+	Matrix3f r;
+
+	for ( unsigned int stack = 0; stack <= stacks; stack++ ) {
+		for ( unsigned int slice = 0; slice <= slices; slice++ ) {
+
+			float theta = sliceStep * static_cast<float>( slice );
+			float height = stackStep * static_cast<float>( stack );
+			float currentRadius = r2 + radiusStep * static_cast<float>( stack );
+			
+			r.RotationEuler( vnorm, theta );
+			Vector3f position = p2 + ( vnorm * height ) + ( r * unit * currentRadius );
+
+			// TODO: The normal vector doesn't consider the change in radius - this must be addressed.
+			Vector3f normal = r * unit;
+			normal.Normalize();
+
+			Vector2f texcoords;
+			texcoords.x = uStep * static_cast<float>( slice );
+			texcoords.y = vStep * static_cast<float>( stack );
+
+			m_pGeometry->AddVertex( position, normal, texcoords );
+		}
+	}
+
+	// Generate all of the indices according to the specified input parameters.
+
+	for ( unsigned int z = 0; z < stacks; z++ ) {
+		for ( unsigned int x = 0; x < slices; x++ ) {
+
+			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+0 );
+			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+1 );
+			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+0 );
+
+			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+1 );
+			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+1 );
+			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+0 );
 		}
 	}
 

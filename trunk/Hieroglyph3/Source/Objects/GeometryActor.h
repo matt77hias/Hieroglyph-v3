@@ -28,9 +28,10 @@ namespace Glyph3
 
 		void ResetGeometry();
 
-		void SetColor( Vector4f& color );
+		void SetColor( const Vector4f& color );
 		
-		void DrawSphere( Vector3f& center, float radius, unsigned int stacks = 6, unsigned int slices = 12 );
+		void DrawSphere( const Vector3f& center, float radius, unsigned int stacks = 6, unsigned int slices = 12 );
+		void DrawCylinder( const Vector3f& p1, const Vector3f& p2, float r1, float r2, unsigned int stacks = 2, unsigned int slices = 10 );
 
 	protected:
 		IndexedImmediateGeometryPtr				m_pGeometry;

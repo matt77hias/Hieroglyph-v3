@@ -58,7 +58,7 @@ void App::Initialize()
 	// from the camera's point of view of the scene.
 
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.5f, 0.3f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( -3.0f, 6.0f, -10.0f );
+	m_pCamera->GetNode()->Position() = Vector3f( -3.0f, 7.0f, -10.0f );
 	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.4f, 0.0f ) );
 
 	// Create the actor to hold the immediate geometry.  
@@ -104,7 +104,8 @@ void App::Initialize()
 	m_pGeometryActor->GetNode()->Position() = Vector3f( 0.0f, 2.5f, 0.0f );
 
 	m_pGeometryActor->SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
-	m_pGeometryActor->DrawSphere( Vector3f( 0.0f, 0.0f, 0.0f ), 1.5f, 40, 60 );
+	m_pGeometryActor->DrawSphere( Vector3f( 1.5f, 1.0f, 0.0f ), 1.5f, 40, 60 );
+	m_pGeometryActor->DrawCylinder( Vector3f( -1.5f, -1.0f, 0.0f ), Vector3f( -3.0f, 3.0f, 0.0f ), 1.5f, 1.0f, 2, 20 );
 
 	RotationController* pGeometryRotController = new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), -0.4f );
 	m_pGeometryActor->GetNode()->AttachController( pGeometryRotController );
