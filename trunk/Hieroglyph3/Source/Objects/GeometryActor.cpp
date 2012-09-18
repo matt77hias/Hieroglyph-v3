@@ -24,8 +24,8 @@ GeometryActor::GeometryActor()
 	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	
 	GetBody()->SetGeometry( m_pGeometry );
-	//GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *pRenderer ) );
-	GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( *pRenderer ) );
+	GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *pRenderer ) );
+	//GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( *pRenderer ) );
 }
 //--------------------------------------------------------------------------------
 GeometryActor::~GeometryActor()
@@ -55,7 +55,7 @@ void GeometryActor::DrawSphere( const Vector3f& center, float radius, unsigned i
 
 	// Generate all of the vertices according to the specified input parameters.
 
-	unsigned int baseVertex = m_pGeometry->GetVertexCount() + 1;
+	unsigned int baseVertex = m_pGeometry->GetVertexCount();
 
 	for ( unsigned int stack = 0; stack <= stacks; stack++ ) {
 		for ( unsigned int slice = 0; slice <= slices; slice++ ) {
@@ -98,6 +98,68 @@ void GeometryActor::DrawSphere( const Vector3f& center, float radius, unsigned i
 
 }
 //--------------------------------------------------------------------------------
+void GeometryActor::DrawDisc( const Vector3f& center, const Vector3f& normal, float radius, unsigned int slices )
+{
+	if ( slices < 4 ) slices = 4;
+ 
+	// Define the axis through the center of the circle
+	Vector3f vnorm = Vector3f::Normalize( normal );
+ 
+	Vector3f up = Vector3f( 0.0f, 1.0f, 0.0f );
+
+	// Find the unit vector perpendicular to the axis, that is pointing closest to the (0,1,0) direction.
+	// If the axis points in the (0,1,0) direction, then use (1,0,0) as the unit vector.
+ 
+	Vector3f unit;
+ 
+	if ( vnorm == up || vnorm == -up ) {
+		unit = Vector3f( 1.0f, 0.0f, 0.0f );
+	} else {
+		Vector3f temp = Vector3f::Cross( vnorm, up );
+		unit = Vector3f::Cross( temp, vnorm );
+		unit.Normalize();
+	}
+
+	float sliceStep = static_cast<float>( 2.0 * GLYPH_PI ) / static_cast<float>( slices );
+ 
+	//float uStep = 2.0f / static_cast<float>( slices );
+	//float vStep = 2.0f / static_cast<float>( stacks );
+
+	// Generate all of the vertices according to the specified input parameters.
+
+	unsigned int baseVertex = m_pGeometry->GetVertexCount();
+
+	Matrix3f r;
+
+	// Add the center vertex first...
+ 
+	m_pGeometry->AddVertex( center, vnorm );
+
+	for ( unsigned int slice = 0; slice <= slices; slice++ ) {
+ 
+		float theta = sliceStep * static_cast<float>( slice );
+
+		r.RotationEuler( vnorm, theta );
+ 		Vector3f position = center + ( r * unit * radius );
+ 
+		// TODO: Figure out how best to interpret texture coordinates for this!
+ 
+		//Vector2f texcoords;
+		//texcoords.x = uStep * static_cast<float>( slice );
+		//texcoords.y = vStep * static_cast<float>( stack );
+ 
+		m_pGeometry->AddVertex( position, vnorm/*, texcoords*/ );
+	}
+ 
+    // Generate all of the indices according to the specified input parameters.
+
+	for ( unsigned int x = 1; x <= slices; x++ ) {
+ 		m_pGeometry->AddIndex( baseVertex + 0 );
+ 		m_pGeometry->AddIndex( baseVertex + x );
+ 		m_pGeometry->AddIndex( baseVertex + x+1 );
+	}
+}
+//--------------------------------------------------------------------------------
 void GeometryActor::DrawCylinder( const Vector3f& p1, const Vector3f& p2, float r1, float r2, unsigned int stacks, unsigned int slices )
 {
 	if ( stacks < 2 ) stacks = 2;
@@ -118,6 +180,7 @@ void GeometryActor::DrawCylinder( const Vector3f& p1, const Vector3f& p2, float 
 	} else {
 		Vector3f temp = Vector3f::Cross( vnorm, up );
 		unit = Vector3f::Cross( temp, vnorm );
+		unit.Normalize();
 	}
 
 	float sliceStep = static_cast<float>( 2.0 * GLYPH_PI ) / static_cast<float>( slices );
@@ -127,9 +190,11 @@ void GeometryActor::DrawCylinder( const Vector3f& p1, const Vector3f& p2, float 
 	float uStep = 2.0f / static_cast<float>( slices );
 	float vStep = 2.0f / static_cast<float>( stacks );
 
+	float normalSlope = ( r2 - r1 ) / l;
+
 	// Generate all of the vertices according to the specified input parameters.
 
-	unsigned int baseVertex = m_pGeometry->GetVertexCount() + 1;
+	unsigned int baseVertex = m_pGeometry->GetVertexCount();
 	Matrix3f r;
 
 	for ( unsigned int stack = 0; stack <= stacks; stack++ ) {
@@ -138,12 +203,15 @@ void GeometryActor::DrawCylinder( const Vector3f& p1, const Vector3f& p2, float 
 			float theta = sliceStep * static_cast<float>( slice );
 			float height = stackStep * static_cast<float>( stack );
 			float currentRadius = r2 + radiusStep * static_cast<float>( stack );
-			
+
+			// Calculate the position, which is a combination of an offset to the p2 endpoint,
+			// shifted along the axis of the cylinder, and a rotated and scaled radius component.
 			r.RotationEuler( vnorm, theta );
 			Vector3f position = p2 + ( vnorm * height ) + ( r * unit * currentRadius );
 
-			// TODO: The normal vector doesn't consider the change in radius - this must be addressed.
-			Vector3f normal = r * unit;
+			// Calculate the normal vector, which is dependent on the delta in radii at each
+			// end of the cylinder.
+			Vector3f normal = r * unit * currentRadius + vnorm * normalSlope * currentRadius;
 			normal.Normalize();
 
 			Vector2f texcoords;

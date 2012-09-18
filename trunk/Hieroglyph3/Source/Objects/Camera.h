@@ -66,6 +66,7 @@ namespace Glyph3
 		float m_fFov;
 
         Matrix4f m_ProjMatrix;
+		VectorParameterDX11* m_pViewPositionParameter;
 	};
 };
 //--------------------------------------------------------------------------------

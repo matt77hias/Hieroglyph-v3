@@ -27,6 +27,8 @@ Camera::Camera()
 	m_fFov = static_cast<float>( GLYPH_PI ) / 4.0f;
 
     m_ProjMatrix.MakeIdentity();
+
+	m_pViewPositionParameter = nullptr;
 }
 //--------------------------------------------------------------------------------
 Camera::~Camera()
@@ -53,8 +55,22 @@ void Camera::RenderFrame( RendererDX11* pRenderer )
 	{
 		// Set the scene's root into the render view
 
-		if ( m_pScene )
+		if ( m_pScene ) {
 			m_pCameraView->SetRoot( m_pScene->GetRoot() );
+		}
+
+
+		// Set the view position in the parameter system, for use by any of the
+		// views being used in this frame.
+
+		if ( !m_pViewPositionParameter ) {
+			m_pViewPositionParameter = pRenderer->m_pParamMgr->GetVectorParameterRef( std::wstring( L"ViewPosition" ) );
+		}
+
+		Vector3f p = GetNode()->Position() + GetBody()->Position();
+		Vector4f ViewPosition( p.x, p.y, p.z, 1.0f );
+		m_pViewPositionParameter->InitializeParameterData( &ViewPosition );
+
 
 		// Use the pre-draw method to queue any needed render views in the scene.
 		// This is followed by rendering all of the views to generate the current

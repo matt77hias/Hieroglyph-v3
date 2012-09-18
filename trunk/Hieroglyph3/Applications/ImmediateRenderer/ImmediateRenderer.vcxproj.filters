@@ -12,7 +12,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Data\Shaders\ImmediateGeometry.hlsl">
+    <None Include="..\Data\Shaders\ImmediateGeometrySolid.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Data\Shaders\ImmediateGeometryTextured.hlsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

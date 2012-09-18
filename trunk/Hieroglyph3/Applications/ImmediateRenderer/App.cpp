@@ -21,6 +21,7 @@
 #include "MaterialGeneratorDX11.h"
 #include "RotationController.h"
 
+#include "VectorParameterDX11.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -103,13 +104,46 @@ void App::Initialize()
 	m_pScene->AddEntity( m_pGeometryActor->GetNode() );
 	m_pGeometryActor->GetNode()->Position() = Vector3f( 0.0f, 2.5f, 0.0f );
 
-	m_pGeometryActor->SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
-	m_pGeometryActor->DrawSphere( Vector3f( 1.5f, 1.0f, 0.0f ), 1.5f, 40, 60 );
-	m_pGeometryActor->DrawCylinder( Vector3f( -1.5f, -1.0f, 0.0f ), Vector3f( -3.0f, 3.0f, 0.0f ), 1.5f, 1.0f, 2, 20 );
+	m_pGeometryActor->SetColor( Vector4f( 1.0f, 0.0f, 0.0f, 1.0f ) );
+	m_pGeometryActor->DrawSphere( Vector3f( 1.5f, 1.0f, 0.0f ), 1.5f, 16, 24 );
+	m_pGeometryActor->SetColor( Vector4f( 0.0f, 1.0f, 0.0f, 1.0f ) );
+	m_pGeometryActor->DrawCylinder( Vector3f( -1.5f, -1.0f, 0.0f ), Vector3f( -1.5f, 3.0f, 0.0f ), 1.5f, 0.0f, 8, 24 );
+	m_pGeometryActor->SetColor( Vector4f( 1.0f, 1.0f, 0.0f, 1.0f ) );
+	m_pGeometryActor->DrawDisc( Vector3f( 0.0f, -3.0f, 0.0f ), Vector3f( 1.0f, 1.0f, 1.0f ), 2.0f, 12 );
 
-	RotationController* pGeometryRotController = new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), -0.4f );
+	RotationController* pGeometryRotController = new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), 0.4f );
 	m_pGeometryActor->GetNode()->AttachController( pGeometryRotController );
 
+
+
+	// Do a one time initialization of the scene lighting parameters here
+	Vector4f Ka( 0.2f, 0.2f, 0.2f, 0.2f );
+	VectorParameterDX11* FactorKa = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Ka" ) );
+	FactorKa->InitializeParameterData( &Ka );
+
+	Vector4f Kd( 0.5f, 0.5f, 0.5f, 0.5f );
+	VectorParameterDX11* FactorKd = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Kd" ) );
+	FactorKd->InitializeParameterData( &Kd );
+
+	Vector4f Ks( 1.0f, 1.0f, 1.0f, 1.0f );
+	VectorParameterDX11* FactorKs = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Ks" ) );
+	FactorKs->InitializeParameterData( &Ks );
+
+	Vector4f LightPosition( 100.0f, 100.0f, -100.0f, 0.0f );
+	VectorParameterDX11* FactorLightPosition = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightPosition" ) );
+	FactorLightPosition->InitializeParameterData( &LightPosition );
+
+	Vector4f Ia( 0.25f, 0.25f, 0.25f, 0.25f );
+	VectorParameterDX11* FactorIa = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Ia" ) );
+	FactorIa->InitializeParameterData( &Ia );
+
+	Vector4f Id( 0.5f, 0.5f, 0.5f, 1.0f );
+	VectorParameterDX11* FactorId = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Id" ) );
+	FactorId->InitializeParameterData( &Id );
+
+	Vector4f Is( 1.0f, 1.0f, 1.0f, 1.0f );
+	VectorParameterDX11* FactorIs = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Is" ) );
+	FactorIs->InitializeParameterData( &Is );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -138,6 +172,7 @@ void App::Update()
 
 	Vector3f v0, v1, v2;
 	Vector2f uv0, uv1, uv2;
+	Vector3f n0, n1, n2;
 
 	float fScaling = 0.25f * sinf( m_pTimer->Runtime() * 0.75f );
 
@@ -152,28 +187,35 @@ void App::Update()
 			
 			float fX = static_cast<float>( x - GRIDSIZE / 2 );
 			float fZ = static_cast<float>( z - GRIDSIZE / 2 );
+			float boundScale = static_cast<float>( GRIDSIZE / 2 );
 
 			v0.x = fX + 0.0f*ELEMSIZE;
 			v0.z = fZ + 0.0f*ELEMSIZE;
 			v0.y = ( 5.0f - 0.2f * ( v0.x*v0.x + v0.z*v0.z ) ) * fScaling;
 			uv0.x =        ( v0.x + ( fGRIDSIZE / 2.0f ) ) / fGRIDSIZE;
 			uv0.y = 1.0f - ( v0.z + ( fGRIDSIZE / 2.0f ) ) / fGRIDSIZE;
+			n0 = Vector3f( v0.x / boundScale, 1.0f, v0.z / boundScale );
+			n0.Normalize();
 
 			v1.x = fX + 0.0f*ELEMSIZE;
 			v1.z = fZ + 1.0f*ELEMSIZE;
 			v1.y = ( 5.0f - 0.2f * ( v1.x*v1.x + v1.z*v1.z ) ) * fScaling;
 			uv1.x =        ( v1.x + ( fGRIDSIZE / 2.0f ) ) / fGRIDSIZE;
 			uv1.y = 1.0f - ( v1.z + ( fGRIDSIZE / 2.0f ) ) / fGRIDSIZE;
+			n1 = Vector3f( v1.x / boundScale, 1.0f, v1.z / boundScale );
+			n1.Normalize();
 
 			v2.x = fX + 1.0f*ELEMSIZE;
 			v2.z = fZ + 0.0f*ELEMSIZE;
 			v2.y = ( 5.0f - 0.2f * ( v2.x*v2.x + v2.z*v2.z ) ) * fScaling;
 			uv2.x =        ( v2.x + ( fGRIDSIZE / 2.0f ) ) / fGRIDSIZE;
 			uv2.y = 1.0f - ( v2.z + ( fGRIDSIZE / 2.0f ) ) / fGRIDSIZE;
+			n2 = Vector3f( v2.x / boundScale, 1.0f, v2.z / boundScale );
+			n2.Normalize();
 
-			m_pGeometry->AddVertex( v0 * fSIZESCALE, uv0 );
-			m_pGeometry->AddVertex( v1 * fSIZESCALE, uv1 );
-			m_pGeometry->AddVertex( v2 * fSIZESCALE, uv2 );
+			m_pGeometry->AddVertex( v0 * fSIZESCALE, n0, uv0 );
+			m_pGeometry->AddVertex( v1 * fSIZESCALE, n1, uv1 );
+			m_pGeometry->AddVertex( v2 * fSIZESCALE, n2, uv2 );
 
 		}
 	}
