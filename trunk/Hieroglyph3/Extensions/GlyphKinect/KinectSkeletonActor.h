@@ -52,14 +52,14 @@
 #ifndef KinectSkeletonActor_h
 #define KinectSkeletonActor_h
 //--------------------------------------------------------------------------------
-#include "Actor.h"
+#include "GeometryActor.h"
 #include "KinectManager.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
 	class MatrixArrayParameterDX11;
 
-	class KinectSkeletonActor : public Actor
+	class KinectSkeletonActor : public GeometryActor
 	{
 	public:
 		KinectSkeletonActor();
@@ -67,6 +67,9 @@ namespace Glyph3
 
 		void UpdateSkeleton( NUI_SKELETON_DATA* pData );
 		Entity3D* GetJointEntity( unsigned int joint );
+
+	private:
+		void DrawLinkage( NUI_SKELETON_DATA* pData, NUI_SKELETON_POSITION_INDEX i1, NUI_SKELETON_POSITION_INDEX i2 );
 
 	protected:
 		TArray<Entity3D*>		m_Joints;

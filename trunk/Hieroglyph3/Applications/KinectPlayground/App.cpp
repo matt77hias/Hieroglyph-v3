@@ -71,10 +71,6 @@ void App::Initialize()
 	m_pLightColor = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightColor" ) );
 	m_pLightColor->InitializeParameterData( &LightParams );
 
-	Vector4f LightPosition = Vector4f( -1000.0f, 200.0f, 0.0f, 0.0f );
-	m_pLightPosition = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightPositionWS" ) );
-	m_pLightPosition->InitializeParameterData( &LightPosition );
-
 
 	// Configure the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
@@ -144,6 +140,35 @@ void App::Initialize()
 	m_pScene->AddEntity( m_pDepthMapViewer->GetNode() );
 
 	SetMultiThreadedMode( false );
+
+	// Do a one time initialization of the scene lighting parameters here
+	Vector4f Ka( 0.2f, 0.2f, 0.2f, 0.2f );
+	VectorParameterDX11* FactorKa = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Ka" ) );
+	FactorKa->InitializeParameterData( &Ka );
+
+	Vector4f Kd( 0.5f, 0.5f, 0.5f, 0.5f );
+	VectorParameterDX11* FactorKd = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Kd" ) );
+	FactorKd->InitializeParameterData( &Kd );
+
+	Vector4f Ks( 1.0f, 1.0f, 1.0f, 1.0f );
+	VectorParameterDX11* FactorKs = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Ks" ) );
+	FactorKs->InitializeParameterData( &Ks );
+
+	Vector4f LightPosition( 100.0f, 100.0f, -100.0f, 0.0f );
+	VectorParameterDX11* FactorLightPosition = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightPosition" ) );
+	FactorLightPosition->InitializeParameterData( &LightPosition );
+
+	Vector4f Ia( 0.25f, 0.25f, 0.25f, 0.25f );
+	VectorParameterDX11* FactorIa = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Ia" ) );
+	FactorIa->InitializeParameterData( &Ia );
+
+	Vector4f Id( 0.5f, 0.5f, 0.5f, 1.0f );
+	VectorParameterDX11* FactorId = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Id" ) );
+	FactorId->InitializeParameterData( &Id );
+
+	Vector4f Is( 1.0f, 1.0f, 1.0f, 1.0f );
+	VectorParameterDX11* FactorIs = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Is" ) );
+	FactorIs->InitializeParameterData( &Is );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
