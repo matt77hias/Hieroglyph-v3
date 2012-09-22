@@ -130,6 +130,7 @@ copy Animation\*.h ..\SDK\Include
     <ClCompile Include="Rendering\IndexedImmediateGeometryDX11.cpp" />
     <ClCompile Include="Rendering\InputAssemblerStageDX11.cpp" />
     <ClCompile Include="Rendering\InputAssemblerStateDX11.cpp" />
+    <ClCompile Include="Rendering\InstancedQuadGeometryDX11.cpp" />
     <ClCompile Include="Rendering\OutputMergerStageStateDX11.cpp" />
     <ClCompile Include="Rendering\ParameterContainer.cpp" />
     <ClCompile Include="Rendering\PipelineExecutorDX11.cpp" />
@@ -481,6 +482,7 @@ copy Animation\*.h ..\SDK\Include
     <ClInclude Include="Rendering\IndexedImmediateGeometryDX11.h" />
     <ClInclude Include="Rendering\InputAssemblerStateDX11.h" />
     <ClInclude Include="Rendering\InputAssemblerStageDX11.h" />
+    <ClInclude Include="Rendering\InstancedQuadGeometryDX11.h" />
     <ClInclude Include="Rendering\OutputMergerStageStateDX11.h" />
     <ClInclude Include="Rendering\ParameterContainer.h" />
     <ClInclude Include="Rendering\PipelineExecutorDX11.h" />

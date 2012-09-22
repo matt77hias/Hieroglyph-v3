@@ -46,6 +46,9 @@ namespace Glyph3
 		void SetShaderFolder( const std::wstring& folder );
 		void SetTextureFolder( const std::wstring& folder );
 
+		bool FileExists( const std::wstring& file );
+		bool FileIsNewer( const std::wstring& file1, const std::wstring& file2 );
+
 	private:
 
 		static std::wstring sDataFolder;

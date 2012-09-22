@@ -87,8 +87,6 @@ namespace Glyph3
 		unsigned int GetVertexCount();
 		virtual unsigned int GetPrimitiveCount();
 
-		void GenerateInputLayout( int ShaderID );
-
 	protected:
 		
 		void UploadVertexData( PipelineManagerDX11* pPipeline );
@@ -104,9 +102,6 @@ namespace Glyph3
 
 		// The type of primitives listed in the index buffer
 		D3D11_PRIMITIVE_TOPOLOGY m_ePrimType;
-
-		// A description of our vertex elements
-		TArray<D3D11_INPUT_ELEMENT_DESC> m_elements;
 
 		// The pointer to our array of vertex data
 		ImmediateVertexDX11* m_pVertexArray;

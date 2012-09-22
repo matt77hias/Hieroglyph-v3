@@ -15,6 +15,7 @@
 #ifndef Entity3D_h
 #define Entity3D_h
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "Vector3f.h"
 #include "Vector4f.h"
 #include "Sphere3f.h"

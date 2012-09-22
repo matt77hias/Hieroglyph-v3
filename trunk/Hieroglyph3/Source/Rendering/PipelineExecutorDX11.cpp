@@ -11,6 +11,7 @@
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "PipelineExecutorDX11.h"
+#include "RendererDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -38,5 +39,19 @@ int PipelineExecutorDX11::GetInputLayout( int ShaderID )
 	layout = m_InputLayouts[ShaderID]->layout;
 
 	return( layout );
+}
+//--------------------------------------------------------------------------------
+void PipelineExecutorDX11::GenerateInputLayout( int ShaderID )
+{
+	// Create the input layout for the given shader index
+
+	RendererDX11* pRenderer = RendererDX11::Get();
+	if ( m_InputLayouts[ShaderID] == 0 )
+	{
+		InputLayoutKey* pKey = new InputLayoutKey();
+		pKey->shader = ShaderID;
+		pKey->layout = pRenderer->CreateInputLayout( m_elements, ShaderID );
+		m_InputLayouts[ShaderID] = pKey;
+	}
 }
 //--------------------------------------------------------------------------------

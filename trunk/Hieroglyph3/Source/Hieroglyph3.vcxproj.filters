@@ -670,6 +670,9 @@
     <ClCompile Include="Objects\GeometryActor.cpp">
       <Filter>Objects\Scene Objects</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\InstancedQuadGeometryDX11.cpp">
+      <Filter>Rendering\Rendering Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mathematics\Matrix3f.h">
@@ -1220,6 +1223,9 @@
     </ClInclude>
     <ClInclude Include="Objects\GeometryActor.h">
       <Filter>Objects\Scene Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\InstancedQuadGeometryDX11.h">
+      <Filter>Rendering\Rendering Geometry</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

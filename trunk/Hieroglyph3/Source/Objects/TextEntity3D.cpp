@@ -1,4 +1,5 @@
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "TextEntity3D.h"
 #include "Log.h"
 #include <sstream>
@@ -7,62 +8,41 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 TextEntity3D::TextEntity3D()
 {
-	m_sText = "";
-	m_vLocation.MakeZero();
+	m_sText = L"";
+	//m_vLocation.MakeZero();
 	m_vSize.MakeZero();
+	m_vColor = Vector4f( 1.0f, 1.0f, 1.0f, 1.0f );
+
+	// Create the text rendering classes.
+	m_pSpriteFont = new SpriteFontDX11();
+	m_pSpriteFont->Initialize( L"Consolas", 12.0f, 0, false );
+	
+	m_pSpriteRenderer = new SpriteRendererDX11();
+	m_pSpriteRenderer->Initialize();
 }
 //--------------------------------------------------------------------------------
 TextEntity3D::~TextEntity3D()
 {
+	SAFE_DELETE( m_pSpriteFont );
+	SAFE_DELETE( m_pSpriteRenderer );
 }
 //--------------------------------------------------------------------------------
-void TextEntity3D::Update( float time )
-{
-	UpdateLocal( time );
-	UpdateWorld( );
-
-	m_sParams.WorldMatrix = m_mWorld;
-}
-//--------------------------------------------------------------------------------
-void TextEntity3D::UpdateLocal( float time )
-{
-	for ( int i = 0; i < m_Controllers.count(); i++ )
-		m_Controllers[i]->Update( time );
-
-	m_mLocal.MakeIdentity( );
-	m_mLocal.SetRotation( m_mRotation );
-	m_mLocal.SetTranslation( m_vTranslation );
-}
-//--------------------------------------------------------------------------------
-void TextEntity3D::UpdateWorld( )
-{
-	if (m_pParent)
-        m_mWorld = m_mLocal * m_pParent->WorldMatrix();
-	else
-		m_mWorld = m_mLocal;
-
-	// Update bounding sphere with the new world space position and orientation.
-	Vector3f center = m_ModelBoundingSphere.Center;
-	Vector4f modelposition = Vector4f( center.x, center.y, center.z, 1.0f );
-	Vector4f worldposition = m_mWorld * modelposition;
-	m_WorldBoundingSphere.Center = Vector3f( worldposition.x, worldposition.y, worldposition.z );
-}
-//--------------------------------------------------------------------------------
-void TextEntity3D::PreRender( RendererDX11& Renderer, VIEWTYPE view )
+void TextEntity3D::PreRender( RendererDX11* pRenderer, VIEWTYPE view )
 {
 	// Perform the pre-render function only if the material has been set
 	//if ( m_pMaterial )
 	//	m_pMaterial->PreRender( Renderer, view );
 }
 //--------------------------------------------------------------------------------
-void TextEntity3D::Render( RendererDX11& Renderer, VIEWTYPE view )
+void TextEntity3D::Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view )
 {
 	// Test if the entity contains any text
-	if ( ( m_sText != "" ) && ( view == VT_GUI_SKIN ) )
+	//if ( m_sText != "" )
 	{
 		// TODO: Project coordinates to screen space and set location based on that.
 		//       This could also be done in the update phase too...
 
+		m_pSpriteRenderer->RenderText( pPipelineManager, pParamManager, *m_pSpriteFont, m_sText.c_str(), Matrix4f::Identity(), m_vColor );
 		//Renderer.DrawTextA( m_iFont, (int)m_vLocation.x, (int)m_vLocation.y, (int)m_vSize.x, (int)m_vSize.y, m_vColor.toARGB(), m_sText );
 	}
 }
@@ -84,20 +64,20 @@ std::string TextEntity3D::toString( )
 	return( objString.str() );
 }
 //--------------------------------------------------------------------------------
-void TextEntity3D::SetLocation( Vector2f& location )
-{
-	m_vLocation = location;
-}
+//void TextEntity3D::SetLocation( Vector2f& location )
+//{
+//	m_vLocation = location;
+//}
 //--------------------------------------------------------------------------------
 void TextEntity3D::SetSize( Vector2f& size )
 {
 	m_vSize = size;
 }
 //--------------------------------------------------------------------------------
-Vector2f TextEntity3D::GetLocation( )
-{
-	return( m_vLocation );
-}
+//Vector2f TextEntity3D::GetLocation( )
+//{
+//	return( m_vLocation );
+//}
 //--------------------------------------------------------------------------------
 Vector2f TextEntity3D::GetSize( )
 {
@@ -129,12 +109,12 @@ void TextEntity3D::BuildPickRecord( Ray3f& ray, TArray<PickRecord>& record )
 	// Do nothing - the text should not intersect a pick ray.
 }
 //--------------------------------------------------------------------------------
-void TextEntity3D::SetText( std::string text )
+void TextEntity3D::SetText( std::wstring text )
 {
 	m_sText = text;
 }
 //--------------------------------------------------------------------------------
-std::string TextEntity3D::GetText( )
+std::wstring TextEntity3D::GetText( )
 {
 	return( m_sText );
 }

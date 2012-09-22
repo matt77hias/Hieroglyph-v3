@@ -11,8 +11,11 @@
 #ifndef TextEntity3D_h
 #define TextEntity3D_h
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "Entity3D.h"
 #include "Vector2f.h"
+#include "SpriteFontDX11.h"
+#include "SpriteRendererDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -22,22 +25,18 @@ namespace Glyph3
 		TextEntity3D( );
 		virtual ~TextEntity3D( );
 
-		virtual void Update( float time );
-		virtual void UpdateLocal( float time );
-		virtual void UpdateWorld( );
-
-		virtual void PreRender( RendererDX11& Renderer, VIEWTYPE view );
-		virtual void Render( RendererDX11& Renderer, VIEWTYPE view );
+		virtual void PreRender( RendererDX11* pRenderer, VIEWTYPE view );
+		virtual void Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view );
 
 		virtual std::string toString( );
 
-		void SetText( std::string text );
-		std::string GetText( );
+		void SetText( std::wstring text );
+		std::wstring GetText( );
 
-		void SetLocation( Vector2f& location );
+		//void SetLocation( Vector2f& location );
+		//Vector2f GetLocation( );
+
 		void SetSize( Vector2f& size );
-
-		Vector2f GetLocation( );
 		Vector2f GetSize( );
 
 		void SetFont( int font );
@@ -49,11 +48,14 @@ namespace Glyph3
 		virtual void BuildPickRecord( Ray3f& ray, TArray<PickRecord>& record );
 
 	protected:
-		std::string m_sText;
-		Vector2f	m_vLocation;
-		Vector2f	m_vSize;
-		Vector4f	m_vColor;
-		int			m_iFont;
+		std::wstring	m_sText;
+		//Vector2f		m_vLocation;
+		Vector2f		m_vSize;
+		Vector4f		m_vColor;
+		int				m_iFont;
+
+		SpriteFontDX11*			m_pSpriteFont;
+		SpriteRendererDX11*		m_pSpriteRenderer;
 	};
 };
 //--------------------------------------------------------------------------------

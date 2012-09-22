@@ -115,6 +115,7 @@ namespace Glyph3
 
 		void Draw( UINT VertexCount, UINT StartVertex );
 		void DrawIndexed( UINT IndexCount, UINT StartIndex, int VertexOffset ); 
+		void DrawIndexedInstanced( UINT IndexCountPerInstance, UINT InstanceCount, UINT StartIndexLocation, INT BaseVertexLocation, UINT StartInstanceLocation );
 
 
 

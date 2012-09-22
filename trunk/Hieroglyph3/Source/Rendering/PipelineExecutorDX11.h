@@ -16,6 +16,7 @@
 #define PipelineExecutorDX11_h
 //--------------------------------------------------------------------------------
 #include "PCH.h"
+#include "TArray.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -39,10 +40,13 @@ namespace Glyph3
 
 		virtual void Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager ) = 0;
 
-		virtual void GenerateInputLayout( int ShaderID ) = 0;
+		virtual void GenerateInputLayout( int ShaderID );
 		int GetInputLayout( int ShaderID );
 
 	protected:
+
+		// A description of our vertex elements
+		TArray<D3D11_INPUT_ELEMENT_DESC> m_elements;
 		std::map<int,InputLayoutKey*> m_InputLayouts;
 
 	};

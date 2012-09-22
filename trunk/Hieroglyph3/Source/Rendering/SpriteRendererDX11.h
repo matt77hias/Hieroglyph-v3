@@ -17,6 +17,7 @@
 //--------------------------------------------------------------------------------
 #include "RendererDX11.h"
 #include "RenderEffectDX11.h"
+#include "InstancedQuadGeometryDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -33,21 +34,6 @@ namespace Glyph3
 			DontSet = 0,
 			Linear = 1,
 			Point = 2
-		};
-
-		struct SpriteDrawRect
-		{
-			float X;
-			float Y;
-			float Width;
-			float Height;
-		};
-
-		struct SpriteDrawData
-		{
-			Matrix4f Transform;
-			Vector4f Color;
-			SpriteDrawRect DrawRect;
 		};
 
 		static const UINT MaxBatchSize = 1000;
@@ -85,23 +71,12 @@ namespace Glyph3
 
 		RenderEffectDX11 m_effect;
 
-		ResourcePtr m_pVertexBuffer;
-		ResourcePtr m_pIndexBuffer;
-		ResourcePtr m_pInstanceDataBuffer;
-		int m_iInputLayout;
+		InstancedQuadGeometryPtr m_pGeometry;
 
 		int m_iLinearSamplerState;
 		int m_iPointSamplerState;
 
 		bool m_bInitialized;
-
-		SpriteDrawData m_TextDrawData [MaxBatchSize];
-
-		struct SpriteVertex
-		{
-			Vector2f Position;
-			Vector2f TexCoord;
-		};
 
 	};
 }

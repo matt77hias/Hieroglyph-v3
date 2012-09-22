@@ -26,7 +26,6 @@
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 SpriteRendererDX11::SpriteRendererDX11() :
-									m_iInputLayout(-1),
 									m_iLinearSamplerState(-1),
 									m_iPointSamplerState(-1),
 									m_bInitialized(false)
@@ -67,94 +66,6 @@ bool SpriteRendererDX11::Initialize()
 		return false;
 	}
 
-	// Create an input layout
-	TArray<D3D11_INPUT_ELEMENT_DESC> elements;
-	D3D11_INPUT_ELEMENT_DESC elementsArray[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TRANSFORM", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-		{ "TRANSFORM", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-		{ "TRANSFORM", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-		{ "TRANSFORM", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 64, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-		{ "SOURCERECT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 80, D3D11_INPUT_PER_INSTANCE_DATA, 1 }
-	};
-	for ( int i = 0; i < sizeof(elementsArray) / sizeof(D3D11_INPUT_ELEMENT_DESC); ++i)
-		elements.add( elementsArray[i] );
-
-	m_iInputLayout = renderer->CreateInputLayout( elements, m_effect.GetVertexShader() );
-
-	if ( m_iInputLayout == -1 )
-	{
-		Log::Get().Write( L"Failed to create sprite input layout" );
-		return false;
-	}
-
-	// Create the vertex buffer
-	SpriteVertex verts[] =
-	{
-		{ Vector2f(0.0f, 0.0f), Vector2f(0.0f, 0.0f) },
-		{ Vector2f(1.0f, 0.0f), Vector2f(1.0f, 0.0f) },
-		{ Vector2f(1.0f, 1.0f), Vector2f(1.0f, 1.0f) },
-		{ Vector2f(0.0f, 1.0f), Vector2f(0.0f, 1.0f) }
-	};
-
-	BufferConfigDX11 vbConfig;
-	vbConfig.SetUsage( D3D11_USAGE_IMMUTABLE );
-	vbConfig.SetByteWidth( sizeof(SpriteVertex) * 4 );
-	vbConfig.SetBindFlags( D3D11_BIND_VERTEX_BUFFER );
-	vbConfig.SetCPUAccessFlags( 0 );
-	vbConfig.SetMiscFlags( 0 );
-
-	D3D11_SUBRESOURCE_DATA initData;
-	initData.pSysMem = verts;
-	initData.SysMemPitch = 0;
-	initData.SysMemSlicePitch = 0;
-
-	m_pVertexBuffer = renderer->CreateVertexBuffer( &vbConfig, &initData );
-
-	if ( m_pVertexBuffer->m_iResource == -1 )
-	{
-		Log::Get().Write( L"Failed to create sprite vertex buffer" );
-		return false;
-	}
-
-	// Create the instance data buffer
-	BufferConfigDX11 instanceConfig;
-	instanceConfig.SetUsage( D3D11_USAGE_DYNAMIC );
-	instanceConfig.SetByteWidth( sizeof(SpriteDrawData) * MaxBatchSize );
-	instanceConfig.SetBindFlags( D3D11_BIND_VERTEX_BUFFER );
-	instanceConfig.SetCPUAccessFlags( D3D11_CPU_ACCESS_WRITE );
-	instanceConfig.SetMiscFlags( 0 );
-
-	m_pInstanceDataBuffer = renderer->CreateVertexBuffer( &instanceConfig, NULL );
-
-	if ( m_pInstanceDataBuffer->m_iResource == -1 )
-	{
-		Log::Get().Write( L"Failed to create sprite instance data buffer" );
-		return false;
-	}
-
-	// Create the index buffer
-	UINT indices[] = { 0, 1, 2, 3, 0, 2 };
-
-	BufferConfigDX11 ibConfig;
-	ibConfig.SetUsage( D3D11_USAGE_IMMUTABLE );
-	ibConfig.SetByteWidth( sizeof(UINT) * 6 );
-	ibConfig.SetBindFlags( D3D11_BIND_INDEX_BUFFER );
-	ibConfig.SetCPUAccessFlags( 0 );
-	ibConfig.SetMiscFlags( 0 );
-
-	initData.pSysMem = indices;
-
-	m_pIndexBuffer = renderer->CreateIndexBuffer( &ibConfig, &initData );
-
-	if ( m_pIndexBuffer->m_iResource == -1 )
-	{
-		Log::Get().Write( L"Failed to create sprite index buffer" );
-		return false;
-	}
 
 	// Create our states
 	RasterizerStateConfigDX11 rsConfig;
@@ -255,6 +166,8 @@ bool SpriteRendererDX11::Initialize()
 		return false;
 	}
 
+	m_pGeometry = InstancedQuadGeometryPtr( new InstancedQuadGeometryDX11() );
+
 	m_bInitialized = true;
 
 	return true;
@@ -270,6 +183,8 @@ void SpriteRendererDX11::Render( PipelineManagerDX11* pipeline,
 
 	RendererDX11::PIXBeginEvent( L"SpriteRendererDX11 Render" );
 
+	m_pGeometry->ResetGeometry();
+
 	// Make sure the draw rects are all valid
 	D3D11_TEXTURE2D_DESC desc = texture->m_pTexture2dConfig->GetTextureDesc();
 	for ( UINT i = 0; i < numSprites; ++i )
@@ -279,16 +194,9 @@ void SpriteRendererDX11::Render( PipelineManagerDX11* pipeline,
 		_ASSERT( drawRect.Y >= 0 && drawRect.Y < desc.Height );
 		_ASSERT( drawRect.Width > 0 && drawRect.X + drawRect.Width <= desc.Width );
 		_ASSERT( drawRect.Height > 0 && drawRect.Y + drawRect.Height <= desc.Height );
+
+		m_pGeometry->AddQuad( drawData[i] );
 	}
-
-	UINT numSpritesToDraw = min( numSprites, MaxBatchSize );
-
-	// Copy in the instance data
-	D3D11_MAPPED_SUBRESOURCE mapped;
-	mapped = pipeline->MapResource( m_pInstanceDataBuffer->m_iResource,
-									0, D3D11_MAP_WRITE_DISCARD, 0 );
-	CopyMemory(mapped.pData, drawData, static_cast<size_t>(sizeof(SpriteDrawData) * numSpritesToDraw));
-	pipeline->UnMapResource( m_pInstanceDataBuffer->m_iResource, 0 );
 
 	// Set the constants
 	Vector4f texAndViewportSize;
@@ -311,16 +219,13 @@ void SpriteRendererDX11::Render( PipelineManagerDX11* pipeline,
 	else if ( filterMode == Point )
 		parameters->SetSamplerParameter( L"SpriteSampler", &m_iPointSamplerState );
 
-	// Draw
-	pipeline->DrawInstanced( m_effect, m_pVertexBuffer, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-								m_pIndexBuffer, m_iInputLayout, sizeof( SpriteVertex ), 6,
-								m_pInstanceDataBuffer, sizeof(SpriteDrawData), numSpritesToDraw, parameters );
+	pipeline->ClearPipelineResources();
+	m_effect.ConfigurePipeline( pipeline, parameters );
+	pipeline->ApplyPipelineResources();
+
+	m_pGeometry->Execute( pipeline, parameters );
 
 	RendererDX11::PIXEndEvent();
-
-	// If there's any left to be rendered, do it recursively
-	if(numSprites > numSpritesToDraw)
-		Render( pipeline, parameters, texture, drawData + numSpritesToDraw, numSprites - numSpritesToDraw );
 }
 //--------------------------------------------------------------------------------
 void SpriteRendererDX11::Render( PipelineManagerDX11* pipeline, 
@@ -355,6 +260,8 @@ void SpriteRendererDX11::RenderText( PipelineManagerDX11* pipeline,
 									 const Matrix4f& transform, const Vector4f& color )
 {
 	RendererDX11::PIXBeginEvent( L"SpriteRenderer RenderText" );
+
+	SpriteDrawData m_TextDrawData [MaxBatchSize];
 
 	size_t length = wcslen( text );
 
