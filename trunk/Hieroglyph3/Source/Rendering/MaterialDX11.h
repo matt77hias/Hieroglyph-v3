@@ -28,7 +28,7 @@ namespace Glyph3
 	{
 		bool							bRender;
 		RenderEffectDX11*				pEffect;
-		TArray<RenderParameterDX11*>	vParameters;
+		//TArray<RenderParameterDX11*>	vParameters;
 		TArray<IRenderView*>			vViews;
 	};
 

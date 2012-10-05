@@ -146,6 +146,15 @@
     <Filter Include="Rendering\Pipeline\Shader Stages\Shader Programs\Reflection">
       <UniqueIdentifier>{459e32db-dd34-4f16-b136-ce4bb25028fe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering\Rendering Geometry\Basis Objects">
+      <UniqueIdentifier>{db81f026-e22b-40df-8de0-3b9502b8788a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Scene Objects\Actors">
+      <UniqueIdentifier>{da272b85-59c3-4cb7-9514-e79c358a0222}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Scene Objects\Cameras">
+      <UniqueIdentifier>{33623c22-7f15-4af2-a4e3-d83fa5192510}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Mathematics\Matrix3f.cpp">
@@ -457,9 +466,6 @@
     <ClCompile Include="Rendering\GeometryLoaderDX11.cpp">
       <Filter>Rendering\Rendering Geometry</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\VertexElementDX11.cpp">
-      <Filter>Rendering\Rendering Geometry</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\EntityRenderParams.cpp">
       <Filter>Rendering\Material System</Filter>
     </ClCompile>
@@ -535,22 +541,10 @@
     <ClCompile Include="Objects\SkinnedBoneController.cpp">
       <Filter>Objects\Basic Objects\Controllers</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\Actor.cpp">
-      <Filter>Objects\Scene Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\Camera.cpp">
-      <Filter>Objects\Scene Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\FirstPersonCamera.cpp">
-      <Filter>Objects\Scene Objects</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\Light.cpp">
       <Filter>Objects\Scene Objects</Filter>
     </ClCompile>
     <ClCompile Include="Objects\Scene.cpp">
-      <Filter>Objects\Scene Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\SkinnedActor.cpp">
       <Filter>Objects\Scene Objects</Filter>
     </ClCompile>
     <ClCompile Include="Objects\ActorGenerator.cpp">
@@ -667,11 +661,29 @@
     <ClCompile Include="Rendering\IndexedImmediateGeometryDX11.cpp">
       <Filter>Rendering\Rendering Geometry</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\GeometryActor.cpp">
-      <Filter>Objects\Scene Objects</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\InstancedQuadGeometryDX11.cpp">
       <Filter>Rendering\Rendering Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\VertexElementDX11.cpp">
+      <Filter>Rendering\Rendering Geometry\Basis Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Actor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\GeometryActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\SkinnedActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TextActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Camera.cpp">
+      <Filter>Objects\Scene Objects\Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\FirstPersonCamera.cpp">
+      <Filter>Objects\Scene Objects\Cameras</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1005,9 +1017,6 @@
     <ClInclude Include="Rendering\GeometryLoaderDX11.h">
       <Filter>Rendering\Rendering Geometry</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\VertexElementDX11.h">
-      <Filter>Rendering\Rendering Geometry</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\ms3dspec.h">
       <Filter>Rendering\Rendering Geometry\File Formats</Filter>
     </ClInclude>
@@ -1086,22 +1095,10 @@
     <ClInclude Include="Objects\SkinnedBoneController.h">
       <Filter>Objects\Basic Objects\Controllers</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\Actor.h">
-      <Filter>Objects\Scene Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\Camera.h">
-      <Filter>Objects\Scene Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\FirstPersonCamera.h">
-      <Filter>Objects\Scene Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Objects\Light.h">
       <Filter>Objects\Scene Objects</Filter>
     </ClInclude>
     <ClInclude Include="Objects\Scene.h">
-      <Filter>Objects\Scene Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\SkinnedActor.h">
       <Filter>Objects\Scene Objects</Filter>
     </ClInclude>
     <ClInclude Include="Objects\ActorGenerator.h">
@@ -1221,11 +1218,38 @@
     <ClInclude Include="Utility\TConfiguration.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\GeometryActor.h">
-      <Filter>Objects\Scene Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\InstancedQuadGeometryDX11.h">
       <Filter>Rendering\Rendering Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Glyphlet.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\VertexElementDX11.h">
+      <Filter>Rendering\Rendering Geometry\Basis Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\TGrowableVertexBufferDX11.h">
+      <Filter>Rendering\Rendering Geometry\Basis Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\TGrowableIndexBufferDX11.h">
+      <Filter>Rendering\Rendering Geometry\Basis Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Actor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\GeometryActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\SkinnedActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TextActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\FirstPersonCamera.h">
+      <Filter>Objects\Scene Objects\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Camera.h">
+      <Filter>Objects\Scene Objects\Cameras</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1237,6 +1261,12 @@
     </None>
     <None Include="Utility\TConfiguration.inl">
       <Filter>Utility</Filter>
+    </None>
+    <None Include="Rendering\TGrowableVertexBufferDX11.inl">
+      <Filter>Rendering\Rendering Geometry\Basis Objects</Filter>
+    </None>
+    <None Include="Rendering\TGrowableIndexBufferDX11.inl">
+      <Filter>Rendering\Rendering Geometry\Basis Objects</Filter>
     </None>
   </ItemGroup>
 </Project>

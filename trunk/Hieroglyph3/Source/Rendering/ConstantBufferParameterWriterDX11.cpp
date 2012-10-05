@@ -22,6 +22,11 @@ ConstantBufferParameterWriterDX11::~ConstantBufferParameterWriterDX11()
 {
 }
 //--------------------------------------------------------------------------------
+void ConstantBufferParameterWriterDX11::SetRenderParameterRef( ConstantBufferParameterDX11* pParam )
+{
+	m_pParameter = pParam;
+}
+//--------------------------------------------------------------------------------
 void ConstantBufferParameterWriterDX11::WriteParameter( IParameterManager* pParamMgr )
 {
 	pParamMgr->SetConstantBufferParameter( m_pParameter, m_Value );

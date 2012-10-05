@@ -12,6 +12,7 @@
 #include "PCH.h"
 #include "GeometryActor.h"
 #include "MaterialGeneratorDX11.h"
+#include "ShaderResourceParameterWriterDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -23,9 +24,12 @@ GeometryActor::GeometryActor()
 	m_pGeometry->SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	
+	m_pSolidMaterial = MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *pRenderer );
+	m_pTexturedMaterial = MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( *pRenderer );
+
 	GetBody()->SetGeometry( m_pGeometry );
-	GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *pRenderer ) );
-	//GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( *pRenderer ) );
+
+	UseSolidMaterial();
 }
 //--------------------------------------------------------------------------------
 GeometryActor::~GeometryActor()
@@ -237,5 +241,124 @@ void GeometryActor::DrawCylinder( const Vector3f& p1, const Vector3f& p2, float 
 		}
 	}
 
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::DrawBox( const Vector3f& center, const Vector3f& xdir, const Vector3f& ydir, const Vector3f& zdir, const Vector3f& extents )
+{
+	// Generate all of the vertices according to the specified input parameters.
+
+	unsigned int baseVertex = m_pGeometry->GetVertexCount();
+
+	Vector3f position;
+	Vector3f normal;
+	Vector2f tex;
+
+	Vector3f x = xdir * extents.x;
+	Vector3f y = ydir * extents.y;
+	Vector3f z = zdir * extents.z;
+
+	Vector2f tex00 = Vector2f( 0.0f, 0.0f );
+	Vector2f tex01 = Vector2f( 0.0f, 1.0f );
+	Vector2f tex10 = Vector2f( 1.0f, 0.0f );
+	Vector2f tex11 = Vector2f( 1.0f, 1.0f );
+
+	// Front face (+Z)
+	DrawRect( center + z, xdir, ydir, Vector2f( extents.x, extents.y ) );
+
+	// Back face (-Z)
+	DrawRect( center - z, -xdir, ydir, Vector2f( extents.x, extents.y ) );
+
+	// Right face (+X)
+	DrawRect( center + x, -zdir, ydir, Vector2f( extents.z, extents.y ) );
+
+	// Left face (-X)
+	DrawRect( center - x, zdir, ydir, Vector2f( extents.z, extents.y ) );
+
+	// Upper face (+Y)
+	DrawRect( center + y, xdir, -zdir, Vector2f( extents.x, extents.z ) );
+
+	// Lower face (-Y)
+	DrawRect( center - y, xdir, zdir, Vector2f( extents.x, extents.z ) );
+
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::DrawBox( const Vector3f& center, const Vector3f& extents )
+{
+	DrawBox( center, Vector3f( 1.0f, 0.0f, 0.0f ), Vector3f( 0.0f, 1.0f, 0.0f ), Vector3f( 0.0f, 0.0f, 1.0f ), extents );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::DrawRect( const Vector3f& center, const Vector3f& xdir, const Vector3f& ydir, const Vector2f& extents )
+{
+	// Generate all of the vertices according to the specified input parameters.
+
+	unsigned int baseVertex = m_pGeometry->GetVertexCount();
+
+	Vector3f position;
+	Vector3f normal;
+	Vector2f tex;
+
+	Vector3f x = xdir * extents.x;
+	Vector3f y = ydir * extents.y;
+
+	Vector2f tex00 = Vector2f( 0.0f, 0.0f );
+	Vector2f tex01 = Vector2f( 0.0f, 1.0f );
+	Vector2f tex10 = Vector2f( 1.0f, 0.0f );
+	Vector2f tex11 = Vector2f( 1.0f, 1.0f );
+
+	// Use a common normal vector for each vertex
+	normal = Vector3f::Cross( ydir, xdir );
+
+	// Top left vertex
+	position = center + x + y;
+	tex = tex00;
+	m_pGeometry->AddVertex( position, normal, tex );
+
+	// Top right vertex
+	position = center - x + y;
+	tex = tex10;
+	m_pGeometry->AddVertex( position, normal, tex );
+
+	// Bottom right vertex
+	position = center - x - y;
+	tex = tex11;
+	m_pGeometry->AddVertex( position, normal, tex );
+
+	// Bottom right vertex
+	position = center + x - y;
+	tex = tex01;
+	m_pGeometry->AddVertex( position, normal, tex );
+
+
+	// Add two triangles to create the rectangular face.
+
+	m_pGeometry->AddIndex( baseVertex + 0 );
+	m_pGeometry->AddIndex( baseVertex + 1 );
+	m_pGeometry->AddIndex( baseVertex + 2 );
+
+	m_pGeometry->AddIndex( baseVertex + 0 );
+	m_pGeometry->AddIndex( baseVertex + 2 );
+	m_pGeometry->AddIndex( baseVertex + 3 );
+
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::UseSolidMaterial()
+{
+	GetBody()->SetMaterial( m_pSolidMaterial );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::UseTexturedMaterial( ResourcePtr texture )
+{
+	GetBody()->SetMaterial( m_pTexturedMaterial );
+
+	// Set the texture to be used if the passed in texture is not null...
+	if ( nullptr != texture ) {
+
+		ShaderResourceParameterWriterDX11* pWriter = 
+			dynamic_cast<ShaderResourceParameterWriterDX11*> (
+				m_pTexturedMaterial->Parameters.GetRenderParameter( std::wstring( L"ColorTexture" ) )
+			);
+
+		pWriter->SetValue( texture );
+	}
 }
 //--------------------------------------------------------------------------------

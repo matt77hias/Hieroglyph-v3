@@ -13,8 +13,9 @@
 //
 // This class specializes PipelineExecutorDX11 to provide an easy to use immediate
 // mode rendering interface.  The basic configuration allows you to add vertices
-// to a dynamic buffer, which is later sent to the input assembler.  What geometry
-// those vertices will create in the IA depend on what topology is selected.
+// to a growable vertex buffer, which is later sent to the input assembler.  What 
+// primitives those vertices will create in the IA depend on what topology is
+// selected.
 //
 // It is important to consider that this pipeline executor does not use indices,
 // and its geometry needs to be submitted and uploaded each time it changes.
@@ -25,6 +26,7 @@
 // following components:
 //
 // float3 position
+// float3 normal
 // float4 color
 // float2 texcoords
 //
@@ -42,7 +44,7 @@
 #include "Vector3f.h"
 #include "Vector4f.h"
 #include "ResourceProxyDX11.h"
-#include "TArray.h"
+#include "TGrowableVertexBufferDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -81,30 +83,20 @@ namespace Glyph3
 		void SetColor( const Vector4f& color );
 		Vector4f GetColor( );
 
-		void SetMaxVertexCount( unsigned int maxVertices );
-		unsigned int GetMaxVertexCount();
-
 		unsigned int GetVertexCount();
 		virtual unsigned int GetPrimitiveCount();
 
 	protected:
-		
-		void UploadVertexData( PipelineManagerDX11* pPipeline );
-		void EnsureVertexCapacity( );
 
-		ResourcePtr m_VB;
-
-		// The sizes
-		unsigned int m_uiMaxVertexCount;
-		unsigned int m_uiVertexCount;
-
+		// This color is considered to be the default if a vertex is added
+		// without specifying a unique color.
 		Vector4f m_Color;
 
 		// The type of primitives listed in the index buffer
 		D3D11_PRIMITIVE_TOPOLOGY m_ePrimType;
 
-		// The pointer to our array of vertex data
-		ImmediateVertexDX11* m_pVertexArray;
+		// Use a growable vertex buffer to hold the vertex data.
+		TGrowableVertexBufferDX11<ImmediateVertexDX11> VertexBuffer;
 	};
 
 	typedef std::shared_ptr<ImmediateGeometryDX11> ImmediateGeometryPtr;

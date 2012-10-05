@@ -34,8 +34,17 @@ namespace Glyph3
 		void DrawDisc( const Vector3f& center, const Vector3f& normal, float radius, unsigned int slices = 12 );
 		void DrawCylinder( const Vector3f& p1, const Vector3f& p2, float r1, float r2, unsigned int stacks = 2, unsigned int slices = 10 );
 
+		void DrawBox( const Vector3f& center, const Vector3f& xdir, const Vector3f& ydir, const Vector3f& zdir, const Vector3f& extents );
+		void DrawBox( const Vector3f& center, const Vector3f& extents );
+		void DrawRect( const Vector3f& center, const Vector3f& xdir, const Vector3f& ydir, const Vector2f& extents );
+
+		void UseSolidMaterial();
+		void UseTexturedMaterial( ResourcePtr texture = nullptr );
+
 	protected:
 		IndexedImmediateGeometryPtr				m_pGeometry;
+		MaterialPtr								m_pSolidMaterial;
+		MaterialPtr								m_pTexturedMaterial;
 	};
 };
 //--------------------------------------------------------------------------------

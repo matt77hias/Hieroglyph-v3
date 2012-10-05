@@ -25,6 +25,7 @@
 #include "Matrix4f.h"
 #include "ResourceProxyDX11.h"
 #include "TArray.h"
+#include "TGrowableVertexBufferDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -57,26 +58,13 @@ namespace Glyph3
 
 		void AddQuad( const SpriteDrawData& data );
 
-		void SetMaxQuadCount( unsigned int maxQuads );
-		unsigned int GetMaxQuadCount();
-
 		unsigned int GetQuadCount();
 
 	protected:
 		
-		void UploadVertexData( PipelineManagerDX11* pPipeline );
-		void EnsureVertexCapacity( );
-
 		ResourcePtr m_pVertexBuffer;
 		ResourcePtr m_pIndexBuffer;
-		ResourcePtr m_pInstanceDataBuffer;
-
-		// The sizes
-		unsigned int m_uiMaxQuadCount;
-		unsigned int m_uiQuadCount;
-
-		// The pointer to our array of vertex data
-		SpriteDrawData* m_pQuadDrawDataArray;
+		TGrowableVertexBufferDX11<SpriteDrawData> QuadBuffer;
 
 		struct SpriteVertex
 		{

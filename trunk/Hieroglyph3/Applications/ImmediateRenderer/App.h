@@ -12,6 +12,7 @@
 #include "ImmediateGeometryDX11.h"
 #include "IndexedImmediateGeometryDX11.h"
 #include "GeometryActor.h"
+#include "TextActor.h"
 
 using namespace Glyph3;
 
@@ -39,6 +40,8 @@ protected:
 
 	Actor*						m_pIndexedActor;
 	IndexedImmediateGeometryPtr m_pIndexedGeometry;
+
+	TextActor*					m_pTextActor;
 
 	GeometryActor*				m_pGeometryActor;
 };

@@ -25,6 +25,8 @@ namespace Glyph3
 		ShaderResourceParameterWriterDX11();
 		virtual ~ShaderResourceParameterWriterDX11();
 
+		void SetRenderParameterRef( ShaderResourceParameterDX11* pParam );
+
 		virtual void WriteParameter( IParameterManager* pParamMgr );
 		void SetValue( ResourcePtr Value );
 

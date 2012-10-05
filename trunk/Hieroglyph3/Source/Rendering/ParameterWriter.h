@@ -26,7 +26,7 @@ namespace Glyph3
 		ParameterWriter();
 		virtual ~ParameterWriter();
 
-		void SetRenderParameterRef( RenderParameterDX11* pParam );
+		//void SetRenderParameterRef( RenderParameterDX11* pParam );
 		RenderParameterDX11* GetRenderParameterRef();
 
 		virtual void WriteParameter( IParameterManager* pParamMgr ) = 0;

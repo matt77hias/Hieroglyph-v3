@@ -57,7 +57,7 @@ bool SpriteFontDX11::Initialize(LPCWSTR fontName, float fontSize, UINT fontStyle
 	GdiPlusCall( sizeGraphics.GetLastStatus() );
 	GdiPlusCall( sizeGraphics.SetTextRenderingHint( hint ) );
 
-	m_fCharHeight = font.GetHeight(&sizeGraphics) * 1.5f;
+	m_fCharHeight = font.GetHeight(&sizeGraphics) * 1.0f;
 
 	WCHAR allChars[NumChars + 1];
 	for( WCHAR i = 0; i < NumChars; ++i )
@@ -67,7 +67,7 @@ bool SpriteFontDX11::Initialize(LPCWSTR fontName, float fontSize, UINT fontStyle
 	RectF sizeRect;
 	GdiPlusCall( sizeGraphics.MeasureString( allChars, NumChars, &font, PointF( 0, 0 ), &sizeRect ) );
 	int numRows = static_cast<int>( sizeRect.Width / TexWidth ) + 1;
-	int texHeight = static_cast<int>( numRows * m_fCharHeight ) + 1;
+	m_uTexHeight = static_cast<int>( numRows * m_fCharHeight ) + 1;
 
 	// Create a temporary Bitmap and Graphics for drawing the characters one by one
 	int tempSize = static_cast<int>( fontSize * 2 );
@@ -79,7 +79,7 @@ bool SpriteFontDX11::Initialize(LPCWSTR fontName, float fontSize, UINT fontStyle
 	GdiPlusCall( drawGraphics.SetTextRenderingHint( hint ) );
 
 	// Create a temporary Bitmap + Graphics for creating a full character set
-	Bitmap textBitmap ( TexWidth, texHeight, PixelFormat32bppARGB );
+	Bitmap textBitmap ( TexWidth, m_uTexHeight, PixelFormat32bppARGB );
 	GdiPlusCall( textBitmap.GetLastStatus() );
 
 	Graphics textGraphics ( &textBitmap );	GdiPlusCall( textGraphics.GetLastStatus() );
@@ -167,37 +167,15 @@ bool SpriteFontDX11::Initialize(LPCWSTR fontName, float fontSize, UINT fontStyle
 
 	// Lock the bitmap for direct memory access
 	BitmapData bmData;
-	GdiPlusCall(textBitmap.LockBits( &Rect( 0, 0, TexWidth, texHeight ), ImageLockModeRead, PixelFormat32bppARGB, &bmData ) );
+	GdiPlusCall(textBitmap.LockBits( &Rect( 0, 0, TexWidth, m_uTexHeight ), ImageLockModeRead, PixelFormat32bppARGB, &bmData ) );
 
 	// Create a D3D texture, initalized with the bitmap data
-	D3D11_TEXTURE2D_DESC texDesc;
-	texDesc.Width = TexWidth;
-	texDesc.Height = texHeight;
-	texDesc.MipLevels = 1;
-	texDesc.ArraySize = 1;
-	texDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-	texDesc.SampleDesc.Count = 1;
-	texDesc.SampleDesc.Quality = 0;
-	texDesc.Usage = D3D11_USAGE_IMMUTABLE;
-	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	texDesc.CPUAccessFlags = 0;
-	texDesc.MiscFlags = 0;
-
 	Texture2dConfigDX11 config;
-	config.SetDefaults();
-	config.SetArraySize( 1 );
 	config.SetBindFlags( D3D11_BIND_SHADER_RESOURCE );
-	config.SetCPUAccessFlags( 0 );
 	config.SetFormat( DXGI_FORMAT_B8G8R8A8_UNORM );
-	config.SetWidth( TexWidth );
-	config.SetHeight( texHeight );
-	config.SetMipLevels( 1 );
-	config.SetMiscFlags( 0 );
-	DXGI_SAMPLE_DESC sampleDesc;
-	sampleDesc.Count = 1;
-	sampleDesc.Quality = 0;
-	config.SetSampleDesc( sampleDesc );
 	config.SetUsage( D3D11_USAGE_IMMUTABLE );
+	config.SetWidth( TexWidth );
+	config.SetHeight( m_uTexHeight );
 
 	D3D11_SUBRESOURCE_DATA data;
 	data.pSysMem = bmData.Scan0;

@@ -21,13 +21,8 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 InstancedQuadGeometryDX11::InstancedQuadGeometryDX11( )
 {
-	m_uiMaxQuadCount = 0;
-	m_uiQuadCount = 0;
-	
-	m_pQuadDrawDataArray = nullptr;
-
 	// Initialize our buffer to a reasonable size
-	SetMaxQuadCount( 128 );
+	QuadBuffer.SetMaxVertexCount( 128 );
 
 
 	// Fill in the vertex element descriptions based on each element of our format
@@ -103,14 +98,13 @@ InstancedQuadGeometryDX11::InstancedQuadGeometryDX11( )
 //--------------------------------------------------------------------------------
 InstancedQuadGeometryDX11::~InstancedQuadGeometryDX11()
 {
-	SAFE_DELETE_ARRAY( m_pQuadDrawDataArray );
 }
 //--------------------------------------------------------------------------------
 void InstancedQuadGeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
 {
-	if ( m_uiQuadCount > 0 ) {
+	if ( QuadBuffer.GetVertexCount() > 0 ) {
 
-		UploadVertexData( pPipeline );
+		QuadBuffer.UploadVertexData( pPipeline );
 	
 		pPipeline->InputAssemblerStage.ClearDesiredState();
 
@@ -120,115 +114,29 @@ void InstancedQuadGeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParame
 		pPipeline->InputAssemblerStage.DesiredState.SetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
 		pPipeline->InputAssemblerStage.DesiredState.SetVertexBuffer( 0, m_pVertexBuffer->m_iResource, 0, sizeof( SpriteVertex ) );
-		pPipeline->InputAssemblerStage.DesiredState.SetVertexBuffer( 1, m_pInstanceDataBuffer->m_iResource, 0, sizeof( SpriteDrawData ) );
+		pPipeline->InputAssemblerStage.DesiredState.SetVertexBuffer( 1, QuadBuffer.GetVertexBuffer()->m_iResource, 0, sizeof( SpriteDrawData ) );
 		pPipeline->InputAssemblerStage.DesiredState.SetIndexBuffer( m_pIndexBuffer->m_iResource );
 		pPipeline->InputAssemblerStage.DesiredState.SetIndexBufferFormat( DXGI_FORMAT_R32_UINT );
 	
 		pPipeline->ApplyInputResources();
 
-		pPipeline->DrawIndexedInstanced( 6, m_uiQuadCount, 0, 0, 0 );
+		pPipeline->DrawIndexedInstanced( 6, QuadBuffer.GetVertexCount(), 0, 0, 0 );
 	}
 }
 //--------------------------------------------------------------------------------
 void InstancedQuadGeometryDX11::ResetGeometry()
 {
 	// Reset the vertex count here to prepare for the next drawing pass.
-	m_uiQuadCount = 0;
-}
-//--------------------------------------------------------------------------------
-void InstancedQuadGeometryDX11::UploadVertexData( PipelineManagerDX11* pPipeline )
-{
-	if ( m_uiQuadCount > 0 ) {
-		// Map the vertex buffer for writing
-
-		D3D11_MAPPED_SUBRESOURCE resource = 
-			pPipeline->MapResource( m_pInstanceDataBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0 );
-
-		// Only copy as much of the data as you actually have filled up
-	
-		memcpy( resource.pData, m_pQuadDrawDataArray, m_uiQuadCount * sizeof( SpriteDrawData ) );
-
-		// Unmap the vertex buffer
-
-		pPipeline->UnMapResource( m_pInstanceDataBuffer, 0 );
-	}
-}
-//--------------------------------------------------------------------------------
-void InstancedQuadGeometryDX11::EnsureVertexCapacity( )
-{
-	// If the next vertex would put us over the limit, then resize the array.
-	if ( m_uiQuadCount + 1 >= m_uiMaxQuadCount ) {
-		SetMaxQuadCount( m_uiMaxQuadCount + 1024 );
-	}
+	QuadBuffer.ResetVertices();
 }
 //--------------------------------------------------------------------------------
 void InstancedQuadGeometryDX11::AddQuad( const SpriteDrawData& data )
 {
-	EnsureVertexCapacity( );
-
-	m_pQuadDrawDataArray[m_uiQuadCount] = data;
-	m_uiQuadCount++;
-}
-//--------------------------------------------------------------------------------
-void InstancedQuadGeometryDX11::SetMaxQuadCount( unsigned int maxQuads )
-{
-	// if this is different than the current size, then release the existing
-	// local array, plus resize the resource.
-
-	if ( maxQuads != m_uiMaxQuadCount ) {
-
-		// Create the new array, temporarily in a local variable.
-		SpriteDrawData* pNewArray = new SpriteDrawData[maxQuads];
-
-		// Truncate the vertex count if more than the new max are already loaded 
-		// which could happen if the array is being shrunken.
-		if ( m_uiQuadCount > maxQuads ) {
-			m_uiQuadCount = maxQuads;
-		}
-
-		// Copy the existing vertex data over, if any has been added.
-		if ( m_uiQuadCount > 0 ) {
-			memcpy( pNewArray, m_pQuadDrawDataArray, m_uiQuadCount * sizeof( SpriteDrawData ) );
-		}
-
-		// Remember the maximum number of vertices to allow, and the 
-		// current count of vertices is left as it is.
-		m_uiMaxQuadCount = maxQuads;
-
-		// Release system memory for the old array so that we can set a new one
-		SAFE_DELETE_ARRAY( m_pQuadDrawDataArray );
-		m_pQuadDrawDataArray = pNewArray;
-
-		// Delete the existing resource if it already existed
-		if ( nullptr != m_pInstanceDataBuffer ) {
-			RendererDX11::Get()->DeleteResource( m_pInstanceDataBuffer );
-			m_pInstanceDataBuffer = nullptr;
-		}
-
-		// Create the new instance buffer, with the dynamic flag set to true
-		BufferConfigDX11 instanceConfig;
-		instanceConfig.SetUsage( D3D11_USAGE_DYNAMIC );
-		instanceConfig.SetByteWidth( m_uiMaxQuadCount * sizeof( SpriteDrawData )  );
-		instanceConfig.SetBindFlags( D3D11_BIND_VERTEX_BUFFER );
-		instanceConfig.SetCPUAccessFlags( D3D11_CPU_ACCESS_WRITE );
-		instanceConfig.SetMiscFlags( 0 );
-
-		m_pInstanceDataBuffer = RendererDX11::Get()->CreateVertexBuffer( &instanceConfig, NULL );
-
-		if ( m_pInstanceDataBuffer->m_iResource == -1 )
-		{
-			Log::Get().Write( L"Failed to create sprite instance data buffer" );
-		}
-	}
-}
-//--------------------------------------------------------------------------------
-unsigned int InstancedQuadGeometryDX11::GetMaxQuadCount()
-{
-	return( m_uiMaxQuadCount );
+	QuadBuffer.AddVertex( data );
 }
 //--------------------------------------------------------------------------------
 unsigned int InstancedQuadGeometryDX11::GetQuadCount()
 {
-	return( m_uiQuadCount );
+	return( QuadBuffer.GetVertexCount() );
 }
 //--------------------------------------------------------------------------------

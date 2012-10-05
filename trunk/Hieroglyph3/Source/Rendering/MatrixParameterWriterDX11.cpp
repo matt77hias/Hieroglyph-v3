@@ -23,6 +23,11 @@ MatrixParameterWriterDX11::~MatrixParameterWriterDX11()
 {
 }
 //--------------------------------------------------------------------------------
+void MatrixParameterWriterDX11::SetRenderParameterRef( MatrixParameterDX11* pParam )
+{
+	m_pParameter = pParam;
+}
+//--------------------------------------------------------------------------------
 void MatrixParameterWriterDX11::WriteParameter( IParameterManager* pParamMgr )
 {
 	pParamMgr->SetMatrixParameter( m_pParameter, &m_Value );

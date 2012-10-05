@@ -23,6 +23,11 @@ SamplerParameterWriterDX11::~SamplerParameterWriterDX11()
 {
 }
 //--------------------------------------------------------------------------------
+void SamplerParameterWriterDX11::SetRenderParameterRef( SamplerParameterDX11* pParam )
+{
+	m_pParameter = pParam;
+}
+//--------------------------------------------------------------------------------
 void SamplerParameterWriterDX11::WriteParameter( IParameterManager* pParamMgr )
 {
 	pParamMgr->SetSamplerParameter( m_pParameter, &m_Value );

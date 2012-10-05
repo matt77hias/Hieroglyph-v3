@@ -26,6 +26,7 @@ namespace Glyph3
 	{
 	public:
 		DiffuseSphereEntity( );
+		virtual ~DiffuseSphereEntity( );
 
         static void LoadResources( );
 
@@ -36,6 +37,7 @@ namespace Glyph3
         static RenderEffectDX11* RenderEffect;
         static RenderEffectDX11* ParabolaEffect;
         static GeometryPtr SphereGeometry;
+		static MaterialPtr DiffuseMaterial;
 	};
 };
 //--------------------------------------------------------------------------------

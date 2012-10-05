@@ -9,32 +9,34 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// MatrixParameterWriterDX11
+// Glyphlet
 //
 //--------------------------------------------------------------------------------
-#ifndef MatrixParameterWriterDX11_h
-#define MatrixParameterWriterDX11_h
+#ifndef Glyphlet_h
+#define Glyphlet_h
 //--------------------------------------------------------------------------------
-#include "ParameterWriter.h"
+#include "Log.h"
+#include "Timer.h"
+#include "EventManager.h"
+#include "Scene.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class MatrixParameterWriterDX11 : public ParameterWriter
+	class Glyphlet
 	{
+
 	public:
-		MatrixParameterWriterDX11();
-		virtual ~MatrixParameterWriterDX11();
 
-		void SetRenderParameterRef( MatrixParameterDX11* pParam );
+		// The general glyphlet interface is defined by these four functions. 
+		// Their individual implementations can perform whatever functionality
+		// is needed for a given situation, thus no data members are assumed in
+		// this base class.
 
-		virtual void WriteParameter( IParameterManager* pParamMgr );
-		void SetValue( Matrix4f& Value );
-
-	protected:
-		Matrix4f						m_Value;
+		virtual void Initialize() = 0;
+		virtual void Update( float dt ) = 0;
+		virtual void Shutdown() = 0;
+		virtual bool HandleEvent( IEvent* pEvent ) = 0;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // MatrixParameterWriterDX11_h
-//--------------------------------------------------------------------------------
-
+#endif // Glyphlet_h

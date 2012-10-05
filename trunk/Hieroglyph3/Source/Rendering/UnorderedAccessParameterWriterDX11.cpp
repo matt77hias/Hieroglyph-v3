@@ -23,6 +23,11 @@ UnorderedAccessParameterWriterDX11::~UnorderedAccessParameterWriterDX11()
 {
 }
 //--------------------------------------------------------------------------------
+void UnorderedAccessParameterWriterDX11::SetRenderParameterRef( UnorderedAccessParameterDX11* pParam )
+{
+	m_pParameter = pParam;
+}
+//--------------------------------------------------------------------------------
 void UnorderedAccessParameterWriterDX11::WriteParameter( IParameterManager* pParamMgr )
 {
 	pParamMgr->SetUnorderedAccessParameter( m_pParameter, m_Value, m_InitCount );

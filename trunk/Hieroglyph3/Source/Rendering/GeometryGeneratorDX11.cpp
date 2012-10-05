@@ -938,20 +938,12 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryPtr pGeometry, 
 
 					ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"EyeOfHorus_128_blurred.png" );
 					//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"Hex.png" );
+					pActor->GetBody()->Parameters.SetShaderResourceParameter( L"ColorTexture", ColorTexture );
 						
-					ShaderResourceParameterWriterDX11* pColorWriter = new ShaderResourceParameterWriterDX11();
-					pColorWriter->SetRenderParameterRef( RendererDX11::Get()->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) ) );
-					pColorWriter->SetValue( ColorTexture );
-					pActor->GetBody()->Parameters.AddRenderParameter( pColorWriter );
 
 					ResourcePtr HeightTexture = RendererDX11::Get()->LoadTexture( L"EyeOfHorus.png" );
 					//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"Hex.png" );
-
-					ShaderResourceParameterWriterDX11* pHeightWriter = new ShaderResourceParameterWriterDX11();
-					pHeightWriter->SetRenderParameterRef( RendererDX11::Get()->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"HeightTexture" ) ) );
-					pHeightWriter->SetValue( HeightTexture );
-					pActor->GetBody()->Parameters.AddRenderParameter( pHeightWriter );
-
+					pActor->GetBody()->Parameters.SetShaderResourceParameter( L"HeightTexture", HeightTexture );
 
 
 					SamplerStateConfigDX11 SamplerConfig;
@@ -961,11 +953,7 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryPtr pGeometry, 
 					SamplerConfig.MaxAnisotropy = 16;
 
 					int LinearSampler = RendererDX11::Get()->CreateSamplerState( &SamplerConfig );
-
-					SamplerParameterDX11* pSamplerParameter = 
-						RendererDX11::Get()->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"LinearSampler" ) );
-
-					pSamplerParameter->InitializeParameterData( &LinearSampler );
+					pActor->GetBody()->Parameters.SetSamplerParameter( L"LinearSampler", LinearSampler );
 				}
 			}
 		}

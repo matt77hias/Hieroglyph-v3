@@ -23,6 +23,11 @@ VectorParameterWriterDX11::~VectorParameterWriterDX11()
 {
 }
 //--------------------------------------------------------------------------------
+void VectorParameterWriterDX11::SetRenderParameterRef( VectorParameterDX11* pParam )
+{
+	m_pParameter = pParam;
+}
+//--------------------------------------------------------------------------------
 void VectorParameterWriterDX11::WriteParameter( IParameterManager* pParamMgr )
 {
 	pParamMgr->SetVectorParameter( m_pParameter, &m_Value );

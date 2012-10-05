@@ -73,6 +73,7 @@ copy Scripting\*.h ..\SDK\Include
 copy Utility\*.h ..\SDK\Include
 copy Utility\*.inl ..\SDK\Include
 copy Rendering\*.h ..\SDK\Include
+copy Rendering\*.inl ..\SDK\Include
 copy Geometry\*.h ..\SDK\Include
 copy Intersection\*.h ..\SDK\Include
 copy Objects\*.h ..\SDK\Include
@@ -102,11 +103,11 @@ copy Scripting\*.h ..\SDK\Include
 copy Utility\*.h ..\SDK\Include
 copy Utility\*.inl ..\SDK\Include
 copy Rendering\*.h ..\SDK\Include
+copy Rendering\*.inl ..\SDK\Include
 copy Geometry\*.h ..\SDK\Include
 copy Intersection\*.h ..\SDK\Include
 copy Objects\*.h ..\SDK\Include
-copy Animation\*.h ..\SDK\Include
-</Command>
+copy Animation\*.h ..\SDK\Include</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -125,6 +126,7 @@ copy Animation\*.h ..\SDK\Include
     <ClCompile Include="Application\RenderWindow.cpp" />
     <ClCompile Include="Application\Win32RenderWindow.cpp" />
     <ClCompile Include="Objects\GeometryActor.cpp" />
+    <ClCompile Include="Objects\TextActor.cpp" />
     <ClCompile Include="Rendering\D3DEnumConversion.cpp" />
     <ClCompile Include="Rendering\ImmediateGeometryDX11.cpp" />
     <ClCompile Include="Rendering\IndexedImmediateGeometryDX11.cpp" />
@@ -463,6 +465,7 @@ copy Animation\*.h ..\SDK\Include
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\FileLoader.h" />
+    <ClInclude Include="Application\Glyphlet.h" />
     <ClInclude Include="Application\IWindowProc.h" />
     <ClInclude Include="Mathematics\Matrix3f.h" />
     <ClInclude Include="Mathematics\Matrix4f.h" />
@@ -477,6 +480,7 @@ copy Animation\*.h ..\SDK\Include
     <ClInclude Include="Application\RenderWindow.h" />
     <ClInclude Include="Application\Win32RenderWindow.h" />
     <ClInclude Include="Objects\GeometryActor.h" />
+    <ClInclude Include="Objects\TextActor.h" />
     <ClInclude Include="Rendering\D3DEnumConversion.h" />
     <ClInclude Include="Rendering\ImmediateGeometryDX11.h" />
     <ClInclude Include="Rendering\IndexedImmediateGeometryDX11.h" />
@@ -492,6 +496,8 @@ copy Animation\*.h ..\SDK\Include
     <ClInclude Include="Rendering\ShaderReflectionDX11.h" />
     <ClInclude Include="Rendering\ShaderReflectionFactoryDX11.h" />
     <ClInclude Include="Rendering\ShaderStageStateDX11.h" />
+    <ClInclude Include="Rendering\TGrowableIndexBufferDX11.h" />
+    <ClInclude Include="Rendering\TGrowableVertexBufferDX11.h" />
     <ClInclude Include="Utility\GlyphString.h" />
     <ClInclude Include="Utility\Log.h" />
     <ClInclude Include="Utility\PCH.h" />
@@ -648,6 +654,8 @@ copy Animation\*.h ..\SDK\Include
     <ClInclude Include="Animation\AnimationStream.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Rendering\TGrowableIndexBufferDX11.inl" />
+    <None Include="Rendering\TGrowableVertexBufferDX11.inl" />
     <None Include="Utility\TArray.inl" />
     <None Include="Shaders\Sprite.hlsl" />
     <None Include="Utility\TConfiguration.inl" />

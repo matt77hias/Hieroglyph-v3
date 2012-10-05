@@ -29,33 +29,19 @@ using namespace Glyph3;
 ResourcePtr DiffuseSphereEntity::ColorTexture;
 ShaderResourceParameterDX11* DiffuseSphereEntity::TextureParameter = NULL;
 int DiffuseSphereEntity::LinearSampler = -1;
-RenderEffectDX11* DiffuseSphereEntity::RenderEffect = NULL;
-RenderEffectDX11* DiffuseSphereEntity::ParabolaEffect = NULL;
-GeometryPtr DiffuseSphereEntity::SphereGeometry = NULL;
+RenderEffectDX11* DiffuseSphereEntity::RenderEffect = nullptr;
+RenderEffectDX11* DiffuseSphereEntity::ParabolaEffect = nullptr;
+GeometryPtr DiffuseSphereEntity::SphereGeometry = nullptr;
+MaterialPtr DiffuseSphereEntity::DiffuseMaterial = nullptr;
 //--------------------------------------------------------------------------------
 DiffuseSphereEntity::DiffuseSphereEntity()
 {
-	MaterialPtr pMaterial = MaterialPtr( new MaterialDX11() );
-
-	// Enable the material to render the given view type, and set its effect.
-	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
-	pMaterial->Params[VT_PERSPECTIVE].pEffect = RenderEffect;	
-
-	// Enable the material to render the given view type, and set its effect.
-	pMaterial->Params[VT_DUAL_PARABOLOID_ENVMAP].bRender = true;
-	pMaterial->Params[VT_DUAL_PARABOLOID_ENVMAP].pEffect = ParabolaEffect;
-
 	this->SetGeometry( SphereGeometry );
-	this->SetMaterial( pMaterial );
-
-	// Create a parameter writer to automatically set the desired texture.
-
-	ShaderResourceParameterWriterDX11* pTextureWriter = new ShaderResourceParameterWriterDX11();
-	pTextureWriter->SetRenderParameterRef( 
-		RendererDX11::Get()->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) ) );
-	pTextureWriter->SetValue( ColorTexture );
-	
-    this->Parameters.AddRenderParameter( pTextureWriter );
+	this->SetMaterial( DiffuseMaterial );
+}
+//--------------------------------------------------------------------------------
+DiffuseSphereEntity::~DiffuseSphereEntity()
+{
 }
 //--------------------------------------------------------------------------------
 void DiffuseSphereEntity::LoadResources()
@@ -68,6 +54,8 @@ void DiffuseSphereEntity::LoadResources()
     SphereGeometry->LoadToBuffers();
     SphereGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
+	DiffuseMaterial = MaterialPtr( new MaterialDX11() );
+
     RenderEffect = new RenderEffectDX11();
     RenderEffect->SetVertexShader( pRenderer11->LoadShader( VERTEX_SHADER,     
 		std::wstring( L"ObjectTexturedVS.hlsl" ),
@@ -78,6 +66,10 @@ void DiffuseSphereEntity::LoadResources()
 		std::wstring( L"ObjectTexturedPS.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_5_0" ) ) );
+
+	// Enable the material to render the given view type, and set its effect.
+	DiffuseMaterial->Params[VT_PERSPECTIVE].bRender = true;
+	DiffuseMaterial->Params[VT_PERSPECTIVE].pEffect = RenderEffect;	
 
     // Create and fill the effect that will be used for a diffuse object 
     // to be rendered into a paraboloid map, which will use the paraboloid
@@ -107,6 +99,10 @@ void DiffuseSphereEntity::LoadResources()
     //ParabolaEffect->m_iRasterizerState = 
     //	pRenderer11->CreateRasterizerState( &RS );
 
+	// Enable the material to render the given view type, and set its effect.
+	DiffuseMaterial->Params[VT_DUAL_PARABOLOID_ENVMAP].bRender = true;
+	DiffuseMaterial->Params[VT_DUAL_PARABOLOID_ENVMAP].pEffect = ParabolaEffect;
+
 	SphereGeometry->GenerateInputLayout( RenderEffect->GetVertexShader() );
 	SphereGeometry->GenerateInputLayout( ParabolaEffect->GetVertexShader() );
 
@@ -115,16 +111,13 @@ void DiffuseSphereEntity::LoadResources()
 
 
     ColorTexture = pRenderer11->LoadTexture( L"Tiles.png" );
-
-    TextureParameter = pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) );
-    TextureParameter->InitializeParameterData( &ColorTexture->m_iResourceSRV );    
+	DiffuseMaterial->Parameters.SetShaderResourceParameter( L"ColorTexture", ColorTexture );
 
     SamplerStateConfigDX11 SamplerConfig;
     SamplerConfig.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
     SamplerConfig.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-    LinearSampler = pRenderer11->CreateSamplerState( &SamplerConfig );
 
-	SamplerParameterDX11* pSamplerParameter = pRenderer11->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"LinearSampler" ) );
-    pSamplerParameter->InitializeParameterData( &LinearSampler );
+    LinearSampler = pRenderer11->CreateSamplerState( &SamplerConfig );
+	DiffuseMaterial->Parameters.SetSamplerParameter( L"LinearSampler", LinearSampler );
 }
 //--------------------------------------------------------------------------------

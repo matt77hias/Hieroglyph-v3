@@ -21,16 +21,8 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ImmediateGeometryDX11::ImmediateGeometryDX11( )
 {
-	m_uiMaxVertexCount = 0;
-	m_uiVertexCount = 0;
 	m_Color = Vector4f( 0.0f, 1.0f, 0.0f, 1.0f );
 	m_ePrimType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-
-	m_pVertexArray = nullptr;
-
-	// Initialize our buffer to a reasonable size
-	SetMaxVertexCount( 128 );
-
 
 	// Fill in the vertex element descriptions based on each element of our format
 
@@ -79,14 +71,13 @@ ImmediateGeometryDX11::ImmediateGeometryDX11( )
 //--------------------------------------------------------------------------------
 ImmediateGeometryDX11::~ImmediateGeometryDX11()
 {
-	SAFE_DELETE_ARRAY( m_pVertexArray );
 }
 //--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
 {
-	if ( m_uiVertexCount > 0 ) {
+	if ( VertexBuffer.GetVertexCount() > 0 ) {
 
-		UploadVertexData( pPipeline );
+		VertexBuffer.UploadVertexData( pPipeline );
 	
 		pPipeline->InputAssemblerStage.ClearDesiredState();
 
@@ -94,140 +85,119 @@ void ImmediateGeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterM
 		int layout = GetInputLayout( pPipeline->ShaderStages[VERTEX_SHADER]->DesiredState.GetShaderProgram() );
 		pPipeline->InputAssemblerStage.DesiredState.SetInputLayout( layout );
 		pPipeline->InputAssemblerStage.DesiredState.SetPrimitiveTopology( m_ePrimType );
-		pPipeline->InputAssemblerStage.DesiredState.SetVertexBuffer( 0, m_VB->m_iResource, 0, sizeof( ImmediateVertexDX11 ) );
+		pPipeline->InputAssemblerStage.DesiredState.SetVertexBuffer( 0, VertexBuffer.GetVertexBuffer()->m_iResource, 0, sizeof( ImmediateVertexDX11 ) );
 	
 		pPipeline->ApplyInputResources();
 
-		pPipeline->Draw( m_uiVertexCount, 0 );
+		pPipeline->Draw( VertexBuffer.GetVertexCount(), 0 );
 	}
 }
 //--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::ResetGeometry()
 {
 	// Reset the vertex count here to prepare for the next drawing pass.
-	m_uiVertexCount = 0;
-}
-//--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::UploadVertexData( PipelineManagerDX11* pPipeline )
-{
-	if ( m_uiVertexCount > 0 ) {
-		// Map the vertex buffer for writing
-
-		D3D11_MAPPED_SUBRESOURCE resource = 
-			pPipeline->MapResource( m_VB, 0, D3D11_MAP_WRITE_DISCARD, 0 );
-
-		// Only copy as much of the data as you actually have filled up
-	
-		memcpy( resource.pData, m_pVertexArray, m_uiVertexCount * sizeof( ImmediateVertexDX11 ) );
-
-		// Unmap the vertex buffer
-
-		pPipeline->UnMapResource( m_VB, 0 );
-	}
-}
-//--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::EnsureVertexCapacity( )
-{
-	// If the next vertex would put us over the limit, then resize the array.
-	if ( m_uiVertexCount + 1 >= m_uiMaxVertexCount ) {
-		SetMaxVertexCount( m_uiMaxVertexCount + 1024 );
-	}
+	VertexBuffer.ResetVertices();
 }
 //--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::AddVertex( const ImmediateVertexDX11& vertex )
 {
-	EnsureVertexCapacity( );
-
-	m_pVertexArray[m_uiVertexCount] = vertex;
-	m_uiVertexCount++;
+	VertexBuffer.AddVertex( vertex );
 }
 //--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::AddVertex( const Vector3f& position )
 {
-	EnsureVertexCapacity( );
+	ImmediateVertexDX11 vertex;
 
-	m_pVertexArray[m_uiVertexCount].position = position;
-	m_pVertexArray[m_uiVertexCount].normal = Vector3f( 0.0f, 1.0f, 0.0f );
-	m_pVertexArray[m_uiVertexCount].color = m_Color;
-	m_pVertexArray[m_uiVertexCount].texcoords = Vector2f( 0.0f, 0.0f );
-	m_uiVertexCount++;
+	vertex.position = position;
+	vertex.normal = Vector3f( 0.0f, 1.0f, 0.0f );
+	vertex.color = m_Color;
+	vertex.texcoords = Vector2f( 0.0f, 0.0f );
+
+	VertexBuffer.AddVertex( vertex );
 }
 //--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector4f& color )
 {
-	EnsureVertexCapacity( );
+	ImmediateVertexDX11 vertex;
 
-	m_pVertexArray[m_uiVertexCount].position = position;
-	m_pVertexArray[m_uiVertexCount].normal = Vector3f( 0.0f, 1.0f, 0.0f );
-	m_pVertexArray[m_uiVertexCount].color = color;
-	m_pVertexArray[m_uiVertexCount].texcoords = Vector2f( 0.0f, 0.0f );
-	m_uiVertexCount++;
+	vertex.position = position;
+	vertex.normal = Vector3f( 0.0f, 1.0f, 0.0f );
+	vertex.color = color;
+	vertex.texcoords = Vector2f( 0.0f, 0.0f );
+	
+	VertexBuffer.AddVertex( vertex );
 }
 //--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector2f& texcoords )
 {
-	EnsureVertexCapacity( );
+	ImmediateVertexDX11 vertex;
 
-	m_pVertexArray[m_uiVertexCount].position = position;
-	m_pVertexArray[m_uiVertexCount].normal = Vector3f( 0.0f, 1.0f, 0.0f );
-	m_pVertexArray[m_uiVertexCount].color = m_Color;
-	m_pVertexArray[m_uiVertexCount].texcoords = texcoords;
-	m_uiVertexCount++;
+	vertex.position = position;
+	vertex.normal = Vector3f( 0.0f, 1.0f, 0.0f );
+	vertex.color = m_Color;
+	vertex.texcoords = texcoords;
+	
+	VertexBuffer.AddVertex( vertex );
 }
 //--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector4f& color, const Vector2f& texcoords )
 {
-	EnsureVertexCapacity( );
+	ImmediateVertexDX11 vertex;
 
-	m_pVertexArray[m_uiVertexCount].position = position;
-	m_pVertexArray[m_uiVertexCount].normal = Vector3f( 0.0f, 1.0f, 0.0f );
-	m_pVertexArray[m_uiVertexCount].color = color;
-	m_pVertexArray[m_uiVertexCount].texcoords = texcoords;
-	m_uiVertexCount++;
+	vertex.position = position;
+	vertex.normal = Vector3f( 0.0f, 1.0f, 0.0f );
+	vertex.color = color;
+	vertex.texcoords = texcoords;
+	
+	VertexBuffer.AddVertex( vertex );
 }
 //--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector3f& normal )
 {
-	EnsureVertexCapacity( );
+	ImmediateVertexDX11 vertex;
 
-	m_pVertexArray[m_uiVertexCount].position = position;
-	m_pVertexArray[m_uiVertexCount].normal = normal;
-	m_pVertexArray[m_uiVertexCount].color = m_Color;
-	m_pVertexArray[m_uiVertexCount].texcoords = Vector2f( 0.0f, 0.0f );
-	m_uiVertexCount++;
+	vertex.position = position;
+	vertex.normal = normal;
+	vertex.color = m_Color;
+	vertex.texcoords = Vector2f( 0.0f, 0.0f );
+	
+	VertexBuffer.AddVertex( vertex );
 }
 //--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector3f& normal, const Vector4f& color )
 {
-	EnsureVertexCapacity( );
+	ImmediateVertexDX11 vertex;
 
-	m_pVertexArray[m_uiVertexCount].position = position;
-	m_pVertexArray[m_uiVertexCount].normal = normal;
-	m_pVertexArray[m_uiVertexCount].color = color;
-	m_pVertexArray[m_uiVertexCount].texcoords = Vector2f( 0.0f, 0.0f );
-	m_uiVertexCount++;
+	vertex.position = position;
+	vertex.normal = normal;
+	vertex.color = color;
+	vertex.texcoords = Vector2f( 0.0f, 0.0f );
+	
+	VertexBuffer.AddVertex( vertex );
 }
 //--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector3f& normal, const Vector2f& texcoords )
 {
-	EnsureVertexCapacity( );
+	ImmediateVertexDX11 vertex;
 
-	m_pVertexArray[m_uiVertexCount].position = position;
-	m_pVertexArray[m_uiVertexCount].normal = normal;
-	m_pVertexArray[m_uiVertexCount].color = m_Color;
-	m_pVertexArray[m_uiVertexCount].texcoords = texcoords;
-	m_uiVertexCount++;
+	vertex.position = position;
+	vertex.normal = normal;
+	vertex.color = m_Color;
+	vertex.texcoords = texcoords;
+	
+	VertexBuffer.AddVertex( vertex );
 }
 //--------------------------------------------------------------------------------
 void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector3f& normal, const Vector4f& color, const Vector2f& texcoords )
 {
-	EnsureVertexCapacity( );
+	ImmediateVertexDX11 vertex;
 
-	m_pVertexArray[m_uiVertexCount].position = position;
-	m_pVertexArray[m_uiVertexCount].normal = normal;
-	m_pVertexArray[m_uiVertexCount].color = color;
-	m_pVertexArray[m_uiVertexCount].texcoords = texcoords;
-	m_uiVertexCount++;
+	vertex.position = position;
+	vertex.normal = normal;
+	vertex.color = color;
+	vertex.texcoords = texcoords;
+	
+	VertexBuffer.AddVertex( vertex );
 }
 //--------------------------------------------------------------------------------
 D3D11_PRIMITIVE_TOPOLOGY ImmediateGeometryDX11::GetPrimitiveType()
@@ -250,62 +220,15 @@ Vector4f ImmediateGeometryDX11::GetColor( )
 	return( m_Color );
 }
 //--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::SetMaxVertexCount( unsigned int maxVertices )
-{
-	// if this is different than the current size, then release the existing
-	// local array, plus resize the resource.
-
-	if ( maxVertices != m_uiMaxVertexCount ) {
-
-		// Create the new array, temporarily in a local variable.
-		ImmediateVertexDX11* pNewArray = new ImmediateVertexDX11[maxVertices];
-
-		// Truncate the vertex count if more than the new max are already loaded 
-		// which could happen if the array is being shrunken.
-		if ( m_uiVertexCount > maxVertices ) {
-			m_uiVertexCount = maxVertices;
-		}
-
-		// Copy the existing vertex data over, if any has been added.
-		if ( m_uiVertexCount > 0 ) {
-			memcpy( pNewArray, m_pVertexArray, m_uiVertexCount * sizeof(ImmediateVertexDX11) );
-		}
-
-		// Remember the maximum number of vertices to allow, and the 
-		// current count of vertices is left as it is.
-		m_uiMaxVertexCount = maxVertices;
-
-		// Release system memory for the old array so that we can set a new one
-		SAFE_DELETE_ARRAY( m_pVertexArray );
-		m_pVertexArray = pNewArray;
-
-		// Delete the existing resource if it already existed
-		if ( nullptr != m_VB ) {
-			RendererDX11::Get()->DeleteResource( m_VB );
-			m_VB = nullptr;
-		}
-
-		// Create the new vertex buffer, with the dynamic flag set to true
-		BufferConfigDX11 vbuffer;
-		vbuffer.SetDefaultVertexBuffer( m_uiMaxVertexCount * sizeof( ImmediateVertexDX11 ), true );
-		m_VB = RendererDX11::Get()->CreateVertexBuffer( &vbuffer, nullptr );
-	}
-}
-//--------------------------------------------------------------------------------
-unsigned int ImmediateGeometryDX11::GetMaxVertexCount()
-{
-	return( m_uiMaxVertexCount );
-}
-//--------------------------------------------------------------------------------
 unsigned int ImmediateGeometryDX11::GetVertexCount()
 {
-	return( m_uiVertexCount );
+	return( VertexBuffer.GetVertexCount() );
 }
 //--------------------------------------------------------------------------------
 unsigned int ImmediateGeometryDX11::GetPrimitiveCount()
 {
 	unsigned int count = 0;
-	unsigned int referencedVertices = m_uiVertexCount;
+	unsigned int referencedVertices = VertexBuffer.GetVertexCount();
 
 	switch ( m_ePrimType )
 	{

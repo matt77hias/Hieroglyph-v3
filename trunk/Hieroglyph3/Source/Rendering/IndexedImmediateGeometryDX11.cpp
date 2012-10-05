@@ -20,25 +20,20 @@
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 IndexedImmediateGeometryDX11::IndexedImmediateGeometryDX11( )
-	: m_uiMaxIndexCount( 0 ),
-	  m_uiIndexCount( 0 ),
-	  m_pIndexArray( nullptr )
 {
-	// Initialize our buffer to a reasonable size
-	SetMaxIndexCount( 128 );
+
 }
 //--------------------------------------------------------------------------------
 IndexedImmediateGeometryDX11::~IndexedImmediateGeometryDX11()
 {
-	SAFE_DELETE_ARRAY( m_pIndexArray );
 }
 //--------------------------------------------------------------------------------
 void IndexedImmediateGeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
 {
-	if ( m_uiIndexCount > 0 ) {
+	if ( IndexBuffer.GetIndexCount() > 0 ) {
 
-		UploadVertexData( pPipeline );
-		UploadIndexData( pPipeline );
+		VertexBuffer.UploadVertexData( pPipeline );
+		IndexBuffer.UploadIndexData( pPipeline );
 	
 		pPipeline->InputAssemblerStage.ClearDesiredState();
 
@@ -46,12 +41,12 @@ void IndexedImmediateGeometryDX11::Execute( PipelineManagerDX11* pPipeline, IPar
 		int layout = GetInputLayout( pPipeline->ShaderStages[VERTEX_SHADER]->DesiredState.GetShaderProgram() );
 		pPipeline->InputAssemblerStage.DesiredState.SetInputLayout( layout );
 		pPipeline->InputAssemblerStage.DesiredState.SetPrimitiveTopology( m_ePrimType );
-		pPipeline->InputAssemblerStage.DesiredState.SetVertexBuffer( 0, m_VB->m_iResource, 0, sizeof( ImmediateVertexDX11 ) );
-		pPipeline->InputAssemblerStage.DesiredState.SetIndexBuffer( m_IB->m_iResource );
+		pPipeline->InputAssemblerStage.DesiredState.SetVertexBuffer( 0, VertexBuffer.GetVertexBuffer()->m_iResource, 0, sizeof( ImmediateVertexDX11 ) );
+		pPipeline->InputAssemblerStage.DesiredState.SetIndexBuffer( IndexBuffer.GetIndexBuffer()->m_iResource );
 
 		pPipeline->ApplyInputResources();
 
-		pPipeline->DrawIndexed( m_uiIndexCount, 0, 0 );
+		pPipeline->DrawIndexed( IndexBuffer.GetIndexCount(), 0, 0 );
 	}
 }
 //--------------------------------------------------------------------------------
@@ -59,36 +54,8 @@ void IndexedImmediateGeometryDX11::ResetGeometry()
 {
 	// Reset the vertex and index count here to prepare for the next drawing pass.
 
-	ImmediateGeometryDX11::ResetGeometry();
-	m_uiIndexCount = 0;
-}
-//--------------------------------------------------------------------------------
-void IndexedImmediateGeometryDX11::UploadIndexData( PipelineManagerDX11* pPipeline )
-{
-
-	if ( m_uiIndexCount > 0 ) {
-		
-		// Map the index buffer for writing
-
-		D3D11_MAPPED_SUBRESOURCE resource = 
-			pPipeline->MapResource( m_IB, 0, D3D11_MAP_WRITE_DISCARD, 0 );
-
-		// Only copy as much of the data as you actually have filled up
-	
-		memcpy( resource.pData, m_pIndexArray, m_uiIndexCount * sizeof( unsigned int ) );
-
-		// Unmap the vertex buffer
-
-		pPipeline->UnMapResource( m_IB, 0 );
-	}
-}
-//--------------------------------------------------------------------------------
-void IndexedImmediateGeometryDX11::EnsureIndexCapacity( )
-{
-	// If the next vertex would put us over the limit, then resize the array.
-	if ( m_uiIndexCount + 1 >= m_uiMaxIndexCount ) {
-		SetMaxIndexCount( m_uiMaxIndexCount + 1024 );
-	}
+	VertexBuffer.ResetVertices();
+	IndexBuffer.ResetIndices();
 }
 //--------------------------------------------------------------------------------
 void IndexedImmediateGeometryDX11::AddIndex( const unsigned int index )
@@ -97,10 +64,7 @@ void IndexedImmediateGeometryDX11::AddIndex( const unsigned int index )
 	// the number of vertices that are out there. User's are allowed to do what they
 	// want with this data, but have to ensure that the indices are correct!
 
-	EnsureIndexCapacity( );
-
-	m_pIndexArray[m_uiIndexCount] = index;
-	m_uiIndexCount++;
+	IndexBuffer.AddIndex( index );
 }
 //--------------------------------------------------------------------------------
 void IndexedImmediateGeometryDX11::AddIndices( const unsigned int i1, const unsigned int i2 )
@@ -116,148 +80,102 @@ void IndexedImmediateGeometryDX11::AddIndices( const unsigned int i1, const unsi
 	AddIndex( i3 );
 }
 //--------------------------------------------------------------------------------
-void IndexedImmediateGeometryDX11::SetMaxIndexCount( unsigned int maxIndices )
-{
-	// if this is different than the current size, then release the existing
-	// local array, plus resize the resource.
-
-	if ( maxIndices != m_uiMaxIndexCount ) {
-
-		// Create the new array, temporarily in a local variable.
-		unsigned int* pNewArray = new unsigned int[maxIndices];
-
-		// Truncate the index count if more than the new max are already loaded 
-		// which could happen if the array is being shrunken.
-		if ( m_uiIndexCount > maxIndices ) {
-			m_uiIndexCount = maxIndices;
-		}
-
-		// Copy the existing index data over, if any has been added.
-		if ( m_uiIndexCount > 0 ) {
-			memcpy( pNewArray, m_pIndexArray, m_uiIndexCount * sizeof(unsigned int) );
-		}
-
-		// Remember the maximum number of indices to allow
-		m_uiMaxIndexCount = maxIndices;
-		
-		// Release system memory for the old array so that we can create a new one
-		SAFE_DELETE_ARRAY( m_pIndexArray );
-		m_pIndexArray = pNewArray;
-
-		// Delete the existing resource if it already existed
-		if ( nullptr != m_IB ) {
-			RendererDX11::Get()->DeleteResource( m_IB );
-			m_IB = nullptr;
-		}
-
-		// Create the new vertex buffer, with the dynamic flag set to true
-		BufferConfigDX11 ibuffer;
-		ibuffer.SetDefaultIndexBuffer( m_uiMaxIndexCount * sizeof( unsigned int ), true );
-		m_IB = RendererDX11::Get()->CreateIndexBuffer( &ibuffer, nullptr );
-	}
-}
-//--------------------------------------------------------------------------------
-unsigned int IndexedImmediateGeometryDX11::GetMaxIndexCount()
-{
-	return( m_uiMaxIndexCount );
-}
-//--------------------------------------------------------------------------------
 unsigned int IndexedImmediateGeometryDX11::GetIndexCount()
 {
-	return( m_uiIndexCount );
+	return( IndexBuffer.GetIndexCount() );
 }
 //--------------------------------------------------------------------------------
 unsigned int IndexedImmediateGeometryDX11::GetPrimitiveCount()
 {
 	unsigned int count = 0;
-	unsigned int referencedVertices = m_uiIndexCount;
+	unsigned int referencedIndices = IndexBuffer.GetIndexCount();
 
 	switch ( m_ePrimType )
 	{
 	case D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED:
 		break;
 	case D3D11_PRIMITIVE_TOPOLOGY_POINTLIST:
-		count = referencedVertices; break;
+		count = referencedIndices; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_LINELIST:
-		count = referencedVertices / 2; break;
+		count = referencedIndices / 2; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP:
-		count = referencedVertices - 1; break;
+		count = referencedIndices - 1; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST:
-		count = referencedVertices / 3; break;
+		count = referencedIndices / 3; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP:
-		count = referencedVertices - 2; break;
+		count = referencedIndices - 2; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_LINELIST_ADJ:
-		count = referencedVertices / 4; break;
+		count = referencedIndices / 4; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ:
-		count = referencedVertices - 3; break;
+		count = referencedIndices - 3; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ:
-		count = referencedVertices / 6; break;
+		count = referencedIndices / 6; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ:
-		count = ( referencedVertices - 3 ) / 2; break;
+		count = ( referencedIndices - 3 ) / 2; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices; break;
+		count = referencedIndices; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 2; break;
+		count = referencedIndices / 2; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 3; break;
+		count = referencedIndices / 3; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 4; break;
+		count = referencedIndices / 4; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_5_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 5; break;
+		count = referencedIndices / 5; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_6_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 6; break;
+		count = referencedIndices / 6; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_7_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 7; break;
+		count = referencedIndices / 7; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_8_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 8; break;
+		count = referencedIndices / 8; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_9_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 9; break;
+		count = referencedIndices / 9; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_10_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 10; break;
+		count = referencedIndices / 10; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_11_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 11; break;
+		count = referencedIndices / 11; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_12_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 12; break;
+		count = referencedIndices / 12; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_13_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 13; break;
+		count = referencedIndices / 13; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_14_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 14; break;
+		count = referencedIndices / 14; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_15_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 15; break;
+		count = referencedIndices / 15; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_16_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 16; break;
+		count = referencedIndices / 16; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_17_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 17; break;
+		count = referencedIndices / 17; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_18_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 18; break;
+		count = referencedIndices / 18; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_19_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 19; break;
+		count = referencedIndices / 19; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_20_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 20; break;
+		count = referencedIndices / 20; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_21_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 21; break;
+		count = referencedIndices / 21; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_22_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 22; break;
+		count = referencedIndices / 22; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_23_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 23; break;
+		count = referencedIndices / 23; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_24_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 24; break;
+		count = referencedIndices / 24; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_25_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 25; break;
+		count = referencedIndices / 25; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_26_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 26; break;
+		count = referencedIndices / 26; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_27_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 27; break;
+		count = referencedIndices / 27; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_28_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 28; break;
+		count = referencedIndices / 28; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_29_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 29; break;
+		count = referencedIndices / 29; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_30_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 30; break;
+		count = referencedIndices / 30; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_31_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 31; break;
+		count = referencedIndices / 31; break;
 	case D3D11_PRIMITIVE_TOPOLOGY_32_CONTROL_POINT_PATCHLIST:
-		count = referencedVertices / 32; break;
+		count = referencedIndices / 32; break;
 	}
 
 	return( count );

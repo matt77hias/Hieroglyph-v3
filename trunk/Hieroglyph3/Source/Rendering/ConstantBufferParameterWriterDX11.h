@@ -25,6 +25,8 @@ namespace Glyph3
 		ConstantBufferParameterWriterDX11();
 		virtual ~ConstantBufferParameterWriterDX11();
 
+		void SetRenderParameterRef( ConstantBufferParameterDX11* pParam );
+
 		virtual void WriteParameter( IParameterManager* pParamMgr );
 		void SetValue( ResourcePtr Value );
 

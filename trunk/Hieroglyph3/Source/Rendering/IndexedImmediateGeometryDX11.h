@@ -31,6 +31,7 @@
 #include "PCH.h"
 #include "ImmediateGeometryDX11.h"
 #include "ResourceProxyDX11.h"
+#include "TGrowableIndexBufferDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -49,25 +50,12 @@ namespace Glyph3
 		void AddIndices( const unsigned int i1, const unsigned int i2 );
 		void AddIndices( const unsigned int i1, const unsigned int i2, const unsigned int i3 );
 
-		void SetMaxIndexCount( unsigned int maxVertices );
-		unsigned int GetMaxIndexCount();
-
 		unsigned int GetIndexCount();
 		virtual unsigned int GetPrimitiveCount();
 
 	protected:
 		
-		void UploadIndexData( PipelineManagerDX11* pPipeline );
-		void EnsureIndexCapacity( );
-
-		ResourcePtr m_IB;
-
-		// The sizes
-		unsigned int m_uiMaxIndexCount;
-		unsigned int m_uiIndexCount;
-
-		// The pointer to our array of vertex data
-		unsigned int* m_pIndexArray;
+		TGrowableIndexBufferDX11<unsigned int> IndexBuffer;
 	};
 
 	typedef std::shared_ptr<IndexedImmediateGeometryDX11> IndexedImmediateGeometryPtr;

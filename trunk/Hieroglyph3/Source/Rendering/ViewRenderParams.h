@@ -67,7 +67,6 @@ namespace Glyph3
 		int				iRenderTargets[10];
 		int				iDepthTargets[8];
 		int				iTextures[8];
-		Vector4f		vParameters[8];
 	};
 };
 //--------------------------------------------------------------------------------

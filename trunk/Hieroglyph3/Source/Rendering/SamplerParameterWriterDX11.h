@@ -25,6 +25,8 @@ namespace Glyph3
 		SamplerParameterWriterDX11();
 		virtual ~SamplerParameterWriterDX11();
 
+		void SetRenderParameterRef( SamplerParameterDX11* pParam );
+
 		virtual void WriteParameter( IParameterManager* pParamMgr );
 		void SetValue( int Value );
 

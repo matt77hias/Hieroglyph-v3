@@ -22,6 +22,11 @@ ShaderResourceParameterWriterDX11::~ShaderResourceParameterWriterDX11()
 {
 }
 //--------------------------------------------------------------------------------
+void ShaderResourceParameterWriterDX11::SetRenderParameterRef( ShaderResourceParameterDX11* pParam )
+{
+	m_pParameter = pParam;
+}
+//--------------------------------------------------------------------------------
 void ShaderResourceParameterWriterDX11::WriteParameter( IParameterManager* pParamMgr )
 {
 	pParamMgr->SetShaderResourceParameter( m_pParameter, m_Value );

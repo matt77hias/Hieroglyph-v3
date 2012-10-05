@@ -25,6 +25,8 @@ namespace Glyph3
 		UnorderedAccessParameterWriterDX11();
 		virtual ~UnorderedAccessParameterWriterDX11();
 
+		void SetRenderParameterRef( UnorderedAccessParameterDX11* pParam );
+
 		virtual void WriteParameter( IParameterManager* pParamMgr );
 		void SetValue( ResourcePtr Value );
 		void SetInitCount( unsigned int count );

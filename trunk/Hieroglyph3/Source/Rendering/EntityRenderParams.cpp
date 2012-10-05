@@ -20,11 +20,13 @@ EntityRenderParams::EntityRenderParams()
 {
 	iPass = GEOMETRY;
 	WorldMatrix.MakeIdentity();
-	Executor = 0;
-	Material = 0;
+	Executor = nullptr;
+	Material = nullptr;
 }
 //--------------------------------------------------------------------------------
 EntityRenderParams::~EntityRenderParams()
 {
+	Executor = nullptr;
+	Material = nullptr;
 }
 //--------------------------------------------------------------------------------

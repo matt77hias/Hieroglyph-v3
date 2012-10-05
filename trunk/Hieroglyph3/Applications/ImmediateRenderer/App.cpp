@@ -44,6 +44,8 @@ bool App::ConfigureEngineComponents()
 		return( false );
 	}
 
+	SetMultiThreadedMode( false );
+
 	return( true );
 }
 //--------------------------------------------------------------------------------
@@ -59,7 +61,7 @@ void App::Initialize()
 	// from the camera's point of view of the scene.
 
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.5f, 0.3f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( -3.0f, 7.0f, -10.0f );
+	m_pCamera->GetNode()->Position() = Vector3f( -3.0f, 12.0f, -15.0f );
 	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.4f, 0.0f ) );
 
 	// Create the actor to hold the immediate geometry.  
@@ -114,6 +116,18 @@ void App::Initialize()
 	RotationController* pGeometryRotController = new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), 0.4f );
 	m_pGeometryActor->GetNode()->AttachController( pGeometryRotController );
 
+
+	m_pTextActor = new TextActor();
+	m_pTextActor->SetTextOrientation( Vector3f( 1.0f, 0.0f, 0.0f ), Vector3f( 0.0f, 1.0f, 0.0f ) );
+	m_pTextActor->SetText( std::wstring( L"Hello World! This is some \nsample text!" ) );
+	
+	m_pTextActor->SetColor( Vector4f( 0.0f, 1.0f, 0.0f, 0.5f ) );
+	m_pTextActor->NewLine();
+	m_pTextActor->SetCharacterHeight( 2.0f );
+	m_pTextActor->AppendText( L"Text is colored, scaled, and alpha blended..." );
+
+	m_pTextActor->GetNode()->Position() = Vector3f( 0.0f, 7.0f, 0.0f );
+	m_pScene->AddEntity( m_pTextActor->GetNode() );
 
 
 	// Do a one time initialization of the scene lighting parameters here

@@ -25,6 +25,8 @@ namespace Glyph3
 		MatrixArrayParameterWriterDX11();
 		virtual ~MatrixArrayParameterWriterDX11();
 
+		void SetRenderParameterRef( MatrixArrayParameterDX11* pParam );
+
 		virtual void WriteParameter( IParameterManager* pParamMgr );
 		void SetValue( Matrix4f* Value );
 		void SetCount( int count );

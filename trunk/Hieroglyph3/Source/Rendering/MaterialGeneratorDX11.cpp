@@ -427,12 +427,7 @@ MaterialPtr MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( Re
 	// material which will be used to set the texture for usage with this material.
 
 	ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"EyeOfHorus_128.png" );
-							
-	ShaderResourceParameterWriterDX11* pColorWriter = new ShaderResourceParameterWriterDX11();
-	pColorWriter->SetRenderParameterRef( RendererDX11::Get()->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) ) );
-	pColorWriter->SetValue( ColorTexture );
-	pMaterial->Parameters.AddRenderParameter( pColorWriter );
-
+	pMaterial->Parameters.SetShaderResourceParameter( L"ColorTexture", ColorTexture );
 
 	// Create a sampler for use by this material.  Then add a parameter writer to the 
 	// material which will be used to set the sampler when this material is used.
@@ -444,11 +439,7 @@ MaterialPtr MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( Re
 	SamplerConfig.MaxAnisotropy = 0;
 
 	int LinearSampler = RendererDX11::Get()->CreateSamplerState( &SamplerConfig );
-
-	SamplerParameterWriterDX11* pSamplerWriter = new SamplerParameterWriterDX11();
-	pSamplerWriter->SetRenderParameterRef( RendererDX11::Get()->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"LinearSampler" ) ) );
-	pSamplerWriter->SetValue( LinearSampler );
-	pMaterial->Parameters.AddRenderParameter( pSamplerWriter );
+	pMaterial->Parameters.SetSamplerParameter( L"LinearSampler", LinearSampler );
 
 	return( pMaterial );
 }

@@ -182,17 +182,8 @@ void App::Initialize()
     _ASSERT( m_NormalMap->m_iResource != -1 );
 
     // Set the texture parameters
-	ShaderResourceParameterWriterDX11* pDiffuseParam = new ShaderResourceParameterWriterDX11();
-	pDiffuseParam->SetRenderParameterRef(
-		m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"DiffuseMap" ) ) );
-    pDiffuseParam->SetValue( m_DiffuseTexture );
-    m_pMaterial->Parameters.AddRenderParameter( pDiffuseParam );
-
-    ShaderResourceParameterWriterDX11* pNormalMapParam = new ShaderResourceParameterWriterDX11();
-	pNormalMapParam->SetRenderParameterRef(
-		m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"NormalMap" ) ) );
-    pNormalMapParam->SetValue( m_NormalMap );
-    m_pMaterial->Parameters.AddRenderParameter( pNormalMapParam );
+    m_pMaterial->Parameters.SetShaderResourceParameter( L"DiffuseMap", m_DiffuseTexture );
+	m_pMaterial->Parameters.SetShaderResourceParameter( L"NormalMap", m_NormalMap );
 
     // Create a sampler state
     D3D11_SAMPLER_DESC sampDesc;
@@ -207,13 +198,7 @@ void App::Initialize()
     sampDesc.MinLOD = 0.0f;
     sampDesc.MipLODBias = 0.0f;
     int samplerState = m_pRenderer11->CreateSamplerState( &sampDesc );
-
-    // Create a sampler state parameter
-    SamplerParameterWriterDX11* pSamplerParam = new SamplerParameterWriterDX11();
-    pSamplerParam->SetRenderParameterRef(
-		(RenderParameterDX11*)m_pRenderer11->m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"AnisoSampler" ) ) );
-	pSamplerParam->SetValue( samplerState );
-    m_pMaterial->Parameters.AddRenderParameter( pSamplerParam );
+	m_pMaterial->Parameters.SetSamplerParameter( L"AnisoSampler", samplerState );
 
 	// Enable the material to render the given view type
 	m_pMaterial->Params[VT_GBUFFER].bRender = true;

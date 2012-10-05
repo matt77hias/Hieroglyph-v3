@@ -83,12 +83,8 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 
 
 	// Add a parameter to the screen that will bind the texture for visualization.
-	
-	ShaderResourceParameterWriterDX11* pWriter = new ShaderResourceParameterWriterDX11();
-	pWriter->SetRenderParameterRef( Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) ) );
-	pWriter->SetValue( resource );
-	
-	pActor->GetBody()->Parameters.AddRenderParameter( pWriter );
+	pActor->GetBody()->Parameters.SetShaderResourceParameter( L"ColorTexture", resource );
+
 
 	D3D11_SAMPLER_DESC state; 
 	state.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -102,14 +98,7 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 	state.MipLODBias = 0;
 	
 	int sampler = Renderer.CreateSamplerState( &state );
-	Renderer.m_pParamMgr->SetSamplerParameter( std::wstring( L"LinearSampler" ), &sampler ); 
-
-    // Create a sampler state parameter
-    SamplerParameterWriterDX11* pSamplerParam = new SamplerParameterWriterDX11();
-    pSamplerParam->SetRenderParameterRef(
-		(RenderParameterDX11*)Renderer.m_pParamMgr->GetSamplerStateParameterRef( std::wstring( L"LinearSampler" ) ) );
-	pSamplerParam->SetValue( sampler );
-    pActor->GetBody()->Parameters.AddRenderParameter( pSamplerParam );
+    pActor->GetBody()->Parameters.SetSamplerParameter( L"LinearSampler", sampler );
 
 
 	return( pActor );

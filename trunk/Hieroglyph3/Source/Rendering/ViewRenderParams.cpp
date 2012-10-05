@@ -41,7 +41,6 @@ ViewRenderParams::ViewRenderParams()
 		iDepthTargets[i] = -1;
 		iTextures[i] = -1;
 		iEffects[i] = -1;
-		vParameters[i].MakeZero();
 	}
 }
 //--------------------------------------------------------------------------------

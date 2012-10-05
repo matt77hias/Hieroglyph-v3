@@ -112,21 +112,9 @@ void SkinnedActor::SetBindPose( )
 	// Create and set up the matrix array rendering parameter.  This gets added
 	// to the skinned actor's body, which is an entity holding the models geometry.
 
-	m_pSkinMatrixWriter = new MatrixArrayParameterWriterDX11();
-	m_pSkinMatrixWriter->SetRenderParameterRef( 
-		RendererDX11::Get()->m_pParamMgr->GetMatrixArrayParameterRef( std::wstring( L"SkinMatrices" ), m_Bones.count() ) );
-	m_pSkinMatrixWriter->SetValue( m_pMatrices );
-	m_pSkinMatrixWriter->SetCount( m_Bones.count() );
+	GetBody()->Parameters.SetMatrixArrayParameter( L"SkinMatrices", m_pMatrices, m_Bones.count() );
+	GetBody()->Parameters.SetMatrixArrayParameter( L"SkinNormalMatrices", m_pNormalMatrices, m_Bones.count() );
 
-	GetBody()->Parameters.AddRenderParameter( m_pSkinMatrixWriter );
-
-	m_pNormalMatrixWriter = new MatrixArrayParameterWriterDX11();
-	m_pNormalMatrixWriter->SetRenderParameterRef( 
-		RendererDX11::Get()->m_pParamMgr->GetMatrixArrayParameterRef( std::wstring( L"SkinNormalMatrices" ), m_Bones.count() ) );
-	m_pNormalMatrixWriter->SetValue( m_pNormalMatrices );
-	m_pNormalMatrixWriter->SetCount( m_Bones.count() );
-
-	GetBody()->Parameters.AddRenderParameter( m_pNormalMatrixWriter );
 }
 //--------------------------------------------------------------------------------
 void SkinnedActor::SetSkinningMatrices( RendererDX11& Renderer )

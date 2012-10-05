@@ -131,11 +131,8 @@ void App::Initialize()
 	
 	ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"Tiles.png" );
 	ShaderResourceParameterWriterDX11* pTextureParameter = new ShaderResourceParameterWriterDX11();
-	pTextureParameter->SetRenderParameterRef(
-		(RenderParameterDX11*)m_pRenderer11->m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ColorTexture" ) ) );
-	pTextureParameter->SetValue( ColorTexture );
-	m_pStaticActor->GetBody()->Parameters.AddRenderParameter( pTextureParameter );
-
+	m_pStaticActor->GetBody()->Parameters.SetShaderResourceParameter( L"ColorTexture", ColorTexture );
+	
 
 	// Attach the actors to the scene, so that they will be rendered all together.
 
