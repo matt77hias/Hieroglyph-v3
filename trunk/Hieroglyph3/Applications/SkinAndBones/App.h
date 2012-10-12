@@ -37,8 +37,6 @@ public:
 
 protected:
 
-	Node3D*					m_pNode;
-	
 	SkinnedActor*			m_pSkinnedActor;
 	SkinnedActor*			m_pDisplacedActor;
 	Actor*					m_pStaticActor;

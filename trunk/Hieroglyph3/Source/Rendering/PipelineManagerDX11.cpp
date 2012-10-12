@@ -366,6 +366,11 @@ void PipelineManagerDX11::DrawIndexedInstanced( UINT IndexCountPerInstance, UINT
 	m_pContext->DrawIndexedInstanced( IndexCountPerInstance, InstanceCount, StartIndexLocation, BaseVertexLocation, StartInstanceLocation );
 }
 //--------------------------------------------------------------------------------
+void PipelineManagerDX11::DrawInstancedIndirect( ID3D11Buffer* argsBuffer, UINT offset )
+{
+	m_pContext->DrawInstancedIndirect( argsBuffer, offset );
+}
+//--------------------------------------------------------------------------------
 void PipelineManagerDX11::Draw( RenderEffectDX11& effect, GeometryPtr geometry, 
 										IParameterManager* pParamManager )
 {

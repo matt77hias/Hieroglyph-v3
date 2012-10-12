@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C++ Express 2010
+# Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hieroglyph3", "Source\Hieroglyph3.vcxproj", "{D120BAFC-B4E1-4A76-833A-94CE1CFCB5BF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DBA1913E-154D-420A-84A9-AD8A789851CC} = {DBA1913E-154D-420A-84A9-AD8A789851CC}

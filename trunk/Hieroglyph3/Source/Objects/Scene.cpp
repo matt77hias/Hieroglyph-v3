@@ -22,6 +22,11 @@ Scene::Scene()
 //--------------------------------------------------------------------------------
 Scene::~Scene()
 {
+	// Delete all the actors that have been added to the scene.
+	for ( int i = 0; i < m_vActors.count(); i++ ) {
+		SAFE_DELETE( m_vActors[i] );
+	}
+
 	delete m_pRoot;
 }
 //--------------------------------------------------------------------------------
@@ -51,16 +56,16 @@ void Scene::AddCamera( Camera* camera )
 {
 	m_vCameras.add( camera );
 	camera->SetScene( this );
-	AddEntity( camera->GetNode() );
+	AddActor( camera );
 }
 //--------------------------------------------------------------------------------
-void Scene::AddEntity( Entity3D* entity )
+void Scene::AddActor( Actor* actor )
 {
-	// TODO: Use a more sophisticated system for tracking the entities.  This 
-	//       could eventually allow for automatic destruction instead of manually
-	//       having to release each entity.
+	// Link the actor's node into the scene, and then add the actor to the list
+	// for cleanup later on.
 
-	m_pRoot->AttachChild( entity );
+	m_pRoot->AttachChild( actor->GetNode() );
+	m_vActors.add( actor );
 }
 //--------------------------------------------------------------------------------
 void Scene::BuildPickRecord( Ray3f& ray, TArray<PickRecord>& record )

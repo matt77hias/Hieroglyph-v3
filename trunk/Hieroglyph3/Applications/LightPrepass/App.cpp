@@ -238,15 +238,12 @@ void App::Initialize()
 	// scene so that it will be updated via the scene interface instead of
 	// manually manipulating it.
 
-	m_pNode = new Node3D();
-	m_pEntity = new Entity3D();
-	m_pEntity->SetGeometry( pGeometry );
-	m_pEntity->SetMaterial( m_pMaterial );
-	m_pEntity->Position() = Vector3f( 0.0f, 0.0f, 0.0f );
+	m_pActor = new Actor();
+	m_pActor->GetBody()->SetGeometry( pGeometry );
+	m_pActor->GetBody()->SetMaterial( m_pMaterial );
+	m_pActor->GetBody()->Position() = Vector3f( 0.0f, 0.0f, 0.0f );
 
-	m_pNode->AttachChild( m_pEntity );
-
-	m_pScene->AddEntity( m_pNode );
+	m_pScene->AddActor( m_pActor );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -280,7 +277,7 @@ void App::Update()
 
 	Matrix3f rotation;
 	rotation.RotationY( m_pTimer->Elapsed() * 0.2f );
-	m_pNode->Rotation() *= rotation;
+	m_pActor->GetNode()->Rotation() *= rotation;
 
 
     DrawHUD( );
@@ -297,9 +294,6 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pEntity );
-	SAFE_DELETE( m_pNode );
-
 	// Print the framerate out for the log before shutting down.
 
 	std::wstringstream out;

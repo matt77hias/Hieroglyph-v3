@@ -31,7 +31,6 @@
 #include "ViewSimulation.h"
 
 #include "IParameterManager.h"
-#include "ParticleSystemEntity.h"
 
 #include "ShaderResourceParameterWriterDX11.h"
 
@@ -80,11 +79,9 @@ void App::Initialize()
 	// scene so that it will be updated via the scene interface instead of 
 	// manually manipulating it.
 
-	m_pNode = new Node3D();
-	m_pEntity = new ParticleSystemEntity();
+	m_pActor = new ParticleSystemActor();
 
-	m_pNode->AttachChild( m_pEntity );
-	m_pScene->AddEntity( m_pNode );
+	m_pScene->AddActor( m_pActor );
 
 
 	m_pTimeFactors = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"TimeFactors" ) );
@@ -173,9 +170,6 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pEntity );
-	SAFE_DELETE( m_pNode );
-
 	// Print the framerate out for the log before shutting down.
 
 	std::wstringstream out;
@@ -198,19 +192,6 @@ bool App::HandleEvent( IEvent* pEvent )
 		EvtKeyUp* pKeyUp = (EvtKeyUp*)pEvent;
 
 		unsigned int key = pKeyUp->GetCharacterCode();
-
-		if ( key == 0x20 ) // 'Space' Key - Save a screen shot for the next frame
-		{
-			// Load a new texture and set it for the particle texture.
-			ResourcePtr ParticleTexture = m_pRenderer11->LoadTexture( L"EyeOfHorus_128.png" );
-
-			ShaderResourceParameterWriterDX11* pWriter = 
-				(ShaderResourceParameterWriterDX11*)m_pEntity->Parameters.GetRenderParameter( std::wstring( L"ParticleTexture" ) );
-
-			pWriter->SetValue( ParticleTexture );
-
-			return( true );
-		}
 	}
 
 	// Call the parent class's event handler if we haven't handled the event.

@@ -19,7 +19,7 @@
 //--------------------------------------------------------------------------------
 #include "Node3D.h"
 #include "Camera.h"
-#include "TArray.h"
+#include <vector>
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -33,7 +33,7 @@ namespace Glyph3
 		virtual void Render( RendererDX11* Renderer );
 
 		void AddCamera( Camera* camera );
-		void AddEntity( Entity3D* entity );
+		void AddActor( Actor* actor );
 
 		// Geometric queries
 		void BuildPickRecord( Ray3f& ray, TArray<PickRecord>& record );
@@ -43,6 +43,7 @@ namespace Glyph3
 	protected:
 		Node3D* m_pRoot;
 		TArray< Camera* > m_vCameras;
+		TArray< Actor* > m_vActors;
 	};
 };
 //--------------------------------------------------------------------------------

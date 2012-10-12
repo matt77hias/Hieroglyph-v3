@@ -110,12 +110,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
-    <ClCompile Include="ParticleSystemEntity.cpp" />
+    <ClCompile Include="ParticleSystemActor.cpp" />
+    <ClCompile Include="ParticleSystemExecutorDX11.cpp" />
     <ClCompile Include="ViewSimulation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
-    <ClInclude Include="ParticleSystemEntity.h" />
+    <ClInclude Include="ParticleSystemActor.h" />
+    <ClInclude Include="ParticleSystemExecutorDX11.h" />
     <ClInclude Include="ViewSimulation.h" />
   </ItemGroup>
   <ItemGroup>

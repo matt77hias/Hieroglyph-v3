@@ -52,8 +52,7 @@ protected:
 	ResourcePtr				m_OffscreenTexture;
 
 	ViewPerspective*		m_pRenderView;
-	Node3D*					m_pNode;
-	Entity3D*				m_pEntity;
+	Actor*					m_pActor;
 	
 	GeometryPtr				m_pGeometry;
 	MaterialPtr				m_pMaterial;

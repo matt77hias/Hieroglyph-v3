@@ -54,6 +54,5 @@ protected:
     ResourcePtr					m_DiffuseTexture;
     ResourcePtr					m_NormalMap;
 
-	Node3D*						m_pNode;
-	Entity3D*					m_pEntity;
+	Actor*					m_pActor;
 };

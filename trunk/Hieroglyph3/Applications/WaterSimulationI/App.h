@@ -37,8 +37,7 @@ public:
 
 protected:
 
-	Node3D*					m_pNode;
-	Entity3D*				m_pEntity;
+	Actor*					m_pActor;
 	
 	// Add parameter references here for setting parameters.
 	VectorParameterDX11*	m_pTimeFactors;

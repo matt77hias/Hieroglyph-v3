@@ -85,7 +85,6 @@ void App::Initialize()
 
 	static float radius = 20.0f;
 
-	m_pNode = new Node3D();
 	
 	m_pDiffuseActor = new Actor();
 	m_pDiffuseActor->GetNode()->AttachController( new RotationController( Vector3f::Random(), 0.05f ) );
@@ -104,6 +103,7 @@ void App::Initialize()
 		m_pDiffuseActor->AddElement( pEntity );
 	}
 
+	m_pActor = new Actor();
 
 	for ( int i = 0; i < 3; i++ )
 	{
@@ -111,8 +111,8 @@ void App::Initialize()
 		pReflector->Position() = Vector3f( -1.0, 1.0f+(i*3), 0.0f );
 		pReflector->m_pParaboloidView->SetRoot( m_pScene->GetRoot() );
 		m_vReflectors.add( pReflector );
-
-		m_pNode->AttachChild( pReflector );
+		m_pActor->AddElement( pReflector );
+		m_pActor->GetNode()->AttachChild( pReflector );
 	}
 
 	m_vReflectors[0]->Position() = Vector3f( -1.0, 1.0f, 1.0f );
@@ -123,10 +123,8 @@ void App::Initialize()
 	m_vReflectors[1]->m_pParaboloidView->SetBackColor( Vector4f( 0.0f, 0.75f, 0.0f, 1.0f ) );
 	m_vReflectors[2]->m_pParaboloidView->SetBackColor( Vector4f( 0.0f, 0.0f, 0.75f, 1.0f ) );
 
-	m_pNode->AttachChild( m_pDiffuseActor->GetNode() );
-	
-
-	m_pScene->AddEntity( m_pNode );
+	m_pScene->AddActor( m_pDiffuseActor );
+	m_pScene->AddActor( m_pActor );
 }
 //--------------------------------------------------------------------------------
 void App::Update()
@@ -166,7 +164,7 @@ void App::Update()
 
 	Matrix3f rotation;
 	rotation.RotationY( m_pTimer->Elapsed() * 0.2f );
-	m_pNode->Rotation() *= rotation;
+	m_pActor->GetNode()->Rotation() *= rotation;
 
 
 	// Update the scene, and then render all cameras within the scene.
@@ -189,14 +187,6 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pNode );
-
-	for ( int i = 0; i < m_vReflectors.count(); i++ ) {
-		SAFE_DELETE( m_vReflectors[i] );
-	}
-
-	SAFE_DELETE( m_pDiffuseActor );
-
 	// Print the framerate out for the log before shutting down.
 
 	std::wstringstream out;

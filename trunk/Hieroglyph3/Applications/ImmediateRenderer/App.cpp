@@ -67,7 +67,7 @@ void App::Initialize()
 	// Create the actor to hold the immediate geometry.  
 
 	m_pActor = new Actor();
-	m_pScene->AddEntity( m_pActor->GetNode() );
+	m_pScene->AddActor( m_pActor );
 	m_pActor->GetNode()->Position() = Vector3f( -3.0, 0.0f, 0.0f );
 
 	m_pGeometry = ImmediateGeometryPtr( new ImmediateGeometryDX11() );
@@ -85,7 +85,7 @@ void App::Initialize()
 
 
 	m_pIndexedActor = new Actor();
-	m_pScene->AddEntity( m_pIndexedActor->GetNode() );
+	m_pScene->AddActor( m_pIndexedActor );
 	m_pIndexedActor->GetNode()->Position() = Vector3f( 3.0, 0.0f, 0.0f );
 
 	m_pIndexedGeometry = IndexedImmediateGeometryPtr( new IndexedImmediateGeometryDX11() );
@@ -103,7 +103,7 @@ void App::Initialize()
 
 
 	m_pGeometryActor = new GeometryActor();
-	m_pScene->AddEntity( m_pGeometryActor->GetNode() );
+	m_pScene->AddActor( m_pGeometryActor );
 	m_pGeometryActor->GetNode()->Position() = Vector3f( 0.0f, 2.5f, 0.0f );
 
 	m_pGeometryActor->SetColor( Vector4f( 1.0f, 0.0f, 0.0f, 1.0f ) );
@@ -127,7 +127,7 @@ void App::Initialize()
 	m_pTextActor->AppendText( L"Text is colored, scaled, and alpha blended..." );
 
 	m_pTextActor->GetNode()->Position() = Vector3f( 0.0f, 7.0f, 0.0f );
-	m_pScene->AddEntity( m_pTextActor->GetNode() );
+	m_pScene->AddActor( m_pTextActor );
 
 
 	// Do a one time initialization of the scene lighting parameters here
@@ -297,8 +297,6 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pActor );
-
 	// Print the framerate out for the log before shutting down.
 
 	std::wstringstream out;

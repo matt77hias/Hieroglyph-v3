@@ -195,14 +195,13 @@ void App::Initialize()
 	// scene so that it will be updated via the scene interface instead of 
 	// manually manipulating it.
 
-	m_pNode = new Node3D();
-	m_pEntity = new Entity3D();
-	m_pEntity->SetGeometry( m_pGeometry );
-	m_pEntity->SetMaterial( m_pMaterial );
-	
-	m_pNode->AttachChild( m_pEntity );
+	m_pActor = new Actor();
+	m_pActor->GetBody()->SetGeometry( m_pGeometry );
+	m_pActor->GetBody()->SetMaterial( m_pMaterial );
+	m_pActor->GetNode()->Position() = Vector3f( 0.0f, 0.0f, 0.0f );
 
-	m_pScene->AddEntity( m_pNode );
+	m_pScene->AddActor( m_pActor );
+
 	m_pScene->AddCamera( m_pCamera );
 
 }
@@ -225,7 +224,7 @@ void App::Update()
 
 	Matrix3f rotation;
 	rotation.RotationY( m_pTimer->Elapsed() );
-	m_pNode->Rotation() *= rotation;
+	m_pActor->GetNode()->Rotation() *= rotation;
 
 
 	// Update the scene, and then render all cameras within the scene.
@@ -262,10 +261,6 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pEntity );
-	
-	SAFE_DELETE( m_pNode );
-
 	SAFE_DELETE( m_pCamera );
 
 	// Print the framerate out for the log before shutting down.

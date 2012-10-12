@@ -22,6 +22,7 @@
 #include "SpriteFontDX11.h"
 
 #include "VectorParameterDX11.h"
+#include "ParticleSystemActor.h"
 
 using namespace Glyph3;
 
@@ -44,8 +45,7 @@ public:
 
 protected:
 
-	Node3D*					m_pNode;
-	Entity3D*				m_pEntity;
+	ParticleSystemActor*	m_pActor;
 
 	VectorParameterDX11*	m_pTimeFactors;
 	VectorParameterDX11*	m_pEmitterLocation;

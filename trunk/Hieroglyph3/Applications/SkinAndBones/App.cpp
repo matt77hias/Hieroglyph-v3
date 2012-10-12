@@ -85,12 +85,6 @@ void App::Initialize()
 	m_pRenderView->SetBackColor( Vector4f( 0.1f, 0.1f, 0.3f, 0.0f ) );
 
 
-	// Create the scene and add the entities to it.  Then add the camera to the
-	// scene so that it will be updated via the scene interface instead of 
-	// manually manipulating it.
-
-	m_pNode = new Node3D();
-
 
 	// Create the displaced skinned actor
 
@@ -136,11 +130,9 @@ void App::Initialize()
 
 	// Attach the actors to the scene, so that they will be rendered all together.
 
-	m_pNode->AttachChild( m_pDisplacedActor->GetNode() );
-	m_pNode->AttachChild( m_pSkinnedActor->GetNode() );
-	m_pNode->AttachChild( m_pStaticActor->GetNode() );
-
-	m_pScene->AddEntity( m_pNode );
+	m_pScene->AddActor( m_pDisplacedActor );
+	m_pScene->AddActor( m_pSkinnedActor );
+	m_pScene->AddActor( m_pStaticActor );
 
 
 	// Setup the skinned actors' bind poses and start their animations.
@@ -198,12 +190,6 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pStaticActor );
-	SAFE_DELETE( m_pSkinnedActor );
-	SAFE_DELETE( m_pDisplacedActor );
-	
-	SAFE_DELETE( m_pNode );
-
 	// Print the framerate out for the log before shutting down.
 
 	std::wstringstream out;

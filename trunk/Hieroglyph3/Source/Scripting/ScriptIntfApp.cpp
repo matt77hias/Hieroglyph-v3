@@ -58,7 +58,7 @@ int ScriptIntfApp::CreateActor( lua_State* pLuaState )
 
 	// Add this actor the application's scene.
 
-	Application::GetApplication()->m_pScene->AddEntity( pActor->GetNode() );
+	Application::GetApplication()->m_pScene->AddActor( pActor );
 
 	// Register the object with the ScriptManager, and get a handle to the object.
 	// This is the return value for this function.

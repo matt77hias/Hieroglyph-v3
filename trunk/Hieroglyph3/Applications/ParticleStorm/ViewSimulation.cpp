@@ -26,6 +26,7 @@ using namespace Glyph3;
 ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 {
 	bOneTimeInit = true;
+	bDebugActive = false;
 
 	// The throttle time is calculated as the number of particles per insertion,
 	// times the maximum particle lifetime and divided by the total buffer size.
@@ -256,13 +257,13 @@ void ViewSimulation::PreDraw( RendererDX11* pRenderer )
 //--------------------------------------------------------------------------------
 void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
+	if ( bDebugActive ) {
+		if ( m_BufferIndex < BUFFER_SIZE )
+			pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[0] );
 
-	//if ( m_BufferIndex < BUFFER_SIZE )
-	//	pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[0] );
-
-	//if ( m_BufferIndex < BUFFER_SIZE )
-	//	pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[1] );
-
+		if ( m_BufferIndex < BUFFER_SIZE )
+			pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[1] );
+	}
 
 	// Initialize the buffers...
 	if ( bOneTimeInit == true )
@@ -276,13 +277,13 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterMana
 	// Set this view's render parameters.
 	SetRenderParams( pParamManager );
 	
+	if ( bDebugActive ) {
+		if ( m_BufferIndex < BUFFER_SIZE )
+			pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[0] );
 
-	//if ( m_BufferIndex < BUFFER_SIZE )
-	//	pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[0] );
-
-	//if ( m_BufferIndex < BUFFER_SIZE )
-	//	pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[1] );
-
+		if ( m_BufferIndex < BUFFER_SIZE )
+			pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[1] );
+	}
 
 
 	// Add any new particles here.  For now we simply add one batch of particles every
@@ -299,12 +300,13 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterMana
 	// Read out the total number of particles for updating into a constant buffer and an
 	// indirect argument buffer.
 
-	//if ( m_BufferIndex < BUFFER_SIZE )
-	//	pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[0] );
+	if ( bDebugActive ) {
+		if ( m_BufferIndex < BUFFER_SIZE )
+			pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[0] );
 
-	//if ( m_BufferIndex < BUFFER_SIZE )
-	//	pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[1] );
-
+		if ( m_BufferIndex < BUFFER_SIZE )
+			pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[1] );
+	}
 	
 	pPipelineManager->CopyStructureCount( ParticleCountCBBuffer, 0, ParticleStateBuffers[0] );	
 
@@ -325,13 +327,44 @@ void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterMana
 	pPipelineManager->CopyStructureCount( ParticleCountIABuffer, 0, ParticleStateBuffers[1] );
 
 
-	//if ( m_BufferIndex < BUFFER_SIZE )
-	//	pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[0] );
+	if ( bDebugActive ) {
+		if ( m_BufferIndex < BUFFER_SIZE )
+			pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[0] );
 
-	//if ( m_BufferIndex < BUFFER_SIZE )
-	//	pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[1] );
+		if ( m_BufferIndex < BUFFER_SIZE )
+			pPipelineManager->CopyStructureCount( ParticleCountSTBuffer, 4*m_BufferIndex++, ParticleStateBuffers[1] );
+	}
 
 	m_BufferIndex = 0;
+
+
+
+
+	// The following code can be used to read out the structure count data from
+	// the staging buffer of the ViewSimulation class.  
+
+	if ( bDebugActive ) {
+
+		D3D11_MAPPED_SUBRESOURCE mapped;
+		unsigned int* pCount = 0;
+		unsigned int count[8];
+
+		ResourcePtr stagingbuffer = GetParticleCountStagingBuffer();
+		mapped = RendererDX11::Get()->pImmPipeline->MapResource( stagingbuffer->m_iResource, 0, D3D11_MAP_READ, 0 );
+		pCount = (unsigned int*)(mapped.pData);
+
+		std::wstringstream debugout;
+		debugout << L"Values: ";
+
+		for ( int i = 0; i < 8; i++ )
+		{
+			count[i] = pCount[i];
+			debugout << count[i] << L", ";
+		}
+		RendererDX11::Get()->pImmPipeline->UnMapResource( stagingbuffer->m_iResource, 0 );
+
+		Log::Get().Write( debugout.str() );
+	}
 }
 //--------------------------------------------------------------------------------
 void ViewSimulation::SetRenderParams( IParameterManager* pParamManager )

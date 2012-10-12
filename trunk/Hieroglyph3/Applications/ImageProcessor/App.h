@@ -63,8 +63,7 @@ protected:
 
 	int						m_Samplers[2];
 
-	Node3D*					m_pNode;
-	Entity3D*				m_pEntity;
+	Actor*					m_pActor;
 
 	RenderEffectDX11*		m_pBruteForceGaussian;
 	RenderEffectDX11*		m_pSeparableGaussianX;

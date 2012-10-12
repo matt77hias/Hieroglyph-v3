@@ -76,6 +76,7 @@ namespace Glyph3
 		float m_fDelta;
 		float m_fThrottle;
 		bool bOneTimeInit;
+		bool bDebugActive;
 
 		// The various rendering parameters that will be used by this render view.
 

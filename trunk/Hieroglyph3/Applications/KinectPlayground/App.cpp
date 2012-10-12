@@ -135,9 +135,9 @@ void App::Initialize()
 
 	// Add all our objects to the scene for rendering.
 
-	m_pScene->AddEntity( m_pColorActor->GetNode() );
-	m_pScene->AddEntity( m_pDepthActor->GetNode() );
-	m_pScene->AddEntity( m_pDepthMapViewer->GetNode() );
+	m_pScene->AddActor( m_pColorActor );
+	m_pScene->AddActor( m_pDepthActor );
+	m_pScene->AddActor( m_pDepthMapViewer );
 
 	SetMultiThreadedMode( false );
 
@@ -206,9 +206,6 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pColorActor );
-	SAFE_DELETE( m_pDepthActor );
-	SAFE_DELETE( m_pSkeletonActor );
 	SAFE_DELETE( m_pKinectView );
 
 	// Print the framerate out for the log before shutting down.

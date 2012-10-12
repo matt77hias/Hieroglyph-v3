@@ -142,7 +142,6 @@ void RenderApplication::ShutdownRenderingEngineComponents()
 void RenderApplication::ShutdownRenderingSetup()
 {
 	SAFE_DELETE( m_pScene );
-	SAFE_DELETE( m_pCamera );
 }
 //--------------------------------------------------------------------------------
 bool RenderApplication::HandleEvent( IEvent* pEvent )

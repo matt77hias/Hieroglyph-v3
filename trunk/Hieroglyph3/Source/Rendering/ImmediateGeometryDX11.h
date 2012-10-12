@@ -48,8 +48,6 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class VertexBufferDX11;
-
 	struct ImmediateVertexDX11 {
 		Vector3f position;
 		Vector3f normal;

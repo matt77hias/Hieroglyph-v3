@@ -47,7 +47,7 @@ public:
 
 protected:
 
-	Node3D*								m_pNode;
+	Actor*								m_pActor;
 	TArray<ReflectiveSphereEntity*>		m_vReflectors;
 	Actor*								m_pDiffuseActor;
 

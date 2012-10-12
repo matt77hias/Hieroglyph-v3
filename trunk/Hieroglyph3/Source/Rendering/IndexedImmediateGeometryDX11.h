@@ -35,8 +35,6 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class VertexBufferDX11;
-
 	class IndexedImmediateGeometryDX11 : public ImmediateGeometryDX11
 	{
 	public:

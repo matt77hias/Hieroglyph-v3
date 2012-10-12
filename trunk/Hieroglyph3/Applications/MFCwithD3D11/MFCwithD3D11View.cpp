@@ -33,9 +33,9 @@ CMFCwithD3D11View::CMFCwithD3D11View()
 //--------------------------------------------------------------------------------
 CMFCwithD3D11View::~CMFCwithD3D11View()
 {
-	if ( pCamera ) {
-		delete pCamera;
-	}
+	//if ( pCamera ) {
+	//	delete pCamera;
+	//}
 }
 //--------------------------------------------------------------------------------
 BOOL CMFCwithD3D11View::PreCreateWindow(CREATESTRUCT& cs)
@@ -122,7 +122,7 @@ void CMFCwithD3D11View::OnInitialUpdate()
 	pCamera->SetOverlayView( pTextOverlayView );
 	pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>(width) / static_cast<float>(height), static_cast<float>( GLYPH_PI ) / 4.0f );
 
-	GetDocument()->pScene->AddEntity( pCamera->GetNode() );
+	GetDocument()->pScene->AddCamera( pCamera );
 
 
 	// Create the parameters for use with this effect
