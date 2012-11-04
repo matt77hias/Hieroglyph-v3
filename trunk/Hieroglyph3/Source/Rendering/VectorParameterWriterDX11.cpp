@@ -15,8 +15,8 @@
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 VectorParameterWriterDX11::VectorParameterWriterDX11()
+	: m_Value( 0.0f, 0.0f, 0.0f, 0.0f )
 {
-	m_Value.MakeZero();
 }
 //--------------------------------------------------------------------------------
 VectorParameterWriterDX11::~VectorParameterWriterDX11()

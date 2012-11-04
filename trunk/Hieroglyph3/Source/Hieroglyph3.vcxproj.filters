@@ -44,9 +44,6 @@
     <Filter Include="Objects\Basic Objects">
       <UniqueIdentifier>{584e7cf3-3234-42ca-8cdf-d6beb12d0e39}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Objects\Basic Objects\Controllers">
-      <UniqueIdentifier>{88450194-98a8-4a55-b099-d9b627089220}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Objects\Scene Objects">
       <UniqueIdentifier>{095200c1-4e7a-4108-bb95-b6b995131c4e}</UniqueIdentifier>
     </Filter>
@@ -154,6 +151,12 @@
     </Filter>
     <Filter Include="Rendering\Pipeline Executors\Basis Objects">
       <UniqueIdentifier>{db81f026-e22b-40df-8de0-3b9502b8788a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Controllers">
+      <UniqueIdentifier>{88450194-98a8-4a55-b099-d9b627089220}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Scene Objects\Actors\Specialized Parameter Writers">
+      <UniqueIdentifier>{82205c9b-9e28-4a4d-a3fc-73e78f3aee52}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -533,13 +536,13 @@
       <Filter>Objects\Basic Objects</Filter>
     </ClCompile>
     <ClCompile Include="Objects\IController.cpp">
-      <Filter>Objects\Basic Objects\Controllers</Filter>
+      <Filter>Objects\Controllers</Filter>
     </ClCompile>
     <ClCompile Include="Objects\RotationController.cpp">
-      <Filter>Objects\Basic Objects\Controllers</Filter>
+      <Filter>Objects\Controllers</Filter>
     </ClCompile>
     <ClCompile Include="Objects\SkinnedBoneController.cpp">
-      <Filter>Objects\Basic Objects\Controllers</Filter>
+      <Filter>Objects\Controllers</Filter>
     </ClCompile>
     <ClCompile Include="Objects\Light.cpp">
       <Filter>Objects\Scene Objects</Filter>
@@ -684,6 +687,12 @@
     </ClCompile>
     <ClCompile Include="Objects\FirstPersonCamera.cpp">
       <Filter>Objects\Scene Objects\Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\VolumeGeometryDX11.cpp">
+      <Filter>Rendering\Pipeline Executors</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TextureSpaceCameraPositionWriter.cpp">
+      <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1087,13 +1096,13 @@
       <Filter>Objects\Basic Objects</Filter>
     </ClInclude>
     <ClInclude Include="Objects\IController.h">
-      <Filter>Objects\Basic Objects\Controllers</Filter>
+      <Filter>Objects\Controllers</Filter>
     </ClInclude>
     <ClInclude Include="Objects\RotationController.h">
-      <Filter>Objects\Basic Objects\Controllers</Filter>
+      <Filter>Objects\Controllers</Filter>
     </ClInclude>
     <ClInclude Include="Objects\SkinnedBoneController.h">
-      <Filter>Objects\Basic Objects\Controllers</Filter>
+      <Filter>Objects\Controllers</Filter>
     </ClInclude>
     <ClInclude Include="Objects\Light.h">
       <Filter>Objects\Scene Objects</Filter>
@@ -1250,6 +1259,12 @@
     </ClInclude>
     <ClInclude Include="Objects\Camera.h">
       <Filter>Objects\Scene Objects\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\VolumeGeometryDX11.h">
+      <Filter>Rendering\Pipeline Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TextureSpaceCameraPositionWriter.h">
+      <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -40,6 +40,8 @@ namespace Glyph3
 		static MaterialPtr GenerateImmediateGeometrySolidMaterial( RendererDX11& Renderer );
 		static MaterialPtr GenerateImmediateGeometryTexturedMaterial( RendererDX11& Renderer );
 
+		static MaterialPtr GenerateVolumeGeometryMaterial( RendererDX11& Renderer );
+
 	private:
 		MaterialGeneratorDX11();
 		

@@ -444,3 +444,53 @@ MaterialPtr MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( Re
 	return( pMaterial );
 }
 //--------------------------------------------------------------------------------
+MaterialPtr MaterialGeneratorDX11::GenerateVolumeGeometryMaterial( RendererDX11& Renderer )
+{
+	// Create the material that will be returned
+	MaterialPtr pMaterial = MaterialPtr( new MaterialDX11() );
+
+	// Create and fill the effect that will be used for this view type
+	RenderEffectDX11* pEffect = new RenderEffectDX11();
+
+	pEffect->SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
+		std::wstring( L"VolumeGeometry.hlsl" ),
+		std::wstring( L"VSMAIN" ),
+		std::wstring( L"vs_5_0" ) ) );
+
+	pEffect->SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
+		std::wstring( L"VolumeGeometry.hlsl" ),
+		std::wstring( L"PSMAIN" ),
+		std::wstring( L"ps_5_0" ) ) );
+
+
+	// Enable the material to render the given view type, and set its effect.
+	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
+	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
+
+
+	// Load a texture to initialize with.  Then add a parameter writer to the 
+	// material which will be used to set the texture for usage with this material.
+
+	//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"EyeOfHorus_128.png" );
+	//pMaterial->Parameters.SetShaderResourceParameter( L"ColorTexture", ColorTexture );
+
+	// Create a sampler for use by this material.  Then add a parameter writer to the 
+	// material which will be used to set the sampler when this material is used.
+
+	SamplerStateConfigDX11 SamplerConfig;
+	SamplerConfig.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	SamplerConfig.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	SamplerConfig.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	SamplerConfig.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	SamplerConfig.BorderColor[0] = 0.0f;
+	SamplerConfig.BorderColor[1] = 0.0f;
+	SamplerConfig.BorderColor[2] = 0.0f;
+	SamplerConfig.BorderColor[3] = 0.0f;
+	SamplerConfig.MaxAnisotropy = 0;
+
+	int LinearSampler = RendererDX11::Get()->CreateSamplerState( &SamplerConfig );
+	pMaterial->Parameters.SetSamplerParameter( L"LinearSampler", LinearSampler );
+
+	return( pMaterial );
+}
+//--------------------------------------------------------------------------------

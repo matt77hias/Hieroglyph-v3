@@ -306,7 +306,7 @@ void GeometryActor::DrawRect( const Vector3f& center, const Vector3f& xdir, cons
 	Vector2f tex11 = Vector2f( 1.0f, 1.0f );
 
 	// Use a common normal vector for each vertex
-	normal = Vector3f::Cross( ydir, xdir );
+	normal = Vector3f::Cross( xdir, ydir );
 
 	// Top left vertex
 	position = center + x + y;

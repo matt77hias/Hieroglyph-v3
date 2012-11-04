@@ -107,11 +107,13 @@ void App::Initialize()
 	m_pGeometryActor->GetNode()->Position() = Vector3f( 0.0f, 2.5f, 0.0f );
 
 	m_pGeometryActor->SetColor( Vector4f( 1.0f, 0.0f, 0.0f, 1.0f ) );
-	m_pGeometryActor->DrawSphere( Vector3f( 1.5f, 1.0f, 0.0f ), 1.5f, 16, 24 );
+	m_pGeometryActor->DrawSphere( Vector3f( 2.5f, 2.0f, 0.0f ), 1.5f, 16, 24 );
 	m_pGeometryActor->SetColor( Vector4f( 0.0f, 1.0f, 0.0f, 1.0f ) );
 	m_pGeometryActor->DrawCylinder( Vector3f( -1.5f, -1.0f, 0.0f ), Vector3f( -1.5f, 3.0f, 0.0f ), 1.5f, 0.0f, 8, 24 );
 	m_pGeometryActor->SetColor( Vector4f( 1.0f, 1.0f, 0.0f, 1.0f ) );
 	m_pGeometryActor->DrawDisc( Vector3f( 0.0f, -3.0f, 0.0f ), Vector3f( 1.0f, 1.0f, 1.0f ), 2.0f, 12 );
+	m_pGeometryActor->SetColor( Vector4f( 0.0f, 0.0f, 1.0f, 1.0f ) );
+	m_pGeometryActor->DrawBox( Vector3f( 0.0f, 3.0f, 0.0f ), Vector3f( 1.0f, 1.0f, 1.0f ) );
 
 	RotationController* pGeometryRotController = new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), 0.4f );
 	m_pGeometryActor->GetNode()->AttachController( pGeometryRotController );
