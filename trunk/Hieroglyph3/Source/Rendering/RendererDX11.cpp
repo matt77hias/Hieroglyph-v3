@@ -111,7 +111,7 @@ RendererDX11::RendererDX11()
 	m_FeatureLevel = D3D_FEATURE_LEVEL_9_1; // Initialize this to only support 9.1...
 
 	EventManager* pEventManager = EventManager::Get( );
-	pEventManager->AddEventListener( RENDER_FRAME_START, this );
+	RequestEvent( RENDER_FRAME_START );
 }
 //--------------------------------------------------------------------------------
 RendererDX11::~RendererDX11()

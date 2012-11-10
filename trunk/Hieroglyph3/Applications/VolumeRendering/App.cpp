@@ -37,7 +37,7 @@ App::App()
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()
 {
-	if ( !ConfigureRenderingEngineComponents( 512, 384, D3D_FEATURE_LEVEL_11_0 ) ) {
+	if ( !ConfigureRenderingEngineComponents( 640, 480, D3D_FEATURE_LEVEL_11_0 ) ) {
 		return( false );
 	}
 
@@ -62,7 +62,7 @@ void App::Initialize()
 	// from the camera's point of view of the scene.
 
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.5f, 0.0f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 7.0f, -10.0f );
+	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 2.0f, -4.0f );
 	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.4f, 0.0f ) );
 
 	// Create the actor to hold the immediate geometry.  
@@ -71,7 +71,7 @@ void App::Initialize()
 	m_pScene->AddActor( m_pActor1 );
 
 	// Throw a rotation onto the actor to slowly rotate it about the Y-axis.
-	RotationController* pRotController = new RotationController();
+	RotationController* pRotController = new RotationController( Vector3f( -1.0f, 1.0f, 0.0f ), 0.2f );
 	m_pActor1->GetNode()->AttachController( pRotController );
 
 
@@ -80,19 +80,19 @@ void App::Initialize()
 	m_pScene->AddActor( m_pActor2 );
 
 	// Throw a rotation onto the actor to slowly rotate it about the Y-axis.
-	RotationController* pRotController2 = new RotationController();
+	RotationController* pRotController2 = new RotationController( Vector3f( 1.0f, 1.0f, 0.0f ), -0.1f );
 	m_pActor2->GetNode()->AttachController( pRotController2 );
 
 
-	m_pActor1->GetNode()->Position() = Vector3f( -3.0f, 0.0f, 0.0f );
-	m_pActor2->GetNode()->Position() = Vector3f( 3.0f, 0.0f, 0.0f );
+	m_pActor1->GetNode()->Position() = Vector3f( -1.2f, 0.0f, 0.0f );
+	m_pActor2->GetNode()->Position() = Vector3f( 1.2f, 0.0f, 0.0f );
 
 	// Do a one time initialization of the scene lighting parameters here
 	Vector4f Ka( 0.2f, 0.2f, 0.2f, 0.2f );
 	VectorParameterDX11* FactorKa = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Ka" ) );
 	FactorKa->InitializeParameterData( &Ka );
 
-	Vector4f Kd( 0.5f, 0.5f, 0.5f, 0.5f );
+	Vector4f Kd( 0.1f, 1.0f, 0.1f, 0.5f );
 	VectorParameterDX11* FactorKd = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Kd" ) );
 	FactorKd->InitializeParameterData( &Kd );
 

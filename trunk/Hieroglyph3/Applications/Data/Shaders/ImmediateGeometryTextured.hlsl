@@ -10,7 +10,7 @@
 Texture2D       ColorTexture : register( t0 );           
 SamplerState    LinearSampler : register( s0 );
 
-cbuffer Transforms
+cbuffer TransformMatrices
 {
 	matrix WorldViewProjMatrix;	
 };

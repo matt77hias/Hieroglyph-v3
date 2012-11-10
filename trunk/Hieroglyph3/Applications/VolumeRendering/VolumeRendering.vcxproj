@@ -110,11 +110,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
-    <ClCompile Include="VolumeActor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
-    <ClInclude Include="VolumeActor.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Source\Hieroglyph3.vcxproj">

@@ -694,6 +694,15 @@
     <ClCompile Include="Objects\TextureSpaceCameraPositionWriter.cpp">
       <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
     </ClCompile>
+    <ClCompile Include="Events\IEventListener.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TextureSpaceLightPositionWriter.cpp">
+      <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\VolumeActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mathematics\Matrix3f.h">
@@ -1265,6 +1274,12 @@
     </ClInclude>
     <ClInclude Include="Objects\TextureSpaceCameraPositionWriter.h">
       <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TextureSpaceLightPositionWriter.h">
+      <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\VolumeActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

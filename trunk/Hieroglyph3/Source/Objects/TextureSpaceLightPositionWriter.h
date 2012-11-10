@@ -9,27 +9,28 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// TextureSpaceCameraPositionWriter
+// TextureSpaceLightPositionWriter
 //
-// This parameter writer will read the current value of the 'CameraPosition'
+// This parameter writer will read the current value of the 'LightPosition'
 // vector parameter and calculate its position in texture space, according to the
 // current world transform (its inverse actually) and the specified object space 
-// to texture space transform.  It then writes the value to the 'CameraPositionTS'
+// to texture space transform.  It then writes the value to the 'LightPositionTS'
 // vector parameter.
 //--------------------------------------------------------------------------------
-#ifndef TextureSpaceCameraPositionWriter_h
-#define TextureSpaceCameraPositionWriter_h
+#ifndef TextureSpaceLightPositionWriter_h
+#define TextureSpaceLightPositionWriter_h
 //--------------------------------------------------------------------------------
 #include "VectorParameterWriterDX11.h"
 #include "Matrix4f.h"
+#include "VectorParameterDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class TextureSpaceCameraPositionWriter : public VectorParameterWriterDX11
+	class TextureSpaceLightPositionWriter : public VectorParameterWriterDX11
 	{
 	public:
-		TextureSpaceCameraPositionWriter();
-		virtual ~TextureSpaceCameraPositionWriter();
+		TextureSpaceLightPositionWriter();
+		virtual ~TextureSpaceLightPositionWriter();
 
 		void SetObjectToTextureSpaceXform( Matrix4f& xform );
 
@@ -38,11 +39,11 @@ namespace Glyph3
 	protected:
 		Matrix4f						ObjectToTextureSpaceMatrix;
 
-		VectorParameterDX11*			m_pCameraPositionParameter;
+		VectorParameterDX11*			m_pLightPositionParameter;
 		MatrixParameterDX11*			m_pWorldMatrixParameter;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // TextureSpaceCameraPositionWriter_h
+#endif // TextureSpaceLightPositionWriter_h
 //--------------------------------------------------------------------------------
 

@@ -45,7 +45,7 @@ RenderApplication::RenderApplication()
 	m_pCamera = 0;
 
 	// Register for window based events here.
-	m_pEventMgr->AddEventListener( WINDOW_RESIZE, this );
+	RequestEvent( WINDOW_RESIZE );
 }
 //--------------------------------------------------------------------------------
 RenderApplication::~RenderApplication( )

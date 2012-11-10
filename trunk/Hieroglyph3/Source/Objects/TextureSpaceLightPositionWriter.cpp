@@ -10,53 +10,53 @@
 
 //--------------------------------------------------------------------------------
 #include "PCH.h"
-#include "TextureSpaceCameraPositionWriter.h"
+#include "TextureSpaceLightPositionWriter.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-TextureSpaceCameraPositionWriter::TextureSpaceCameraPositionWriter()
+TextureSpaceLightPositionWriter::TextureSpaceLightPositionWriter()
 	: ObjectToTextureSpaceMatrix()
 {
-	// Get the texture space camera position parameter reference.  This will be
+	// Get the texture space light position parameter reference.  This will be
 	// used later to set the calculated value later on.
 
 	VectorParameterDX11* pVectorParameter = 
-		RendererDX11::Get()->m_pParamMgr->GetVectorParameterRef( L"CameraPositionTS" );
+		RendererDX11::Get()->m_pParamMgr->GetVectorParameterRef( L"LightPositionTS" );
 
 	SetRenderParameterRef( pVectorParameter );
 
 	// Grab the references to the parameters that we will be using later on.
 
-	m_pCameraPositionParameter =
-		RendererDX11::Get()->m_pParamMgr->GetVectorParameterRef( L"ViewPosition" );
+	m_pLightPositionParameter =
+		RendererDX11::Get()->m_pParamMgr->GetVectorParameterRef( L"LightPosition" );
 		
 	m_pWorldMatrixParameter =
 		RendererDX11::Get()->m_pParamMgr->GetMatrixParameterRef( L"WorldMatrix" );
 }
 //--------------------------------------------------------------------------------
-TextureSpaceCameraPositionWriter::~TextureSpaceCameraPositionWriter()
+TextureSpaceLightPositionWriter::~TextureSpaceLightPositionWriter()
 {
 }
 //--------------------------------------------------------------------------------
-void TextureSpaceCameraPositionWriter::SetObjectToTextureSpaceXform( Matrix4f& xform )
+void TextureSpaceLightPositionWriter::SetObjectToTextureSpaceXform( Matrix4f& xform )
 {
 	ObjectToTextureSpaceMatrix = xform;
 }
 //--------------------------------------------------------------------------------
-void TextureSpaceCameraPositionWriter::WriteParameter( IParameterManager* pParamMgr )
+void TextureSpaceLightPositionWriter::WriteParameter( IParameterManager* pParamMgr )
 {
-	// Get the 'CameraPosition' current value
-	Vector4f CameraPosition = pParamMgr->GetVectorParameter( m_pCameraPositionParameter );
+	// Get the 'LightPosition' current value
+	Vector4f LightPosition = pParamMgr->GetVectorParameter( m_pLightPositionParameter );
 
 	// Get the current world matrix, and invert it
 	Matrix4f WorldMatrix = pParamMgr->GetMatrixParameter( m_pWorldMatrixParameter );
 	Matrix4f InvWorldMatrix = WorldMatrix.Inverse();
 
-	// Calculate the texture space camera position
-	Vector4f CameraPositionTS = InvWorldMatrix * ObjectToTextureSpaceMatrix * CameraPosition;
+	// Calculate the texture space light position
+	Vector4f LightPositionTS = InvWorldMatrix * ObjectToTextureSpaceMatrix * LightPosition;
 
-	// Write the value into the parameter manager as 'CameraPositionTS'
-	SetValue( CameraPositionTS );
+	// Write the value into the parameter manager as 'LightPositionTS'
+	SetValue( LightPositionTS );
 	VectorParameterWriterDX11::WriteParameter( pParamMgr );
 }
 //--------------------------------------------------------------------------------

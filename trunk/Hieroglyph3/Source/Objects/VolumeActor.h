@@ -19,6 +19,7 @@
 #include "Actor.h"
 #include "VolumeGeometryDX11.h"
 #include "TextureSpaceCameraPositionWriter.h"
+#include "TextureSpaceLightPositionWriter.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

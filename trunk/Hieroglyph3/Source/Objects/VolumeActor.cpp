@@ -14,6 +14,7 @@
 #include "Log.h"
 #include "Texture3dConfigDX11.h"
 #include "MaterialGeneratorDX11.h"
+#include "PerlinNoise.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -21,35 +22,37 @@ VolumeActor::VolumeActor()
 {
 	// Create the texture that we will be using as the volume.
 
-	float fData[32][32][32];
+	PerlinNoise noise;
+	noise.initialize();
 
-	for ( int z = 0; z < 32; z++ ) {
-		for ( int y = 0; y < 32; y++ ) {
-			for ( int x = 0; x < 32; x++ ) {
-				if ( z > 15 && y > 15 && x > 15 ) {
-					fData[z][y][x] = 1.0f;
-				} else {
-					fData[z][y][x] = 0.0f;
-				}
+	const int DIM = 32;
+
+	float* fData = new float[DIM*DIM*DIM];
+
+	for ( int z = 0; z < DIM; z++ ) {
+		for ( int y = 0; y < DIM; y++ ) {
+			for ( int x = 0; x < DIM; x++ ) {
+				fData[z*DIM*DIM+y*DIM+x] = noise.noise3( (float)x * 0.25f, (float)y * 0.25f, (float)z * 0.25f );
 			}
 		}
 	}
 
 	D3D11_SUBRESOURCE_DATA data;
 	data.pSysMem = fData;
-	data.SysMemPitch = sizeof( float ) * 32;
-	data.SysMemSlicePitch = sizeof( float ) * 32 * 32;
+	data.SysMemPitch = sizeof( float ) * DIM;
+	data.SysMemSlicePitch = sizeof( float ) * DIM * DIM;
 
 
 	Texture3dConfigDX11 config;
 	config.SetFormat( DXGI_FORMAT_R32_FLOAT );
 	config.SetBindFlags( D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS );
-	config.SetWidth( 32 );
-	config.SetHeight( 32 );
-	config.SetDepth( 32 );
+	config.SetWidth( DIM );
+	config.SetHeight( DIM );
+	config.SetDepth( DIM );
 	
 	m_VolumeTexture = RendererDX11::Get()->CreateTexture3D( &config, &data );
 
+	delete [] fData;
 	
 	// Generate the volume geometry to display what is in the volume texture.
 
@@ -132,6 +135,10 @@ VolumeActor::VolumeActor()
 	TextureSpaceCameraPositionWriter* pCameraTSPositionWriter = new TextureSpaceCameraPositionWriter();
 	pCameraTSPositionWriter->SetObjectToTextureSpaceXform( ObjectToTextureSpaceMatrix );
 	GetBody()->Parameters.AddRenderParameter( pCameraTSPositionWriter );
+
+	TextureSpaceLightPositionWriter* pLightTSPositionWriter = new TextureSpaceLightPositionWriter();
+	pLightTSPositionWriter->SetObjectToTextureSpaceXform( ObjectToTextureSpaceMatrix );
+	GetBody()->Parameters.AddRenderParameter( pLightTSPositionWriter );
 }
 //--------------------------------------------------------------------------------
 VolumeActor::~VolumeActor()

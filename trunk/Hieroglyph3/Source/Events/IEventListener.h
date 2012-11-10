@@ -16,17 +16,28 @@
 #define IEventListener_h
 //--------------------------------------------------------------------------------
 #include "IEvent.h"
+#include "TArray.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
+	class EventManager;
+
 	class IEventListener
 	{
 	public:
-		IEventListener( ) {}; 
-		virtual ~IEventListener( ) {};
+		IEventListener( ); 
+		virtual ~IEventListener( );
 
 		virtual std::wstring GetName( ) = 0;
 		virtual bool HandleEvent( IEvent* pEvent ) = 0;
+
+		void RequestEvent( eEVENT e );
+		void UnRequestEvent( eEVENT e );
+		void SetEventManager( EventManager* pEventManager );
+
+	protected:
+		EventManager*	m_pEventManager;
+		TArray< eEVENT > m_RequestedEvents;
 	};
 };
 //--------------------------------------------------------------------------------

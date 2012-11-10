@@ -69,13 +69,13 @@ FirstPersonCamera::FirstPersonCamera() :    m_iLastMouseX( InvalidMousePos ),
 
     EventManager* pEventManager = EventManager::Get( );
 
-    pEventManager->AddEventListener( SYSTEM_KEYBOARD_KEYUP, this );
-    pEventManager->AddEventListener( SYSTEM_KEYBOARD_KEYDOWN, this );
-    pEventManager->AddEventListener( SYSTEM_RBUTTON_DOWN, this );
-    pEventManager->AddEventListener( SYSTEM_RBUTTON_UP, this );
-    pEventManager->AddEventListener( SYSTEM_MOUSE_MOVE, this );
-    pEventManager->AddEventListener( SYSTEM_MOUSE_LEAVE, this );
-    pEventManager->AddEventListener( RENDER_FRAME_START, this );
+    RequestEvent( SYSTEM_KEYBOARD_KEYUP );
+    RequestEvent( SYSTEM_KEYBOARD_KEYDOWN );
+    RequestEvent( SYSTEM_RBUTTON_DOWN );
+    RequestEvent( SYSTEM_RBUTTON_UP );
+    RequestEvent( SYSTEM_MOUSE_MOVE );
+    RequestEvent( SYSTEM_MOUSE_LEAVE );
+    RequestEvent( RENDER_FRAME_START );
 }
 //--------------------------------------------------------------------------------
 FirstPersonCamera::~FirstPersonCamera()

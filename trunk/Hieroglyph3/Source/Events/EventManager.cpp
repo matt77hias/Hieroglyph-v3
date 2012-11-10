@@ -27,6 +27,13 @@ EventManager::EventManager()
 //--------------------------------------------------------------------------------
 EventManager::~EventManager()
 {
+	// TODO: Detach any remaining event handlers that were being serviced
+
+	//for ( int e = 0; e < NUM_EVENTS; e++ ) {
+	//	for ( int i = 0; i < m_EventHandlers[e].count(); i++ ) {
+
+	//	}
+	//}
 }
 //--------------------------------------------------------------------------------
 EventManager* EventManager::Get()

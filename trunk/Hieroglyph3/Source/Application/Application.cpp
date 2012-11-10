@@ -41,14 +41,16 @@ Application::Application()
 
 	m_pEventMgr = new EventManager();
 
+	SetEventManager( m_pEventMgr );
+
 	// The application object wants to know about these events, so it 
 	// registers itself with the appropriate event IDs.
 
-	m_pEventMgr->AddEventListener( SYSTEM_KEYBOARD_KEYUP, this );
-	m_pEventMgr->AddEventListener( SYSTEM_KEYBOARD_KEYDOWN, this );
-	m_pEventMgr->AddEventListener( SYSTEM_KEYBOARD_CHAR, this );
-	m_pEventMgr->AddEventListener( INFO_MESSAGE, this );
-	m_pEventMgr->AddEventListener( ERROR_MESSAGE, this );
+	RequestEvent( SYSTEM_KEYBOARD_KEYUP );
+	RequestEvent( SYSTEM_KEYBOARD_KEYDOWN );
+	RequestEvent( SYSTEM_KEYBOARD_CHAR );
+	RequestEvent( INFO_MESSAGE );
+	RequestEvent( ERROR_MESSAGE );
 
 	// TODO: this should go into the RenderApplication class!
 	m_pScene = new Scene();

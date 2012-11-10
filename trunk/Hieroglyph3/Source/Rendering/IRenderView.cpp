@@ -27,7 +27,7 @@ IRenderView::IRenderView( )
 	m_iCurrRecurrence = m_iMaxRecurrence;
 	
 	EventManager* pEventManager = EventManager::Get( );
-	pEventManager->AddEventListener( RENDER_FRAME_START, this );
+	RequestEvent( RENDER_FRAME_START );
 }
 //--------------------------------------------------------------------------------
 IRenderView::~IRenderView( )

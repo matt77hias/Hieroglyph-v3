@@ -15,7 +15,8 @@
 #ifndef PerlinNoise_h
 #define PerlinNoise_h
 //--------------------------------------------------------------------------------
-
+#include "Vector2f.h"
+#include "Vector3f.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -38,17 +39,15 @@ namespace Glyph3
 		void normalize2(float v[2]);
 		void normalize3(float v[3]);
 
-		#define B 0x100
-		#define BM 0xff
+		#define base 0x100
+		#define baseMask 0xff
 
-		#define N 0x1000
-		#define NP 12
-		#define NM 0xfff
+		int permutation[base + base + 2];
+		float g1[base + base + 2];
+		float g2[base + base + 2][2];
+		float g3[base + base + 2][3];
 
-		int p[B + B + 2];
-		float g1[B + B + 2];
-		float g2[B + B + 2][2];
-		float g3[B + B + 2][3];
+		//Vector3f g3[base+base+2];
 	};
 };
 //--------------------------------------------------------------------------------
