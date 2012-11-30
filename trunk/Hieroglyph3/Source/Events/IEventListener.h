@@ -35,7 +35,7 @@ namespace Glyph3
 		void UnRequestEvent( eEVENT e );
 		void SetEventManager( EventManager* pEventManager );
 
-	protected:
+	private:
 		EventManager*	m_pEventManager;
 		TArray< eEVENT > m_RequestedEvents;
 	};

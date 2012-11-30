@@ -24,7 +24,7 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {    
-    class FirstPersonCamera : public Camera, IEventListener
+    class FirstPersonCamera : public Camera, public IEventListener
     {
     public:
         FirstPersonCamera();

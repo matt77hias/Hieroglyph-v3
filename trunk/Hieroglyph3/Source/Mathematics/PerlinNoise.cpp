@@ -176,7 +176,6 @@ float PerlinNoise::noise3( float x, float y, float z )
 	int x0, x1, y0, y1, z0, z1;
 	int b000, b001, b010, b011, b100, b101, b110, b111;
 	float rx0, rx1, ry0, ry1, rz0, rz1, *q, sx, sy, sz, a, b, c, d, u, v;
-	int i, j, k;
 
 	// Find the enclosing basis points around our input x value
 	x0 = ((int)x) & baseMask;

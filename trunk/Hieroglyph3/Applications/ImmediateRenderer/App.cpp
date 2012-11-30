@@ -169,7 +169,7 @@ void App::Update()
 
 	m_pTimer->Update();
 
-	EventManager::Get()->ProcessEvent( new EvtFrameStart( *m_pTimer ) );
+	EventManager::Get()->ProcessEvent( new EvtFrameStart( m_pTimer->Elapsed() ) );
 
 
 	// Do some immediate rendering here.  These vertex data are applied in object

@@ -196,7 +196,7 @@ void App::Update()
 	m_pTimer->Update();
 
 	// Process any new events
-	EventManager::Get()->ProcessEvent( new EvtFrameStart( *m_pTimer ) );
+	EventManager::Get()->ProcessEvent( new EvtFrameStart( m_pTimer->Elapsed() ) );
 
 	// Update any animation/camera config
 	UpdateViewState();

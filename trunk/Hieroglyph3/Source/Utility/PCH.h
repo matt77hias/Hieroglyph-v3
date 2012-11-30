@@ -33,37 +33,14 @@
 // Standard C Library includes
 #include <stdio.h>
 #include <stdlib.h>
-//#include <stdint.h>
 #include <math.h>
 #include <memory>
 #include <assert.h>
 
-// DirectX SDK includes
-#include <D3Dcommon.h>
-#include <dxgi.h>
+// DirectX includes
 #include <d3d11.h>
 #include <d3dCompiler.h>
 #include <d3dx11.h>
-//#include <D3DX10core.h>
-//#include <D3D11Shader.h>
-
-#include <d3d9.h>
-
-// Windows SDK includes
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-
-#include <windows.h>
-#include <initguid.h>
-#include <shlobj.h>
-
-// Library imports
-#pragma comment( lib, "d3d11.lib" )
-#pragma comment( lib, "d3dx11.lib" )
-//#pragma comment( lib, "d3dx10.lib" )
-#pragma comment( lib, "DXGI.lib" )
-#pragma comment( lib, "d3d9.lib" )
 
 #define SAFE_RELEASE( x ) {if(x){(x)->Release();(x)=NULL;}}
 #define SAFE_DELETE( x ) {if(x){delete (x);(x)=NULL;}}

@@ -124,7 +124,7 @@ void App::Update()
 
 	m_pTimer->Update();
 
-	EventManager::Get()->ProcessEvent( new EvtFrameStart( *m_pTimer ) );
+	EventManager::Get()->ProcessEvent( new EvtFrameStart( m_pTimer->Elapsed() ) );
 
 	
 	// Print a message to show the framerate and sample name.

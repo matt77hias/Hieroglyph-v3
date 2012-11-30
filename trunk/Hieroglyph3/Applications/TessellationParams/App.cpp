@@ -201,7 +201,7 @@ void App::Update()
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.
 
-	EventManager::Get()->ProcessEvent( new EvtFrameStart( *m_pTimer ) );
+	EventManager::Get()->ProcessEvent( new EvtFrameStart( m_pTimer->Elapsed() ) );
 
 	// Clear the window to white
 	m_pRenderer11->pImmPipeline->ClearBuffers( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ), 1.0f );

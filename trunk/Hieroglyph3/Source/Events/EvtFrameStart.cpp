@@ -15,10 +15,9 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-EvtFrameStart::EvtFrameStart( Timer& timer )
-	: m_Timer( timer )
+EvtFrameStart::EvtFrameStart( float dt )
 {
-	m_Timer = timer;
+	m_fDelta = dt;
 }
 //--------------------------------------------------------------------------------
 EvtFrameStart::~EvtFrameStart( )
@@ -37,21 +36,6 @@ eEVENT EvtFrameStart::GetEventType( )
 //--------------------------------------------------------------------------------
 float EvtFrameStart::GetElapsed()
 {
-	return( m_Timer.Elapsed() );
-}
-//--------------------------------------------------------------------------------
-float EvtFrameStart::GetFrameRate()
-{
-	return( static_cast<float>( m_Timer.Framerate() ) );
-}
-//--------------------------------------------------------------------------------
-float EvtFrameStart::GetRuntime()
-{
-	return( m_Timer.Runtime() );
-}
-//--------------------------------------------------------------------------------
-int EvtFrameStart::GetFrameCount()
-{
-	return( m_Timer.FrameCount() );
+	return( m_fDelta );
 }
 //--------------------------------------------------------------------------------

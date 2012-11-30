@@ -21,14 +21,6 @@
 #include <string>
 #include <map>
 //--------------------------------------------------------------------------------
-#ifdef _DEBUG
-	#pragma comment( lib, "lualibd.lib" )
-	#pragma comment( lib, "lualiblibd.lib" )
-#else
-	#pragma comment( lib, "lualib.lib" )
-	#pragma comment( lib, "lualiblib.lib" )
-#endif
-//--------------------------------------------------------------------------------
 extern "C"
 {
 #include "lua.h"

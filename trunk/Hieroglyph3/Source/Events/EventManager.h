@@ -21,7 +21,7 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class EventManager
+	class EventManager : public IEventListener
 	{
 	public:
 		EventManager( );
@@ -35,6 +35,11 @@ namespace Glyph3
 		bool ProcessEventQueue( );
 
 		static EventManager* Get( );
+
+		// IEventListener interface implementation
+		virtual std::wstring GetName( );
+		virtual bool HandleEvent( IEvent* pEvent );
+
 
 	protected:
 		TArray< IEventListener* > m_EventHandlers[NUM_EVENTS];

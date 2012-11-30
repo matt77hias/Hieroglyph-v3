@@ -86,7 +86,17 @@
 
 #include "D3DEnumConversion.h"
 
-#include <sstream>
+// Library imports
+#pragma comment( lib, "d3d11.lib" )
+#pragma comment( lib, "d3dx11.lib" )
+#pragma comment( lib, "DXGI.lib" )
+
+// NOTE:
+// These d3d9 related items are only needed for the D3DPERF event definitions.  It can be removed
+// once D3D11.1 is available, and replaced with ID3DUserDefinedAnnotation instead.
+#include <d3d9.h>
+#pragma comment( lib, "d3d9.lib" )
+
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------

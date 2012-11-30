@@ -110,3 +110,39 @@ bool EventManager::ProcessEventQueue( )
 	return( true );
 }
 //--------------------------------------------------------------------------------
+std::wstring EventManager::GetName( )
+{
+	return( L"EventManager" );
+}
+//--------------------------------------------------------------------------------
+bool EventManager::HandleEvent( IEvent* pEvent )
+{
+	// If an event manager receives an event, it will simply forward the event
+	// to its own listeners until someone handles it.  In this scenario, the 
+	// handling is slightly different than if the event was originally posted to
+	// this manager since the event lifetime will be controlled by the originator.
+
+	if ( !pEvent )
+		return( false );
+
+	eEVENT e = pEvent->GetEventType();
+	int num = m_EventHandlers[e].count();
+
+	bool bHandled = false;
+
+	// Loop through each listener and allow them to handle the event.  Halt the
+	// processing if the event is handled.
+
+	for ( int i = 0; i < num; i++ )
+	{
+		bHandled = m_EventHandlers[e][i]->HandleEvent( pEvent );
+		if ( bHandled )
+			break;
+	}
+
+	// Do not delete the event after processing.  Instead, return the 'handled'
+	// result and let the original event manager take care of it.
+
+	return( bHandled );
+}
+//--------------------------------------------------------------------------------

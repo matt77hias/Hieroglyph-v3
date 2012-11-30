@@ -27,7 +27,7 @@ TextActor::TextActor()
 	  m_xdir( 1.0f, 0.0f, 0.0f ),
 	  m_ydir( 0.0f, 1.0f, 0.0f ),
 	  m_pSpriteFont( nullptr ),
-	  m_fCharacterHeight( 1.0f ),
+	  m_fCharacterHeight( 0.8f ),
 	  m_fPhysicalScale( m_fCharacterHeight / 20.0f ),
 	  m_fTextureXScale( 0.1f ),
 	  m_fTextureYScale( 0.1f )

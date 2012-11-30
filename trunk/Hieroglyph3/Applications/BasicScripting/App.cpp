@@ -190,7 +190,7 @@ void App::Update()
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.
 
-	EventManager::Get()->ProcessEvent( new EvtFrameStart( *m_pTimer ) );
+	EventManager::Get()->ProcessEvent( new EvtFrameStart( m_pTimer->Elapsed() ) );
 
 
 	// Manipulate the scene here - simply rotate the root of the scene in this
@@ -223,9 +223,6 @@ void App::Shutdown()
 	ScriptIntfApp::Shutdown( );
 
 	ConsoleWindow::StopConsole();
-
-	//SAFE_DELETE( m_pNode );
-	SAFE_DELETE( m_pCamera );
 
 	// Print the framerate out for the log before shutting down.
 

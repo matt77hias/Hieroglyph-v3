@@ -45,40 +45,40 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <ProgramDataBaseFileName>..\..\lib\LuaLibd.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Lib>
-      <OutputFile>..\..\Lib\lualibd.lib</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
     <PostBuildEvent>
-      <Command>copy ..\..\Lib\lualibd.lib ..\..\..\..\SDK\Library\Debug
-copy ..\..\Lib\lualibd.pdb ..\..\..\..\SDK\Library\Debug</Command>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\SDK\Library\Debug
+copy $(OutDir)$(TargetName).pdb ..\..\..\..\SDK\Library\Debug</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <ProgramDataBaseFileName>..\..\lib\LuaLib.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Lib>
-      <OutputFile>..\..\Lib\lualib.lib</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
     <PostBuildEvent>
-      <Command>copy ..\..\Lib\lualib.lib ..\..\..\..\SDK\Library\Release
-copy ..\..\Lib\lualib.pdb ..\..\..\..\SDK\Library\Release</Command>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\SDK\Library\Release
+copy $(OutDir)$(TargetName).pdb ..\..\..\..\SDK\Library\Release</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -92,10 +92,13 @@ bool FirstPersonCamera::HandleEvent( IEvent* pEvent )
         UINT key = pKeyDown->GetCharacterCode();
 
         for( UINT i = 0; i < NumControlKeys; ++i )
+		{
             if( key == KeyBindings[i] )
+			{
                 m_bPressedKeys[i] = true;
-
-        return true;
+		        return true;
+			}
+		}
     }
     else if ( e == SYSTEM_KEYBOARD_KEYUP )
     {
@@ -104,10 +107,13 @@ bool FirstPersonCamera::HandleEvent( IEvent* pEvent )
         UINT key = pKeyUp->GetCharacterCode();
 
         for( UINT i = 0; i < NumControlKeys; ++i )
+		{
             if( key == KeyBindings[i] )
-                m_bPressedKeys[i] = false;
-
-        return true;
+            {
+				m_bPressedKeys[i] = false;
+			    return true;
+			}
+		}
     }
     else if ( e == SYSTEM_MOUSE_MOVE )
     {
@@ -128,6 +134,8 @@ bool FirstPersonCamera::HandleEvent( IEvent* pEvent )
 
         m_iLastMouseX = mouseX;
         m_iLastMouseY = mouseY;
+
+		return true;
     }
     else if ( e == SYSTEM_MOUSE_LEAVE )
     {
@@ -137,12 +145,16 @@ bool FirstPersonCamera::HandleEvent( IEvent* pEvent )
     else if ( e == SYSTEM_RBUTTON_DOWN )
     {        
         m_iLastMouseX = InvalidMousePos;
-        m_iLastMouseY = InvalidMousePos;        
+        m_iLastMouseY = InvalidMousePos;
+
+		return true;
     }
     else if ( e == SYSTEM_RBUTTON_UP )
     {
         m_iLastMouseX = InvalidMousePos;
         m_iLastMouseY = InvalidMousePos; 
+
+		return true;
     }
     else if ( e == RENDER_FRAME_START )
     {

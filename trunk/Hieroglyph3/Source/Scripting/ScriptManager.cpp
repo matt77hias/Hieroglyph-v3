@@ -13,6 +13,9 @@
 #include "ScriptManager.h"
 #include "Log.h"
 //--------------------------------------------------------------------------------
+#pragma comment( lib, "lualib.lib" )
+#pragma comment( lib, "lualiblib.lib" )
+//--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ScriptManager* ScriptManager::ms_pScriptManager = NULL;

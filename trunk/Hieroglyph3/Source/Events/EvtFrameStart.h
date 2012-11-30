@@ -24,19 +24,16 @@ namespace Glyph3
 	class EvtFrameStart : public IEvent
 	{
 	public:
-		EvtFrameStart( Timer& timer );
+		EvtFrameStart( float dt );
 		virtual ~EvtFrameStart( );
 
 		virtual std::wstring GetEventName( );
 		virtual eEVENT GetEventType( );
 
 		float GetElapsed();
-		float GetFrameRate();
-		float GetRuntime();
-		int GetFrameCount();
 
 	protected:
-		Timer& m_Timer;
+		float m_fDelta;
 	};
 
 };
