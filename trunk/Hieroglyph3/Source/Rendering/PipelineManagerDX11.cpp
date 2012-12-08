@@ -46,6 +46,8 @@
 
 #include "IndirectArgsBufferDX11.h"
 
+#include "ScreenGrab.h"
+
 #include <sstream>
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
@@ -802,7 +804,7 @@ std::wstring PipelineManagerDX11::PrintPipelineStatistics( )
 	return( s.str() );
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::SaveTextureScreenShot( int index, std::wstring filename, D3DX11_IMAGE_FILE_FORMAT format )
+void PipelineManagerDX11::SaveTextureScreenShot( int index, std::wstring filename/*, D3DX11_IMAGE_FILE_FORMAT format*/ )
 {
 	// Get the texture as a resource and save it to file
 	ID3D11Resource* pResource = RendererDX11::Get()->GetResourceByIndex( index )->GetResource();
@@ -815,46 +817,50 @@ void PipelineManagerDX11::SaveTextureScreenShot( int index, std::wstring filenam
 
 		// Build the output file name
 		std::wstringstream out;
-		out << filename << iScreenNum;
+		out << filename << iScreenNum << L".dds";
 
 		// Select the appropriate format to add the extension to the name.  DDS format
 		// may be the only one that can handle certain texture formats, so it may be a 
 		// backup format later on.
 
-		switch ( format )
-		{
-		case D3DX11_IFF_BMP:
-			out << ".bmp";
-			break;
-		case D3DX11_IFF_JPG:
-			out << ".jpg";
-			break;
-		case D3DX11_IFF_PNG:
-			out << ".png";
-			break;
-		case D3DX11_IFF_DDS:
-			out << ".dds";
-			break;
-		case D3DX11_IFF_TIFF:
-			out << ".tiff";
-			break;
-		case D3DX11_IFF_GIF:
-			out << ".gif";
-			break;
-		case D3DX11_IFF_WMP:
-			out << ".wmp";
-			break;
-		default:
-			Log::Get().Write( L"Tried to save a texture image in an unsupported format!" );
-		}
+		//switch ( format )
+		//{
+		//case D3DX11_IFF_BMP:
+		//	out << ".bmp";
+		//	break;
+		//case D3DX11_IFF_JPG:
+		//	out << ".jpg";
+		//	break;
+		//case D3DX11_IFF_PNG:
+		//	out << ".png";
+		//	break;
+		//case D3DX11_IFF_DDS:
+		//	out << ".dds";
+		//	break;
+		//case D3DX11_IFF_TIFF:
+		//	out << ".tiff";
+		//	break;
+		//case D3DX11_IFF_GIF:
+		//	out << ".gif";
+		//	break;
+		//case D3DX11_IFF_WMP:
+		//	out << ".wmp";
+		//	break;
+		//default:
+		//	Log::Get().Write( L"Tried to save a texture image in an unsupported format!" );
+		//}
 
+		HRESULT hr = DirectX::SaveDDSTextureToFile( 
+			m_pContext,
+            pResource,
+            out.str().c_str() );
 
-		HRESULT hr = D3DX11SaveTextureToFile(
-		  m_pContext,
-		  pResource,
-		  format,
-		  out.str().c_str()
-		);
+		//HRESULT hr = D3DX11SaveTextureToFile(
+		//  m_pContext,
+		//  pResource,
+		//  format,
+		//  out.str().c_str()
+		//);
 
 		if ( FAILED( hr ) )
 			Log::Get().Write( L"D3DX11SaveTextureToFile has failed!" );

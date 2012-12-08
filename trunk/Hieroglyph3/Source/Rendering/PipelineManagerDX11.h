@@ -191,7 +191,7 @@ namespace Glyph3
 		void EndPipelineStatistics( );
 		std::wstring PrintPipelineStatistics( );
 
-		void SaveTextureScreenShot( int ID, std::wstring filename, D3DX11_IMAGE_FILE_FORMAT format = D3DX11_IFF_PNG );
+		void SaveTextureScreenShot( int ID, std::wstring filename /*, D3DX11_IMAGE_FILE_FORMAT format = D3DX11_IFF_PNG*/ );
 
 
 		D3D_FEATURE_LEVEL			m_FeatureLevel;

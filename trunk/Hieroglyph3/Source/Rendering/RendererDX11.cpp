@@ -86,9 +86,10 @@
 
 #include "D3DEnumConversion.h"
 
+#include "WICTextureLoader.h"
+
 // Library imports
 #pragma comment( lib, "d3d11.lib" )
-#pragma comment( lib, "d3dx11.lib" )
 #pragma comment( lib, "DXGI.lib" )
 
 // NOTE:
@@ -1217,21 +1218,27 @@ int RendererDX11::CreateInputLayout( TArray<D3D11_INPUT_ELEMENT_DESC>& elements,
 	return( index );
 }
 //--------------------------------------------------------------------------------
-ResourcePtr RendererDX11::LoadTexture( std::wstring filename, D3DX11_IMAGE_LOAD_INFO* pLoadInfo )
+ResourcePtr RendererDX11::LoadTexture( std::wstring filename /*, D3DX11_IMAGE_LOAD_INFO* pLoadInfo*/ )
 {
 	ID3D11Resource* pTexture = 0;
 
 	FileSystem fs;
 	filename = fs.GetTextureFolder() + filename;
 
-	HRESULT hr = D3DX11CreateTextureFromFile(
+	HRESULT hr = DirectX::CreateWICTextureFromFile(
 		m_pDevice,
+		pImmPipeline->m_pContext,
 		filename.c_str(),
-		pLoadInfo,
-		0,
 		&pTexture,
-		0
-	);
+		0 );
+	//HRESULT hr = D3DX11CreateTextureFromFile(
+	//	m_pDevice,
+	//	filename.c_str(),
+	//	pLoadInfo,
+	//	0,
+	//	&pTexture,
+	//	0
+	//);
 
 	if ( FAILED( hr ) )
 	{
@@ -1247,19 +1254,27 @@ ResourcePtr RendererDX11::LoadTexture( std::wstring filename, D3DX11_IMAGE_LOAD_
 	return( ResourcePtr( new ResourceProxyDX11( ResourceID, &TextureConfig, this ) ) );
 }
 //--------------------------------------------------------------------------------
-ResourcePtr RendererDX11::LoadTexture( void* pData, SIZE_T sizeInBytes, D3DX11_IMAGE_LOAD_INFO* pLoadInfo )
+ResourcePtr RendererDX11::LoadTexture( void* pData, SIZE_T sizeInBytes/*, D3DX11_IMAGE_LOAD_INFO* pLoadInfo*/ )
 {
 	ID3D11Resource* pTexture = 0;
 
-	HRESULT hr = D3DX11CreateTextureFromMemory(
+	HRESULT hr = DirectX::CreateWICTextureFromMemory(
 		m_pDevice,
-		pData,
+		pImmPipeline->m_pContext,
+		static_cast<uint8_t*>(pData),
 		sizeInBytes,
-		pLoadInfo,
-		0,
 		&pTexture,
-		0
-	);
+		0 );
+
+	//HRESULT hr = D3DX11CreateTextureFromMemory(
+	//	m_pDevice,
+	//	pData,
+	//	sizeInBytes,
+	//	pLoadInfo,
+	//	0,
+	//	&pTexture,
+	//	0
+	//);
 
 	if ( FAILED( hr ) )
 	{

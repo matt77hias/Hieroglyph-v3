@@ -173,9 +173,12 @@ void App::Initialize()
 
     // Load textures. For the diffuse map, we'll specify that we want an sRGB format so that
     // the texture data is gamma-corrected when sampled in the shader
-    D3DX11_IMAGE_LOAD_INFO loadInfo;
-    loadInfo.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    m_DiffuseTexture = m_pRenderer11->LoadTexture( std::wstring( L"Hex.png" ), &loadInfo );
+   
+	// TODO: Check if DirectXTK supports this loading information!
+	//
+	//D3DX11_IMAGE_LOAD_INFO loadInfo;
+    //loadInfo.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    m_DiffuseTexture = m_pRenderer11->LoadTexture( std::wstring( L"Hex.png" ) /*, &loadInfo*/ );
     m_NormalMap = m_pRenderer11->LoadTexture( std::wstring( L"Hex_Normal.png" ) );
 
     _ASSERT( m_DiffuseTexture->m_iResource != -1 );

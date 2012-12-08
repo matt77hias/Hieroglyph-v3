@@ -21,9 +21,7 @@
 #ifndef KinectManager_h
 #define KinectManager_h
 //--------------------------------------------------------------------------------
-#include "PCH.h"
 #include <Windows.h>
-#include "NuiApi.h"
 #include "Timer.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3

@@ -148,13 +148,13 @@ bool FileSystem::FileIsNewer( const std::wstring& file1, const std::wstring& fil
 	HANDLE handle2 = INVALID_HANDLE_VALUE;
 
 	// Get the file handles for the two files
-#if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
-    handle1 = CreateFile2( file1.c_str(),
-                           GENERIC_READ,
-                           FILE_SHARE_READ,
-                           OPEN_EXISTING,
-                           nullptr );
-#else
+//#if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
+//    handle1 = CreateFile2( file1.c_str(),
+//                           GENERIC_READ,
+//                           FILE_SHARE_READ,
+//                           OPEN_EXISTING,
+//                           nullptr );
+//#else
     handle1 = CreateFileW( file1.c_str(),
 						   GENERIC_READ,
                            FILE_SHARE_READ,
@@ -162,16 +162,16 @@ bool FileSystem::FileIsNewer( const std::wstring& file1, const std::wstring& fil
                            OPEN_EXISTING,
                            FILE_ATTRIBUTE_NORMAL,
                            nullptr );
-#endif
+//#endif
 
 
-#if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
-    handle2 = CreateFile2( file2.c_str(),
-                           GENERIC_READ,
-                           FILE_SHARE_READ,
-                           OPEN_EXISTING,
-                           nullptr );
-#else
+//#if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
+//    handle2 = CreateFile2( file2.c_str(),
+//                           GENERIC_READ,
+//                           FILE_SHARE_READ,
+//                           OPEN_EXISTING,
+//                           nullptr );
+//#else
     handle2 = CreateFileW( file2.c_str(),
 						   GENERIC_READ,
                            FILE_SHARE_READ,
@@ -179,7 +179,7 @@ bool FileSystem::FileIsNewer( const std::wstring& file1, const std::wstring& fil
                            OPEN_EXISTING,
                            FILE_ATTRIBUTE_NORMAL,
                            nullptr );
-#endif
+//#endif
 
 	FILETIME fileTime1;
 	FILETIME fileTime2;

@@ -211,8 +211,8 @@ namespace Glyph3
 
 		Vector2f GetDesktopResolution();
 
-		ResourcePtr LoadTexture( std::wstring filename, D3DX11_IMAGE_LOAD_INFO* pLoadInfo = NULL );
-		ResourcePtr LoadTexture( void* pData, SIZE_T sizeInBytes, D3DX11_IMAGE_LOAD_INFO* pLoadInfo = NULL );
+		ResourcePtr LoadTexture( std::wstring filename /*, D3DX11_IMAGE_LOAD_INFO* pLoadInfo = NULL*/ );
+		ResourcePtr LoadTexture( void* pData, SIZE_T sizeInBytes /*, D3DX11_IMAGE_LOAD_INFO* pLoadInfo = NULL*/ );
 
 		// These methods are used to take an existing texture resource and to resize it.  This
 		// will recreate the texture and its associated views with the exact same configuration

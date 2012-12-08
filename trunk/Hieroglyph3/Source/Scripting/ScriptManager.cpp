@@ -14,12 +14,10 @@
 #include "Log.h"
 //--------------------------------------------------------------------------------
 #pragma comment( lib, "lualib.lib" )
-#pragma comment( lib, "lualiblib.lib" )
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ScriptManager* ScriptManager::ms_pScriptManager = NULL;
-//ScriptManager ScriptMgr;
 //--------------------------------------------------------------------------------
 ScriptManager::ScriptManager()
 {
@@ -58,27 +56,16 @@ void ScriptManager::Run( char* FileName )
 //--------------------------------------------------------------------------------
 void ScriptManager::ExecuteChunk( char* chunk )
 {
-//	char AsciiChunk[1024];
-//	WideCharToMultiByte( CP_ACP, 0, chunk, -1, AsciiChunk, 1024, NULL, NULL);
-
 	luaL_dostring( m_pLuaState, chunk );
 }
 //--------------------------------------------------------------------------------
 void ScriptManager::RegisterFunction( const char* name, lua_CFunction function )
 {
-//	char AsciiName[1024];
-//	WideCharToMultiByte( CP_ACP, 0, name, -1, AsciiName, 1024, NULL, NULL);
-
 	lua_register( m_pLuaState, name, function );
 }
 //--------------------------------------------------------------------------------
 void ScriptManager::RegisterClassFunction( const char* classname, const char* funcname, lua_CFunction function )
 {
-//	char AsciiClassName[1024];
-//	char AsciiFuncName[1024];
-//	WideCharToMultiByte( CP_ACP, 0, classname, -1, AsciiClassName, 1024, NULL, NULL);
-//	WideCharToMultiByte( CP_ACP, 0, funcname, -1, AsciiFuncName, 1024, NULL, NULL);
-
 	lua_getfield( m_pLuaState, LUA_GLOBALSINDEX, classname );	// Get the class's table
 	lua_pushcfunction( m_pLuaState, function );		// Push the function onto the stack
 	lua_setfield( m_pLuaState, -2, funcname );		// Store the function in the class
@@ -92,9 +79,6 @@ lua_State* ScriptManager::GetState( )
 //--------------------------------------------------------------------------------
 unsigned int ScriptManager::RegisterEngineClass( const char* name )
 {
-//	char AsciiName[1024];
-//	WideCharToMultiByte( CP_ACP, 0, name, -1, AsciiName, 1024, NULL, NULL);
-
 	sClassData data = m_kClassRegistry[name];
 
 	if ( data.name == "" )
@@ -114,11 +98,6 @@ unsigned int ScriptManager::RegisterEngineClass( const char* name )
 
 	return( data.id );
 }
-//--------------------------------------------------------------------------------
-//void ScriptManager::RegisterClassMethod( int ClassID, const char* name, lua_CFunction function )
-//{
-//
-//}
 //--------------------------------------------------------------------------------
 unsigned int ScriptManager::RegisterEngineObject( const char* name, void* pObject )
 {
@@ -150,9 +129,6 @@ bool ScriptManager::UnRegisterObjectByHandle( unsigned int handle )
 	// TODO: Possibly add some marker to the object data structure to indicate
 	//       that the object has been unregistered...
 
-	// If the object has been registered, remove its pointer and handle, then 
-	// return true, otherwise return false.
-
 	if ( m_kObjectRegistry[handle].pointer )
 	{
 		m_kPointerRegistry[m_kObjectRegistry[handle].pointer].handle = 0xffffffff;
@@ -176,13 +152,7 @@ bool ScriptManager::UnRegisterObjectByPointer( void* pObject )
 	}
 
 	return( false );
-
 }
-//--------------------------------------------------------------------------------
-//std::wstring& ScriptManager::GetClass( int ClassID )
-//{
-//
-//}
 //--------------------------------------------------------------------------------
 void* ScriptManager::GetObjectPointer( unsigned int handle )
 {
@@ -196,11 +166,3 @@ unsigned int ScriptManager::GetObjectHandle( void* pObject )
 	return( m_kPointerRegistry[pObject].handle );
 }
 //--------------------------------------------------------------------------------
-
-
-//iStatus = lua_pcall( lState, 0, LUA_MULTRET, 0 );
-//if( iStatus )
-//{
-//    std::cout << "Error: " << lua_tostring( lState, -1 );
-//    return 1;
-//}

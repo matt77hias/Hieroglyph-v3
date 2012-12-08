@@ -32,14 +32,16 @@ bool FileLoader::Open( const std::wstring& filename )
 	Close();
 
 
+	// TODO: This needs to be updated to correctly choose CreateFile2 whenever 
+	//       the library is being compiled for a WinRT target...
 
-#if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
-    HANDLE hFile = CreateFile2( filename.c_str(),
-                                GENERIC_READ,
-                                FILE_SHARE_READ,
-                                OPEN_EXISTING,
-                                nullptr );
-#else
+//#if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
+//    HANDLE hFile = CreateFile2( filename.c_str(),
+//                                GENERIC_READ,
+//                                FILE_SHARE_READ,
+//                                OPEN_EXISTING,
+//                                nullptr );
+//#else
     HANDLE hFile = CreateFileW( filename.c_str(),
                                 GENERIC_READ,
                                 FILE_SHARE_READ,
@@ -48,7 +50,7 @@ bool FileLoader::Open( const std::wstring& filename )
                                 FILE_ATTRIBUTE_NORMAL,
                                 nullptr
                               );
-#endif
+//#endif
 
     if (INVALID_HANDLE_VALUE == hFile) {
         return( false );

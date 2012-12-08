@@ -40,7 +40,7 @@
 // DirectX includes
 #include <d3d11.h>
 #include <d3dCompiler.h>
-#include <d3dx11.h>
+//#include <d3dx11.h>
 
 #define SAFE_RELEASE( x ) {if(x){(x)->Release();(x)=NULL;}}
 #define SAFE_DELETE( x ) {if(x){delete (x);(x)=NULL;}}

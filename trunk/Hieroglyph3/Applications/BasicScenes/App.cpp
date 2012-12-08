@@ -174,7 +174,7 @@ void App::Initialize()
 	// scene so that it will be updated via the scene interface instead of 
 	// manually manipulating it.
 
-	m_pNode = new Node3D();
+	m_pActor = new Actor();
 
 	
 	for ( int i = 0; i < 10; i++ )
@@ -184,10 +184,10 @@ void App::Initialize()
 		m_pEntity[i]->SetMaterial( m_pMaterial );
 		m_pEntity[i]->Position() = Vector3f( static_cast<float>( i ) * 4.0f, 4.0f * ( i % 2 ) - 2.0f, 0.0f );
 
-		m_pNode->AttachChild( m_pEntity[i] );
+		m_pActor->GetNode()->AttachChild( m_pEntity[i] );
 	}
 
-	m_pScene->AddEntity( m_pNode );
+	m_pScene->AddActor( m_pActor );
 	m_pScene->AddCamera( m_pCamera );
 }
 //--------------------------------------------------------------------------------
@@ -201,14 +201,14 @@ void App::Update()
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.
 
-	EventManager::Get()->ProcessEvent( new EvtFrameStart( *m_pTimer ) );
+	EventManager::Get()->ProcessEvent( new EvtFrameStart( m_pTimer->Elapsed() ) );
 
 	// Manipulate the scene here - simply rotate the root of the scene in this
 	// example.
 
 	Matrix3f rotation;
 	rotation.RotationX( m_pTimer->Elapsed() );
-	m_pNode->Rotation() *= rotation;
+	m_pActor->GetNode()->Rotation() *= rotation;
 
 	// Update the scene, and then render all cameras within the scene.
 
@@ -226,9 +226,7 @@ void App::Shutdown()
 	for ( int i = 0; i < 10; i++ )
 		SAFE_DELETE( m_pEntity[i] );
 
-	SAFE_DELETE( m_pNode );
-
-	SAFE_DELETE( m_pCamera );
+	//SAFE_DELETE( m_pCamera );
 
 	// Print the framerate out for the log before shutting down.
 
@@ -242,7 +240,7 @@ void App::TakeScreenShot()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName() );
 	}
 }
 //--------------------------------------------------------------------------------

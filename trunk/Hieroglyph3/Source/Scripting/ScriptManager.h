@@ -17,9 +17,7 @@
 #ifndef ScriptManager_h
 #define ScriptManager_h
 //--------------------------------------------------------------------------------
-#include <vector>
-#include <string>
-#include <map>
+#include "PCH.h"
 //--------------------------------------------------------------------------------
 extern "C"
 {

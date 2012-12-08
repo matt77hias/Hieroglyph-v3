@@ -14,7 +14,7 @@
 #include "Log.h"
 
 #include <sstream>
-#include <xnamath.h>
+#include <DirectXMath.h>
 
 #include "EventManager.h"
 #include "EvtFrameStart.h"
@@ -40,8 +40,8 @@ using namespace Glyph3;
 // Structure for Vertex Buffer
 struct Vertex
 {
-	XMFLOAT3 Pos;
-	XMFLOAT4 Color;
+	DirectX::XMFLOAT3 Pos;
+	DirectX::XMFLOAT4 Color;
 };
 //--------------------------------------------------------------------------------
 
@@ -226,14 +226,14 @@ void App::Initialize()
 	{
 		Vertex vertices[] =
 		{
-			{ XMFLOAT3( -1.0f, 1.0f, -1.0f ), XMFLOAT4( 0.0f, 0.0f, 1.0f, 1.0f ) },
-			{ XMFLOAT3( 1.0f, 1.0f, -1.0f ), XMFLOAT4( 0.0f, 1.0f, 0.0f, 1.0f ) },
-			{ XMFLOAT3( 1.0f, 1.0f, 1.0f ), XMFLOAT4( 0.0f, 1.0f, 1.0f, 1.0f ) },
-			{ XMFLOAT3( -1.0f, 1.0f, 1.0f ), XMFLOAT4( 1.0f, 0.0f, 0.0f, 1.0f ) },
-			{ XMFLOAT3( -1.0f, -1.0f, -1.0f ), XMFLOAT4( 1.0f, 0.0f, 1.0f, 1.0f ) },
-			{ XMFLOAT3( 1.0f, -1.0f, -1.0f ), XMFLOAT4( 1.0f, 1.0f, 0.0f, 1.0f ) },
-			{ XMFLOAT3( 1.0f, -1.0f, 1.0f ), XMFLOAT4( 1.0f, 1.0f, 1.0f, 1.0f ) },
-			{ XMFLOAT3( -1.0f, -1.0f, 1.0f ), XMFLOAT4( 0.0f, 0.0f, 0.0f, 1.0f ) },
+			{ DirectX::XMFLOAT3( -1.0f, 1.0f, -1.0f ), DirectX::XMFLOAT4( 0.0f, 0.0f, 1.0f, 1.0f ) },
+			{ DirectX::XMFLOAT3( 1.0f, 1.0f, -1.0f ), DirectX::XMFLOAT4( 0.0f, 1.0f, 0.0f, 1.0f ) },
+			{ DirectX::XMFLOAT3( 1.0f, 1.0f, 1.0f ), DirectX::XMFLOAT4( 0.0f, 1.0f, 1.0f, 1.0f ) },
+			{ DirectX::XMFLOAT3( -1.0f, 1.0f, 1.0f ), DirectX::XMFLOAT4( 1.0f, 0.0f, 0.0f, 1.0f ) },
+			{ DirectX::XMFLOAT3( -1.0f, -1.0f, -1.0f ), DirectX::XMFLOAT4( 1.0f, 0.0f, 1.0f, 1.0f ) },
+			{ DirectX::XMFLOAT3( 1.0f, -1.0f, -1.0f ), DirectX::XMFLOAT4( 1.0f, 1.0f, 0.0f, 1.0f ) },
+			{ DirectX::XMFLOAT3( 1.0f, -1.0f, 1.0f ), DirectX::XMFLOAT4( 1.0f, 1.0f, 1.0f, 1.0f ) },
+			{ DirectX::XMFLOAT3( -1.0f, -1.0f, 1.0f ), DirectX::XMFLOAT4( 0.0f, 0.0f, 0.0f, 1.0f ) },
 		};
 		D3D11_SUBRESOURCE_DATA data;
 		data.pSysMem = vertices;
@@ -293,16 +293,16 @@ void App::Initialize()
 
 	// Create the view matrix
 
-	XMVECTOR Eye = XMVectorSet( 0.0f, 1.0f, -5.0f, 0.0f );
-	XMVECTOR At = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
-	XMVECTOR Up = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
+	DirectX::XMVECTOR Eye = DirectX::XMVectorSet( 0.0f, 1.0f, -5.0f, 0.0f );
+	DirectX::XMVECTOR At = DirectX::XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
+	DirectX::XMVECTOR Up = DirectX::XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
 	// not recommended, just to demonstrate interoperation with xnamath
-	m_ViewMatrix = *((Matrix4f*)&XMMatrixLookAtLH(Eye, At, Up));
+	m_ViewMatrix = *((Matrix4f*)&DirectX::XMMatrixLookAtLH(Eye, At, Up));
 
 	// Create the projection matrix
 
 	// not recommended, just to demonstrate interoperation with xnamath
-	m_ProjMatrix = *((Matrix4f*)&XMMatrixPerspectiveFovLH( XM_PIDIV2, (FLOAT)m_pWindow->GetWidth() / (FLOAT)m_pWindow->GetHeight(), 0.01f, 100.0f ));
+	m_ProjMatrix = *((Matrix4f*)&DirectX::XMMatrixPerspectiveFovLH( DirectX::XM_PIDIV2, (FLOAT)m_pWindow->GetWidth() / (FLOAT)m_pWindow->GetHeight(), 0.01f, 100.0f ));
 
 	// Engine will automatically keep all concat'd matrices up to date
 
@@ -366,7 +366,7 @@ void App::TakeScreenShot()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName(), D3DX11_IFF_BMP );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName() );
 	}
 }
 //--------------------------------------------------------------------------------
