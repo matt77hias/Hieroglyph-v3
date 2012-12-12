@@ -49,7 +49,10 @@ void Scene::Render( RendererDX11* pRenderer )
 	// appropriate image.
 
 	for ( int i = 0; i < m_vCameras.count(); i++ )
+	{
+		Parameters.InitRenderParams();
 		m_vCameras[i]->RenderFrame( pRenderer );
+	}
 }
 //--------------------------------------------------------------------------------
 void Scene::AddCamera( Camera* camera )

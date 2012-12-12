@@ -27,13 +27,23 @@ void ConstantBufferParameterWriterDX11::SetRenderParameterRef( ConstantBufferPar
 	m_pParameter = pParam;
 }
 //--------------------------------------------------------------------------------
+void ConstantBufferParameterWriterDX11::SetValue( ResourcePtr Value )
+{
+	m_Value = Value;
+}
+//--------------------------------------------------------------------------------
 void ConstantBufferParameterWriterDX11::WriteParameter( IParameterManager* pParamMgr )
 {
 	pParamMgr->SetConstantBufferParameter( m_pParameter, m_Value );
 }
 //--------------------------------------------------------------------------------
-void ConstantBufferParameterWriterDX11::SetValue( ResourcePtr Value )
+void ConstantBufferParameterWriterDX11::InitializeParameter( )
 {
-	m_Value = Value;
+	m_pParameter->InitializeParameterData( &m_Value );
+}
+//--------------------------------------------------------------------------------
+RenderParameterDX11* ConstantBufferParameterWriterDX11::GetRenderParameterRef()
+{
+	return( m_pParameter );
 }
 //--------------------------------------------------------------------------------

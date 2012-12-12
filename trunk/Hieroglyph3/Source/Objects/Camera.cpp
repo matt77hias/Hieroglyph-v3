@@ -17,9 +17,19 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 Camera::Camera()
 {
-	m_pCameraView = 0;
-	m_pOverlayView = 0;
-	m_pScene = 0;
+	m_pCameraView = nullptr;
+	m_pOverlayView = nullptr;
+	m_pScene = nullptr;
+
+	// TODO: We may not need to keep a reference to the spatial controller here,
+	//       and instead we could simply identify the spatial controller in the
+	//       node itself.  That would put the ownership in the entity being 
+	//       controlled, since that is where it will be deleted anyways...
+
+	// Create the spatial controller, which will be used to manipulate the node
+	// in a simple way.
+	m_pSpatialController = new SpatialController();
+	GetNode()->AttachController( m_pSpatialController );
 
 	m_fNear = 0.1f;
 	m_fFar = 100.0f;
@@ -28,7 +38,7 @@ Camera::Camera()
 
     m_ProjMatrix.MakeIdentity();
 
-	m_pViewPositionParameter = nullptr;
+	m_pViewPositionWriter = Parameters.SetVectorParameter( L"ViewPosition", Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 }
 //--------------------------------------------------------------------------------
 Camera::~Camera()
@@ -63,14 +73,10 @@ void Camera::RenderFrame( RendererDX11* pRenderer )
 		// Set the view position in the parameter system, for use by any of the
 		// views being used in this frame.
 
-		if ( !m_pViewPositionParameter ) {
-			m_pViewPositionParameter = pRenderer->m_pParamMgr->GetVectorParameterRef( std::wstring( L"ViewPosition" ) );
-		}
-
 		Vector3f p = GetNode()->Position() + GetBody()->Position();
-		Vector4f ViewPosition( p.x, p.y, p.z, 1.0f );
-		m_pViewPositionParameter->InitializeParameterData( &ViewPosition );
+		m_pViewPositionWriter->SetValue( Vector4f( p.x, p.y, p.z, 1.0f ) );
 
+		Parameters.InitRenderParams();
 
 		// Use the pre-draw method to queue any needed render views in the scene.
 		// This is followed by rendering all of the views to generate the current
@@ -174,6 +180,11 @@ void Camera::ApplyProjectionParams()
 //--------------------------------------------------------------------------------
 const Matrix4f& Camera::ProjMatrix()
 {
-    return m_ProjMatrix;
+    return( m_ProjMatrix );
+}
+//--------------------------------------------------------------------------------
+SpatialController& Camera::Spatial()
+{
+	return( *m_pSpatialController );
 }
 //--------------------------------------------------------------------------------

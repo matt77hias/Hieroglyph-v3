@@ -19,7 +19,7 @@
 //--------------------------------------------------------------------------------
 #include "Node3D.h"
 #include "Camera.h"
-#include <vector>
+#include "ParameterContainer.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -39,6 +39,9 @@ namespace Glyph3
 		void BuildPickRecord( Ray3f& ray, TArray<PickRecord>& record );
 
 		Node3D* GetRoot();
+
+	public:
+		ParameterContainer Parameters;
 
 	protected:
 		Node3D* m_pRoot;

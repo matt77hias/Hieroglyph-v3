@@ -63,7 +63,8 @@
       <AdditionalLibraryDirectories>..\..\SDK\Library\Debug;</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetDir)$(ProjectName).exe" "$(SolutionDir)\Applications\Bin"</Command>
+      <Command>copy /Y "$(TargetDir)$(ProjectName).exe" "$(SolutionDir)Applications\Bin"
+copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)Applications\Bin”</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -86,7 +87,8 @@
       <AdditionalLibraryDirectories>..\..\SDK\Library\Release;</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetDir)$(ProjectName).exe" "$(SolutionDir)\Applications\Bin"</Command>
+      <Command>copy /Y "$(TargetDir)$(ProjectName).exe" "$(SolutionDir)Applications\Bin"
+copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)Applications\Bin”</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -150,8 +150,8 @@ void App::Initialize()
 	// from the camera's point of view of the scene.
 
 	m_pCamera = new Camera();
-	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.707f, 0.707f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( -10.0f, 27.5f, -20.0f );
+	m_pCamera->Spatial().SetRotation( Vector3f( 0.707f, 0.707f, 0.0f ) );
+	m_pCamera->Spatial().SetTranslation( Vector3f( -10.0f, 27.5f, -20.0f ) );
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_RenderTarget, m_DepthTarget );
 	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.2f, 0.2f ) );
 	m_pCamera->SetCameraView( m_pRenderView );

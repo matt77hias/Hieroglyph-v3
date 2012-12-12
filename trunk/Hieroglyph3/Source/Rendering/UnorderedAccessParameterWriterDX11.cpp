@@ -43,3 +43,13 @@ void UnorderedAccessParameterWriterDX11::SetInitCount( unsigned int count )
 	m_InitCount = count;
 }
 //--------------------------------------------------------------------------------
+void UnorderedAccessParameterWriterDX11::InitializeParameter( )
+{
+	m_pParameter->InitializeParameterData( &m_Value );
+}
+//--------------------------------------------------------------------------------
+RenderParameterDX11* UnorderedAccessParameterWriterDX11::GetRenderParameterRef()
+{
+	return( m_pParameter );
+}
+//--------------------------------------------------------------------------------

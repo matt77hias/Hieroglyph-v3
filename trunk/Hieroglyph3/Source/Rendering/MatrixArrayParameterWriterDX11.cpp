@@ -44,3 +44,13 @@ void MatrixArrayParameterWriterDX11::SetCount( int count )
 	m_iCount = count;
 }
 //--------------------------------------------------------------------------------
+void MatrixArrayParameterWriterDX11::InitializeParameter( )
+{
+	m_pParameter->InitializeParameterData( m_pValue );
+}
+//--------------------------------------------------------------------------------
+RenderParameterDX11* MatrixArrayParameterWriterDX11::GetRenderParameterRef()
+{
+	return( m_pParameter );
+}
+//--------------------------------------------------------------------------------

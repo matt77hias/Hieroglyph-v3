@@ -701,6 +701,9 @@
     <ClCompile Include="Utility\Timer.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
+    <ClCompile Include="Objects\SpatialController.cpp">
+      <Filter>Objects\Controllers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationStream.h">
@@ -1278,6 +1281,9 @@
     </ClInclude>
     <ClInclude Include="Utility\Timer.h">
       <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\SpatialController.h">
+      <Filter>Objects\Controllers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -11,6 +11,14 @@
 //--------------------------------------------------------------------------------
 // Camera
 //
+// This class specializes an actor, and provides an interface for easily setting 
+// particular camera based parameters like the aspect ration and field-of-view.  
+// In addition, it allows the specification of a 'render-view' which it will
+// execute with the camera parameters that the user has specified.
+//        
+// In addition, a second render view slot is provided to allow the insertion of 
+// an overlay visualization.  If one is set, it will automatically be rendered
+// after the main view has been.
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -19,10 +27,13 @@
 //--------------------------------------------------------------------------------
 #include "Actor.h"
 #include "IRenderView.h"
+#include "SpatialController.h"
+#include "ParameterContainer.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
 	class Scene;
+	class SpatialController;
 
 	class Camera : public Actor
 	{
@@ -50,7 +61,12 @@ namespace Glyph3
 		float GetAspectRatio();
 		float GetFieldOfView();
 
+		SpatialController& Spatial();
+
         const Matrix4f& ProjMatrix();
+
+	public:
+		ParameterContainer Parameters;
 
 	protected:
 
@@ -66,7 +82,8 @@ namespace Glyph3
 		float m_fFov;
 
         Matrix4f m_ProjMatrix;
-		VectorParameterDX11* m_pViewPositionParameter;
+		VectorParameterWriterDX11* m_pViewPositionWriter;
+		SpatialController*	m_pSpatialController;
 	};
 };
 //--------------------------------------------------------------------------------

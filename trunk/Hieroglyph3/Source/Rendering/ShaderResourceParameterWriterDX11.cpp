@@ -37,3 +37,13 @@ void ShaderResourceParameterWriterDX11::SetValue( ResourcePtr Value )
 	m_Value = Value;
 }
 //--------------------------------------------------------------------------------
+void ShaderResourceParameterWriterDX11::InitializeParameter( )
+{
+	m_pParameter->InitializeParameterData( &m_Value );
+}
+//--------------------------------------------------------------------------------
+RenderParameterDX11* ShaderResourceParameterWriterDX11::GetRenderParameterRef()
+{
+	return( m_pParameter );
+}
+//--------------------------------------------------------------------------------

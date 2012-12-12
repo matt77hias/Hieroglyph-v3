@@ -75,6 +75,7 @@
     <ClCompile Include="Objects\Scene.cpp" />
     <ClCompile Include="Objects\SkinnedActor.cpp" />
     <ClCompile Include="Objects\SkinnedBoneController.cpp" />
+    <ClCompile Include="Objects\SpatialController.cpp" />
     <ClCompile Include="Objects\TextActor.cpp" />
     <ClCompile Include="Objects\TextureSpaceCameraPositionWriter.cpp" />
     <ClCompile Include="Objects\TextureSpaceLightPositionWriter.cpp" />
@@ -263,6 +264,7 @@
     <ClInclude Include="Objects\Scene.h" />
     <ClInclude Include="Objects\SkinnedActor.h" />
     <ClInclude Include="Objects\SkinnedBoneController.h" />
+    <ClInclude Include="Objects\SpatialController.h" />
     <ClInclude Include="Objects\TextActor.h" />
     <ClInclude Include="Objects\TextureSpaceCameraPositionWriter.h" />
     <ClInclude Include="Objects\TextureSpaceLightPositionWriter.h" />

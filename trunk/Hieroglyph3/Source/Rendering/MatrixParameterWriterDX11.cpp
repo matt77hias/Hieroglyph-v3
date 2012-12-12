@@ -38,3 +38,13 @@ void MatrixParameterWriterDX11::SetValue( Matrix4f& Value )
 	m_Value = Value;
 }
 //--------------------------------------------------------------------------------
+void MatrixParameterWriterDX11::InitializeParameter( )
+{
+	m_pParameter->InitializeParameterData( &m_Value );
+}
+//--------------------------------------------------------------------------------
+RenderParameterDX11* MatrixParameterWriterDX11::GetRenderParameterRef()
+{
+	return( m_pParameter );
+}
+//--------------------------------------------------------------------------------

@@ -26,11 +26,15 @@ namespace Glyph3
 		virtual ~MatrixParameterWriterDX11();
 
 		void SetRenderParameterRef( MatrixParameterDX11* pParam );
-
-		virtual void WriteParameter( IParameterManager* pParamMgr );
 		void SetValue( Matrix4f& Value );
 
+		virtual void WriteParameter( IParameterManager* pParamMgr );
+		virtual void InitializeParameter( );
+
+		virtual RenderParameterDX11* GetRenderParameterRef();
+
 	protected:
+		MatrixParameterDX11*			m_pParameter;
 		Matrix4f						m_Value;
 	};
 };

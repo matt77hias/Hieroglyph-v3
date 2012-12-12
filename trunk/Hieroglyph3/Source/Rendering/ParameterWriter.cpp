@@ -22,13 +22,3 @@ ParameterWriter::~ParameterWriter()
 {
 }
 //--------------------------------------------------------------------------------
-//void ParameterWriter::SetRenderParameterRef( RenderParameterDX11* pParam )
-//{
-//	m_pParameter = pParam;
-//}
-//--------------------------------------------------------------------------------
-RenderParameterDX11* ParameterWriter::GetRenderParameterRef()
-{
-	return( m_pParameter );
-}
-//--------------------------------------------------------------------------------

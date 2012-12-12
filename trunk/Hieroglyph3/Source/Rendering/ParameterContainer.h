@@ -49,16 +49,17 @@ namespace Glyph3
 		// Setting values will add a parameter writer of the appropriate type to 
 		// this container.  This allows for easy setting of values without having to
 		// manually add, get, and set each value.
-		void SetConstantBufferParameter( const std::wstring& name, ResourcePtr value );
-		void SetMatrixArrayParameter( const std::wstring& name, Matrix4f* values, int count );
-		void SetMatrixParameter( const std::wstring& name, Matrix4f& value );
-		void SetSamplerParameter( const std::wstring& name, int value );
-		void SetShaderResourceParameter( const std::wstring& name, ResourcePtr value );
-		void SetUnorderedAccessParameter( const std::wstring& name, ResourcePtr value );
-		void SetVectorParameter( const std::wstring& name, Vector4f& value );
+		ConstantBufferParameterWriterDX11* SetConstantBufferParameter( const std::wstring& name, ResourcePtr value );
+		MatrixArrayParameterWriterDX11* SetMatrixArrayParameter( const std::wstring& name, Matrix4f* values, int count );
+		MatrixParameterWriterDX11* SetMatrixParameter( const std::wstring& name, Matrix4f& value );
+		SamplerParameterWriterDX11* SetSamplerParameter( const std::wstring& name, int value );
+		ShaderResourceParameterWriterDX11* SetShaderResourceParameter( const std::wstring& name, ResourcePtr value );
+		UnorderedAccessParameterWriterDX11* SetUnorderedAccessParameter( const std::wstring& name, ResourcePtr value );
+		VectorParameterWriterDX11* SetVectorParameter( const std::wstring& name, Vector4f& value );
 
 		// Apply the parameters in this container to a parameter manager.
 		void SetRenderParams( IParameterManager* pParamManager );
+		void InitRenderParams( );
 
 	protected:
 

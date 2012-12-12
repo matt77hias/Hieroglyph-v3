@@ -295,12 +295,19 @@ VectorParameterWriterDX11* ParameterContainer::GetVectorParameterWriter( const s
 //--------------------------------------------------------------------------------
 void ParameterContainer::SetRenderParams( IParameterManager* pParamManager )
 {
-	// Scroll through each parameter and set it in the renderer
+	// Scroll through each parameter and set it in the provided parameter manager.
 	for ( int i = 0; i < m_RenderParameters.count(); i++ )
 		m_RenderParameters[i]->WriteParameter( pParamManager );
 }
 //--------------------------------------------------------------------------------
-void ParameterContainer::SetConstantBufferParameter( const std::wstring& name, ResourcePtr value )
+void ParameterContainer::InitRenderParams( )
+{
+	// Scroll through each parameter and initialize its value.
+	for ( int i = 0; i < m_RenderParameters.count(); i++ )
+		m_RenderParameters[i]->InitializeParameter( );
+}
+//--------------------------------------------------------------------------------
+ConstantBufferParameterWriterDX11* ParameterContainer::SetConstantBufferParameter( const std::wstring& name, ResourcePtr value )
 {
 	// Check if the parameter already exists in this container
 	ConstantBufferParameterWriterDX11* pConstantBufferWriter = GetConstantBufferParameterWriter( name );
@@ -314,9 +321,11 @@ void ParameterContainer::SetConstantBufferParameter( const std::wstring& name, R
 
 	// ... and set the value.
 	pConstantBufferWriter->SetValue( value );
+
+	return( pConstantBufferWriter );
 }
 //--------------------------------------------------------------------------------
-void ParameterContainer::SetMatrixArrayParameter( const std::wstring& name, Matrix4f* values, int count )
+MatrixArrayParameterWriterDX11* ParameterContainer::SetMatrixArrayParameter( const std::wstring& name, Matrix4f* values, int count )
 {
 	// Check if the parameter already exists in this container
 	MatrixArrayParameterWriterDX11* pMatrixArrayWriter = GetMatrixArrayParameterWriter( name );
@@ -330,9 +339,11 @@ void ParameterContainer::SetMatrixArrayParameter( const std::wstring& name, Matr
 
 	// ... and set the value.
 	pMatrixArrayWriter->SetValue( values );
+
+	return( pMatrixArrayWriter );
 }
 //--------------------------------------------------------------------------------
-void ParameterContainer::SetMatrixParameter( const std::wstring& name, Matrix4f& value )
+MatrixParameterWriterDX11* ParameterContainer::SetMatrixParameter( const std::wstring& name, Matrix4f& value )
 {
 	// Check if the parameter already exists in this container
 	MatrixParameterWriterDX11* pMatrixWriter = GetMatrixParameterWriter( name );
@@ -346,9 +357,11 @@ void ParameterContainer::SetMatrixParameter( const std::wstring& name, Matrix4f&
 
 	// ... and set the value.
 	pMatrixWriter->SetValue( value );
+
+	return( pMatrixWriter );
 }
 //--------------------------------------------------------------------------------
-void ParameterContainer::SetSamplerParameter( const std::wstring& name, int value )
+SamplerParameterWriterDX11* ParameterContainer::SetSamplerParameter( const std::wstring& name, int value )
 {
 	// Check if the parameter already exists in this container
 	SamplerParameterWriterDX11* pSamplerWriter = GetSamplerParameterWriter( name );
@@ -362,9 +375,11 @@ void ParameterContainer::SetSamplerParameter( const std::wstring& name, int valu
 
 	// ... and set the value.
 	pSamplerWriter->SetValue( value );
+
+	return( pSamplerWriter );
 }
 //--------------------------------------------------------------------------------
-void ParameterContainer::SetShaderResourceParameter( const std::wstring& name, ResourcePtr value )
+ShaderResourceParameterWriterDX11* ParameterContainer::SetShaderResourceParameter( const std::wstring& name, ResourcePtr value )
 {
 	// Check if the parameter already exists in this container
 	ShaderResourceParameterWriterDX11* pShaderResourceWriter = GetShaderResourceParameterWriter( name );
@@ -378,9 +393,11 @@ void ParameterContainer::SetShaderResourceParameter( const std::wstring& name, R
 
 	// ... and set the value.
 	pShaderResourceWriter->SetValue( value );
+
+	return( pShaderResourceWriter );
 }
 //--------------------------------------------------------------------------------
-void ParameterContainer::SetUnorderedAccessParameter( const std::wstring& name, ResourcePtr value )
+UnorderedAccessParameterWriterDX11* ParameterContainer::SetUnorderedAccessParameter( const std::wstring& name, ResourcePtr value )
 {
 	// Check if the parameter already exists in this container
 	UnorderedAccessParameterWriterDX11* pUnorderedAccessWriter = GetUnorderedAccessParameterWriter( name );
@@ -394,9 +411,11 @@ void ParameterContainer::SetUnorderedAccessParameter( const std::wstring& name, 
 
 	// ... and set the value.
 	pUnorderedAccessWriter->SetValue( value );
+
+	return( pUnorderedAccessWriter );
 }
 //--------------------------------------------------------------------------------
-void ParameterContainer::SetVectorParameter( const std::wstring& name, Vector4f& value )
+VectorParameterWriterDX11* ParameterContainer::SetVectorParameter( const std::wstring& name, Vector4f& value )
 {
 	// Check if the parameter already exists in this container
 	VectorParameterWriterDX11* pVectorWriter = GetVectorParameterWriter( name );
@@ -410,5 +429,7 @@ void ParameterContainer::SetVectorParameter( const std::wstring& name, Vector4f&
 
 	// ... and set the value.
 	pVectorWriter->SetValue( value );
+
+	return( pVectorWriter );
 }
 //--------------------------------------------------------------------------------

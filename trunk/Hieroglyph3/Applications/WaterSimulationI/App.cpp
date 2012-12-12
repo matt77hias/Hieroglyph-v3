@@ -109,8 +109,8 @@ void App::Initialize()
 	// The camera is already created, we just need to specify where it is.  We also set
 	// the back color of the render view.
 
-	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.307f, 0.707f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( -100.0f, 30.5f, -100.0f );
+	m_pCamera->Spatial().SetRotation( Vector3f( 0.307f, 0.707f, 0.0f ) );
+	m_pCamera->Spatial().SetTranslation( Vector3f( -100.0f, 30.5f, -100.0f ) );
 	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
 
 	// Create the desired scene and add the entities to it.  Then add the camera to the

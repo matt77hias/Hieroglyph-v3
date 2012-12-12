@@ -181,28 +181,27 @@ void FirstPersonCamera::Update()
     if ( m_bPressedKeys[SpeedUpKey] )
         CamMoveSpeed *= 3.0f;
 
-    Matrix3f& rotation = m_pBody->Rotation();
-    Vector3f& position = m_pBody->Position();    
-
     // Move the camera with the keyboard
     if ( m_bPressedKeys[RightKey] )
-        position += rotation.GetRow( 0 ) * CamMoveSpeed;
+        Spatial().MoveRight( CamMoveSpeed );
     else if ( m_bPressedKeys[LeftKey] )
-        position -= rotation.GetRow( 0 ) * CamMoveSpeed;
+        Spatial().MoveLeft( CamMoveSpeed );
     if ( m_bPressedKeys[UpKey] )
-        position += rotation.GetRow( 1 ) * CamMoveSpeed;
+        Spatial().MoveUp( CamMoveSpeed );
     else if ( m_bPressedKeys[DownKey] )
-        position -= rotation.GetRow( 1 ) * CamMoveSpeed;
+        Spatial().MoveDown( CamMoveSpeed );
     if ( m_bPressedKeys[ForwardKey] )
-        position += rotation.GetRow( 2 ) * CamMoveSpeed;
+        Spatial().MoveForward( CamMoveSpeed );
     else if ( m_bPressedKeys[BackKey] )
-        position -= rotation.GetRow( 2 ) * CamMoveSpeed;
+        Spatial().MoveBackward( CamMoveSpeed );
 
     // Rotate the camera with the mouse
     m_fRotationX += m_iMouseDeltaY * CamRotSpeed;
     m_fRotationY += m_iMouseDeltaX * CamRotSpeed;
     m_iMouseDeltaX = 0;
     m_iMouseDeltaY = 0;
+
+	// TODO: Move these rotation clamping actions into the spatial controller
 
     // Clamp the rotation values
     if ( m_fRotationX < -PiOver2 )
@@ -213,6 +212,8 @@ void FirstPersonCamera::Update()
     m_fRotationY = WrapAngle( m_fRotationY );
 
     // Make a rotation matrix from the X/Y rotation
-    rotation.Rotation( Vector3f( m_fRotationX, m_fRotationY, 0.0f ) );    
+	Spatial().RotateBy( Vector3f( m_fRotationX, m_fRotationY, 0.0f ) );
+	m_fRotationX = 0.0f;
+	m_fRotationY = 0.0f;
 }
 //--------------------------------------------------------------------------------

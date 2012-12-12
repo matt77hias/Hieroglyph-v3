@@ -60,8 +60,8 @@ void App::Initialize()
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
 
-	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.5f, 0.3f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( -3.0f, 12.0f, -15.0f );
+	m_pCamera->Spatial().SetRotation( Vector3f( 0.5f, 0.3f, 0.0f ) );
+	m_pCamera->Spatial().SetTranslation( Vector3f( -3.0f, 12.0f, -15.0f ) );
 	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.4f, 0.0f ) );
 
 	// Create the actor to hold the immediate geometry.  

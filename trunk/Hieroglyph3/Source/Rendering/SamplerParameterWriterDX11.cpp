@@ -38,3 +38,13 @@ void SamplerParameterWriterDX11::SetValue( int Value )
 	m_Value = Value;
 }
 //--------------------------------------------------------------------------------
+void SamplerParameterWriterDX11::InitializeParameter( )
+{
+	m_pParameter->InitializeParameterData( &m_Value );
+}
+//--------------------------------------------------------------------------------
+RenderParameterDX11* SamplerParameterWriterDX11::GetRenderParameterRef()
+{
+	return( m_pParameter );
+}
+//--------------------------------------------------------------------------------

@@ -70,8 +70,8 @@ bool App::ConfigureRenderingSetup()
 
 
 	m_pCamera = new FirstPersonCamera();
-	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.407f, -0.707f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( 4.0f, 4.5f, -4.0f );
+	m_pCamera->Spatial().SetRotation( Vector3f( 0.407f, -0.707f, 0.0f ) );
+	m_pCamera->Spatial().SetTranslation( Vector3f( 4.0f, 4.5f, -4.0f ) );
 
 	m_pCamera->SetCameraView( m_pRenderView );
 	m_pCamera->SetOverlayView( m_pTextOverlayView );
