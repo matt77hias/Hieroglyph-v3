@@ -66,7 +66,9 @@
     <ClCompile Include="Objects\Camera.cpp" />
     <ClCompile Include="Objects\Entity3D.cpp" />
     <ClCompile Include="Objects\FirstPersonCamera.cpp" />
-    <ClCompile Include="Objects\GeometryActor.cpp" />
+    <ClCompile Include="Objects\GeometryActor.cpp">
+      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</PreprocessToFile>
+    </ClCompile>
     <ClCompile Include="Objects\IController.cpp" />
     <ClCompile Include="Objects\Light.cpp" />
     <ClCompile Include="Objects\Node3D.cpp" />
@@ -80,6 +82,7 @@
     <ClCompile Include="Objects\TextureSpaceCameraPositionWriter.cpp" />
     <ClCompile Include="Objects\TextureSpaceLightPositionWriter.cpp" />
     <ClCompile Include="Objects\VolumeActor.cpp" />
+    <ClCompile Include="Rendering\BasicVertexDX11.cpp" />
     <ClCompile Include="Rendering\BlendStateConfigDX11.cpp" />
     <ClCompile Include="Rendering\BlendStateDX11.cpp" />
     <ClCompile Include="Rendering\BufferConfigDX11.cpp" />
@@ -101,28 +104,30 @@
     <ClCompile Include="Rendering\DXGIAdapter.cpp" />
     <ClCompile Include="Rendering\DXGIOutput.cpp" />
     <ClCompile Include="Rendering\EntityRenderParams.cpp" />
-    <ClCompile Include="Rendering\GeometryDX11.cpp" />
+    <ClCompile Include="Rendering\GeometryDX11.cpp">
+      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</PreprocessToFile>
+    </ClCompile>
     <ClCompile Include="Rendering\GeometryGeneratorDX11.cpp" />
     <ClCompile Include="Rendering\GeometryLoaderDX11.cpp" />
     <ClCompile Include="Rendering\GeometryShaderDX11.cpp" />
     <ClCompile Include="Rendering\GeometryStageDX11.cpp" />
     <ClCompile Include="Rendering\HullShaderDX11.cpp" />
     <ClCompile Include="Rendering\HullStageDX11.cpp" />
-    <ClCompile Include="Rendering\ImmediateGeometryDX11.cpp" />
     <ClCompile Include="Rendering\IndexBufferDX11.cpp" />
-    <ClCompile Include="Rendering\IndexedImmediateGeometryDX11.cpp" />
     <ClCompile Include="Rendering\IndirectArgsBufferDX11.cpp" />
     <ClCompile Include="Rendering\InputAssemblerStageDX11.cpp" />
     <ClCompile Include="Rendering\InputAssemblerStateDX11.cpp" />
     <ClCompile Include="Rendering\InputLayoutDX11.cpp" />
-    <ClCompile Include="Rendering\InstancedQuadGeometryDX11.cpp" />
     <ClCompile Include="Rendering\IRenderView.cpp" />
     <ClCompile Include="Rendering\MaterialDX11.cpp" />
     <ClCompile Include="Rendering\MaterialGeneratorDX11.cpp" />
+    <ClCompile Include="Rendering\MaterialManager.cpp" />
+    <ClCompile Include="Rendering\MaterialTemplate.cpp" />
     <ClCompile Include="Rendering\MatrixArrayParameterDX11.cpp" />
     <ClCompile Include="Rendering\MatrixArrayParameterWriterDX11.cpp" />
     <ClCompile Include="Rendering\MatrixParameterDX11.cpp" />
     <ClCompile Include="Rendering\MatrixParameterWriterDX11.cpp" />
+    <ClCompile Include="Rendering\MultiExecutorDX11.cpp" />
     <ClCompile Include="Rendering\OutputMergerStageDX11.cpp" />
     <ClCompile Include="Rendering\OutputMergerStageStateDX11.cpp" />
     <ClCompile Include="Rendering\ParameterContainer.cpp" />
@@ -159,6 +164,7 @@
     <ClCompile Include="Rendering\ShaderStageStateDX11.cpp" />
     <ClCompile Include="Rendering\SpriteFontDX11.cpp" />
     <ClCompile Include="Rendering\SpriteRendererDX11.cpp" />
+    <ClCompile Include="Rendering\SpriteVertexDX11.cpp" />
     <ClCompile Include="Rendering\StructuredBufferDX11.cpp" />
     <ClCompile Include="Rendering\SwapChainConfigDX11.cpp" />
     <ClCompile Include="Rendering\SwapChainDX11.cpp" />
@@ -185,7 +191,7 @@
     <ClCompile Include="Rendering\ViewPortDX11.cpp" />
     <ClCompile Include="Rendering\ViewRenderParams.cpp" />
     <ClCompile Include="Rendering\ViewTextOverlay.cpp" />
-    <ClCompile Include="Rendering\VolumeGeometryDX11.cpp" />
+    <ClCompile Include="Rendering\VolumeTextureVertexDX11.cpp" />
     <ClCompile Include="Scripting\ScriptIntfActor.cpp" />
     <ClCompile Include="Scripting\ScriptIntfApp.cpp" />
     <ClCompile Include="Scripting\ScriptManager.cpp" />
@@ -269,6 +275,7 @@
     <ClInclude Include="Objects\TextureSpaceCameraPositionWriter.h" />
     <ClInclude Include="Objects\TextureSpaceLightPositionWriter.h" />
     <ClInclude Include="Objects\VolumeActor.h" />
+    <ClInclude Include="Rendering\BasicVertexDX11.h" />
     <ClInclude Include="Rendering\BlendStateConfigDX11.h" />
     <ClInclude Include="Rendering\BlendStateDX11.h" />
     <ClInclude Include="Rendering\BufferConfigDX11.h" />
@@ -287,6 +294,9 @@
     <ClInclude Include="Rendering\DepthStencilViewDX11.h" />
     <ClInclude Include="Rendering\DomainShaderDX11.h" />
     <ClInclude Include="Rendering\DomainStageDX11.h" />
+    <ClInclude Include="Rendering\DrawExecutorDX11.h" />
+    <ClInclude Include="Rendering\DrawIndexedExecutorDX11.h" />
+    <ClInclude Include="Rendering\DrawIndexedInstancedExecutorDX11.h" />
     <ClInclude Include="Rendering\DXGIAdapter.h" />
     <ClInclude Include="Rendering\DXGIOutput.h" />
     <ClInclude Include="Rendering\EntityRenderParams.h" />
@@ -297,24 +307,24 @@
     <ClInclude Include="Rendering\GeometryStageDX11.h" />
     <ClInclude Include="Rendering\HullShaderDX11.h" />
     <ClInclude Include="Rendering\HullStageDX11.h" />
-    <ClInclude Include="Rendering\ImmediateGeometryDX11.h" />
     <ClInclude Include="Rendering\IndexBufferDX11.h" />
-    <ClInclude Include="Rendering\IndexedImmediateGeometryDX11.h" />
     <ClInclude Include="Rendering\IndirectArgsBufferDX11.h" />
     <ClInclude Include="Rendering\InputAssemblerStageDX11.h" />
     <ClInclude Include="Rendering\InputAssemblerStateDX11.h" />
     <ClInclude Include="Rendering\InputLayoutDX11.h" />
-    <ClInclude Include="Rendering\InstancedQuadGeometryDX11.h" />
     <ClInclude Include="Rendering\IParameterManager.h" />
     <ClInclude Include="Rendering\IRenderer.h" />
     <ClInclude Include="Rendering\IRenderView.h" />
     <ClInclude Include="Rendering\MaterialDX11.h" />
     <ClInclude Include="Rendering\MaterialGeneratorDX11.h" />
+    <ClInclude Include="Rendering\MaterialManager.h" />
+    <ClInclude Include="Rendering\MaterialTemplate.h" />
     <ClInclude Include="Rendering\MatrixArrayParameterDX11.h" />
     <ClInclude Include="Rendering\MatrixArrayParameterWriterDX11.h" />
     <ClInclude Include="Rendering\MatrixParameterDX11.h" />
     <ClInclude Include="Rendering\MatrixParameterWriterDX11.h" />
     <ClInclude Include="Rendering\ms3dspec.h" />
+    <ClInclude Include="Rendering\MultiExecutorDX11.h" />
     <ClInclude Include="Rendering\OutputMergerStageDX11.h" />
     <ClInclude Include="Rendering\OutputMergerStageStateDX11.h" />
     <ClInclude Include="Rendering\ParameterContainer.h" />
@@ -352,6 +362,7 @@
     <ClInclude Include="Rendering\ShaderStageStateDX11.h" />
     <ClInclude Include="Rendering\SpriteFontDX11.h" />
     <ClInclude Include="Rendering\SpriteRendererDX11.h" />
+    <ClInclude Include="Rendering\SpriteVertexDX11.h" />
     <ClInclude Include="Rendering\StructuredBufferDX11.h" />
     <ClInclude Include="Rendering\SwapChainConfigDX11.h" />
     <ClInclude Include="Rendering\SwapChainDX11.h" />
@@ -380,7 +391,7 @@
     <ClInclude Include="Rendering\ViewPortDX11.h" />
     <ClInclude Include="Rendering\ViewRenderParams.h" />
     <ClInclude Include="Rendering\ViewTextOverlay.h" />
-    <ClInclude Include="Rendering\VolumeGeometryDX11.h" />
+    <ClInclude Include="Rendering\VolumeTextureVertexDX11.h" />
     <ClInclude Include="Scripting\IScriptInterface.h" />
     <ClInclude Include="Scripting\ScriptIntfActor.h" />
     <ClInclude Include="Scripting\ScriptIntfApp.h" />
@@ -388,14 +399,15 @@
     <ClInclude Include="Utility\GlyphString.h" />
     <ClInclude Include="Utility\Log.h" />
     <ClInclude Include="Utility\PCH.h" />
-    <ClInclude Include="Utility\TArray.h" />
     <ClInclude Include="Utility\TConfiguration.h" />
     <ClInclude Include="Utility\Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Rendering\DrawExecutorDX11.inl" />
+    <None Include="Rendering\DrawIndexedExecutorDX11.inl" />
+    <None Include="Rendering\DrawIndexedInstancedExecutorDX11.inl" />
     <None Include="Rendering\TGrowableIndexBufferDX11.inl" />
     <None Include="Rendering\TGrowableVertexBufferDX11.inl" />
-    <None Include="Utility\TArray.inl" />
     <None Include="Utility\TConfiguration.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -443,6 +455,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation;..\Dependencies\DirectXTK\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -461,7 +474,7 @@ copy Geometry\*.h ..\SDK\Include
 copy Intersection\*.h ..\SDK\Include
 copy Objects\*.h ..\SDK\Include
 copy Animation\*.h ..\SDK\Include
-</Command>
+copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”</Command>
     </PostBuildEvent>
     <Lib>
       <AdditionalLibraryDirectories>..\Dependencies\DirectXTK\Bin\Desktop_2012\Win32\$(Configuration)</AdditionalLibraryDirectories>
@@ -498,7 +511,7 @@ copy Geometry\*.h ..\SDK\Include
 copy Intersection\*.h ..\SDK\Include
 copy Objects\*.h ..\SDK\Include
 copy Animation\*.h ..\SDK\Include
-</Command>
+copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”</Command>
     </PostBuildEvent>
     <Lib>
       <AdditionalLibraryDirectories>..\Dependencies\DirectXTK\Bin\Desktop_2012\Win32\$(Configuration)</AdditionalLibraryDirectories>

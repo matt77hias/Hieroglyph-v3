@@ -61,7 +61,7 @@ void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager
 	{
 		// Set the parameters for rendering this view
 		pPipelineManager->ClearRenderTargets();
-		for ( int i = 0; i < m_GBufferTargets.count(); ++i)
+		for ( unsigned int i = 0; i < m_GBufferTargets.size(); ++i )
 			pPipelineManager->OutputMergerStage.DesiredState.SetRenderTarget( i, m_GBufferTargets[i]->m_iResourceRTV );
 		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
 		pPipelineManager->ApplyRenderTargets();
@@ -70,7 +70,7 @@ void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager
 		pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iViewport );
 
 		// Clear the G-Buffer targets
-		Vector4f color(0.0f, 0.0f, 0.0f, 0.0f);
+		Vector4f color( 0.0f, 0.0f, 0.0f, 0.0f );
 		pPipelineManager->ClearBuffers( color, 1.0f, 0 );
 
 		// Set this view's render parameters
@@ -98,7 +98,7 @@ void ViewGBuffer::SetUsageParams( IParameterManager* pParamManager )
 
 }
 //--------------------------------------------------------------------------------
-void ViewGBuffer::SetTargets( TArray<ResourcePtr>& GBufferTargets,
+void ViewGBuffer::SetTargets( std::vector<ResourcePtr>& GBufferTargets,
                                 ResourcePtr DepthTarget, int Viewport )
 {
     m_GBufferTargets = GBufferTargets;
@@ -106,3 +106,4 @@ void ViewGBuffer::SetTargets( TArray<ResourcePtr>& GBufferTargets,
     m_iViewport = Viewport;
     m_DepthTarget = DepthTarget;
 }
+//--------------------------------------------------------------------------------

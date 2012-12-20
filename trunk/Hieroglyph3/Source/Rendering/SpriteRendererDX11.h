@@ -17,12 +17,15 @@
 //--------------------------------------------------------------------------------
 #include "RendererDX11.h"
 #include "RenderEffectDX11.h"
-#include "InstancedQuadGeometryDX11.h"
+#include "DrawIndexedInstancedExecutorDX11.h"
+#include "SpriteVertexDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
 	class SpriteFontDX11;
 	class PipelineManagerDX11;
+
+	typedef std::shared_ptr<DrawIndexedInstancedExecutorDX11<SpriteVertexDX11::VertexData,SpriteVertexDX11::InstanceData>> SpriteGeometryPtr;
 
 	class SpriteRendererDX11
 	{
@@ -46,7 +49,7 @@ namespace Glyph3
 		void Render(	PipelineManagerDX11* pipeline,
 						IParameterManager* parameters,
 						ResourcePtr texture,
-						const SpriteDrawData* drawData,
+						const SpriteVertexDX11::InstanceData* drawData,
 						UINT numSprites,
 						FilterMode filterMode = Linear );
 
@@ -56,7 +59,7 @@ namespace Glyph3
 						const Matrix4f& transform,
 						const Vector4f& Color = Vector4f( 1, 1, 1, 1 ),
 						FilterMode filterMode = Linear,
-						const SpriteDrawRect* drawRect = NULL );
+						const SpriteVertexDX11::SpriteDrawRect* drawRect = NULL );
 
 		void RenderText(	PipelineManagerDX11* pipeline,
 							IParameterManager* parameters,
@@ -71,7 +74,7 @@ namespace Glyph3
 
 		RenderEffectDX11 m_effect;
 
-		InstancedQuadGeometryPtr m_pGeometry;
+		SpriteGeometryPtr m_pGeometry;
 
 		int m_iLinearSamplerState;
 		int m_iPointSamplerState;

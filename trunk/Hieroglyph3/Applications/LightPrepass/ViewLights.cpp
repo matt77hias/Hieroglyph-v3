@@ -36,27 +36,27 @@ static float Clamp( float x, float low, float high )
     return x;
 }
 //--------------------------------------------------------------------------------
-static void DrawLightType( const TArray<Light>& lights, RenderEffectDX11 effects[2], 
+static void DrawLightType( const std::vector<Light>& lights, RenderEffectDX11 effects[2], 
                             ResourcePtr vb, int inputLayout, PipelineManagerDX11* pPipelineManager,
                             IParameterManager* pParamManager )
 {
-    if ( lights.count() > 0 )
+    if ( lights.size() > 0 )
     {
         // Copy in the light data for each vertex
         D3D11_MAPPED_SUBRESOURCE mapped;
         mapped = pPipelineManager->MapResource( vb->m_iResource, 0, D3D11_MAP_WRITE_DISCARD, 0 );
-        memcpy( mapped.pData, &lights[0], sizeof( Light ) * lights.count() );
+        memcpy( mapped.pData, &lights[0], sizeof( Light ) * lights.size() );
         pPipelineManager->UnMapResource( vb->m_iResource, 0 );
 
         // Render the lights for non-edge pixels. We'll render as a point list.
         pPipelineManager->DrawNonIndexed( effects[0], vb, inputLayout,
                                             D3D11_PRIMITIVE_TOPOLOGY_POINTLIST, sizeof( Light ),
-                                            lights.count(), 0, pParamManager );
+                                            lights.size(), 0, pParamManager );
 
         // Render the lights for edge pixels. We'll render as a point list.
         pPipelineManager->DrawNonIndexed( effects[1], vb, inputLayout, 
                                             D3D11_PRIMITIVE_TOPOLOGY_POINTLIST, sizeof( Light ),
-                                            lights.count(), 0, pParamManager );
+                                            lights.size(), 0, pParamManager );
     }
 }
 //--------------------------------------------------------------------------------
@@ -251,7 +251,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
 
     // Create the input layouts
     // Create the input layout
-    TArray<D3D11_INPUT_ELEMENT_DESC> inputElements;
+    std::vector<D3D11_INPUT_ELEMENT_DESC> inputElements;
     D3D11_INPUT_ELEMENT_DESC element;
 
     // Position
@@ -262,25 +262,25 @@ ViewLights::ViewLights( RendererDX11& Renderer)
     element.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
     element.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
     element.InstanceDataStepRate = 0;
-    inputElements.add( element);
+	inputElements.push_back( element);
 
     // Color
     element.SemanticName = "COLOR";
-    inputElements.add( element );
+    inputElements.push_back( element );
 
     // Direction
     element.SemanticName = "DIRECTION";
-    inputElements.add( element );
+    inputElements.push_back( element );
 
     // Range
     element.SemanticName = "RANGE";
     element.Format = DXGI_FORMAT_R32_FLOAT;
-    inputElements.add( element );
+    inputElements.push_back( element );
 
     // Spotlight angles
     element.SemanticName = "SPOTANGLES";
     element.Format = DXGI_FORMAT_R32G32_FLOAT;
-    inputElements.add( element) ; 
+    inputElements.push_back( element) ; 
 
     m_iPointLightIL = Renderer.CreateInputLayout( inputElements, m_PointLightEffect[0].GetVertexShader() );
     m_iSpotLightIL = Renderer.CreateInputLayout( inputElements, m_SpotLightEffect[0].GetVertexShader() );
@@ -353,9 +353,9 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager*
     pPipelineManager->ClearPipelineResources();
 
     // Clear the lights
-    m_PointLights.empty();
-    m_SpotLights.empty();
-    m_DirectionalLights.empty();
+    m_PointLights.clear();
+    m_SpotLights.clear();
+    m_DirectionalLights.clear();
 }
 //--------------------------------------------------------------------------------
 void ViewLights::Resize( UINT width, UINT height )
@@ -390,11 +390,11 @@ void ViewLights::SetUsageParams( IParameterManager* pParamManager )
 void ViewLights::AddLight( const Light& light )
 {
     if ( light.Type == Point )
-        m_PointLights.add( light );
+        m_PointLights.push_back( light );
     else if ( light.Type == Spot )
-        m_SpotLights.add( light );
+        m_SpotLights.push_back( light );
     else if ( light.Type == Directional )
-        m_DirectionalLights.add( light );    
+        m_DirectionalLights.push_back( light );    
 }
 //--------------------------------------------------------------------------------
 void ViewLights::SetTargets( ResourcePtr GBufferTarget, ResourcePtr pRenderTarget,

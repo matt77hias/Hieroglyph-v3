@@ -35,12 +35,12 @@ ResourceType ConstantBufferDX11::GetType()
 //--------------------------------------------------------------------------------
 void ConstantBufferDX11::AddMapping( ConstantBufferMapping& mapping )
 {
-	m_Mappings.add( mapping );
+	m_Mappings.push_back( mapping );
 }
 //--------------------------------------------------------------------------------
 void ConstantBufferDX11::EmptyMappings( )
 {
-	m_Mappings.empty();
+	m_Mappings.clear();
 }
 //--------------------------------------------------------------------------------
 void ConstantBufferDX11::EvaluateMappings( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
@@ -57,7 +57,7 @@ void ConstantBufferDX11::EvaluateMappings( PipelineManagerDX11* pPipeline, IPara
 
 			bool doUpdate = false;
 
-			for ( int j = 0; j < m_Mappings.count(); j++ ) {
+			for ( unsigned int j = 0; j < m_Mappings.size(); j++ ) {
 				if ( m_Mappings[j].pParameter->GetValueID( pParamManager->GetID() ) 
 					!= m_Mappings[j].valueID ) {
 					doUpdate = true;
@@ -78,7 +78,7 @@ void ConstantBufferDX11::EvaluateMappings( PipelineManagerDX11* pPipeline, IPara
 				// by their type, and are currently allowed to be Vector4f, Matrix4f, or Matrix4f
 				// arrays.  Additional types will be added as they are needed...
 
-				for ( int j = 0; j < m_Mappings.count(); j++ )
+				for ( unsigned int j = 0; j < m_Mappings.size(); j++ )
 				{
 					RenderParameterDX11* pParam		= m_Mappings[j].pParameter;
 					unsigned int offset				= m_Mappings[j].offset;
@@ -129,13 +129,15 @@ void ConstantBufferDX11::EvaluateMappings( PipelineManagerDX11* pPipeline, IPara
 	}
 }
 //--------------------------------------------------------------------------------
-bool ConstantBufferDX11::ContainsMapping( int index, const ConstantBufferMapping& mapping )
+bool ConstantBufferDX11::ContainsMapping( int ID, const ConstantBufferMapping& mapping )
 {
 	bool result = false;
 
 	// First retrieve the internal mapping
 
-	if ( this->m_Mappings.inrange( index ) ) {
+	unsigned int index = static_cast<unsigned int>( ID );
+
+	if ( index < m_Mappings.size() ) {
 		ConstantBufferMapping internalMapping = m_Mappings[index];
 
 		if ( internalMapping.pParameter == mapping.pParameter 

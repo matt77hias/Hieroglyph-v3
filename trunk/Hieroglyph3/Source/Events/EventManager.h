@@ -15,9 +15,9 @@
 #ifndef EventManager_h
 #define EventManager_h
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "IEvent.h"
 #include "IEventListener.h"
-#include "TArray.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -42,8 +42,8 @@ namespace Glyph3
 
 
 	protected:
-		TArray< IEventListener* > m_EventHandlers[NUM_EVENTS];
-		TArray< IEvent* > m_EventQueue;
+		std::vector< IEventListener* > m_EventHandlers[NUM_EVENTS];
+		std::vector< IEvent* > m_EventQueue;
 
 		static EventManager* m_spEventManager;
 	};

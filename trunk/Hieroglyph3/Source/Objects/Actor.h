@@ -34,7 +34,7 @@ namespace Glyph3
 		Node3D*					m_pRoot;
 		Entity3D*				m_pBody;
 
-		TArray<Entity3D*>		m_Elements;
+		std::vector<Entity3D*>	m_Elements;
 	};
 };
 //--------------------------------------------------------------------------------

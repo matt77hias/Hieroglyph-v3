@@ -47,16 +47,16 @@ public:
 
 protected:
 
-	Actor*								m_pActor;
-	TArray<ReflectiveSphereEntity*>		m_vReflectors;
-	Actor*								m_pDiffuseActor;
+	Actor*									m_pActor;
+	std::vector<ReflectiveSphereEntity*>	m_vReflectors;
+	Actor*									m_pDiffuseActor;
 
 
-	Vector4f							m_LightParams;
-	Vector4f							m_LightPosition;
+	Vector4f								m_LightParams;
+	Vector4f								m_LightPosition;
 
-	VectorParameterDX11*				m_pLightColor;
-	VectorParameterDX11*				m_pLightPosition;
-	VectorParameterDX11*				m_pTimeFactors;
-	VectorParameterDX11*				m_pViewPosition;
+	VectorParameterDX11*					m_pLightColor;
+	VectorParameterDX11*					m_pLightPosition;
+	VectorParameterDX11*					m_pTimeFactors;
+	VectorParameterDX11*					m_pViewPosition;
 };

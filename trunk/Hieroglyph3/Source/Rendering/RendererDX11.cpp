@@ -187,16 +187,16 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	// Enumerate all of the adapters in the current system.  This includes all
 	// adapters, even the ones that don't support the ID3D11Device interface.
 
-	IDXGIAdapter1* pAdapter;
-	TArray<DXGIAdapter*> vAdapters;
-	TArray<DXGIOutput*> vOutputs;
+	IDXGIAdapter1* pCurrentAdapter;
+	std::vector<DXGIAdapter*> vAdapters;
+	std::vector<DXGIOutput*> vOutputs;
 
-	while( pFactory->EnumAdapters1( vAdapters.count(), &pAdapter ) != DXGI_ERROR_NOT_FOUND )
+	while( pFactory->EnumAdapters1( vAdapters.size(), &pCurrentAdapter ) != DXGI_ERROR_NOT_FOUND )
 	{
-		vAdapters.add( new DXGIAdapter( pAdapter ) );
+		vAdapters.push_back( new DXGIAdapter( pCurrentAdapter ) );
 
 		DXGI_ADAPTER_DESC1 desc;
-		pAdapter->GetDesc1( &desc );
+		pCurrentAdapter->GetDesc1( &desc );
 
 		Log::Get().Write( desc.Description );
 	}
@@ -225,8 +225,8 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 
 	// Release the adapters and the factory for now...
 
-	for ( int i = 0; i < vAdapters.count(); i++ )
-		delete vAdapters[i];
+	for ( auto pAdapter : vAdapters )
+		delete pAdapter;
 
 	SAFE_RELEASE( pFactory );
 
@@ -376,37 +376,40 @@ void RendererDX11::Shutdown()
 	// Since these are all managed with smart pointers, we just empty the
 	// container and the objects will automatically be deleted.
 
-	m_vBlendStates.empty();
-	m_vDepthStencilStates.empty();
-	m_vRasterizerStates.empty();
+	m_vBlendStates.clear();
+	m_vDepthStencilStates.clear();
+	m_vRasterizerStates.clear();
 
-	for ( int i = 0; i < m_vSamplerStates.count(); i++ )
-		delete m_vSamplerStates[i];
+	for ( auto pLayout : m_vInputLayouts )
+		delete pLayout;
 
-	for ( int i = 0; i < m_vInputLayouts.count(); i++ )
-		delete m_vInputLayouts[i];
+	for ( auto pSamplers : m_vSamplerStates )
+		delete pSamplers;
 
-	for ( int i = 0; i < m_vShaders.count(); i++ )
-		delete m_vShaders[i];
+	for ( auto pViewports : m_vViewPorts )
+		delete pViewports;
 
-	for ( int i = 0; i < m_vShaderResourceViews.count(); i++ )
-		delete m_vShaderResourceViews[i];
+	for ( auto pShader : m_vShaders )
+		delete pShader;
 
-	for ( int i = 0; i < m_vRenderTargetViews.count(); i++ )
-		delete m_vRenderTargetViews[i];
+	for ( auto pSRV : m_vShaderResourceViews )
+		delete pSRV;
 
-	for ( int i = 0; i < m_vDepthStencilViews.count(); i++ )
-		delete m_vDepthStencilViews[i];
+	for ( auto pRTV : m_vRenderTargetViews )
+		delete pRTV;
 
-	for ( int i = 0; i < m_vUnorderedAccessViews.count(); i++ )
-		delete m_vUnorderedAccessViews[i];
+	for ( auto pDSV : m_vDepthStencilViews )
+		delete pDSV;
 
-	for ( int i = 0; i < m_vResources.count(); i++ )
-		SAFE_DELETE( m_vResources[i] );
+	for ( auto pUAV : m_vUnorderedAccessViews )
+		delete pUAV;
 
-	for ( int i = 0; i < m_vSwapChains.count(); i++ ) {
-		m_vSwapChains[i]->m_pSwapChain->SetFullscreenState( false, NULL );
-		delete m_vSwapChains[i];
+	for ( auto pResource : m_vResources )
+		delete pResource;
+
+	for ( auto pSwapChain : m_vSwapChains ) {
+		pSwapChain->m_pSwapChain->SetFullscreenState( false, NULL );
+		delete pSwapChain;
 	}
 
 	// Clear the context and the device
@@ -419,7 +422,9 @@ void RendererDX11::Present( HWND hWnd, int SwapChain )
 {
 	// Present to the window
 
-	if ( ( SwapChain >= 0 ) && ( SwapChain < m_vSwapChains.count() ) ) {
+	unsigned int index = static_cast<unsigned int>( SwapChain );
+
+	if ( index < m_vSwapChains.size() ) {
 		SwapChainDX11* pSwapChain = m_vSwapChains[SwapChain];
 		pSwapChain->m_pSwapChain->Present( 0, 0 );
 	}
@@ -490,9 +495,9 @@ int RendererDX11::CreateSwapChain( SwapChainConfigDX11* pConfig )
 	// The resource proxy can then be used later on by the application to get the
 	// RTV or texture ID if needed.
 
-	m_vSwapChains.add( new SwapChainDX11( pSwapChain, Proxy ) );
+	m_vSwapChains.push_back( new SwapChainDX11( pSwapChain, Proxy ) );
 
-	return( m_vSwapChains.count() - 1 );
+	return( m_vSwapChains.size() - 1 );
 }
 //--------------------------------------------------------------------------------
 ResourcePtr RendererDX11::CreateVertexBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData )
@@ -726,9 +731,9 @@ int RendererDX11::CreateShaderResourceView( int ResourceID, D3D11_SHADER_RESOURC
 
 			if ( pView ) {
 				ShaderResourceViewDX11* pShaderResource = new ShaderResourceViewDX11( pView );
-				m_vShaderResourceViews.add( pShaderResource );
+				m_vShaderResourceViews.push_back( pShaderResource );
 
-				return( m_vShaderResourceViews.count() - 1 );
+				return( m_vShaderResourceViews.size() - 1 );
 			}
 		}
 	}
@@ -750,9 +755,9 @@ int RendererDX11::CreateRenderTargetView( int ResourceID, D3D11_RENDER_TARGET_VI
 
 			if ( pView ) {
 				RenderTargetViewDX11* pRenderTarget = new RenderTargetViewDX11( pView );
-				m_vRenderTargetViews.add( pRenderTarget );
+				m_vRenderTargetViews.push_back( pRenderTarget );
 
-				return( m_vRenderTargetViews.count() - 1 );
+				return( m_vRenderTargetViews.size() - 1 );
 			}
 		}
 	}
@@ -775,9 +780,9 @@ int RendererDX11::CreateDepthStencilView( int ResourceID, D3D11_DEPTH_STENCIL_VI
 
 			if ( pView ) {
 				DepthStencilViewDX11* pDepthStencil = new DepthStencilViewDX11( pView );
-				m_vDepthStencilViews.add( pDepthStencil );
+				m_vDepthStencilViews.push_back( pDepthStencil );
 
-				return( m_vDepthStencilViews.count() - 1 );
+				return( m_vDepthStencilViews.size() - 1 );
 			}
 		}
 	}
@@ -799,9 +804,9 @@ int RendererDX11::CreateUnorderedAccessView( int ResourceID, D3D11_UNORDERED_ACC
 
 			if ( pView ) {
 				UnorderedAccessViewDX11* pUnorderedAccess = new UnorderedAccessViewDX11( pView );
-				m_vUnorderedAccessViews.add( pUnorderedAccess );
+				m_vUnorderedAccessViews.push_back( pUnorderedAccess );
 
-				return( m_vUnorderedAccessViews.count() - 1 );
+				return( m_vUnorderedAccessViews.size() - 1 );
 			}
 		}
 	}
@@ -854,13 +859,15 @@ void RendererDX11::ResizeTextureSRV( int RID, int SRVID, UINT width, UINT height
 	ResourceDX11* pResource = GetResourceByIndex( RID );
 
 	// Check that the input resources / views are legit.
-	if ( !pResource || !m_vShaderResourceViews.inrange( SRVID ) || (pResource->GetType() != RT_TEXTURE2D ) ) {
+	unsigned int index = static_cast<unsigned int>( SRVID );
+
+	if ( !pResource || !( index < m_vShaderResourceViews.size() ) || (pResource->GetType() != RT_TEXTURE2D ) ) {
 		Log::Get().Write( L"Error trying to resize a SRV!!!!" );
 		return;
 	}
 
 	// Get the existing UAV.
-	ShaderResourceViewDX11* pOldSRV = m_vShaderResourceViews[SRVID];
+	ShaderResourceViewDX11* pOldSRV = m_vShaderResourceViews[index];
 
 	// Get its description.
 	D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
@@ -887,13 +894,15 @@ void RendererDX11::ResizeTextureRTV( int RID, int RTVID, UINT width, UINT height
 	ResourceDX11* pResource = GetResourceByIndex( RID );
 
 	// Check that the input resources / views are legit.
-	if ( !pResource || !m_vRenderTargetViews.inrange( RTVID ) || (pResource->GetType() != RT_TEXTURE2D ) ) {
+	unsigned int index = static_cast<unsigned int>( RTVID );
+
+	if ( !pResource || !( index < m_vRenderTargetViews.size() ) || (pResource->GetType() != RT_TEXTURE2D ) ) {
 		Log::Get().Write( L"Error trying to resize a RTV!!!!" );
 		return;
 	}
 
 	// Get the existing UAV.
-	RenderTargetViewDX11* pOldRTV = m_vRenderTargetViews[RTVID];
+	RenderTargetViewDX11* pOldRTV = m_vRenderTargetViews[index];
 
 	// Get its description.
 	D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
@@ -920,13 +929,15 @@ void RendererDX11::ResizeTextureDSV( int RID, int DSVID, UINT width, UINT height
 	ResourceDX11* pResource = GetResourceByIndex( RID );
 
 	// Check that the input resources / views are legit.
-	if ( !pResource || !m_vDepthStencilViews.inrange( DSVID ) || (pResource->GetType() != RT_TEXTURE2D ) ) {
+	unsigned int index = static_cast<unsigned int>( DSVID );
+
+	if ( !pResource || !( index < m_vDepthStencilViews.size() ) || (pResource->GetType() != RT_TEXTURE2D ) ) {
 		Log::Get().Write( L"Error trying to resize a DSV!!!!" );
 		return;
 	}
 
 	// Get the existing UAV.
-	DepthStencilViewDX11* pOldDSV = m_vDepthStencilViews[DSVID];
+	DepthStencilViewDX11* pOldDSV = m_vDepthStencilViews[index];
 
 	// Get its description.
 	D3D11_DEPTH_STENCIL_VIEW_DESC DSVDesc;
@@ -953,13 +964,15 @@ void RendererDX11::ResizeTextureUAV( int RID, int UAVID, UINT width, UINT height
 	ResourceDX11* pResource = GetResourceByIndex( RID );
 
 	// Check that the input resources / views are legit.
-	if ( !pResource || !m_vUnorderedAccessViews.inrange( UAVID ) || (pResource->GetType() != RT_TEXTURE2D ) ) {
+	unsigned int index = static_cast<unsigned int>( UAVID );
+
+	if ( !pResource || !( index < m_vUnorderedAccessViews.size() ) || (pResource->GetType() != RT_TEXTURE2D ) ) {
 		Log::Get().Write( L"Error trying to resize a UAV!!!!" );
 		return;
 	}
 
 	// Get the existing UAV.
-	UnorderedAccessViewDX11* pOldUAV = m_vUnorderedAccessViews[UAVID];
+	UnorderedAccessViewDX11* pOldUAV = m_vUnorderedAccessViews[index];
 
 	// Get its description.
 	D3D11_UNORDERED_ACCESS_VIEW_DESC UAVDesc;
@@ -978,12 +991,14 @@ void RendererDX11::ResizeTextureUAV( int RID, int UAVID, UINT width, UINT height
 //--------------------------------------------------------------------------------
 void RendererDX11::ResizeSwapChain( int SID, UINT width, UINT height )
 {
-	if ( !m_vSwapChains.inrange( SID ) ) {
+	unsigned int index = static_cast<unsigned int>( SID );
+
+	if ( !( index < m_vSwapChains.size() ) ) {
 		Log::Get().Write( L"Error trying to resize swap chain!" );
 		return;
 	}
 
-	SwapChainDX11* pSwapChain = m_vSwapChains[SID];
+	SwapChainDX11* pSwapChain = m_vSwapChains[index];
 
 
 	Texture2dDX11* pBackBuffer = GetTexture2DByIndex( pSwapChain->m_Resource->m_iResource );
@@ -1033,11 +1048,13 @@ void RendererDX11::ResizeSwapChain( int SID, UINT width, UINT height )
 //--------------------------------------------------------------------------------
 void RendererDX11::ResizeViewport( int ID, UINT width, UINT height )
 {
-	if ( !m_vViewPorts.inrange( ID ) ) {
+	unsigned int index = static_cast<unsigned int>( ID );
+
+	if ( !( index < m_vViewPorts.size() ) ) {
 		Log::Get().Write( L"Error trying to resize viewport!" );
 	}
 
-	ViewPortDX11* pViewport = m_vViewPorts[ID];
+	ViewPortDX11* pViewport = m_vViewPorts[index];
 	pViewport->m_ViewPort.Width = static_cast<float>( width );
 	pViewport->m_ViewPort.Height = static_cast<float>( height );
 }
@@ -1156,7 +1173,7 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 
 	pShaderWrapper->FileName = filename;
 
-	m_vShaders.add( pShaderWrapper );
+	m_vShaders.push_back( pShaderWrapper );
 
 
 
@@ -1181,22 +1198,22 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 
 	// Return the index for future referencing.
 
-	return( m_vShaders.count() - 1 );
+	return( m_vShaders.size() - 1 );
 
 }
 //--------------------------------------------------------------------------------
-int RendererDX11::CreateInputLayout( TArray<D3D11_INPUT_ELEMENT_DESC>& elements, int ShaderID  )
+int RendererDX11::CreateInputLayout( std::vector<D3D11_INPUT_ELEMENT_DESC>& elements, int ShaderID  )
 {
 	// Create array of elements here for the API call.
-	D3D11_INPUT_ELEMENT_DESC* pElements = new D3D11_INPUT_ELEMENT_DESC[elements.count()];
-	for ( int i = 0; i < elements.count(); i++ )
+	D3D11_INPUT_ELEMENT_DESC* pElements = new D3D11_INPUT_ELEMENT_DESC[elements.size()];
+	for ( unsigned int i = 0; i < elements.size(); i++ )
 		pElements[i] = elements[i];
 	
 	// Attempt to create the input layout from the input information.
 	ID3DBlob* pCompiledShader = m_vShaders[ShaderID]->pCompiledShader;
 	ID3D11InputLayout* pLayout = 0;
 
-	HRESULT hr = m_pDevice->CreateInputLayout( pElements, elements.count(), 
+	HRESULT hr = m_pDevice->CreateInputLayout( pElements, elements.size(), 
 		pCompiledShader->GetBufferPointer(), pCompiledShader->GetBufferSize(), &pLayout );
 
 	// Release the input elements array.
@@ -1211,8 +1228,8 @@ int RendererDX11::CreateInputLayout( TArray<D3D11_INPUT_ELEMENT_DESC>& elements,
 
 	// Create the input layout wrapper instance and store it in the renderer's list.
 	InputLayoutDX11* pLayoutWrapper = new InputLayoutDX11( pLayout );
-	m_vInputLayouts.add( pLayoutWrapper );
-	int index = m_vInputLayouts.count() - 1;
+	m_vInputLayouts.push_back( pLayoutWrapper );
+	int index = m_vInputLayouts.size() - 1;
 
 	// Return the index for referencing later on.
 	return( index );
@@ -1303,9 +1320,9 @@ int RendererDX11::CreateBlendState( BlendStateConfigDX11* pConfig )
 	}
 
 	BlendStatePtr ptr = BlendStatePtr( new BlendStateDX11( pState ) );
-	m_vBlendStates.add( ptr );
+	m_vBlendStates.push_back( ptr );
 
-	return( m_vBlendStates.count() - 1 );
+	return( m_vBlendStates.size() - 1 );
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateDepthStencilState( DepthStencilStateConfigDX11* pConfig )
@@ -1321,9 +1338,9 @@ int RendererDX11::CreateDepthStencilState( DepthStencilStateConfigDX11* pConfig 
 	}
 
 	DepthStencilStatePtr ptr = DepthStencilStatePtr( new DepthStencilStateDX11( pState ) );
-	m_vDepthStencilStates.add( ptr );
+	m_vDepthStencilStates.push_back( ptr );
 
-	return( m_vDepthStencilStates.count() - 1 );
+	return( m_vDepthStencilStates.size() - 1 );
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateRasterizerState( RasterizerStateConfigDX11* pConfig )
@@ -1339,9 +1356,9 @@ int RendererDX11::CreateRasterizerState( RasterizerStateConfigDX11* pConfig )
 	}
 
 	RasterizerStatePtr ptr = RasterizerStatePtr( new RasterizerStateDX11( pState ) );
-	m_vRasterizerStates.add( ptr );
+	m_vRasterizerStates.push_back( ptr );
 
-	return( m_vRasterizerStates.count() - 1 );
+	return( m_vRasterizerStates.size() - 1 );
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateSamplerState( D3D11_SAMPLER_DESC* pDesc )
@@ -1356,23 +1373,26 @@ int RendererDX11::CreateSamplerState( D3D11_SAMPLER_DESC* pDesc )
 		return( -1 );
 	}
 
-	m_vSamplerStates.add( new SamplerStateDX11( pState ) );
+	m_vSamplerStates.push_back( new SamplerStateDX11( pState ) );
 
-	return( m_vSamplerStates.count() - 1 );
+	return( m_vSamplerStates.size() - 1 );
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateViewPort( D3D11_VIEWPORT viewport )
 {
 	ViewPortDX11* pViewPort = new ViewPortDX11( viewport );
-	m_vViewPorts.add( pViewPort );
+	m_vViewPorts.push_back( pViewPort );
 
-	return( m_vViewPorts.count() - 1 );
+	return( m_vViewPorts.size() - 1 );
 }
 //--------------------------------------------------------------------------------
 ResourcePtr RendererDX11::GetSwapChainResource( int ID )
 {
-	if ( ( ID >= 0 ) && ( m_vSwapChains.count() ) )
-		return( m_vSwapChains[ID]->m_Resource );
+	unsigned int index = static_cast<unsigned int>( ID );
+
+	if ( index < m_vSwapChains.size() )
+		return( m_vSwapChains[index]->m_Resource );
+
 	Log::Get().Write( L"Tried to get an invalid swap buffer index texture ID!" );
 
 	return( ResourcePtr( new ResourceProxyDX11() ) );
@@ -1423,20 +1443,27 @@ RasterizerStatePtr RendererDX11::GetRasterizerState( int index )
 	return( m_vRasterizerStates[index] );
 }
 //--------------------------------------------------------------------------------
-ViewPortDX11* RendererDX11::GetViewPort( int index )
+ViewPortDX11* RendererDX11::GetViewPort( int ID )
 {
-	return( m_vViewPorts[index] );
+	ViewPortDX11* pViewport = nullptr;
+
+	unsigned int index = static_cast<unsigned int>( ID );
+
+	if ( index < m_vViewPorts.size() )
+		pViewport = m_vViewPorts[index];
+		
+	return( pViewport );
 }
 //--------------------------------------------------------------------------------
-ResourceDX11* RendererDX11::GetResourceByIndex( int index )
+ResourceDX11* RendererDX11::GetResourceByIndex( int ID )
 {
 	ResourceDX11* pResource = 0;
 
-	int id = index & 0xffff;
-	int innerID = ( index & 0xffff0000 ) >> 16;
+	unsigned int index = ID & 0xffff;
+	int innerID = ( ID & 0xffff0000 ) >> 16;
 
-	if ( m_vResources.inrange( id ) ) {
-		pResource = m_vResources[id];
+	if ( index < m_vResources.size() ) {
+		pResource = m_vResources[index];
 
 		if ( pResource->GetInnerID() != innerID ) {
 			Log::Get().Write( L"Inner ID doesn't match resource index!!!" );
@@ -1456,24 +1483,29 @@ SamplerStateDX11* RendererDX11::GetSamplerState( int index )
 	return( m_vSamplerStates[index] );
 }
 //--------------------------------------------------------------------------------
-ShaderDX11* RendererDX11::GetShader( int index )
+ShaderDX11* RendererDX11::GetShader( int ID )
 {
-	if ( m_vShaders.inrange( index ) )
+	unsigned int index = static_cast<unsigned int>( ID );
+
+	if ( index < m_vShaders.size() )
 		return( m_vShaders[index] );
 	else
-		return( 0 );
+		return( nullptr );
 }
 //--------------------------------------------------------------------------------
 void RendererDX11::QueueRenderView( IRenderView* pRenderView )
 {
-	m_vQueuedViews.add( pRenderView );
+	m_vQueuedViews.push_back( pRenderView );
 }
 //--------------------------------------------------------------------------------
 void RendererDX11::ProcessRenderViewQueue( )
 {
+	
 	if ( MultiThreadingConfig.GetConfiguration() == false )
 	{
-		for ( int i = m_vQueuedViews.count()-1; i >= 0; i-=NUM_THREADS )
+		// Single-threaded processing of the render view queue
+
+		for ( int i = m_vQueuedViews.size()-1; i >= 0; i-=NUM_THREADS )
         {
 			for ( int j = 0; j < NUM_THREADS; j++ )
 			{
@@ -1491,33 +1523,13 @@ void RendererDX11::ProcessRenderViewQueue( )
 			}
         }
 
-		m_vQueuedViews.empty();
+		m_vQueuedViews.clear();
 	}
-	//if ( MultiThreadingConfig.GetConfiguration() == false )
-	//{
-	//	for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
- //       {
- //           std::string viewName = ViewRenderParams::ViewIndexToName( m_vQueuedViews[i]->GetType() );
- //           PIXBeginEvent( GlyphString::ToUnicode( "View Draw: " + viewName ).c_str() );
-
-	//		m_vQueuedViews[i]->Draw( pImmPipeline, g_aPayload[i].pParamManager );
-
- //           PIXEndEvent();
- //       }
-
-	//	m_vQueuedViews.empty();
-	//}
-
 	else
 	{
+		// Multi-threaded processing of the render view queue
 
-		// While processed count > 0
-		//   Execute NUM_THREADS work loads
-		//   WFMO
-		//   Execute command lists
-		//   Update processed count and loop
-
-		for ( int i = m_vQueuedViews.count()-1; i >= 0; i-=NUM_THREADS )
+		for ( int i = m_vQueuedViews.size()-1; i >= 0; i-=NUM_THREADS )
 		{
 			DWORD count = 0;
 
@@ -1533,34 +1545,17 @@ void RendererDX11::ProcessRenderViewQueue( )
 
 			WaitForMultipleObjects( count, g_aEndEventHandle, true, INFINITE );
 
-			for ( int j = 0/*count-1*/; count > 0; count-- )
+			for ( int j = 0; count > 0; count-- )
 			{
 				//g_aPayload[j].pPipeline->m_pContext->ClearState();
 				pImmPipeline->ExecuteCommandList( g_aPayload[j].pList );
 				g_aPayload[j].pList->ReleaseList();
-				//j--;
 				j++;
 			}
 
 		}
 
-		//for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
-		//{
-		//	g_aPayload[i].pRenderView = m_vQueuedViews[i];
-		//	SetEvent( g_aBeginEventHandle[i] );
-		//}
-
-		//WaitForMultipleObjects( (DWORD)m_vQueuedViews.count(), g_aEndEventHandle, true, INFINITE );
-		
-		//for ( int i = m_vQueuedViews.count()-1; i >= 0; i-- )
-		//{
-		//	g_aPayload[i].pPipeline->m_pContext->ClearState();
-		//	pImmPipeline->ExecuteCommandList( g_aPayload[i].pList );
-		//	g_aPayload[i].pList->ReleaseList();
-		//}
-
-		m_vQueuedViews.empty();
-
+		m_vQueuedViews.clear();
 	}
 }
 //--------------------------------------------------------------------------------
@@ -1801,11 +1796,14 @@ RenderTargetViewDX11* RendererDX11::GetRenderTargetViewByIndex( int rid )
 	RenderTargetViewDX11* pResult = 0;
 
 	if ( rid != -1 ) {
+
+		unsigned int index = static_cast<unsigned int>( rid );
+
 		// Check if this ID is in range
-		if ( !m_vRenderTargetViews.inrange( rid ) ) {
-			Log::Get().Write( L"Trying to access a non-render target view!!!!" );
+		if ( index < m_vRenderTargetViews.size() ) {
+			pResult = m_vRenderTargetViews[index];
 		} else {
-			pResult = m_vRenderTargetViews[rid];
+			Log::Get().Write( L"Trying to access a non-render target view!!!!" );
 		}
 	}
 
@@ -1817,11 +1815,14 @@ DepthStencilViewDX11* RendererDX11::GetDepthStencilViewByIndex( int rid )
 	DepthStencilViewDX11* pResult = 0;
 
 	if ( rid != -1 ) {
+
+		unsigned int index = static_cast<unsigned int>( rid );
+
 		// Check if this ID is in range
-		if ( !m_vDepthStencilViews.inrange( rid ) ) {
-			Log::Get().Write( L"Trying to access a non-depth stencil view!!!!" );
+		if ( index < m_vDepthStencilViews.size() ) {
+			pResult = m_vDepthStencilViews[index];
 		} else {
-			pResult = m_vDepthStencilViews[rid];
+			Log::Get().Write( L"Trying to access a non-depth stencil view!!!!" );
 		}
 	}
 
@@ -1830,14 +1831,17 @@ DepthStencilViewDX11* RendererDX11::GetDepthStencilViewByIndex( int rid )
 //--------------------------------------------------------------------------------
 ShaderResourceViewDX11* RendererDX11::GetShaderResourceViewByIndex( int rid )
 {
-	ShaderResourceViewDX11* pResult = 0;
+	ShaderResourceViewDX11* pResult = nullptr;
 
 	if ( rid != -1 ) {
+
+		unsigned int index = static_cast<unsigned int>( rid );
+
 		// Check if this ID is in range
-		if ( !m_vShaderResourceViews.inrange( rid ) ) {
-			Log::Get().Write( L"Trying to access a non-shader resource view!!!!" );
+		if ( index < m_vShaderResourceViews.size() ) {
+			pResult = m_vShaderResourceViews[index];
 		} else {
-			pResult = m_vShaderResourceViews[rid];
+			Log::Get().Write( L"Trying to access a non-shader resource view!!!!" );
 		}
 	}
 
@@ -1849,11 +1853,14 @@ UnorderedAccessViewDX11* RendererDX11::GetUnorderedAccessViewByIndex( int rid )
 	UnorderedAccessViewDX11* pResult = 0;
 
 	if ( rid != -1 ) {
+
+		unsigned int index = static_cast<unsigned int>( rid );
+
 		// Check if this ID is in range
-		if ( !m_vUnorderedAccessViews.inrange( rid ) ) {
-			Log::Get().Write( L"Trying to access a non-unordered access view!!!!" );
+		if ( index < m_vUnorderedAccessViews.size() ) {
+			pResult = m_vUnorderedAccessViews[index];
 		} else {
-			pResult = m_vUnorderedAccessViews[rid];
+			Log::Get().Write( L"Trying to access a non-unordered access view!!!!" );
 		}
 	}
 
@@ -1866,7 +1873,7 @@ int	RendererDX11::GetUnusedResourceIndex()
 	int index = -1;
 	
 	// Search for a NULL index location.
-	for ( int i = 0; i < m_vResources.count(); i++ ) {
+	for ( unsigned int i = 0; i < m_vResources.size(); i++ ) {
 		if ( m_vResources[i] == NULL ) {
 			index = i;
 			break;
@@ -1885,8 +1892,8 @@ int	RendererDX11::StoreNewResource( ResourceDX11* pResource )
 	int index = GetUnusedResourceIndex();
 
 	if ( index == -1 ) {
-		m_vResources.add( pResource );
-		index = m_vResources.count() - 1;
+		m_vResources.push_back( pResource );
+		index = m_vResources.size() - 1;
 	} else {
 		m_vResources[index] = pResource;
 	}
@@ -1912,9 +1919,9 @@ void RendererDX11::DeleteResource( int index )
 	// being deleted, it is 
 	ResourceDX11* pResource = GetResourceByIndex( index );
 
-	if ( pResource != NULL ) {
+	if ( pResource != nullptr ) {
 		delete pResource;
-		m_vResources[index & 0xffff] = NULL;
+		m_vResources[index & 0xffff] = nullptr;
 	}
 }
 //--------------------------------------------------------------------------------

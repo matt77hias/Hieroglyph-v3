@@ -160,13 +160,42 @@ bool SpriteRendererDX11::Initialize()
 
 	m_iPointSamplerState = renderer->CreateSamplerState( &samplerConfig );
 
-	if ( m_iLinearSamplerState == -1 )
+	if ( m_iPointSamplerState == -1 )
 	{
 		Log::Get().Write( L"Failed to create sprite sampler state" );
 		return false;
 	}
 
-	m_pGeometry = InstancedQuadGeometryPtr( new InstancedQuadGeometryDX11() );
+	m_pGeometry = SpriteGeometryPtr( new DrawIndexedInstancedExecutorDX11<SpriteVertexDX11::VertexData, SpriteVertexDX11::InstanceData>() );
+	m_pGeometry->SetLayoutElements( SpriteVertexDX11::GetElementCount(), SpriteVertexDX11::Elements );
+
+	// Set up the vertex data here first.  This is essentially just the four
+	// vertices that will make up a quad.
+	
+	SpriteVertexDX11::VertexData verts[] =
+	{
+		{ Vector2f(0.0f, 0.0f), Vector2f(0.0f, 0.0f) },
+		{ Vector2f(1.0f, 0.0f), Vector2f(1.0f, 0.0f) },
+		{ Vector2f(1.0f, 1.0f), Vector2f(1.0f, 1.0f) },
+		{ Vector2f(0.0f, 1.0f), Vector2f(0.0f, 1.0f) }
+	};
+
+	m_pGeometry->AddVertex( verts[0] );
+	m_pGeometry->AddVertex( verts[1] );
+	m_pGeometry->AddVertex( verts[2] );
+	m_pGeometry->AddVertex( verts[3] );
+
+	// Next, set up the index data.  This will provide the indices for each 
+	// instance that gets replicated during the draw call.  Since we are just
+	// replicating a quad made of two triangles, we only need two triangles.
+
+	m_pGeometry->AddIndices( 0, 1, 2 );
+	m_pGeometry->AddIndices( 3, 0, 2 );
+
+	// Ensure the compatibility of the pipeline executor and the render effect
+	// that is going to be used with it.
+
+	m_pGeometry->GenerateInputLayout( m_effect.GetVertexShader() );
 
 	m_bInitialized = true;
 
@@ -176,26 +205,27 @@ bool SpriteRendererDX11::Initialize()
 void SpriteRendererDX11::Render( PipelineManagerDX11* pipeline,
 								 IParameterManager* parameters,
 								 ResourcePtr texture,
-								 const SpriteDrawData* drawData,
+								 const SpriteVertexDX11::InstanceData* drawData,
 								 UINT numSprites, FilterMode filterMode )
 {
 	_ASSERT(m_bInitialized);
 
 	RendererDX11::PIXBeginEvent( L"SpriteRendererDX11 Render" );
 
-	m_pGeometry->ResetGeometry();
+	// Only reset the instances, since the vertex and index data remains the same!
+	m_pGeometry->ResetInstances();
 
 	// Make sure the draw rects are all valid
 	D3D11_TEXTURE2D_DESC desc = texture->m_pTexture2dConfig->GetTextureDesc();
 	for ( UINT i = 0; i < numSprites; ++i )
 	{
-		SpriteDrawRect drawRect = drawData[i].DrawRect;
+		SpriteVertexDX11::SpriteDrawRect drawRect = drawData[i].DrawRect;
 		_ASSERT( drawRect.X >= 0 && drawRect.X < desc.Width );
 		_ASSERT( drawRect.Y >= 0 && drawRect.Y < desc.Height );
 		_ASSERT( drawRect.Width > 0 && drawRect.X + drawRect.Width <= desc.Width );
 		_ASSERT( drawRect.Height > 0 && drawRect.Y + drawRect.Height <= desc.Height );
 
-		m_pGeometry->AddQuad( drawData[i] );
+		m_pGeometry->AddInstance( drawData[i] );
 	}
 
 	// Set the constants
@@ -233,9 +263,9 @@ void SpriteRendererDX11::Render( PipelineManagerDX11* pipeline,
 							     ResourcePtr texture, 
 								 const Matrix4f& transform,
 								 const Vector4f& color, FilterMode filterMode,
-								 const SpriteDrawRect* drawRect )
+								 const SpriteVertexDX11::SpriteDrawRect* drawRect )
 {
-	SpriteDrawData data;
+	SpriteVertexDX11::InstanceData data;
 	data.Color = color;
 	data.Transform = transform;
 
@@ -261,7 +291,7 @@ void SpriteRendererDX11::RenderText( PipelineManagerDX11* pipeline,
 {
 	RendererDX11::PIXBeginEvent( L"SpriteRenderer RenderText" );
 
-	SpriteDrawData m_TextDrawData [MaxBatchSize];
+	SpriteVertexDX11::InstanceData m_TextDrawData [MaxBatchSize];
 
 	size_t length = wcslen( text );
 

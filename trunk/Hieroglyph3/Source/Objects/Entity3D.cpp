@@ -52,8 +52,8 @@ Entity3D::Entity3D()
 //--------------------------------------------------------------------------------
 Entity3D::~Entity3D()
 {
-	for ( int i = 0; i < m_Controllers.count(); i++ )
-		delete m_Controllers[i];
+	for ( auto pController : m_Controllers )
+		delete pController;
 
 	if ( m_pComposite )
 		delete m_pComposite;
@@ -132,8 +132,8 @@ void Entity3D::UpdateLocal( float fTime )
 {
 	// Update the controllers that are attached to this entity.
 
-	for ( int i = 0; i < m_Controllers.count(); i++ )
-		m_Controllers[i]->Update( fTime );
+	for ( auto pController : m_Controllers )
+		pController->Update( fTime );
 
 	// Load the local space matrix with the rotation and translation components.
 
@@ -279,7 +279,7 @@ std::string Entity3D::toString( )
 	return( objString.str() );
 }
 //--------------------------------------------------------------------------------
-void Entity3D::BuildPickRecord( Ray3f& ray, TArray<PickRecord>& record )
+void Entity3D::BuildPickRecord( Ray3f& ray, std::vector<PickRecord>& record )
 {
 	// If the entity has a composite shape then use it, otherwise simply use
 	// the world bounding sphere to check for a hit.
@@ -307,7 +307,7 @@ void Entity3D::BuildPickRecord( Ray3f& ray, TArray<PickRecord>& record )
 			PickRecord Record;
 			Record.pEntity = this;
 			Record.fDistance = fT;
-			record.add( Record );
+			record.push_back( Record );
 		}
 	}
 	else
@@ -319,7 +319,7 @@ void Entity3D::BuildPickRecord( Ray3f& ray, TArray<PickRecord>& record )
 			Record.pEntity = this;
 			//Record.fDistance = std::min( Intersector.m_afRayT[0], Intersector.m_afRayT[1] ); 
 			Record.fDistance = min( Intersector.m_afRayT[0], Intersector.m_afRayT[1] ); 
-			record.add( Record );
+			record.push_back( Record );
 		}
 	}
 }
@@ -328,23 +328,15 @@ void Entity3D::AttachController( IController* pController )
 {
 	if ( pController )
 	{
-		m_Controllers.add( pController );
+		m_Controllers.push_back( pController );
 		pController->SetEntity( this );
 	}
 }
 //--------------------------------------------------------------------------------
-void Entity3D::UpdateControllers( float fTime )
+IController* Entity3D::GetController( unsigned int index )
 {
-	for ( int i = 0; i < m_Controllers.count(); i++ )
-	{
-		m_Controllers[i]->Update( fTime );
-	}
-}
-//--------------------------------------------------------------------------------
-IController* Entity3D::GetController( int index )
-{
-	if ( m_Controllers.count() <= index )
-		return( 0 );
+	if ( m_Controllers.size() <= index )
+		return( nullptr );
 
 	return( m_Controllers[index] );
 }
@@ -367,6 +359,20 @@ CompositeShape* Entity3D::GetCompositeShape( )
 void Entity3D::SetMaterial( MaterialPtr pMaterial )
 {
 	m_sParams.Material = pMaterial;
+
+	// TODO: This could probably be moved to another class, possibly to the 
+	//       EntityRenderParams class...  That would avoid duplicating it, and
+	//       would put the functionality in the location that it is needed...
+
+	if ( m_sParams.Material != nullptr && m_sParams.Executor != nullptr )
+	{
+		std::vector<int> idlist;
+		m_sParams.Material->GetAllVertexShaderIDs( idlist );
+
+		for ( auto ID : idlist ) {
+			m_sParams.Executor->GenerateInputLayout( ID );
+		}
+	}
 }
 //--------------------------------------------------------------------------------
 MaterialPtr Entity3D::GetMaterial( )
@@ -374,18 +380,33 @@ MaterialPtr Entity3D::GetMaterial( )
 	return( m_sParams.Material );
 }
 //--------------------------------------------------------------------------------
-void Entity3D::GetEntities( TArray< Entity3D* >& set )
+void Entity3D::GetEntities( std::vector< Entity3D* >& set )
 {
-	set.add( this );
+	set.push_back( this );
 }
 //--------------------------------------------------------------------------------
-void Entity3D::SetGeometry( ExecutorPtr executor )
+void Entity3D::SetGeometry( ExecutorPtr pExecutor )
 {
-	// If there is already an executor set, then release it.
-	if ( m_sParams.Executor != NULL )
-		m_sParams.Executor = NULL;
+	m_sParams.Executor = pExecutor;
 
-	m_sParams.Executor = executor;
+	// TODO: This could probably be moved to another class, possibly to the 
+	//       EntityRenderParams class...  That would avoid duplicating it, and
+	//       would put the functionality in the location that it is needed...
+
+	if ( m_sParams.Material != nullptr && m_sParams.Executor != nullptr )
+	{
+		std::vector<int> idlist;
+		m_sParams.Material->GetAllVertexShaderIDs( idlist );
+
+		for ( auto ID : idlist ) {
+			m_sParams.Executor->GenerateInputLayout( ID );
+		}
+	}
+}
+//--------------------------------------------------------------------------------
+ExecutorPtr Entity3D::GetGeometry( )
+{
+	return( m_sParams.Executor );
 }
 //--------------------------------------------------------------------------------
 void Entity3D::SetLocalMatrixCalculation( bool bCalc )

@@ -9,74 +9,27 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-#include "PCH.h"
-#include "ImmediateGeometryDX11.h"
-#include "VertexBufferDX11.h"
-#include "BufferConfigDX11.h"
-#include "Log.h"
-#include "GlyphString.h"
-#include "PipelineManagerDX11.h"
-//--------------------------------------------------------------------------------
-using namespace Glyph3;
-//--------------------------------------------------------------------------------
-ImmediateGeometryDX11::ImmediateGeometryDX11( )
+template <class TVertex>
+DrawExecutorDX11<TVertex>::DrawExecutorDX11( )
 {
-	m_Color = Vector4f( 0.0f, 1.0f, 0.0f, 1.0f );
+	// Default to triangle list...
 	m_ePrimType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-
-	// Fill in the vertex element descriptions based on each element of our format
-
-	D3D11_INPUT_ELEMENT_DESC e1;
-	D3D11_INPUT_ELEMENT_DESC e2;
-	D3D11_INPUT_ELEMENT_DESC e3;
-	D3D11_INPUT_ELEMENT_DESC e4;
-
-	e1.SemanticName = "POSITION";
-	e1.SemanticIndex = 0;
-	e1.Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	e1.InputSlot = 0;
-	e1.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	e1.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	e1.InstanceDataStepRate = 0;
-
-	e2.SemanticName = "NORMAL";
-	e2.SemanticIndex = 0;
-	e2.Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	e2.InputSlot = 0;
-	e2.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	e2.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	e2.InstanceDataStepRate = 0;
-
-	e3.SemanticName = "COLOR";
-	e3.SemanticIndex = 0;
-	e3.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	e3.InputSlot = 0;
-	e3.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	e3.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	e3.InstanceDataStepRate = 0;
-
-	e4.SemanticName = "TEXCOORD";
-	e4.SemanticIndex = 0;
-	e4.Format = DXGI_FORMAT_R32G32_FLOAT;
-	e4.InputSlot = 0;
-	e4.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	e4.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	e4.InstanceDataStepRate = 0;
-
-	m_elements.add( e1 );
-	m_elements.add( e2 );
-	m_elements.add( e3 );
-	m_elements.add( e4 );
 }
 //--------------------------------------------------------------------------------
-ImmediateGeometryDX11::~ImmediateGeometryDX11()
+template <class TVertex>
+DrawExecutorDX11<TVertex>::~DrawExecutorDX11()
 {
 }
 //--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
+template <class TVertex>
+void DrawExecutorDX11<TVertex>::Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
 {
+	// If any vertices have been added, then render them!
+
 	if ( VertexBuffer.GetVertexCount() > 0 ) {
 
+		// First upload the data to the D3D11 buffer resource (this only uploads
+		// if something has been changed since last upload).
 		VertexBuffer.UploadVertexData( pPipeline );
 	
 		pPipeline->InputAssemblerStage.ClearDesiredState();
@@ -85,147 +38,55 @@ void ImmediateGeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterM
 		int layout = GetInputLayout( pPipeline->ShaderStages[VERTEX_SHADER]->DesiredState.GetShaderProgram() );
 		pPipeline->InputAssemblerStage.DesiredState.SetInputLayout( layout );
 		pPipeline->InputAssemblerStage.DesiredState.SetPrimitiveTopology( m_ePrimType );
-		pPipeline->InputAssemblerStage.DesiredState.SetVertexBuffer( 0, VertexBuffer.GetVertexBuffer()->m_iResource, 0, sizeof( ImmediateVertexDX11 ) );
+		pPipeline->InputAssemblerStage.DesiredState.SetVertexBuffer( 0, VertexBuffer.GetVertexBuffer()->m_iResource, 0, sizeof( TVertex ) );
 	
 		pPipeline->ApplyInputResources();
 
+		// Perform a draw call without any indices, instances, or indirect anything!
 		pPipeline->Draw( VertexBuffer.GetVertexCount(), 0 );
 	}
 }
 //--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::ResetGeometry()
+template <class TVertex>
+void DrawExecutorDX11<TVertex>::ResetGeometry()
 {
 	// Reset the vertex count here to prepare for the next drawing pass.
+	
+	ResetVertices();
+}
+//--------------------------------------------------------------------------------
+template <class TVertex>
+void DrawExecutorDX11<TVertex>::ResetVertices()
+{
 	VertexBuffer.ResetVertices();
 }
 //--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::AddVertex( const ImmediateVertexDX11& vertex )
+template <class TVertex>
+void DrawExecutorDX11<TVertex>::AddVertex( const TVertex& vertex )
 {
 	VertexBuffer.AddVertex( vertex );
 }
 //--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::AddVertex( const Vector3f& position )
-{
-	ImmediateVertexDX11 vertex;
-
-	vertex.position = position;
-	vertex.normal = Vector3f( 0.0f, 1.0f, 0.0f );
-	vertex.color = m_Color;
-	vertex.texcoords = Vector2f( 0.0f, 0.0f );
-
-	VertexBuffer.AddVertex( vertex );
-}
-//--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector4f& color )
-{
-	ImmediateVertexDX11 vertex;
-
-	vertex.position = position;
-	vertex.normal = Vector3f( 0.0f, 1.0f, 0.0f );
-	vertex.color = color;
-	vertex.texcoords = Vector2f( 0.0f, 0.0f );
-	
-	VertexBuffer.AddVertex( vertex );
-}
-//--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector2f& texcoords )
-{
-	ImmediateVertexDX11 vertex;
-
-	vertex.position = position;
-	vertex.normal = Vector3f( 0.0f, 1.0f, 0.0f );
-	vertex.color = m_Color;
-	vertex.texcoords = texcoords;
-	
-	VertexBuffer.AddVertex( vertex );
-}
-//--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector4f& color, const Vector2f& texcoords )
-{
-	ImmediateVertexDX11 vertex;
-
-	vertex.position = position;
-	vertex.normal = Vector3f( 0.0f, 1.0f, 0.0f );
-	vertex.color = color;
-	vertex.texcoords = texcoords;
-	
-	VertexBuffer.AddVertex( vertex );
-}
-//--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector3f& normal )
-{
-	ImmediateVertexDX11 vertex;
-
-	vertex.position = position;
-	vertex.normal = normal;
-	vertex.color = m_Color;
-	vertex.texcoords = Vector2f( 0.0f, 0.0f );
-	
-	VertexBuffer.AddVertex( vertex );
-}
-//--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector3f& normal, const Vector4f& color )
-{
-	ImmediateVertexDX11 vertex;
-
-	vertex.position = position;
-	vertex.normal = normal;
-	vertex.color = color;
-	vertex.texcoords = Vector2f( 0.0f, 0.0f );
-	
-	VertexBuffer.AddVertex( vertex );
-}
-//--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector3f& normal, const Vector2f& texcoords )
-{
-	ImmediateVertexDX11 vertex;
-
-	vertex.position = position;
-	vertex.normal = normal;
-	vertex.color = m_Color;
-	vertex.texcoords = texcoords;
-	
-	VertexBuffer.AddVertex( vertex );
-}
-//--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::AddVertex( const Vector3f& position, const Vector3f& normal, const Vector4f& color, const Vector2f& texcoords )
-{
-	ImmediateVertexDX11 vertex;
-
-	vertex.position = position;
-	vertex.normal = normal;
-	vertex.color = color;
-	vertex.texcoords = texcoords;
-	
-	VertexBuffer.AddVertex( vertex );
-}
-//--------------------------------------------------------------------------------
-D3D11_PRIMITIVE_TOPOLOGY ImmediateGeometryDX11::GetPrimitiveType()
+template <class TVertex>
+D3D11_PRIMITIVE_TOPOLOGY DrawExecutorDX11<TVertex>::GetPrimitiveType()
 {
 	return( m_ePrimType );
 }
 //--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY type )
+template <class TVertex>
+void DrawExecutorDX11<TVertex>::SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY type )
 {
 	m_ePrimType = type;
 }
 //--------------------------------------------------------------------------------
-void ImmediateGeometryDX11::SetColor( const Vector4f& color )
-{
-	m_Color = color;
-}
-//--------------------------------------------------------------------------------
-Vector4f ImmediateGeometryDX11::GetColor( )
-{
-	return( m_Color );
-}
-//--------------------------------------------------------------------------------
-unsigned int ImmediateGeometryDX11::GetVertexCount()
+template <class TVertex>
+unsigned int DrawExecutorDX11<TVertex>::GetVertexCount()
 {
 	return( VertexBuffer.GetVertexCount() );
 }
 //--------------------------------------------------------------------------------
-unsigned int ImmediateGeometryDX11::GetPrimitiveCount()
+template <class TVertex>
+unsigned int DrawExecutorDX11<TVertex>::GetPrimitiveCount()
 {
 	unsigned int count = 0;
 	unsigned int referencedVertices = VertexBuffer.GetVertexCount();

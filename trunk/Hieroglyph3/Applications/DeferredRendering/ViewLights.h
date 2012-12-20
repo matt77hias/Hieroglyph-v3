@@ -64,7 +64,7 @@ namespace Glyph3
         virtual void SetUsageParams( IParameterManager* pParamManager );
 
         void AddLight( const Light& light );
-        void SetTargets( TArray<ResourcePtr>& GBufferTargets, ResourcePtr pRenderTarget,
+        void SetTargets( std::vector<ResourcePtr>& GBufferTargets, ResourcePtr pRenderTarget,
                             ResourcePtr DepthTarget, int Viewport, int vpWidth, int vpHeight );
         void SetClipPlanes( float NearClip, float FarClip );
 
@@ -76,36 +76,35 @@ namespace Glyph3
 
     protected:
 
-        int					m_iViewport;
-        int					m_iDisabledDSState;
-        int                 m_iLessThanDSState;
-        int                 m_iGreaterThanDSState;
-        int                 m_iBlendState;
-        int                 m_iScissorRSState;
-        int                 m_iBackFaceCullRSState;
-        int                 m_iFrontFaceCullRSState;
+        int								m_iDisabledDSState;
+        int								m_iLessThanDSState;
+        int								m_iGreaterThanDSState;
+        int								m_iBlendState;
+        int								m_iScissorRSState;
+        int							    m_iBackFaceCullRSState;
+        int								m_iFrontFaceCullRSState;
 
-        UINT                m_uVPWidth;
-        UINT                m_uVPHeight;
+        UINT						    m_uVPWidth;
+        UINT							m_uVPHeight;
 
-        float               m_fNearClip;
-        float               m_fFarClip;
+        float							m_fNearClip;
+        float							m_fFarClip;
 
-        ResourcePtr	            m_pRenderTarget;
-        ResourcePtr			    m_DepthTarget;
-        ResourcePtr			    m_ReadOnlyDepthTarget;
-        TArray<ResourcePtr>     m_GBufferTargets;
+        ResourcePtr						m_pRenderTarget;
+        ResourcePtr						m_DepthTarget;
+        ResourcePtr						m_ReadOnlyDepthTarget;
+        std::vector<ResourcePtr>		m_GBufferTargets;
 
-        GeometryPtr				m_QuadGeometry;
-        GeometryPtr		        m_SphereGeometry;
-        GeometryPtr	            m_ConeGeometry;
+        GeometryPtr						m_QuadGeometry;
+        GeometryPtr						m_SphereGeometry;
+        GeometryPtr						m_ConeGeometry;
 
-        RenderEffectDX11		m_PointLightEffect[GBufferOptMode::NumSettings][LightOptMode::NumSettings][AAMode::NumSettings];
-        RenderEffectDX11		m_SpotLightEffect[GBufferOptMode::NumSettings][LightOptMode::NumSettings][AAMode::NumSettings];
-        RenderEffectDX11		m_DirectionalLightEffect[GBufferOptMode::NumSettings][LightOptMode::NumSettings][AAMode::NumSettings];
+        RenderEffectDX11				m_PointLightEffect[GBufferOptMode::NumSettings][LightOptMode::NumSettings][AAMode::NumSettings];
+        RenderEffectDX11				m_SpotLightEffect[GBufferOptMode::NumSettings][LightOptMode::NumSettings][AAMode::NumSettings];
+        RenderEffectDX11				m_DirectionalLightEffect[GBufferOptMode::NumSettings][LightOptMode::NumSettings][AAMode::NumSettings];
 
-        TArray<Light>           m_Lights;
-        Matrix4f                m_WorldMatrix;
+        std::vector<Light>				m_Lights;
+        Matrix4f						m_WorldMatrix;
 
 		MatrixParameterDX11*			m_pInvProjMatrix;
 		MatrixParameterDX11*			m_pProjMatrix;

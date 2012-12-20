@@ -18,7 +18,6 @@
 #include "PCH.h"
 
 #include "IRenderer.h"
-#include "TArray.h"
 #include "TConfiguration.h"
 
 #include "Vector2f.h"
@@ -182,7 +181,7 @@ namespace Glyph3
 		// provided for creating an input layout and later indexing the value when setting
 		// the appropriate vertex shader.
 
-		int CreateInputLayout( TArray<D3D11_INPUT_ELEMENT_DESC>& elements, int ShaderID  );
+		int CreateInputLayout( std::vector<D3D11_INPUT_ELEMENT_DESC>& elements, int ShaderID  );
 
 		// The individual states available in the D3D11 pipeline can be created here.  They
 		// are referred to by index after being created.
@@ -255,30 +254,30 @@ namespace Glyph3
 		// Static renderer access - used for accessing the renderer when no reference
 		// is already available.
 
-		static RendererDX11*				m_spRenderer;
+		static RendererDX11*					m_spRenderer;
 
 		// In general, all resources and API objects are housed in expandable arrays
 		// wrapper objects.  The position within the array is used to provide fast
 		// random access to the renderer clients.
 
-		TArray<SwapChainDX11*>				m_vSwapChains;
+		std::vector<SwapChainDX11*>				m_vSwapChains;
 
 		// Resource allocation containers are stored in an expandable array, which
 		// provides fast random access with indices.
 
-		TArray<ResourceDX11*>				m_vResources;
+		std::vector<ResourceDX11*>				m_vResources;
 
 		// Resource view containers.  These are indexed by the application for
 		// the various pipeline binding operations.
 
-		TArray<ShaderResourceViewDX11*>		m_vShaderResourceViews;
-		TArray<RenderTargetViewDX11*>		m_vRenderTargetViews;
-		TArray<DepthStencilViewDX11*>		m_vDepthStencilViews;
-		TArray<UnorderedAccessViewDX11*>	m_vUnorderedAccessViews;
+		std::vector<ShaderResourceViewDX11*>	m_vShaderResourceViews;
+		std::vector<RenderTargetViewDX11*>		m_vRenderTargetViews;
+		std::vector<DepthStencilViewDX11*>		m_vDepthStencilViews;
+		std::vector<UnorderedAccessViewDX11*>	m_vUnorderedAccessViews;
 
 		// The shader programs are stored in an expandable array of their base classes.
 
-		TArray<ShaderDX11*>					m_vShaders;
+		std::vector<ShaderDX11*>				m_vShaders;
 		
 		// These states are stored as shared pointers to the object.  This is the direction
 		// that the renderer is heading in - eventually references to the objects will be
@@ -286,13 +285,13 @@ namespace Glyph3
 		// destroying many resources, and allow the renderer clients to have greater access
 		// the objects without querying the renderer.
 
-		TArray<BlendStatePtr>					m_vBlendStates;
-		TArray<DepthStencilStatePtr>			m_vDepthStencilStates;
-		TArray<RasterizerStatePtr>				m_vRasterizerStates;
+		std::vector<BlendStatePtr>				m_vBlendStates;
+		std::vector<DepthStencilStatePtr>		m_vDepthStencilStates;
+		std::vector<RasterizerStatePtr>			m_vRasterizerStates;
 
-		TArray<InputLayoutDX11*>				m_vInputLayouts;
-		TArray<SamplerStateDX11*>				m_vSamplerStates;
-		TArray<ViewPortDX11*>					m_vViewPorts;
+		std::vector<InputLayoutDX11*>			m_vInputLayouts;
+		std::vector<SamplerStateDX11*>			m_vSamplerStates;
+		std::vector<ViewPortDX11*>				m_vViewPorts;
 
 	public:
 		IParameterManager*						m_pParamMgr;
@@ -334,9 +333,9 @@ namespace Glyph3
 		int							GetUnusedResourceIndex();
 		int							StoreNewResource( ResourceDX11* pResource );
 
-		D3D_FEATURE_LEVEL						m_FeatureLevel;
+		D3D_FEATURE_LEVEL			m_FeatureLevel;
 
-		TArray<IRenderView*>					m_vQueuedViews;
+		std::vector<IRenderView*>	m_vQueuedViews;
 
 		friend GeometryDX11;
 	};

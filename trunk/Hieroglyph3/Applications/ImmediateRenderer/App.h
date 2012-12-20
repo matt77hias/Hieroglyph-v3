@@ -9,8 +9,6 @@
 //--------------------------------------------------------------------------------
 #include "RenderApplication.h"
 #include "Actor.h"
-#include "ImmediateGeometryDX11.h"
-#include "IndexedImmediateGeometryDX11.h"
 #include "GeometryActor.h"
 #include "TextActor.h"
 
@@ -35,13 +33,7 @@ public:
 
 protected:
 
-	Actor*						m_pActor;
-	ImmediateGeometryPtr		m_pGeometry;
-
-	Actor*						m_pIndexedActor;
-	IndexedImmediateGeometryPtr m_pIndexedGeometry;
-
-	TextActor*					m_pTextActor;
-
+	GeometryActor*				m_pIndexedActor;
 	GeometryActor*				m_pGeometryActor;
+	TextActor*					m_pTextActor;
 };

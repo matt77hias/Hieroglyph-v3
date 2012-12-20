@@ -224,19 +224,6 @@ void App::Initialize()
 	m_pMaterial->Parameters.SetSamplerParameter( L"AnisoSampler", samplerState );
 
 
-
-	// Pre-generate all of the input layout views for our geometry to ensure that
-	// in the parallel processing of the render views we don't try to create one,
-	// which could lead to a multi-threading problem.
-
-	for ( int i = 0; i < VT_NUM_VIEW_TYPES; i++ ) {
-		if ( m_pMaterial->Params[i].bRender ) {
-			pGeometry->GetInputLayout( m_pMaterial->Params[i].pEffect->GetVertexShader() );
-		}
-	}
-
-
-
 	// Create the scene and add the entities to it.  Then add the camera to the
 	// scene so that it will be updated via the scene interface instead of
 	// manually manipulating it.

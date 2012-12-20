@@ -16,7 +16,7 @@
 #ifndef TGrowableIndexBufferDX11_h
 #define TGrowableIndexBufferDX11_h
 //--------------------------------------------------------------------------------
-
+#include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

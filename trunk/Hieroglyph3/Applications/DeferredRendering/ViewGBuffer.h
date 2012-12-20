@@ -32,18 +32,16 @@ namespace Glyph3
 		virtual void SetRenderParams( IParameterManager* pParamManager );
 		virtual void SetUsageParams( IParameterManager* pParamManager );
 
-        void SetTargets( TArray<ResourcePtr>& GBufferTargets, ResourcePtr DepthTarget,
+        void SetTargets( std::vector<ResourcePtr>& GBufferTargets, ResourcePtr DepthTarget,
                           int Viewport );
 
 		virtual ~ViewGBuffer();
 
 	protected:
 
-		int					m_iViewport;
-
-        RendererDX11&           m_Renderer;
-		TArray<ResourcePtr> 	m_GBufferTargets;
-		ResourcePtr				m_DepthTarget;
+        RendererDX11&				m_Renderer;
+		std::vector<ResourcePtr>	m_GBufferTargets;
+		ResourcePtr					m_DepthTarget;
 	};
 }
 //--------------------------------------------------------------------------------

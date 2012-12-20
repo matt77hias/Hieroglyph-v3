@@ -56,9 +56,11 @@ VolumeActor::VolumeActor()
 	
 	// Generate the volume geometry to display what is in the volume texture.
 
-	m_pGeometry = VolumeGeometryPtr( new VolumeGeometryDX11() );
+	m_pGeometry = VolumeGeometryPtr( new DrawIndexedExecutorDX11<VolumeTextureVertexDX11::Vertex>() );
+	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	m_pGeometry->SetLayoutElements( VolumeTextureVertexDX11::GetElementCount(), VolumeTextureVertexDX11::Elements );
 
-	VolumeVertexDX11 v;
+	VolumeTextureVertexDX11::Vertex v;
 	
 	// [-X,+Y,-Z] Offset 0
 	v.position = Vector3f( -1.0f, 1.0f, -1.0f );

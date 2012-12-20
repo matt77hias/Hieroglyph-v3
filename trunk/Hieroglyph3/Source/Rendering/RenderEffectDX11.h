@@ -60,7 +60,7 @@ namespace Glyph3
 		int					m_aiIndices[6];
 		ShaderDX11*			m_apShaders[6];
 
-		TArray< RenderParameterDX11* > m_uniqueConstBuffers;
+		std::vector< RenderParameterDX11* > m_uniqueConstBuffers;
 	};
 };
 //--------------------------------------------------------------------------------

@@ -9,16 +9,16 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// IndexedImmediateGeometryDX11
+// DrawIndexedExecutorDX11
 //
-// This class specializes the ImmediateGeometryDX11 class by adding indices to
+// This class specializes the DrawExecutorDX11 class by adding indices to
 // its capability, and subsequently uses indexed rendering instead of standard
 // rendering calls.  The interface for the indexed portion of the geometry
 // functions in a similar manner to the vertex capability from 
-// ImmediateGeometryDX11 - you simply add indices which reference the vertices
+// DrawExecutorDX11 - you simply add indices which reference the vertices
 // that have either already been added to the object or will be added (i.e. this
 // class doesn't perform any range checking of the indices - you need to add
-// correct indices to your object!).
+// correct indices yourself!).
 //
 // With vertices and indices available, you can use this class to create any type
 // of primitive for submission to the pipeline.  The only thing that needs to be
@@ -29,20 +29,21 @@
 #define IndexedImmediateGeometryDX11_h
 //--------------------------------------------------------------------------------
 #include "PCH.h"
-#include "ImmediateGeometryDX11.h"
-#include "ResourceProxyDX11.h"
+#include "DrawExecutorDX11.h"
 #include "TGrowableIndexBufferDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class IndexedImmediateGeometryDX11 : public ImmediateGeometryDX11
+	template <class TVertex>
+	class DrawIndexedExecutorDX11 : public DrawExecutorDX11<TVertex>
 	{
 	public:
-		IndexedImmediateGeometryDX11( );
-		virtual ~IndexedImmediateGeometryDX11( );
+		DrawIndexedExecutorDX11( );
+		virtual ~DrawIndexedExecutorDX11( );
 	
 		virtual void Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager );
 		virtual void ResetGeometry();
+		virtual void ResetIndices();
 
 		void AddIndex( const unsigned int index );
 		void AddIndices( const unsigned int i1, const unsigned int i2 );
@@ -56,7 +57,7 @@ namespace Glyph3
 		TGrowableIndexBufferDX11<unsigned int> IndexBuffer;
 	};
 
-	typedef std::shared_ptr<IndexedImmediateGeometryDX11> IndexedImmediateGeometryPtr;
+	#include "DrawIndexedExecutorDX11.inl"
 };
 //--------------------------------------------------------------------------------
 #endif // IndexedImmediateGeometryDX11_h

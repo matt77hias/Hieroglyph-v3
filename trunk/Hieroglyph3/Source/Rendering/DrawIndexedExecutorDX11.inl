@@ -9,29 +9,25 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-#include "PCH.h"
-#include "IndexedImmediateGeometryDX11.h"
-#include "IndexBufferDX11.h"
-#include "BufferConfigDX11.h"
-#include "Log.h"
-#include "GlyphString.h"
-#include "PipelineManagerDX11.h"
-//--------------------------------------------------------------------------------
-using namespace Glyph3;
-//--------------------------------------------------------------------------------
-IndexedImmediateGeometryDX11::IndexedImmediateGeometryDX11( )
+template <class TVertex>
+DrawIndexedExecutorDX11<TVertex>::DrawIndexedExecutorDX11( )
 {
+}
+//--------------------------------------------------------------------------------
+template <class TVertex>
+DrawIndexedExecutorDX11<TVertex>::~DrawIndexedExecutorDX11()
+{
+}
+//--------------------------------------------------------------------------------
+template <class TVertex>
+void DrawIndexedExecutorDX11<TVertex>::Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
+{
+	// Since we are doing indexed rendering, we only want to proceed if some
+	// indices are available (otherwise no primitives would be generated).
 
-}
-//--------------------------------------------------------------------------------
-IndexedImmediateGeometryDX11::~IndexedImmediateGeometryDX11()
-{
-}
-//--------------------------------------------------------------------------------
-void IndexedImmediateGeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager )
-{
 	if ( IndexBuffer.GetIndexCount() > 0 ) {
 
+		// Upload the vertex and index data (only if they have been modified).
 		VertexBuffer.UploadVertexData( pPipeline );
 		IndexBuffer.UploadIndexData( pPipeline );
 	
@@ -41,24 +37,36 @@ void IndexedImmediateGeometryDX11::Execute( PipelineManagerDX11* pPipeline, IPar
 		int layout = GetInputLayout( pPipeline->ShaderStages[VERTEX_SHADER]->DesiredState.GetShaderProgram() );
 		pPipeline->InputAssemblerStage.DesiredState.SetInputLayout( layout );
 		pPipeline->InputAssemblerStage.DesiredState.SetPrimitiveTopology( m_ePrimType );
-		pPipeline->InputAssemblerStage.DesiredState.SetVertexBuffer( 0, VertexBuffer.GetVertexBuffer()->m_iResource, 0, sizeof( ImmediateVertexDX11 ) );
+		pPipeline->InputAssemblerStage.DesiredState.SetVertexBuffer( 0, VertexBuffer.GetVertexBuffer()->m_iResource, 0, sizeof( TVertex ) );
 		pPipeline->InputAssemblerStage.DesiredState.SetIndexBuffer( IndexBuffer.GetIndexBuffer()->m_iResource );
 
 		pPipeline->ApplyInputResources();
 
+		// Perform the indexed draw call, which only depends on the number of 
+		// indices that are available.  The number of primitives generated will be
+		// a function of how many indices and the primitive topology set above.
 		pPipeline->DrawIndexed( IndexBuffer.GetIndexCount(), 0, 0 );
 	}
 }
 //--------------------------------------------------------------------------------
-void IndexedImmediateGeometryDX11::ResetGeometry()
+template <class TVertex>
+void DrawIndexedExecutorDX11<TVertex>::ResetGeometry()
 {
-	// Reset the vertex and index count here to prepare for the next drawing pass.
+	// Reset the instances here to prepare for the next drawing pass.  Then
+	// allow the super class to reset its buffers as well.
 
-	VertexBuffer.ResetVertices();
+	ResetIndices();
+	DrawExecutorDX11::ResetGeometry();
+}
+//--------------------------------------------------------------------------------
+template <class TVertex>
+void DrawIndexedExecutorDX11<TVertex>::ResetIndices()
+{
 	IndexBuffer.ResetIndices();
 }
 //--------------------------------------------------------------------------------
-void IndexedImmediateGeometryDX11::AddIndex( const unsigned int index )
+template <class TVertex>
+void DrawIndexedExecutorDX11<TVertex>::AddIndex( const unsigned int index )
 {
 	// This method does not check the value that is passed as an index against
 	// the number of vertices that are out there. User's are allowed to do what they
@@ -67,25 +75,29 @@ void IndexedImmediateGeometryDX11::AddIndex( const unsigned int index )
 	IndexBuffer.AddIndex( index );
 }
 //--------------------------------------------------------------------------------
-void IndexedImmediateGeometryDX11::AddIndices( const unsigned int i1, const unsigned int i2 )
+template <class TVertex>
+void DrawIndexedExecutorDX11<TVertex>::AddIndices( const unsigned int i1, const unsigned int i2 )
 {
 	AddIndex( i1 );
 	AddIndex( i2 );
 }
 //--------------------------------------------------------------------------------
-void IndexedImmediateGeometryDX11::AddIndices( const unsigned int i1, const unsigned int i2, const unsigned int i3 )
+template <class TVertex>
+void DrawIndexedExecutorDX11<TVertex>::AddIndices( const unsigned int i1, const unsigned int i2, const unsigned int i3 )
 {
 	AddIndex( i1 );
 	AddIndex( i2 );
 	AddIndex( i3 );
 }
 //--------------------------------------------------------------------------------
-unsigned int IndexedImmediateGeometryDX11::GetIndexCount()
+template <class TVertex>
+unsigned int DrawIndexedExecutorDX11<TVertex>::GetIndexCount()
 {
 	return( IndexBuffer.GetIndexCount() );
 }
 //--------------------------------------------------------------------------------
-unsigned int IndexedImmediateGeometryDX11::GetPrimitiveCount()
+template <class TVertex>
+unsigned int DrawIndexedExecutorDX11<TVertex>::GetPrimitiveCount()
 {
 	unsigned int count = 0;
 	unsigned int referencedIndices = IndexBuffer.GetIndexCount();

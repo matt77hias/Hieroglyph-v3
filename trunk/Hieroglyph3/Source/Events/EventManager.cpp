@@ -29,11 +29,11 @@ EventManager::~EventManager()
 {
 	// TODO: Detach any remaining event handlers that were being serviced
 
-	//for ( int e = 0; e < NUM_EVENTS; e++ ) {
-	//	for ( int i = 0; i < m_EventHandlers[e].count(); i++ ) {
-
-	//	}
-	//}
+	for ( unsigned int e = 0; e < NUM_EVENTS; e++ ) {
+		for ( unsigned int i = 0; i < m_EventHandlers[e].size(); i++ ) {
+			m_EventHandlers[e][i]->SetEventManager( nullptr );
+		}
+	}
 }
 //--------------------------------------------------------------------------------
 EventManager* EventManager::Get()
@@ -46,7 +46,7 @@ bool EventManager::AddEventListener( eEVENT EventID, IEventListener* pListener )
 	if ( EventID >= NUM_EVENTS )
 		return( false );
 
-	m_EventHandlers[EventID].add( pListener );
+	m_EventHandlers[EventID].push_back( pListener );
 
 	return( true );
 }
@@ -58,13 +58,17 @@ bool EventManager::DelEventListener( eEVENT EventID, IEventListener* pListener )
 
 	bool bResult = false;
 
-	int index = m_EventHandlers[EventID].find( pListener );		
-
-	if ( index != -1 )
+	int index = -1;
+	for ( std::vector< IEventListener* >::iterator it = m_EventHandlers[EventID].begin(); it != m_EventHandlers[EventID].end(); ++it )
 	{
-		m_EventHandlers[EventID].remove( index );
-		bResult = true;
+		if ( *it == pListener )
+		{
+			m_EventHandlers[EventID].erase( it );
+			bResult = true;
+			break;
+		}
 	}
+
 
 	return( bResult );
 }
@@ -75,11 +79,11 @@ bool EventManager::ProcessEvent( IEvent* pEvent )
 		return( false );
 
 	eEVENT e = pEvent->GetEventType();
-	int num = m_EventHandlers[e].count();
+	unsigned int num = m_EventHandlers[e].size();
 
 	bool bHandled = false;
 
-	for ( int i = 0; i < num; i++ )
+	for ( unsigned int i = 0; i < num; i++ )
 	{
 		bHandled = m_EventHandlers[e][i]->HandleEvent( pEvent );
 		if ( bHandled )
@@ -126,14 +130,14 @@ bool EventManager::HandleEvent( IEvent* pEvent )
 		return( false );
 
 	eEVENT e = pEvent->GetEventType();
-	int num = m_EventHandlers[e].count();
+	UINT num = m_EventHandlers[e].size();
 
 	bool bHandled = false;
 
 	// Loop through each listener and allow them to handle the event.  Halt the
 	// processing if the event is handled.
 
-	for ( int i = 0; i < num; i++ )
+	for ( unsigned int i = 0; i < num; i++ )
 	{
 		bHandled = m_EventHandlers[e][i]->HandleEvent( pEvent );
 		if ( bHandled )

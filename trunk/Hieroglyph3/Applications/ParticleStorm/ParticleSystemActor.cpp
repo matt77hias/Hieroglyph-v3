@@ -84,7 +84,7 @@ ParticleSystemActor::ParticleSystemActor()
 	// Enable the material to render the given view type, and set its effect.
 	m_pMaterial->Params[VT_PERSPECTIVE].bRender = true;
 	m_pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
-	m_pMaterial->Params[VT_PERSPECTIVE].vViews.add( m_pSimulation );
+	m_pMaterial->Params[VT_PERSPECTIVE].vViews.push_back( m_pSimulation );
 
 
 	// Create and attach the needed render parameters to the entity.  This consists of

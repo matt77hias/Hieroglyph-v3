@@ -22,6 +22,7 @@
 #include "RotationController.h"
 
 #include "VectorParameterDX11.h"
+#include "BasicVertexDX11.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -66,35 +67,11 @@ void App::Initialize()
 
 	// Create the actor to hold the immediate geometry.  
 
-	m_pActor = new Actor();
-	m_pScene->AddActor( m_pActor );
-	m_pActor->GetNode()->Position() = Vector3f( -3.0, 0.0f, 0.0f );
-
-	m_pGeometry = ImmediateGeometryPtr( new ImmediateGeometryDX11() );
-	m_pGeometry->SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
-	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-	
-	m_pActor->GetBody()->SetGeometry( m_pGeometry );
-	//m_pActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *m_pRenderer11 ) );
-	m_pActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( *m_pRenderer11 ) );
-
-	// Throw a rotation onto the actor to slowly rotate it about the Y-axis.
-	RotationController* pRotController = new RotationController();
-	m_pActor->GetNode()->AttachController( pRotController );
-
-
-
-	m_pIndexedActor = new Actor();
+	m_pIndexedActor = new GeometryActor();
 	m_pScene->AddActor( m_pIndexedActor );
 	m_pIndexedActor->GetNode()->Position() = Vector3f( 3.0, 0.0f, 0.0f );
-
-	m_pIndexedGeometry = IndexedImmediateGeometryPtr( new IndexedImmediateGeometryDX11() );
-	m_pIndexedGeometry->SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
-	m_pIndexedGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-	
-	m_pIndexedActor->GetBody()->SetGeometry( m_pIndexedGeometry );
-	//m_pIndexedActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *m_pRenderer11 ) );
-	m_pIndexedActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( *m_pRenderer11 ) );
+	m_pIndexedActor->SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_pIndexedActor->UseTexturedMaterial( m_pRenderer11->LoadTexture( L"EyeOfHorus_128.png" ) );
 
 	// Throw a rotation onto the actor to slowly rotate it about the Y-axis.
 	RotationController* pIndexedRotController = new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), -0.1f );
@@ -179,8 +156,6 @@ void App::Update()
 	//
 	// In this case, I am animating a paraboloid shape as well as its color.
 	
-	m_pGeometry->ResetGeometry();
-
 	const int GRIDSIZE = 20;
 	const float fGRIDSIZE = static_cast<float>( GRIDSIZE );
 	const float ELEMSIZE = 1.0f;
@@ -192,54 +167,9 @@ void App::Update()
 
 	float fScaling = 0.25f * sinf( m_pTimer->Runtime() * 0.75f );
 
-	Vector4f TopColor = Vector4f( 0.25f, 1.0f, 1.0f, 1.0f );
-	Vector4f BotColor = Vector4f( 1.0f, 0.25f, 0.25f, 1.0f );
-
-	float fColorScale = 0.5f * cosf( m_pTimer->Runtime() * 11.0f ) + 0.5f;
-	m_pGeometry->SetColor( TopColor * fColorScale + BotColor * ( 1.0f - fColorScale ) );
-
-	for ( int z = 0; z < GRIDSIZE; z++ ) {
-		for ( int x = 0; x < GRIDSIZE; x++ ) {
-			
-			float fX = static_cast<float>( x - GRIDSIZE / 2 );
-			float fZ = static_cast<float>( z - GRIDSIZE / 2 );
-			float boundScale = static_cast<float>( GRIDSIZE / 2 );
-
-			v0.x = fX + 0.0f*ELEMSIZE;
-			v0.z = fZ + 0.0f*ELEMSIZE;
-			v0.y = ( 5.0f - 0.2f * ( v0.x*v0.x + v0.z*v0.z ) ) * fScaling;
-			uv0.x =        ( v0.x + ( fGRIDSIZE / 2.0f ) ) / fGRIDSIZE;
-			uv0.y = 1.0f - ( v0.z + ( fGRIDSIZE / 2.0f ) ) / fGRIDSIZE;
-			n0 = Vector3f( v0.x / boundScale, 1.0f, v0.z / boundScale );
-			n0.Normalize();
-
-			v1.x = fX + 0.0f*ELEMSIZE;
-			v1.z = fZ + 1.0f*ELEMSIZE;
-			v1.y = ( 5.0f - 0.2f * ( v1.x*v1.x + v1.z*v1.z ) ) * fScaling;
-			uv1.x =        ( v1.x + ( fGRIDSIZE / 2.0f ) ) / fGRIDSIZE;
-			uv1.y = 1.0f - ( v1.z + ( fGRIDSIZE / 2.0f ) ) / fGRIDSIZE;
-			n1 = Vector3f( v1.x / boundScale, 1.0f, v1.z / boundScale );
-			n1.Normalize();
-
-			v2.x = fX + 1.0f*ELEMSIZE;
-			v2.z = fZ + 0.0f*ELEMSIZE;
-			v2.y = ( 5.0f - 0.2f * ( v2.x*v2.x + v2.z*v2.z ) ) * fScaling;
-			uv2.x =        ( v2.x + ( fGRIDSIZE / 2.0f ) ) / fGRIDSIZE;
-			uv2.y = 1.0f - ( v2.z + ( fGRIDSIZE / 2.0f ) ) / fGRIDSIZE;
-			n2 = Vector3f( v2.x / boundScale, 1.0f, v2.z / boundScale );
-			n2.Normalize();
-
-			m_pGeometry->AddVertex( v0 * fSIZESCALE, n0, uv0 );
-			m_pGeometry->AddVertex( v1 * fSIZESCALE, n1, uv1 );
-			m_pGeometry->AddVertex( v2 * fSIZESCALE, n2, uv2 );
-
-		}
-	}
-
-
 	// Do some indexed immediate rendering by creating a grid of vertices first...
 
-	m_pIndexedGeometry->ResetGeometry();
+	m_pIndexedActor->ResetGeometry();
 
 	for ( int z = 0; z < GRIDSIZE; z++ ) {
 		for ( int x = 0; x < GRIDSIZE; x++ ) {
@@ -253,7 +183,7 @@ void App::Update()
 			uv0.x =        ( fX ) / ( fGRIDSIZE-1 );
 			uv0.y = 1.0f - ( fZ ) / ( fGRIDSIZE-1 );
 
-			m_pIndexedGeometry->AddVertex( v0 * fSIZESCALE, uv0 );
+			m_pIndexedActor->AddVertex( v0 * fSIZESCALE, uv0 );
 		}
 	}
 
@@ -263,13 +193,13 @@ void App::Update()
 	for ( int z = 0; z < GRIDSIZE-1; z++ ) {
 		for ( int x = 0; x < GRIDSIZE-1; x++ ) {
 
-			m_pIndexedGeometry->AddIndex( (z*GRIDSIZE + x) );
-			m_pIndexedGeometry->AddIndex( (z*GRIDSIZE + x) + GRIDSIZE );
-			m_pIndexedGeometry->AddIndex( (z*GRIDSIZE + x) + 1 );
+			m_pIndexedActor->AddIndex( (z*GRIDSIZE + x) );
+			m_pIndexedActor->AddIndex( (z*GRIDSIZE + x) + GRIDSIZE );
+			m_pIndexedActor->AddIndex( (z*GRIDSIZE + x) + 1 );
 
-			m_pIndexedGeometry->AddIndex( (z*GRIDSIZE + x) + 1 );
-			m_pIndexedGeometry->AddIndex( (z*GRIDSIZE + x) + GRIDSIZE );
-			m_pIndexedGeometry->AddIndex( (z*GRIDSIZE + x) + GRIDSIZE + 1 );
+			m_pIndexedActor->AddIndex( (z*GRIDSIZE + x) + 1 );
+			m_pIndexedActor->AddIndex( (z*GRIDSIZE + x) + GRIDSIZE );
+			m_pIndexedActor->AddIndex( (z*GRIDSIZE + x) + GRIDSIZE + 1 );
 		}
 	}
 

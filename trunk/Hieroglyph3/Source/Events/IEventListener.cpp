@@ -26,26 +26,31 @@ IEventListener::IEventListener()
 //--------------------------------------------------------------------------------
 IEventListener::~IEventListener()
 {
-	// Disconnect from any events that may have been requested before.
+	// Disconnect from any events that may have been requested before.  This is
+	// accomplished by setting the event manager to null, which will automatically
+	// de-register all of this object's event listeners from it.
 
-	if ( m_pEventManager ) {
-		for ( int i = 0; i < m_RequestedEvents.count(); i++ ) {
-			m_pEventManager->DelEventListener( m_RequestedEvents[i], this );
-		}
-	}
+	SetEventManager( nullptr );
 }
 //--------------------------------------------------------------------------------
 void IEventListener::RequestEvent( eEVENT e )
 {
 	// Check if this event has already been requested
-	if ( m_RequestedEvents.contains( e ) ) {
+	bool bAlreadyRequested = false;
+
+	for ( auto requested : m_RequestedEvents ) {
+		if ( requested == e )
+			bAlreadyRequested = true;
+	}
+
+	if ( bAlreadyRequested ) {
 		
 		Log::Get().Write( L"WARNING: Trying to request an event that has already been added!!!" );
 	
 	} else {
 	
 		// If it isn't already there, then add it to the list of events to receive
-		m_RequestedEvents.add( e );
+		m_RequestedEvents.push_back( e );
 
 		// Request the event from the currently assigned event manager
 		if ( m_pEventManager ) {
@@ -56,30 +61,31 @@ void IEventListener::RequestEvent( eEVENT e )
 //--------------------------------------------------------------------------------
 void IEventListener::UnRequestEvent( eEVENT e )
 {
-	// Check if this event has already been requested
-	if ( !m_RequestedEvents.contains( e ) ) {
-		
-		Log::Get().Write( L"WARNING: Trying to un-request an event that hasn't already been added!!!" );
-	
-	} else {
+	// Remove any instances of the event from the requested list.
 
-		// If so, then remove it from the list
-		m_RequestedEvents.remove( m_RequestedEvents.find( e ) );
-
-		// Remove the event from the currently assigned event manager
-		if ( m_pEventManager ) {
-			m_pEventManager->DelEventListener( e, this );
+	for ( std::vector<eEVENT>::iterator it = m_RequestedEvents.begin(); it != m_RequestedEvents.end(); ++it )
+	{
+		if ( *it == e )
+		{
+			it = m_RequestedEvents.erase( it );
 		}
+	}
+
+	// Remove the event from the currently assigned event manager
+	if ( m_pEventManager )
+	{
+		m_pEventManager->DelEventListener( e, this );
 	}
 }
 //--------------------------------------------------------------------------------
 void IEventListener::SetEventManager( EventManager* pEventManager )
 {
 	// Remove any currently requested events from the existing event manager
-	
-	if ( m_pEventManager ) {
-		for ( int i = 0; i < m_RequestedEvents.count(); i++ ) {
-			m_pEventManager->DelEventListener( m_RequestedEvents[i], this );
+	if ( m_pEventManager )
+	{
+		for ( auto e : m_RequestedEvents )
+		{
+			m_pEventManager->DelEventListener( e, this );
 		}
 	}
 
@@ -87,9 +93,11 @@ void IEventListener::SetEventManager( EventManager* pEventManager )
 	m_pEventManager = pEventManager;
 
 	// Request all of the desired events from the new event manager
-	if ( m_pEventManager ) {
-		for ( int i = 0; i < m_RequestedEvents.count(); i++ ) {
-			m_pEventManager->AddEventListener( m_RequestedEvents[i], this );
+	if ( m_pEventManager ) 
+	{
+		for ( auto e : m_RequestedEvents )
+		{
+			m_pEventManager->AddEventListener( e, this );
 		}
 	}
 }

@@ -18,7 +18,6 @@
 #define Node3D_h
 //--------------------------------------------------------------------------------
 #include "Entity3D.h"
-#include "TArray.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -35,19 +34,19 @@ namespace Glyph3
 
 		void AttachChild( Entity3D* Child );
 		void DetachChild( Entity3D* Child );
-		Entity3D* GetChild( int index );
+		Entity3D* GetChild( unsigned int index );
 
 		virtual void GetIntersectingEntities( std::vector< Entity3D* >& set, Sphere3f& bounds );
 		virtual void GetIntersectingEntities( std::vector< Entity3D* >& set, Frustum3f& bounds );
 		
-		virtual void GetEntities( TArray< Entity3D* >& set );
+		virtual void GetEntities( std::vector< Entity3D* >& set );
 
-		virtual void BuildPickRecord( Ray3f& ray, TArray<PickRecord>& record );
+		virtual void BuildPickRecord( Ray3f& ray, std::vector<PickRecord>& record );
 
 		virtual std::string toString( );
 
 	protected:
-		TArray< Entity3D* > m_vChildren;
+		std::vector< Entity3D* > m_vChildren;
 
 	};
 };

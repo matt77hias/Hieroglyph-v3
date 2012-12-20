@@ -12,7 +12,7 @@
 // DXGIOutput
 //
 //--------------------------------------------------------------------------------
-#include "RendererDX11.h"
+#include "PCH.h"
 //--------------------------------------------------------------------------------
 #ifndef DXGIOutput_h
 #define DXGIOutput_h
@@ -28,7 +28,7 @@ namespace Glyph3
 	protected:
 		IDXGIOutput*	m_pOutput;
 
-		friend RendererDX11;
+		friend class RendererDX11;
 	};
 };
 //--------------------------------------------------------------------------------

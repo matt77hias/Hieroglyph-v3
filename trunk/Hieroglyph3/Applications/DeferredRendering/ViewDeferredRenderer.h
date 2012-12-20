@@ -61,26 +61,26 @@ namespace Glyph3
 
 	protected:
 
-        int						m_iCurrentViewport;
-		int						ResolutionX;
-		int						ResolutionY;
+        int							m_iCurrentViewport;
+		int							ResolutionX;
+		int							ResolutionY;
 
-        float					m_fNearClip;
-        float					m_fFarClip;
+        float						m_fNearClip;
+        float						m_fFarClip;
 
-		TArray<ResourcePtr>		m_GBuffer[GBufferOptMode::NumSettings][AAMode::NumSettings];
-		ResourcePtr				m_DepthTarget[AAMode::NumSettings];
-		ResourcePtr             m_ReadOnlyDepthTarget[AAMode::NumSettings];
-		ResourcePtr             m_FinalTarget[AAMode::NumSettings];
-		int                     m_iViewport[AAMode::NumSettings];
-		ResourcePtr             m_ResolveTarget;
-		ResourcePtr				m_BackBuffer;
+		std::vector<ResourcePtr>	m_GBuffer[GBufferOptMode::NumSettings][AAMode::NumSettings];
+		ResourcePtr					m_DepthTarget[AAMode::NumSettings];
+		ResourcePtr					m_ReadOnlyDepthTarget[AAMode::NumSettings];
+		ResourcePtr					m_FinalTarget[AAMode::NumSettings];
+		int							m_iViewport[AAMode::NumSettings];
+		ResourcePtr					m_ResolveTarget;
+		ResourcePtr					m_BackBuffer;
 
-		ViewGBuffer*			m_pGBufferView;
-		ViewLights*				m_pLightsView;
+		ViewGBuffer*				m_pGBufferView;
+		ViewLights*					m_pLightsView;
 
-		SpriteRendererDX11		m_SpriteRenderer;
-		SpriteFontDX11			m_Font;
+		SpriteRendererDX11			m_SpriteRenderer;
+		SpriteFontDX11				m_Font;
 
 	};
 };

@@ -20,31 +20,6 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 KinectSkeletonActor::KinectSkeletonActor()
 {
-	// Utilize a common geometry and material for our joints
-	//GeometryPtr pGeometry = GeometryLoaderDX11::loadMS3DFile2( L"small_box.ms3d" );
-    //pGeometry->LoadToBuffers();
-    //pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-
-	//MaterialPtr pMaterial = MaterialGeneratorDX11::GeneratePhong( *RendererDX11::Get() );
-
-	// Loop and creat one entity for each joint
-	//for ( int i = 0; i < NUI_SKELETON_POSITION_COUNT; i++ ) {
-		
-		// Create an entity, and specify its geometry and material
-		//Entity3D* pEntity = new Entity3D();
-		//pEntity->SetGeometry( pGeometry );
-		//pEntity->SetMaterial( pMaterial );
-
-		// Attach the entities to the node of the actor.
-		//GetNode()->AttachChild( pEntity );
-
-		// We add the joint entity to a list so that we can access it later on.
-		//m_Joints.add( pEntity );
-
-		// Adding the entity as an element will automatically release it 
-		// when the actor is destroyed.
-		//AddElement( pEntity );
-	//}
 }
 //--------------------------------------------------------------------------------
 KinectSkeletonActor::~KinectSkeletonActor()
@@ -112,14 +87,5 @@ void KinectSkeletonActor::DrawLinkage( NUI_SKELETON_DATA* pData, NUI_SKELETON_PO
 				   pData->SkeletonPositions[i2].z );
 
 	DrawCylinder( p1, p2, 0.015f, 0.015f );
-}
-//--------------------------------------------------------------------------------
-Entity3D* KinectSkeletonActor::GetJointEntity( unsigned int joint )
-{
-	if ( joint < NUI_SKELETON_POSITION_COUNT ) {
-		return( m_Joints[joint] );
-	} else {
-		return( 0 );
-	}
 }
 //--------------------------------------------------------------------------------

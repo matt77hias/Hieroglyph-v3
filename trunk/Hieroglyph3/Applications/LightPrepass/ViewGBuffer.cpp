@@ -80,7 +80,7 @@ ViewGBuffer::ViewGBuffer( RendererDX11& Renderer )
 
 	m_pGBufferTexture = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"GBufferTexture" ) );
 
-	m_QuadGeometry->GetInputLayout( m_MaskEffect.GetVertexShader() );
+	m_QuadGeometry->GenerateInputLayout( m_MaskEffect.GetVertexShader() );
 }
 //--------------------------------------------------------------------------------
 ViewGBuffer::~ViewGBuffer()

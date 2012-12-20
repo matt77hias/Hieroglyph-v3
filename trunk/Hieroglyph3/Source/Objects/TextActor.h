@@ -31,11 +31,14 @@
 #define TextActor_h
 //--------------------------------------------------------------------------------
 #include "Actor.h"
-#include "IndexedImmediateGeometryDX11.h"
+#include "DrawIndexedExecutorDX11.h"
 #include "SpriteFontDX11.h"
+#include "BasicVertexDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
+	typedef std::shared_ptr<DrawIndexedExecutorDX11<BasicVertexDX11::Vertex>> IndexedImmediateGeometryPtr;
+
 	class TextActor : public Actor
 	{
 	public:
@@ -79,6 +82,9 @@ namespace Glyph3
 		void SetFont( SpriteFontDX11* pFont );
 		void SetCharacterHeight( float scale );
 		
+	private:
+		void AddVertex( const Vector3f& position, const Vector2f& texcoords );
+
 	protected:
 		
 		std::wstring							m_sText;
@@ -88,6 +94,8 @@ namespace Glyph3
 		Vector3f								m_Cursor;
 		Vector3f								m_xdir;
 		Vector3f								m_ydir;
+
+		Vector4f								m_Color;
 
 		IndexedImmediateGeometryPtr				m_pGeometry;
 		MaterialPtr								m_pMaterial;

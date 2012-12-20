@@ -99,13 +99,13 @@ void ViewParaboloidEnvMap::PreDraw( RendererDX11* pRenderer )
 
 		if ( m_pRoot )
 		{
-			TArray<Entity3D*> set;
+			std::vector<Entity3D*> set;
 			m_pRoot->GetEntities( set );
 
-			for ( int i = 0; i < set.count(); i++ )
+			for ( auto pEntity : set )
 			{
-				if ( set[i] != this->m_pEntity )
-					set[i]->PreRender( pRenderer, GetType() );
+				if ( pEntity != this->m_pEntity )
+					pEntity->PreRender( pRenderer, GetType() );
 			}
 		}
 	}
@@ -135,13 +135,13 @@ void ViewParaboloidEnvMap::Draw( PipelineManagerDX11* pPipelineManager, IParamet
 		SetRenderParams( pParamManager );
 
 		// Run through the graph and render each of the entities
-		TArray<Entity3D*> set;
+		std::vector<Entity3D*> set;
 		m_pRoot->GetEntities( set );
 
-		for ( int i = 0; i < set.count(); i++ )
+		for ( auto pEntity : set )
 		{
-			if ( set[i] != this->m_pEntity )
-				set[i]->Render( pPipelineManager, pParamManager, GetType() );
+			if ( pEntity != this->m_pEntity )
+				pEntity->Render( pPipelineManager, pParamManager, GetType() );
 		}
 
 		pPipelineManager->ClearRenderTargets();

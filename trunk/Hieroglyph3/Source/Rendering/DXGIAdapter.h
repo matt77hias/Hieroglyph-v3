@@ -12,14 +12,15 @@
 // DXGIAdapter
 //
 //--------------------------------------------------------------------------------
-#include "RendererDX11.h"
-#include "DXGIOutput.h"
+#include "PCH.h"
 //--------------------------------------------------------------------------------
 #ifndef DXGIAdapter_h
 #define DXGIAdapter_h
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
+	class DXGIOutput;
+
 	class DXGIAdapter
 	{
 	public:
@@ -27,10 +28,10 @@ namespace Glyph3
 		virtual ~DXGIAdapter();
 
 	protected:
-		IDXGIAdapter1*			m_pAdapter;
-		TArray<DXGIOutput*>		m_vOutputs;
+		IDXGIAdapter1*				m_pAdapter;
+		std::vector<DXGIOutput*>	m_vOutputs;
 
-		friend RendererDX11;
+		friend class RendererDX11;
 	};
 };
 //--------------------------------------------------------------------------------

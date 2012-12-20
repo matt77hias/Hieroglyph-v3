@@ -23,8 +23,8 @@ Scene::Scene()
 Scene::~Scene()
 {
 	// Delete all the actors that have been added to the scene.
-	for ( int i = 0; i < m_vActors.count(); i++ ) {
-		SAFE_DELETE( m_vActors[i] );
+	for ( auto pActor : m_vActors ) {
+		SAFE_DELETE( pActor );
 	}
 
 	delete m_pRoot;
@@ -48,16 +48,16 @@ void Scene::Render( RendererDX11* pRenderer )
 	// Render here!  Each camera should use it's render view to create an
 	// appropriate image.
 
-	for ( int i = 0; i < m_vCameras.count(); i++ )
+	for ( auto pCamera : m_vCameras )
 	{
 		Parameters.InitRenderParams();
-		m_vCameras[i]->RenderFrame( pRenderer );
+		pCamera->RenderFrame( pRenderer );
 	}
 }
 //--------------------------------------------------------------------------------
 void Scene::AddCamera( Camera* camera )
 {
-	m_vCameras.add( camera );
+	m_vCameras.push_back( camera );
 	camera->SetScene( this );
 	AddActor( camera );
 }
@@ -68,10 +68,10 @@ void Scene::AddActor( Actor* actor )
 	// for cleanup later on.
 
 	m_pRoot->AttachChild( actor->GetNode() );
-	m_vActors.add( actor );
+	m_vActors.push_back( actor );
 }
 //--------------------------------------------------------------------------------
-void Scene::BuildPickRecord( Ray3f& ray, TArray<PickRecord>& record )
+void Scene::BuildPickRecord( Ray3f& ray, std::vector<PickRecord>& record )
 {
 	m_pRoot->BuildPickRecord( ray, record );
 }

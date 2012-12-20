@@ -67,13 +67,10 @@ namespace Glyph3
 		virtual ~KinectSkeletonActor();
 
 		void UpdateSkeleton( NUI_SKELETON_DATA* pData );
-		Entity3D* GetJointEntity( unsigned int joint );
 
 	private:
 		void DrawLinkage( NUI_SKELETON_DATA* pData, NUI_SKELETON_POSITION_INDEX i1, NUI_SKELETON_POSITION_INDEX i2 );
 
-	protected:
-		TArray<Entity3D*>		m_Joints;
 	};
 };
 //--------------------------------------------------------------------------------

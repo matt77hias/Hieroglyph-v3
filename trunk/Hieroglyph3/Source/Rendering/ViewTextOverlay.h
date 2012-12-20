@@ -66,7 +66,7 @@ namespace Glyph3
 		SpriteFontDX11*			m_pSpriteFont;
 		SpriteRendererDX11*		m_pSpriteRenderer;
 		
-		TArray<TextEntry>		m_TextEntries;
+		std::vector<TextEntry>	m_TextEntries;
 	};
 };
 //--------------------------------------------------------------------------------

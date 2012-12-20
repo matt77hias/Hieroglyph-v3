@@ -79,7 +79,7 @@ void ViewTextOverlay::PreDraw( RendererDX11* pRenderer )
 //--------------------------------------------------------------------------------
 void ViewTextOverlay::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
-	if ( m_TextEntries.count() > 0 ) {
+	if ( m_TextEntries.size() > 0 ) {
 		// Set the parameters for rendering this view
 		pPipelineManager->ClearRenderTargets();
 		pPipelineManager->OutputMergerStage.DesiredState.SetRenderTarget( 0, m_RenderTarget->m_iResourceRTV );
@@ -93,13 +93,12 @@ void ViewTextOverlay::Draw( PipelineManagerDX11* pPipelineManager, IParameterMan
 		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilState( 0 );
 		pPipelineManager->OutputMergerStage.DesiredState.SetBlendState( 0 );
 
-		for ( int i = 0; i < m_TextEntries.count(); i++ )
+		for ( auto entry : m_TextEntries )
 		{
-			TextEntry t = m_TextEntries[i];
-			m_pSpriteRenderer->RenderText( pPipelineManager, pParamManager, *m_pSpriteFont, t.text.c_str(), t.xform, t.color );
+			m_pSpriteRenderer->RenderText( pPipelineManager, pParamManager, *m_pSpriteFont, entry.text.c_str(), entry.xform, entry.color );
 		}
 
-		m_TextEntries.empty();
+		m_TextEntries.clear();
 	}
 }
 //--------------------------------------------------------------------------------
@@ -131,6 +130,6 @@ void ViewTextOverlay::SetUsageParams( IParameterManager* pParamManager )
 //--------------------------------------------------------------------------------
 void ViewTextOverlay::WriteText( std::wstring& text, Matrix4f& xform, Vector4f& color )
 {
-	m_TextEntries.add( TextEntry( text, xform, color ) );
+	m_TextEntries.push_back( TextEntry( text, xform, color ) );
 }
 //--------------------------------------------------------------------------------

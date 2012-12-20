@@ -101,9 +101,9 @@ namespace Glyph3
         int                     m_iSpotLightIL;
         int                     m_iDirectionalLightIL;
 
-        TArray<Light>           m_PointLights;
-        TArray<Light>           m_SpotLights;
-        TArray<Light>           m_DirectionalLights;
+        std::vector<Light>      m_PointLights;
+        std::vector<Light>      m_SpotLights;
+        std::vector<Light>      m_DirectionalLights;
         Matrix4f                m_WorldMatrix;
 
 		MatrixParameterDX11*	m_pInvProjMatrix;

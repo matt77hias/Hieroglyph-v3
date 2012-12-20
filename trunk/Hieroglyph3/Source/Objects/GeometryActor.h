@@ -16,10 +16,13 @@
 #define GeometryActor_h
 //--------------------------------------------------------------------------------
 #include "Actor.h"
-#include "IndexedImmediateGeometryDX11.h"
+#include "BasicVertexDX11.h"
+#include "DrawIndexedExecutorDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
+	typedef std::shared_ptr<DrawIndexedExecutorDX11<BasicVertexDX11::Vertex>> IndexedImmediateGeometryPtr;
+
 	class GeometryActor : public Actor
 	{
 	public:
@@ -28,8 +31,24 @@ namespace Glyph3
 
 		void ResetGeometry();
 
-		void SetColor( const Vector4f& color );
-		
+		// Low level vertex manipulation can be performed with these methods.
+
+		void AddVertex( const Vector3f& position );
+		void AddVertex( const Vector3f& position, const Vector4f& color );
+		void AddVertex( const Vector3f& position, const Vector2f& texcoords );
+		void AddVertex( const Vector3f& position, const Vector4f& color, const Vector2f& texcoords );
+
+		void AddVertex( const Vector3f& position, const Vector3f& normal );
+		void AddVertex( const Vector3f& position, const Vector3f& normal, const Vector4f& color );
+		void AddVertex( const Vector3f& position, const Vector3f& normal, const Vector2f& texcoords );
+		void AddVertex( const Vector3f& position, const Vector3f& normal, const Vector4f& color, const Vector2f& texcoords );
+
+		void AddIndex( const unsigned int index );
+		void AddIndices( const unsigned int i1, const unsigned int i2 );
+		void AddIndices( const unsigned int i1, const unsigned int i2, const unsigned int i3 );
+
+		// Higher level geometric object manipulation can be performed with these methods.
+
 		void DrawSphere( const Vector3f& center, float radius, unsigned int stacks = 6, unsigned int slices = 12 );
 		void DrawDisc( const Vector3f& center, const Vector3f& normal, float radius, unsigned int slices = 12 );
 		void DrawCylinder( const Vector3f& p1, const Vector3f& p2, float r1, float r2, unsigned int stacks = 2, unsigned int slices = 10 );
@@ -40,11 +59,16 @@ namespace Glyph3
 
 		void UseSolidMaterial();
 		void UseTexturedMaterial( ResourcePtr texture = nullptr );
+		
+		void SetColor( const Vector4f& color );
+		Vector4f GetColor( );
 
 	protected:
 		IndexedImmediateGeometryPtr				m_pGeometry;
 		MaterialPtr								m_pSolidMaterial;
 		MaterialPtr								m_pTexturedMaterial;
+
+		Vector4f								m_Color;
 	};
 };
 //--------------------------------------------------------------------------------

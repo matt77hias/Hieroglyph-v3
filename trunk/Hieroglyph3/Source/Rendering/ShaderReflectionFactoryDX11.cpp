@@ -64,13 +64,13 @@ ShaderReflectionDX11* ShaderReflectionFactoryDX11::GenerateReflection( ShaderDX1
 	{
 		D3D11_SIGNATURE_PARAMETER_DESC input_desc;
 		pReflector->GetInputParameterDesc( i, &input_desc );
-		pReflection->InputSignatureParameters.add( input_desc );
+		pReflection->InputSignatureParameters.push_back( input_desc );
 	}
 	for ( UINT i = 0; i < desc.OutputParameters; i++ )
 	{
 		D3D11_SIGNATURE_PARAMETER_DESC output_desc;
 		pReflector->GetOutputParameterDesc( i, &output_desc );
-		pReflection->OutputSignatureParameters.add( output_desc );
+		pReflection->OutputSignatureParameters.push_back( output_desc );
 	}
 
 
@@ -99,14 +99,14 @@ ShaderReflectionDX11* ShaderReflectionFactoryDX11::GenerateReflection( ShaderDX1
 				D3D11_SHADER_VARIABLE_DESC var_desc;
 				pVariable->GetDesc( &var_desc );
 
-				BufferLayout.Variables.add( var_desc );
+				BufferLayout.Variables.push_back( var_desc );
 
 				// Get the variable type description and store it
 				ID3D11ShaderReflectionType* pType = pVariable->GetType();
 				D3D11_SHADER_TYPE_DESC type_desc;
 				pType->GetDesc( &type_desc );
 
-				BufferLayout.Types.add( type_desc );
+				BufferLayout.Types.push_back( type_desc );
 
 				// Get references to the parameters for binding to these variables.
 				RenderParameterDX11* pParam = 0;
@@ -129,10 +129,10 @@ ShaderReflectionDX11* ShaderReflectionFactoryDX11::GenerateReflection( ShaderDX1
 					}
 				}
 
-				BufferLayout.Parameters.add( pParam );
+				BufferLayout.Parameters.push_back( pParam );
 			}
 
-			pReflection->ConstantBuffers.add( BufferLayout );
+			pReflection->ConstantBuffers.push_back( BufferLayout );
 		}
 	}
 
@@ -168,7 +168,7 @@ ShaderReflectionDX11* ShaderReflectionFactoryDX11::GenerateReflection( ShaderDX1
 		}
 
 
-		pReflection->ResourceBindings.add( binddesc );
+		pReflection->ResourceBindings.push_back( binddesc );
 	}
 
 

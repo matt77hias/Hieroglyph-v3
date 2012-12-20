@@ -85,7 +85,7 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 	
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
 	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
-	pMaterial->Params[VT_PERSPECTIVE].vViews.add( m_pParaboloidView );
+	pMaterial->Params[VT_PERSPECTIVE].vViews.push_back( m_pParaboloidView );
 
 	
 	// Create and fill the effect that will be used for a reflective object 
@@ -113,7 +113,7 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 	
 	pMaterial->Params[VT_DUAL_PARABOLOID_ENVMAP].bRender = true;
 	pMaterial->Params[VT_DUAL_PARABOLOID_ENVMAP].pEffect = pParabGenEffect;
-	pMaterial->Params[VT_DUAL_PARABOLOID_ENVMAP].vViews.add( m_pParaboloidView );
+	pMaterial->Params[VT_DUAL_PARABOLOID_ENVMAP].vViews.push_back( m_pParaboloidView );
 
 	SamplerStateConfigDX11 SamplerConfig;
 	SamplerConfig.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;

@@ -15,7 +15,6 @@
 #define AnimationStream_h
 //--------------------------------------------------------------------------------
 #include "PCH.h"
-#include "TArray.h"
 #include "Vector3f.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
@@ -73,20 +72,20 @@ namespace Glyph3
 		T& GetState();
 
 		void AddAnimation( Animation& animation );
-		void PlayAnimation( int index );
+		void PlayAnimation( unsigned int index );
 		void PlayAnimation( std::wstring& name );
 		void PlayAllAnimations( );
 
 	protected:
-		TArray<AnimationState<T>>	m_vStates;
-		T							m_kCurrState;
-		int							m_iCurrFrame;
-		int							m_iEndFrame;
+		std::vector<AnimationState<T>>	m_vStates;
+		T								m_kCurrState;
+		unsigned int					m_uiCurrFrame;
+		unsigned int 					m_uiEndFrame;
 
-		bool						m_bRunning;
-		float						m_fAnimationTime;
+		bool							m_bRunning;
+		float							m_fAnimationTime;
 
-		TArray<Animation>			m_vAnimations;
+		std::vector<Animation>			m_vAnimations;
 	};
 };
 //--------------------------------------------------------------------------------

@@ -23,8 +23,8 @@ ParameterContainer::ParameterContainer()
 //--------------------------------------------------------------------------------
 ParameterContainer::~ParameterContainer()
 {
-	for ( int i = 0; i < m_RenderParameters.count(); i++ )
-		delete m_RenderParameters[i];
+	for ( auto pParameter : m_RenderParameters )
+		delete pParameter;
 }
 //--------------------------------------------------------------------------------
 void ParameterContainer::AddRenderParameter( ParameterWriter* pWriter )
@@ -37,7 +37,7 @@ void ParameterContainer::AddRenderParameter( ParameterWriter* pWriter )
 		// Search the list to see if this parameter is already there
 		ParameterWriter* pCurr = 0;
 
-		for ( int i = 0; i < m_RenderParameters.count(); i++ )
+		for ( unsigned int i = 0; i < m_RenderParameters.size(); i++ )
 		{
 			if ( pWriter->GetRenderParameterRef()->GetName() == m_RenderParameters[i]->GetRenderParameterRef()->GetName() )
 			{
@@ -48,7 +48,7 @@ void ParameterContainer::AddRenderParameter( ParameterWriter* pWriter )
 
 		if ( !pCurr )
 		{
-			m_RenderParameters.add( pWriter );
+			m_RenderParameters.push_back( pWriter );
 		}
 		else
 		{
@@ -59,13 +59,12 @@ void ParameterContainer::AddRenderParameter( ParameterWriter* pWriter )
 //--------------------------------------------------------------------------------
 ParameterWriter* ParameterContainer::GetRenderParameter( const std::wstring& name )
 {
-	ParameterWriter* pResult = NULL;
+	ParameterWriter* pResult = nullptr;
 
-	for ( int i = 0; i < m_RenderParameters.count(); i++ ) {
-		ParameterWriter* pParameterWriter = m_RenderParameters[i];
-		
+	for ( auto pParameterWriter : m_RenderParameters )
+	{
 		RenderParameterDX11* pParameter = pParameterWriter->GetRenderParameterRef();
-		if ( pParameter != NULL ) {
+		if ( pParameter != nullptr ) {
 			if ( name.compare( pParameter->GetName() ) == 0 ) {
 				pResult = pParameterWriter;
 				break;
@@ -296,15 +295,15 @@ VectorParameterWriterDX11* ParameterContainer::GetVectorParameterWriter( const s
 void ParameterContainer::SetRenderParams( IParameterManager* pParamManager )
 {
 	// Scroll through each parameter and set it in the provided parameter manager.
-	for ( int i = 0; i < m_RenderParameters.count(); i++ )
-		m_RenderParameters[i]->WriteParameter( pParamManager );
+	for ( auto pParamWriter : m_RenderParameters )
+		pParamWriter->WriteParameter( pParamManager );
 }
 //--------------------------------------------------------------------------------
 void ParameterContainer::InitRenderParams( )
 {
 	// Scroll through each parameter and initialize its value.
-	for ( int i = 0; i < m_RenderParameters.count(); i++ )
-		m_RenderParameters[i]->InitializeParameter( );
+	for ( auto pParamWriter : m_RenderParameters )
+		pParamWriter->InitializeParameter( );
 }
 //--------------------------------------------------------------------------------
 ConstantBufferParameterWriterDX11* ParameterContainer::SetConstantBufferParameter( const std::wstring& name, ResourcePtr value )

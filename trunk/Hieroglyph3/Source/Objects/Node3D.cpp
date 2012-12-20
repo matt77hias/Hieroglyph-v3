@@ -25,19 +25,19 @@ Node3D::~Node3D()
 //--------------------------------------------------------------------------------
 void Node3D::PreRender( RendererDX11* pRenderer, VIEWTYPE view )
 {
-	for ( int i = 0; i < m_vChildren.count(); i++ )
+	for ( auto pChild : m_vChildren )
 	{
-		if ( m_vChildren[i] != NULL )
-            m_vChildren[i]->PreRender( pRenderer, view );
+		if ( pChild )
+            pChild->PreRender( pRenderer, view );
 	}
 }
 //--------------------------------------------------------------------------------
 void Node3D::Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view )
 {
-	for ( int i = 0; i < m_vChildren.count(); i++ )
+	for ( auto pChild : m_vChildren )
 	{
-		if ( m_vChildren[i] != NULL )
-			m_vChildren[i]->Render( pPipelineManager, pParamManager, view );
+		if ( pChild )
+			pChild->Render( pPipelineManager, pParamManager, view );
 	}
 }
 //--------------------------------------------------------------------------------
@@ -46,39 +46,39 @@ void Node3D::Update( float time )
 	UpdateLocal( time );
 	UpdateWorld( );
 
-	for ( int i = 0; i < m_vChildren.count(); i++ )
+	for ( auto pChild : m_vChildren )
 	{
-		if ( m_vChildren[i] != NULL )
-            m_vChildren[i]->Update( time );
+		if ( pChild )
+            pChild->Update( time );
 	}
 }
 //--------------------------------------------------------------------------------
 void Node3D::AttachChild( Entity3D* Child )
 {
 	// Check for open spots in the vector
-	for ( int i = 0; i < m_vChildren.count(); i++ )
+	for ( auto pChild : m_vChildren )
 	{
-		if ( m_vChildren[i] == NULL )
+		if ( pChild == nullptr )
 		{
-			m_vChildren[i] = Child;
+			pChild = Child;
 			Child->AttachParent( this );
 			return;
 		}
 	}
 
 	// If no open spots then add a new one
-	m_vChildren.add( Child );
+	m_vChildren.push_back( Child );
 	Child->AttachParent( this );
 }
 //--------------------------------------------------------------------------------
 void Node3D::DetachChild( Entity3D* Child )
 {
-	for ( int i = 0; i < m_vChildren.count(); i++ )
+	for ( auto pChild : m_vChildren )
 	{
-		if ( m_vChildren[i] == Child )
+		if ( pChild == Child )
 		{
-			m_vChildren[i]->DetachParent();
-			m_vChildren[i] = 0;
+			pChild->DetachParent();
+			pChild = nullptr;
 		}
 	}
 }
@@ -87,19 +87,19 @@ void Node3D::GetIntersectingEntities( std::vector< Entity3D* >& set, Frustum3f& 
 {
 	Entity3D::GetIntersectingEntities( set, bounds );
 
-	for ( int i = 0; i < m_vChildren.count(); i++ )
+	for ( auto pChild : m_vChildren )
 	{
-		if ( m_vChildren[i] != NULL)
-			m_vChildren[i]->GetIntersectingEntities( set, bounds );
+		if ( pChild )
+			pChild->GetIntersectingEntities( set, bounds );
 	}
 }
 //--------------------------------------------------------------------------------
 void Node3D::GetIntersectingEntities( std::vector< Entity3D* >& set, Sphere3f& bounds )
 {
-	for ( int i = 0; i < m_vChildren.count(); i++ )
+	for ( auto pChild : m_vChildren )
 	{
-		if ( m_vChildren[i] != NULL)
-			m_vChildren[i]->GetIntersectingEntities( set, bounds );
+		if ( pChild )
+			pChild->GetIntersectingEntities( set, bounds );
 	}
 }
 //--------------------------------------------------------------------------------
@@ -112,37 +112,37 @@ std::string Node3D::toString( )
 
 	objString << "Node3D : ID : " << m_iEntityID << "\n";
 
-	for ( int i = 0; i < m_vChildren.count(); i++ )
+	for ( auto pChild : m_vChildren )
 	{
-		if ( m_vChildren[i] != NULL)
-			objString << m_vChildren[i]->toString();
+		if ( pChild )
+			objString << pChild->toString();
 	}
 
 	return( objString.str() );
 }
 //--------------------------------------------------------------------------------
-void Node3D::BuildPickRecord( Ray3f& ray, TArray<PickRecord>& record )
+void Node3D::BuildPickRecord( Ray3f& ray, std::vector<PickRecord>& record )
 {
-	for ( int i = 0; i < m_vChildren.count(); i++ )
+	for ( auto pChild : m_vChildren )
 	{
-		if ( m_vChildren[i] != NULL )
-			m_vChildren[i]->BuildPickRecord( ray, record );
+		if ( pChild )
+			pChild->BuildPickRecord( ray, record );
 	}
 }
 //--------------------------------------------------------------------------------
-void Node3D::GetEntities( TArray< Entity3D* >& set )
+void Node3D::GetEntities( std::vector< Entity3D* >& set )
 {
-	for ( int i = 0; i < m_vChildren.count(); i++ )
+	for ( auto pChild : m_vChildren )
 	{
-		if ( m_vChildren[i] != NULL )
-			m_vChildren[i]->GetEntities( set );
+		if ( pChild )
+			pChild->GetEntities( set );
 	}
 }
 //--------------------------------------------------------------------------------
-Entity3D* Node3D::GetChild( int index )
+Entity3D* Node3D::GetChild( unsigned int index )
 {
-	if ( ( index < 0 ) || ( index >= m_vChildren.count() ) )
-		return( 0 );
+	if ( index >= m_vChildren.size() )
+		return( nullptr );
 	else
 		return( m_vChildren[index] );
 }

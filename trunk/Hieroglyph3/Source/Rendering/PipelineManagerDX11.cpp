@@ -47,6 +47,7 @@
 #include "IndirectArgsBufferDX11.h"
 
 #include "ScreenGrab.h"
+#include <wincodec.h>
 
 #include <sstream>
 //--------------------------------------------------------------------------------
@@ -239,24 +240,18 @@ void PipelineManagerDX11::BindSamplerStateParameter( ShaderType type, RenderPara
 				reinterpret_cast<SamplerParameterDX11*>( pParam );
 
 			int ID = pResource->GetIndex( tID ); 
-			SamplerStateDX11* pState = pRenderer->GetSamplerState( ID );
 
-			// Allow a range including -1 up to the number of samplers
+			// Get the resource to be set, and pass it in to the desired shader type
 
-			if ( pState || ( ID == -1 ) ) {
+			ID3D11SamplerState* pSampler = nullptr;
 
-				// Get the resource to be set, and pass it in to the desired shader type
-
-				ID3D11SamplerState* pSampler = 0;
-
-				if ( ID >= 0 ) {
-					pSampler = pState->m_pState; 
-				}
-
-				ShaderStages[type]->DesiredState.SetSamplerState( slot, pSampler );
-			} else {
-				Log::Get().Write( L"Tried to set an invalid sampler state ID!" );
+			if ( ID >= 0 ) {
+				SamplerStateDX11* pState = pRenderer->GetSamplerState( ID );
+				pSampler = pState->m_pState; 
 			}
+
+			ShaderStages[type]->DesiredState.SetSamplerState( slot, pSampler );
+
 		} else {
 			Log::Get().Write( L"Tried to set a non-sampler state ID as a sampler state!" );
 		}
@@ -804,7 +799,7 @@ std::wstring PipelineManagerDX11::PrintPipelineStatistics( )
 	return( s.str() );
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::SaveTextureScreenShot( int index, std::wstring filename/*, D3DX11_IMAGE_FILE_FORMAT format*/ )
+void PipelineManagerDX11::SaveTextureScreenShot( int index, std::wstring filename )
 {
 	// Get the texture as a resource and save it to file
 	ID3D11Resource* pResource = RendererDX11::Get()->GetResourceByIndex( index )->GetResource();
@@ -817,53 +812,22 @@ void PipelineManagerDX11::SaveTextureScreenShot( int index, std::wstring filenam
 
 		// Build the output file name
 		std::wstringstream out;
-		out << filename << iScreenNum << L".dds";
+		out << filename << iScreenNum << L".bmp";
 
-		// Select the appropriate format to add the extension to the name.  DDS format
-		// may be the only one that can handle certain texture formats, so it may be a 
-		// backup format later on.
+		HRESULT hr = DirectX::SaveWICTextureToFile( 
+			m_pContext, 
+			pResource,
+			GUID_ContainerFormatBmp,
+			out.str().c_str() );
 
-		//switch ( format )
-		//{
-		//case D3DX11_IFF_BMP:
-		//	out << ".bmp";
-		//	break;
-		//case D3DX11_IFF_JPG:
-		//	out << ".jpg";
-		//	break;
-		//case D3DX11_IFF_PNG:
-		//	out << ".png";
-		//	break;
-		//case D3DX11_IFF_DDS:
-		//	out << ".dds";
-		//	break;
-		//case D3DX11_IFF_TIFF:
-		//	out << ".tiff";
-		//	break;
-		//case D3DX11_IFF_GIF:
-		//	out << ".gif";
-		//	break;
-		//case D3DX11_IFF_WMP:
-		//	out << ".wmp";
-		//	break;
-		//default:
-		//	Log::Get().Write( L"Tried to save a texture image in an unsupported format!" );
-		//}
-
-		HRESULT hr = DirectX::SaveDDSTextureToFile( 
-			m_pContext,
-            pResource,
-            out.str().c_str() );
-
-		//HRESULT hr = D3DX11SaveTextureToFile(
-		//  m_pContext,
-		//  pResource,
-		//  format,
-		//  out.str().c_str()
-		//);
+		// Note: Use this version for WP8!
+		//HRESULT hr = DirectX::SaveDDSTextureToFile( 
+		//	m_pContext,
+		//	pResource,
+		//	out.str().c_str() );
 
 		if ( FAILED( hr ) )
-			Log::Get().Write( L"D3DX11SaveTextureToFile has failed!" );
+			Log::Get().Write( L"ERROR: Failed to save texture screen shot!" );
 	}
 }
 //--------------------------------------------------------------------------------

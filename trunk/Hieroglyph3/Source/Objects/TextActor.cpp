@@ -34,11 +34,13 @@ TextActor::TextActor()
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
 
-	m_pGeometry = IndexedImmediateGeometryPtr( new IndexedImmediateGeometryDX11() );
-	m_pGeometry->SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_pGeometry = IndexedImmediateGeometryPtr( new DrawIndexedExecutorDX11<BasicVertexDX11::Vertex>() );
 	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-	
+	m_pGeometry->SetLayoutElements( BasicVertexDX11::GetElementCount(), BasicVertexDX11::Elements );
+
 	m_pMaterial = MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( *pRenderer );
+
+	SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 
 	// Create a special blend state to allow blending based on the alpha channel of the
@@ -107,12 +109,12 @@ void TextActor::AppendText( const std::wstring& text )
 //--------------------------------------------------------------------------------
 void TextActor::SetColor( const Vector4f& color )
 {
-	m_pGeometry->SetColor( color );
+	m_Color = color;
 }
 //--------------------------------------------------------------------------------
 Vector4f TextActor::GetColor()
 {
-	return( m_pGeometry->GetColor() );
+	return( m_Color );
 }
 //--------------------------------------------------------------------------------
 void TextActor::SetTextOrigin( const Vector3f& location )
@@ -153,6 +155,18 @@ void TextActor::NewLine()
 
 	m_LineStart = m_LineStart - m_ydir * m_pSpriteFont->CharHeight() * m_fPhysicalScale;
 	m_Cursor = m_LineStart;
+}
+//--------------------------------------------------------------------------------
+void TextActor::AddVertex( const Vector3f& position, const Vector2f& texcoords )
+{
+	BasicVertexDX11::Vertex vertex;
+
+	vertex.position = position;
+	vertex.normal = Vector3f( 0.0f, 1.0f, 0.0f );
+	vertex.color = m_Color;
+	vertex.texcoords = texcoords;
+	
+	m_pGeometry->AddVertex( vertex );
 }
 //--------------------------------------------------------------------------------
 void TextActor::DrawString( const std::wstring& text )
@@ -202,25 +216,25 @@ void TextActor::DrawCharacter( const wchar_t& character )
 	p = m_Cursor;
 	t.x = ( desc.X ) * m_fTextureXScale;
 	t.y = ( desc.Y ) * m_fTextureYScale;
-	m_pGeometry->AddVertex( p, t );
+	AddVertex( p, t );
 
 	// Top right vertex
 	p = m_Cursor + m_xdir * desc.Width * m_fPhysicalScale; 
 	t.x = ( desc.X + desc.Width ) * m_fTextureXScale;
 	t.y = ( desc.Y ) * m_fTextureYScale;
-	m_pGeometry->AddVertex( p, t );
+	AddVertex( p, t );
 
 	// Bottom left vertex
 	p = m_Cursor - m_ydir * desc.Height * m_fPhysicalScale;
 	t.x = ( desc.X ) * m_fTextureXScale;
 	t.y = ( desc.Y + desc.Height ) * m_fTextureYScale;
-	m_pGeometry->AddVertex( p, t );
+	AddVertex( p, t );
 
 	// Bottom right vertex
 	p = m_Cursor + ( m_xdir * desc.Width - m_ydir * desc.Height ) * m_fPhysicalScale;
 	t.x = ( desc.X + desc.Width ) * m_fTextureXScale;
 	t.y = ( desc.Y + desc.Height ) * m_fTextureYScale;
-	m_pGeometry->AddVertex( p, t );
+	AddVertex( p, t );
 
 	// Add the indices to link the vertices together.  Here we simply
 	// use two triangles, which have three vertex indices each.

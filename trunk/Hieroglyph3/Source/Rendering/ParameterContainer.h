@@ -15,7 +15,7 @@
 #ifndef ParameterContainer_h
 #define ParameterContainer_h
 //--------------------------------------------------------------------------------
-#include "TArray.h"
+#include "PCH.h"
 #include "ConstantBufferParameterWriterDX11.h"
 #include "MatrixArrayParameterWriterDX11.h"
 #include "MatrixParameterWriterDX11.h"
@@ -63,8 +63,7 @@ namespace Glyph3
 
 	protected:
 
-
-		TArray< ParameterWriter* > m_RenderParameters;
+		std::vector< ParameterWriter* > m_RenderParameters;
 	};
 };
 //--------------------------------------------------------------------------------

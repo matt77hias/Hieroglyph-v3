@@ -28,10 +28,8 @@ namespace Glyph3
 	{
 		bool							bRender;
 		RenderEffectDX11*				pEffect;
-		//TArray<RenderParameterDX11*>	vParameters;
-		TArray<IRenderView*>			vViews;
+		std::vector<IRenderView*>		vViews;
 	};
-
 
 	class MaterialDX11
 	{
@@ -42,6 +40,11 @@ namespace Glyph3
 		void PreRender( RendererDX11* pRenderer, VIEWTYPE type );
 		void SetEntity( Entity3D* pEntity );
 		void SetRenderParams( IParameterManager* pParamManager, VIEWTYPE type );
+		
+		// This method should return *all* possible vertex shader IDs that could
+		// be used by this material.  This is used to generate the input layouts
+		// to be used with them.
+		void GetAllVertexShaderIDs( std::vector<int>& idlist );
 
 	public:
 		MaterialParams				Params[VT_NUM_VIEW_TYPES];

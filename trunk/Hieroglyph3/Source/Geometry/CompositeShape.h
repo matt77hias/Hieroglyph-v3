@@ -17,7 +17,6 @@
 //--------------------------------------------------------------------------------
 #include "Shape3D.h"
 #include "Ray3f.h"
-#include "TArray.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -35,7 +34,7 @@ namespace Glyph3
 		int GetNumberOfShapes();
 
 	protected:
-		TArray< Shape3D* > m_Shapes;
+		std::vector< Shape3D* > m_Shapes;
 	};
 };
 //--------------------------------------------------------------------------------

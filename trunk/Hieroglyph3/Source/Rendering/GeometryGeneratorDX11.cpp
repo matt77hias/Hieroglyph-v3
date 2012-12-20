@@ -854,13 +854,13 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryPtr pGeometry, 
 	{
 		// Set the geometry in the body of the actor
 		//pActor->GetBody()->SetGeometry( pMesh );
-		TArray<Node3D*> m_Bones;
+		std::vector<Node3D*> m_Bones;
 
 		// Create the bones, distributed along the length of the cone
 		for ( unsigned int i = 0; i < NumBones; i++ )
 		{
 			Node3D* pBone = new Node3D();
-			m_Bones.add( pBone );
+			m_Bones.push_back( pBone );
 
 			Vector3f BindPosition = Vector3f( 0.0f, 0.0f, 0.0f);
 
@@ -911,50 +911,37 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryPtr pGeometry, 
 		// Connect up the bones to form the skeleton.
 		for ( unsigned int i = 0; i < NumBones; i++ )
 		{
-			Node3D* pParent = m_Bones[i-1];
-			Node3D* pChild = m_Bones[i];
-
 			// If the node has a parent, link them
-			if ( i != 0 )
+			if ( i != 0 ) 
 			{
+				Node3D* pParent = m_Bones[i-1];
+				Node3D* pChild = m_Bones[i];
+
 				pParent->AttachChild( pChild );
-				SkinnedBoneController* pParentController = (SkinnedBoneController*)pParent->GetController( 0 );
-				SkinnedBoneController* pChildController = (SkinnedBoneController*)pChild->GetController( 0 );
-				//pChildController->SetParentBone( pParentController );
 			} 
 			else
 			{
-				if ( i == 0 )
-				{
-					pActor->GetNode()->AttachChild( pChild );
+				Node3D* pRoot = m_Bones[i];
 
-					pActor->GetBody()->SetGeometry( pGeometry );
+				pActor->GetNode()->AttachChild( pRoot );
+				pActor->GetBody()->SetGeometry( pGeometry );
 						
-					pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );		
-						
-					//pChild->AttachChild( pActor->GetGeometryEntity() );
+				pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );		
 
+				ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"EyeOfHorus_128_blurred.png" );
+				pActor->GetBody()->Parameters.SetShaderResourceParameter( L"ColorTexture", ColorTexture );
 
+				ResourcePtr HeightTexture = RendererDX11::Get()->LoadTexture( L"EyeOfHorus.png" );
+				pActor->GetBody()->Parameters.SetShaderResourceParameter( L"HeightTexture", HeightTexture );
 
-					ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"EyeOfHorus_128_blurred.png" );
-					//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"Hex.png" );
-					pActor->GetBody()->Parameters.SetShaderResourceParameter( L"ColorTexture", ColorTexture );
-						
+				SamplerStateConfigDX11 SamplerConfig;
+				SamplerConfig.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+				SamplerConfig.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+				SamplerConfig.Filter = D3D11_FILTER_ANISOTROPIC;
+				SamplerConfig.MaxAnisotropy = 16;
 
-					ResourcePtr HeightTexture = RendererDX11::Get()->LoadTexture( L"EyeOfHorus.png" );
-					//ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"Hex.png" );
-					pActor->GetBody()->Parameters.SetShaderResourceParameter( L"HeightTexture", HeightTexture );
-
-
-					SamplerStateConfigDX11 SamplerConfig;
-					SamplerConfig.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-					SamplerConfig.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-					SamplerConfig.Filter = D3D11_FILTER_ANISOTROPIC;
-					SamplerConfig.MaxAnisotropy = 16;
-
-					int LinearSampler = RendererDX11::Get()->CreateSamplerState( &SamplerConfig );
-					pActor->GetBody()->Parameters.SetSamplerParameter( L"LinearSampler", LinearSampler );
-				}
+				int LinearSampler = RendererDX11::Get()->CreateSamplerState( &SamplerConfig );
+				pActor->GetBody()->Parameters.SetSamplerParameter( L"LinearSampler", LinearSampler );
 			}
 		}
 	}

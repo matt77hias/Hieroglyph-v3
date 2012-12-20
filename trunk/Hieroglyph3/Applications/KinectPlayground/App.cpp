@@ -92,8 +92,8 @@ void App::Initialize()
 		*m_pRenderer11, m_pKinectView->GetDepthResource(),
 		MaterialGeneratorDX11::GenerateKinectDepthBufferMaterial(*m_pRenderer11) );
 	
-	m_pColorActor->GetBody()->GetMaterial()->Params[VT_PERSPECTIVE].vViews.add( m_pKinectView );
-	m_pDepthActor->GetBody()->GetMaterial()->Params[VT_PERSPECTIVE].vViews.add( m_pKinectView );
+	m_pColorActor->GetBody()->GetMaterial()->Params[VT_PERSPECTIVE].vViews.push_back( m_pKinectView );
+	m_pDepthActor->GetBody()->GetMaterial()->Params[VT_PERSPECTIVE].vViews.push_back( m_pKinectView );
 	
 	m_pColorActor->GetNode()->Position() = Vector3f( -5.5f, 5.5f, 5.0f );
 	m_pColorActor->GetNode()->Rotation().RotationY( -0.7f );
@@ -115,7 +115,7 @@ void App::Initialize()
 
 	m_pDepthMapViewer->GetBody()->SetGeometry( pGeometry );
 	m_pDepthMapViewer->GetBody()->SetMaterial( pMaterial );
-	m_pDepthMapViewer->GetBody()->GetMaterial()->Params[VT_PERSPECTIVE].vViews.add( m_pKinectView );
+	m_pDepthMapViewer->GetBody()->GetMaterial()->Params[VT_PERSPECTIVE].vViews.push_back( m_pKinectView );
 
 	m_pDepthMapViewer->GetNode()->Position() = Vector3f( 1.0f, 0.0f, 2.0f );
 	m_pDepthMapViewer->GetNode()->Rotation().RotationX( 0.0f );

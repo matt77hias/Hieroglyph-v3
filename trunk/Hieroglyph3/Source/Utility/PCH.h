@@ -29,6 +29,7 @@
 #include <sstream>
 #include <algorithm>
 #include <map>
+#include <vector>
 
 // Standard C Library includes
 #include <stdio.h>

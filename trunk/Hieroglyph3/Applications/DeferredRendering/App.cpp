@@ -205,19 +205,7 @@ void App::Initialize()
 
 	// Enable the material to render the given view type
 	m_pMaterial->Params[VT_GBUFFER].bRender = true;
-
-
-	// Pre-generate all of the input layout views for our geometry to ensure that
-	// in the parallel processing of the render views we don't try to create one,
-	// which could lead to a multi-threading problem.
-
 	m_pMaterial->Params[VT_GBUFFER].pEffect = m_pGBufferEffect[GBufferOptMode::Value];
-
-	for ( int i = 0; i < VT_NUM_VIEW_TYPES; i++ ) {
-		if ( m_pMaterial->Params[i].bRender ) {
-			pGeometry->GetInputLayout( m_pMaterial->Params[i].pEffect->GetVertexShader() );
-		}
-	}
 
 
 	// Create the scene and add the entities to it.  Then add the camera to the

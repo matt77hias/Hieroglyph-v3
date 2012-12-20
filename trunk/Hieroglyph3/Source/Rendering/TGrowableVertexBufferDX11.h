@@ -16,7 +16,8 @@
 #ifndef TGrowableVertexBufferDX11_h
 #define TGrowableVertexBufferDX11_h
 //--------------------------------------------------------------------------------
-
+#include "PipelineManagerDX11.h"
+#include "BufferConfigDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

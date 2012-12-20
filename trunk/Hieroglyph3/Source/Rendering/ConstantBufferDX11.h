@@ -48,9 +48,8 @@ namespace Glyph3
 		bool						GetAutoUpdate( );
 
 	protected:
-		bool						m_bAutoUpdate;
-
-		TArray< ConstantBufferMapping >	m_Mappings;
+		bool									m_bAutoUpdate;
+		std::vector< ConstantBufferMapping >	m_Mappings;
 
 		friend RendererDX11;
 	};

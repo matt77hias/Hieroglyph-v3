@@ -27,8 +27,8 @@ Actor::Actor()
 //--------------------------------------------------------------------------------
 Actor::~Actor()
 {
-	for ( int i = 0; i < m_Elements.count(); i++ )
-		SAFE_DELETE( m_Elements[i] );
+	for ( auto pEntity : m_Elements )
+		SAFE_DELETE( pEntity );
 }
 //--------------------------------------------------------------------------------
 Node3D* Actor::GetNode()
@@ -43,6 +43,6 @@ Entity3D* Actor::GetBody()
 //--------------------------------------------------------------------------------
 void Actor::AddElement( Entity3D* pElement )
 {
-	m_Elements.add( pElement );
+	m_Elements.push_back( pElement );
 }
 //--------------------------------------------------------------------------------

@@ -27,7 +27,6 @@
 #include "PickRecord.h"
 #include "MaterialDX11.h"
 #include "IController.h"
-#include "TArray.h"
 #include "CompositeShape.h"
 #include "EntityRenderParams.h"
 #include "ParameterContainer.h"
@@ -63,7 +62,8 @@ namespace Glyph3
 		void SetMaterial( MaterialPtr pMaterial );
 		MaterialPtr GetMaterial( );
 
-		void SetGeometry( ExecutorPtr executor );
+		void SetGeometry( ExecutorPtr pExecutor );
+		ExecutorPtr GetGeometry( );
 
 
 		// Various entity properties are accessed here.
@@ -79,8 +79,7 @@ namespace Glyph3
 		// will be updated in the order that they are added to the entity.
 
 		void AttachController( IController* pController );
-		void UpdateControllers( float fTime );
-		IController* GetController( int index );
+		IController* GetController( unsigned int index );
 
 		virtual std::string toString( );
 
@@ -109,10 +108,10 @@ namespace Glyph3
 		// intersecting the ray.  The other two methods are just as valid, but perform
 		// a different type of query than the pick record.
 
-		virtual void BuildPickRecord( Ray3f& ray, TArray<PickRecord>& record );
+		virtual void BuildPickRecord( Ray3f& ray, std::vector<PickRecord>& record );
 		virtual void GetIntersectingEntities( std::vector< Entity3D* >& set, Sphere3f& bounds );
 		virtual void GetIntersectingEntities( std::vector< Entity3D* >& set, Frustum3f& bounds );
-		virtual void GetEntities( TArray< Entity3D* >& set );
+		virtual void GetEntities( std::vector< Entity3D* >& set );
 		
 		// The composite shape consists of multiple shapes to represent the entity.
 		// It is currently used for ray picking, but will eventually be added to visibility
@@ -136,7 +135,7 @@ namespace Glyph3
 	
 		Entity3D* m_pParent;
 		int m_iEntityID;
-		TArray< IController* > m_Controllers;
+		std::vector< IController* > m_Controllers;
 
 	public:
 		EntityRenderParams m_sParams;

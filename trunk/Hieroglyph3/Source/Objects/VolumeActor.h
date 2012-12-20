@@ -17,12 +17,15 @@
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "Actor.h"
-#include "VolumeGeometryDX11.h"
+#include "DrawIndexedExecutorDX11.h"
+#include "VolumeTextureVertexDX11.h"
 #include "TextureSpaceCameraPositionWriter.h"
 #include "TextureSpaceLightPositionWriter.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
+	typedef std::shared_ptr<DrawIndexedExecutorDX11<VolumeTextureVertexDX11::Vertex>> VolumeGeometryPtr;
+
 	class VolumeActor : public Actor
 	{
 	public:

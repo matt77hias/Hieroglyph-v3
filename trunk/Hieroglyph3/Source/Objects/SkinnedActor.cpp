@@ -31,9 +31,9 @@ SkinnedActor::~SkinnedActor()
 {
 	// Delete each controller's entity.  This will in turn delete each of the
 	// controller's that are attached to the entity.
-	for ( int i = 0; i < m_Bones.count(); i++ )
+	for ( auto pController : m_Bones )
 	{
-		Entity3D* pEntity = m_Bones[i]->GetEntity();
+		Entity3D* pEntity = pController->GetEntity();
 		SAFE_DELETE( pEntity );
 	}
 
@@ -71,7 +71,7 @@ void SkinnedActor::AddBoneNode( Node3D* pBone, Vector3f BindPosition, Vector3f B
 		pBone->Rotation().Rotation( BindRotation );
 
 		// Store the node in the bones list.
-		m_Bones.add( pController );
+		m_Bones.push_back( pController );
 
 
 
@@ -98,29 +98,29 @@ void SkinnedActor::SetBindPose( )
 
 	GetNode()->Update( 0.0f );
 
-	for ( int i = 0; i < m_Bones.count(); i++ )
+	for ( auto pController : m_Bones )
 	{
-		m_Bones[i]->SetBindPose();
+		pController->SetBindPose();
 	}
 
 
 	// Create an array to hold the CPU side matrices.
 
-	m_pMatrices = new Matrix4f[m_Bones.count()];
-	m_pNormalMatrices = new Matrix4f[m_Bones.count()];
+	m_pMatrices = new Matrix4f[m_Bones.size()];
+	m_pNormalMatrices = new Matrix4f[m_Bones.size()];
 
 	// Create and set up the matrix array rendering parameter.  This gets added
 	// to the skinned actor's body, which is an entity holding the models geometry.
 
-	GetBody()->Parameters.SetMatrixArrayParameter( L"SkinMatrices", m_pMatrices, m_Bones.count() );
-	GetBody()->Parameters.SetMatrixArrayParameter( L"SkinNormalMatrices", m_pNormalMatrices, m_Bones.count() );
+	GetBody()->Parameters.SetMatrixArrayParameter( L"SkinMatrices", m_pMatrices, m_Bones.size() );
+	GetBody()->Parameters.SetMatrixArrayParameter( L"SkinNormalMatrices", m_pNormalMatrices, m_Bones.size() );
 
 }
 //--------------------------------------------------------------------------------
 void SkinnedActor::SetSkinningMatrices( RendererDX11& Renderer )
 {
 	// Update the CPU side animation matrices.
-	for ( int i = 0; i < m_Bones.count(); i++ )
+	for ( unsigned int i = 0; i < m_Bones.size(); i++ )
 	{
 		m_pMatrices[i] = m_Bones[i]->GetTransform();
 		m_pNormalMatrices[i] = m_Bones[i]->GetNormalTransform();
@@ -129,7 +129,7 @@ void SkinnedActor::SetSkinningMatrices( RendererDX11& Renderer )
 //--------------------------------------------------------------------------------
 void SkinnedActor::PlayAnimation( int index )
 {
-	for ( int i = 0; i < m_Bones.count(); i++ )
+	for ( unsigned int i = 0; i < m_Bones.size(); i++ )
 	{
 		AnimationStream<Vector3f>* pStream = 0;
 		
@@ -145,7 +145,7 @@ void SkinnedActor::PlayAnimation( int index )
 //--------------------------------------------------------------------------------
 void SkinnedActor::PlayAnimation( std::wstring& name )
 {
-	for ( int i = 0; i < m_Bones.count(); i++ )
+	for ( unsigned int i = 0; i < m_Bones.size(); i++ )
 	{
 		AnimationStream<Vector3f>* pStream = 0;
 		
@@ -161,7 +161,7 @@ void SkinnedActor::PlayAnimation( std::wstring& name )
 //--------------------------------------------------------------------------------
 void SkinnedActor::PlayAllAnimations( )
 {
-	for ( int i = 0; i < m_Bones.count(); i++ )
+	for ( unsigned int i = 0; i < m_Bones.size(); i++ )
 	{
 		AnimationStream<Vector3f>* pStream = 0;
 		

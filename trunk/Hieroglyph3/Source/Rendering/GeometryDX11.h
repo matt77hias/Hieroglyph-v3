@@ -23,7 +23,6 @@
 #include "PointIndices.h"
 #include "PipelineExecutorDX11.h"
 #include "InputAssemblerStateDX11.h"
-#include "TArray.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -48,7 +47,7 @@ namespace Glyph3
 		VertexElementDX11* GetElement( std::wstring name );
 		VertexElementDX11* GetElement( int index );
 
-		UINT GetIndex( int index );
+		UINT GetIndex( unsigned int index );
 
 		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveType();
 		void SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY type );
@@ -72,8 +71,8 @@ namespace Glyph3
                                   std::string texCoordSemantic = VertexElementDX11::TexCoordSemantic, 
                                   std::string tangentSemantic = VertexElementDX11::TangentSemantic );
 
-		TArray<VertexElementDX11*> m_vElements;
-		TArray<UINT> m_vIndices;
+		std::vector<VertexElementDX11*>		m_vElements;
+		std::vector<UINT>					m_vIndices;
 		
 		ResourcePtr m_VB;
 		ResourcePtr m_IB;

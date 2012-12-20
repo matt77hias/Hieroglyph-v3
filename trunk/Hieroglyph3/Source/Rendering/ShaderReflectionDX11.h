@@ -18,7 +18,6 @@
 #include "PCH.h"
 #include "GlyphString.h"
 #include "RenderParameterDX11.h"
-#include "TArray.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -92,11 +91,11 @@ namespace Glyph3
 
 	struct ConstantBufferLayout
 	{
-		D3D11_SHADER_BUFFER_DESC			Description;
-		TArray<D3D11_SHADER_VARIABLE_DESC>	Variables;
-		TArray<D3D11_SHADER_TYPE_DESC>		Types;
-		TArray<RenderParameterDX11*>		Parameters;
-		RenderParameterDX11*				pParamRef;
+		D3D11_SHADER_BUFFER_DESC				Description;
+		std::vector<D3D11_SHADER_VARIABLE_DESC>	Variables;
+		std::vector<D3D11_SHADER_TYPE_DESC>		Types;
+		std::vector<RenderParameterDX11*>		Parameters;
+		RenderParameterDX11*					pParamRef;
 	};
 
 	class ShaderReflectionDX11
@@ -115,12 +114,12 @@ namespace Glyph3
 		std::wstring GetName( );
 
 	public:
-		std::wstring							Name;
-		D3D11_SHADER_DESC						ShaderDescription;
-		TArray<D3D11_SIGNATURE_PARAMETER_DESC>	InputSignatureParameters;
-		TArray<D3D11_SIGNATURE_PARAMETER_DESC>	OutputSignatureParameters;
-		TArray<ConstantBufferLayout>			ConstantBuffers;
-		TArray<ShaderInputBindDesc>				ResourceBindings;
+		std::wstring									Name;
+		D3D11_SHADER_DESC								ShaderDescription;
+		std::vector<D3D11_SIGNATURE_PARAMETER_DESC>		InputSignatureParameters;
+		std::vector<D3D11_SIGNATURE_PARAMETER_DESC>		OutputSignatureParameters;
+		std::vector<ConstantBufferLayout>				ConstantBuffers;
+		std::vector<ShaderInputBindDesc>				ResourceBindings;
 	};
 
 };

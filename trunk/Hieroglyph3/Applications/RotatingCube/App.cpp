@@ -176,9 +176,9 @@ bool App::ConfigureEngineComponents()
 		{ "SV_POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	TArray<D3D11_INPUT_ELEMENT_DESC> layout;
-	layout.add(desc[0]);
-	layout.add(desc[1]);
+	std::vector<D3D11_INPUT_ELEMENT_DESC> layout;
+	layout.push_back(desc[0]);
+	layout.push_back(desc[1]);
 	m_VertexLayout = m_pRenderer11->CreateInputLayout(layout, m_Effect.GetVertexShader());
 	if (m_VertexLayout == -1) {
 		Log::Get().Write( L"Failed to create vertex layout" );

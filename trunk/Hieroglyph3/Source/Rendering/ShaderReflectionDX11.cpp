@@ -45,7 +45,7 @@ std::wstring ShaderReflectionDX11::GetName( )
 //--------------------------------------------------------------------------------
 void ShaderReflectionDX11::InitializeConstantBuffers( IParameterManager* pParamManager )
 {
-	for ( int i = 0; i < ConstantBuffers.count(); i++ )
+	for ( unsigned int i = 0; i < ConstantBuffers.size(); i++ )
 	{
 		if ( ConstantBuffers[i].Description.Type == D3D11_CT_CBUFFER )
 		{
@@ -84,7 +84,7 @@ void ShaderReflectionDX11::InitializeConstantBuffers( IParameterManager* pParamM
 					// buffers.  This allows the buffer to know how to update itself
 					// with the parameter system.
 
-					for ( int j = 0; j < ConstantBuffers[i].Variables.count(); j++ )
+					for ( unsigned int j = 0; j < ConstantBuffers[i].Variables.size(); j++ )
 					{
 						ConstantBufferMapping mapping;
 
@@ -119,7 +119,7 @@ void ShaderReflectionDX11::InitializeConstantBuffers( IParameterManager* pParamM
 					// expecting something else to manage the contents of this buffer, and there
 					// is no need for the mapping information.
 
-					for ( int j = 0; j < ConstantBuffers[i].Variables.count(); j++ )
+					for ( unsigned int j = 0; j < ConstantBuffers[i].Variables.size(); j++ )
 					{
 						ConstantBufferMapping mapping;
 
@@ -158,7 +158,7 @@ void ShaderReflectionDX11::UpdateParameters( PipelineManagerDX11* pPipeline, IPa
 	// This function will then call renderer functions to update each constant
 	// buffer needed for the shader.
 
-	for ( int i = 0; i < ConstantBuffers.count(); i++ )
+	for ( unsigned int i = 0; i < ConstantBuffers.size(); i++ )
 	{
 		if ( ConstantBuffers[i].Description.Type == D3D11_CT_CBUFFER )
 		{
@@ -223,7 +223,7 @@ void ShaderReflectionDX11::BindParameters( ShaderType type, PipelineManagerDX11*
 	// and type of parameter, in addition to the pipeline stage to bind the 
 	// parameter to.
 
-	for ( int i = 0; i < ResourceBindings.count(); i++ )
+	for ( unsigned int i = 0; i < ResourceBindings.size(); i++ )
 	{
 		UINT slot = ResourceBindings[i].BindPoint;
 
@@ -266,8 +266,8 @@ void ShaderReflectionDX11::PrintShaderDetails()
 	
 	s << std::endl;
 
-	s << L"Number of Input Signature Elements: " << InputSignatureParameters.count() << std::endl;
-	for ( int i = 0; i < InputSignatureParameters.count(); i++ )
+	s << L"Number of Input Signature Elements: " << InputSignatureParameters.size() << std::endl;
+	for ( unsigned int i = 0; i < InputSignatureParameters.size(); i++ )
 	{
 		s << L"  Semantic Name: " << InputSignatureParameters[i].SemanticName;
 		s << L", Semantic Index: " << InputSignatureParameters[i].SemanticIndex;
@@ -280,8 +280,8 @@ void ShaderReflectionDX11::PrintShaderDetails()
 	}
 	s << std::endl;
 
-	s << L"Number of Output Signature Elements: " << OutputSignatureParameters.count() << std::endl;
-	for ( int i = 0; i < OutputSignatureParameters.count(); i++ )
+	s << L"Number of Output Signature Elements: " << OutputSignatureParameters.size() << std::endl;
+	for ( unsigned int i = 0; i < OutputSignatureParameters.size(); i++ )
 	{
 		s << L"  Semantic Name: " << OutputSignatureParameters[i].SemanticName;
 		s << L", Semantic Index: " << OutputSignatureParameters[i].SemanticIndex;
@@ -294,8 +294,8 @@ void ShaderReflectionDX11::PrintShaderDetails()
 	}
 	s << std::endl;
 
-	s << L"Number of Constant Buffer Descriptions: " << ConstantBuffers.count() << std::endl;
-	for ( int i = 0; i < ConstantBuffers.count(); i++ )
+	s << L"Number of Constant Buffer Descriptions: " << ConstantBuffers.size() << std::endl;
+	for ( unsigned int i = 0; i < ConstantBuffers.size(); i++ )
 	{
 		s << L"  Buffer Name: " << ConstantBuffers[i].Description.Name;
 		s << L", Buffer Type: " << TO_STRING_D3D_CBUFFER_TYPE( ConstantBuffers[i].Description.Type );
@@ -303,7 +303,7 @@ void ShaderReflectionDX11::PrintShaderDetails()
 		s << L", Size: " << ConstantBuffers[i].Description.Size;
 		s << L", Flags: " << ConstantBuffers[i].Description.uFlags;
 		
-		for ( int j = 0; j < ConstantBuffers[i].Variables.count(); j++ )
+		for ( unsigned int j = 0; j < ConstantBuffers[i].Variables.size(); j++ )
 		{
 			s << std::endl << L"    ";
 			s << L"Variable Name: " << ConstantBuffers[i].Variables[j].Name;
@@ -317,7 +317,7 @@ void ShaderReflectionDX11::PrintShaderDetails()
 		}
 
 
-		for ( int j = 0; j < ConstantBuffers[i].Types.count(); j++ )
+		for ( unsigned int j = 0; j < ConstantBuffers[i].Types.size(); j++ )
 		{
 			s << std::endl << L"    ";
 			s << L"Variable Type Name: " << ConstantBuffers[i].Types[j].Name;
@@ -334,8 +334,8 @@ void ShaderReflectionDX11::PrintShaderDetails()
 	}
 	s << std::endl;
 
-	s << L"Number of Resource Binding Descriptions: " << ResourceBindings.count() << std::endl;
-	for ( int i = 0; i < ResourceBindings.count(); i++ )
+	s << L"Number of Resource Binding Descriptions: " << ResourceBindings.size() << std::endl;
+	for ( unsigned int i = 0; i < ResourceBindings.size(); i++ )
 	{
 		s << L"  Name: " << ResourceBindings[i].Name;
 		s << L", Type: " << TO_STRING_D3D_SHADER_INPUT_TYPE( ResourceBindings[i].Type );

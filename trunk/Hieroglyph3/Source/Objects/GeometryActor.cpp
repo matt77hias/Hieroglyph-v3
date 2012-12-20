@@ -16,14 +16,17 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-GeometryActor::GeometryActor()
+GeometryActor::GeometryActor() :
+	m_Color( 1.0f, 1.0f, 1.0f, 1.0f )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
 
-	m_pGeometry = IndexedImmediateGeometryPtr( new IndexedImmediateGeometryDX11() );
-	m_pGeometry->SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_pGeometry = IndexedImmediateGeometryPtr( new DrawIndexedExecutorDX11<BasicVertexDX11::Vertex>() );
 	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	m_pGeometry->SetLayoutElements( BasicVertexDX11::GetElementCount(), BasicVertexDX11::Elements );
 	
+	SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
 	m_pSolidMaterial = MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *pRenderer );
 	m_pTexturedMaterial = MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( *pRenderer );
 
@@ -43,7 +46,130 @@ void GeometryActor::ResetGeometry()
 //--------------------------------------------------------------------------------
 void GeometryActor::SetColor( const Vector4f& color )
 {
-	m_pGeometry->SetColor( color );
+	m_Color = color;
+}
+//--------------------------------------------------------------------------------
+Vector4f GeometryActor::GetColor( )
+{
+	return( m_Color );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::AddVertex( const Vector3f& position )
+{
+	BasicVertexDX11::Vertex vertex;
+
+	vertex.position = position;
+	vertex.normal = Vector3f( 0.0f, 1.0f, 0.0f );
+	vertex.color = m_Color;
+	vertex.texcoords = Vector2f( 0.0f, 0.0f );
+
+	m_pGeometry->AddVertex( vertex );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::AddVertex( const Vector3f& position, const Vector4f& color )
+{
+	BasicVertexDX11::Vertex vertex;
+
+	vertex.position = position;
+	vertex.normal = Vector3f( 0.0f, 1.0f, 0.0f );
+	vertex.color = color;
+	vertex.texcoords = Vector2f( 0.0f, 0.0f );
+	
+	m_pGeometry->AddVertex( vertex );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::AddVertex( const Vector3f& position, const Vector2f& texcoords )
+{
+	BasicVertexDX11::Vertex vertex;
+
+	vertex.position = position;
+	vertex.normal = Vector3f( 0.0f, 1.0f, 0.0f );
+	vertex.color = m_Color;
+	vertex.texcoords = texcoords;
+	
+	m_pGeometry->AddVertex( vertex );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::AddVertex( const Vector3f& position, const Vector4f& color, const Vector2f& texcoords )
+{
+	BasicVertexDX11::Vertex vertex;
+
+	vertex.position = position;
+	vertex.normal = Vector3f( 0.0f, 1.0f, 0.0f );
+	vertex.color = color;
+	vertex.texcoords = texcoords;
+	
+	m_pGeometry->AddVertex( vertex );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::AddVertex( const Vector3f& position, const Vector3f& normal )
+{
+	BasicVertexDX11::Vertex vertex;
+
+	vertex.position = position;
+	vertex.normal = normal;
+	vertex.color = m_Color;
+	vertex.texcoords = Vector2f( 0.0f, 0.0f );
+	
+	m_pGeometry->AddVertex( vertex );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::AddVertex( const Vector3f& position, const Vector3f& normal, const Vector4f& color )
+{
+	BasicVertexDX11::Vertex vertex;
+
+	vertex.position = position;
+	vertex.normal = normal;
+	vertex.color = color;
+	vertex.texcoords = Vector2f( 0.0f, 0.0f );
+	
+	m_pGeometry->AddVertex( vertex );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::AddVertex( const Vector3f& position, const Vector3f& normal, const Vector2f& texcoords )
+{
+	BasicVertexDX11::Vertex vertex;
+
+	vertex.position = position;
+	vertex.normal = normal;
+	vertex.color = m_Color;
+	vertex.texcoords = texcoords;
+	
+	m_pGeometry->AddVertex( vertex );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::AddVertex( const Vector3f& position, const Vector3f& normal, const Vector4f& color, const Vector2f& texcoords )
+{
+	BasicVertexDX11::Vertex vertex;
+
+	vertex.position = position;
+	vertex.normal = normal;
+	vertex.color = color;
+	vertex.texcoords = texcoords;
+	
+	m_pGeometry->AddVertex( vertex );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::AddIndex( const unsigned int index )
+{
+	// This method does not check the value that is passed as an index against
+	// the number of vertices that are out there. User's are allowed to do what they
+	// want with this data, but have to ensure that the indices are correct!
+
+	m_pGeometry->AddIndex( index );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::AddIndices( const unsigned int i1, const unsigned int i2 )
+{
+	AddIndex( i1 );
+	AddIndex( i2 );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::AddIndices( const unsigned int i1, const unsigned int i2, const unsigned int i3 )
+{
+	AddIndex( i1 );
+	AddIndex( i2 );
+	AddIndex( i3 );
 }
 //--------------------------------------------------------------------------------
 void GeometryActor::DrawSphere( const Vector3f& center, float radius, unsigned int stacks, unsigned int slices )
@@ -80,7 +206,7 @@ void GeometryActor::DrawSphere( const Vector3f& center, float radius, unsigned i
 			texcoords.x = uStep * static_cast<float>( slice );
 			texcoords.y = vStep * static_cast<float>( stack );
 
-			m_pGeometry->AddVertex( position + center, normal, texcoords );
+			AddVertex( position + center, normal, texcoords );
 		}
 	}
 
@@ -137,7 +263,7 @@ void GeometryActor::DrawDisc( const Vector3f& center, const Vector3f& normal, fl
 
 	// Add the center vertex first...
  
-	m_pGeometry->AddVertex( center, vnorm );
+	AddVertex( center, vnorm );
 
 	for ( unsigned int slice = 0; slice <= slices; slice++ ) {
  
@@ -152,7 +278,7 @@ void GeometryActor::DrawDisc( const Vector3f& center, const Vector3f& normal, fl
 		//texcoords.x = uStep * static_cast<float>( slice );
 		//texcoords.y = vStep * static_cast<float>( stack );
  
-		m_pGeometry->AddVertex( position, vnorm/*, texcoords*/ );
+		AddVertex( position, vnorm/*, texcoords*/ );
 	}
  
     // Generate all of the indices according to the specified input parameters.
@@ -222,7 +348,7 @@ void GeometryActor::DrawCylinder( const Vector3f& p1, const Vector3f& p2, float 
 			texcoords.x = uStep * static_cast<float>( slice );
 			texcoords.y = vStep * static_cast<float>( stack );
 
-			m_pGeometry->AddVertex( position, normal, texcoords );
+			AddVertex( position, normal, texcoords );
 		}
 	}
 
@@ -311,22 +437,22 @@ void GeometryActor::DrawRect( const Vector3f& center, const Vector3f& xdir, cons
 	// Top left vertex
 	position = center + x + y;
 	tex = tex00;
-	m_pGeometry->AddVertex( position, normal, tex );
+	AddVertex( position, normal, tex );
 
 	// Top right vertex
 	position = center - x + y;
 	tex = tex10;
-	m_pGeometry->AddVertex( position, normal, tex );
+	AddVertex( position, normal, tex );
 
 	// Bottom right vertex
 	position = center - x - y;
 	tex = tex11;
-	m_pGeometry->AddVertex( position, normal, tex );
+	AddVertex( position, normal, tex );
 
 	// Bottom right vertex
 	position = center + x - y;
 	tex = tex01;
-	m_pGeometry->AddVertex( position, normal, tex );
+	AddVertex( position, normal, tex );
 
 
 	// Add two triangles to create the rectangular face.

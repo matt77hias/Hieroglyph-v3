@@ -291,7 +291,7 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager*
     SetRenderParams( pParamManager );
 
     // Loop through the lights
-    for ( int i = 0; i < m_Lights.count(); ++i )
+    for ( unsigned int i = 0; i < m_Lights.size(); ++i )
     {
         const Light& light = m_Lights[i];
 
@@ -423,7 +423,7 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager*
     pPipelineManager->ClearPipelineResources();
 
     // Clear the lights
-    m_Lights.empty();
+    m_Lights.clear();
 }
 //--------------------------------------------------------------------------------
 void ViewLights::Resize( UINT width, UINT height )
@@ -456,7 +456,7 @@ void ViewLights::SetRenderParams( IParameterManager* pParamManager )
     //    L"PositionTexture",
     //};
 
-    for ( int i = 0; i < m_GBufferTargets.count(); ++i )
+    for ( unsigned int i = 0; i < m_GBufferTargets.size(); ++i )
         pParamManager->SetShaderResourceParameter( m_pGBufferTargets[i], m_GBufferTargets[i] );
 
     // Bind depth if optimizations are enabled
@@ -471,10 +471,10 @@ void ViewLights::SetUsageParams( IParameterManager* pParamManager )
 //--------------------------------------------------------------------------------
 void ViewLights::AddLight( const Light& light )
 {
-    m_Lights.add( light );
+	m_Lights.push_back( light );
 }
 //--------------------------------------------------------------------------------
-void ViewLights::SetTargets( TArray<ResourcePtr>& GBufferTargets, ResourcePtr pRenderTarget,
+void ViewLights::SetTargets( std::vector<ResourcePtr>& GBufferTargets, ResourcePtr pRenderTarget,
                             ResourcePtr DepthTarget, int Viewport, int vpWidth, int vpHeight )
 {
     m_GBufferTargets = GBufferTargets;

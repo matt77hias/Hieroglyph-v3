@@ -14,10 +14,10 @@
 // This interface provides the function interface to the information 
 // contained in the D3D11 buffer class.  
 //--------------------------------------------------------------------------------
-#include "ResourceDX11.h"
-//--------------------------------------------------------------------------------
 #ifndef BufferDX11_h
 #define BufferDX11_h
+//--------------------------------------------------------------------------------
+#include "ResourceDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {

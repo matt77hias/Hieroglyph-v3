@@ -15,8 +15,8 @@
 #ifndef IEventListener_h
 #define IEventListener_h
 //--------------------------------------------------------------------------------
+#include "PCH.h"
 #include "IEvent.h"
-#include "TArray.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -37,7 +37,7 @@ namespace Glyph3
 
 	private:
 		EventManager*	m_pEventManager;
-		TArray< eEVENT > m_RequestedEvents;
+		std::vector< eEVENT > m_RequestedEvents;
 	};
 };
 //--------------------------------------------------------------------------------

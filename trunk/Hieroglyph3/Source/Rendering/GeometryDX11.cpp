@@ -31,10 +31,10 @@ GeometryDX11::GeometryDX11( )
 //--------------------------------------------------------------------------------
 GeometryDX11::~GeometryDX11()
 {
-	for ( int i = 0; i < m_vElements.count(); i++ )
+	for ( auto pElement : m_vElements )
 	{
-		if ( m_vElements[i] != NULL )
-			delete m_vElements[i];
+		if ( pElement != nullptr )
+			delete pElement;
 	}
 }
 //--------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ void GeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterManager* p
 void GeometryDX11::AddElement( VertexElementDX11* element )
 {
 	int index = -1;
-	for (int i = 0; i < m_vElements.count(); i++ )
+	for ( unsigned int i = 0; i < m_vElements.size(); i++ )
 	{
 		if ( m_vElements[i]->m_SemanticName == element->m_SemanticName )
 			index = i;
@@ -66,7 +66,7 @@ void GeometryDX11::AddElement( VertexElementDX11* element )
 
 	if ( index == -1 )
 	{
-		m_vElements.add( element );		// the element wasn't found, so add it
+		m_vElements.push_back( element );		// the element wasn't found, so add it
 	}
 	else
 	{
@@ -77,31 +77,31 @@ void GeometryDX11::AddElement( VertexElementDX11* element )
 //--------------------------------------------------------------------------------
 void GeometryDX11::AddFace( TriangleIndices& face )
 {
-	m_vIndices.add( face.P1() );
-	m_vIndices.add( face.P2() );
-	m_vIndices.add( face.P3() );
+	m_vIndices.push_back( face.P1() );
+	m_vIndices.push_back( face.P2() );
+	m_vIndices.push_back( face.P3() );
 }
 //--------------------------------------------------------------------------------
 void GeometryDX11::AddLine( LineIndices& line )
 {
-	m_vIndices.add( line.P1() );
-	m_vIndices.add( line.P2() );
+	m_vIndices.push_back( line.P1() );
+	m_vIndices.push_back( line.P2() );
 }
 //--------------------------------------------------------------------------------
 void GeometryDX11::AddPoint( PointIndices& point )
 {
-	m_vIndices.add( point.P1() );
+	m_vIndices.push_back( point.P1() );
 }
 //--------------------------------------------------------------------------------
 void GeometryDX11::AddIndex( UINT index )
 {
-	m_vIndices.add( index );
+	m_vIndices.push_back( index );
 }
 //--------------------------------------------------------------------------------
 VertexElementDX11* GeometryDX11::GetElement( std::string name )
 {
     VertexElementDX11* pElement = NULL;
-    for ( int i = 0; i < m_vElements.count(); i++ )
+    for ( unsigned int i = 0; i < m_vElements.size(); i++ )
     {
         if ( m_vElements[i]->m_SemanticName == name )
             pElement = m_vElements[i];
@@ -121,9 +121,9 @@ VertexElementDX11* GeometryDX11::GetElement( int index )
 	return( m_vElements[index] );
 }
 //--------------------------------------------------------------------------------
-UINT GeometryDX11::GetIndex( int index )
+UINT GeometryDX11::GetIndex( unsigned int index )
 {
-	if ( ( index >= 0 ) && ( index < m_vIndices.count() ) )
+	if ( index < m_vIndices.size() )
 		return( m_vIndices[index] );
 	
 	Log::Get().Write( L"Tried to get an out of bounds index!" );
@@ -139,7 +139,7 @@ D3D11_PRIMITIVE_TOPOLOGY GeometryDX11::GetPrimitiveType()
 int GeometryDX11::GetPrimitiveCount()
 {
 	UINT count = 0;
-	UINT indices = m_vIndices.count();
+	UINT indices = m_vIndices.size();
 
 	switch ( m_ePrimType )
 	{
@@ -244,7 +244,7 @@ int GeometryDX11::GetVertexCount()
 //--------------------------------------------------------------------------------
 int GeometryDX11::GetElementCount()
 {
-	return( m_vElements.count() );
+	return( m_vElements.size() );
 }
 //--------------------------------------------------------------------------------
 int GeometryDX11::GetVertexSize()
@@ -258,8 +258,8 @@ int GeometryDX11::CalculateVertexSize()
 	m_iVertexSize = 0;
 
 	// Loop through the elements and add their per-vertex size
-	for ( int i = 0; i < m_vElements.count(); i++ )
-		m_iVertexSize += m_vElements[i]->SizeInBytes();
+	for ( auto pElement : m_vElements )
+		m_iVertexSize += pElement->SizeInBytes();
 
 	return( m_iVertexSize );
 }
@@ -269,7 +269,7 @@ int GeometryDX11::CalculateVertexCount()
 	// Record the number of vertices as the number of vertices in the 
 	// first element.  This could select the minimum number from all 
 	// elements, but the user should have all the same size elements...
-	if ( m_vElements.count() > 0 )
+	if ( m_vElements.size() > 0 )
 		m_iVertexCount = m_vElements[0]->Count();
 	else
 		m_iVertexCount = 0;
@@ -279,7 +279,7 @@ int GeometryDX11::CalculateVertexCount()
 //--------------------------------------------------------------------------------
 void GeometryDX11::GenerateInputLayout( int ShaderID )
 {
-	int iElems = m_vElements.count();
+	int iElems = m_vElements.size();
 
 	if ( iElems == 0 )
 	{
@@ -290,7 +290,7 @@ void GeometryDX11::GenerateInputLayout( int ShaderID )
 		m_iVertexCount = GetPrimitiveCount();
 		
 		// Allocate the necessary number of element descriptions
-		TArray<D3D11_INPUT_ELEMENT_DESC> elements;
+		std::vector<D3D11_INPUT_ELEMENT_DESC> elements;
 
 		// Create the input layout for the given shader index
 		RendererDX11* pRenderer = RendererDX11::Get();
@@ -308,10 +308,10 @@ void GeometryDX11::GenerateInputLayout( int ShaderID )
 		CalculateVertexCount();
 
 		// Allocate the necessary number of element descriptions
-		TArray<D3D11_INPUT_ELEMENT_DESC> elements;
+		std::vector<D3D11_INPUT_ELEMENT_DESC> elements;
 
 		// Fill in the vertex element descriptions based on each element
-		for ( int i = 0; i < m_vElements.count(); i++ )
+		for ( unsigned int i = 0; i < m_vElements.size(); i++ )
 		{
 			D3D11_INPUT_ELEMENT_DESC e;
 			e.SemanticName = m_vElements[i]->m_SemanticName.c_str();
@@ -322,7 +322,7 @@ void GeometryDX11::GenerateInputLayout( int ShaderID )
 			e.InputSlotClass = m_vElements[i]->m_InputSlotClass;
 			e.InstanceDataStepRate = m_vElements[i]->m_uiInstanceDataStepRate;
 			
-			elements.add( e );
+			elements.push_back( e );
 		}
 
 		// Create the input layout for the given shader index
@@ -356,7 +356,7 @@ void GeometryDX11::LoadToBuffers()
 		for ( int j = 0; j < m_iVertexCount; j++ )
 		{
 			int iElemOffset = 0;
-			for ( int i = 0; i < m_vElements.count(); i++ )
+			for ( unsigned int i = 0; i < m_vElements.size(); i++ )
 			{
 				memcpy( pBytes + j * m_iVertexSize + iElemOffset, m_vElements[i]->GetPtr(j), m_vElements[i]->SizeInBytes() );
 				iElemOffset += m_vElements[i]->SizeInBytes();
@@ -393,7 +393,7 @@ void GeometryDX11::LoadToBuffers()
 //--------------------------------------------------------------------------------
 UINT GeometryDX11::GetIndexCount()
 {
-	return( m_vIndices.count() );
+	return( m_vIndices.size() );
 }
 //--------------------------------------------------------------------------------
 bool GeometryDX11::ComputeTangentFrame( std::string positionSemantic,
@@ -409,7 +409,7 @@ bool GeometryDX11::ComputeTangentFrame( std::string positionSemantic,
     }
 
     // Needs to be indexed
-    if ( m_vIndices.count() == 0 )
+    if ( m_vIndices.size() == 0 )
     {
         Log::Get().Write( L"Tangent frame computation failed, geometry wasn't indexed" );
         return false;
@@ -458,7 +458,7 @@ bool GeometryDX11::ComputeTangentFrame( std::string positionSemantic,
     ZeroMemory( bitangents, m_iVertexCount * sizeof( Vector3f ) );
 
     // Loop through each triangle    
-    for ( int i = 0; i < m_vIndices.count(); i += 3 )
+    for ( UINT i = 0; i < m_vIndices.size(); i += 3 )
     {
         UINT i1 = m_vIndices[i + 0];
         UINT i2 = m_vIndices[i + 1];

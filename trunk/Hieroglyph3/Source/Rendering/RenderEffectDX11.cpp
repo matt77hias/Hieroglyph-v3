@@ -157,13 +157,22 @@ void RenderEffectDX11::UpdateConstantBufferList()
 
 			ShaderReflectionDX11* pReflection = pShader->GetReflection();
 		
-			for ( int i = 0; i < pReflection->ConstantBuffers.count(); i++ ) {
+			for ( unsigned int i = 0; i < pReflection->ConstantBuffers.size(); i++ ) {
 			
 				RenderParameterDX11* pParameter = pReflection->ConstantBuffers[i].pParamRef;
 
 				// If it isn't already included, then add it to the list.
-				if ( !m_uniqueConstBuffers.contains( pParameter ) ) {
-					m_uniqueConstBuffers.add( pParameter );
+
+				bool bAlreadyThere = false;
+				for ( auto pExistingParam : m_uniqueConstBuffers ) {
+					if ( pParameter == pExistingParam ) {
+						bAlreadyThere = true;
+						break;
+					}
+				}
+
+				if ( !bAlreadyThere ) {
+					m_uniqueConstBuffers.push_back( pParameter );
 				} else {
 					Log::Get().Write( L"Skipped adding a duplicate constant buffer..." );
 				}
@@ -199,8 +208,7 @@ void RenderEffectDX11::ConfigurePipeline( PipelineManagerDX11* pPipeline, IParam
 
 	// Update the contents of the needed constant buffers.
 
-	for ( int i = 0; i < m_uniqueConstBuffers.count(); i++ ) {
-		RenderParameterDX11* pParameter = m_uniqueConstBuffers[i];
+	for ( auto pParameter : m_uniqueConstBuffers ) {
 		ConstantBufferDX11* cbuffer = RendererDX11::Get()->GetConstantBufferByIndex( pParamManager->GetConstantBufferParameter( pParameter ) );
 		cbuffer->EvaluateMappings( pPipeline, pParamManager );
 	}

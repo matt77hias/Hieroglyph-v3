@@ -59,21 +59,21 @@ ViewDeferredRenderer::ViewDeferredRenderer( RendererDX11& Renderer, ResourcePtr 
         RTConfig.SetBindFlags( D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET );
         RTConfig.SetSampleDesc( sampleDesc );
 	    for(int i = 0; i < 4; ++i)
-            m_GBuffer[GBufferOptMode::OptDisabled][aaMode].add( Renderer.CreateTexture2D( &RTConfig, NULL ) );
+            m_GBuffer[GBufferOptMode::OptDisabled][aaMode].push_back( Renderer.CreateTexture2D( &RTConfig, NULL ) );
 
         // Create the render targets for our optimized G-Buffer
 
         // 2-component signed normalized format for spheremap-encoded normals
         RTConfig.SetFormat( DXGI_FORMAT_R16G16_SNORM );
-        m_GBuffer[GBufferOptMode::OptEnabled][aaMode].add( Renderer.CreateTexture2D( &RTConfig, NULL ) );
+		m_GBuffer[GBufferOptMode::OptEnabled][aaMode].push_back( Renderer.CreateTexture2D( &RTConfig, NULL ) );
 
         // 3-component 10-bit unsigned normalized format for diffuse albedo
         RTConfig.SetFormat( DXGI_FORMAT_R10G10B10A2_UNORM );
-        m_GBuffer[GBufferOptMode::OptEnabled][aaMode].add( Renderer.CreateTexture2D( &RTConfig, NULL ) );
+		m_GBuffer[GBufferOptMode::OptEnabled][aaMode].push_back( Renderer.CreateTexture2D( &RTConfig, NULL ) );
 
         // 4-component 8-bit unsigned normalized format for specular albedo and power
         RTConfig.SetFormat( DXGI_FORMAT_R8G8B8A8_UNORM );
-        m_GBuffer[GBufferOptMode::OptEnabled][aaMode].add( Renderer.CreateTexture2D( &RTConfig, NULL ) );
+		m_GBuffer[GBufferOptMode::OptEnabled][aaMode].push_back( Renderer.CreateTexture2D( &RTConfig, NULL ) );
 
         // We need one last render target for the final image
         RTConfig.SetFormat( DXGI_FORMAT_R10G10B10A2_UNORM );
@@ -208,7 +208,7 @@ void ViewDeferredRenderer::Draw( PipelineManagerDX11* pPipelineManager, IParamet
 	pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
 	pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iCurrentViewport );
 
-    TArray<ResourcePtr>& gBuffer = m_GBuffer[GBufferOptMode::Value][AAMode::Value];
+    std::vector<ResourcePtr>& gBuffer = m_GBuffer[GBufferOptMode::Value][AAMode::Value];
     float scaleFactor = AAMode::Value == AAMode::SSAA ? 0.5f : 1.0f;
 
     if ( DisplayMode::Value == DisplayMode::Final )
@@ -297,12 +297,12 @@ void ViewDeferredRenderer::Resize( UINT width, UINT height )
 		pRenderer->ResizeTextureDSV( m_DepthTarget[aaMode]->m_iResource, m_ReadOnlyDepthTarget[aaMode]->m_iResourceDSV, rtWidth, rtHeight );
 
 		// Resize each of the G-Buffers for optimization disabled mode.
-		for( int i = 0; i < m_GBuffer[GBufferOptMode::OptDisabled][aaMode].count(); ++i ) {
+		for( unsigned int i = 0; i < m_GBuffer[GBufferOptMode::OptDisabled][aaMode].size(); ++i ) {
             pRenderer->ResizeTexture( m_GBuffer[GBufferOptMode::OptDisabled][aaMode][i], rtWidth, rtHeight );
 		}
         
 		// Resize each of the G-Buffers for optimization enabled mode.
-		for ( int i = 0; i < m_GBuffer[GBufferOptMode::OptEnabled][aaMode].count(); i++ ) {
+		for ( unsigned int i = 0; i < m_GBuffer[GBufferOptMode::OptEnabled][aaMode].size(); ++i ) {
 	        pRenderer->ResizeTexture( m_GBuffer[GBufferOptMode::OptEnabled][aaMode][i], rtWidth, rtHeight );
 		}
 

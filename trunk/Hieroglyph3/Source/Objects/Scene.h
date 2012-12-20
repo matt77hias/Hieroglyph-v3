@@ -36,7 +36,7 @@ namespace Glyph3
 		void AddActor( Actor* actor );
 
 		// Geometric queries
-		void BuildPickRecord( Ray3f& ray, TArray<PickRecord>& record );
+		void BuildPickRecord( Ray3f& ray, std::vector<PickRecord>& record );
 
 		Node3D* GetRoot();
 
@@ -45,8 +45,8 @@ namespace Glyph3
 
 	protected:
 		Node3D* m_pRoot;
-		TArray< Camera* > m_vCameras;
-		TArray< Actor* > m_vActors;
+		std::vector< Camera* > m_vCameras;
+		std::vector< Actor* > m_vActors;
 	};
 };
 //--------------------------------------------------------------------------------

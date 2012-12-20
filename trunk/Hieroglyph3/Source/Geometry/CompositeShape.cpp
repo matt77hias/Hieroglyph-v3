@@ -28,83 +28,80 @@ CompositeShape::CompositeShape( )
 //--------------------------------------------------------------------------------
 CompositeShape::~CompositeShape()
 {
+	for ( auto pShape : m_Shapes )
+		delete pShape;
 }
 //--------------------------------------------------------------------------------
 void CompositeShape::AddShape( Shape3D* pShape )
 {
 	if ( pShape )
-		m_Shapes.add( pShape );
+		m_Shapes.push_back( pShape );
 }
 //--------------------------------------------------------------------------------
 CompositeShape* CompositeShape::DeepCopy( )
 {
 	CompositeShape* pCopy = new CompositeShape();
 
-	for ( int i = 0; i < m_Shapes.count(); i++ )
+	for ( auto pShape : m_Shapes )
 	{
-		Shape3D* pShape = m_Shapes[i];
-		
-		if ( pShape )
+		// Get the shape type
+		eSHAPE type = pShape->GetShapeType();
+
+		// Create and copy the shape, then add it to the copied composite
+		switch( type )
 		{
-			// Get the shape type
-			eSHAPE type = pShape->GetShapeType();
-
-			// Create and copy the shape, then add it to the copied composite
-			switch( type )
+		case SPHERE:
 			{
-			case SPHERE:
-				{
-					Sphere3f* pSphere = new Sphere3f();
-					*pSphere = *(Sphere3f*)pShape;
-					pCopy->AddShape( pSphere );
+				Sphere3f* pSphere = new Sphere3f();
+				*pSphere = *(Sphere3f*)pShape;
+				pCopy->AddShape( pSphere );
 				
-					break;
-				}
+				break;
+			}
 
-			case BOX:
-				{
-					Box3f* pBox = new Box3f();
-					*pBox = *(Box3f*)pShape;
-					pCopy->AddShape( pBox );
+		case BOX:
+			{
+				Box3f* pBox = new Box3f();
+				*pBox = *(Box3f*)pShape;
+				pCopy->AddShape( pBox );
 				
-					break;
-				}
+				break;
+			}
 
-			case FRUSTUM:
-				{
-					Frustum3f* pFrustum = new Frustum3f();
-					*pFrustum = *(Frustum3f*)pShape;
-					pCopy->AddShape( pFrustum );
+		case FRUSTUM:
+			{
+				Frustum3f* pFrustum = new Frustum3f();
+				*pFrustum = *(Frustum3f*)pShape;
+				pCopy->AddShape( pFrustum );
 				
-					break;
-				}
+				break;
+			}
 
-			case PLANE:
-				{
-					Plane3f* pPlane = new Plane3f();
-					*pPlane = *(Plane3f*)pShape;
-					pCopy->AddShape( pPlane );
+		case PLANE:
+			{
+				Plane3f* pPlane = new Plane3f();
+				*pPlane = *(Plane3f*)pShape;
+				pCopy->AddShape( pPlane );
 				
-					break;
-				}
+				break;
+			}
 
-			case RAY:
-				{
-					Ray3f* pRay = new Ray3f();
-					*pRay = *(Ray3f*)pShape;
-					pCopy->AddShape( pRay );
+		case RAY:
+			{
+				Ray3f* pRay = new Ray3f();
+				*pRay = *(Ray3f*)pShape;
+				pCopy->AddShape( pRay );
 				
-					break;
-				}
+				break;
+			}
 
-			case TRIANGLE:
-				{
-					Triangle3f* pTriangle = new Triangle3f();
-					*pTriangle = *(Triangle3f*)pShape;
-					pCopy->AddShape( pTriangle );
+		case TRIANGLE:
+			{
+				Triangle3f* pTriangle = new Triangle3f();
+				*pTriangle = *(Triangle3f*)pShape;
+				pCopy->AddShape( pTriangle );
 				
-					break;
-				}
+				break;
 			}
 		}
 	}
@@ -117,78 +114,73 @@ bool CompositeShape::RayIntersection( Ray3f Ray, float* fDist )
 	float fMin = 10000000000.0f;
 	bool bHit = false;
 
-	for ( int i = 0; i < m_Shapes.count(); i++ )
+	for ( auto pShape : m_Shapes )
 	{
-		Shape3D* pShape = m_Shapes[i];
-		
-		if ( pShape )
+		eSHAPE type = pShape->GetShapeType();
+
+		switch( type )
 		{
-			eSHAPE type = pShape->GetShapeType();
-
-			switch( type )
+		case SPHERE:
 			{
-			case SPHERE:
+				Sphere3f* pSphere = (Sphere3f*)pShape;
+				IntrRay3fSphere3f Intr( Ray, *pSphere );
+				if ( Intr.Test() )
 				{
-					Sphere3f* pSphere = (Sphere3f*)pShape;
-					IntrRay3fSphere3f Intr( Ray, *pSphere );
-					if ( Intr.Test() )
-					{
-						bHit = true;
+					bHit = true;
 
-						Intr.Find();
-						for ( int j = 0; j < Intr.m_iQuantity; j++ )
-						{
-							if ( Intr.m_afRayT[j] < *fDist )
-								*fDist = Intr.m_afRayT[j];
-						}
+					Intr.Find();
+					for ( int j = 0; j < Intr.m_iQuantity; j++ )
+					{
+						if ( Intr.m_afRayT[j] < *fDist )
+							*fDist = Intr.m_afRayT[j];
 					}
+				}
 					
 
-					break;
-				}
+				break;
+			}
 
-			case BOX:
+		case BOX:
+			{
+				Box3f* pBox = (Box3f*)pShape;
+				IntrRay3fBox3f Intr( Ray, *pBox );
+				if ( Intr.Test() )
 				{
-					Box3f* pBox = (Box3f*)pShape;
-					IntrRay3fBox3f Intr( Ray, *pBox );
-					if ( Intr.Test() )
+					bHit = true;
+
+					Intr.Find();
+					for ( int j = 0; j < Intr.m_iQuantity; j++ )
 					{
-						bHit = true;
-
-						Intr.Find();
-						for ( int j = 0; j < Intr.m_iQuantity; j++ )
-						{
-							if ( Intr.m_afRayT[j] < *fDist )
-								*fDist = Intr.m_afRayT[j];
-						}
+						if ( Intr.m_afRayT[j] < *fDist )
+							*fDist = Intr.m_afRayT[j];
 					}
-				
-					break;
 				}
+				
+				break;
+			}
 
-			case FRUSTUM:
-				{
+		case FRUSTUM:
+			{
 				
-					break;
-				}
+				break;
+			}
 
-			case PLANE:
-				{
+		case PLANE:
+			{
 				
-					break;
-				}
+				break;
+			}
 
-			case RAY:
-				{
+		case RAY:
+			{
 				
-					break;
-				}
+				break;
+			}
 
-			case TRIANGLE:
-				{
+		case TRIANGLE:
+			{
 				
-					break;
-				}
+				break;
 			}
 		}
 	}
@@ -199,6 +191,6 @@ bool CompositeShape::RayIntersection( Ray3f Ray, float* fDist )
 //--------------------------------------------------------------------------------
 int CompositeShape::GetNumberOfShapes()
 {
-	return( m_Shapes.count() );
+	return( m_Shapes.size() );
 }
 //--------------------------------------------------------------------------------

@@ -55,3 +55,11 @@ void PipelineExecutorDX11::GenerateInputLayout( int ShaderID )
 	}
 }
 //--------------------------------------------------------------------------------
+void PipelineExecutorDX11::SetLayoutElements( unsigned int count, D3D11_INPUT_ELEMENT_DESC* pElements )
+{
+	for ( unsigned int i = 0; i < count; i++ )
+	{
+		m_elements.push_back( pElements[i] );
+	}
+}
+//--------------------------------------------------------------------------------
