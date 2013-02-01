@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink
+// Copyright (c) Jason Zink
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -66,13 +66,16 @@ namespace Glyph3
 		SpriteFontDX11();
 		~SpriteFontDX11();
 
-		bool Initialize(LPCWSTR fontName, float fontSize, UINT fontStyle, bool antiAliased );
+		bool Initialize( std::wstring& fontName, float fontSize, UINT fontStyle, bool antiAliased );
 
 		// Accessors
-		int SRViewResource() const;
+		std::wstring FontName() const;
+		float Size() const;
+		UINT FontStyle() const;
+		bool AntiAliased() const;
+
 		const CharDesc* CharDescriptors() const;
 		const CharDesc& GetCharDescriptor(WCHAR character) const;
-		float Size() const;
 		ResourcePtr TextureResource() const;
 		UINT TextureWidth() const;
 		UINT TextureHeight() const;
@@ -80,16 +83,19 @@ namespace Glyph3
 		float CharHeight() const;
 
 	protected:
+		std::wstring m_FontName;
+		float m_fSize;
+		UINT m_uiFontStyle;
+		bool m_bAntiAliased;
 
 		ResourcePtr m_pTexture;
-		int m_iSRView;
 		CharDesc m_CharDescs [NumChars];
-		float m_fSize;
 		UINT m_uTexHeight;
 		float m_fSpaceWidth;
 		float m_fCharHeight;
 	};
 
+	typedef std::shared_ptr<SpriteFontDX11> SpriteFontPtr;
 }
 
 //--------------------------------------------------------------------------------

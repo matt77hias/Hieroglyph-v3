@@ -61,7 +61,7 @@ VS_OUTPUT VSMAIN( in VS_INPUT input )
 float4 PSMAIN( in VS_OUTPUT input ) : SV_Target
 {
 	float4 color = input.color;
-
+	
 	return( color );
 }
 //--------------------------------------------------------------------------------

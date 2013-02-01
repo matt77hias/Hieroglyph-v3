@@ -1,4 +1,12 @@
 //--------------------------------------------------------------------------------
+// This file is a portion of the Hieroglyph 3 Rendering Engine.  It is distributed
+// under the MIT License, available in the root of this distribution and 
+// at the following URL:
+//
+// http://www.opensource.org/licenses/mit-license.php
+//
+// Copyright (c) Jason Zink 
+//--------------------------------------------------------------------------------
 #include "PCH.h"
 
 #include "RenderApplication.h"
@@ -144,7 +152,7 @@ void RenderApplication::ShutdownRenderingSetup()
 	SAFE_DELETE( m_pScene );
 }
 //--------------------------------------------------------------------------------
-bool RenderApplication::HandleEvent( IEvent* pEvent )
+bool RenderApplication::HandleEvent( EventPtr pEvent )
 {
 	// This method body is included here for future use, to allow the 
 	// RenderApplication to handle some events if needed.
@@ -153,7 +161,7 @@ bool RenderApplication::HandleEvent( IEvent* pEvent )
 
 	if ( e == WINDOW_RESIZE )
 	{
-		EvtWindowResize* pResize = (EvtWindowResize*)pEvent;
+		EvtWindowResizePtr pResize = std::static_pointer_cast<EvtWindowResize>( pEvent );
 
 		this->HandleWindowResize( pResize->GetWindowHandle(), pResize->NewWidth(), pResize->NewHeight() );
 
@@ -161,7 +169,7 @@ bool RenderApplication::HandleEvent( IEvent* pEvent )
 	}
 	else if ( e == SYSTEM_KEYBOARD_KEYUP )
 	{
-		EvtKeyUp* pKeyUp = (EvtKeyUp*)pEvent;
+		EvtKeyUpPtr pKeyUp = std::static_pointer_cast<EvtKeyUp>( pEvent );
 
 		unsigned int key = pKeyUp->GetCharacterCode();
 

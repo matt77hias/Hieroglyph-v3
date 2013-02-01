@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 #include "Application.h"
 
@@ -17,7 +17,7 @@
 #include "RenderEffectDX11.h"
 
 #include "SpriteRendererDX11.h"
-#include "SpriteFontDX11.h"
+#include "SpriteFontLoaderDX11.h"
 
 #include "ShaderResourceParameterDX11.h"
 #include "UnorderedAccessParameterDX11.h"
@@ -43,7 +43,7 @@ public:
 
 	virtual void TakeScreenShot();
 
-	virtual bool HandleEvent( IEvent* pEvent );
+	virtual bool HandleEvent( EventPtr pEvent );
 	virtual std::wstring GetName( );
 
 protected:
@@ -59,7 +59,7 @@ protected:
 	ResourcePtr					m_RenderTarget;
 	ResourcePtr					m_DepthTarget;
 
-	SpriteFontDX11*				m_pFont;
+	SpriteFontPtr				m_pFont;
 	SpriteRendererDX11*			m_pSpriteRenderer;
 
 	GeometryPtr					m_pTerrainGeometry;

@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 #pragma warning( disable : 4244 )
 //--------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ void ShaderReflectionDX11::InitializeConstantBuffers( IParameterManager* pParamM
 							message << L" - class: " << TO_STRING_D3D_SHADER_VARIABLE_CLASS(mapping.varclass) << std::endl << std::endl;
 
 							Log::Get().Write( message.str() );
-							EventManager::Get()->ProcessEvent( new EvtErrorMessage( message.str() ) );
+							EventManager::Get()->ProcessEvent( EvtErrorMessagePtr( new EvtErrorMessage( message.str() ) ) );
 
 						}
 					}

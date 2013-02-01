@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 #include "RenderApplication.h"
 
@@ -37,7 +37,7 @@ public:
 	virtual void Update();
 	virtual void Shutdown();
 
-	virtual bool HandleEvent( IEvent* pEvent );
+	virtual bool HandleEvent( EventPtr pEvent );
 	virtual std::wstring GetName( );
 
 protected:

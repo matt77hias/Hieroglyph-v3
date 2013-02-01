@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //
 // Author: Jason Kinzer (based on DirectX Tutorial 4)
 //--------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ public:
 
 	virtual void TakeScreenShot();
 
-	virtual bool HandleEvent( IEvent* pEvent );
+	virtual bool HandleEvent( EventPtr pEvent );
 	virtual std::wstring GetName( );
 
 protected:

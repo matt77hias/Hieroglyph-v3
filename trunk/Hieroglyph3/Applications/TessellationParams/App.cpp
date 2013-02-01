@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 #include "App.h"
 #include "Log.h"
@@ -184,8 +184,7 @@ void App::Initialize()
 	SetPartitioningMode(Integer);
 
 	// Create the text rendering
-	m_pFont = new SpriteFontDX11();
-	m_pFont->Initialize( L"Consolas", 12.0f, 0, true );
+	m_pFont = SpriteFontLoaderDX11::LoadFont( std::wstring( L"Consolas" ), 12.0f, 0, true );
 	
 	m_pSpriteRenderer = new SpriteRendererDX11();
 	m_pSpriteRenderer->Initialize();
@@ -201,7 +200,7 @@ void App::Update()
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.
 
-	EventManager::Get()->ProcessEvent( new EvtFrameStart( m_pTimer->Elapsed() ) );
+	EvtManager.ProcessEvent( EvtFrameStartPtr( new EvtFrameStart( m_pTimer->Elapsed() ) ) );
 
 	// Clear the window to white
 	m_pRenderer11->pImmPipeline->ClearBuffers( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ), 1.0f );
@@ -271,7 +270,7 @@ void App::Update()
 			case FractionalEven:	out << L"('fractional_even')"; break;
 		}
 
-		m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, *m_pFont, out.str().c_str(), Matrix4f::Identity(), Vector4f( 1.f, 0.f, 0.f, 1.f ) );
+		m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, m_pFont, out.str().c_str(), Matrix4f::Identity(), Vector4f( 1.f, 0.f, 0.f, 1.f ) );
 	}
 
 	// Present the final image to the screen
@@ -288,7 +287,6 @@ void App::Shutdown()
 	m_pTriangleGeometry = NULL;
 	SAFE_DELETE( m_pTriangleEffect );
 
-	SAFE_DELETE( m_pFont );
 	SAFE_DELETE( m_pSpriteRenderer );
 
 	// Print the framerate out for the log before shutting down.
@@ -306,19 +304,19 @@ void App::TakeScreenShot()
 	}
 }
 //--------------------------------------------------------------------------------
-bool App::HandleEvent( IEvent* pEvent )
+bool App::HandleEvent( EventPtr pEvent )
 {
 	eEVENT e = pEvent->GetEventType();
 
 	if ( e == SYSTEM_KEYBOARD_KEYDOWN )
 	{
-		EvtKeyDown* pKeyDown = (EvtKeyDown*)pEvent;
+		EvtKeyDownPtr pKeyDown = std::static_pointer_cast<EvtKeyDown>( pEvent );
 
 		unsigned int key = pKeyDown->GetCharacterCode();
 	}
 	else if ( e == SYSTEM_KEYBOARD_KEYUP )
 	{
-		EvtKeyUp* pKeyUp = (EvtKeyUp*)pEvent;
+		EvtKeyUpPtr pKeyUp = std::static_pointer_cast<EvtKeyUp>( pEvent );
 
 		unsigned int key = pKeyUp->GetCharacterCode();
 

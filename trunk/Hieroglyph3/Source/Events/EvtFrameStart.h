@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -36,6 +36,7 @@ namespace Glyph3
 		float m_fDelta;
 	};
 
+	typedef std::shared_ptr<EvtFrameStart> EvtFrameStartPtr;
 };
 //--------------------------------------------------------------------------------
 #endif // EvtFrameStart_h

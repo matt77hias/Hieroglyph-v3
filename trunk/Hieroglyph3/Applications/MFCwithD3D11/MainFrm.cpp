@@ -85,8 +85,23 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 	m_SplitterMain.CreateView( 0, 0, RUNTIME_CLASS (CMFCwithD3D11View), CSize(800,800), pContext );
 
 	m_SplitterSub.CreateStatic( &m_SplitterMain, 2, 1, WS_CHILD|WS_VISIBLE, m_SplitterMain.IdFromRowCol(0,1) );
-	m_SplitterSub.CreateView( 0, 0, RUNTIME_CLASS (CMFCwithD3D11View), CSize(300,300), pContext );
+	m_SplitterSub.CreateView( 0, 0, RUNTIME_CLASS (CMFCwithD3D11View), CSize(300,200), pContext );
 	m_SplitterSub.CreateView( 1, 0, RUNTIME_CLASS (CMFCwithD3D11View), CSize(300,300), pContext );
+
+	//// Viewing parameters for the larger left side window
+	//Glyph3::Camera* pCamera = ((CMFCwithD3D11View*)m_SplitterMain.GetPane( 0, 0 ))->pCamera;
+	//pCamera->Spatial().SetRotation( Glyph3::Vector3f( 0.65f, -0.75f, 0.0f ) );
+	//pCamera->Spatial().SetTranslation( Glyph3::Vector3f( 30.0f, 30.0f, -30.0f ) );
+
+	//// Viewing parameters for the top right side window
+	//pCamera = ((CMFCwithD3D11View*)m_SplitterSub.GetPane( 0, 0 ))->pCamera;
+	//pCamera->Spatial().SetRotation( Glyph3::Vector3f( 1.5f, 0.0, 0.0f ) );
+	//pCamera->Spatial().SetTranslation( Glyph3::Vector3f( 0.0f, 30.0f, 0.0f ) );
+
+	//// Viewing parameters for the bottom right side window
+	//pCamera = ((CMFCwithD3D11View*)m_SplitterSub.GetPane( 1, 0 ))->pCamera;
+	//pCamera->Spatial().SetRotation( Glyph3::Vector3f( 0.65f, 0.75f, 0.0f ) );
+	//pCamera->Spatial().SetTranslation( Glyph3::Vector3f( -30.0f, 30.0f, -30.0f ) );
 
 	return true;
 	//return CFrameWnd::OnCreateClient(lpcs, pContext);

@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -105,6 +105,8 @@ namespace Glyph3
 
 		void Run( char *fp_szFileName );
 		lua_State* GetState( );
+
+		void ReportErrors();
 
 	protected:
 		

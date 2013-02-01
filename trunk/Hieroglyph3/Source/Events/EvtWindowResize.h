@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -37,6 +37,7 @@ namespace Glyph3
 		bool IsRestored();	// The window has been resized, but neither the SIZE_MINIMIZED nor SIZE_MAXIMIZED value applies.
 	};
 
+	typedef std::shared_ptr<EvtWindowResize> EvtWindowResizePtr;
 };
 //--------------------------------------------------------------------------------
 #endif // EvtWindowResize_h

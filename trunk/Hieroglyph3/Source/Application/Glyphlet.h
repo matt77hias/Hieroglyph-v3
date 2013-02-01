@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -22,7 +22,7 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class Glyphlet
+	class Glyphlet : public IEventListener
 	{
 
 	public:
@@ -35,7 +35,7 @@ namespace Glyph3
 		virtual void Initialize() = 0;
 		virtual void Update( float dt ) = 0;
 		virtual void Shutdown() = 0;
-		virtual bool HandleEvent( IEvent* pEvent ) = 0;
+		virtual bool HandleEvent( EventPtr pEvent ) = 0;
 	};
 };
 //--------------------------------------------------------------------------------

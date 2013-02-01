@@ -24,8 +24,8 @@ END_MESSAGE_MAP()
 //--------------------------------------------------------------------------------
 CMFCwithD3D11Doc::CMFCwithD3D11Doc()
 {
-	pScene = 0;
-	pActor = 0;
+	pScene = nullptr;
+	pActor = nullptr;
 }
 //--------------------------------------------------------------------------------
 CMFCwithD3D11Doc::~CMFCwithD3D11Doc()
@@ -81,10 +81,6 @@ void CMFCwithD3D11Doc::Dump(CDumpContext& dc) const
 //--------------------------------------------------------------------------------
 void CMFCwithD3D11Doc::DeleteContents()
 {
-	if ( pActor ) {
-		delete pActor;
-	}
-
 	if ( pScene ) {
 		delete pScene;
 	}

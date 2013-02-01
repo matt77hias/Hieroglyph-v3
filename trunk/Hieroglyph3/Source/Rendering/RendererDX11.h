@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink
+// Copyright (c) Jason Zink
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -325,7 +325,7 @@ namespace Glyph3
 		TConfiguration<bool>		MultiThreadingConfig;
 
 		virtual std::wstring GetName( );
-		virtual bool HandleEvent( IEvent* pEvent );
+		virtual bool HandleEvent( EventPtr pEvent );
 
 
 	protected:

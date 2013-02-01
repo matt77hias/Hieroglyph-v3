@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -54,8 +54,7 @@ ViewTextOverlay::ViewTextOverlay( RendererDX11& Renderer, ResourcePtr RenderTarg
 	}
 
 	// Create the text rendering classes.
-	m_pSpriteFont = new SpriteFontDX11();
-	m_pSpriteFont->Initialize( L"Consolas", 12.0f, 0, false );
+	m_pSpriteFont = SpriteFontLoaderDX11::LoadFont( std::wstring( L"Consolas" ), 12.0f, 0, false );
 	
 	m_pSpriteRenderer = new SpriteRendererDX11();
 	m_pSpriteRenderer->Initialize();
@@ -63,7 +62,6 @@ ViewTextOverlay::ViewTextOverlay( RendererDX11& Renderer, ResourcePtr RenderTarg
 //--------------------------------------------------------------------------------
 ViewTextOverlay::~ViewTextOverlay()
 {
-	SAFE_DELETE( m_pSpriteFont );
 	SAFE_DELETE( m_pSpriteRenderer );
 }
 //--------------------------------------------------------------------------------
@@ -95,7 +93,7 @@ void ViewTextOverlay::Draw( PipelineManagerDX11* pPipelineManager, IParameterMan
 
 		for ( auto entry : m_TextEntries )
 		{
-			m_pSpriteRenderer->RenderText( pPipelineManager, pParamManager, *m_pSpriteFont, entry.text.c_str(), entry.xform, entry.color );
+			m_pSpriteRenderer->RenderText( pPipelineManager, pParamManager, m_pSpriteFont, entry.text.c_str(), entry.xform, entry.color );
 		}
 
 		m_TextEntries.clear();

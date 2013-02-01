@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 #include "App.h"
 #include "Log.h"
@@ -124,7 +124,7 @@ void App::Update()
 
 	m_pTimer->Update();
 
-	EventManager::Get()->ProcessEvent( new EvtFrameStart( m_pTimer->Elapsed() ) );
+	EvtManager.ProcessEvent( EvtFrameStartPtr( new EvtFrameStart( m_pTimer->Elapsed() ) ) );
 
 	
 	// Print a message to show the framerate and sample name.
@@ -160,20 +160,20 @@ void App::Shutdown()
 	Log::Get().Write( out.str() );
 }
 //--------------------------------------------------------------------------------
-bool App::HandleEvent( IEvent* pEvent )
+bool App::HandleEvent( EventPtr pEvent )
 {
 	eEVENT e = pEvent->GetEventType();
 
 	if ( e == SYSTEM_KEYBOARD_KEYDOWN )
 	{
-		EvtKeyDown* pKeyDown = (EvtKeyDown*)pEvent;
+		EvtKeyDownPtr pKeyDown = std::static_pointer_cast<EvtKeyDown>( pEvent );
 
 		unsigned int key = pKeyDown->GetCharacterCode();
 
 	}
 	else if ( e == SYSTEM_KEYBOARD_KEYUP )
 	{
-		EvtKeyUp* pKeyUp = (EvtKeyUp*)pEvent;
+		EvtKeyUpPtr pKeyUp = std::static_pointer_cast<EvtKeyUp>( pEvent );
 
 		unsigned int key = pKeyUp->GetCharacterCode();
 

@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -17,7 +17,7 @@
 #define ViewTextOverlay_h
 //--------------------------------------------------------------------------------
 #include "IRenderView.h"
-#include "SpriteFontDX11.h"
+#include "SpriteFontLoaderDX11.h"
 #include "SpriteRendererDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
@@ -63,7 +63,7 @@ namespace Glyph3
 
 		ResourcePtr				m_RenderTarget;
 
-		SpriteFontDX11*			m_pSpriteFont;
+		SpriteFontPtr			m_pSpriteFont;
 		SpriteRendererDX11*		m_pSpriteRenderer;
 		
 		std::vector<TextEntry>	m_TextEntries;

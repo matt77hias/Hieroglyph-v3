@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -26,7 +26,6 @@ IRenderView::IRenderView( )
 	m_iMaxRecurrence = 1;
 	m_iCurrRecurrence = m_iMaxRecurrence;
 	
-	EventManager* pEventManager = EventManager::Get( );
 	RequestEvent( RENDER_FRAME_START );
 }
 //--------------------------------------------------------------------------------
@@ -87,7 +86,7 @@ std::wstring IRenderView::GetName( )
 	return( m_sName );
 }
 //--------------------------------------------------------------------------------
-bool IRenderView::HandleEvent( IEvent* pEvent )
+bool IRenderView::HandleEvent( EventPtr pEvent )
 {
 	eEVENT e = pEvent->GetEventType();
 

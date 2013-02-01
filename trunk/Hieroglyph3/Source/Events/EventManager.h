@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -21,7 +21,7 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class EventManager : public IEventListener
+	class EventManager
 	{
 	public:
 		EventManager( );
@@ -30,20 +30,15 @@ namespace Glyph3
 		bool AddEventListener( eEVENT EventID, IEventListener* pListener );
 		bool DelEventListener( eEVENT EventID, IEventListener* pListener );
 
-		bool ProcessEvent( IEvent* pEvent );
-		bool QueueEvent( IEvent* pEvent );
+		bool ProcessEvent( EventPtr pEvent );
+		bool QueueEvent( EventPtr pEvent );
 		bool ProcessEventQueue( );
 
 		static EventManager* Get( );
 
-		// IEventListener interface implementation
-		virtual std::wstring GetName( );
-		virtual bool HandleEvent( IEvent* pEvent );
-
-
 	protected:
 		std::vector< IEventListener* > m_EventHandlers[NUM_EVENTS];
-		std::vector< IEvent* > m_EventQueue;
+		std::vector< EventPtr > m_EventQueue;
 
 		static EventManager* m_spEventManager;
 	};

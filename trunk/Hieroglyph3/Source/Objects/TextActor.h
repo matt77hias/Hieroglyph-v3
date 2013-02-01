@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -32,7 +32,7 @@
 //--------------------------------------------------------------------------------
 #include "Actor.h"
 #include "DrawIndexedExecutorDX11.h"
-#include "SpriteFontDX11.h"
+#include "SpriteFontLoaderDX11.h"
 #include "BasicVertexDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
@@ -63,6 +63,7 @@ namespace Glyph3
 		void AdvanceCursor( float distance );
 		void Space();
 		void NewLine();
+		void ResetCursor();
 
 		// Manipulation of the text color can be performed through these methods.
 
@@ -79,7 +80,7 @@ namespace Glyph3
 
 		// The font to use for the drawing of the text goes here.
 
-		void SetFont( SpriteFontDX11* pFont );
+		void SetFont( SpriteFontPtr pFont );
 		void SetCharacterHeight( float scale );
 		
 	private:
@@ -100,7 +101,7 @@ namespace Glyph3
 		IndexedImmediateGeometryPtr				m_pGeometry;
 		MaterialPtr								m_pMaterial;
 
-		SpriteFontDX11*							m_pSpriteFont;
+		SpriteFontPtr							m_pSpriteFont;
 		float									m_fCharacterHeight;
 		float									m_fPhysicalScale;
 		float									m_fTextureXScale;

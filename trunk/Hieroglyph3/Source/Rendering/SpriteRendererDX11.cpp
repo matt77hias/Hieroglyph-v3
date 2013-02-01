@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink
+// Copyright (c) Jason Zink
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -286,7 +286,7 @@ void SpriteRendererDX11::Render( PipelineManagerDX11* pipeline,
 //--------------------------------------------------------------------------------
 void SpriteRendererDX11::RenderText( PipelineManagerDX11* pipeline, 
 									 IParameterManager* parameters,
-									 const SpriteFontDX11& font, const wchar_t* text,
+									 SpriteFontPtr pFont, const wchar_t* text,
 									 const Matrix4f& transform, const Vector4f& color )
 {
 	RendererDX11::PIXBeginEvent( L"SpriteRenderer RenderText" );
@@ -303,15 +303,15 @@ void SpriteRendererDX11::RenderText( PipelineManagerDX11* pipeline,
 	{
 		wchar_t character = text[i];
 		if(character == ' ')
-			textTransform[12] += font.SpaceWidth();
+			textTransform[12] += pFont->SpaceWidth();
 		else if(character == '\n')
 		{
-			textTransform[13] += font.CharHeight();
+			textTransform[13] += pFont->CharHeight();
 			textTransform[12] = 0;
 		}
 		else
 		{
-			SpriteFontDX11::CharDesc desc = font.GetCharDescriptor(character);
+			SpriteFontDX11::CharDesc desc = pFont->GetCharDescriptor(character);
 
 			m_TextDrawData[currentDraw].Transform = textTransform * transform;
 			m_TextDrawData[currentDraw].Color = color;
@@ -326,11 +326,11 @@ void SpriteRendererDX11::RenderText( PipelineManagerDX11* pipeline,
 	}
 
 	// Submit a batch
-	Render( pipeline, parameters, font.TextureResource(), m_TextDrawData, currentDraw, Point );
+	Render( pipeline, parameters, pFont->TextureResource(), m_TextDrawData, currentDraw, Point );
 
 	RendererDX11::PIXEndEvent();
 
 	if( length > numCharsToDraw )
-		RenderText( pipeline, parameters, font, text + numCharsToDraw, textTransform, color );
+		RenderText( pipeline, parameters, pFont, text + numCharsToDraw, textTransform, color );
 }
 //--------------------------------------------------------------------------------

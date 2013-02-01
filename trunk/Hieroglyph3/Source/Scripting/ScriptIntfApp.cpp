@@ -1,4 +1,14 @@
 //--------------------------------------------------------------------------------
+// This file is a portion of the Hieroglyph 3 Rendering Engine.  It is distributed
+// under the MIT License, available in the root of this distribution and 
+// at the following URL:
+//
+// http://www.opensource.org/licenses/mit-license.php
+//
+// Copyright (c) Jason Zink 
+//--------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "ScriptIntfApp.h"
 #include "Log.h"
@@ -74,7 +84,10 @@ void ScriptIntfApp::Initialize()
 {
 	lua_State* pLuaState = ScriptManager::Get()->GetState();
 	lua_getfield( pLuaState, LUA_GLOBALSINDEX, "Initialize" );
-    lua_call( pLuaState, 0, 0 );
+    if ( lua_pcall( pLuaState, 0, 0, 0 ) )
+	{
+		ScriptManager::Get()->ReportErrors();
+	}
 }
 //--------------------------------------------------------------------------------
 void ScriptIntfApp::Update( float time )
@@ -82,21 +95,30 @@ void ScriptIntfApp::Update( float time )
 	lua_State* pLuaState = ScriptManager::Get()->GetState();
 	lua_getfield( pLuaState, LUA_GLOBALSINDEX, "Update" );
     lua_pushnumber( pLuaState, time );
-    lua_call( pLuaState, 1, 0 );
+    if ( lua_pcall( pLuaState, 1, 0, 0 ) )
+	{
+		ScriptManager::Get()->ReportErrors();
+	}
 }
 //--------------------------------------------------------------------------------
 void ScriptIntfApp::Render()
 {
 	lua_State* pLuaState = ScriptManager::Get()->GetState();
 	lua_getfield( pLuaState, LUA_GLOBALSINDEX, "Render" );
-    lua_call( pLuaState, 0, 0 );
+    if ( lua_pcall( pLuaState, 0, 0, 0 ) )
+	{
+		ScriptManager::Get()->ReportErrors();
+	}
 }
 //--------------------------------------------------------------------------------
 void ScriptIntfApp::Shutdown()
 {
 	lua_State* pLuaState = ScriptManager::Get()->GetState();
 	lua_getfield( pLuaState, LUA_GLOBALSINDEX, "Shutdown" );
-    lua_call( pLuaState, 0, 0 );
+    if ( lua_pcall( pLuaState, 0, 0, 0 ) )
+	{
+		ScriptManager::Get()->ReportErrors();
+	}
 }
 //--------------------------------------------------------------------------------
 void ScriptIntfApp::OnKeyDown( unsigned int key )
@@ -104,7 +126,10 @@ void ScriptIntfApp::OnKeyDown( unsigned int key )
 	lua_State* pLuaState = ScriptManager::Get()->GetState();
 	lua_getfield( pLuaState, LUA_GLOBALSINDEX, "OnKeyDown" );
 	lua_pushnumber( pLuaState, key );
-    lua_call( pLuaState, 1, 0 );
+    if ( lua_pcall( pLuaState, 1, 0, 0 ) )
+	{
+		ScriptManager::Get()->ReportErrors();
+	}
 }
 //--------------------------------------------------------------------------------
 void ScriptIntfApp::InitializeInterface()

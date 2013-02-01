@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -67,8 +67,6 @@ FirstPersonCamera::FirstPersonCamera() :    m_iLastMouseX( InvalidMousePos ),
     for( UINT i = 0; i < NumControlKeys; ++i )
         m_bPressedKeys[i] = false;
 
-    EventManager* pEventManager = EventManager::Get( );
-
     RequestEvent( SYSTEM_KEYBOARD_KEYUP );
     RequestEvent( SYSTEM_KEYBOARD_KEYDOWN );
     RequestEvent( SYSTEM_RBUTTON_DOWN );
@@ -82,13 +80,13 @@ FirstPersonCamera::~FirstPersonCamera()
 {
 }
 //--------------------------------------------------------------------------------
-bool FirstPersonCamera::HandleEvent( IEvent* pEvent )
+bool FirstPersonCamera::HandleEvent( EventPtr pEvent )
 {
     eEVENT e = pEvent->GetEventType();
 
     if ( e == SYSTEM_KEYBOARD_KEYDOWN )
     {
-        EvtKeyDown* pKeyDown = static_cast<EvtKeyDown*>(pEvent);
+        EvtKeyDownPtr pKeyDown = std::static_pointer_cast<EvtKeyDown>(pEvent);
         UINT key = pKeyDown->GetCharacterCode();
 
         for( UINT i = 0; i < NumControlKeys; ++i )
@@ -102,7 +100,7 @@ bool FirstPersonCamera::HandleEvent( IEvent* pEvent )
     }
     else if ( e == SYSTEM_KEYBOARD_KEYUP )
     {
-        EvtKeyUp* pKeyUp = static_cast<EvtKeyUp*>(pEvent);
+        EvtKeyUpPtr pKeyUp = std::static_pointer_cast<EvtKeyUp>(pEvent);
 
         UINT key = pKeyUp->GetCharacterCode();
 
@@ -117,7 +115,7 @@ bool FirstPersonCamera::HandleEvent( IEvent* pEvent )
     }
     else if ( e == SYSTEM_MOUSE_MOVE )
     {
-        EvtMouseMove* pMouseMove = static_cast<EvtMouseMove*>(pEvent);
+        EvtMouseMovePtr pMouseMove = std::static_pointer_cast<EvtMouseMove>(pEvent);
         
         m_iMouseDeltaX = 0;
         m_iMouseDeltaY = 0;

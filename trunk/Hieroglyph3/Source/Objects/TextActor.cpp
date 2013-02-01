@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -68,14 +68,12 @@ TextActor::TextActor()
 	GetBody()->SetGeometry( m_pGeometry );
 	GetBody()->SetMaterial( m_pMaterial );
 
-	SpriteFontDX11* pSpriteFont = new SpriteFontDX11();
-	pSpriteFont->Initialize( L"Consolas", 20.0f, 0, true );
+	SpriteFontPtr pSpriteFont = SpriteFontLoaderDX11::LoadFont( std::wstring( L"Consolas" ), 20.0f, 0, true );
 	SetFont( pSpriteFont );
 }
 //--------------------------------------------------------------------------------
 TextActor::~TextActor()
 {
-	SAFE_DELETE( m_pSpriteFont );
 }
 //--------------------------------------------------------------------------------
 void TextActor::ClearText()
@@ -85,6 +83,7 @@ void TextActor::ClearText()
 
 	m_sText = L"";
 	m_pGeometry->ResetGeometry();
+	ResetCursor();
 }
 //--------------------------------------------------------------------------------
 void TextActor::SetText( const std::wstring& text )
@@ -155,6 +154,14 @@ void TextActor::NewLine()
 
 	m_LineStart = m_LineStart - m_ydir * m_pSpriteFont->CharHeight() * m_fPhysicalScale;
 	m_Cursor = m_LineStart;
+}
+//--------------------------------------------------------------------------------
+void TextActor::ResetCursor()
+{
+	// For a line return, we go back to zero for the horizontal location, and 
+	// advance downward by the scaled size of the character set height.
+
+	m_Cursor = m_Origin;
 }
 //--------------------------------------------------------------------------------
 void TextActor::AddVertex( const Vector3f& position, const Vector2f& texcoords )
@@ -245,14 +252,8 @@ void TextActor::DrawCharacter( const wchar_t& character )
 	AdvanceCursor( desc.Width * m_fPhysicalScale );
 }
 //--------------------------------------------------------------------------------
-void TextActor::SetFont( SpriteFontDX11* pFont )
+void TextActor::SetFont( SpriteFontPtr pFont )
 {
-	// If there is an existing font already, then release it.
-	
-	if ( nullptr != m_pSpriteFont ) {
-		delete m_pSpriteFont;
-	}
-
 	m_pSpriteFont = pFont;
 	
 	// Update the material parameters to account for the new font's texture.
@@ -275,6 +276,14 @@ void TextActor::SetFont( SpriteFontDX11* pFont )
 	} else {
 		m_fTextureYScale = 0.0f;
 	}
+
+	// After setting a new font, we should regenerate the geometry.  First clear
+	// the geometry and reset the cursor, then regenerate the contents of the
+	// geometry by drawing into it.
+
+	m_pGeometry->ResetGeometry();
+	ResetCursor();
+	DrawString( m_sText );
 }
 //--------------------------------------------------------------------------------
 void TextActor::SetCharacterHeight( float height )

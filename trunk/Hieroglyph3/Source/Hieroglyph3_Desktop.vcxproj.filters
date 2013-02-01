@@ -171,6 +171,12 @@
     <Filter Include="Rendering\Material System\Components\Material Templates">
       <UniqueIdentifier>{fd4a0249-dfec-421c-aea7-992b7109520d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripting\New Interfaces">
+      <UniqueIdentifier>{4012733d-e510-4651-8a9b-b6339d383531}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application\Glyphlets">
+      <UniqueIdentifier>{67267e42-6de0-4dd5-bea4-1b47003272af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation\AnimationStream.cpp">
@@ -725,6 +731,27 @@
     <ClCompile Include="Rendering\MultiExecutorDX11.cpp">
       <Filter>Rendering\Pipeline System\Pipeline Execution\Executors</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\SpriteFontLoaderDX11.cpp">
+      <Filter>Rendering\Sprite System</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\LuaApp.cpp">
+      <Filter>Scripting\New Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\LuaGeometryActor.cpp">
+      <Filter>Scripting\New Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\LuaScene.cpp">
+      <Filter>Scripting\New Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\LuaTextActor.cpp">
+      <Filter>Scripting\New Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\SingleWindowGlyphlet.cpp">
+      <Filter>Application\Glyphlets</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\GlyphletActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationStream.h">
@@ -740,9 +767,6 @@
       <Filter>Application</Filter>
     </ClInclude>
     <ClInclude Include="Application\FileSystem.h">
-      <Filter>Application</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Glyphlet.h">
       <Filter>Application</Filter>
     </ClInclude>
     <ClInclude Include="Application\IWindowProc.h">
@@ -1317,6 +1341,30 @@
     </ClInclude>
     <ClInclude Include="Rendering\MultiExecutorDX11.h">
       <Filter>Rendering\Pipeline System\Pipeline Execution\Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\SpriteFontLoaderDX11.h">
+      <Filter>Rendering\Sprite System</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\LuaApp.h">
+      <Filter>Scripting\New Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\LuaGeometryActor.h">
+      <Filter>Scripting\New Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\LuaScene.h">
+      <Filter>Scripting\New Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\LuaTextActor.h">
+      <Filter>Scripting\New Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Glyphlet.h">
+      <Filter>Application\Glyphlets</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\SingleWindowGlyphlet.h">
+      <Filter>Application\Glyphlets</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\GlyphletActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

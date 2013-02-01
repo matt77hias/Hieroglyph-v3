@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -31,6 +31,7 @@ namespace Glyph3
 		int GetWheelDelta();
 	};
 
+	typedef std::shared_ptr<EvtMouseWheel> EvtMouseWheelPtr;
 };
 //--------------------------------------------------------------------------------
 #endif // EvtMouseWheel_h

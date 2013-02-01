@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -29,7 +29,7 @@
 #include "ViewGBuffer.h"
 #include "ViewLights.h"
 #include "SpriteRendererDX11.h"
-#include "SpriteFontDX11.h"
+#include "SpriteFontLoaderDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -80,7 +80,7 @@ namespace Glyph3
 		ViewLights*					m_pLightsView;
 
 		SpriteRendererDX11			m_SpriteRenderer;
-		SpriteFontDX11				m_Font;
+		SpriteFontPtr				m_pFont;
 
 	};
 };

@@ -5,12 +5,15 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "ScriptManager.h"
+#include "EventManager.h"
+#include "EvtErrorMessage.h"
+#include "GlyphString.h"
 #include "Log.h"
 //--------------------------------------------------------------------------------
 #pragma comment( lib, "lualib.lib" )
@@ -51,7 +54,10 @@ void ScriptManager::Run( char* FileName )
 	// TODO: Update this function to reference the script folder specified in the
 	//       FileSystem class!!!
 
-	luaL_dofile( m_pLuaState, FileName );
+	if ( luaL_dofile( m_pLuaState, FileName ) )
+	{
+		ReportErrors( );
+	}
 }
 //--------------------------------------------------------------------------------
 void ScriptManager::ExecuteChunk( char* chunk )
@@ -164,5 +170,16 @@ void* ScriptManager::GetObjectPointer( unsigned int handle )
 unsigned int ScriptManager::GetObjectHandle( void* pObject )
 {
 	return( m_kPointerRegistry[pObject].handle );
+}
+//--------------------------------------------------------------------------------
+void ScriptManager::ReportErrors( )
+{
+
+	std::string errormsg = lua_tostring( m_pLuaState, -1 );
+	lua_pop( m_pLuaState, 1 );
+
+	std::wstring werrormsg = GlyphString::ToUnicode( errormsg );
+
+	EventManager::Get()->ProcessEvent( EvtErrorMessagePtr( new EvtErrorMessage( werrormsg ) ) );
 }
 //--------------------------------------------------------------------------------

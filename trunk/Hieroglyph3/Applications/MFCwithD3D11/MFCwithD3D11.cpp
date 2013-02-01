@@ -16,6 +16,8 @@
 #include "MFCwithD3D11Doc.h"
 #include "MFCwithD3D11View.h"
 
+#include "EvtFrameStart.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -206,6 +208,8 @@ BOOL CMFCwithD3D11App::OnIdle(LONG lCount)
 	// Update the timer and then update the current scene with the elapsed time.
 	
 	pTimer->Update();
+
+	pEventMgr->ProcessEvent( Glyph3::EvtFrameStartPtr( new Glyph3::EvtFrameStart( pTimer->Elapsed() ) ) );
 
 	Glyph3::Scene* pScene = CMFCwithD3D11Doc::GetDoc()->pScene;
 

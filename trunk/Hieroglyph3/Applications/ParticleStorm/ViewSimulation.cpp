@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -409,14 +409,14 @@ void ViewSimulation::SetUsageParams( IParameterManager* pParamManager )
 	pParamManager->SetShaderResourceParameter( pSimState, ParticleStateBuffers[1] );
 }
 //--------------------------------------------------------------------------------
-bool ViewSimulation::HandleEvent( IEvent* pEvent )
+bool ViewSimulation::HandleEvent( EventPtr pEvent )
 {
 	eEVENT e = pEvent->GetEventType();
 
 	// Start of a rendering frame
 	if ( e == RENDER_FRAME_START )
 	{
-		EvtFrameStart* pFrameStart = (EvtFrameStart*)pEvent;
+		EvtFrameStartPtr pFrameStart = std::static_pointer_cast<EvtFrameStart>( pEvent );
 
 		m_fDelta += pFrameStart->GetElapsed();
 

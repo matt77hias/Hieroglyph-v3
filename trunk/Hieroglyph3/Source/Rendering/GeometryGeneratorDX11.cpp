@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -29,8 +29,8 @@ GeometryGeneratorDX11::GeometryGeneratorDX11( )
 void GeometryGeneratorDX11::GenerateFullScreenQuad( GeometryPtr pGeometry )
 {
 	if ( pGeometry == NULL ) {
-		EventManager::Get()->ProcessEvent( new EvtErrorMessage( std::wstring( 
-			L"Attempted to generate a full-screen quad on null geometry object!" ) ) );
+		EventManager::Get()->ProcessEvent( EvtErrorMessagePtr( new EvtErrorMessage( std::wstring( 
+			L"Attempted to generate a full-screen quad on null geometry object!" ) ) ) );
 
 		return;
 	}
@@ -82,8 +82,8 @@ void GeometryGeneratorDX11::GenerateFullScreenQuad( GeometryPtr pGeometry )
 void GeometryGeneratorDX11::GenerateTexturedPlane( GeometryPtr pGeometry, int SizeX, int SizeY )
 {
 	if ( pGeometry == NULL ) {
-		EventManager::Get()->ProcessEvent( new EvtErrorMessage( std::wstring( 
-			L"Attempted to generate a textured plane on null geometry object!" ) ) );
+		EventManager::Get()->ProcessEvent( EvtErrorMessagePtr( new EvtErrorMessage( std::wstring( 
+			L"Attempted to generate a textured plane on null geometry object!" ) ) ) );
 
 		return;
 	}
@@ -148,8 +148,8 @@ void GeometryGeneratorDX11::GenerateTexturedPlane( GeometryPtr pGeometry, int Si
 void GeometryGeneratorDX11::GenerateSkinnedBiped( GeometryPtr pGeometry )
 {
 	if ( pGeometry == NULL ) {
-		EventManager::Get()->ProcessEvent( new EvtErrorMessage( std::wstring( 
-			L"Attempted to generate a skinned biped on null geometry object!" ) ) );
+		EventManager::Get()->ProcessEvent( EvtErrorMessagePtr( new EvtErrorMessage( std::wstring( 
+			L"Attempted to generate a skinned biped on null geometry object!" ) ) ) );
 
 		return;
 	}
@@ -257,8 +257,8 @@ void GeometryGeneratorDX11::GenerateSkinnedBiped( GeometryPtr pGeometry )
 void GeometryGeneratorDX11::GenerateAxisGeometry( GeometryPtr pGeometry )
 {
 	if ( pGeometry == NULL ) {
-		EventManager::Get()->ProcessEvent( new EvtErrorMessage( std::wstring( 
-			L"Attempted to generate an axis on null geometry object!" ) ) );
+		EventManager::Get()->ProcessEvent( EvtErrorMessagePtr( new EvtErrorMessage( std::wstring( 
+			L"Attempted to generate an axis on null geometry object!" ) ) ) );
 
 		return;
 	}
@@ -411,8 +411,8 @@ void GeometryGeneratorDX11::GenerateSphere( GeometryPtr pGeometry, unsigned int 
     _ASSERT( Radius > 0.0f );
 
 	if ( pGeometry == NULL ) {
-		EventManager::Get()->ProcessEvent( new EvtErrorMessage( std::wstring( 
-			L"Attempted to generate a sphere on null geometry object!" ) ) );
+		EventManager::Get()->ProcessEvent( EvtErrorMessagePtr( new EvtErrorMessage( std::wstring( 
+			L"Attempted to generate a sphere on null geometry object!" ) ) ) );
 
 		return;
 	}
@@ -529,8 +529,8 @@ void GeometryGeneratorDX11::GenerateCone( GeometryPtr pGeometry, unsigned int UR
     _ASSERT( Height > 0.0f );
 
 	if ( pGeometry == NULL ) {
-		EventManager::Get()->ProcessEvent( new EvtErrorMessage( std::wstring( 
-			L"Attempted to generate a cone on null geometry object!" ) ) );
+		EventManager::Get()->ProcessEvent( EvtErrorMessagePtr( new EvtErrorMessage( std::wstring( 
+			L"Attempted to generate a cone on null geometry object!" ) ) ) );
 
 		return;
 	}
@@ -642,8 +642,8 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryPtr pGeometry, 
     _ASSERT( Height > 0.0f );
 
 	if ( pGeometry == NULL ) {
-		EventManager::Get()->ProcessEvent( new EvtErrorMessage( std::wstring( 
-			L"Attempted to generate a weighted skinned cone on null geometry object!" ) ) );
+		EventManager::Get()->ProcessEvent( EvtErrorMessagePtr( new EvtErrorMessage( std::wstring( 
+			L"Attempted to generate a weighted skinned cone on null geometry object!" ) ) ) );
 
 		return;
 	}

@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -38,6 +38,7 @@ namespace Glyph3
 		std::wstring m_Message;
 	};
 
+	typedef std::shared_ptr<EvtErrorMessage> EvtErrorMessagePtr;
 };
 //--------------------------------------------------------------------------------
 #endif // EvtErrorMessage_h

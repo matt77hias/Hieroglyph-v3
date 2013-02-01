@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 #include "App.h"
 #include "Log.h"
@@ -181,8 +181,7 @@ void App::Initialize()
 	m_pRenderer11->m_pParamMgr->SetVectorParameter( m_pminMaxLOD, &vMinMaxLod );
 
 	// Create the text rendering
-	m_pFont = new SpriteFontDX11();
-	m_pFont->Initialize( L"Consolas", 12.0f, 0, true );
+	m_pFont = SpriteFontLoaderDX11::LoadFont( std::wstring( L"Consolas" ), 12.0f, 0, true );
 	
 	m_pSpriteRenderer = new SpriteRendererDX11();
 	m_pSpriteRenderer->Initialize();
@@ -196,7 +195,7 @@ void App::Update()
 	m_pTimer->Update();
 
 	// Process any new events
-	EventManager::Get()->ProcessEvent( new EvtFrameStart( m_pTimer->Elapsed() ) );
+	EvtManager.ProcessEvent( EvtFrameStartPtr( new EvtFrameStart( m_pTimer->Elapsed() ) ) );
 
 	// Update any animation/camera config
 	UpdateViewState();
@@ -250,7 +249,7 @@ void App::Update()
 		// Automatic Rotation
 		out << L"\n A : Toggle Automated Camera";
 
-		m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, *m_pFont, out.str().c_str(), Matrix4f::Identity(), Vector4f( 1.f, 0.f, 0.f, 1.f ) );
+		m_pSpriteRenderer->RenderText( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, m_pFont, out.str().c_str(), Matrix4f::Identity(), Vector4f( 1.f, 0.f, 0.f, 1.f ) );
 	}
 
 	// Present the final image to the screen
@@ -282,19 +281,19 @@ void App::TakeScreenShot()
 	}
 }
 //--------------------------------------------------------------------------------
-bool App::HandleEvent( IEvent* pEvent )
+bool App::HandleEvent( EventPtr pEvent )
 {
 	eEVENT e = pEvent->GetEventType();
 
 	if ( e == SYSTEM_KEYBOARD_KEYDOWN )
 	{
-		EvtKeyDown* pKeyDown = (EvtKeyDown*)pEvent;
+		EvtKeyDownPtr pKeyDown = std::static_pointer_cast<EvtKeyDown>( pEvent );
 
 		unsigned int key = pKeyDown->GetCharacterCode();
 	}
 	else if ( e == SYSTEM_KEYBOARD_KEYUP )
 	{
-		EvtKeyUp* pKeyUp = (EvtKeyUp*)pEvent;
+		EvtKeyUpPtr pKeyUp = std::static_pointer_cast<EvtKeyUp>( pEvent );
 
 		unsigned int key = pKeyUp->GetCharacterCode();
 

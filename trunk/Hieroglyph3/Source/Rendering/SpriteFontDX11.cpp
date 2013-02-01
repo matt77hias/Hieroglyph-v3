@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink
+// Copyright (c) Jason Zink
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -16,10 +16,14 @@
 using namespace Glyph3;
 using namespace Gdiplus;
 //--------------------------------------------------------------------------------
-SpriteFontDX11::SpriteFontDX11() :  m_fSize(0),
-									m_uTexHeight(0),
-									m_fSpaceWidth(0),
-									m_fCharHeight(0)
+SpriteFontDX11::SpriteFontDX11() :  
+	m_FontName( L"" ),
+	m_fSize( 0 ),
+	m_uiFontStyle( 0 ),
+	m_bAntiAliased( false ),
+	m_uTexHeight( 0 ),
+	m_fSpaceWidth( 0 ),
+	m_fCharHeight( 0 )
 {
 
 }
@@ -29,9 +33,12 @@ SpriteFontDX11::~SpriteFontDX11()
 
 }
 //--------------------------------------------------------------------------------
-bool SpriteFontDX11::Initialize(LPCWSTR fontName, float fontSize, UINT fontStyle, bool antiAliased )
+bool SpriteFontDX11::Initialize( std::wstring& fontName, float fontSize, UINT fontStyle, bool antiAliased )
 {
+	m_FontName = fontName;
 	m_fSize = fontSize;
+	m_uiFontStyle = fontStyle;
+	m_bAntiAliased = antiAliased;
 
 	TextRenderingHint hint = antiAliased ? TextRenderingHintAntiAliasGridFit : TextRenderingHintSingleBitPerPixelGridFit;
 
@@ -42,7 +49,7 @@ bool SpriteFontDX11::Initialize(LPCWSTR fontName, float fontSize, UINT fontStyle
 	GdiPlusCall( GdiplusStartup( &token, &startupInput, &startupOutput ) );
 
 	// Create the font
-	Gdiplus::Font font( fontName, fontSize, fontStyle, UnitPixel, NULL );
+	Gdiplus::Font font( m_FontName.c_str(), fontSize, fontStyle, UnitPixel, NULL );
 
 	// Check for error during construction
 	GdiPlusCall( font.GetLastStatus() );
@@ -194,11 +201,6 @@ bool SpriteFontDX11::Initialize(LPCWSTR fontName, float fontSize, UINT fontStyle
 	return true;
 }
 //--------------------------------------------------------------------------------
-int SpriteFontDX11::SRViewResource() const
-{
-	return m_iSRView;
-}
-//--------------------------------------------------------------------------------
 const SpriteFontDX11::CharDesc* SpriteFontDX11::CharDescriptors() const
 {
 	return m_CharDescs;
@@ -210,9 +212,24 @@ const SpriteFontDX11::CharDesc& SpriteFontDX11::GetCharDescriptor(WCHAR characte
 	return m_CharDescs[character - StartChar];
 }
 //--------------------------------------------------------------------------------
+std::wstring SpriteFontDX11::FontName() const
+{
+	return( m_FontName );
+}
+//--------------------------------------------------------------------------------
 float SpriteFontDX11::Size() const
 {
-	return m_fSize;
+	return( m_fSize );
+}
+//--------------------------------------------------------------------------------
+UINT SpriteFontDX11::FontStyle() const
+{
+	return( m_uiFontStyle );
+}
+//--------------------------------------------------------------------------------
+bool SpriteFontDX11::AntiAliased() const
+{
+	return( m_bAntiAliased );
 }
 //--------------------------------------------------------------------------------
 UINT SpriteFontDX11::TextureWidth() const

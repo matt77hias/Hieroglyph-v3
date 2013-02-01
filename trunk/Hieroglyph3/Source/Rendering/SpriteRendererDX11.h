@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink
+// Copyright (c) Jason Zink
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -19,10 +19,10 @@
 #include "RenderEffectDX11.h"
 #include "DrawIndexedInstancedExecutorDX11.h"
 #include "SpriteVertexDX11.h"
+#include "SpriteFontDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class SpriteFontDX11;
 	class PipelineManagerDX11;
 
 	typedef std::shared_ptr<DrawIndexedInstancedExecutorDX11<SpriteVertexDX11::VertexData,SpriteVertexDX11::InstanceData>> SpriteGeometryPtr;
@@ -63,7 +63,7 @@ namespace Glyph3
 
 		void RenderText(	PipelineManagerDX11* pipeline,
 							IParameterManager* parameters,
-							const SpriteFontDX11& font,
+							SpriteFontPtr pFont,
 							const wchar_t* text,
 							const Matrix4f& transform,
 							const Vector4f& color = Vector4f( 1, 1, 1, 1 ) );

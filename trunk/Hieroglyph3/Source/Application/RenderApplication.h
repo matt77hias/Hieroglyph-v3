@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink
+// Copyright (c) Jason Zink
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 
@@ -36,7 +36,7 @@ namespace Glyph3
 		virtual void ShutdownRenderingSetup();
 
 		virtual void HandleWindowResize( HWND handle, UINT width, UINT height );
-		virtual bool HandleEvent( IEvent* pEvent );
+		virtual bool HandleEvent( EventPtr pEvent );
 
 		virtual Win32RenderWindow* CreateRenderWindow();
 

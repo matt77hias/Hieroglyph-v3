@@ -5,18 +5,17 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
 // IEvent
 //
-// Copyright (C) 2003-2007 Jason Zink
 //--------------------------------------------------------------------------------
 #ifndef IEvent_h
 #define IEvent_h
 //--------------------------------------------------------------------------------
-#include <string>
+#include "PCH.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -57,6 +56,8 @@ namespace Glyph3
 		virtual std::wstring GetEventName( ) = 0;
 		virtual eEVENT GetEventType( ) = 0;
 	};
+
+	typedef std::shared_ptr<IEvent> EventPtr;
 };
 //--------------------------------------------------------------------------------
 #endif // IEvent_h

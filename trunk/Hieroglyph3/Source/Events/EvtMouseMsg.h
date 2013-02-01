@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -35,6 +35,7 @@ namespace Glyph3
 		int GetY();
 	};
 
+	typedef std::shared_ptr<EvtMouseMsg> EvtMouseMsgPtr;
 };
 //--------------------------------------------------------------------------------
 #endif // EvtMouseMsg_h

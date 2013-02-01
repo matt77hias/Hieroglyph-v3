@@ -33,9 +33,6 @@ CMFCwithD3D11View::CMFCwithD3D11View()
 //--------------------------------------------------------------------------------
 CMFCwithD3D11View::~CMFCwithD3D11View()
 {
-	//if ( pCamera ) {
-	//	delete pCamera;
-	//}
 }
 //--------------------------------------------------------------------------------
 BOOL CMFCwithD3D11View::PreCreateWindow(CREATESTRUCT& cs)
@@ -116,8 +113,8 @@ void CMFCwithD3D11View::OnInitialUpdate()
 	// Create and configure the camera for this view.
 
 	pCamera = new Glyph3::FirstPersonCamera();
-	pCamera->GetNode()->Rotation().Rotation( Glyph3::Vector3f( 0.65f, -0.75f, 0.0f ) );
-	pCamera->GetNode()->Position() = Glyph3::Vector3f( 30.0f, 30.0f, -30.0f );
+	pCamera->Spatial().SetRotation( Glyph3::Vector3f( 0.65f, -0.75f, 0.0f ) );
+	pCamera->Spatial().SetTranslation( Glyph3::Vector3f( 30.0f, 30.0f, -30.0f ) );
 	pCamera->SetCameraView( pPerspectiveView );
 	pCamera->SetOverlayView( pTextOverlayView );
 	pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>(width) / static_cast<float>(height), static_cast<float>( GLYPH_PI ) / 4.0f );

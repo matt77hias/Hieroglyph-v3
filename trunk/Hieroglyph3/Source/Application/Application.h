@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ namespace Glyph3
 		virtual LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam); 
         virtual void BeforeRegisterWindowClass(WNDCLASSEX &wc);
 
-		virtual bool HandleEvent( IEvent* pEvent );
+		virtual bool HandleEvent( EventPtr pEvent );
 
 		// Request an exit from windows
 		void RequestTermination();
@@ -88,14 +88,15 @@ namespace Glyph3
 		Timer* m_pTimer;
 
 		// Engine Components
-		EventManager* m_pEventMgr;
+		EventManager EvtManager;
 
 		Scene* m_pScene;
 
 		bool m_bSaveScreenshot;
+		bool m_bLoop;
 
 	protected:
-		// CApplication pointer to ensure single instance
+		// Application pointer to ensure single instance
 		static Application* ms_pApplication;
 	};
 };

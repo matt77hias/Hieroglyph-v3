@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -21,8 +21,6 @@ EventManager::EventManager()
 {
 	if ( !m_spEventManager )
 		m_spEventManager = this;
-	else
-		Log::Get().Write( L"ERROR: Someone create more than one EventManagers!" );
 }
 //--------------------------------------------------------------------------------
 EventManager::~EventManager()
@@ -73,7 +71,7 @@ bool EventManager::DelEventListener( eEVENT EventID, IEventListener* pListener )
 	return( bResult );
 }
 //--------------------------------------------------------------------------------
-bool EventManager::ProcessEvent( IEvent* pEvent )
+bool EventManager::ProcessEvent( EventPtr pEvent )
 {
 	if ( !pEvent )
 		return( false );
@@ -90,15 +88,13 @@ bool EventManager::ProcessEvent( IEvent* pEvent )
 			break;
 	}
 
-	// Delete the event after processing.  This may need to check the handled
-	// flag to see if it should be re-queued or not...
-
-	delete pEvent;
+	// The event will automatically be destroyed after exiting this method if no
+	// other references to the event have been created.
 
 	return( bHandled );
 }
 //--------------------------------------------------------------------------------
-bool EventManager::QueueEvent( IEvent* pEvent )
+bool EventManager::QueueEvent( EventPtr pEvent )
 {
 	// TODO: Events are currently not queued - they are handled immediately after
 	//       sending them.  This will need to be addressed in the future...
@@ -112,41 +108,5 @@ bool EventManager::ProcessEventQueue( )
 	//       sending them.  This will need to be addressed in the future...
 
 	return( true );
-}
-//--------------------------------------------------------------------------------
-std::wstring EventManager::GetName( )
-{
-	return( L"EventManager" );
-}
-//--------------------------------------------------------------------------------
-bool EventManager::HandleEvent( IEvent* pEvent )
-{
-	// If an event manager receives an event, it will simply forward the event
-	// to its own listeners until someone handles it.  In this scenario, the 
-	// handling is slightly different than if the event was originally posted to
-	// this manager since the event lifetime will be controlled by the originator.
-
-	if ( !pEvent )
-		return( false );
-
-	eEVENT e = pEvent->GetEventType();
-	UINT num = m_EventHandlers[e].size();
-
-	bool bHandled = false;
-
-	// Loop through each listener and allow them to handle the event.  Halt the
-	// processing if the event is handled.
-
-	for ( unsigned int i = 0; i < num; i++ )
-	{
-		bHandled = m_EventHandlers[e][i]->HandleEvent( pEvent );
-		if ( bHandled )
-			break;
-	}
-
-	// Do not delete the event after processing.  Instead, return the 'handled'
-	// result and let the original event manager take care of it.
-
-	return( bHandled );
 }
 //--------------------------------------------------------------------------------

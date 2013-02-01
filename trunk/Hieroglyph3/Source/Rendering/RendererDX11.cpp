@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink
+// Copyright (c) Jason Zink
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -121,7 +121,6 @@ RendererDX11::RendererDX11()
 
 	m_FeatureLevel = D3D_FEATURE_LEVEL_9_1; // Initialize this to only support 9.1...
 
-	EventManager* pEventManager = EventManager::Get( );
 	RequestEvent( RENDER_FRAME_START );
 }
 //--------------------------------------------------------------------------------
@@ -1930,7 +1929,7 @@ std::wstring RendererDX11::GetName( )
 	return( std::wstring( L"RendererDX11" ) );
 }
 //--------------------------------------------------------------------------------
-bool RendererDX11::HandleEvent( IEvent* pEvent )
+bool RendererDX11::HandleEvent( EventPtr pEvent )
 {
 	eEVENT e = pEvent->GetEventType();
 

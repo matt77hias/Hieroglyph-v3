@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 // 06.02.2012: BeforeRegisterWindowClass default implementation added by Francois
 //             Piette.
@@ -20,8 +20,9 @@ using namespace Glyph3;
 // Initialize the application pointer to NULL
 Application* Application::ms_pApplication = NULL;
 //--------------------------------------------------------------------------------
-Application::Application()
-	: m_bSaveScreenshot( false )
+Application::Application() :
+	m_bSaveScreenshot( false ),
+	m_bLoop( true )
 {
 	// Record the this pointer to provide access to the WinMain function.
 
@@ -36,12 +37,10 @@ Application::Application()
 
 	Log::Get().Open();
 
-	// Create the event manager here since it must be the first engine component
-	// instantiated.
+	// The event manager can be used here since it must be the first engine component
+	// to be active.
 
-	m_pEventMgr = new EventManager();
-
-	SetEventManager( m_pEventMgr );
+	SetEventManager( &EvtManager );
 
 	// The application object wants to know about these events, so it 
 	// registers itself with the appropriate event IDs.
@@ -64,9 +63,6 @@ Application::~Application( )
 	if ( m_pTimer != NULL )
 		delete m_pTimer;
 
-	if ( m_pEventMgr )
-		delete m_pEventMgr;
-
 	Log::Get().Close();
 }
 //--------------------------------------------------------------------------------
@@ -81,30 +77,30 @@ void Application::RequestTermination( )
 	PostQuitMessage( 0 );
 }
 //--------------------------------------------------------------------------------
-bool Application::HandleEvent( IEvent* pEvent )
+bool Application::HandleEvent( EventPtr pEvent )
 {
 	eEVENT e = pEvent->GetEventType();
 
 	if ( e == INFO_MESSAGE )
 	{
-		EvtInfoMessage* pInfoMessage = dynamic_cast<EvtInfoMessage*>( pEvent );
+		EvtInfoMessagePtr pInfoMessage = std::static_pointer_cast<EvtInfoMessage>( pEvent );
 		MessageBox( 0, pInfoMessage->GetInfoMessage().c_str(), L"Hieroglyph 3 :: Info Message", MB_ICONINFORMATION | MB_SYSTEMMODAL );
 	}
 	else if ( e == ERROR_MESSAGE )
 	{
-		EvtErrorMessage* pErrorMessage = dynamic_cast<EvtErrorMessage*>( pEvent );
+		EvtErrorMessagePtr pErrorMessage = std::static_pointer_cast<EvtErrorMessage>( pEvent );
 		MessageBox( 0, pErrorMessage->GetErrorMessage().c_str(), L"Hieroglyph 3 :: Error Message", MB_ICONERROR | MB_SYSTEMMODAL );
 		RequestTermination();
 	}
 	else if ( e == SYSTEM_KEYBOARD_KEYUP )
 	{
-		EvtKeyUp* pKeyUp = (EvtKeyUp*)pEvent;
+		EvtKeyUpPtr pKeyUp = std::static_pointer_cast<EvtKeyUp>( pEvent );
 
 		unsigned int key = pKeyUp->GetCharacterCode();
 
 		if ( key == VK_ESCAPE ) // 'Esc' Key - Exit the application
 		{
-			this->RequestTermination();
+			RequestTermination();
 			return( true );
 		}
 		else if ( key == VK_SPACE ) // 'SPACE' Key - Take a screenshot
@@ -120,17 +116,16 @@ bool Application::HandleEvent( IEvent* pEvent )
 void Application::MessageLoop()
 {
 	MSG msg;
-	bool bLoop = true;
 	
-	while( bLoop )
+	while( true )
 	{
 		while ( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
 		{ 
 			if ( msg.message == WM_QUIT )
 			{
-				bLoop = false;
-				break;
+				return;
 			}
+
 			TranslateMessage( &msg );
 			DispatchMessage( &msg );
 		}
@@ -150,6 +145,7 @@ LRESULT Application::WindowProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpar
 {
 	switch( msg )
 	{	
+
 		case WM_CREATE: 
 			{
 				// Automatically return 0 to allow the window to proceed in the
@@ -175,85 +171,81 @@ LRESULT Application::WindowProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpar
 		case WM_DESTROY: 
 			{
 				// This message is sent when a window has been destroyed.
-
 				PostQuitMessage(0);
 				return( 0 );
 			} break;
 
 		case WM_SIZE:
 			{				
-                EvtWindowResize* pEvent = new EvtWindowResize( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
+                EvtWindowResizePtr pEvent = EvtWindowResizePtr( new EvtWindowResize( hwnd, wparam, lparam ) );
+                EvtManager.ProcessEvent( pEvent );
 			} break;
 
 
 		case WM_LBUTTONUP:
 			{				
-                EvtMouseLButtonUp* pEvent = new EvtMouseLButtonUp( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
+                EvtMouseLButtonUpPtr pEvent = EvtMouseLButtonUpPtr( new EvtMouseLButtonUp( hwnd, wparam, lparam ) );
+                EvtManager.ProcessEvent( pEvent );
 			} break;
 
 		case WM_LBUTTONDOWN:
 			{
-                EvtMouseLButtonDown* pEvent = new EvtMouseLButtonDown( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
+                EvtMouseLButtonDownPtr pEvent = EvtMouseLButtonDownPtr( new EvtMouseLButtonDown( hwnd, wparam, lparam ) );
+                EvtManager.ProcessEvent( pEvent );
 			} break;
 			
 		case WM_MBUTTONUP:
 			{
-                EvtMouseMButtonUp* pEvent = new EvtMouseMButtonUp( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
+                EvtMouseMButtonUpPtr pEvent = EvtMouseMButtonUpPtr( new EvtMouseMButtonUp( hwnd, wparam, lparam ) );
+                EvtManager.ProcessEvent( pEvent );
 			} break;
 
 		case WM_MBUTTONDOWN:
 			{
-                EvtMouseMButtonDown* pEvent = new EvtMouseMButtonDown( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
+                EvtMouseMButtonDownPtr pEvent = EvtMouseMButtonDownPtr( new EvtMouseMButtonDown( hwnd, wparam, lparam ) );
+                EvtManager.ProcessEvent( pEvent );
 			} break;
 
 		case WM_RBUTTONUP:
 			{
-                EvtMouseRButtonUp* pEvent = new EvtMouseRButtonUp( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
+                EvtMouseRButtonUpPtr pEvent = EvtMouseRButtonUpPtr( new EvtMouseRButtonUp( hwnd, wparam, lparam ) );
+                EvtManager.ProcessEvent( pEvent );
 			} break;
 
 		case WM_RBUTTONDOWN:
 			{
-                EvtMouseRButtonDown* pEvent = new EvtMouseRButtonDown( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
+                EvtMouseRButtonDownPtr pEvent = EvtMouseRButtonDownPtr( new EvtMouseRButtonDown( hwnd, wparam, lparam ) );
+                EvtManager.ProcessEvent( pEvent );
 			} break;
 
 		case WM_MOUSEMOVE:
 			{
-                EvtMouseMove* pEvent = new EvtMouseMove( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
+                EvtMouseMovePtr pEvent = EvtMouseMovePtr( new EvtMouseMove( hwnd, wparam, lparam ) );
+                EvtManager.ProcessEvent( pEvent );
 			} break;
 
 		case WM_MOUSEWHEEL:
 			{
-                EvtMouseWheel* pEvent = new EvtMouseWheel( hwnd, wparam, lparam );
-                EventManager::Get()->ProcessEvent( pEvent );
+                EvtMouseWheelPtr pEvent = EvtMouseWheelPtr( new EvtMouseWheel( hwnd, wparam, lparam ) );
+                EvtManager.ProcessEvent( pEvent );
 			} break;
 
 		case WM_CHAR:
 			{
-				EvtChar* pEvent = new EvtChar( hwnd, wparam, lparam );
-				EventManager::Get()->ProcessEvent( pEvent );
-				//return( 0 );
+				EvtCharPtr pEvent = EvtCharPtr( new EvtChar( hwnd, wparam, lparam ) );
+				EvtManager.ProcessEvent( pEvent );
 			} break;
 
 		case WM_KEYDOWN:
 			{
-				EvtKeyDown* pEvent = new EvtKeyDown( hwnd, wparam, lparam );
-				EventManager::Get()->ProcessEvent( pEvent );
-				//return( 0 );
+				EvtKeyDownPtr pEvent = EvtKeyDownPtr( new EvtKeyDown( hwnd, wparam, lparam ) );
+				EvtManager.ProcessEvent( pEvent );
 			} break;
 
 		case WM_KEYUP:
 			{
-				EvtKeyUp* pEvent = new EvtKeyUp( hwnd, wparam, lparam );
-				EventManager::Get()->ProcessEvent( pEvent );
-				//return( 0 );
+				EvtKeyUpPtr pEvent = EvtKeyUpPtr( new EvtKeyUp( hwnd, wparam, lparam ) );
+				EvtManager.ProcessEvent( pEvent );
 			} break;
     }
     return( DefWindowProc( hwnd, msg, wparam, lparam ) );

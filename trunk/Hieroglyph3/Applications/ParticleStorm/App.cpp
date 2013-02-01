@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 #include "App.h"
 #include "Log.h"
@@ -115,7 +115,7 @@ void App::Update()
 	// Send an event to everyone that a new frame has started.  This will be used
 	// in later examples for using the material system with render views.
 
-	EventManager::Get()->ProcessEvent( new EvtFrameStart( m_pTimer->Elapsed() ) );
+	EvtManager.ProcessEvent( EvtFrameStartPtr( new EvtFrameStart( m_pTimer->Elapsed() ) ) );
 
 	// The following code can be used to read out the structure count data from
 	// the staging buffer of the ViewSimulation class.  This requires the copy
@@ -177,19 +177,19 @@ void App::Shutdown()
 	Log::Get().Write( out.str() );
 }
 //--------------------------------------------------------------------------------
-bool App::HandleEvent( IEvent* pEvent )
+bool App::HandleEvent( EventPtr pEvent )
 {
 	eEVENT e = pEvent->GetEventType();
 
 	if ( e == SYSTEM_KEYBOARD_KEYDOWN )
 	{
-		EvtKeyDown* pKeyDown = (EvtKeyDown*)pEvent;
+		EvtKeyDownPtr pKeyDown = std::static_pointer_cast<EvtKeyDown>( pEvent );
 
 		unsigned int key = pKeyDown->GetCharacterCode();
 	}
 	else if ( e == SYSTEM_KEYBOARD_KEYUP )
 	{
-		EvtKeyUp* pKeyUp = (EvtKeyUp*)pEvent;
+		EvtKeyUpPtr pKeyUp = std::static_pointer_cast<EvtKeyUp>( pEvent );
 
 		unsigned int key = pKeyUp->GetCharacterCode();
 	}

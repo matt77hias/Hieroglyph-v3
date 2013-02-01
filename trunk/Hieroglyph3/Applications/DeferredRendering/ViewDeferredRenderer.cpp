@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
@@ -150,7 +150,7 @@ ViewDeferredRenderer::ViewDeferredRenderer( RendererDX11& Renderer, ResourcePtr 
 	m_pLightsView = new ViewLights( Renderer );
 
     m_SpriteRenderer.Initialize();
-    m_Font.Initialize( L"Arial", 14, 0, true );
+	m_pFont = SpriteFontLoaderDX11::LoadFont( std::wstring( L"Arial" ), 14, 0, true );
 }
 //--------------------------------------------------------------------------------
 ViewDeferredRenderer::~ViewDeferredRenderer()
@@ -230,7 +230,7 @@ void ViewDeferredRenderer::Draw( PipelineManagerDX11* pPipelineManager, IParamet
             std::wstring text = L"Unable to view G-Buffers while MSAA is enabled";
             Matrix4f mat = Matrix4f::Identity();
             mat.SetTranslation( Vector3f( 500.0f, 350.0f, 0.0f ) );
-            m_SpriteRenderer.RenderText( pPipelineManager, pParamManager, m_Font, text.c_str(), mat );
+            m_SpriteRenderer.RenderText( pPipelineManager, pParamManager, m_pFont, text.c_str(), mat );
         }
         else
         {

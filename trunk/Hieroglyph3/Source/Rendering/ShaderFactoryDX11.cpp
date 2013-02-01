@@ -5,7 +5,7 @@
 //
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Copyright (c) 2003-2010 Jason Zink 
+// Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 #pragma warning( disable : 4244 )
 //--------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ ID3DBlob* ShaderFactoryDX11::GenerateShader( ShaderType type, std::wstring& file
 	FileLoader SourceFile;
 	if ( !SourceFile.Open( filename ) ) {
 		message << "Unable to load shader from file: " << filename;
-		EventManager::Get()->ProcessEvent( new EvtErrorMessage( message.str() ) );
+		EventManager::Get()->ProcessEvent( EvtErrorMessagePtr( new EvtErrorMessage( message.str() ) ) );
 		return( nullptr );
 	}
 
@@ -104,7 +104,7 @@ ID3DBlob* ShaderFactoryDX11::GenerateShader( ShaderType type, std::wstring& file
 			Log::Get().Write( message.str() );
 		}
 
-		EventManager::Get()->ProcessEvent( new EvtErrorMessage( message.str() ) );
+		EventManager::Get()->ProcessEvent( EvtErrorMessagePtr( new EvtErrorMessage( message.str() ) ) );
 
 		SAFE_RELEASE( pCompiledShader );
 		SAFE_RELEASE( pErrorMessages );
@@ -132,7 +132,7 @@ ID3DBlob* ShaderFactoryDX11::GeneratePrecompiledShader( std::wstring& filename, 
 	FileLoader CompiledObjectFile;
 	if ( !CompiledObjectFile.Open( filename ) ) {
 		message << "Unable to load shader from file: " << filename;
-		EventManager::Get()->ProcessEvent( new EvtErrorMessage( message.str() ) );
+		EventManager::Get()->ProcessEvent( EvtErrorMessagePtr( new EvtErrorMessage( message.str() ) ) );
 		return( nullptr );
 	}
 
@@ -143,7 +143,7 @@ ID3DBlob* ShaderFactoryDX11::GeneratePrecompiledShader( std::wstring& filename, 
 
 	if ( FAILED( hr ) ) {
 		message << "Unable to create a D3DBlob of size: " << CompiledObjectFile.GetDataSize() << L" while compiling shader: " << filename;
-		EventManager::Get()->ProcessEvent( new EvtErrorMessage( message.str() ) );
+		EventManager::Get()->ProcessEvent( EvtErrorMessagePtr( new EvtErrorMessage( message.str() ) ) );
 		return( nullptr );
 	}
 
