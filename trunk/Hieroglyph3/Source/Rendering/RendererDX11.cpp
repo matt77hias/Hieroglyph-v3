@@ -76,7 +76,7 @@
 #include "ParameterManagerDX11.h"
 #include "PipelineManagerDX11.h"
 
-#include "IRenderView.h"
+#include "Task.h"
 
 #include "EventManager.h"
 #include "EvtErrorMessage.h"
@@ -92,11 +92,6 @@
 #pragma comment( lib, "d3d11.lib" )
 #pragma comment( lib, "DXGI.lib" )
 
-// NOTE:
-// These d3d9 related items are only needed for the D3DPERF event definitions.  It can be removed
-// once D3D11.1 is available, and replaced with ID3DUserDefinedAnnotation instead.
-#include <d3d9.h>
-#pragma comment( lib, "d3d9.lib" )
 
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
@@ -118,10 +113,9 @@ RendererDX11::RendererDX11()
 
 	// Initialize this to always use MT!
 	MultiThreadingConfig.SetConfiguration( true );
+	MultiThreadingConfig.ApplyConfiguration();
 
 	m_FeatureLevel = D3D_FEATURE_LEVEL_9_1; // Initialize this to only support 9.1...
-
-	RequestEvent( RENDER_FRAME_START );
 }
 //--------------------------------------------------------------------------------
 RendererDX11::~RendererDX11()
@@ -334,11 +328,11 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 
 		// Initialize the payload data variables.
 		g_aPayload[i].bComplete = true;
-		g_aPayload[i].pRenderView = 0;
+		g_aPayload[i].pTask = nullptr;
 
 		// Create the threads in a suspended state.
 		g_aThreadHandles[i] = 0;
-		g_aThreadHandles[i] = (HANDLE)_beginthreadex( 0, 0xfffff, _RenderViewThreadProc, &g_aPayload[i], CREATE_SUSPENDED, 0 );
+		g_aThreadHandles[i] = (HANDLE)_beginthreadex( 0, 0xfffff, _TaskThreadProc, &g_aPayload[i], CREATE_SUSPENDED, 0 );
 
 		// Create the synchronization events.
 		g_aBeginEventHandle[i] = CreateEvent( 0, FALSE, FALSE, 0 );
@@ -357,7 +351,7 @@ void RendererDX11::Shutdown()
 	for ( int i = 0; i < NUM_THREADS; i++ )
 	{
 		g_aPayload[i].bComplete = true;
-		g_aPayload[i].pRenderView = 0;
+		g_aPayload[i].pTask = nullptr;
 		
 		SAFE_DELETE( g_aPayload[i].pParamManager );
 		SAFE_DELETE( g_aPayload[i].pPipeline );
@@ -407,7 +401,9 @@ void RendererDX11::Shutdown()
 		delete pResource;
 
 	for ( auto pSwapChain : m_vSwapChains ) {
-		pSwapChain->m_pSwapChain->SetFullscreenState( false, NULL );
+		if ( pSwapChain->m_pSwapChain != nullptr ) {
+			pSwapChain->m_pSwapChain->SetFullscreenState( false, NULL );
+		}
 		delete pSwapChain;
 	}
 
@@ -1492,43 +1488,41 @@ ShaderDX11* RendererDX11::GetShader( int ID )
 		return( nullptr );
 }
 //--------------------------------------------------------------------------------
-void RendererDX11::QueueRenderView( IRenderView* pRenderView )
+void RendererDX11::QueueTask( Task* pTask )
 {
-	m_vQueuedViews.push_back( pRenderView );
+	m_vQueuedTasks.push_back( pTask );
 }
 //--------------------------------------------------------------------------------
-void RendererDX11::ProcessRenderViewQueue( )
+void RendererDX11::ProcessTaskQueue( )
 {
-	
+	MultiThreadingConfig.ApplyConfiguration();
+
 	if ( MultiThreadingConfig.GetConfiguration() == false )
 	{
 		// Single-threaded processing of the render view queue
 
-		for ( int i = m_vQueuedViews.size()-1; i >= 0; i-=NUM_THREADS )
+		for ( int i = m_vQueuedTasks.size()-1; i >= 0; i-=NUM_THREADS )
         {
 			for ( int j = 0; j < NUM_THREADS; j++ )
 			{
 				if ( (i-j) >= 0 )
 				{
-					std::string viewName = ViewRenderParams::ViewIndexToName( m_vQueuedViews[i-j]->GetType() );
-					PIXBeginEvent( GlyphString::ToUnicode( "View Draw: " + viewName ).c_str() );
-
-					g_aPayload[j].pRenderView = m_vQueuedViews[i-j];
-
-					m_vQueuedViews[i-j]->Draw( pImmPipeline, g_aPayload[j].pParamManager );
-
-					PIXEndEvent();
+					//
+					pImmPipeline->BeginEvent( std::wstring( L"View Draw: ") + m_vQueuedTasks[i-j]->GetName() );
+					m_vQueuedTasks[i-j]->ExecuteTask( pImmPipeline, g_aPayload[j].pParamManager );
+					pImmPipeline->EndEvent();
+					//PIXEndEvent();
 				}
 			}
         }
 
-		m_vQueuedViews.clear();
+		m_vQueuedTasks.clear();
 	}
 	else
 	{
 		// Multi-threaded processing of the render view queue
 
-		for ( int i = m_vQueuedViews.size()-1; i >= 0; i-=NUM_THREADS )
+		for ( int i = m_vQueuedTasks.size()-1; i >= 0; i-=NUM_THREADS )
 		{
 			DWORD count = 0;
 
@@ -1537,7 +1531,7 @@ void RendererDX11::ProcessRenderViewQueue( )
 				if ( (i-j) >= 0 )
 				{
 					count++;
-					g_aPayload[j].pRenderView = m_vQueuedViews[i-j];
+					g_aPayload[j].pTask = m_vQueuedTasks[i-j];
 					SetEvent( g_aBeginEventHandle[j] );
 				}
 			}
@@ -1546,7 +1540,6 @@ void RendererDX11::ProcessRenderViewQueue( )
 
 			for ( int j = 0; count > 0; count-- )
 			{
-				//g_aPayload[j].pPipeline->m_pContext->ClearState();
 				pImmPipeline->ExecuteCommandList( g_aPayload[j].pList );
 				g_aPayload[j].pList->ReleaseList();
 				j++;
@@ -1554,18 +1547,8 @@ void RendererDX11::ProcessRenderViewQueue( )
 
 		}
 
-		m_vQueuedViews.clear();
+		m_vQueuedTasks.clear();
 	}
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::PIXBeginEvent( const wchar_t* name )
-{
-	D3DPERF_BeginEvent( 0xFFFFFFFF, name );
-}
-//--------------------------------------------------------------------------------
-void RendererDX11::PIXEndEvent( )
-{
-	D3DPERF_EndEvent();
 }
 //--------------------------------------------------------------------------------
 
@@ -1582,7 +1565,7 @@ HANDLE						g_aBeginEventHandle[NUM_THREADS];
 HANDLE						g_aEndEventHandle[NUM_THREADS];
 
 
-unsigned int WINAPI _RenderViewThreadProc( void* lpParameter )
+unsigned int WINAPI _TaskThreadProc( void* lpParameter )
 {
 	ThreadPayLoad* pPayload = (ThreadPayLoad*) lpParameter;
 
@@ -1595,15 +1578,9 @@ unsigned int WINAPI _RenderViewThreadProc( void* lpParameter )
 		WaitForSingleObject( g_aBeginEventHandle[id], INFINITE );
 
 		pPayload->pPipeline->m_pContext->ClearState();
-		pPayload->pPipeline->RasterizerStage.DesiredState.SetRasterizerState( 0 );
-		pPayload->pPipeline->OutputMergerStage.DesiredState.SetDepthStencilState( 0 );
-		pPayload->pPipeline->OutputMergerStage.DesiredState.SetBlendState( 0 );
-
 
 		// Execute the render view with the provided pipeline and parameter managers.
-		pPayload->pRenderView->Draw( pPayload->pPipeline, pPayload->pParamManager );
-
-		//pPayload->pPipeline->m_pContext->ClearState();
+		pPayload->pTask->ExecuteTask( pPayload->pPipeline, pPayload->pParamManager );
 
 		// Generate the command list.
 		pPayload->pPipeline->GenerateCommandList( pPayload->pList );
@@ -1922,27 +1899,5 @@ void RendererDX11::DeleteResource( int index )
 		delete pResource;
 		m_vResources[index & 0xffff] = nullptr;
 	}
-}
-//--------------------------------------------------------------------------------
-std::wstring RendererDX11::GetName( )
-{
-	return( std::wstring( L"RendererDX11" ) );
-}
-//--------------------------------------------------------------------------------
-bool RendererDX11::HandleEvent( EventPtr pEvent )
-{
-	eEVENT e = pEvent->GetEventType();
-
-	// Start of a rendering frame
-	if ( e == RENDER_FRAME_START )
-	{
-		// Apply any changes to the multithreading state.
-		MultiThreadingConfig.ApplyConfiguration();
-
-		// Return false to ensure other listeners can react accordingly.
-		return( false );
-	}
-
-	return( false );
 }
 //--------------------------------------------------------------------------------

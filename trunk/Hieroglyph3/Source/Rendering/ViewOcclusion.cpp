@@ -22,8 +22,6 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ViewOcclusion::ViewOcclusion( RendererDX11& Renderer, ResourcePtr OcclusionTarget, ResourcePtr BlurTarget, ResourcePtr DepthNormalTarget )
 {
-	m_sParams.iViewType = VT_OCCLUSION;
-
 	D3D11_TEXTURE2D_DESC desc = OcclusionTarget->m_pTexture2dConfig->GetTextureDesc();
 
 	ResolutionX = desc.Width;
@@ -82,13 +80,13 @@ void ViewOcclusion::Update( float fTime )
 {
 }
 //--------------------------------------------------------------------------------
-void ViewOcclusion::PreDraw( RendererDX11* pRenderer )
+void ViewOcclusion::QueuePreTasks( RendererDX11* pRenderer )
 {
 	// Queue this view into the renderer for processing.
-	pRenderer->QueueRenderView( this );
+	pRenderer->QueueTask( this );
 }
 //--------------------------------------------------------------------------------
-void ViewOcclusion::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
+void ViewOcclusion::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	// Process the occlusion buffer next.  Start by setting the needed resource
 	// parameters for the depth/normal buffer and the occlusion buffer.
@@ -131,5 +129,10 @@ void ViewOcclusion::SetUsageParams( IParameterManager* pParamManager )
 	// for rendering.
 
 	pParamManager->SetShaderResourceParameter( (RenderParameterDX11*)m_pAmbientOcclusionBuffer, OcclusionBuffer );
+}
+//--------------------------------------------------------------------------------
+std::wstring ViewOcclusion::GetName( )
+{
+	return( L"ViewOcclusion" );
 }
 //--------------------------------------------------------------------------------

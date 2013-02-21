@@ -163,7 +163,7 @@ void ViewDeferredRenderer::Update( float fTime )
 {
 }
 //--------------------------------------------------------------------------------
-void ViewDeferredRenderer::PreDraw( RendererDX11* pRenderer )
+void ViewDeferredRenderer::QueuePreTasks( RendererDX11* pRenderer )
 {
 	// Call the super class's predraw in order to queue it in the renderer.  The
 	// views are processed in a LIFO order, so this will be executed last in both
@@ -176,22 +176,22 @@ void ViewDeferredRenderer::PreDraw( RendererDX11* pRenderer )
 	}
 
 	// Queue this view into the renderer for processing.
-	pRenderer->QueueRenderView( this );
+	pRenderer->QueueTask( this );
 
 	if ( m_pRoot )
 	{
 		// Run through the graph and pre-render the entities
-		m_pRoot->PreRender( pRenderer, GetType() );
+		m_pRoot->PreRender( pRenderer, VT_PERSPECTIVE );
 	}
 
 	// Next we call the predraw method of each of the supporting views.
 
 	SetupViews();
-	m_pLightsView->PreDraw( pRenderer );
-	m_pGBufferView->PreDraw( pRenderer );
+	m_pLightsView->QueuePreTasks( pRenderer );
+	m_pGBufferView->QueuePreTasks( pRenderer );
 }
 //--------------------------------------------------------------------------------
-void ViewDeferredRenderer::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
+void ViewDeferredRenderer::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	// Here we select what will be visible on the final rendered image based on 
 	// the current options that have been selected.  This includes performing a
@@ -205,8 +205,8 @@ void ViewDeferredRenderer::Draw( PipelineManagerDX11* pPipelineManager, IParamet
     pPipelineManager->ApplyRenderTargets();
     pPipelineManager->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 
-	pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
-	pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iCurrentViewport );
+	// Configure the desired viewports in this pipeline
+	ConfigureViewports( pPipelineManager );
 
     std::vector<ResourcePtr>& gBuffer = m_GBuffer[GBufferOptMode::Value][AAMode::Value];
     float scaleFactor = AAMode::Value == AAMode::SSAA ? 0.5f : 1.0f;
@@ -341,7 +341,7 @@ void ViewDeferredRenderer::SetUsageParams( IParameterManager* pParamManager )
 void ViewDeferredRenderer::SetViewMatrix( const Matrix4f& matrix )
 {
 	// Perform the view matrix setting for this view.
-	IRenderView::SetViewMatrix( matrix );
+	SceneRenderTask::SetViewMatrix( matrix );
 
 	// Propagate the view matrix.
 	m_pGBufferView->SetViewMatrix( matrix );
@@ -351,7 +351,7 @@ void ViewDeferredRenderer::SetViewMatrix( const Matrix4f& matrix )
 void ViewDeferredRenderer::SetProjMatrix( const Matrix4f& matrix )
 {
 	// Perform the projection matrix setting for this view.
-	IRenderView::SetProjMatrix( matrix );
+	SceneRenderTask::SetProjMatrix( matrix );
 
 	// Propagate the projection matrix.
 	m_pGBufferView->SetProjMatrix( matrix );
@@ -431,7 +431,7 @@ void ViewDeferredRenderer::SetupViews( )
 
     // Configure all of the view resources according to the options
 	// that have been selected.
-	m_iCurrentViewport = m_iViewport[AAMode::Value];
+	SetViewPort( m_iViewport[AAMode::Value] );
 
     m_pGBufferView->SetTargets( m_GBuffer[GBufferOptMode::Value][AAMode::Value],
                                 m_DepthTarget[AAMode::Value],
@@ -440,5 +440,10 @@ void ViewDeferredRenderer::SetupViews( )
                                m_FinalTarget[AAMode::Value],
                                m_ReadOnlyDepthTarget[AAMode::Value],
                                m_iViewport[AAMode::Value], vpWidth, vpHeight );
+}
+//--------------------------------------------------------------------------------
+std::wstring ViewDeferredRenderer::GetName()
+{
+	return( L"ViewDeferredRenderer" );
 }
 //--------------------------------------------------------------------------------

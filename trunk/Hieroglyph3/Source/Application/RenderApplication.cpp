@@ -187,7 +187,6 @@ bool RenderApplication::HandleEvent( EventPtr pEvent )
 //--------------------------------------------------------------------------------
 void RenderApplication::HandleWindowResize( HWND handle, UINT width, UINT height )
 {
-	// TODO: are these local width and height members needed???
 	if ( width < 1 ) width = 1;
 	if ( height < 1 ) height = 1;
 	m_iWidth = width;

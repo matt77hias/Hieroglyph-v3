@@ -25,7 +25,7 @@
 #ifndef ViewDeferredRenderer_h
 #define ViewDeferredRenderer_h
 //--------------------------------------------------------------------------------
-#include "IRenderView.h"
+#include "SceneRenderTask.h"
 #include "ViewGBuffer.h"
 #include "ViewLights.h"
 #include "SpriteRendererDX11.h"
@@ -35,21 +35,22 @@ namespace Glyph3
 {
 	class Entity3D;
 
-	class ViewDeferredRenderer : public IRenderView
+	class ViewDeferredRenderer : public SceneRenderTask
 	{
 	public:
 		ViewDeferredRenderer( RendererDX11& Renderer, ResourcePtr RenderTarget );
+		virtual ~ViewDeferredRenderer();
 
 		virtual void Update( float fTime );
-		virtual void PreDraw( RendererDX11* pRenderer );
-		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
+		virtual void QueuePreTasks( RendererDX11* pRenderer );
+		virtual void ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 		virtual void Resize( UINT width, UINT height );
-
-		virtual void SetEntity( Entity3D* pEntity );
-		virtual void SetRoot( Node3D* pRoot );
 
 		virtual void SetRenderParams( IParameterManager* pParamManager );
 		virtual void SetUsageParams( IParameterManager* pParamManager );
+
+		virtual void SetEntity( Entity3D* pEntity );
+		virtual void SetRoot( Node3D* pRoot );
 
 		virtual void SetViewMatrix( const Matrix4f& matrix );
 		virtual void SetProjMatrix( const Matrix4f& matrix );
@@ -57,7 +58,7 @@ namespace Glyph3
 		void SetClipPlanes( float NearClip, float FarClip );
 		void SetupViews();
 
-		virtual ~ViewDeferredRenderer();
+		virtual std::wstring GetName();
 
 	protected:
 

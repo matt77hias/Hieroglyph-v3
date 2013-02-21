@@ -35,8 +35,6 @@ ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX )
 	m_fDelta = m_fThrottle;
 
 
-	m_sParams.iViewType = VT_SIMULATION;
-
 	// Remember what number of thread groups to run in the dispatch call.  This
 	// allows the creator of this view to choose the size of buffers to create
 	// instead of hard coding it.
@@ -244,18 +242,25 @@ ResourcePtr ViewSimulation::GetParticleCountStagingBuffer()
 //--------------------------------------------------------------------------------
 void ViewSimulation::Update( float fTime )
 {
+	m_fDelta += fTime;
+
+	// Swap the two buffers in between frames to allow multithreaded access
+	// during the rendering phase for the particle buffers.
+	ResourcePtr TempState = ParticleStateBuffers[0];
+	ParticleStateBuffers[0] = ParticleStateBuffers[1];
+	ParticleStateBuffers[1] = TempState;
 }
 //--------------------------------------------------------------------------------
-void ViewSimulation::PreDraw( RendererDX11* pRenderer )
+void ViewSimulation::QueuePreTasks( RendererDX11* pRenderer )
 {
 	// Queue this view into the renderer for processing.  Since this is a 
 	// simulation style view, there is no root and hence no additional recursive
 	// 'PreDraw'ing required.
 
-	pRenderer->QueueRenderView( this );
+	pRenderer->QueueTask( this );
 }
 //--------------------------------------------------------------------------------
-void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
+void ViewSimulation::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	if ( bDebugActive ) {
 		if ( m_BufferIndex < BUFFER_SIZE )
@@ -409,27 +414,8 @@ void ViewSimulation::SetUsageParams( IParameterManager* pParamManager )
 	pParamManager->SetShaderResourceParameter( pSimState, ParticleStateBuffers[1] );
 }
 //--------------------------------------------------------------------------------
-bool ViewSimulation::HandleEvent( EventPtr pEvent )
+std::wstring ViewSimulation::GetName()
 {
-	eEVENT e = pEvent->GetEventType();
-
-	// Start of a rendering frame
-	if ( e == RENDER_FRAME_START )
-	{
-		EvtFrameStartPtr pFrameStart = std::static_pointer_cast<EvtFrameStart>( pEvent );
-
-		m_fDelta += pFrameStart->GetElapsed();
-
-		// Swap the two buffers in between frames to allow multithreaded access
-		// during the rendering phase for the particle buffers.
-		ResourcePtr TempState = ParticleStateBuffers[0];
-		ParticleStateBuffers[0] = ParticleStateBuffers[1];
-		ParticleStateBuffers[1] = TempState;
-
-		// Return false to ensure other views can reset as well
-		return( false );
-	}
-
-	return( IRenderView::HandleEvent( pEvent ) );
+	return( L"ViewSimulation" );
 }
 //--------------------------------------------------------------------------------

@@ -166,6 +166,10 @@ void App::Update()
 	rotation.RotationY( m_pTimer->Elapsed() * 0.2f );
 	m_pActor->GetNode()->Rotation() *= rotation;
 
+	for ( int i = 0; i < 3; i++ ) {
+		m_vReflectors[i]->m_pParaboloidView->ResetRecurrence();
+	}
+
 
 	// Update the scene, and then render all cameras within the scene.
 

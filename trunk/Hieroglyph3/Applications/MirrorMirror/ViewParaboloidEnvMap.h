@@ -15,7 +15,7 @@
 #ifndef ViewParaboloidEnvMap_h
 #define ViewParaboloidEnvMap_h
 //--------------------------------------------------------------------------------
-#include "IRenderView.h"
+#include "SceneRenderTask.h"
 #include "ShaderResourceParameterDX11.h"
 #include "MatrixParameterDX11.h"
 //--------------------------------------------------------------------------------
@@ -23,28 +23,28 @@ namespace Glyph3
 {
 	class Entity3D;
 
-	class ViewParaboloidEnvMap : public IRenderView
+	class ViewParaboloidEnvMap : public SceneRenderTask
 	{
 	public:
 		ViewParaboloidEnvMap( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget );
+		virtual ~ViewParaboloidEnvMap();
 
 		virtual void Update( float fTime );
-		virtual void PreDraw( RendererDX11* pRenderer );
-		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
-
-		virtual void SetBackColor( Vector4f color );
-		virtual void SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ );
+		virtual void QueuePreTasks( RendererDX11* pRenderer );
+		virtual void ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
+		virtual void Resize( UINT width, UINT height );
 
 		virtual void SetRenderParams( IParameterManager* pParamManager );
 		virtual void SetUsageParams( IParameterManager* pParamManager );
 
+		void SetMaxRecurrence( int max );
+		int GetMaxRecurrence( );
+		void ResetRecurrence( );
 
-		virtual ~ViewParaboloidEnvMap();
+		virtual std::wstring GetName();
+		
 
 	protected:
-		Vector4f		m_vColor;
-		int				m_iViewport;
-
 		ResourcePtr		m_RenderTarget;
 		ResourcePtr		m_DepthTarget;
 
@@ -52,6 +52,9 @@ namespace Glyph3
 		MatrixParameterDX11*			m_pParaboloidBasisParam;
 
 		Matrix4f		m_ParaboloidBasis;
+
+		int		m_iMaxRecurrence;
+		int		m_iCurrRecurrence;
 	};
 };
 //--------------------------------------------------------------------------------

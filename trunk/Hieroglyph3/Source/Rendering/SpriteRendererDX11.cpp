@@ -210,7 +210,7 @@ void SpriteRendererDX11::Render( PipelineManagerDX11* pipeline,
 {
 	_ASSERT(m_bInitialized);
 
-	RendererDX11::PIXBeginEvent( L"SpriteRendererDX11 Render" );
+	pipeline->BeginEvent( std::wstring( L"SpriteRendererDX11 Render" ) );
 
 	// Only reset the instances, since the vertex and index data remains the same!
 	m_pGeometry->ResetInstances();
@@ -255,7 +255,7 @@ void SpriteRendererDX11::Render( PipelineManagerDX11* pipeline,
 
 	m_pGeometry->Execute( pipeline, parameters );
 
-	RendererDX11::PIXEndEvent();
+	pipeline->EndEvent();
 }
 //--------------------------------------------------------------------------------
 void SpriteRendererDX11::Render( PipelineManagerDX11* pipeline, 
@@ -289,7 +289,7 @@ void SpriteRendererDX11::RenderText( PipelineManagerDX11* pipeline,
 									 SpriteFontPtr pFont, const wchar_t* text,
 									 const Matrix4f& transform, const Vector4f& color )
 {
-	RendererDX11::PIXBeginEvent( L"SpriteRenderer RenderText" );
+	pipeline->BeginEvent( std::wstring( L"SpriteRenderer RenderText" ) );
 
 	SpriteVertexDX11::InstanceData m_TextDrawData [MaxBatchSize];
 
@@ -328,7 +328,7 @@ void SpriteRendererDX11::RenderText( PipelineManagerDX11* pipeline,
 	// Submit a batch
 	Render( pipeline, parameters, pFont->TextureResource(), m_TextDrawData, currentDraw, Point );
 
-	RendererDX11::PIXEndEvent();
+	pipeline->EndEvent();
 
 	if( length > numCharsToDraw )
 		RenderText( pipeline, parameters, pFont, text + numCharsToDraw, textTransform, color );

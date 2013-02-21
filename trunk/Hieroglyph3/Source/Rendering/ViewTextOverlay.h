@@ -16,7 +16,7 @@
 #ifndef ViewTextOverlay_h
 #define ViewTextOverlay_h
 //--------------------------------------------------------------------------------
-#include "IRenderView.h"
+#include "Task.h"
 #include "SpriteFontLoaderDX11.h"
 #include "SpriteRendererDX11.h"
 //--------------------------------------------------------------------------------
@@ -38,24 +38,23 @@ namespace Glyph3
 		};
 	};
 
-	class ViewTextOverlay : public IRenderView
+	class ViewTextOverlay : public Task
 	{
 	public:
 		ViewTextOverlay( RendererDX11& Renderer, ResourcePtr RenderTarget );
+		virtual ~ViewTextOverlay();
 
 		virtual void Update( float fTime );
-		virtual void PreDraw( RendererDX11* pRenderer );
-		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
+		virtual void QueuePreTasks( RendererDX11* pRenderer );
+		virtual void ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 		virtual void Resize( UINT width, UINT height );
-
-		virtual void SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ );
 
 		virtual void SetRenderParams( IParameterManager* pParamManager );
 		virtual void SetUsageParams( IParameterManager* pParamManager );
 
 		void WriteText( std::wstring& text, Matrix4f& xform, Vector4f& color );
 
-		virtual ~ViewTextOverlay();
+		virtual std::wstring GetName();
 
 	protected:
 		Vector4f				m_vColor;

@@ -21,6 +21,25 @@ SingleWindowGlyphlet::SingleWindowGlyphlet()
 	SetEventManager( &EvtManager );
 
 	RequestEvent( SYSTEM_KEYBOARD_KEYDOWN );
+
+
+	RendererDX11* pRenderer = RendererDX11::Get();
+
+	m_pScene = new Scene();
+
+	ViewPerspective* pPerspectiveView = new ViewPerspective( *pRenderer, m_RenderTarget );
+	pPerspectiveView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
+	m_pRenderView = pPerspectiveView;
+
+	m_pCamera = new FirstPersonCamera();
+	m_pCamera->SetEventManager( &EvtManager );
+	
+	m_pCamera->Spatial().SetRotation( Vector3f( 0.0f, 0.0f, 0.0f ) );
+	m_pCamera->Spatial().SetTranslation( Vector3f( 0.0f, 10.0f, -20.0f ) );
+	m_pCamera->SetCameraView( m_pRenderView );
+	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>(m_iWidth) / static_cast<float>(m_iHeight), static_cast<float>( GLYPH_PI ) / 4.0f );
+
+	m_pScene->AddCamera( m_pCamera );
 }
 //--------------------------------------------------------------------------------
 SingleWindowGlyphlet::~SingleWindowGlyphlet()
@@ -31,8 +50,6 @@ SingleWindowGlyphlet::~SingleWindowGlyphlet()
 void SingleWindowGlyphlet::Setup( ResourcePtr target )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
-
-	m_pScene = new Scene();
 
 	m_RenderTarget = target;
 
@@ -49,19 +66,7 @@ void SingleWindowGlyphlet::Setup( ResourcePtr target )
 		// TODO: add error handling here.
 	}
 
-	ViewPerspective* pPerspectiveView = new ViewPerspective( *pRenderer, m_RenderTarget );
-	pPerspectiveView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
-	m_pRenderView = pPerspectiveView;
-
-	m_pCamera = new FirstPersonCamera();
-	m_pCamera->SetEventManager( &EvtManager );
-	
-	m_pCamera->Spatial().SetRotation( Vector3f( 0.0f, 0.0f, 0.0f ) );
-	m_pCamera->Spatial().SetTranslation( Vector3f( 0.0f, 10.0f, -20.0f ) );
-	m_pCamera->SetCameraView( m_pRenderView );
-	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>(m_iWidth) / static_cast<float>(m_iHeight), static_cast<float>( GLYPH_PI ) / 4.0f );
-
-	m_pScene->AddCamera( m_pCamera );
+	dynamic_cast<ViewPerspective*>( m_pRenderView )->SetRenderTargets( m_RenderTarget );
 }
 //--------------------------------------------------------------------------------
 void SingleWindowGlyphlet::Initialize()

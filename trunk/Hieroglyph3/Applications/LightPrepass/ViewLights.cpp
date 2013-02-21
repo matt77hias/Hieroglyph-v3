@@ -62,8 +62,6 @@ static void DrawLightType( const std::vector<Light>& lights, RenderEffectDX11 ef
 //--------------------------------------------------------------------------------
 ViewLights::ViewLights( RendererDX11& Renderer)
 {
-    m_sParams.iViewType = VT_LIGHTS;
-
     ViewMatrix.MakeIdentity();
     ProjMatrix.MakeIdentity();
 
@@ -307,7 +305,7 @@ void ViewLights::Update( float fTime )
 {
 }
 //--------------------------------------------------------------------------------
-void ViewLights::PreDraw( RendererDX11* pRenderer )
+void ViewLights::QueuePreTasks( RendererDX11* pRenderer )
 {
     if ( m_pEntity != NULL )
     {
@@ -316,10 +314,10 @@ void ViewLights::PreDraw( RendererDX11* pRenderer )
     }
 
     // Queue this view into the renderer for processing.
-    pRenderer->QueueRenderView( this );
+    pRenderer->QueueTask( this );
 }
 //--------------------------------------------------------------------------------
-void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
+void ViewLights::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
     // Bind the render target
     pPipelineManager->ClearRenderTargets();
@@ -410,5 +408,10 @@ void ViewLights::SetClipPlanes( float NearClip, float FarClip )
 {
     m_fNearClip = NearClip;
     m_fFarClip = FarClip;
+}
+//--------------------------------------------------------------------------------
+std::wstring ViewLights::GetName()
+{
+	return( L"ViewLights" );
 }
 //--------------------------------------------------------------------------------

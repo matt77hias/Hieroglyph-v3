@@ -38,7 +38,7 @@ void GlyphletActor::SetGlyphlet( std::shared_ptr<SingleWindowGlyphlet> pGlyphlet
 	m_pGlyphlet->Setup( m_RenderTexture );
 
 	// Execute the glyphlet via its generic interface...
-	m_pGlyphlet->Initialize();
+
 	m_pGlyphlet->Update( 0.0f );
 }
 //--------------------------------------------------------------------------------

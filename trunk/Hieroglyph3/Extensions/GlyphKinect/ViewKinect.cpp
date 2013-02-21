@@ -25,8 +25,6 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ViewKinect::ViewKinect( RendererDX11& Renderer )
 {
-	m_sParams.iViewType = VT_SIMULATION;
-
 	// Acquire two CPU buffers for caching the CPU data.  We use an 8-bit 
 	// 4-component value for the color buffer, and a 16-bit 1-component texture
 	// for the depth buffer - so we allocate the accordingly sized arrays.
@@ -133,16 +131,16 @@ void ViewKinect::Update( float fTime )
 {
 }
 //--------------------------------------------------------------------------------
-void ViewKinect::PreDraw( RendererDX11* pRenderer )
+void ViewKinect::QueuePreTasks( RendererDX11* pRenderer )
 {
 	// Queue this view into the renderer for processing.  Since this is a 
 	// simulation style view, there is no root and hence no additional recursive
 	// 'PreDraw'ing required.
 
-	pRenderer->QueueRenderView( this );
+	pRenderer->QueueTask( this );
 }
 //--------------------------------------------------------------------------------
-void ViewKinect::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
+void ViewKinect::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	// In this view, we check to see if the KinectManager has given us a system
 	// memory copy of one or both of the frames.  If so, then we copy it into the
@@ -314,5 +312,10 @@ ResourcePtr ViewKinect::GetDepthResource()
 void ViewKinect::SetSkeletonActor( KinectSkeletonActor* pActor )
 {
 	m_pSkeletonActor = pActor;
+}
+//--------------------------------------------------------------------------------
+std::wstring ViewKinect::GetName()
+{
+	return( L"ViewKinect" );
 }
 //--------------------------------------------------------------------------------

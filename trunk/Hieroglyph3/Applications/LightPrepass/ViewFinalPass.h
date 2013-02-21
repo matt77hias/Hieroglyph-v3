@@ -15,19 +15,20 @@
 #ifndef ViewFinalPass_h
 #define ViewFinalPass_h
 //--------------------------------------------------------------------------------
-#include "IRenderView.h"
+#include "SceneRenderTask.h"
 #include "ShaderResourceParameterDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-    class ViewFinalPass : public IRenderView
+    class ViewFinalPass : public SceneRenderTask
     {
     public:
         ViewFinalPass( RendererDX11& Renderer );
+		virtual ~ViewFinalPass();
 
         virtual void Update( float fTime );
-        virtual void PreDraw( RendererDX11* pRenderer );
-        virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
+		virtual void QueuePreTasks( RendererDX11* pRenderer );
+		virtual void ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 		virtual void Resize( UINT width, UINT height );
 
         virtual void SetRenderParams( IParameterManager* pParamManager );
@@ -35,11 +36,10 @@ namespace Glyph3
 
         void SetTargets( ResourcePtr LightTarget, ResourcePtr RenderTarget, ResourcePtr DepthTarget, int Viewport );
 
-        virtual ~ViewFinalPass();
+        virtual std::wstring GetName();
 
     protected:
 
-        RendererDX11&           m_Renderer;
         ResourcePtr 	        m_LightTarget;
         ResourcePtr 	        m_RenderTarget;
         ResourcePtr				m_DepthTarget;

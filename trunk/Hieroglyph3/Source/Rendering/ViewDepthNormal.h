@@ -31,7 +31,12 @@ namespace Glyph3
 		ViewDepthNormal( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget );
 		virtual ~ViewDepthNormal();
 
+		virtual void QueuePreTasks( RendererDX11* pRenderer );
+		virtual void ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
+
 		virtual void SetUsageParams( IParameterManager* pParamManager );
+
+		virtual std::wstring GetName( );
 
 	protected:
 		ShaderResourceParameterDX11* m_pDepthNormalBuffer;

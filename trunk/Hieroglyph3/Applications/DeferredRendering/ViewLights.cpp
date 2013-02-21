@@ -37,8 +37,6 @@ static float Clamp( float x, float low, float high )
 //--------------------------------------------------------------------------------
 ViewLights::ViewLights( RendererDX11& Renderer)
 {
-    m_sParams.iViewType = VT_LIGHTS;
-
     ViewMatrix.MakeIdentity();
     ProjMatrix.MakeIdentity();
 
@@ -257,7 +255,7 @@ void ViewLights::Update( float fTime )
 {
 }
 //--------------------------------------------------------------------------------
-void ViewLights::PreDraw( RendererDX11* pRenderer )
+void ViewLights::QueuePreTasks( RendererDX11* pRenderer )
 {
     if ( m_pEntity != NULL )
     {
@@ -266,10 +264,10 @@ void ViewLights::PreDraw( RendererDX11* pRenderer )
     }
 
     // Queue this view into the renderer for processing.
-    pRenderer->QueueRenderView( this );
+    pRenderer->QueueTask( this );
 }
 //--------------------------------------------------------------------------------
-void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
+void ViewLights::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
     // Bind the render target
     pPipelineManager->ClearRenderTargets();
@@ -284,8 +282,8 @@ void ViewLights::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager*
 	pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
     pPipelineManager->ApplyRenderTargets();
 
-	pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
-	pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iViewport );
+	// Configure the desired viewports in this pipeline
+	ConfigureViewports( pPipelineManager );
 
     // Set this view's render parameters
     SetRenderParams( pParamManager );
@@ -480,7 +478,7 @@ void ViewLights::SetTargets( std::vector<ResourcePtr>& GBufferTargets, ResourceP
     m_GBufferTargets = GBufferTargets;
     m_pRenderTarget = pRenderTarget;
     m_DepthTarget = DepthTarget;
-    m_iViewport = Viewport;
+    SetViewPort( Viewport );
     m_uVPWidth = vpWidth;
     m_uVPHeight = vpHeight;
 }
@@ -554,5 +552,10 @@ void ViewLights::SetClipPlanes( float NearClip, float FarClip )
 {
     m_fNearClip = NearClip;
     m_fFarClip = FarClip;
+}
+//--------------------------------------------------------------------------------
+std::wstring ViewLights::GetName()
+{
+	return( L"ViewLights" );
 }
 //--------------------------------------------------------------------------------

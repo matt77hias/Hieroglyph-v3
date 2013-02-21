@@ -23,8 +23,6 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ViewParaboloidEnvMap::ViewParaboloidEnvMap( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget )
 {
-	m_sParams.iViewType = VT_DUAL_PARABOLOID_ENVMAP;
-
 	m_RenderTarget = RenderTarget;
 	m_DepthTarget = DepthTarget;
 
@@ -33,10 +31,8 @@ ViewParaboloidEnvMap::ViewParaboloidEnvMap( RendererDX11& Renderer, ResourcePtr 
 
 	m_ParaboloidBasis.MakeIdentity();
 
-	m_pEntity = 0;
-	m_vColor.MakeZero();
-
-	
+	m_pEntity = nullptr;
+		
 	// Set up a viewport based on the dimensions of the resource.
 
 	Texture2dDX11* pTexture = Renderer.GetTexture2DByIndex( m_RenderTarget->m_iResource );
@@ -54,34 +50,39 @@ ViewParaboloidEnvMap::ViewParaboloidEnvMap( RendererDX11& Renderer, ResourcePtr 
 		viewport.TopLeftX = 0;
 		viewport.TopLeftY = 0;
 
-		m_iViewport = Renderer.CreateViewPort( viewport );
+		SetViewPort( Renderer.CreateViewPort( viewport ) );
 	} else {
 		// TODO: Fail here...
 	}
 
-
-	
 	// Get references to the parameters that will be used.
 
 	m_pParaboloidTextureParam = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"ParaboloidTexture" ) );
 	m_pParaboloidBasisParam = Renderer.m_pParamMgr->GetMatrixParameterRef( std::wstring( L"ParaboloidBasis" ) );
 
+	m_iMaxRecurrence = 1;
+	m_iCurrRecurrence = m_iMaxRecurrence;
 }
 //--------------------------------------------------------------------------------
 ViewParaboloidEnvMap::~ViewParaboloidEnvMap()
 {
 }
 //--------------------------------------------------------------------------------
-void ViewParaboloidEnvMap::SetBackColor( Vector4f color )
+void ViewParaboloidEnvMap::SetMaxRecurrence( int max )
 {
-	m_vColor = color;
+	m_iMaxRecurrence = max;
+}
+//--------------------------------------------------------------------------------
+int ViewParaboloidEnvMap::GetMaxRecurrence( )
+{
+	return( m_iMaxRecurrence );
 }
 //--------------------------------------------------------------------------------
 void ViewParaboloidEnvMap::Update( float fTime )
 {
 }
 //--------------------------------------------------------------------------------
-void ViewParaboloidEnvMap::PreDraw( RendererDX11* pRenderer )
+void ViewParaboloidEnvMap::QueuePreTasks( RendererDX11* pRenderer )
 {
 	if ( m_pEntity != NULL )
 	{
@@ -95,7 +96,7 @@ void ViewParaboloidEnvMap::PreDraw( RendererDX11* pRenderer )
 		m_iCurrRecurrence--;
 
 		// Queue this view into the renderer for processing.
-		pRenderer->QueueRenderView( this );
+		pRenderer->QueueTask( this );
 
 		if ( m_pRoot )
 		{
@@ -105,13 +106,13 @@ void ViewParaboloidEnvMap::PreDraw( RendererDX11* pRenderer )
 			for ( auto pEntity : set )
 			{
 				if ( pEntity != this->m_pEntity )
-					pEntity->PreRender( pRenderer, GetType() );
+					pEntity->PreRender( pRenderer, VT_DUAL_PARABOLOID_ENVMAP );
 			}
 		}
 	}
 }
 //--------------------------------------------------------------------------------
-void ViewParaboloidEnvMap::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
+void ViewParaboloidEnvMap::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	if ( m_pRoot )
 	{
@@ -121,13 +122,8 @@ void ViewParaboloidEnvMap::Draw( PipelineManagerDX11* pPipelineManager, IParamet
 		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
 		pPipelineManager->ApplyRenderTargets();
 
-		pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
-		pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iViewport );
-		pPipelineManager->RasterizerStage.DesiredState.SetRasterizerState( 0 );
-
-		// Set default states for these stages
-		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilState( 0 );
-		pPipelineManager->OutputMergerStage.DesiredState.SetBlendState( 0 );
+		// Configure the desired viewports in this pipeline
+		ConfigureViewports( pPipelineManager );
 
 		pPipelineManager->ClearBuffers( m_vColor, 1.0f );
 
@@ -141,14 +137,14 @@ void ViewParaboloidEnvMap::Draw( PipelineManagerDX11* pPipelineManager, IParamet
 		for ( auto pEntity : set )
 		{
 			if ( pEntity != this->m_pEntity )
-				pEntity->Render( pPipelineManager, pParamManager, GetType() );
+				pEntity->Render( pPipelineManager, pParamManager, VT_DUAL_PARABOLOID_ENVMAP );
 		}
 
 		pPipelineManager->ClearRenderTargets();
 	}
 }
 //--------------------------------------------------------------------------------
-void ViewParaboloidEnvMap::SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ )
+void ViewParaboloidEnvMap::Resize( UINT width, UINT height )
 {
 }
 //--------------------------------------------------------------------------------
@@ -162,5 +158,15 @@ void ViewParaboloidEnvMap::SetUsageParams( IParameterManager* pParamManager )
 {
 	pParamManager->SetMatrixParameter( m_pParaboloidBasisParam, &m_ParaboloidBasis );
 	pParamManager->SetShaderResourceParameter( m_pParaboloidTextureParam, m_RenderTarget );
+}
+//--------------------------------------------------------------------------------
+std::wstring ViewParaboloidEnvMap::GetName()
+{
+	return( L"ViewParaboloidEnvMap" );
+}
+//--------------------------------------------------------------------------------
+void ViewParaboloidEnvMap::ResetRecurrence()
+{
+	m_iCurrRecurrence = m_iMaxRecurrence;
 }
 //--------------------------------------------------------------------------------

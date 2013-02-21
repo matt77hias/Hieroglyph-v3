@@ -23,8 +23,6 @@ using namespace Glyph3;
 ViewGBuffer::ViewGBuffer( RendererDX11& Renderer )
     : m_Renderer( Renderer )
 {
-	m_sParams.iViewType = VT_GBUFFER;
-
 	ViewMatrix.MakeIdentity();
 	ProjMatrix.MakeIdentity();
 }
@@ -37,7 +35,7 @@ void ViewGBuffer::Update( float fTime )
 {
 }
 //--------------------------------------------------------------------------------
-void ViewGBuffer::PreDraw( RendererDX11* pRenderer )
+void ViewGBuffer::QueuePreTasks( RendererDX11* pRenderer )
 {
 	if ( m_pEntity != NULL )
 	{
@@ -46,16 +44,16 @@ void ViewGBuffer::PreDraw( RendererDX11* pRenderer )
 	}
 
 	// Queue this view into the renderer for processing.
-	pRenderer->QueueRenderView( this );
+	pRenderer->QueueTask( this );
 
 	if ( m_pRoot )
 	{
 		// Run through the graph and pre-render the entities
-		m_pRoot->PreRender( pRenderer, GetType() );
+		m_pRoot->PreRender( pRenderer, VT_GBUFFER );
 	}
 }
 //--------------------------------------------------------------------------------
-void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
+void ViewGBuffer::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	if ( m_pRoot )
 	{
@@ -66,8 +64,8 @@ void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager
 		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
 		pPipelineManager->ApplyRenderTargets();
 
-		pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
-		pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iViewport );
+		// Configure the desired viewports in this pipeline
+		ConfigureViewports( pPipelineManager );
 
 		// Clear the G-Buffer targets
 		Vector4f color( 0.0f, 0.0f, 0.0f, 0.0f );
@@ -77,7 +75,7 @@ void ViewGBuffer::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager
 		SetRenderParams( pParamManager );
 
 		// Run through the graph and render each of the entities
-		m_pRoot->Render( pPipelineManager, pParamManager, GetType() );
+		m_pRoot->Render( pPipelineManager, pParamManager, VT_GBUFFER );
 	}
 }
 //--------------------------------------------------------------------------------
@@ -103,7 +101,12 @@ void ViewGBuffer::SetTargets( std::vector<ResourcePtr>& GBufferTargets,
 {
     m_GBufferTargets = GBufferTargets;
 
-    m_iViewport = Viewport;
+    SetViewPort( Viewport );
     m_DepthTarget = DepthTarget;
+}
+//--------------------------------------------------------------------------------
+std::wstring ViewGBuffer::GetName()
+{
+	return( L"ViewGBuffer" );
 }
 //--------------------------------------------------------------------------------

@@ -15,18 +15,19 @@
 #ifndef ViewGBuffer_h
 #define ViewGBuffer_h
 //--------------------------------------------------------------------------------
-#include "IRenderView.h"
+#include "SceneRenderTask.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class ViewGBuffer : public IRenderView
+	class ViewGBuffer : public SceneRenderTask
 	{
 	public:
 		ViewGBuffer( RendererDX11& Renderer );
+		virtual ~ViewGBuffer();
 
 		virtual void Update( float fTime );
-		virtual void PreDraw( RendererDX11* pRenderer );
-		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
+		virtual void QueuePreTasks( RendererDX11* pRenderer );
+		virtual void ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 		virtual void Resize( UINT width, UINT height );
 
 		virtual void SetRenderParams( IParameterManager* pParamManager );
@@ -35,7 +36,7 @@ namespace Glyph3
         void SetTargets( std::vector<ResourcePtr>& GBufferTargets, ResourcePtr DepthTarget,
                           int Viewport );
 
-		virtual ~ViewGBuffer();
+		virtual std::wstring GetName();
 
 	protected:
 

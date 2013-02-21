@@ -25,7 +25,7 @@
 #ifndef ViewLightPrepassRenderer_h
 #define ViewLightPrepassRenderer_h
 //--------------------------------------------------------------------------------
-#include "IRenderView.h"
+#include "SceneRenderTask.h"
 #include "ViewGBuffer.h"
 #include "ViewLights.h"
 #include "ViewFinalPass.h"
@@ -35,14 +35,15 @@ namespace Glyph3
 {
 	class Entity3D;
 
-	class ViewLightPrepassRenderer : public IRenderView
+	class ViewLightPrepassRenderer : public SceneRenderTask
 	{
 	public:
 		ViewLightPrepassRenderer( RendererDX11& Renderer, ResourcePtr RenderTarget );
+		virtual ~ViewLightPrepassRenderer();
 
 		virtual void Update( float fTime );
-		virtual void PreDraw( RendererDX11* pRenderer );
-		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
+		virtual void QueuePreTasks( RendererDX11* pRenderer );
+		virtual void ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 		virtual void Resize( UINT width, UINT height );
 
 		virtual void SetEntity( Entity3D* pEntity );
@@ -57,7 +58,7 @@ namespace Glyph3
 		void SetClipPlanes( float NearClip, float FarClip );
 		void SetupLights();
 
-		virtual ~ViewLightPrepassRenderer();
+		virtual std::wstring GetName();
 
 	protected:
 

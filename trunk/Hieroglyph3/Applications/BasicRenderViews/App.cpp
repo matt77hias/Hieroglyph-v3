@@ -207,7 +207,7 @@ void App::Update()
 
 	m_pRoot->Update( m_pTimer->Elapsed() );
 
-	m_pRenderView->Draw( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr );
+	m_pRenderView->ExecuteTask( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr );
 
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
 

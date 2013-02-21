@@ -107,7 +107,7 @@ ViewLightPrepassRenderer::ViewLightPrepassRenderer( RendererDX11& Renderer, Reso
     viewport.TopLeftX = 0;
     viewport.TopLeftY = 0;
 
-    m_iViewport = Renderer.CreateViewPort( viewport );
+    SetViewPort( Renderer.CreateViewPort( viewport ) );
 
     // Create a render target for MSAA resolve
     Texture2dConfigDX11 resolveConfig;
@@ -127,15 +127,15 @@ ViewLightPrepassRenderer::ViewLightPrepassRenderer( RendererDX11& Renderer, Reso
 	// Set the the targets for the views
     m_pGBufferView->SetTargets( m_GBufferTarget,
                                 m_DepthTarget,
-                                m_iViewport );
+                                m_iViewports[0] );
     m_pLightsView->SetTargets( m_GBufferTarget,
                                 m_LightTarget,
                                 m_ReadOnlyDepthTarget,
-                                m_iViewport );
+                                m_iViewports[0] );
     m_pFinalPassView->SetTargets( m_LightTarget,
                                     m_FinalTarget,
                                     m_ReadOnlyDepthTarget,
-                                    m_iViewport );
+                                    m_iViewports[0] );
 
 
     m_SpriteRenderer.Initialize();
@@ -152,7 +152,7 @@ void ViewLightPrepassRenderer::Update( float fTime )
 {
 }
 //--------------------------------------------------------------------------------
-void ViewLightPrepassRenderer::PreDraw( RendererDX11* pRenderer )
+void ViewLightPrepassRenderer::QueuePreTasks( RendererDX11* pRenderer )
 {
 	// Call the super class's predraw in order to queue it in the renderer.  The
 	// views are processed in a LIFO order, so this will be executed last in both
@@ -165,23 +165,23 @@ void ViewLightPrepassRenderer::PreDraw( RendererDX11* pRenderer )
 	}
 
 	// Queue this view into the renderer for processing.
-	pRenderer->QueueRenderView( this );
+	pRenderer->QueueTask( this );
 
 	if ( m_pRoot )
 	{
 		// Run through the graph and pre-render the entities
-		m_pRoot->PreRender( pRenderer, GetType() );
+		m_pRoot->PreRender( pRenderer, VT_PERSPECTIVE );
 	}
 
 	// Next we call the predraw method of each of the supporting views.
 
 	SetupLights();
-	m_pFinalPassView->PreDraw( pRenderer );
-	m_pLightsView->PreDraw( pRenderer );
-	m_pGBufferView->PreDraw( pRenderer );
+	m_pFinalPassView->QueuePreTasks( pRenderer );
+	m_pLightsView->QueuePreTasks( pRenderer );
+	m_pGBufferView->QueuePreTasks( pRenderer );
 }
 //--------------------------------------------------------------------------------
-void ViewLightPrepassRenderer::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
+void ViewLightPrepassRenderer::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
     // Render to the backbuffer
     pPipelineManager->ClearRenderTargets();
@@ -190,8 +190,8 @@ void ViewLightPrepassRenderer::Draw( PipelineManagerDX11* pPipelineManager, IPar
 
     pPipelineManager->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 
-	pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
-	pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iViewport );
+	// Configure the desired viewports in this pipeline
+	ConfigureViewports( pPipelineManager );
 
     // Need to resolve the MSAA target before we can render it
     pPipelineManager->ResolveSubresource( m_ResolveTarget, 0, m_FinalTarget, 0, DXGI_FORMAT_R10G10B10A2_UNORM );
@@ -220,16 +220,16 @@ void ViewLightPrepassRenderer::Resize( UINT width, UINT height )
 	RendererDX11::Get()->ResizeTexture( m_ResolveTarget, width, height );
 
 	// Resize the viewport.
-	RendererDX11::Get()->ResizeViewport( m_iViewport, width, height );
+	RendererDX11::Get()->ResizeViewport( m_iViewports[0], width, height );
 
 	m_pGBufferView->Resize( width, height );
 	m_pLightsView->Resize( width, height );
 	m_pFinalPassView->Resize( width, height );
 
 	// Set the the targets for the views
-    m_pGBufferView->SetViewPort( m_iViewport );
-    m_pLightsView->SetViewPort( m_iViewport );
-    m_pFinalPassView->SetViewPort( m_iViewport );
+    m_pGBufferView->SetViewPort( m_iViewports[0] );
+    m_pLightsView->SetViewPort( m_iViewports[0] );
+    m_pFinalPassView->SetViewPort( m_iViewports[0] );
 }
 //--------------------------------------------------------------------------------
 void ViewLightPrepassRenderer::SetRenderParams( IParameterManager* pParamManager )
@@ -250,7 +250,7 @@ void ViewLightPrepassRenderer::SetUsageParams( IParameterManager* pParamManager 
 void ViewLightPrepassRenderer::SetViewMatrix( const Matrix4f& matrix )
 {
 	// Perform the view matrix setting for this view.
-	IRenderView::SetViewMatrix( matrix );
+	SceneRenderTask::SetViewMatrix( matrix );
 
 	// Propagate the view matrix.
 	m_pGBufferView->SetViewMatrix( matrix );
@@ -261,7 +261,7 @@ void ViewLightPrepassRenderer::SetViewMatrix( const Matrix4f& matrix )
 void ViewLightPrepassRenderer::SetProjMatrix( const Matrix4f& matrix )
 {
 	// Perform the projection matrix setting for this view.
-	IRenderView::SetProjMatrix( matrix );
+	SceneRenderTask::SetProjMatrix( matrix );
 
 	// Propagate the projection matrix.
 	m_pGBufferView->SetProjMatrix( matrix );
@@ -332,5 +332,10 @@ void ViewLightPrepassRenderer::SetupLights( )
             }
         }
     }
+}
+//--------------------------------------------------------------------------------
+std::wstring ViewLightPrepassRenderer::GetName()
+{
+	return( L"ViewLightPrepassRenderer" );
 }
 //--------------------------------------------------------------------------------

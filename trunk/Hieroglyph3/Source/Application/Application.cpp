@@ -51,7 +51,8 @@ Application::Application() :
 	RequestEvent( INFO_MESSAGE );
 	RequestEvent( ERROR_MESSAGE );
 
-	// TODO: this should go into the RenderApplication class!
+	// Create the scene to be manipulated.
+
 	m_pScene = new Scene();
 }
 //--------------------------------------------------------------------------------

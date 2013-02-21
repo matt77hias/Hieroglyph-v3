@@ -24,12 +24,10 @@ using namespace Glyph3;
 ViewDepthNormal::ViewDepthNormal( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget )
 	: ViewPerspective( Renderer, RenderTarget, DepthTarget )
 {
-	// This view is the same as a perspective view, with only a different 
-	// rendering type as indicated here.  In addition, the render target
-	// that gets passed to this view will serve as the depth/normal buffer
-	// as opposed to the standard render target.
-
-	m_sParams.iViewType = VT_LINEAR_DEPTH_NORMAL;
+	// This view is more or less the same as a ViewPerspective, with only a 
+	// different scene rendering type (as indicated below with VT_LINEAR_DEPTH_NORMAL).  
+	// In addition, the render target that gets passed to this view will serve as
+	// the depth/normal buffer as opposed to a standard render target.
 
 	m_pDepthNormalBuffer = Renderer.m_pParamMgr->GetShaderResourceParameterRef( std::wstring( L"DepthNormalBuffer" ) );
 }
@@ -38,11 +36,57 @@ ViewDepthNormal::~ViewDepthNormal()
 {
 }
 //--------------------------------------------------------------------------------
+void ViewDepthNormal::QueuePreTasks( RendererDX11* pRenderer )
+{
+	if ( m_pEntity != NULL )
+	{
+		Matrix4f view = m_pEntity->GetView();
+		SetViewMatrix( view );
+	}
+
+	// Queue this view into the renderer for processing.
+	pRenderer->QueueTask( this );
+
+	if ( m_pRoot )
+	{
+		// Run through the graph and pre-render the entities
+		m_pRoot->PreRender( pRenderer, VT_LINEAR_DEPTH_NORMAL );
+	}
+}
+//--------------------------------------------------------------------------------
+void ViewDepthNormal::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
+{
+	if ( m_pRoot )
+	{
+		// Set the parameters for rendering this view
+		pPipelineManager->ClearRenderTargets();
+		pPipelineManager->OutputMergerStage.DesiredState.SetRenderTarget( 0, m_RenderTarget->m_iResourceRTV );
+		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
+		pPipelineManager->ApplyRenderTargets();
+
+		pPipelineManager->ClearBuffers( m_vColor, 1.0f );
+
+		// Configure the desired viewports in this pipeline
+		ConfigureViewports( pPipelineManager );
+
+		// Set this view's render parameters
+		SetRenderParams( pParamManager );
+
+		// Run through the graph and render each of the entities
+		m_pRoot->Render( pPipelineManager, pParamManager, VT_LINEAR_DEPTH_NORMAL );
+	}
+}
+//--------------------------------------------------------------------------------
 void ViewDepthNormal::SetUsageParams( IParameterManager* pParamManager )
 {
 	// This view will bind the depth/normal buffer to the "DepthNormalBuffer" shader
 	// resource view parameter, so that other views can make use of it.
 
 	pParamManager->SetShaderResourceParameter( m_pDepthNormalBuffer, m_RenderTarget );
+}
+//--------------------------------------------------------------------------------
+std::wstring ViewDepthNormal::GetName()
+{
+	return( L"ViewDepthNormal" );
 }
 //--------------------------------------------------------------------------------

@@ -15,7 +15,7 @@
 #ifndef ViewSimulation_h
 #define ViewSimulation_h
 //--------------------------------------------------------------------------------
-#include "IRenderView.h"
+#include "Task.h"
 #include "UnorderedAccessParameterDX11.h"
 #include "ShaderResourceParameterDX11.h"
 #include "VectorParameterDX11.h"
@@ -34,26 +34,25 @@ namespace Glyph3
 	};
 
 	
-	class ViewSimulation : public IRenderView
+	class ViewSimulation : public Task
 	{
 	public:
 		ViewSimulation( RendererDX11& Renderer, int SizeX );
+		virtual ~ViewSimulation();
 
 		virtual void Update( float fTime );
-		virtual void PreDraw( RendererDX11* pRenderer );
-		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
+		virtual void QueuePreTasks( RendererDX11* pRenderer );
+		virtual void ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 
 		virtual void SetRenderParams( IParameterManager* pParamManager );
 		virtual void SetUsageParams( IParameterManager* pParamManager );
 
-
-		virtual ~ViewSimulation();
+		virtual std::wstring GetName();
+		
 
 		ResourcePtr GetParticleCountConstantBuffer();
 		ResourcePtr GetParticleCountIndirectArgsBuffer();
 		ResourcePtr GetParticleCountStagingBuffer();
-
-		virtual bool HandleEvent( EventPtr pEvent );
 
 	protected:
 

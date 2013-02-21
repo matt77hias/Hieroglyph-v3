@@ -18,27 +18,26 @@
 #ifndef ViewPerspective_h
 #define ViewPerspective_h
 //--------------------------------------------------------------------------------
-#include "IRenderView.h"
+#include "SceneRenderTask.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
 	class Entity3D;
 
-	class ViewPerspective : public IRenderView
+	class ViewPerspective : public SceneRenderTask
 	{
 	public:
 		ViewPerspective( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget = 0 );
+		virtual ~ViewPerspective();
 
 		virtual void Update( float fTime );
-		virtual void PreDraw( RendererDX11* pRenderer );
-		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
+		virtual void QueuePreTasks( RendererDX11* pRenderer );
+		virtual void ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 		virtual void Resize( UINT width, UINT height );
 
-		virtual void SetRenderParams( IParameterManager* pParamManager );
-		virtual void SetUsageParams( IParameterManager* pParamManager );
+		void SetRenderTargets( ResourcePtr RenderTarget, ResourcePtr DepthTarget = nullptr );
 
-
-		virtual ~ViewPerspective();
+		virtual std::wstring GetName();
 
 	protected:
 

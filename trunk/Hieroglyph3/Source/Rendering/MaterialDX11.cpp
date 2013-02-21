@@ -25,7 +25,7 @@ MaterialDX11::MaterialDX11()
 		Params[i].pEffect = nullptr;
 	}
 	
-	m_pEntity = nullptr;
+	//m_pEntity = nullptr;
 }
 //--------------------------------------------------------------------------------
 MaterialDX11::~MaterialDX11()
@@ -36,47 +36,39 @@ MaterialDX11::~MaterialDX11()
 		SAFE_DELETE( Params[i].pEffect );
 }
 //--------------------------------------------------------------------------------
+void MaterialDX11::Update( float time )
+{
+	for ( int i = 0; i < VT_NUM_VIEW_TYPES; i++ )
+	{
+		if ( Params[i].bRender ) 
+		{
+			for ( auto pView : Params[i].Tasks )
+				pView->Update( time );
+		}
+	}
+}
+//--------------------------------------------------------------------------------
 void MaterialDX11::PreRender( RendererDX11* pRenderer, VIEWTYPE type )
 {
 	// Update the render views that are needed before a view of 'type' can be
 	// processed.  We will always try to update the view, but it may limit if it
 	// is updated based on the maximum recurrence allowed. 
 
-	for ( auto pView : Params[type].vViews ) 
-		pView->PreDraw( pRenderer );
+	for ( auto pView : Params[type].Tasks ) 
+		pView->QueuePreTasks( pRenderer );
 }
 //--------------------------------------------------------------------------------
 void MaterialDX11::SetRenderParams( IParameterManager* pParamManager, VIEWTYPE type )
 {
-	if ( m_pEntity )
-	{
-		// TODO:
-		// Set the object specific render parameters here, like object position,
-		// orientation, etc...
-	}
-
 	// Set any special render view parameters that may be needed for the effect
 	// to use the results of the render view in its rendering pass.
 
-	for ( auto pView : Params[type].vViews )
+	for ( auto pView : Params[type].Tasks )
 		pView->SetUsageParams( pParamManager);
 
 	// Set the additional render parameters that have been added to the material.
 
 	Parameters.SetRenderParams( pParamManager );
-}
-//--------------------------------------------------------------------------------
-void MaterialDX11::SetEntity( Entity3D* pEntity )
-{
-	m_pEntity = pEntity;
-
-	for ( int i = 0; i < VT_NUM_VIEW_TYPES; i++ )
-	{
-		for ( auto pView : Params[i].vViews )
-		{
-			pView->SetEntity( pEntity );
-		}
-	}
 }
 //--------------------------------------------------------------------------------
 void MaterialDX11::GetAllVertexShaderIDs( std::vector<int>& idlist )

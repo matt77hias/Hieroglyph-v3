@@ -9,28 +9,16 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// ActorGenerator
-//
+#include "PCH.h"
+#include "Task.h"
 //--------------------------------------------------------------------------------
-#ifndef ActorGenerator_h
-#define ActorGenerator_h
+using namespace Glyph3;
 //--------------------------------------------------------------------------------
-#include "Actor.h"
-#include "MaterialDX11.h"
-//--------------------------------------------------------------------------------
-namespace Glyph3
+Task::Task( )
 {
-	class ActorGenerator
-	{
-	public:
-		static Actor* GenerateVisualizationTexture2D( RendererDX11& Renderer, 
-			ResourcePtr resource, MaterialPtr pMaterial );
-
-	private:
-		ActorGenerator();
-		
-	};
-};
-#endif // ActorGenerator_h
-
-
+}
+//--------------------------------------------------------------------------------
+Task::~Task( )
+{
+}
+//--------------------------------------------------------------------------------

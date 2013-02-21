@@ -53,7 +53,6 @@ namespace Glyph3
 		void ClearText();
 		void SetText( const std::wstring& text );
 		void AppendText( const std::wstring& text );
-		// TODO: possibly add a based stream function here...
 
 		// These methods provide the ability to draw individual characters, 
 		// advance the 'cursor' with a space, or start a new line of text.

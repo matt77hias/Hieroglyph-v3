@@ -627,11 +627,6 @@ void GeometryGeneratorDX11::GenerateCone( GeometryPtr pGeometry, unsigned int UR
     }
 }
 //--------------------------------------------------------------------------------
-void GeometryGeneratorDX11::GenerateBox( GeometryPtr pGeometry, Vector3f center, Vector3f size )
-{
-	// TODO: Add the box function here!!!
-}
-//--------------------------------------------------------------------------------
 void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryPtr pGeometry, unsigned int URes, 
                                         unsigned int VRes, float Radius, float Height, 
 										unsigned int NumBones, SkinnedActor* pActor )

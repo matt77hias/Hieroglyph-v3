@@ -30,8 +30,6 @@
 #include "BlendStateDX11.h"
 #include "DepthStencilStateDX11.h"
 #include "RasterizerStateDX11.h"
-
-#include "IEventListener.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -77,7 +75,7 @@ namespace Glyph3
 	class IParameterManager;
 	class PipelineManagerDX11;
 
-	class IRenderView;
+	class Task;
 
 
 	enum ResourceType
@@ -98,14 +96,14 @@ namespace Glyph3
 		bool bComplete;
 		PipelineManagerDX11* pPipeline;
 		IParameterManager* pParamManager;
-		IRenderView* pRenderView;
+		Task* pTask;
 		CommandListDX11* pList;
 	};
 
 
 
 
-	class RendererDX11 : public IRenderer, public IEventListener
+	class RendererDX11 : public IRenderer
 	{
 	public:
 		RendererDX11();
@@ -237,12 +235,8 @@ namespace Glyph3
 		ShaderDX11*										GetShader( int index );
 
 		// Here is the caching API functions
-		void QueueRenderView( IRenderView* pRenderView );
-		void ProcessRenderViewQueue( );
-
-		// PIX marker and event functions
-		static void PIXBeginEvent( const wchar_t* name );
-		static void PIXEndEvent();
+		void QueueTask( Task* pTask );
+		void ProcessTaskQueue( );
 
 	protected:
 
@@ -324,10 +318,6 @@ namespace Glyph3
 
 		TConfiguration<bool>		MultiThreadingConfig;
 
-		virtual std::wstring GetName( );
-		virtual bool HandleEvent( EventPtr pEvent );
-
-
 	protected:
 
 		int							GetUnusedResourceIndex();
@@ -335,13 +325,13 @@ namespace Glyph3
 
 		D3D_FEATURE_LEVEL			m_FeatureLevel;
 
-		std::vector<IRenderView*>	m_vQueuedViews;
+		std::vector<Task*>			m_vQueuedTasks;
 
 		friend GeometryDX11;
 	};
 };
 
-unsigned int WINAPI _RenderViewThreadProc( void* lpParameter );
+unsigned int WINAPI _TaskThreadProc( void* lpParameter );
 
 // Multithreading support objects
 extern HANDLE						g_aThreadHandles[NUM_THREADS];

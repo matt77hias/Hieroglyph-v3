@@ -126,6 +126,12 @@ void Entity3D::Update( float time )
 	UpdateWorld( );
 
 	m_sParams.WorldMatrix = m_mWorld;
+
+	// Give the material a chance to update itself
+	if ( m_sParams.Material != nullptr )
+	{
+		m_sParams.Material->Update( time );
+	}
 }
 //--------------------------------------------------------------------------------
 void Entity3D::UpdateLocal( float fTime )
@@ -360,9 +366,8 @@ void Entity3D::SetMaterial( MaterialPtr pMaterial )
 {
 	m_sParams.Material = pMaterial;
 
-	// TODO: This could probably be moved to another class, possibly to the 
-	//       EntityRenderParams class...  That would avoid duplicating it, and
-	//       would put the functionality in the location that it is needed...
+	// Query all of the vertex shader IDs that will be used so that the pipeline
+	// executor class can pre-create them.
 
 	if ( m_sParams.Material != nullptr && m_sParams.Executor != nullptr )
 	{
@@ -389,9 +394,8 @@ void Entity3D::SetGeometry( ExecutorPtr pExecutor )
 {
 	m_sParams.Executor = pExecutor;
 
-	// TODO: This could probably be moved to another class, possibly to the 
-	//       EntityRenderParams class...  That would avoid duplicating it, and
-	//       would put the functionality in the location that it is needed...
+	// Query all of the vertex shader IDs that will be used so that the pipeline
+	// executor class can pre-create them.
 
 	if ( m_sParams.Material != nullptr && m_sParams.Executor != nullptr )
 	{

@@ -261,8 +261,6 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
-	SAFE_DELETE( m_pCamera );
-
 	// Print the framerate out for the log before shutting down.
 
 	std::wstringstream out;

@@ -39,7 +39,7 @@
 #include <assert.h>
 
 // DirectX includes
-#include <d3d11.h>
+#include <d3d11_1.h>
 #include <d3dCompiler.h>
 //#include <d3dx11.h>
 

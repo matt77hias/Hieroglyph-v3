@@ -363,9 +363,6 @@ void GeometryDX11::LoadToBuffers()
 			}
 		}
 
-		// TODO: Change this to check the current buffer size, and allow releasing of the resources.
-		//       This may take some reference counting to change the way it works...
-
 		D3D11_SUBRESOURCE_DATA data;
 		data.pSysMem = reinterpret_cast<void*>( pBytes );
 		data.SysMemPitch = 0;
@@ -376,7 +373,6 @@ void GeometryDX11::LoadToBuffers()
 		m_VB = RendererDX11::Get()->CreateVertexBuffer( &vbuffer, &data );
 
 		delete [] pBytes; 
-		// TODO: add error checking here!
 	}
 	
 	// Load the index buffer by calculating the required size

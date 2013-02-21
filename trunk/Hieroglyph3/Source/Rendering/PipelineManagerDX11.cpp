@@ -50,6 +50,12 @@
 #include <wincodec.h>
 
 #include <sstream>
+
+// NOTE:
+// These d3d9 related items are only needed for the D3DPERF event definitions.  It can be removed
+// once D3D11.1 is available, and replaced with ID3DUserDefinedAnnotation instead.
+#include <d3d9.h>
+#pragma comment( lib, "d3d9.lib" )
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -74,6 +80,8 @@ PipelineManagerDX11::PipelineManagerDX11()
 //--------------------------------------------------------------------------------
 PipelineManagerDX11::~PipelineManagerDX11()
 {
+	if ( m_pAnnotation ) m_pAnnotation->Release();
+
 	if( m_pContext ) m_pContext->ClearState();
 	if( m_pContext ) m_pContext->Flush();
 
@@ -86,6 +94,10 @@ void PipelineManagerDX11::SetDeviceContext( ID3D11DeviceContext* pContext, D3D_F
 {
 	m_pContext = pContext;
 	m_FeatureLevel = level;
+
+	m_pAnnotation = nullptr;
+	HRESULT hr = m_pContext->QueryInterface( __uuidof( ID3DUserDefinedAnnotation ), (void**)&m_pAnnotation );
+	
 
 	// For each pipeline stage object, set its feature level here so they know
 	// what they can do and what they can't do.
@@ -576,7 +588,11 @@ void PipelineManagerDX11::CopyStructureCount( ResourcePtr dest, UINT offset, Res
 		pRawView = pView->m_pUnorderedAccessView;
 	}
 
-	m_pContext->CopyStructureCount( pRawArgsBuffer, offset, pRawView );
+	if ( pArgsBuffer != nullptr && pView != nullptr ) {
+		m_pContext->CopyStructureCount( pRawArgsBuffer, offset, pRawView );
+	} else {
+		Log::Get().Write( L"ERROR: Trying to copy structure count with null values!" );
+	}
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth, UINT stencil )
@@ -924,5 +940,30 @@ void PipelineManagerDX11::ResolveSubresource( ResourcePtr DestResource, UINT Dst
     ID3D11Resource* pSrcResource = RendererDX11::Get()->GetResourceByIndex(SrcID)->GetResource();
  
     m_pContext->ResolveSubresource( pDestResource, DstSubresource, pSrcResource, SrcSubresource, format );
+}
+//--------------------------------------------------------------------------------
+void PipelineManagerDX11::BeginEvent( std::wstring& name )
+{
+	if ( m_pAnnotation ) {
+		m_pAnnotation->BeginEvent( name.c_str() );
+	} else {
+		D3DPERF_BeginEvent( 0xFFFFFFFF, name.c_str() );
+	}
+}
+//--------------------------------------------------------------------------------
+void PipelineManagerDX11::EndEvent()
+{
+	if ( m_pAnnotation ) {
+		m_pAnnotation->EndEvent();
+	} else {
+		D3DPERF_EndEvent();
+	}
+}
+//--------------------------------------------------------------------------------
+void PipelineManagerDX11::SetMarker( std::wstring& name )
+{
+	if ( m_pAnnotation ) {
+		m_pAnnotation->SetMarker( name.c_str() );
+	}
 }
 //--------------------------------------------------------------------------------

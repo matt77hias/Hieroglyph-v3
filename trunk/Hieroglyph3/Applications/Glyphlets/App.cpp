@@ -95,7 +95,9 @@ void App::Initialize()
 	m_pScene->AddActor( m_pBodyText1 );
 
 	m_pActor1 = new GlyphletActor();
-	m_pActor1->SetGlyphlet( SingleWindowGlyphletPtr( new ScriptedGlyphlet() ) );
+	SingleWindowGlyphletPtr pScriptedGlyphlet( new ScriptedGlyphlet() );
+	pScriptedGlyphlet->Initialize();
+	m_pActor1->SetGlyphlet( pScriptedGlyphlet );
 	m_pActor1->GetNode()->Position() = Vector3f( 0.0f, 7.5f, 10.0f );
 	m_pScene->AddActor( m_pActor1 );
 
@@ -113,7 +115,9 @@ void App::Initialize()
 	m_pScene->AddActor( m_pBodyText2 );
 
 	m_pActor2 = new GlyphletActor();
-	m_pActor2->SetGlyphlet( SingleWindowGlyphletPtr( new ParticleStormGlyphlet() ) );
+	SingleWindowGlyphletPtr pParticleStormGlyphlet( new ParticleStormGlyphlet() );
+	pParticleStormGlyphlet->Initialize();
+	m_pActor2->SetGlyphlet( pParticleStormGlyphlet );
 	m_pActor2->GetNode()->Position() = Vector3f( 0.0f, -0.5f, 10.0f );
 	m_pScene->AddActor( m_pActor2 );
 

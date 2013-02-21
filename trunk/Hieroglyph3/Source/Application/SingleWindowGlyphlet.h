@@ -52,7 +52,7 @@ namespace Glyph3
 
 		Scene*					m_pScene;
 		FirstPersonCamera*		m_pCamera;
-		IRenderView*			m_pRenderView;
+		SceneRenderTask*		m_pRenderView;
 		ResourcePtr				m_RenderTarget;
 
 		unsigned int			m_iWidth;

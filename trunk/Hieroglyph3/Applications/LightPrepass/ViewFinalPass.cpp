@@ -21,10 +21,7 @@
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ViewFinalPass::ViewFinalPass( RendererDX11& Renderer )
-    : m_Renderer( Renderer )
 {
-    m_sParams.iViewType = VT_FINALPASS;
-
     ViewMatrix.MakeIdentity();
     ProjMatrix.MakeIdentity();
 
@@ -39,7 +36,7 @@ void ViewFinalPass::Update( float fTime )
 {
 }
 //--------------------------------------------------------------------------------
-void ViewFinalPass::PreDraw( RendererDX11* pRenderer )
+void ViewFinalPass::QueuePreTasks( RendererDX11* pRenderer )
 {
     if ( m_pEntity != NULL )
     {
@@ -48,16 +45,16 @@ void ViewFinalPass::PreDraw( RendererDX11* pRenderer )
     }
 
     // Queue this view into the renderer for processing.
-    pRenderer->QueueRenderView( this );
+    pRenderer->QueueTask( this );
 
     if ( m_pRoot )
     {
         // Run through the graph and pre-render the entities
-        m_pRoot->PreRender( pRenderer, GetType() );
+        m_pRoot->PreRender( pRenderer, VT_FINALPASS );
     }
 }
 //--------------------------------------------------------------------------------
-void ViewFinalPass::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
+void ViewFinalPass::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
     if ( m_pRoot )
     {
@@ -71,14 +68,14 @@ void ViewFinalPass::Draw( PipelineManagerDX11* pPipelineManager, IParameterManag
 		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
 		pPipelineManager->ApplyRenderTargets();
 
-		pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
-		pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iViewport );
+		// Configure the desired viewports in this pipeline
+		ConfigureViewports( pPipelineManager );
 
         // Set this view's render parameters
         SetRenderParams( pParamManager );
 
         // Run through the graph and render each of the entities
-        m_pRoot->Render( pPipelineManager, pParamManager, GetType() );
+        m_pRoot->Render( pPipelineManager, pParamManager, VT_FINALPASS );
     }
 }
 //--------------------------------------------------------------------------------
@@ -107,7 +104,12 @@ void ViewFinalPass::SetTargets( ResourcePtr LightTarget, ResourcePtr RenderTarge
 {
     m_LightTarget = LightTarget;
     m_RenderTarget = RenderTarget;
-    m_iViewport = Viewport;
+    SetViewPort( Viewport );
     m_DepthTarget = DepthTarget;
+}
+//--------------------------------------------------------------------------------
+std::wstring ViewFinalPass::GetName()
+{
+	return( L"ViewFinalPass" );
 }
 //--------------------------------------------------------------------------------

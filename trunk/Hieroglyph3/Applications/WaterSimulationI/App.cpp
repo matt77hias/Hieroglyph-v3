@@ -94,7 +94,7 @@ void App::Initialize()
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
 	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
-	pMaterial->Params[VT_PERSPECTIVE].vViews.push_back( new ViewSimulation( *m_pRenderer11, DispatchSizeX, DispatchSizeZ ) );
+	pMaterial->Params[VT_PERSPECTIVE].Tasks.push_back( new ViewSimulation( *m_pRenderer11, DispatchSizeX, DispatchSizeZ ) );
 
 	// Initialize parameter values that will be needed by the shaders used above.
 

@@ -26,7 +26,7 @@
 #define Camera_h
 //--------------------------------------------------------------------------------
 #include "Actor.h"
-#include "IRenderView.h"
+#include "SceneRenderTask.h"
 #include "SpatialController.h"
 #include "ParameterContainer.h"
 //--------------------------------------------------------------------------------
@@ -41,12 +41,12 @@ namespace Glyph3
 		Camera();
 		virtual ~Camera();
 
-		void SetCameraView( IRenderView* pView );
-		void SetOverlayView( IRenderView* pView );
+		void SetCameraView( SceneRenderTask* pTask );
+		void SetOverlayView( Task* pTask );
 		void SetScene( Scene* pScene );
 
-		IRenderView* GetCameraView();
-		IRenderView* GetOverlayView();
+		SceneRenderTask* GetCameraView();
+		Task* GetOverlayView();
 		Scene* GetScene();
 
 		void RenderFrame( RendererDX11* pRenderer );
@@ -72,8 +72,8 @@ namespace Glyph3
 
 		void ApplyProjectionParams();
 
-		IRenderView* m_pCameraView;
-		IRenderView* m_pOverlayView;
+		SceneRenderTask* m_pCameraView;
+		Task* m_pOverlayView;
 		Scene* m_pScene;
 
 		float m_fNear;

@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio Express 2012 for Windows Desktop
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hieroglyph3_Desktop", "Source\Hieroglyph3_Desktop.vcxproj", "{0F6D257E-70D5-46C5-8A12-7BDF93C35E81}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E252E0D3-A52B-447F-A108-647F9C52AE33} = {E252E0D3-A52B-447F-A108-647F9C52AE33}
@@ -117,11 +117,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VolumeRendering_Desktop", "
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Glyphlets_Desktop", "Applications\Glyphlets\Glyphlets_Desktop.vcxproj", "{32D8D2D4-BE73-40E1-A0C1-8C8F9594A9E0}"
-	ProjectSection(ProjectDependencies) = postProject
-		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81} = {0F6D257E-70D5-46C5-8A12-7BDF93C35E81}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MFCwithD3D11_Desktop", "Applications\MFCwithD3D11\MFCwithD3D11_Desktop.vcxproj", "{25D5DBF0-DD2B-4B73-A1D1-2D387DB7E963}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81} = {0F6D257E-70D5-46C5-8A12-7BDF93C35E81}
 	EndProjectSection
@@ -286,12 +281,6 @@ Global
 		{32D8D2D4-BE73-40E1-A0C1-8C8F9594A9E0}.Release|Win32.ActiveCfg = Release|Win32
 		{32D8D2D4-BE73-40E1-A0C1-8C8F9594A9E0}.Release|Win32.Build.0 = Release|Win32
 		{32D8D2D4-BE73-40E1-A0C1-8C8F9594A9E0}.Release|x64.ActiveCfg = Release|Win32
-		{25D5DBF0-DD2B-4B73-A1D1-2D387DB7E963}.Debug|Win32.ActiveCfg = Debug|Win32
-		{25D5DBF0-DD2B-4B73-A1D1-2D387DB7E963}.Debug|Win32.Build.0 = Debug|Win32
-		{25D5DBF0-DD2B-4B73-A1D1-2D387DB7E963}.Debug|x64.ActiveCfg = Debug|Win32
-		{25D5DBF0-DD2B-4B73-A1D1-2D387DB7E963}.Release|Win32.ActiveCfg = Release|Win32
-		{25D5DBF0-DD2B-4B73-A1D1-2D387DB7E963}.Release|Win32.Build.0 = Release|Win32
-		{25D5DBF0-DD2B-4B73-A1D1-2D387DB7E963}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

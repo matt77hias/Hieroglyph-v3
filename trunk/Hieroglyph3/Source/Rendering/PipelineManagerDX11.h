@@ -191,12 +191,22 @@ namespace Glyph3
 		void EndPipelineStatistics( );
 		std::wstring PrintPipelineStatistics( );
 
+
+		// Provide the ability to set markers and event notifications for use in a debugging
+		// tool such as the Graphics Debugger in VS2012.
+
+		void BeginEvent( std::wstring& name );
+		void EndEvent();
+		void SetMarker( std::wstring& name );
+
+
 		void SaveTextureScreenShot( int ID, std::wstring filename );
 
 
 		D3D_FEATURE_LEVEL			m_FeatureLevel;
 
 		ID3D11DeviceContext*		            m_pContext;
+		ID3DUserDefinedAnnotation*				m_pAnnotation;
 		
         static const int                        NumQueries = 3;
         int                                     m_iCurrentQuery;

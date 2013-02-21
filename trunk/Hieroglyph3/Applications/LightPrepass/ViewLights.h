@@ -15,7 +15,7 @@
 #ifndef ViewLights_h
 #define ViewLights_h
 //--------------------------------------------------------------------------------
-#include "IRenderView.h"
+#include "SceneRenderTask.h"
 #include "GeometryDX11.h"
 #include "RenderEffectDX11.h"
 #include "AppSettings.h"
@@ -50,7 +50,7 @@ namespace Glyph3
                 Range( 2.0f ), SpotInnerAngle( 0 ), SpotOuterAngle ( 0 ), Type ( Point ) {}
     };
 
-    class ViewLights : public IRenderView
+    class ViewLights : public SceneRenderTask
     {
     public:
 
@@ -59,10 +59,11 @@ namespace Glyph3
 
     public:
         ViewLights( RendererDX11& Renderer );
+        virtual ~ViewLights();
 
         virtual void Update( float fTime );
-        virtual void PreDraw( RendererDX11* pRenderer );
-        virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
+		virtual void QueuePreTasks( RendererDX11* pRenderer );
+		virtual void ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 		virtual void Resize( UINT width, UINT height );
 
         virtual void SetRenderParams( IParameterManager* pParamManager );
@@ -73,7 +74,7 @@ namespace Glyph3
                             ResourcePtr DepthTarget, int Viewport);
         void SetClipPlanes( float NearClip, float FarClip );
 
-        virtual ~ViewLights();
+		virtual std::wstring GetName();
 
     protected:
 

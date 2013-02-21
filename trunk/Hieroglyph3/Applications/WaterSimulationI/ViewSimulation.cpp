@@ -22,8 +22,6 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ViewSimulation::ViewSimulation( RendererDX11& Renderer, int SizeX, int SizeY )
 {
-	m_sParams.iViewType = VT_SIMULATION;
-
 	// Remember what number of thread groups to run in the dispatch call.
 
 	ThreadGroupsX = SizeX;
@@ -99,15 +97,15 @@ void ViewSimulation::Update( float fTime )
 {
 }
 //--------------------------------------------------------------------------------
-void ViewSimulation::PreDraw( RendererDX11* pRenderer )
+void ViewSimulation::QueuePreTasks( RendererDX11* pRenderer )
 {
 	// Queue this view into the renderer for processing.  Since this is a 
 	// simulation style view, there is no root and hence no additional recursive
 	// 'PreDraw'ing required.
-	pRenderer->QueueRenderView( this );
+	pRenderer->QueueTask( this );
 }
 //--------------------------------------------------------------------------------
-void ViewSimulation::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
+void ViewSimulation::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	// Set this view's render parameters.
 	SetRenderParams( pParamManager );
@@ -142,5 +140,10 @@ void ViewSimulation::SetUsageParams( IParameterManager* pParamManager )
 
 	pParamManager->SetShaderResourceParameter( m_pCurrentWaterState, WaterState[0] );
 	pParamManager->SetVectorParameter( m_pDispatchSize, &DispatchSize );
+}
+//--------------------------------------------------------------------------------
+std::wstring ViewSimulation::GetName()
+{
+	return( L"ViewSimulation" );
 }
 //--------------------------------------------------------------------------------

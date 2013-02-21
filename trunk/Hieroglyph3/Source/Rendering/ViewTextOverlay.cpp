@@ -23,14 +23,14 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ViewTextOverlay::ViewTextOverlay( RendererDX11& Renderer, ResourcePtr RenderTarget )
 {
-	m_sParams.iViewType = VT_GUI_SKIN;
+	//m_sParams.iViewType = VT_GUI_SKIN;
 
 	m_RenderTarget = RenderTarget;
 
-	ViewMatrix.MakeIdentity();
-	ProjMatrix.MakeIdentity();
+	//ViewMatrix.MakeIdentity();
+	//ProjMatrix.MakeIdentity();
 
-	m_pEntity = 0;
+	//m_pEntity = 0;
 	m_vColor.MakeZero();
 
 	ResourceDX11* pResource = Renderer.GetResourceByIndex( m_RenderTarget->m_iResource );
@@ -69,13 +69,13 @@ void ViewTextOverlay::Update( float fTime )
 {
 }
 //--------------------------------------------------------------------------------
-void ViewTextOverlay::PreDraw( RendererDX11* pRenderer )
+void ViewTextOverlay::QueuePreTasks( RendererDX11* pRenderer )
 {
 	// Queue this view into the renderer for processing.
-	pRenderer->QueueRenderView( this );
+	pRenderer->QueueTask( this );
 }
 //--------------------------------------------------------------------------------
-void ViewTextOverlay::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
+void ViewTextOverlay::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	if ( m_TextEntries.size() > 0 ) {
 		// Set the parameters for rendering this view
@@ -105,16 +105,6 @@ void ViewTextOverlay::Resize( UINT width, UINT height )
 	RendererDX11::Get()->ResizeViewport( m_iViewport, width, height );
 }
 //--------------------------------------------------------------------------------
-void ViewTextOverlay::SetViewPort( DWORD x, DWORD y, DWORD w, DWORD h, float MinZ, float MaxZ )
-{
-	//m_viewport.X = x;
-	//m_viewport.Y = y;
-	//m_viewport.Width = w;
-	//m_viewport.Height = h;
-	//m_viewport.MinZ = MinZ;
-	//m_viewport.MaxZ = MaxZ;
-}
-//--------------------------------------------------------------------------------
 void ViewTextOverlay::SetRenderParams( IParameterManager* pParamManager )
 {
 //	pParamManager->SetViewMatrixParameter( &ViewMatrix );
@@ -129,5 +119,10 @@ void ViewTextOverlay::SetUsageParams( IParameterManager* pParamManager )
 void ViewTextOverlay::WriteText( std::wstring& text, Matrix4f& xform, Vector4f& color )
 {
 	m_TextEntries.push_back( TextEntry( text, xform, color ) );
+}
+//--------------------------------------------------------------------------------
+std::wstring ViewTextOverlay::GetName()
+{
+	return( L"ViewTextOverlay" );
 }
 //--------------------------------------------------------------------------------

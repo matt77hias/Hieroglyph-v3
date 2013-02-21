@@ -21,11 +21,6 @@ Camera::Camera()
 	m_pOverlayView = nullptr;
 	m_pScene = nullptr;
 
-	// TODO: We may not need to keep a reference to the spatial controller here,
-	//       and instead we could simply identify the spatial controller in the
-	//       node itself.  That would put the ownership in the entity being 
-	//       controlled, since that is where it will be deleted anyways...
-
 	// Create the spatial controller, which will be used to manipulate the node
 	// in a simple way.
 	m_pSpatialController = new SpatialController();
@@ -56,7 +51,7 @@ void Camera::RenderFrame( RendererDX11* pRenderer )
 	// be executed last.
 
 	if ( m_pOverlayView )
-		pRenderer->QueueRenderView( m_pOverlayView );
+		pRenderer->QueueTask( m_pOverlayView );
 
 	// If a render view for the camera is available, then render it with the given
 	// scene.
@@ -82,20 +77,20 @@ void Camera::RenderFrame( RendererDX11* pRenderer )
 		// This is followed by rendering all of the views to generate the current
 		// frame.
 
-		m_pCameraView->PreDraw( pRenderer );
-		pRenderer->ProcessRenderViewQueue();
+		m_pCameraView->QueuePreTasks( pRenderer );
+		pRenderer->ProcessTaskQueue();
 	}
 }
 //--------------------------------------------------------------------------------
-void Camera::SetCameraView( IRenderView* pView )
+void Camera::SetCameraView( SceneRenderTask* pTask )
 {
-	m_pCameraView = pView;
+	m_pCameraView = pTask;
 	m_pCameraView->SetEntity( m_pBody );
 }
 //--------------------------------------------------------------------------------
-void Camera::SetOverlayView( IRenderView* pView )
+void Camera::SetOverlayView( Task* pTask )
 {
-	m_pOverlayView = pView;
+	m_pOverlayView = pTask;
 }
 //--------------------------------------------------------------------------------
 void Camera::SetScene( Scene* pScene )
@@ -103,12 +98,12 @@ void Camera::SetScene( Scene* pScene )
 	m_pScene = pScene;
 }
 //--------------------------------------------------------------------------------
-IRenderView* Camera::GetCameraView()
+SceneRenderTask* Camera::GetCameraView()
 {
 	return( m_pCameraView );
 }
 //--------------------------------------------------------------------------------
-IRenderView* Camera::GetOverlayView()
+Task* Camera::GetOverlayView()
 {
 	return( m_pOverlayView );
 }

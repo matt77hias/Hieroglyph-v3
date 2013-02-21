@@ -165,9 +165,6 @@
     <Filter Include="Rendering\Material System\Components">
       <UniqueIdentifier>{c25ae441-b273-4869-b43f-5585840c09d9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Rendering\Material System\Components\Render Views">
-      <UniqueIdentifier>{e7c809f6-8040-45de-91ba-944550f2ecc9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Rendering\Material System\Components\Material Templates">
       <UniqueIdentifier>{fd4a0249-dfec-421c-aea7-992b7109520d}</UniqueIdentifier>
     </Filter>
@@ -176,6 +173,9 @@
     </Filter>
     <Filter Include="Application\Glyphlets">
       <UniqueIdentifier>{67267e42-6de0-4dd5-bea4-1b47003272af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Material System\Components\Tasks">
+      <UniqueIdentifier>{e7c809f6-8040-45de-91ba-944550f2ecc9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -395,26 +395,20 @@
     <ClCompile Include="Rendering\MaterialGeneratorDX11.cpp">
       <Filter>Rendering\Material System</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\IRenderView.cpp">
-      <Filter>Rendering\Material System\Components\Render Views</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\ViewAmbientOcclusion.cpp">
-      <Filter>Rendering\Material System\Components\Render Views</Filter>
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\ViewDepthNormal.cpp">
-      <Filter>Rendering\Material System\Components\Render Views</Filter>
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\ViewOcclusion.cpp">
-      <Filter>Rendering\Material System\Components\Render Views</Filter>
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\ViewPerspective.cpp">
-      <Filter>Rendering\Material System\Components\Render Views</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\ViewRenderParams.cpp">
-      <Filter>Rendering\Material System\Components\Render Views</Filter>
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\ViewTextOverlay.cpp">
-      <Filter>Rendering\Material System\Components\Render Views</Filter>
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\ConstantBufferParameterWriterDX11.cpp">
       <Filter>Rendering\Parameter System\Parameter Writers</Filter>
@@ -752,6 +746,12 @@
     <ClCompile Include="Objects\GlyphletActor.cpp">
       <Filter>Objects\Scene Objects\Actors</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\SceneRenderTask.cpp">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Task.cpp">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationStream.h">
@@ -976,26 +976,20 @@
     <ClInclude Include="Rendering\MaterialGeneratorDX11.h">
       <Filter>Rendering\Material System</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\IRenderView.h">
-      <Filter>Rendering\Material System\Components\Render Views</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\ViewAmbientOcclusion.h">
-      <Filter>Rendering\Material System\Components\Render Views</Filter>
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ViewDepthNormal.h">
-      <Filter>Rendering\Material System\Components\Render Views</Filter>
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ViewOcclusion.h">
-      <Filter>Rendering\Material System\Components\Render Views</Filter>
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ViewPerspective.h">
-      <Filter>Rendering\Material System\Components\Render Views</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\ViewRenderParams.h">
-      <Filter>Rendering\Material System\Components\Render Views</Filter>
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ViewTextOverlay.h">
-      <Filter>Rendering\Material System\Components\Render Views</Filter>
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ConstantBufferParameterWriterDX11.h">
       <Filter>Rendering\Parameter System\Parameter Writers</Filter>
@@ -1365,6 +1359,12 @@
     </ClInclude>
     <ClInclude Include="Objects\GlyphletActor.h">
       <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\SceneRenderTask.h">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Task.h">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

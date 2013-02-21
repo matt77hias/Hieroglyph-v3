@@ -14,7 +14,7 @@
 #include "Win32RenderWindow.h"
 #include "RendererDX11.h"
 
-#include "IRenderView.h"
+#include "SceneRenderTask.h"
 #include "ViewTextOverlay.h"
 #include "Camera.h"
 #include "Scene.h"
@@ -56,7 +56,7 @@ namespace Glyph3
 
 		ResourcePtr				m_BackBuffer;
 
-		IRenderView*			m_pRenderView;
+		SceneRenderTask*		m_pRenderView;
 		ViewTextOverlay*		m_pTextOverlayView;
 
 		bool					m_bMultithreadedMode;

@@ -18,27 +18,28 @@
 #ifndef ViewOcclusion_h
 #define ViewOcclusion_h
 //--------------------------------------------------------------------------------
-#include "IRenderView.h"
+#include "Task.h"
 #include "Actor.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
 	class Entity3D;
 
-	class ViewOcclusion : public IRenderView
+	class ViewOcclusion : public Task
 	{
 	public:
 		ViewOcclusion( RendererDX11& Renderer, ResourcePtr OcclusionTarget, ResourcePtr BlurTarget, ResourcePtr DepthNormalTarget );
+		virtual ~ViewOcclusion();
 
 		virtual void Update( float fTime );
-		virtual void PreDraw( RendererDX11* pRenderer );
-		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
+		virtual void QueuePreTasks( RendererDX11* pRenderer );
+		virtual void ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 		virtual void Resize( UINT width, UINT height );
 
 		virtual void SetRenderParams( IParameterManager* pParamManager );
 		virtual void SetUsageParams( IParameterManager* pParamManager );
 
-		virtual ~ViewOcclusion();
+		virtual std::wstring GetName( );
 
 	protected:
 		int ResolutionX;

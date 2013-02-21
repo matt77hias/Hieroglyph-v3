@@ -17,18 +17,19 @@
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "RendererDX11.h"
-#include "IRenderView.h"
+#include "Task.h"
 #include "RenderEffectDX11.h"
 #include "RenderParameterDX11.h"
 #include "ParameterContainer.h"
+#include "SceneRenderTask.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
 	struct MaterialParams
 	{
-		bool							bRender;
-		RenderEffectDX11*				pEffect;
-		std::vector<IRenderView*>		vViews;
+		bool					bRender;
+		RenderEffectDX11*		pEffect;
+		std::vector<Task*>		Tasks;
 	};
 
 	class MaterialDX11
@@ -37,8 +38,8 @@ namespace Glyph3
 		MaterialDX11();
 		virtual ~MaterialDX11();
 
+		void Update( float time );
 		void PreRender( RendererDX11* pRenderer, VIEWTYPE type );
-		void SetEntity( Entity3D* pEntity );
 		void SetRenderParams( IParameterManager* pParamManager, VIEWTYPE type );
 		
 		// This method should return *all* possible vertex shader IDs that could
@@ -49,7 +50,6 @@ namespace Glyph3
 	public:
 		MaterialParams				Params[VT_NUM_VIEW_TYPES];
 		ParameterContainer			Parameters;
-		Entity3D*					m_pEntity;
 	};
 	typedef std::shared_ptr<MaterialDX11> MaterialPtr;
 };

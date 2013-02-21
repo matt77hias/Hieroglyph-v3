@@ -120,7 +120,6 @@
     <ClCompile Include="Rendering\InputAssemblerStageDX11.cpp" />
     <ClCompile Include="Rendering\InputAssemblerStateDX11.cpp" />
     <ClCompile Include="Rendering\InputLayoutDX11.cpp" />
-    <ClCompile Include="Rendering\IRenderView.cpp" />
     <ClCompile Include="Rendering\MaterialDX11.cpp" />
     <ClCompile Include="Rendering\MaterialGeneratorDX11.cpp" />
     <ClCompile Include="Rendering\MaterialManager.cpp" />
@@ -154,6 +153,7 @@
     <ClCompile Include="Rendering\SamplerParameterWriterDX11.cpp" />
     <ClCompile Include="Rendering\SamplerStateConfigDX11.cpp" />
     <ClCompile Include="Rendering\SamplerStateDX11.cpp" />
+    <ClCompile Include="Rendering\SceneRenderTask.cpp" />
     <ClCompile Include="Rendering\ShaderDX11.cpp" />
     <ClCompile Include="Rendering\ShaderFactoryDX11.cpp" />
     <ClCompile Include="Rendering\ShaderReflectionDX11.cpp" />
@@ -171,6 +171,7 @@
     <ClCompile Include="Rendering\StructuredBufferDX11.cpp" />
     <ClCompile Include="Rendering\SwapChainConfigDX11.cpp" />
     <ClCompile Include="Rendering\SwapChainDX11.cpp" />
+    <ClCompile Include="Rendering\Task.cpp" />
     <ClCompile Include="Rendering\Texture1dConfigDX11.cpp" />
     <ClCompile Include="Rendering\Texture1dDX11.cpp" />
     <ClCompile Include="Rendering\Texture2dConfigDX11.cpp" />
@@ -192,7 +193,6 @@
     <ClCompile Include="Rendering\ViewOcclusion.cpp" />
     <ClCompile Include="Rendering\ViewPerspective.cpp" />
     <ClCompile Include="Rendering\ViewPortDX11.cpp" />
-    <ClCompile Include="Rendering\ViewRenderParams.cpp" />
     <ClCompile Include="Rendering\ViewTextOverlay.cpp" />
     <ClCompile Include="Rendering\VolumeTextureVertexDX11.cpp" />
     <ClCompile Include="Scripting\LuaApp.cpp" />
@@ -323,7 +323,6 @@
     <ClInclude Include="Rendering\InputLayoutDX11.h" />
     <ClInclude Include="Rendering\IParameterManager.h" />
     <ClInclude Include="Rendering\IRenderer.h" />
-    <ClInclude Include="Rendering\IRenderView.h" />
     <ClInclude Include="Rendering\MaterialDX11.h" />
     <ClInclude Include="Rendering\MaterialGeneratorDX11.h" />
     <ClInclude Include="Rendering\MaterialManager.h" />
@@ -359,6 +358,7 @@
     <ClInclude Include="Rendering\SamplerParameterWriterDX11.h" />
     <ClInclude Include="Rendering\SamplerStateConfigDX11.h" />
     <ClInclude Include="Rendering\SamplerStateDX11.h" />
+    <ClInclude Include="Rendering\SceneRenderTask.h" />
     <ClInclude Include="Rendering\ShaderDX11.h" />
     <ClInclude Include="Rendering\ShaderFactoryDX11.h" />
     <ClInclude Include="Rendering\ShaderReflectionDX11.h" />
@@ -376,6 +376,7 @@
     <ClInclude Include="Rendering\StructuredBufferDX11.h" />
     <ClInclude Include="Rendering\SwapChainConfigDX11.h" />
     <ClInclude Include="Rendering\SwapChainDX11.h" />
+    <ClInclude Include="Rendering\Task.h" />
     <ClInclude Include="Rendering\Texture1dConfigDX11.h" />
     <ClInclude Include="Rendering\Texture1dDX11.h" />
     <ClInclude Include="Rendering\Texture2dConfigDX11.h" />
@@ -399,7 +400,6 @@
     <ClInclude Include="Rendering\ViewOcclusion.h" />
     <ClInclude Include="Rendering\ViewPerspective.h" />
     <ClInclude Include="Rendering\ViewPortDX11.h" />
-    <ClInclude Include="Rendering\ViewRenderParams.h" />
     <ClInclude Include="Rendering\ViewTextOverlay.h" />
     <ClInclude Include="Rendering\VolumeTextureVertexDX11.h" />
     <ClInclude Include="Scripting\IScriptInterface.h" />

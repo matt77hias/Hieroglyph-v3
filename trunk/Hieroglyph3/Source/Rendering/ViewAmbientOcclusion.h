@@ -32,10 +32,11 @@ namespace Glyph3
 	{
 	public:
 		ViewAmbientOcclusion( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget = 0 );
+		virtual ~ViewAmbientOcclusion();
 
 		virtual void Update( float fTime );
-		virtual void PreDraw( RendererDX11* pRenderer );
-		virtual void Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
+		virtual void QueuePreTasks( RendererDX11* pRenderer );
+		virtual void ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager );
 		virtual void Resize( UINT width, UINT height );
 
 		virtual void SetEntity( Entity3D* pEntity );
@@ -49,7 +50,7 @@ namespace Glyph3
 
 		void SetVisualizationActive( bool active );
 
-		virtual ~ViewAmbientOcclusion();
+		virtual std::wstring GetName();
 
 	protected:
 

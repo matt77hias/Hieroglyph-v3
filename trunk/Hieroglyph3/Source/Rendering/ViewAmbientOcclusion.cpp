@@ -83,13 +83,13 @@ void ViewAmbientOcclusion::Update( float fTime )
 {
 }
 //--------------------------------------------------------------------------------
-void ViewAmbientOcclusion::PreDraw( RendererDX11* pRenderer )
+void ViewAmbientOcclusion::QueuePreTasks( RendererDX11* pRenderer )
 {
 	// Call the super class's predraw in order to queue it in the renderer.  The
 	// views are processed in a LIFO order, so this will be executed last in both
 	// single- or multi-threaded mode.
 
-	ViewPerspective::PreDraw( pRenderer );
+	ViewPerspective::QueuePreTasks( pRenderer );
 
 	// Next we call the predraw method of each of the supporting views.  Once 
 	// again, the views are processed in reverse order of submission, so the depth
@@ -97,16 +97,16 @@ void ViewAmbientOcclusion::PreDraw( RendererDX11* pRenderer )
 	// actual standard perspective view (whose objects will use the ambient 
 	// occlusion buffers).
 
-	pOcclusionView->PreDraw( pRenderer );
-	pDepthNormalView->PreDraw( pRenderer );
+	pOcclusionView->QueuePreTasks( pRenderer );
+	pDepthNormalView->QueuePreTasks( pRenderer );
 }
 //--------------------------------------------------------------------------------
-void ViewAmbientOcclusion::Draw( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
+void ViewAmbientOcclusion::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
 	// Here we are simply calling our super class's draw method to perform the 
 	// standard rendering process.
 
-	ViewPerspective::Draw( pPipelineManager, pParamManager );
+	ViewPerspective::ExecuteTask( pPipelineManager, pParamManager );
 
 
 	// Add the visualization rendering into the scene
@@ -125,7 +125,7 @@ void ViewAmbientOcclusion::Resize( UINT width, UINT height )
 	RendererDX11::Get()->ResizeTexture( DepthNormalBuffer, width, height );
 	RendererDX11::Get()->ResizeTexture( OcclusionBuffer, width, height );
 	RendererDX11::Get()->ResizeTexture( BilateralBuffer, width, height );
-	RendererDX11::Get()->ResizeViewport( m_iViewport, width, height );
+	RendererDX11::Get()->ResizeViewport( m_iViewports[0], width, height );
 
 	pDepthNormalView->Resize( width, height );
 	pOcclusionView->Resize( width, height );
@@ -155,7 +155,7 @@ void ViewAmbientOcclusion::SetUsageParams( IParameterManager* pParamManager )
 void ViewAmbientOcclusion::SetViewMatrix( const Matrix4f& matrix )
 {
 	// Perform the view matrix setting for this view.
-	IRenderView::SetViewMatrix( matrix );
+	SceneRenderTask::SetViewMatrix( matrix );
 
 	// Propagate the view matrix to the depth/normal view.
 	pDepthNormalView->SetViewMatrix( matrix );
@@ -164,7 +164,7 @@ void ViewAmbientOcclusion::SetViewMatrix( const Matrix4f& matrix )
 void ViewAmbientOcclusion::SetProjMatrix( const Matrix4f& matrix )
 {
 	// Perform the projection matrix setting for this view.
-	IRenderView::SetProjMatrix( matrix );
+	SceneRenderTask::SetProjMatrix( matrix );
 
 	// Propagate the projection matrix to the depth/normal view.
 	pDepthNormalView->SetProjMatrix( matrix );
@@ -191,5 +191,10 @@ void ViewAmbientOcclusion::SetEntity( Entity3D* pEntity )
 void ViewAmbientOcclusion::SetVisualizationActive( bool active )
 {
 	bRenderVisualization = active;
+}
+//--------------------------------------------------------------------------------
+std::wstring ViewAmbientOcclusion::GetName()
+{
+	return( L"ViewAmbientOcclusion" );
 }
 //--------------------------------------------------------------------------------
