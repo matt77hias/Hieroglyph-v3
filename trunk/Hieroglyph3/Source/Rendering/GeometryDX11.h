@@ -17,6 +17,7 @@
 #define GeometryDX11_h
 //--------------------------------------------------------------------------------
 #include "PCH.h"
+#include "ResourceProxyDX11.h"
 #include "VertexElementDX11.h"
 #include "TriangleIndices.h"
 #include "LineIndices.h"

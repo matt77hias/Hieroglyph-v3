@@ -189,21 +189,22 @@ void RenderEffectDX11::ConfigurePipeline( PipelineManagerDX11* pPipeline, IParam
 	// been specified before this effect was bound.
 
 	if ( m_iBlendState != -1 ) {
-		pPipeline->OutputMergerStage.DesiredState.SetBlendState( m_iBlendState );
+		pPipeline->OutputMergerStage.DesiredState.BlendState.SetState( m_iBlendState );
 	} else {
-		pPipeline->OutputMergerStage.DesiredState.SetBlendState( 0 );
+		pPipeline->OutputMergerStage.DesiredState.BlendState.SetState( 0 );
 	}
 
 	if ( m_iDepthStencilState != -1 ) {
-		pPipeline->OutputMergerStage.DesiredState.SetDepthStencilState( m_iDepthStencilState, m_uStencilRef );
+		pPipeline->OutputMergerStage.DesiredState.DepthStencilState.SetState( m_iDepthStencilState );
+		pPipeline->OutputMergerStage.DesiredState.StencilRef.SetState( m_uStencilRef );
 	} else {
-		pPipeline->OutputMergerStage.DesiredState.SetDepthStencilState( 0 );
+		pPipeline->OutputMergerStage.DesiredState.DepthStencilState.SetState( 0 );
 	}
 
 	if ( m_iRasterizerState != -1 ) {
-		pPipeline->RasterizerStage.DesiredState.SetRasterizerState( m_iRasterizerState );
+		pPipeline->RasterizerStage.DesiredState.RasterizerState.SetState( m_iRasterizerState );
 	} else {
-		pPipeline->RasterizerStage.DesiredState.SetRasterizerState( 0 );
+		pPipeline->RasterizerStage.DesiredState.RasterizerState.SetState( 0 );
 	}
 
 	// Update the contents of the needed constant buffers.

@@ -55,9 +55,10 @@ void RasterizerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 	RendererDX11* pRenderer = RendererDX11::Get();
 
 	// Compare the current state vs. the desired state and set it if necesary.
-	if ( true == DesiredState.m_bUpdateRasterizerState ) {
-		
-		RasterizerStatePtr pGlyphRasterizerState = pRenderer->GetRasterizerState( DesiredState.GetRasterizerState() );
+	if ( DesiredState.RasterizerState.IsUpdateNeeded() )
+	{
+		RasterizerStatePtr pGlyphRasterizerState 
+			= pRenderer->GetRasterizerState( DesiredState.RasterizerState.GetState() );
 		
 		if ( pGlyphRasterizerState != nullptr ) {
 			ID3D11RasterizerState* pRasterizerState = pGlyphRasterizerState->m_pState;
@@ -68,35 +69,44 @@ void RasterizerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 	// Compare the viewport state and set it if necesary.
 	int viewports = 0;
 	
-	if ( true == DesiredState.m_bUpdateViewportState ) {
+	// TODO: The viewport state should be directly holding D3D11_VIEWPORT structs instead of
+	//       integer references to them.  This would simplify the handling, and reduce the 
+	//       number of objects that need to be managed by the renderer!  Then we could also
+	//       directly use the array stored in the TStateArrayMonitor too, removing the need
+	//       for this copying loop.
+
+	if ( DesiredState.ViewportCount.IsUpdateNeeded() 
+		|| DesiredState.Viewports.IsUpdateNeeded() ) {
 		
 		D3D11_VIEWPORT aViewports[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
 		
-		for ( int i = 0; i < D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE; i++ ) {
+		for ( unsigned int i = 0; i < DesiredState.ViewportCount.GetState(); i++ ) {
 
-			ViewPortDX11* pViewport = pRenderer->GetViewPort( DesiredState.Viewports[i] );
+			ViewPortDX11* pViewport = pRenderer->GetViewPort( DesiredState.Viewports.GetState( i ) );
 			
 			if ( pViewport ) {
 				aViewports[i] = pViewport->m_ViewPort; 
-				viewports++;
 			}
 		}
 
-		pContext->RSSetViewports( viewports, aViewports );
+		pContext->RSSetViewports( DesiredState.ViewportCount.GetState(), aViewports );
 	}
 
 
 	// Compare the scissor rect state and set it if necesary.
+
+	// TODO: Same applies to the scissor rect state.  This should directly be the state that
+	//       is monitored by the template...
 	
-	if ( true == DesiredState.m_bUpdateScissorRectState ) {
+	if ( DesiredState.ScissorRectCount.IsUpdateNeeded() || DesiredState.ScissorRects.IsUpdateNeeded() ) {
 		
 		D3D11_RECT aRects[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
 		
-		for ( int i = 0; i < D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE; i++ ) {
-			aRects[i] = DesiredState.ScissorRects[i]; 
+		for ( int i = 0; i < DesiredState.ScissorRectCount.GetState(); i++ ) {
+			aRects[i] = DesiredState.ScissorRects.GetState( i );
 		}
 
-		pContext->RSSetScissorRects( D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE, aRects );
+		pContext->RSSetScissorRects( DesiredState.ScissorRectCount.GetState(), aRects );
 	}
 
 	DesiredState.ResetUpdateFlags();

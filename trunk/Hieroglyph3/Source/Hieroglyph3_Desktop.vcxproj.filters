@@ -57,9 +57,6 @@
     <Filter Include="Objects\Basic Objects">
       <UniqueIdentifier>{8a7bd4dc-3681-4886-8012-b6a52b11d212}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Objects\Controllers">
-      <UniqueIdentifier>{a20ae4db-4d27-4342-87b4-c5544ff0359f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Objects\Scene Objects">
       <UniqueIdentifier>{32989379-071d-45f6-93e3-c05d76387220}</UniqueIdentifier>
     </Filter>
@@ -111,26 +108,11 @@
     <Filter Include="Rendering\Pipeline System\Fixed Stages">
       <UniqueIdentifier>{80e1301b-3050-4e8f-ae3f-19e83e745c87}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Rendering\Pipeline System\Shader Stages">
-      <UniqueIdentifier>{a0472b3d-c023-4336-8b6f-c487d2584071}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Rendering\Pipeline System\Fixed Stages\Stages">
       <UniqueIdentifier>{f994eadc-3be9-4c18-ba2e-519c4c38026a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering\Pipeline System\Fixed Stages\States">
       <UniqueIdentifier>{a43a9cc2-1aec-45a4-af77-b08bacf83d73}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Rendering\Pipeline System\Shader Stages\Shader Programs">
-      <UniqueIdentifier>{c5559abb-2563-472a-ae7e-ec492806b78d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Rendering\Pipeline System\Shader Stages\Stages">
-      <UniqueIdentifier>{fac63cd2-d226-4641-bfd2-64c01aaa20f1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Rendering\Pipeline System\Shader Stages\States">
-      <UniqueIdentifier>{1aa4fc4f-5576-4cf0-a5be-c32aa3a17951}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Rendering\Pipeline System\Shader Stages\Shader Programs\Reflection">
-      <UniqueIdentifier>{1001c132-67bf-4cd9-a26e-b5d7cd086d31}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering\Resource System\Buffers">
       <UniqueIdentifier>{405e59b9-ba5a-402e-9222-522362fe761d}</UniqueIdentifier>
@@ -176,6 +158,27 @@
     </Filter>
     <Filter Include="Rendering\Material System\Components\Tasks">
       <UniqueIdentifier>{e7c809f6-8040-45de-91ba-944550f2ecc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Controllers">
+      <UniqueIdentifier>{a20ae4db-4d27-4342-87b4-c5544ff0359f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Common">
+      <UniqueIdentifier>{750a93a7-cd31-4661-ab6c-caaa19b69fe7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Programmable Stages">
+      <UniqueIdentifier>{a0472b3d-c023-4336-8b6f-c487d2584071}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Programmable Stages\Shader Programs">
+      <UniqueIdentifier>{c5559abb-2563-472a-ae7e-ec492806b78d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Programmable Stages\Shader Programs\Reflection">
+      <UniqueIdentifier>{1001c132-67bf-4cd9-a26e-b5d7cd086d31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Programmable Stages\Stages">
+      <UniqueIdentifier>{fac63cd2-d226-4641-bfd2-64c01aaa20f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Programmable Stages\States">
+      <UniqueIdentifier>{1aa4fc4f-5576-4cf0-a5be-c32aa3a17951}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -516,58 +519,58 @@
       <Filter>Rendering\Pipeline System\Fixed Stages\Stages</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\ShaderReflectionDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs\Reflection</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs\Reflection</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\ShaderReflectionFactoryDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs\Reflection</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs\Reflection</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\ComputeShaderDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\DomainShaderDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\GeometryShaderDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\HullShaderDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\PixelShaderDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\ShaderDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\ShaderFactoryDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\VertexShaderDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\ComputeStageDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\Stages</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Stages</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\DomainStageDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\Stages</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Stages</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\GeometryStageDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\Stages</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Stages</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\HullStageDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\Stages</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Stages</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\PixelStageDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\Stages</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Stages</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\ShaderStageDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\Stages</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Stages</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\VertexStageDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\Stages</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Stages</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\ShaderStageStateDX11.cpp">
-      <Filter>Rendering\Pipeline System\Shader Stages\States</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\States</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\VertexElementDX11.cpp">
       <Filter>Rendering\Pipeline System\Pipeline Execution\Executors\Basis Objects</Filter>
@@ -1100,58 +1103,58 @@
       <Filter>Rendering\Pipeline System\Fixed Stages\Stages</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ShaderReflectionDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs\Reflection</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs\Reflection</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ShaderReflectionFactoryDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs\Reflection</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs\Reflection</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ComputeShaderDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\DomainShaderDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\GeometryShaderDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\HullShaderDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\PixelShaderDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ShaderDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ShaderFactoryDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\VertexShaderDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\Shader Programs</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Shader Programs</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ComputeStageDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\Stages</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Stages</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\DomainStageDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\Stages</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Stages</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\GeometryStageDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\Stages</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Stages</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\HullStageDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\Stages</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Stages</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\PixelStageDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\Stages</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Stages</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ShaderStageDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\Stages</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Stages</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\VertexStageDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\Stages</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\Stages</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ShaderStageStateDX11.h">
-      <Filter>Rendering\Pipeline System\Shader Stages\States</Filter>
+      <Filter>Rendering\Pipeline System\Programmable Stages\States</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\TGrowableIndexBufferDX11.h">
       <Filter>Rendering\Pipeline System\Pipeline Execution\Executors\Basis Objects</Filter>
@@ -1366,6 +1369,12 @@
     <ClInclude Include="Rendering\Task.h">
       <Filter>Rendering\Material System\Components\Tasks</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\TStateArrayMonitor.h">
+      <Filter>Rendering\Pipeline System\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\TStateMonitor.h">
+      <Filter>Rendering\Pipeline System\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Rendering\TGrowableIndexBufferDX11.inl">
@@ -1385,6 +1394,12 @@
     </None>
     <None Include="Rendering\DrawIndexedInstancedExecutorDX11.inl">
       <Filter>Rendering\Pipeline System\Pipeline Execution\Executors</Filter>
+    </None>
+    <None Include="Rendering\TStateArrayMonitor.inl">
+      <Filter>Rendering\Pipeline System\Common</Filter>
+    </None>
+    <None Include="Rendering\TStateMonitor.inl">
+      <Filter>Rendering\Pipeline System\Common</Filter>
     </None>
   </ItemGroup>
 </Project>

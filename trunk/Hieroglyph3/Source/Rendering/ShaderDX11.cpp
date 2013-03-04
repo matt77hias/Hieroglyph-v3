@@ -23,6 +23,7 @@ ShaderDX11::ShaderDX11()
 ShaderDX11::~ShaderDX11()
 {
 	SAFE_RELEASE( pCompiledShader );
+	SAFE_DELETE( m_pReflection );
 }
 //--------------------------------------------------------------------------------
 void ShaderDX11::SetReflection( ShaderReflectionDX11* pReflection )

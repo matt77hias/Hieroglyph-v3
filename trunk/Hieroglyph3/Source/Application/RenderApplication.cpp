@@ -127,6 +127,7 @@ bool RenderApplication::ConfigureRenderingSetup()
 
 
 	m_pCamera = new FirstPersonCamera();
+	m_pCamera->SetEventManager( &EvtManager );
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.0f, 0.0f, 0.0f ) );
 	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 10.0f, -20.0f );
 	m_pCamera->SetCameraView( m_pRenderView );

@@ -201,7 +201,7 @@ void ViewDeferredRenderer::ExecuteTask( PipelineManagerDX11* pPipelineManager, I
 
 	// Bind the back buffer and clear it
     pPipelineManager->ClearRenderTargets();
-	pPipelineManager->OutputMergerStage.DesiredState.SetRenderTarget( 0, m_BackBuffer->m_iResourceRTV );
+	pPipelineManager->OutputMergerStage.DesiredState.RenderTargetViews.SetState( 0, m_BackBuffer->m_iResourceRTV );
     pPipelineManager->ApplyRenderTargets();
     pPipelineManager->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 

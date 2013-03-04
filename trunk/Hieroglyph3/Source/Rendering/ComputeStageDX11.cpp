@@ -32,7 +32,7 @@ ShaderType ComputeStageDX11::GetType()
 void ComputeStageDX11::BindShaderProgram( ID3D11DeviceContext* pContext )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
-	ShaderDX11* pShaderDX11 = pRenderer->GetShader( DesiredState.m_ShaderIndex );
+	ShaderDX11* pShaderDX11 = pRenderer->GetShader( DesiredState.ShaderProgram.GetState() );
 
 	ID3D11ComputeShader* pShader = 0;
 	
@@ -45,22 +45,47 @@ void ComputeStageDX11::BindShaderProgram( ID3D11DeviceContext* pContext )
 //--------------------------------------------------------------------------------
 void ComputeStageDX11::BindConstantBuffers( ID3D11DeviceContext* pContext, int count )
 {
-	pContext->CSSetConstantBuffers( 0, count, DesiredState.ConstantBuffers );
+	pContext->CSSetConstantBuffers( 
+		DesiredState.ConstantBuffers.GetStartSlot(),
+		DesiredState.ConstantBuffers.GetRange(),
+		DesiredState.ConstantBuffers.GetFirstSlotLocation() );
 }
 //--------------------------------------------------------------------------------
 void ComputeStageDX11::BindSamplerStates( ID3D11DeviceContext* pContext, int count )
 {
-	pContext->CSSetSamplers( 0, count, DesiredState.SamplerStates );
+	pContext->CSSetSamplers( 
+		DesiredState.SamplerStates.GetStartSlot(),
+		DesiredState.SamplerStates.GetRange(),
+		DesiredState.SamplerStates.GetFirstSlotLocation() );
 }
 //--------------------------------------------------------------------------------
 void ComputeStageDX11::BindShaderResourceViews( ID3D11DeviceContext* pContext, int count )
 {
-	pContext->CSSetShaderResources( 0, count, DesiredState.ShaderResourceViews ); 
+	pContext->CSSetShaderResources( 
+		DesiredState.ShaderResourceViews.GetStartSlot(),
+		DesiredState.ShaderResourceViews.GetRange(),
+		DesiredState.ShaderResourceViews.GetFirstSlotLocation() ); 
 }
 //--------------------------------------------------------------------------------
 void ComputeStageDX11::BindUnorderedAccessViews( ID3D11DeviceContext* pContext, int count )
 {
-	pContext->CSSetUnorderedAccessViews( 0, count, DesiredState.UnorderedAccessViews, DesiredState.UAVInitCounts );
+	// Here we need to get the start and end slots from both the UAV states and the 
+	// UAV initial counts, and take the superset of those to ensure that all of the
+	// UAV states are accounted for.
+
+	unsigned int minStartSlot = 
+		min( DesiredState.UnorderedAccessViews.GetStartSlot(),
+		DesiredState.UAVInitialCounts.GetStartSlot() );
+
+	unsigned int maxEndSlot =
+		max( DesiredState.UnorderedAccessViews.GetEndSlot(),
+		DesiredState.UAVInitialCounts.GetEndSlot() );
+
+	pContext->CSSetUnorderedAccessViews( 
+		minStartSlot,
+		maxEndSlot - minStartSlot + 1,
+		DesiredState.UnorderedAccessViews.GetSlotLocation( minStartSlot ),
+		DesiredState.UAVInitialCounts.GetSlotLocation( minStartSlot ) );
 }
 //--------------------------------------------------------------------------------
 

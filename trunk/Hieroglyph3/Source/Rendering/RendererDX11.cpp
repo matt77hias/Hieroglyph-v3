@@ -251,19 +251,19 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	// to keep a copy of it here.
 
 	RasterizerStateConfigDX11 RasterizerState;
-	pImmPipeline->RasterizerStage.DesiredState.SetRasterizerState( CreateRasterizerState( &RasterizerState ) );
+	pImmPipeline->RasterizerStage.DesiredState.RasterizerState.SetState( CreateRasterizerState( &RasterizerState ) );
 
 	// Depth Stencil State (DS) - the first state will be index zero, so no need
 	// to keep a copy of it here.
 
 	DepthStencilStateConfigDX11 DepthStencilState;
-	pImmPipeline->OutputMergerStage.DesiredState.SetDepthStencilState( CreateDepthStencilState( &DepthStencilState ) );
+	pImmPipeline->OutputMergerStage.DesiredState.DepthStencilState.SetState( CreateDepthStencilState( &DepthStencilState ) );
 
 	// Output Merger State (OM) - the first state will be index zero, so no need
 	// to keep a copy of it here.
 
 	BlendStateConfigDX11 BlendState;
-	pImmPipeline->OutputMergerStage.DesiredState.SetBlendState( CreateBlendState( &BlendState ) );
+	pImmPipeline->OutputMergerStage.DesiredState.BlendState.SetState( CreateBlendState( &BlendState ) );
 
 	// Create a query object to be used to gather statistics on the pipeline.
 
@@ -314,9 +314,9 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 		// Create the pipeline and set the context.
 		g_aPayload[i].pPipeline = new PipelineManagerDX11();
 		g_aPayload[i].pPipeline->SetDeviceContext( pDeferred, m_FeatureLevel );
-		g_aPayload[i].pPipeline->RasterizerStage.DesiredState.SetRasterizerState( 0 );
-		g_aPayload[i].pPipeline->OutputMergerStage.DesiredState.SetDepthStencilState( 0 );
-		g_aPayload[i].pPipeline->OutputMergerStage.DesiredState.SetBlendState( 0 );
+		g_aPayload[i].pPipeline->RasterizerStage.DesiredState.RasterizerState.SetState( 0 );
+		g_aPayload[i].pPipeline->OutputMergerStage.DesiredState.DepthStencilState.SetState( 0 );
+		g_aPayload[i].pPipeline->OutputMergerStage.DesiredState.BlendState.SetState( 0 );
 
 
 		// Create the command list.
@@ -1063,6 +1063,24 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstring& function, 
                                 std::wstring& model, const D3D_SHADER_MACRO* pDefines, bool enablelogging )
 {
+
+	// Check the existing list of shader files to see if there are any matches
+	// before trying to load it up again.  This will reduce the load times,
+	// and should speed up rendering in many cases since the shader object won't 
+	// have to be bound again.
+	
+	for ( int i = 0; i < m_vShaders.size(); i++ )
+	{
+		ShaderDX11* pShader = m_vShaders[i];
+
+		if ( pShader->FileName.compare( filename ) == 0
+			&& pShader->Function.compare( function ) == 0
+			&& pShader->ShaderModel.compare( model ) == 0 )
+		{
+			return( i );
+		}
+	}
+
 	HRESULT hr = S_OK;
 
 	ID3DBlob* pCompiledShader = NULL;
@@ -1167,6 +1185,8 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 	}
 
 	pShaderWrapper->FileName = filename;
+	pShaderWrapper->Function = function;
+	pShaderWrapper->ShaderModel = model;
 
 	m_vShaders.push_back( pShaderWrapper );
 

@@ -48,62 +48,32 @@ void ShaderStageDX11::ClearCurrentState( )
 //--------------------------------------------------------------------------------
 void ShaderStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 {
-
-	//// Compare the current shader vs. the desired shader and set it if necesary.
-	//if ( CurrentState.CompareShaderProgramState( DesiredState ) == 1 ) {
-	//	BindShaderProgram( pContext );
-	//}
-
-	//// Compare the constant buffer state and set it if necesary.
-	//int buffers = CurrentState.CompareConstantBufferState( DesiredState );
-	//if ( buffers > 0 ) {
-	//	BindConstantBuffers( pContext, buffers );
-	//}
-
-	//// Compare the sampler states and set them if necesary.
-	//int samplers = CurrentState.CompareSamplerStateState( DesiredState );
-	//if ( samplers > 0 ) {
-	//	BindSamplerStates( pContext, samplers );
-	//}
-
-	//// Compare the shader resource view states and set them if necesary.
-	//int srvs = CurrentState.CompareShaderResourceViewState( DesiredState );
-	//if ( srvs > 0 ) {
-	//	BindShaderResourceViews( pContext, srvs ); 
-	//}
-
-	//// Compare the unordered access view states and set them if necesary.
-	//int uavs = CurrentState.CompareUnorderedAccessViewState( DesiredState );
-	//if ( uavs > 0 ) {
-	//	if ( m_FeatureLevel != D3D_FEATURE_LEVEL_11_0 )
-	//		BindUnorderedAccessViews( pContext, 1 );
-	//	else
-	//		BindUnorderedAccessViews( pContext, uavs );
-	//}
-
+	// TODO: remove the 'count' arguments from the Bind* methods, since the number
+	//       is tracked internally by the state itself.
 
 	// Compare the current shader vs. the desired shader and set it if necesary.
-	if ( true == DesiredState.m_bUpdateShaderIndex ) {
+	if ( DesiredState.ShaderProgram.IsUpdateNeeded() ) {
 		BindShaderProgram( pContext );
 	}
 
 	// Compare the constant buffer state and set it if necesary.
-	if ( true == DesiredState.m_bUpdateConstantBuffers ) {
+	if ( DesiredState.ConstantBuffers.IsUpdateNeeded() ) {
 		BindConstantBuffers( pContext, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT-1 );
 	}
 
 	// Compare the sampler states and set them if necesary.
-	if ( true == DesiredState.m_bUpdateSamplerStates ) {
+	if ( DesiredState.SamplerStates.IsUpdateNeeded() ) {
 		BindSamplerStates( pContext, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT-1 );
 	}
 
 	// Compare the shader resource view states and set them if necesary.
-	if ( true == DesiredState.m_bUpdateSRVs ) {
+	if ( DesiredState.ShaderResourceViews.IsUpdateNeeded() ) {
 		BindShaderResourceViews( pContext, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT-1 ); 
 	}
 
 	// Compare the unordered access view states and set them if necesary.
-	if ( true == DesiredState.m_bUpdateUAVs ) {
+	if ( DesiredState.UnorderedAccessViews.IsUpdateNeeded() 
+		|| DesiredState.UAVInitialCounts.IsUpdateNeeded() ) {
 		if ( m_FeatureLevel != D3D_FEATURE_LEVEL_11_0 )
 			BindUnorderedAccessViews( pContext, 1 );
 		else

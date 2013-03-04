@@ -233,7 +233,7 @@ void SpriteRendererDX11::Render( PipelineManagerDX11* pipeline,
 	texAndViewportSize.x = static_cast<float>( desc.Width );
 	texAndViewportSize.y = static_cast<float>( desc.Height );
 
-	int viewportID = pipeline->RasterizerStage.DesiredState.GetViewport( 0 );
+	int viewportID = pipeline->RasterizerStage.DesiredState.Viewports.GetState( 0 );
 	ViewPortDX11* vp = RendererDX11::Get()->GetViewPort( viewportID );
 	texAndViewportSize.z = static_cast<float>( vp->GetWidth() );
 	texAndViewportSize.w = static_cast<float>( vp->GetHeight() );

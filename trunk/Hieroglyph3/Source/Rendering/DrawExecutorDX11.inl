@@ -35,10 +35,12 @@ void DrawExecutorDX11<TVertex>::Execute( PipelineManagerDX11* pPipeline, IParame
 		pPipeline->InputAssemblerStage.ClearDesiredState();
 
 		// Set the Input Assembler state, then perform the draw call.
-		int layout = GetInputLayout( pPipeline->ShaderStages[VERTEX_SHADER]->DesiredState.GetShaderProgram() );
-		pPipeline->InputAssemblerStage.DesiredState.SetInputLayout( layout );
-		pPipeline->InputAssemblerStage.DesiredState.SetPrimitiveTopology( m_ePrimType );
-		pPipeline->InputAssemblerStage.DesiredState.SetVertexBuffer( 0, VertexBuffer.GetVertexBuffer()->m_iResource, 0, sizeof( TVertex ) );
+		int layout = GetInputLayout( pPipeline->ShaderStages[VERTEX_SHADER]->DesiredState.ShaderProgram.GetState() );
+		pPipeline->InputAssemblerStage.DesiredState.InputLayout.SetState( layout );
+		pPipeline->InputAssemblerStage.DesiredState.PrimitiveTopology.SetState( m_ePrimType );
+		pPipeline->InputAssemblerStage.DesiredState.VertexBuffers.SetState( 0, VertexBuffer.GetVertexBuffer()->m_iResource );
+		pPipeline->InputAssemblerStage.DesiredState.VertexBufferStrides.SetState( 0, sizeof( TVertex ) );
+		pPipeline->InputAssemblerStage.DesiredState.VertexBufferOffsets.SetState( 0, 0 );
 	
 		pPipeline->ApplyInputResources();
 

@@ -9,47 +9,47 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// Scene
+// TStateMonitor
 //
 //--------------------------------------------------------------------------------
+#ifndef TStateMonitor_h
+#define TStateMonitor_h
+//--------------------------------------------------------------------------------
 
-//--------------------------------------------------------------------------------
-#ifndef Scene_h
-#define Scene_h
-//--------------------------------------------------------------------------------
-#include "Node3D.h"
-#include "Camera.h"
-#include "ParameterContainer.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class Scene
+	template <class T>
+	class TStateMonitor
 	{
 	public:
-		Scene();
-		virtual ~Scene();
+		TStateMonitor( T initialState );
+		~TStateMonitor();
 
-		virtual void Update( float time );
-		virtual void Render( RendererDX11* Renderer );
+		void SetSister( TStateMonitor<T>* pSister );
+		bool SameAsSister();
 
-		void AddCamera( Camera* camera );
+		void SetState( T state );
+		T GetState() const;
 
-		void AddActor( Actor* actor );
-		void RemoveActor( Actor* actor );
+		bool IsUpdateNeeded();
+		void InitializeState();
+		void ResetTracking();
 
-		// Geometric queries
-		void BuildPickRecord( Ray3f& ray, std::vector<PickRecord>& record );
+	private:
 
-		Node3D* GetRoot();
+		// The monitoring varaibles
+		bool m_bUploadNeeded;
 
-	public:
-		ParameterContainer Parameters;
+		// The state data
+		T m_InitialState;
+		T m_State;
 
-	protected:
-		Node3D* m_pRoot;
-		std::vector< Camera* > m_vCameras;
-		std::vector< Actor* > m_vActors;
+		// The sister state
+		TStateMonitor<T>* m_pSister;
 	};
+
+#include "TStateMonitor.inl"
 };
 //--------------------------------------------------------------------------------
-#endif // Scene_h
+#endif // TStateMonitor_h

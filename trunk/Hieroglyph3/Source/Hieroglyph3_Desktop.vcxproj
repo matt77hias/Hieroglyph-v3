@@ -385,6 +385,8 @@
     <ClInclude Include="Rendering\Texture3dDX11.h" />
     <ClInclude Include="Rendering\TGrowableIndexBufferDX11.h" />
     <ClInclude Include="Rendering\TGrowableVertexBufferDX11.h" />
+    <ClInclude Include="Rendering\TStateArrayMonitor.h" />
+    <ClInclude Include="Rendering\TStateMonitor.h" />
     <ClInclude Include="Rendering\UnorderedAccessParameterDX11.h" />
     <ClInclude Include="Rendering\UnorderedAccessParameterWriterDX11.h" />
     <ClInclude Include="Rendering\UnorderedAccessViewConfigDX11.h" />
@@ -422,6 +424,8 @@
     <None Include="Rendering\DrawIndexedInstancedExecutorDX11.inl" />
     <None Include="Rendering\TGrowableIndexBufferDX11.inl" />
     <None Include="Rendering\TGrowableVertexBufferDX11.inl" />
+    <None Include="Rendering\TStateArrayMonitor.inl" />
+    <None Include="Rendering\TStateMonitor.inl" />
     <None Include="Utility\TConfiguration.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

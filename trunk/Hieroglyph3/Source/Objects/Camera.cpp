@@ -183,3 +183,15 @@ SpatialController& Camera::Spatial()
 	return( *m_pSpatialController );
 }
 //--------------------------------------------------------------------------------
+bool Camera::HandleEvent( EventPtr pEvent )
+{
+    eEVENT e = pEvent->GetEventType();
+	
+    return false;
+}
+//--------------------------------------------------------------------------------
+std::wstring Camera::GetName()
+{
+    return L"Camera";
+}
+//--------------------------------------------------------------------------------

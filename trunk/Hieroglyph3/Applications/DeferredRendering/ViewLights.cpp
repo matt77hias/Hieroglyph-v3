@@ -271,7 +271,7 @@ void ViewLights::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterM
 {
     // Bind the render target
     pPipelineManager->ClearRenderTargets();
-	pPipelineManager->OutputMergerStage.DesiredState.SetRenderTarget( 0, m_pRenderTarget->m_iResourceRTV );
+	pPipelineManager->OutputMergerStage.DesiredState.RenderTargetViews.SetState( 0, m_pRenderTarget->m_iResourceRTV );
     pPipelineManager->ApplyRenderTargets();
 
     // Clear the render target
@@ -279,7 +279,7 @@ void ViewLights::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterM
     pPipelineManager->ClearBuffers( color, 1.0f, 0 );
 
     // Bind the read-only depth buffer
-	pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
+	pPipelineManager->OutputMergerStage.DesiredState.DepthTargetViews.SetState( m_DepthTarget->m_iResourceDSV );
     pPipelineManager->ApplyRenderTargets();
 
 	// Configure the desired viewports in this pipeline
@@ -342,8 +342,8 @@ void ViewLights::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterM
                 D3D11_RECT rect = CalcScissorRect( light.Position, light.Range );
 
                 // Set it
-				pPipelineManager->RasterizerStage.DesiredState.SetScissorRectCount( 1 );
-                pPipelineManager->RasterizerStage.DesiredState.SetScissorRect( 0, rect );
+				pPipelineManager->RasterizerStage.DesiredState.ScissorRectCount.SetState( 1 );
+                pPipelineManager->RasterizerStage.DesiredState.ScissorRects.SetState( 0, rect );
             }
 
             pEffect->m_iDepthStencilState = m_iDisabledDSState;

@@ -93,11 +93,11 @@ void SceneRenderTask::SetViewPortCount( unsigned int count )
 void SceneRenderTask::ConfigureViewports( PipelineManagerDX11* pPipeline )
 {
 	// Indicate the number of viewports to set.
-	pPipeline->RasterizerStage.DesiredState.SetViewportCount( m_uiViewportCount );
+	pPipeline->RasterizerStage.DesiredState.ViewportCount.SetState( m_uiViewportCount );
 
 	// Provide the actual viewport indices.
 	for ( unsigned int i = 0; i < m_uiViewportCount; i++ ) {
-		pPipeline->RasterizerStage.DesiredState.SetViewport( i, m_iViewports[i] );
+		pPipeline->RasterizerStage.DesiredState.Viewports.SetState( i, m_iViewports[i] );
 	}
 }
 //--------------------------------------------------------------------------------

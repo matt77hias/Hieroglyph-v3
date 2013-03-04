@@ -43,6 +43,8 @@ namespace Glyph3
 
 	public:
 		std::wstring							FileName;
+		std::wstring							Function;
+		std::wstring							ShaderModel;
 		std::string								ShaderText;
 		ID3DBlob*								pCompiledShader;
 

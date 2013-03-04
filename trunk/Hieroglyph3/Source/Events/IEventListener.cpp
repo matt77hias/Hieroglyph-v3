@@ -17,11 +17,8 @@
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
 IEventListener::IEventListener()
+	: m_pEventManager( nullptr )
 {
-	// We default to using the 'main' event manager.  If there is another one 
-	// specified later on, then that will override this association.
-
-	SetEventManager( EventManager::Get() );
 }
 //--------------------------------------------------------------------------------
 IEventListener::~IEventListener()

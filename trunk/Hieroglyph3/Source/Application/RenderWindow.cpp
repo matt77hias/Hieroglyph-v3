@@ -155,7 +155,7 @@ void RenderWindow::UpdateWindowState()
 		AdjustWindowRect( &WindowRect, m_dStyle, FALSE );
 
 		int deltaX = ( WindowRect.right - ClientRect.right ) / 2;
-		int deltaY = ( WindowRect.bottom - ClientRect.right ) / 2;
+		int deltaY = ( WindowRect.bottom - ClientRect.bottom ) / 2;
 
 		MoveWindow( m_hWnd, m_iLeft - deltaX, m_iTop - deltaY, 
 			m_iWidth + deltaX * 2, m_iHeight + deltaY * 2, true );

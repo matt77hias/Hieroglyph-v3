@@ -60,12 +60,12 @@ void ViewFinalPass::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParamet
     {
 	    // Set the render target for the final pass, and clear it
 		pPipelineManager->ClearRenderTargets();
-		pPipelineManager->OutputMergerStage.DesiredState.SetRenderTarget( 0, m_RenderTarget->m_iResourceRTV );
+		pPipelineManager->OutputMergerStage.DesiredState.RenderTargetViews.SetState( 0, m_RenderTarget->m_iResourceRTV );
 		pPipelineManager->ApplyRenderTargets();
 		pPipelineManager->ClearBuffers( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 
 		// Also bind the depth buffer
-		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
+		pPipelineManager->OutputMergerStage.DesiredState.DepthTargetViews.SetState( m_DepthTarget->m_iResourceDSV );
 		pPipelineManager->ApplyRenderTargets();
 
 		// Configure the desired viewports in this pipeline

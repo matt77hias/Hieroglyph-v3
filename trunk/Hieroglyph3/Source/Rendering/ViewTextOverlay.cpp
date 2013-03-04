@@ -80,16 +80,16 @@ void ViewTextOverlay::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParam
 	if ( m_TextEntries.size() > 0 ) {
 		// Set the parameters for rendering this view
 		pPipelineManager->ClearRenderTargets();
-		pPipelineManager->OutputMergerStage.DesiredState.SetRenderTarget( 0, m_RenderTarget->m_iResourceRTV );
+		pPipelineManager->OutputMergerStage.DesiredState.RenderTargetViews.SetState( 0, m_RenderTarget->m_iResourceRTV );
 		pPipelineManager->ApplyRenderTargets();
 
-		pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
-		pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iViewport );
-		pPipelineManager->RasterizerStage.DesiredState.SetRasterizerState( 0 );
+		pPipelineManager->RasterizerStage.DesiredState.ViewportCount.SetState( 1 );
+		pPipelineManager->RasterizerStage.DesiredState.Viewports.SetState( 0, m_iViewport );
+		pPipelineManager->RasterizerStage.DesiredState.RasterizerState.SetState( 0 );
 
 		// Set default states for these stages
-		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilState( 0 );
-		pPipelineManager->OutputMergerStage.DesiredState.SetBlendState( 0 );
+		pPipelineManager->OutputMergerStage.DesiredState.DepthStencilState.SetState( 0 );
+		pPipelineManager->OutputMergerStage.DesiredState.BlendState.SetState( 0 );
 
 		for ( auto entry : m_TextEntries )
 		{

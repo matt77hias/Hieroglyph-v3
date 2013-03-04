@@ -32,7 +32,7 @@ ShaderType PixelStageDX11::GetType()
 void PixelStageDX11::BindShaderProgram( ID3D11DeviceContext* pContext )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
-	ShaderDX11* pShaderDX11 = pRenderer->GetShader( DesiredState.m_ShaderIndex );
+	ShaderDX11* pShaderDX11 = pRenderer->GetShader( DesiredState.ShaderProgram.GetState() );
 
 	ID3D11PixelShader* pShader = 0;
 
@@ -45,17 +45,26 @@ void PixelStageDX11::BindShaderProgram( ID3D11DeviceContext* pContext )
 //--------------------------------------------------------------------------------
 void PixelStageDX11::BindConstantBuffers( ID3D11DeviceContext* pContext, int count )
 {
-	pContext->PSSetConstantBuffers( 0, count, DesiredState.ConstantBuffers );
+	pContext->PSSetConstantBuffers(
+		DesiredState.ConstantBuffers.GetStartSlot(),
+		DesiredState.ConstantBuffers.GetRange(),
+		DesiredState.ConstantBuffers.GetFirstSlotLocation() );
 }
 //--------------------------------------------------------------------------------
 void PixelStageDX11::BindSamplerStates( ID3D11DeviceContext* pContext, int count )
 {
-	pContext->PSSetSamplers( 0, count, DesiredState.SamplerStates );
+	pContext->PSSetSamplers( 
+		DesiredState.SamplerStates.GetStartSlot(),
+		DesiredState.SamplerStates.GetRange(),
+		DesiredState.SamplerStates.GetFirstSlotLocation() );
 }
 //--------------------------------------------------------------------------------
 void PixelStageDX11::BindShaderResourceViews( ID3D11DeviceContext* pContext, int count )
 {
-	pContext->PSSetShaderResources( 0, count, DesiredState.ShaderResourceViews ); 
+	pContext->PSSetShaderResources( 
+		DesiredState.ShaderResourceViews.GetStartSlot(),
+		DesiredState.ShaderResourceViews.GetRange(),
+		DesiredState.ShaderResourceViews.GetFirstSlotLocation() ); 
 }
 //--------------------------------------------------------------------------------
 void PixelStageDX11::BindUnorderedAccessViews( ID3D11DeviceContext* pContext, int count )

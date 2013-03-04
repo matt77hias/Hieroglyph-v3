@@ -18,13 +18,11 @@
 #define FirstPersonCamera_h
 //--------------------------------------------------------------------------------
 #include "Camera.h"
-#include "IEventListener.h"
 #include "Timer.h"
-
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {    
-    class FirstPersonCamera : public Camera, public IEventListener
+    class FirstPersonCamera : public Camera
     {
     public:
         FirstPersonCamera();

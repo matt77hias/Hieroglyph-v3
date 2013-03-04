@@ -29,13 +29,14 @@
 #include "SceneRenderTask.h"
 #include "SpatialController.h"
 #include "ParameterContainer.h"
+#include "IEventListener.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
 	class Scene;
 	class SpatialController;
 
-	class Camera : public Actor
+	class Camera : public Actor, public IEventListener
 	{
 	public:
 		Camera();
@@ -64,6 +65,10 @@ namespace Glyph3
 		SpatialController& Spatial();
 
         const Matrix4f& ProjMatrix();
+
+        virtual bool HandleEvent( EventPtr pEvent );
+        virtual std::wstring GetName();
+
 
 	public:
 		ParameterContainer Parameters;

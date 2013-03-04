@@ -43,12 +43,16 @@ void GeometryDX11::Execute( PipelineManagerDX11* pPipeline, IParameterManager* p
 	pPipeline->InputAssemblerStage.ClearDesiredState();
 
 	// Set the Input Assembler state, then perform the draw call.
-	int layout = GetInputLayout( pPipeline->ShaderStages[VERTEX_SHADER]->DesiredState.GetShaderProgram() );
-	pPipeline->InputAssemblerStage.DesiredState.SetInputLayout( layout );
-	pPipeline->InputAssemblerStage.DesiredState.SetPrimitiveTopology( m_ePrimType );
-	pPipeline->InputAssemblerStage.DesiredState.SetVertexBuffer( 0, m_VB->m_iResource, 0, m_iVertexSize );
-	pPipeline->InputAssemblerStage.DesiredState.SetIndexBuffer( m_IB->m_iResource );
-	pPipeline->InputAssemblerStage.DesiredState.SetIndexBufferFormat( DXGI_FORMAT_R32_UINT );
+	int layout = GetInputLayout( pPipeline->ShaderStages[VERTEX_SHADER]->DesiredState.ShaderProgram.GetState() );
+	pPipeline->InputAssemblerStage.DesiredState.InputLayout.SetState( layout );
+	pPipeline->InputAssemblerStage.DesiredState.PrimitiveTopology.SetState( m_ePrimType );
+
+	pPipeline->InputAssemblerStage.DesiredState.VertexBuffers.SetState( 0, m_VB->m_iResource );
+	pPipeline->InputAssemblerStage.DesiredState.VertexBufferStrides.SetState( 0, m_iVertexSize );
+	pPipeline->InputAssemblerStage.DesiredState.VertexBufferOffsets.SetState( 0, 0 );
+
+	pPipeline->InputAssemblerStage.DesiredState.IndexBuffer.SetState( m_IB->m_iResource );
+	pPipeline->InputAssemblerStage.DesiredState.IndexBufferFormat.SetState( DXGI_FORMAT_R32_UINT );
 	
 	pPipeline->ApplyInputResources();
 

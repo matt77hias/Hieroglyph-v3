@@ -38,13 +38,20 @@ void DrawIndexedInstancedExecutorDX11<TVertex,TInstance>::Execute( PipelineManag
 		pPipeline->InputAssemblerStage.ClearDesiredState();
 
 		// Set the Input Assembler state, then perform the draw call.
-		int layout = GetInputLayout( pPipeline->ShaderStages[VERTEX_SHADER]->DesiredState.GetShaderProgram() );
-		pPipeline->InputAssemblerStage.DesiredState.SetInputLayout( layout );
-		pPipeline->InputAssemblerStage.DesiredState.SetPrimitiveTopology( m_ePrimType );
-		pPipeline->InputAssemblerStage.DesiredState.SetVertexBuffer( 0, VertexBuffer.GetVertexBuffer()->m_iResource, 0, sizeof( TVertex ) );
-		pPipeline->InputAssemblerStage.DesiredState.SetVertexBuffer( 1, InstanceBuffer.GetVertexBuffer()->m_iResource, 0, sizeof( TInstance ) );
-		pPipeline->InputAssemblerStage.DesiredState.SetIndexBuffer( IndexBuffer.GetIndexBuffer()->m_iResource );
-		pPipeline->InputAssemblerStage.DesiredState.SetIndexBufferFormat( DXGI_FORMAT_R32_UINT );
+		int layout = GetInputLayout( pPipeline->ShaderStages[VERTEX_SHADER]->DesiredState.ShaderProgram.GetState() );
+		pPipeline->InputAssemblerStage.DesiredState.InputLayout.SetState( layout );
+		pPipeline->InputAssemblerStage.DesiredState.PrimitiveTopology.SetState( m_ePrimType );
+
+		pPipeline->InputAssemblerStage.DesiredState.VertexBuffers.SetState( 0, VertexBuffer.GetVertexBuffer()->m_iResource );
+		pPipeline->InputAssemblerStage.DesiredState.VertexBufferStrides.SetState( 0, sizeof( TVertex ) );
+		pPipeline->InputAssemblerStage.DesiredState.VertexBufferOffsets.SetState( 0, 0 );
+
+		pPipeline->InputAssemblerStage.DesiredState.VertexBuffers.SetState( 1, InstanceBuffer.GetVertexBuffer()->m_iResource );
+		pPipeline->InputAssemblerStage.DesiredState.VertexBufferStrides.SetState( 1, sizeof( TInstance ) );
+		pPipeline->InputAssemblerStage.DesiredState.VertexBufferOffsets.SetState( 1, 0 );
+
+		pPipeline->InputAssemblerStage.DesiredState.IndexBuffer.SetState( IndexBuffer.GetIndexBuffer()->m_iResource );
+		pPipeline->InputAssemblerStage.DesiredState.IndexBufferFormat.SetState( DXGI_FORMAT_R32_UINT );
 	
 		pPipeline->ApplyInputResources();
 

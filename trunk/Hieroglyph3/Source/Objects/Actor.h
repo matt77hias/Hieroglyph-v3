@@ -11,6 +11,24 @@
 //--------------------------------------------------------------------------------
 // Actor
 //
+// The actor class provides a common interface for working with groups of entities
+// and the other objects that can be combined with them.  Each instances comes 
+// with one node and one entity.  The entity (referred to as the 'body') allows 
+// the actor to have a rendered presence in the scene, while the node allows the
+// actor to have multiple other entities or nodes to be attached to it.
+//
+// Whenever an entity or node is attached to an actor, the user has the option of
+// adding it as an 'element' to this actor.  This essentially means that the 
+// objects will be deleted by the actor when it is deleted.  There is no direct
+// link between the scene graph based at the actor's node and the ownership 
+// indicated by the element mechanism - entities can be managed as elements 
+// regardless of if they are attached to the scene graph or not.
+//
+// This mechanism allows an actor subclass to manage all its objects in one simple
+// way.  If it adds an entity to render the axes of one of its objects, that axis 
+// object can be enabled (attached to the graph) or disabled (detached from the 
+// graph) but its lifetime will always be managed by the actor once it is added
+// as an 'element'.
 //--------------------------------------------------------------------------------
 #ifndef Actor_h
 #define Actor_h
@@ -29,6 +47,10 @@ namespace Glyph3
 		Entity3D* GetBody();
 
 		void AddElement( Entity3D* pElement );
+		void RemoveElement( Entity3D* pElement );
+
+		void AddSubtree( Node3D* pNode );
+		void RemoveSubtree( Node3D* pNode );
 
 	protected:
 		Node3D*					m_pRoot;

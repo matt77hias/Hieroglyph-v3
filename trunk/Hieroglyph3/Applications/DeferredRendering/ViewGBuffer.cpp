@@ -60,8 +60,8 @@ void ViewGBuffer::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameter
 		// Set the parameters for rendering this view
 		pPipelineManager->ClearRenderTargets();
 		for ( unsigned int i = 0; i < m_GBufferTargets.size(); ++i )
-			pPipelineManager->OutputMergerStage.DesiredState.SetRenderTarget( i, m_GBufferTargets[i]->m_iResourceRTV );
-		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
+			pPipelineManager->OutputMergerStage.DesiredState.RenderTargetViews.SetState( i, m_GBufferTargets[i]->m_iResourceRTV );
+		pPipelineManager->OutputMergerStage.DesiredState.DepthTargetViews.SetState( m_DepthTarget->m_iResourceDSV );
 		pPipelineManager->ApplyRenderTargets();
 
 		// Configure the desired viewports in this pipeline

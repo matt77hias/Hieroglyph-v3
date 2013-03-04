@@ -71,6 +71,28 @@ void Scene::AddActor( Actor* actor )
 	m_vActors.push_back( actor );
 }
 //--------------------------------------------------------------------------------
+void Scene::RemoveActor( Actor* pActor )
+{
+	// First we iterate through the list of actors and remove any instances of 
+	// this actor. 
+
+	auto it = m_vActors.begin();
+
+	while ( it != m_vActors.end() ) {
+		if ( *it == pActor ) it = m_vActors.erase( it );
+	}
+
+	// Now we remove the actor's node from the scene's root node, if it is there.
+	// In general, an actor should always be attached directly to the scene's 
+	// root, but there may be cases where an actor is attached to another actor.
+	// To accommodate both situations, we do the removal by accessing the actor's
+	// node's parent.  This ensures that the actor is completely removed from the
+	// scene, and can safely be added back into the scene at a later time.
+
+	Node3D* pParent = static_cast<Node3D*>( pActor->GetNode()->GetParent() );
+	if ( pParent ) pParent->DetachChild( pActor->GetNode() );
+}
+//--------------------------------------------------------------------------------
 void Scene::BuildPickRecord( Ray3f& ray, std::vector<PickRecord>& record )
 {
 	m_pRoot->BuildPickRecord( ray, record );

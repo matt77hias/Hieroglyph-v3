@@ -321,7 +321,7 @@ void ViewLights::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterM
 {
     // Bind the render target
     pPipelineManager->ClearRenderTargets();
-	pPipelineManager->OutputMergerStage.DesiredState.SetRenderTarget( 0, m_pRenderTarget->m_iResourceRTV );
+	pPipelineManager->OutputMergerStage.DesiredState.RenderTargetViews.SetState( 0, m_pRenderTarget->m_iResourceRTV );
     pPipelineManager->ApplyRenderTargets();
 
     // Clear the render target
@@ -329,11 +329,11 @@ void ViewLights::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterM
     pPipelineManager->ClearBuffers( color, 1.0f, 0 );
 
     // Bind the depth buffer
-	pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_pDepthTarget->m_iResourceDSV );
+	pPipelineManager->OutputMergerStage.DesiredState.DepthTargetViews.SetState( m_pDepthTarget->m_iResourceDSV );
     pPipelineManager->ApplyRenderTargets();
 
-	pPipelineManager->RasterizerStage.DesiredState.SetViewportCount( 1 );
-	pPipelineManager->RasterizerStage.DesiredState.SetViewport( 0, m_iViewport );
+	pPipelineManager->RasterizerStage.DesiredState.ViewportCount.SetState( 1 );
+	pPipelineManager->RasterizerStage.DesiredState.Viewports.SetState( 0, m_iViewport );
 
     // Set this view's render parameters
     SetRenderParams( pParamManager );

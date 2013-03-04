@@ -72,10 +72,10 @@ int LuaTextActor::SetColor( lua_State* L )
 	TextActor* pActor = CheckType( L, 1 );
 	
 	Vector4f c;
-	c.x = luaL_checknumber( L, 2 );
-	c.y = luaL_checknumber( L, 3 );
-	c.z = luaL_checknumber( L, 4 );
-	c.w = luaL_checknumber( L, 5 );
+	c.x = static_cast<float>( luaL_checknumber( L, 2 ) );
+	c.y = static_cast<float>( luaL_checknumber( L, 3 ) );
+	c.z = static_cast<float>( luaL_checknumber( L, 4 ) );
+	c.w = static_cast<float>( luaL_checknumber( L, 5 ) );
 	
 	pActor->SetColor( c );
 
@@ -116,9 +116,9 @@ int LuaTextActor::SetTextOrigin( lua_State* L )
 	TextActor* pActor = CheckType( L, 1 );
 	
 	Vector3f p;
-	p.x = luaL_checknumber( L, 2 );
-	p.y = luaL_checknumber( L, 3 );
-	p.z = luaL_checknumber( L, 4 );
+	p.x = static_cast<float>( luaL_checknumber( L, 2 ) );
+	p.y = static_cast<float>( luaL_checknumber( L, 3 ) );
+	p.z = static_cast<float>( luaL_checknumber( L, 4 ) );
 	
 	pActor->GetNode()->Position() = p;
 
@@ -130,13 +130,13 @@ int LuaTextActor::SetTextOrientation( lua_State* L )
 	TextActor* pActor = CheckType( L, 1 );
 	
 	Vector3f xdir, ydir;
-	xdir.x = luaL_checknumber( L, 2 );
-	xdir.y = luaL_checknumber( L, 3 );
-	xdir.z = luaL_checknumber( L, 4 );
+	xdir.x = static_cast<float>( luaL_checknumber( L, 2 ) );
+	xdir.y = static_cast<float>( luaL_checknumber( L, 3 ) );
+	xdir.z = static_cast<float>( luaL_checknumber( L, 4 ) );
 
-	ydir.x = luaL_checknumber( L, 5 );
-	ydir.y = luaL_checknumber( L, 6 );
-	ydir.z = luaL_checknumber( L, 7 );
+	ydir.x = static_cast<float>( luaL_checknumber( L, 5 ) );
+	ydir.y = static_cast<float>( luaL_checknumber( L, 6 ) );
+	ydir.z = static_cast<float>( luaL_checknumber( L, 7 ) );
 
 	pActor->SetTextOrientation( xdir, ydir );
 
@@ -148,9 +148,9 @@ int LuaTextActor::SetFont( lua_State* L )
 	TextActor* pActor = CheckType( L, 1 );
 
 	std::string fontName = luaL_checkstring( L, 2 );
-	float fontSize = luaL_checknumber( L, 3 );
-	unsigned int fontStyle = luaL_checknumber( L, 4 );
-	bool antialiased = luaL_checknumber( L, 5 );
+	float fontSize = static_cast<float>( luaL_checknumber( L, 3 ) );
+	unsigned int fontStyle = static_cast<unsigned int>( luaL_checknumber( L, 4 ) );
+	bool antialiased = static_cast<bool>( luaL_checknumber( L, 5 ) );
 
 	SpriteFontPtr pFont = SpriteFontLoaderDX11::LoadFont( GlyphString::ToUnicode(fontName), fontSize, fontStyle, antialiased );
 
@@ -162,7 +162,7 @@ int LuaTextActor::SetFont( lua_State* L )
 int LuaTextActor::SetCharacterHeight( lua_State* L )
 {
 	TextActor* pActor = CheckType( L, 1 );
-	float fHeight = luaL_checknumber( L, 2 );
+	float fHeight = static_cast<float>( luaL_checknumber( L, 2 ) );
 		
 	pActor->SetCharacterHeight( fHeight );
 

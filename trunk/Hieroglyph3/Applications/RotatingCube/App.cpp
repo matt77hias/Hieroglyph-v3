@@ -115,8 +115,8 @@ bool App::ConfigureEngineComponents()
 	// rendering.  
 
 	m_pRenderer11->pImmPipeline->ClearRenderTargets();
-	m_pRenderer11->pImmPipeline->OutputMergerStage.DesiredState.SetRenderTarget( 0, m_RenderTarget->m_iResourceRTV );
-	m_pRenderer11->pImmPipeline->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
+	m_pRenderer11->pImmPipeline->OutputMergerStage.DesiredState.RenderTargetViews.SetState( 0, m_RenderTarget->m_iResourceRTV );
+	m_pRenderer11->pImmPipeline->OutputMergerStage.DesiredState.DepthTargetViews.SetState( m_DepthTarget->m_iResourceDSV );
 	m_pRenderer11->pImmPipeline->ApplyRenderTargets();
 
 	m_Effect.SetVertexShader( m_pRenderer11->LoadShader( VERTEX_SHADER,
@@ -197,8 +197,8 @@ bool App::ConfigureEngineComponents()
 	viewport.TopLeftY = 0;
 
 	int ViewPort = m_pRenderer11->CreateViewPort( viewport );
-	m_pRenderer11->pImmPipeline->RasterizerStage.DesiredState.SetViewportCount( 1 );
-	m_pRenderer11->pImmPipeline->RasterizerStage.DesiredState.SetViewport( 0, ViewPort );
+	m_pRenderer11->pImmPipeline->RasterizerStage.DesiredState.ViewportCount.SetState( 1 );
+	m_pRenderer11->pImmPipeline->RasterizerStage.DesiredState.Viewports.SetState( 0, ViewPort );
 
 	return( true );
 }

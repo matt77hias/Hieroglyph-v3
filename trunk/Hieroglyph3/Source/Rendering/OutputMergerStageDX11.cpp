@@ -52,10 +52,12 @@ void OutputMergerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 //--------------------------------------------------------------------------------
 void OutputMergerStageDX11::ApplyDesiredRenderTargetStates( ID3D11DeviceContext* pContext )
 {
-	int rtvCount = 0; //CurrentState.CompareRenderTargets( DesiredState );
-	int uavCount = 0; //CurrentState.CompareUnorderedAccessViews( DesiredState );
+	int rtvCount = 0;
+	int uavCount = 0;
 
-	if ( DesiredState.m_bUpdateRenderTargetState || DesiredState.m_bUpdateUnorderedAccessState || DesiredState.m_bUpdateDepthStencilTarget ) {
+	if ( DesiredState.RenderTargetViews.IsUpdateNeeded() 
+		|| DesiredState.UnorderedAccessViews.IsUpdateNeeded()
+		|| DesiredState.DepthTargetViews.IsUpdateNeeded() ) {
 
 		RendererDX11* pRenderer = RendererDX11::Get();
 
@@ -65,7 +67,7 @@ void OutputMergerStageDX11::ApplyDesiredRenderTargetStates( ID3D11DeviceContext*
 
 		for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ ) {
 
-			RenderTargetViewDX11* pRenderTargetView = pRenderer->GetRenderTargetViewByIndex( DesiredState.GetRenderTarget( i ) );
+			RenderTargetViewDX11* pRenderTargetView = pRenderer->GetRenderTargetViewByIndex( DesiredState.RenderTargetViews.GetState( i ) );
 			
 			if ( pRenderTargetView != 0 ) {
 				rtvCount = i+1; // Record the number of non-null rtvs...
@@ -77,7 +79,7 @@ void OutputMergerStageDX11::ApplyDesiredRenderTargetStates( ID3D11DeviceContext*
 
 		for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) {
 
-			UnorderedAccessViewDX11* pUnorderedAccessView = pRenderer->GetUnorderedAccessViewByIndex( DesiredState.GetUnorderedAccessView( i ) );
+			UnorderedAccessViewDX11* pUnorderedAccessView = pRenderer->GetUnorderedAccessViewByIndex( DesiredState.UnorderedAccessViews.GetState( i ) );
 			
 			if ( pUnorderedAccessView != 0 ) {
 				uavCount = i+1; // Record the number of non-null uavs...
@@ -88,7 +90,7 @@ void OutputMergerStageDX11::ApplyDesiredRenderTargetStates( ID3D11DeviceContext*
 		}
 
 		
-		DepthStencilViewDX11* pDepthStencilView = pRenderer->GetDepthStencilViewByIndex( DesiredState.GetDepthStencilTarget() );
+		DepthStencilViewDX11* pDepthStencilView = pRenderer->GetDepthStencilViewByIndex( DesiredState.DepthTargetViews.GetState() );
 
 		if ( pDepthStencilView ) {
 			dsv = pDepthStencilView->m_pDepthStencilView;
@@ -103,19 +105,23 @@ void OutputMergerStageDX11::ApplyDesiredRenderTargetStates( ID3D11DeviceContext*
 		//pContext->OMSetRenderTargetsAndUnorderedAccessViews( rtvCount, rtvs, dsv, 
 		//	rtvCount, uavCount, uavs, (UINT*)&DesiredState.UAVInitialCounts );
 
+		// TODO: Find a better way to copy the state from desired to current...
+
 		for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ ) {
-			CurrentState.SetRenderTarget( i, DesiredState.GetRenderTarget( i ) );
+			CurrentState.RenderTargetViews.SetState( i, DesiredState.RenderTargetViews.GetState( i ) );
 		}
 
 		for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) {
-			CurrentState.SetUnorderedAccessView( i, DesiredState.GetUnorderedAccessView( i ), DesiredState.GetInitialCount( i ) );
+			CurrentState.UnorderedAccessViews.SetState( i, DesiredState.UnorderedAccessViews.GetState( i ) );
+			CurrentState.UAVInitialCounts.SetState( i, DesiredState.UAVInitialCounts.GetState( i ) );
 		}
 
-		CurrentState.SetDepthStencilTarget( DesiredState.GetDepthStencilTarget() );
+		CurrentState.DepthTargetViews.SetState( DesiredState.DepthTargetViews.GetState() );
 
-		DesiredState.m_bUpdateRenderTargetState = false;
-		DesiredState.m_bUpdateUnorderedAccessState = false;
-		DesiredState.m_bUpdateDepthStencilTarget = false;
+		DesiredState.RenderTargetViews.ResetTracking();
+		DesiredState.UnorderedAccessViews.ResetTracking();
+		DesiredState.UAVInitialCounts.ResetTracking();
+		DesiredState.DepthTargetViews.ResetTracking();
 	}
 }
 //--------------------------------------------------------------------------------
@@ -123,13 +129,13 @@ void OutputMergerStageDX11::ApplyDesiredBlendAndDepthStencilStates( ID3D11Device
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
 
-	if ( true == DesiredState.m_bUpdateBlendState ) {
+	if ( DesiredState.BlendState.IsUpdateNeeded() ) {
 
-		BlendStatePtr pGlyphBlendState = pRenderer->GetBlendState( DesiredState.GetBlendState() );
+		BlendStatePtr pGlyphBlendState = pRenderer->GetBlendState( DesiredState.BlendState.GetState() );
 
 		if ( nullptr != pGlyphBlendState ) {
 			
-			ID3D11BlendState* pBlendState = pRenderer->GetBlendState( DesiredState.GetBlendState() )->m_pState;
+			ID3D11BlendState* pBlendState = pGlyphBlendState->m_pState;
 
 			// TODO: Add in the blend factors as states to the OutputMergerStageStateDX11 class!
 			if ( pBlendState ) {
@@ -137,25 +143,27 @@ void OutputMergerStageDX11::ApplyDesiredBlendAndDepthStencilStates( ID3D11Device
 				pContext->OMSetBlendState( pBlendState, afBlendFactors, 0xFFFFFFFF );
 			}
 
-			CurrentState.SetBlendState( DesiredState.GetBlendState() );
-			DesiredState.m_bUpdateBlendState = false;
+			CurrentState.BlendState.SetState( DesiredState.BlendState.GetState() );
+			DesiredState.BlendState.ResetTracking();
 		}
 	}
 
-	if ( true == DesiredState.m_bUpdateDepthStencilState ) {
+	if ( DesiredState.DepthStencilState.IsUpdateNeeded() || DesiredState.StencilRef.IsUpdateNeeded() ) {
 
-		DepthStencilStatePtr pGlyphDepthStencilState = pRenderer->GetDepthState( DesiredState.GetDepthStencilState() );
+		DepthStencilStatePtr pGlyphDepthStencilState = pRenderer->GetDepthState( DesiredState.DepthStencilState.GetState() );
 		
 		if ( nullptr != pGlyphDepthStencilState ) {
 
 			ID3D11DepthStencilState* pDepthState = pGlyphDepthStencilState->m_pState;
 
 			if ( pDepthState ) {
-				pContext->OMSetDepthStencilState( pDepthState, DesiredState.GetStencilReference() );
+				pContext->OMSetDepthStencilState( pDepthState, DesiredState.StencilRef.GetState() );
 			}
 
-			CurrentState.SetDepthStencilState( DesiredState.GetDepthStencilState(), DesiredState.GetStencilReference() );
-			DesiredState.m_bUpdateDepthStencilState = false;
+			CurrentState.DepthStencilState.SetState( DesiredState.DepthStencilState.GetState() );
+			CurrentState.StencilRef.SetState( DesiredState.StencilRef.GetState() );
+			DesiredState.DepthStencilState.ResetTracking();
+			DesiredState.StencilRef.ResetTracking();
 		}
 	}
 }

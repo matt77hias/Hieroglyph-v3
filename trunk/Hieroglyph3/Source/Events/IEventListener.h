@@ -11,6 +11,9 @@
 //--------------------------------------------------------------------------------
 // IEventListener
 //
+// The event listener relies on an event manager to send it events as they occur.
+// At object creation, the listener is not bound to any event manager, meaning 
+// that if nobody sets one that it will never receive any events!
 //--------------------------------------------------------------------------------
 #ifndef IEventListener_h
 #define IEventListener_h

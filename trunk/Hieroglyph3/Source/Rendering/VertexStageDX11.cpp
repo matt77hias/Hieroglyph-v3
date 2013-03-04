@@ -32,7 +32,7 @@ ShaderType VertexStageDX11::GetType()
 void VertexStageDX11::BindShaderProgram( ID3D11DeviceContext* pContext )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
-	ShaderDX11* pShaderDX11 = pRenderer->GetShader( DesiredState.m_ShaderIndex );
+	ShaderDX11* pShaderDX11 = pRenderer->GetShader( DesiredState.ShaderProgram.GetState() );
 
 	ID3D11VertexShader* pShader = 0;
 		
@@ -45,17 +45,26 @@ void VertexStageDX11::BindShaderProgram( ID3D11DeviceContext* pContext )
 //--------------------------------------------------------------------------------
 void VertexStageDX11::BindConstantBuffers( ID3D11DeviceContext* pContext, int count )
 {
-	pContext->VSSetConstantBuffers( 0, count, DesiredState.ConstantBuffers );
+	pContext->VSSetConstantBuffers( 
+		DesiredState.ConstantBuffers.GetStartSlot(),
+		DesiredState.ConstantBuffers.GetRange(),
+		DesiredState.ConstantBuffers.GetFirstSlotLocation() );
 }
 //--------------------------------------------------------------------------------
 void VertexStageDX11::BindSamplerStates( ID3D11DeviceContext* pContext, int count )
 {
-	pContext->VSSetSamplers( 0, count, DesiredState.SamplerStates );
+	pContext->VSSetSamplers( 
+		DesiredState.SamplerStates.GetStartSlot(),
+		DesiredState.SamplerStates.GetRange(),
+		DesiredState.SamplerStates.GetFirstSlotLocation() );
 }
 //--------------------------------------------------------------------------------
 void VertexStageDX11::BindShaderResourceViews( ID3D11DeviceContext* pContext, int count )
 {
-	pContext->VSSetShaderResources( 0, count, DesiredState.ShaderResourceViews ); 
+	pContext->VSSetShaderResources( 
+		DesiredState.ShaderResourceViews.GetStartSlot(),
+		DesiredState.ShaderResourceViews.GetRange(),
+		DesiredState.ShaderResourceViews.GetFirstSlotLocation() ); 
 }
 //--------------------------------------------------------------------------------
 void VertexStageDX11::BindUnorderedAccessViews( ID3D11DeviceContext* pContext, int count )

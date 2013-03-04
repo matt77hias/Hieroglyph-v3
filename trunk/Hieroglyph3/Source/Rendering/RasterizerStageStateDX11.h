@@ -16,11 +16,11 @@
 #define RasterizerStageStateDX11_h
 //--------------------------------------------------------------------------------
 #include "PCH.h"
+#include "TStateMonitor.h"
+#include "TStateArrayMonitor.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class RasterizerStageDX11;
-
 	class RasterizerStageStateDX11
 	{
 	public:
@@ -29,44 +29,22 @@ namespace Glyph3
 
 		void SetFeautureLevel( D3D_FEATURE_LEVEL level );
 
-		void SetRasterizerState( int state );
-		void SetViewportCount( int count );
-		void SetViewport( unsigned int slot, int viewport );
-		void SetScissorRectCount( int count );
-		void SetScissorRect( unsigned int slot, D3D11_RECT& rect );
-		
-		int GetRasterizerState() const;
-		int GetViewportCount() const;
-		int GetViewport( UINT slot ) const;
-		int GetScissorRectCount() const;
-		D3D11_RECT GetScissorRect( UINT slot ) const;
-
-		int CompareRasterizerState( RasterizerStageStateDX11& desired );
-		int CompareViewportState( RasterizerStageStateDX11& desired );
-		int CompareScissorRectState( RasterizerStageStateDX11& desired );
-
 		void ClearState( );
 
 		void SetSisterState( RasterizerStageStateDX11* pState );
 		void ResetUpdateFlags( );
 
+		TStateMonitor< int > RasterizerState;
+		TStateMonitor< int > ViewportCount;
+		TStateArrayMonitor< int, D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE > Viewports;
+		TStateMonitor< int > ScissorRectCount;
+		TStateArrayMonitor< D3D11_RECT, D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE > ScissorRects;
+
 	protected:
 
 		D3D_FEATURE_LEVEL				m_FeatureLevel;
 
-		int								RasterizerState;
-		int								ViewportCount;
-		int								Viewports[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
-		int								ScissorRectCount;
-		D3D11_RECT						ScissorRects[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
-		
 		RasterizerStageStateDX11*		m_pSisterState;
-
-		bool							m_bUpdateRasterizerState;
-		bool							m_bUpdateViewportState;
-		bool							m_bUpdateScissorRectState;
-
-		friend RasterizerStageDX11;
 	};
 };
 //--------------------------------------------------------------------------------

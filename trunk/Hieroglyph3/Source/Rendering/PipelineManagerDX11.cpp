@@ -140,7 +140,7 @@ void PipelineManagerDX11::BindConstantBufferParameter( ShaderType type, RenderPa
 					pBuffer = (ID3D11Buffer*)pResource->GetResource();
 				}
 
-				ShaderStages[type]->DesiredState.SetConstantBuffer( slot, pBuffer );
+				ShaderStages[type]->DesiredState.ConstantBuffers.SetState( slot, pBuffer );
 			} else {
 				Log::Get().Write( L"Tried to set an invalid constant buffer ID!" );
 			}
@@ -181,7 +181,7 @@ void PipelineManagerDX11::BindShaderResourceParameter( ShaderType type, RenderPa
 					pResourceView = pView->m_pShaderResourceView;
 				}
 
-				ShaderStages[type]->DesiredState.SetShaderResourceView( slot, pResourceView );
+				ShaderStages[type]->DesiredState.ShaderResourceViews.SetState( slot, pResourceView );
 			} else {
 				Log::Get().Write( L"Tried to set an invalid shader resource ID!" );
 			}
@@ -224,7 +224,8 @@ void PipelineManagerDX11::BindUnorderedAccessParameter( ShaderType type, RenderP
 					pResourceView = pView->m_pUnorderedAccessView;
 				}
 
-				ShaderStages[type]->DesiredState.SetUnorderedAccessView( slot, pResourceView, initial );
+				ShaderStages[type]->DesiredState.UnorderedAccessViews.SetState( slot, pResourceView );
+				ShaderStages[type]->DesiredState.UAVInitialCounts.SetState( slot, initial );
 			} else {
 				Log::Get().Write( L"Tried to set an invalid unordered access ID!" );
 			} 
@@ -262,7 +263,7 @@ void PipelineManagerDX11::BindSamplerStateParameter( ShaderType type, RenderPara
 				pSampler = pState->m_pState; 
 			}
 
-			ShaderStages[type]->DesiredState.SetSamplerState( slot, pSampler );
+			ShaderStages[type]->DesiredState.SamplerStates.SetState( slot, pSampler );
 
 		} else {
 			Log::Get().Write( L"Tried to set a non-sampler state ID as a sampler state!" );
@@ -397,21 +398,23 @@ void PipelineManagerDX11::Draw( RenderEffectDX11& effect, ResourcePtr vb, Resour
 	// Configure the pipeline input data with the input assembler
 	// state object.
 
-	InputAssemblerStage.DesiredState.SetPrimitiveTopology( primType );
+	InputAssemblerStage.DesiredState.PrimitiveTopology.SetState( primType );
 	
 	// Bind the vertex and index buffers.
 	if ( vb != NULL ) {
-		InputAssemblerStage.DesiredState.SetVertexBuffer( 0, vb->m_iResource, 0, vertexStride );
+		InputAssemblerStage.DesiredState.VertexBuffers.SetState( 0, vb->m_iResource );
+		InputAssemblerStage.DesiredState.VertexBufferStrides.SetState( 0, vertexStride );
+		InputAssemblerStage.DesiredState.VertexBufferOffsets.SetState( 0, 0 );
 	}
 
 	if ( ib != NULL ) {
-		InputAssemblerStage.DesiredState.SetIndexBuffer( ib->m_iResource );
-		InputAssemblerStage.DesiredState.SetIndexBufferFormat( DXGI_FORMAT_R32_UINT );
+		InputAssemblerStage.DesiredState.IndexBuffer.SetState( ib->m_iResource );
+		InputAssemblerStage.DesiredState.IndexBufferFormat.SetState( DXGI_FORMAT_R32_UINT );
 	}
 
 	// Bind the input layout.
 	if ( vb != NULL ) {
-		InputAssemblerStage.DesiredState.SetInputLayout( inputLayout );
+		InputAssemblerStage.DesiredState.InputLayout.SetState( inputLayout );
 	}
 
 	// Set and apply the state in this pipeline manager's input assembler.
@@ -433,13 +436,15 @@ void PipelineManagerDX11::DrawNonIndexed( RenderEffectDX11& effect, ResourcePtr 
 	InputAssemblerStage.ClearDesiredState();
 	
 	// Specify the type of geometry that we will be dealing with.
-    InputAssemblerStage.DesiredState.SetPrimitiveTopology( primType );
+    InputAssemblerStage.DesiredState.PrimitiveTopology.SetState( primType );
 
     // Bind the vertex buffer.
-	InputAssemblerStage.DesiredState.SetVertexBuffer( 0, vb->m_iResource, 0, vertexStride );
+	InputAssemblerStage.DesiredState.VertexBuffers.SetState( 0, vb->m_iResource );
+	InputAssemblerStage.DesiredState.VertexBufferStrides.SetState( 0, vertexStride );
+	InputAssemblerStage.DesiredState.VertexBufferOffsets.SetState( 0, 0 );
 
     // Bind the input layout.
-	InputAssemblerStage.DesiredState.SetInputLayout( inputLayout );
+	InputAssemblerStage.DesiredState.InputLayout.SetState( inputLayout );
 
 	// Set and apply the state in this pipeline manager's input assembler.
 	InputAssemblerStage.ApplyDesiredState( m_pContext );
@@ -471,18 +476,23 @@ void PipelineManagerDX11::DrawInstanced( RenderEffectDX11& effect, ResourcePtr v
 	InputAssemblerStage.ClearDesiredState();
 
 	// Specify the type of geometry that we will be dealing with.
-    InputAssemblerStage.DesiredState.SetPrimitiveTopology( primType );
+    InputAssemblerStage.DesiredState.PrimitiveTopology.SetState( primType );
 
     // Bind the vertex buffers.
-	InputAssemblerStage.DesiredState.SetVertexBuffer( 0, vb->m_iResource, 0, vertexStride );
-	InputAssemblerStage.DesiredState.SetVertexBuffer( 1, instanceData->m_iResource, 0, instanceDataStride );
+	InputAssemblerStage.DesiredState.VertexBuffers.SetState( 0, vb->m_iResource );
+	InputAssemblerStage.DesiredState.VertexBufferStrides.SetState( 0, vertexStride );
+	InputAssemblerStage.DesiredState.VertexBufferOffsets.SetState( 0, 0 );
+
+	InputAssemblerStage.DesiredState.VertexBuffers.SetState( 1, instanceData->m_iResource );
+	InputAssemblerStage.DesiredState.VertexBufferStrides.SetState( 1, instanceDataStride );
+	InputAssemblerStage.DesiredState.VertexBufferOffsets.SetState( 1, 0 );
 
 	// Bind the index buffer.
-	InputAssemblerStage.DesiredState.SetIndexBuffer( ib->m_iResource );
-	InputAssemblerStage.DesiredState.SetIndexBufferFormat( DXGI_FORMAT_R32_UINT );
+	InputAssemblerStage.DesiredState.IndexBuffer.SetState( ib->m_iResource );
+	InputAssemblerStage.DesiredState.IndexBufferFormat.SetState( DXGI_FORMAT_R32_UINT );
 
     // Bind the input layout.
-	InputAssemblerStage.DesiredState.SetInputLayout( inputLayout );
+	InputAssemblerStage.DesiredState.InputLayout.SetState( inputLayout );
 
 	// Set and apply the state in this pipeline manager's input assembler.
 	InputAssemblerStage.ApplyDesiredState( m_pContext );
@@ -542,10 +552,10 @@ void PipelineManagerDX11::DrawIndirect( RenderEffectDX11& effect,
 	InputAssemblerStage.ClearDesiredState();
 
 	// Specify the type of geometry that we will be dealing with.
-    InputAssemblerStage.DesiredState.SetPrimitiveTopology( primType );
+    InputAssemblerStage.DesiredState.PrimitiveTopology.SetState( primType );
 
     // Bind the input layout.
-	InputAssemblerStage.DesiredState.SetInputLayout( inputLayout );
+	InputAssemblerStage.DesiredState.InputLayout.SetState( inputLayout );
 
 	// Set and apply the state in this pipeline manager's input assembler.
 	InputAssemblerStage.ApplyDesiredState( m_pContext );
@@ -612,7 +622,7 @@ void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth, UINT stenci
 	for( UINT i = 0; i < viewCount; ++i )
 	{
 	    float clearColours[] = { color.x, color.y, color.z, color.w }; // RGBA
-		int rtv = OutputMergerStage.GetCurrentState().GetRenderTarget( i );
+		int rtv = OutputMergerStage.GetCurrentState().RenderTargetViews.GetState( i );
 		RenderTargetViewDX11* pRTV = RendererDX11::Get()->GetRenderTargetViewByIndex( rtv );
 		if ( pRTV != 0 ) {
 			pRenderTargetViews[i] = pRTV->m_pRenderTargetView; 
@@ -622,9 +632,9 @@ void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth, UINT stenci
 
 	// Check if the output merger currently has a depth target set, and if so clear it.
 
-	if ( OutputMergerStage.GetCurrentState().GetDepthStencilTarget() != -1 )
+	if ( OutputMergerStage.GetCurrentState().DepthTargetViews.GetState() != -1 )
 	{
-		int dsv = OutputMergerStage.GetCurrentState().GetDepthStencilTarget();
+		int dsv = OutputMergerStage.GetCurrentState().DepthTargetViews.GetState();
 		DepthStencilViewDX11* pDSV = RendererDX11::Get()->GetDepthStencilViewByIndex( dsv );
 		if ( pDSV != 0 ) {
 			pDepthStencilView = pDSV->m_pDepthStencilView;
@@ -640,7 +650,7 @@ void PipelineManagerDX11::BindShader( ShaderType type, int ID, IParameterManager
 	ShaderDX11* pShaderDX11 = pRenderer->GetShader( ID );
 
 	// Record the shader ID for use later on
-	ShaderStages[type]->DesiredState.SetShaderProgram( ID );
+	ShaderStages[type]->DesiredState.ShaderProgram.SetState( ID );
 
 	// Check if the shader has a valid identifier
 	if ( pShaderDX11 )
@@ -653,7 +663,6 @@ void PipelineManagerDX11::BindShader( ShaderType type, int ID, IParameterManager
 			// Before binding the shader, have it update its required parameters.  These
 			// parameters will then be bound to the pipeline after the shader is bound.
 
-			//pShaderDX11->GetReflection()->UpdateParameters( this, pParamManager );
 			pShaderDX11->GetReflection()->BindParameters( type, this, pParamManager );
 		}
 		else

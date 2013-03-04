@@ -112,8 +112,8 @@ void ViewGBuffer::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameter
 	{
 		// Set the parameters for rendering this view
 		pPipelineManager->ClearRenderTargets();
-		pPipelineManager->OutputMergerStage.DesiredState.SetRenderTarget( 0, m_GBufferTarget->m_iResourceRTV );
-		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
+		pPipelineManager->OutputMergerStage.DesiredState.RenderTargetViews.SetState( 0, m_GBufferTarget->m_iResourceRTV );
+		pPipelineManager->OutputMergerStage.DesiredState.DepthTargetViews.SetState( m_DepthTarget->m_iResourceDSV );
 		pPipelineManager->ApplyRenderTargets();
 
 		// Configure the desired viewports in this pipeline
@@ -137,7 +137,7 @@ void ViewGBuffer::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameter
         // leaving a value of 2.
 
         pPipelineManager->ClearRenderTargets();
-		pPipelineManager->OutputMergerStage.DesiredState.SetDepthStencilTarget( m_DepthTarget->m_iResourceDSV );
+		pPipelineManager->OutputMergerStage.DesiredState.DepthTargetViews.SetState( m_DepthTarget->m_iResourceDSV );
         pPipelineManager->ApplyRenderTargets();
 
         pParamManager->SetShaderResourceParameter( m_pGBufferTexture, m_GBufferTarget );

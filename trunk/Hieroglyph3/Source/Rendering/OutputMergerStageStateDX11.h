@@ -16,10 +16,12 @@
 #define OutputMergerStageStateDX11_h
 //--------------------------------------------------------------------------------
 #include "PCH.h"
+#include "TStateMonitor.h"
+#include "TStateArrayMonitor.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class OutputMergerStageDX11;
+	//class OutputMergerStageDX11;
 
 	class OutputMergerStageStateDX11
 	{
@@ -29,53 +31,61 @@ namespace Glyph3
 
 		void SetFeautureLevel( D3D_FEATURE_LEVEL level );
 
-		void SetBlendState( int state );
-		void SetDepthStencilState( int state, unsigned int stencilRef = 0 );
-		void SetRenderTarget( unsigned int slot, int rtv );
-		void SetDepthStencilTarget( int dsv );
-		void SetUnorderedAccessView( unsigned int slot, int uav, unsigned int initCount = -1 );
+		//void SetBlendState( int state );
+		//void SetDepthStencilState( int state, unsigned int stencilRef = 0 );
+		//void SetRenderTarget( unsigned int slot, int rtv );
+		//void SetDepthStencilTarget( int dsv );
+		//void SetUnorderedAccessView( unsigned int slot, int uav, unsigned int initCount = -1 );
 		
-		int GetBlendState() const;
-		int GetDepthStencilState() const;
-		unsigned int GetStencilReference() const;
-		int GetRenderTarget( unsigned int slot ) const;
-		int GetDepthStencilTarget( ) const;
-		int GetUnorderedAccessView( unsigned int slot ) const;
-		int GetInitialCount( unsigned int slot ) const;
+		//int GetBlendState() const;
+		//int GetDepthStencilState() const;
+		//unsigned int GetStencilReference() const;
+		//int GetRenderTarget( unsigned int slot ) const;
+		//int GetDepthStencilTarget( ) const;
+		//int GetUnorderedAccessView( unsigned int slot ) const;
+		//int GetInitialCount( unsigned int slot ) const;
 
 		int GetRenderTargetCount() const;
 
-		int CompareBlendState( OutputMergerStageStateDX11& desired );
-		int CompareDepthStencilState( OutputMergerStageStateDX11& desired );
-		int CompareRenderTargets( OutputMergerStageStateDX11& desired );
-		int CompareUnorderedAccessViews( OutputMergerStageStateDX11& desired );
+		//int CompareBlendState( OutputMergerStageStateDX11& desired );
+		//int CompareDepthStencilState( OutputMergerStageStateDX11& desired );
+		//int CompareRenderTargets( OutputMergerStageStateDX11& desired );
+		//int CompareUnorderedAccessViews( OutputMergerStageStateDX11& desired );
 
 		void ClearState( );
 
 		void SetSisterState( OutputMergerStageStateDX11* pState );
 		void ResetUpdateFlags( );
 
+		TStateMonitor< int > BlendState;
+		TStateMonitor< int > DepthStencilState;
+		TStateMonitor< unsigned int > StencilRef;
+		TStateArrayMonitor< int, D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT > RenderTargetViews;
+		TStateMonitor< int > DepthTargetViews;
+		TStateArrayMonitor< int, D3D11_PS_CS_UAV_REGISTER_COUNT > UnorderedAccessViews;
+		TStateArrayMonitor< unsigned int, D3D11_PS_CS_UAV_REGISTER_COUNT > UAVInitialCounts;
+
 	protected:
 
 		D3D_FEATURE_LEVEL				m_FeatureLevel;
 
-		int								BlendState;
-		int								DepthStencilState;
-		unsigned int					StencilRef;
-		int								RenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT];
-		int								DepthTargetViews;
-		int								UnorderedAccessViews[D3D11_PS_CS_UAV_REGISTER_COUNT];
-		unsigned int					UAVInitialCounts[D3D11_PS_CS_UAV_REGISTER_COUNT];
+		//int								BlendState;
+		//int								DepthStencilState;
+		//unsigned int					StencilRef;
+		//int								RenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT];
+		//int								DepthTargetViews;
+		//int								UnorderedAccessViews[D3D11_PS_CS_UAV_REGISTER_COUNT];
+		//unsigned int					UAVInitialCounts[D3D11_PS_CS_UAV_REGISTER_COUNT];
 		
 		OutputMergerStageStateDX11*		m_pSisterState;
 
-		bool							m_bUpdateBlendState;
-		bool							m_bUpdateDepthStencilState;
-		bool							m_bUpdateRenderTargetState;
-		bool							m_bUpdateUnorderedAccessState;
-		bool							m_bUpdateDepthStencilTarget;
+		//bool							m_bUpdateBlendState;
+		//bool							m_bUpdateDepthStencilState;
+		//bool							m_bUpdateRenderTargetState;
+		//bool							m_bUpdateUnorderedAccessState;
+		//bool							m_bUpdateDepthStencilTarget;
 
-		friend OutputMergerStageDX11;
+		//friend OutputMergerStageDX11;
 	};
 };
 //--------------------------------------------------------------------------------

@@ -42,9 +42,9 @@ void ParticleSystemExecutorDX11::Execute( PipelineManagerDX11* pPipeline, IParam
 		pPipeline->InputAssemblerStage.ClearDesiredState();
 
 		// Set the Input Assembler state, then perform the draw call.
-		int layout = GetInputLayout( pPipeline->ShaderStages[VERTEX_SHADER]->DesiredState.GetShaderProgram() );
-		pPipeline->InputAssemblerStage.DesiredState.SetInputLayout( layout );
-		pPipeline->InputAssemblerStage.DesiredState.SetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_POINTLIST );
+		int layout = GetInputLayout( pPipeline->ShaderStages[VERTEX_SHADER]->DesiredState.ShaderProgram.GetState() );
+		pPipeline->InputAssemblerStage.DesiredState.InputLayout.SetState( layout );
+		pPipeline->InputAssemblerStage.DesiredState.PrimitiveTopology.SetState( D3D11_PRIMITIVE_TOPOLOGY_POINTLIST );
 
 		pPipeline->ApplyInputResources();
 

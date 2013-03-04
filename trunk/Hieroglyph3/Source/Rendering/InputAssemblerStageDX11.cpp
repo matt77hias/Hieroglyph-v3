@@ -53,8 +53,9 @@ void InputAssemblerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 	RendererDX11* pRenderer = RendererDX11::Get();
 
 	// Compare the primitive topology of the desired and current states
-	if ( true == DesiredState.m_bUpdateInputLayout ) {
-		InputLayoutDX11* pLayout = pRenderer->GetInputLayout( DesiredState.InputLayout );
+	if ( DesiredState.InputLayout.IsUpdateNeeded() ) 
+	{
+		InputLayoutDX11* pLayout = pRenderer->GetInputLayout( DesiredState.InputLayout.GetState() );
 
 		if ( pLayout ) {
 			pContext->IASetInputLayout( pLayout->m_pInputLayout );
@@ -64,18 +65,21 @@ void InputAssemblerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 	}
 
 	// Bind the primitive topology
-	if ( true == DesiredState.m_bUpdateUpdatePrimitiveTopology ) {
-		pContext->IASetPrimitiveTopology( DesiredState.PrimitiveTopology );
+	if ( DesiredState.PrimitiveTopology.IsUpdateNeeded() ) 
+	{
+		pContext->IASetPrimitiveTopology( DesiredState.PrimitiveTopology.GetState() );
 	}
 
 	// Bind the vertex buffers
-	if ( true == DesiredState.m_bUpdateVertexBuffers ) {
-
+	if ( DesiredState.VertexBuffers.IsUpdateNeeded()
+		|| DesiredState.VertexBufferOffsets.IsUpdateNeeded()
+		|| DesiredState.VertexBufferStrides.IsUpdateNeeded() )
+	{
 		ID3D11Buffer* Buffers[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
 
-		for ( unsigned int i = 0; i <= DesiredState.AvailableSlotCount-1; i++ )
+		for ( unsigned int i = 0; i < DesiredState.GetAvailableSlotCount(); i++ )
 		{
-			int index = DesiredState.VertexBuffers[i];
+			int index = DesiredState.VertexBuffers.GetState( i );
 
 			VertexBufferDX11* pBuffer = pRenderer->GetVertexBufferByIndex( index );
 
@@ -86,21 +90,33 @@ void InputAssemblerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 			}
 		}
 
-		pContext->IASetVertexBuffers( 0, DesiredState.AvailableSlotCount, Buffers, DesiredState.VertexStrides, DesiredState.VertexOffsets );
+		UINT startSlot = min( DesiredState.VertexBuffers.GetStartSlot(),
+			min( DesiredState.VertexBufferOffsets.GetStartSlot(),
+			DesiredState.VertexBufferStrides.GetStartSlot() ) );
+
+		UINT endSlot = max( DesiredState.VertexBuffers.GetEndSlot(),
+			max( DesiredState.VertexBufferOffsets.GetEndSlot(),
+			DesiredState.VertexBufferStrides.GetEndSlot() ) );
+
+		//pContext->IASetVertexBuffers( 0, DesiredState.AvailableSlotCount, Buffers, DesiredState.VertexStrides, DesiredState.VertexOffsets );
+		pContext->IASetVertexBuffers( 
+			startSlot, endSlot-startSlot+1, 
+			&Buffers[ startSlot ],
+			DesiredState.VertexBufferStrides.GetSlotLocation( startSlot ),
+			DesiredState.VertexBufferOffsets.GetSlotLocation( startSlot ) );
 	}
 
-	if ( true == DesiredState.m_bUpdateIndexBuffer ) {
+	if ( DesiredState.IndexBuffer.IsUpdateNeeded() ) {
 	
-		// TODO: Add the ability to use different formats and offsets to this function!
-		int index = DesiredState.IndexBuffer;
+		int index = DesiredState.IndexBuffer.GetState();
 
 		IndexBufferDX11* pBuffer = pRenderer->GetIndexBufferByIndex( index );
 
 		if ( pBuffer ) {
 			ID3D11Buffer* pIndexBuffer = reinterpret_cast<ID3D11Buffer*>( pBuffer->GetResource() );
-			pContext->IASetIndexBuffer( pIndexBuffer, DesiredState.IndexBufferFormat, 0 );
+			pContext->IASetIndexBuffer( pIndexBuffer, DesiredState.IndexBufferFormat.GetState(), 0 );
 		} else {
-			pContext->IASetIndexBuffer( 0, DesiredState.IndexBufferFormat, 0 );
+			pContext->IASetIndexBuffer( 0, DesiredState.IndexBufferFormat.GetState(), 0 );
 		}
 	}
 
