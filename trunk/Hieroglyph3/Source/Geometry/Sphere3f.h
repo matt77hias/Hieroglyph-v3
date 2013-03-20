@@ -26,17 +26,21 @@ namespace Glyph3
 	{
 	public:
 		Sphere3f( );
-		Sphere3f( Vector3f& center, float radius );
+		Sphere3f( const Vector3f& center, float radius );
 		virtual ~Sphere3f( );
 
-		void Update( Vector3f& center, float radius );
-		void UpdateCenter( Vector3f& center );
+		void Update( const Vector3f& center, float radius );
+		void UpdateCenter( const Vector3f& center );
 		void UpdateRadius( float radius );
 
-		bool Intersects( Sphere3f& test );
-		bool Envelops( Sphere3f& test );
+		bool Intersects( const Sphere3f& test ) const;
+		bool Envelops( const Sphere3f& test ) const;
 
-		virtual eSHAPE GetShapeType( );
+		void SamplePosition( Vector3f& position, float theta, float phi ) const;
+		void SampleNormal( Vector3f& normal, float theta, float phi ) const;
+		void SamplePositionAndNormal( Vector3f& position, Vector3f& normal, float theta, float phi ) const;
+
+		virtual eSHAPE GetShapeType( ) const;
 
 		Vector3f	Center;
 		float		Radius;

@@ -25,16 +25,16 @@ Frustum3f::Frustum3f()
 	}
 }
 //--------------------------------------------------------------------------------
-Frustum3f::Frustum3f(Matrix4f& ViewProjection)
+Frustum3f::Frustum3f( const Matrix4f& ViewProjection )
 {
-	Update(ViewProjection, true);
+	Update( ViewProjection, true );
 }
 //--------------------------------------------------------------------------------
 Frustum3f::~Frustum3f()
 {
 }
 //--------------------------------------------------------------------------------
-void Frustum3f::Update(Matrix4f& ViewProj, bool bNormalize)
+void Frustum3f::Update( const Matrix4f& ViewProj, bool bNormalize )
 {
 	// Left Plane
 	m_Planes[0].a() = ViewProj(0,3) + ViewProj(0,0);
@@ -73,45 +73,8 @@ void Frustum3f::Update(Matrix4f& ViewProj, bool bNormalize)
 	m_Planes[5].d() = ViewProj(3,3) - ViewProj(3,2);
 
 
-	//// Left Plane
-	//m_Planes[0].a() = ViewProj(1,4) + ViewProj(1,1);
-	//m_Planes[0].b() = ViewProj(2,4) + ViewProj(2,1);
-	//m_Planes[0].c() = ViewProj(3,4) + ViewProj(3,1);
-	//m_Planes[0].d() = ViewProj(4,4) + ViewProj(4,1);
-
-	//// Right Plane
-	//m_Planes[1].a() = ViewProj(1,4) - ViewProj(1,1);
-	//m_Planes[1].b() = ViewProj(2,4) - ViewProj(2,1);
-	//m_Planes[1].c() = ViewProj(3,4) - ViewProj(3,1);
-	//m_Planes[1].d() = ViewProj(4,4) - ViewProj(4,1);
-
- //   // Top Plane
-	//m_Planes[2].a() = ViewProj(1,4) - ViewProj(1,2);
-	//m_Planes[2].b() = ViewProj(2,4) - ViewProj(2,2);
-	//m_Planes[2].c() = ViewProj(3,4) - ViewProj(3,2);
-	//m_Planes[2].d() = ViewProj(4,4) - ViewProj(4,2);
-
-	//// Bottom Plane
-	//m_Planes[3].a() = ViewProj(1,4) + ViewProj(1,2);
-	//m_Planes[3].b() = ViewProj(2,4) + ViewProj(2,2);
-	//m_Planes[3].c() = ViewProj(3,4) + ViewProj(3,2);
-	//m_Planes[3].d() = ViewProj(4,4) + ViewProj(4,2);
-
-	//// Near Plane
-	//m_Planes[4].a() = ViewProj(1,3);
-	//m_Planes[4].b() = ViewProj(2,3);
-	//m_Planes[4].c() = ViewProj(3,3);
-	//m_Planes[4].d() = ViewProj(4,3);
-
-	//// Far Plane
-	//m_Planes[5].a() = ViewProj(1,4) - ViewProj(1,3);
-	//m_Planes[5].b() = ViewProj(2,4) - ViewProj(2,3);
-	//m_Planes[5].c() = ViewProj(3,4) - ViewProj(3,3);
-	//m_Planes[5].d() = ViewProj(4,4) - ViewProj(4,3);
-
-
 	// Normalize all planes
-	if (bNormalize)
+	if ( bNormalize )
 	{
 		for (int i = 0; i < 6; i++)
 		{
@@ -120,32 +83,32 @@ void Frustum3f::Update(Matrix4f& ViewProj, bool bNormalize)
 	}
 }
 //--------------------------------------------------------------------------------
-bool Frustum3f::Test(Vector3f& TestPoint)
+bool Frustum3f::Test( const Vector3f& TestPoint ) const
 {
 	// Test the point against each plane
-	if (m_Planes[0].DistanceToPoint(TestPoint) < 0)
+	if ( m_Planes[0].DistanceToPoint( TestPoint ) < 0 )
 		return(false);
 
-	if (m_Planes[1].DistanceToPoint(TestPoint) < 0)
+	if ( m_Planes[1].DistanceToPoint( TestPoint ) < 0 )
 		return(false);
 
-	if (m_Planes[2].DistanceToPoint(TestPoint) < 0)
+	if ( m_Planes[2].DistanceToPoint( TestPoint ) < 0 )
 		return(false);
 
-	if (m_Planes[3].DistanceToPoint(TestPoint) < 0)
+	if ( m_Planes[3].DistanceToPoint( TestPoint ) < 0 )
 		return(false);
 
-	if (m_Planes[4].DistanceToPoint(TestPoint) < 0)
+	if ( m_Planes[4].DistanceToPoint( TestPoint ) < 0 )
 		return(false);
 
-	if (m_Planes[5].DistanceToPoint(TestPoint) < 0)
+	if ( m_Planes[5].DistanceToPoint( TestPoint ) < 0 )
 		return(false);
 
 	// If all tests passed, point is within the frustum
-	return(true);
+	return( true );
 }
 //--------------------------------------------------------------------------------
-bool Frustum3f::Test(Sphere3f& TestSphere)
+bool Frustum3f::Test( const Sphere3f& TestSphere ) const
 {
 	// Test the center against each plane and compare the radius
 	
@@ -165,13 +128,13 @@ bool Frustum3f::Test(Sphere3f& TestSphere)
 	return( true );
 }
 //--------------------------------------------------------------------------------
-bool Frustum3f::Intersects( Sphere3f& bounds )
+bool Frustum3f::Intersects( const Sphere3f& bounds ) const
 {
 	// distance to point plus the radius must be greater than zero to be intersecting!!!
 
 	for ( int i = 0; i < 6; i++ )
 	{
-		if ( m_Planes[i].DistanceToPoint( bounds.Center ) + bounds.Radius < 0)
+		if ( m_Planes[i].DistanceToPoint( bounds.Center ) + bounds.Radius < 0 )
 			return( false );
 	}
 
@@ -185,7 +148,7 @@ bool Frustum3f::Intersects( Sphere3f& bounds )
 	return( true );
 }
 //--------------------------------------------------------------------------------
-bool Frustum3f::Envelops( Sphere3f& bounds )
+bool Frustum3f::Envelops( const Sphere3f& bounds ) const
 {
 	// distance to point minus the radius must be greater than zero to be enveloped!!!
 
@@ -200,7 +163,7 @@ bool Frustum3f::Envelops( Sphere3f& bounds )
 	return( true );
 }
 //--------------------------------------------------------------------------------
-eSHAPE Frustum3f::GetShapeType( )
+eSHAPE Frustum3f::GetShapeType( ) const
 {
 	return( FRUSTUM );
 }

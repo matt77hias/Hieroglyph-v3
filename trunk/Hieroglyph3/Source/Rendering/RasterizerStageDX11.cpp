@@ -82,11 +82,9 @@ void RasterizerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 		
 		for ( unsigned int i = 0; i < DesiredState.ViewportCount.GetState(); i++ ) {
 
-			ViewPortDX11* pViewport = pRenderer->GetViewPort( DesiredState.Viewports.GetState( i ) );
+			const ViewPortDX11& Viewport = pRenderer->GetViewPort( DesiredState.Viewports.GetState( i ) );
 			
-			if ( pViewport ) {
-				aViewports[i] = pViewport->m_ViewPort; 
-			}
+			aViewports[i] = Viewport.m_ViewPort; 
 		}
 
 		pContext->RSSetViewports( DesiredState.ViewportCount.GetState(), aViewports );

@@ -39,45 +39,10 @@ namespace Glyph3
 
 		const OutputMergerStageStateDX11& GetCurrentState() const;
 
-
 		// The desired state is a public member that will allow the user of this
 		// class to configure the state as desired before applying the state.
 
 		OutputMergerStageStateDX11		DesiredState;
-
-
-
-
-
-
-
-		//// Each of these set methods will buffer their input views for binding
-		//// at a later time when the BindResources method is called.  Until it is,
-		//// these views are cached for later use.
-		//void BindRenderTarget( int index, ResourcePtr Target );
-		//void BindDepthTarget( ResourcePtr DepthTarget );
-		//void SetUnorderedAccessView( int index, ID3D11UnorderedAccessView* pUAV, unsigned int initial = -1 );
-
-		//// Binding resources actually binds the currently 'set' views and makes 
-		//// them 'bound' views to the API.
-		//void BindResources( ID3D11DeviceContext* pContext );
-		//
-		//// Clearing resources wipes out the currently 'set' views from the buffer.
-		//void ClearResources();
-		//void UnbindResources( ID3D11DeviceContext* pContext );
-
-		//// This method will set the current cached API state to the default value.
-		//// This is commonly used when the context is reset for some reason.
-		//void SetToDefaultState();
-
-		//// The number of views 'set' indicates how many views will be bound after
-		//// the next call to bind resources (i.e. the number of views planned to be
-		//// bound).
-		//unsigned int GetViewsSetCount();
-
-		//// The number of views bound indicates how many views are bound to the pipeline
-		//// in the API currently according to the tracked state of the context.
-		//unsigned int GetViewsBoundCount();
 
 	protected:
 

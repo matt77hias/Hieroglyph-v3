@@ -42,12 +42,12 @@ namespace Glyph3
 		void Scale( float fScale );
 		void Translate( float fX, float fY, float fZ );
 
-		Vector3f GetBasisX();
-		Vector3f GetBasisY();
-		Vector3f GetBasisZ();
+		Vector3f GetBasisX() const;
+		Vector3f GetBasisY() const;
+		Vector3f GetBasisZ() const;
 
-		Vector3f GetTranslation();
-		Matrix3f GetRotation();
+		Vector3f GetTranslation() const;
+		Matrix3f GetRotation() const;
 
 		void SetRotation( const Matrix3f& Rot );
 		void SetTranslation( const Vector3f& Trans );

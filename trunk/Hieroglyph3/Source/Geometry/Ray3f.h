@@ -24,10 +24,10 @@ namespace Glyph3
 	{
 	public:
 		Ray3f( );
-		Ray3f( Vector3f& position, Vector3f& direction );
+		Ray3f( const Vector3f& position, const Vector3f& direction );
 		virtual ~Ray3f( );
 
-		virtual eSHAPE GetShapeType( );
+		virtual eSHAPE GetShapeType( ) const;
 
 	public:
 		Vector3f Origin;

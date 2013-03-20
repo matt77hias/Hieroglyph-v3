@@ -43,7 +43,7 @@ namespace Glyph3
 
 		virtual void BuildPickRecord( Ray3f& ray, std::vector<PickRecord>& record );
 
-		virtual std::string toString( );
+		virtual std::wstring toString( );
 
 	protected:
 		std::vector< Entity3D* > m_vChildren;

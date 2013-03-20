@@ -43,8 +43,11 @@ namespace Glyph3
 		Actor();
 		virtual ~Actor();
 
+		Node3D* GetNode() const;
 		Node3D* GetNode();
+		Entity3D* GetBody() const;
 		Entity3D* GetBody();
+
 
 		void AddElement( Entity3D* pElement );
 		void RemoveElement( Entity3D* pElement );

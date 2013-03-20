@@ -18,7 +18,7 @@ Ray3f::Ray3f()
 {
 }
 //--------------------------------------------------------------------------------
-Ray3f::Ray3f( Vector3f& position, Vector3f& direction )
+Ray3f::Ray3f( const Vector3f& position, const Vector3f& direction )
 {
 	Origin = position;
 	Direction = direction;
@@ -28,7 +28,7 @@ Ray3f::~Ray3f()
 {
 }
 //--------------------------------------------------------------------------------
-eSHAPE Ray3f::GetShapeType()
+eSHAPE Ray3f::GetShapeType() const
 {
 	return( RAY );
 }

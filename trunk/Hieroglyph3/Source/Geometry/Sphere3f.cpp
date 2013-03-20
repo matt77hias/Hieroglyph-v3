@@ -20,7 +20,7 @@ Sphere3f::Sphere3f( )
 	Radius = 0.0f;
 }
 //--------------------------------------------------------------------------------
-Sphere3f::Sphere3f( Vector3f& center, float radius )
+Sphere3f::Sphere3f( const Vector3f& center, float radius )
 {
 	Update( center, radius );
 }
@@ -29,23 +29,13 @@ Sphere3f::~Sphere3f()
 {
 }
 //--------------------------------------------------------------------------------
-void Sphere3f::Update( Vector3f& center, float radius ) 
+void Sphere3f::Update( const Vector3f& center, float radius ) 
 {
 	Center = center;
 	Radius = radius;
 }
 //--------------------------------------------------------------------------------
-//Vector3f& Sphere3f::Center( )
-//{
-//	return( C );
-//}
-////--------------------------------------------------------------------------------
-//float Sphere3f::Radius( )
-//{
-//	return( r );
-//}
-//--------------------------------------------------------------------------------
-bool Sphere3f::Intersects( Sphere3f& Test )
+bool Sphere3f::Intersects( const Sphere3f& Test ) const
 {
 	Vector3f Dist;
 	Dist = ( Center - Test.Center ); 
@@ -53,7 +43,7 @@ bool Sphere3f::Intersects( Sphere3f& Test )
 	return( Dist.Magnitude( ) < ( Radius + Test.Radius ) );
 }
 //--------------------------------------------------------------------------------
-bool Sphere3f::Envelops( Sphere3f& test )
+bool Sphere3f::Envelops( const Sphere3f& test ) const
 {
 	Vector3f Dist;
 	Dist = ( Center - test.Center ); 
@@ -61,7 +51,7 @@ bool Sphere3f::Envelops( Sphere3f& test )
 	return( Radius > test.Radius + Dist.Magnitude( ) );
 }
 //--------------------------------------------------------------------------------
-void Sphere3f::UpdateCenter( Vector3f& center )
+void Sphere3f::UpdateCenter( const Vector3f& center )
 {
 	Center = center;
 }
@@ -71,8 +61,34 @@ void Sphere3f::UpdateRadius( float radius )
 	Radius = radius;
 }
 //--------------------------------------------------------------------------------
-eSHAPE Sphere3f::GetShapeType( )
+eSHAPE Sphere3f::GetShapeType( ) const
 {
 	return( SPHERE );
+}
+//--------------------------------------------------------------------------------
+void Sphere3f::SamplePosition( Vector3f& position, float theta, float phi ) const
+{
+	position.x = Radius * sinf( phi ) * cosf( theta ) + Center.x;
+	position.y = Radius * cosf( phi ) + Center.y;
+	position.z = Radius * sinf( phi ) * sinf( theta ) + Center.z;
+}
+//--------------------------------------------------------------------------------
+void Sphere3f::SampleNormal( Vector3f& normal, float theta, float phi ) const
+{
+	normal.x = Radius * sinf( phi ) * cosf( theta );
+	normal.y = Radius * cosf( phi );
+	normal.z = Radius * sinf( phi ) * sinf( theta );
+
+	normal = Vector3f::Normalize( normal );
+}
+//--------------------------------------------------------------------------------
+void Sphere3f::SamplePositionAndNormal( Vector3f& position, Vector3f& normal, float theta, float phi ) const
+{
+	normal.x = Radius * sinf( phi ) * cosf( theta );
+	normal.y = Radius * cosf( phi );
+	normal.z = Radius * sinf( phi ) * sinf( theta );
+
+	position = normal + Center;
+	normal = Vector3f::Normalize( normal );
 }
 //--------------------------------------------------------------------------------

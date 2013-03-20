@@ -24,11 +24,11 @@ namespace Glyph3
 	{
 	public:
 		Box3f( );
-		Box3f( Vector3f& center, Vector3f& forward, Vector3f& up, 
-			Vector3f& right, float fextents, float uextents, float rextents );
+		Box3f( const Vector3f& center, const Vector3f& forward, const Vector3f& up, 
+			const Vector3f& right, float fextents, float uextents, float rextents );
 		virtual ~Box3f( );
 
-		virtual eSHAPE GetShapeType( );
+		virtual eSHAPE GetShapeType( ) const;
 
 	public:
 		Vector3f Center;

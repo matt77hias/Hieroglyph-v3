@@ -54,13 +54,13 @@ ID3DBlob* ShaderFactoryDX11::GenerateShader( ShaderType type, std::wstring& file
 	// Get the current path to the shader folders, and add the filename to it.
 
 	FileSystem fs;
-	filename = fs.GetShaderFolder() + filename;
+	std::wstring filepath = fs.GetShaderFolder() + filename;
 
 	// Load the file into memory
 
 	FileLoader SourceFile;
-	if ( !SourceFile.Open( filename ) ) {
-		message << "Unable to load shader from file: " << filename;
+	if ( !SourceFile.Open( filepath ) ) {
+		message << "Unable to load shader from file: " << filepath;
 		EventManager::Get()->ProcessEvent( EvtErrorMessagePtr( new EvtErrorMessage( message.str() ) ) );
 		return( nullptr );
 	}
@@ -93,7 +93,7 @@ ID3DBlob* ShaderFactoryDX11::GenerateShader( ShaderType type, std::wstring& file
 	//	&hr
 	//	) ) )
 	{
-		message << L"Error compiling shader program: " << filename << std::endl << std::endl;
+		message << L"Error compiling shader program: " << filepath << std::endl << std::endl;
 		message << L"The following error was reported:" << std::endl;
 
 		if ( ( enablelogging ) && ( pErrorMessages != nullptr ) )
@@ -125,13 +125,13 @@ ID3DBlob* ShaderFactoryDX11::GeneratePrecompiledShader( std::wstring& filename, 
 	// Determine where to look for the shader file
 
 	FileSystem fs;
-	filename = fs.GetShaderFolder() + filename + L"_" + function + L"_" + model + L".cso";
+	std::wstring filepath = fs.GetShaderFolder() + filename + L"_" + function + L"_" + model + L".cso";
 
 	// Load the file into memory
 
 	FileLoader CompiledObjectFile;
-	if ( !CompiledObjectFile.Open( filename ) ) {
-		message << "Unable to load shader from file: " << filename;
+	if ( !CompiledObjectFile.Open( filepath ) ) {
+		message << "Unable to load shader from file: " << filepath;
 		EventManager::Get()->ProcessEvent( EvtErrorMessagePtr( new EvtErrorMessage( message.str() ) ) );
 		return( nullptr );
 	}
@@ -142,7 +142,7 @@ ID3DBlob* ShaderFactoryDX11::GeneratePrecompiledShader( std::wstring& filename, 
 	HRESULT hr = D3DCreateBlob( CompiledObjectFile.GetDataSize(), &pBlob );
 
 	if ( FAILED( hr ) ) {
-		message << "Unable to create a D3DBlob of size: " << CompiledObjectFile.GetDataSize() << L" while compiling shader: " << filename;
+		message << "Unable to create a D3DBlob of size: " << CompiledObjectFile.GetDataSize() << L" while compiling shader: " << filepath;
 		EventManager::Get()->ProcessEvent( EvtErrorMessagePtr( new EvtErrorMessage( message.str() ) ) );
 		return( nullptr );
 	}

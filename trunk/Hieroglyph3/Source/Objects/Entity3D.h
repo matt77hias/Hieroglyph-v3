@@ -57,7 +57,7 @@ namespace Glyph3
 
 		Matrix4f& LocalMatrix( );
 		Matrix4f& WorldMatrix( );
-		Matrix4f GetView( );
+		Matrix4f GetView( ) const;
 
 		void SetMaterial( MaterialPtr pMaterial );
 		MaterialPtr GetMaterial( );
@@ -68,10 +68,11 @@ namespace Glyph3
 
 		// Various entity properties are accessed here.
 
-		int GetEntityID( );
+		bool IsHidden( ) const;
+		void SetHidden( bool bHide );
+		bool IsPickable() const;
+		void SetPickable( bool bPickable );
 
-		bool IsHidden( );
-		void Hide( bool bHide );
 		void SetLocalMatrixCalculation( bool bCalc );
 
 
@@ -81,13 +82,7 @@ namespace Glyph3
 		void AttachController( IController* pController );
 		IController* GetController( unsigned int index );
 
-		virtual std::string toString( );
-
-
-		// Static entity population variables
-
-		static int m_iEntityCount;
-		static Entity3D* m_pRoot;
+		virtual std::wstring toString( );
 
 		// Scene graph support is added by the following functions.  The graph is enforced
 		// by allowing only a single parent, and only Entity3D will be leaf nodes.
@@ -113,13 +108,9 @@ namespace Glyph3
 		virtual void GetIntersectingEntities( std::vector< Entity3D* >& set, Frustum3f& bounds );
 		virtual void GetEntities( std::vector< Entity3D* >& set );
 		
-		// The composite shape consists of multiple shapes to represent the entity.
-		// It is currently used for ray picking, but will eventually be added to visibility
-		// tests, and possibly used to drive the physics shape generation.
 
-		void SetCompositeShape( CompositeShape* pShape );
-		CompositeShape* GetCompositeShape( );
-
+		void SetName( const std::wstring& name );
+		std::wstring GetName() const;
 
 	protected:
 
@@ -130,12 +121,15 @@ namespace Glyph3
 		Matrix4f m_mLocal;			// world matrix.
 
 		// Entity flags
+		bool m_bPickable;
 		bool m_bHidden;
 		bool m_bCalcLocal;
 	
 		Entity3D* m_pParent;
-		int m_iEntityID;
+		//int m_iEntityID;
 		std::vector< IController* > m_Controllers;
+
+		std::wstring m_Name;
 
 	public:
 		EntityRenderParams m_sParams;
@@ -144,7 +138,12 @@ namespace Glyph3
 		Sphere3f m_ModelBoundingSphere;
 		Sphere3f m_WorldBoundingSphere;
 
-		CompositeShape* m_pComposite;
+		// The composite shape consists of multiple shapes to represent the entity.
+		// It is currently used for ray picking, but will eventually be added to visibility
+		// tests, and possibly used to drive the physics shape generation.
+
+		CompositeShape CompositeShape;
+		
 
 		friend IController;
 	};

@@ -18,7 +18,7 @@ Triangle3f::Triangle3f()
 {
 }
 //--------------------------------------------------------------------------------
-Triangle3f::Triangle3f( Vector3f& v1, Vector3f& v2, Vector3f& v3 )
+Triangle3f::Triangle3f( const Vector3f& v1, const Vector3f& v2, const Vector3f& v3 )
 {
 	v[0] = v1;
 	v[1] = v2;
@@ -29,7 +29,7 @@ Triangle3f::~Triangle3f()
 {
 }
 //--------------------------------------------------------------------------------
-eSHAPE Triangle3f::GetShapeType( )
+eSHAPE Triangle3f::GetShapeType( ) const
 {
 	return( TRIANGLE );
 }

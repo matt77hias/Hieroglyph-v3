@@ -98,7 +98,6 @@ void InputAssemblerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 			max( DesiredState.VertexBufferOffsets.GetEndSlot(),
 			DesiredState.VertexBufferStrides.GetEndSlot() ) );
 
-		//pContext->IASetVertexBuffers( 0, DesiredState.AvailableSlotCount, Buffers, DesiredState.VertexStrides, DesiredState.VertexOffsets );
 		pContext->IASetVertexBuffers( 
 			startSlot, endSlot-startSlot+1, 
 			&Buffers[ startSlot ],
@@ -122,5 +121,10 @@ void InputAssemblerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 
 	DesiredState.ResetUpdateFlags();
 	CurrentState = DesiredState;
+}
+//--------------------------------------------------------------------------------
+const InputAssemblerStateDX11& InputAssemblerStageDX11::GetCurrentState() const
+{
+	return( CurrentState );
 }
 //--------------------------------------------------------------------------------

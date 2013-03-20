@@ -32,7 +32,7 @@ namespace Glyph3
 
 		// Operations
 		void Normalize();
-		float DistanceToPoint(const Vector3f& pt);
+		float DistanceToPoint( const Vector3f& pt ) const;
 
 		// Member Access
 		float a() const;
@@ -44,7 +44,7 @@ namespace Glyph3
 		float d() const;
 		float& d();
 
-		virtual eSHAPE GetShapeType( );
+		virtual eSHAPE GetShapeType( ) const;
 
 	protected:
 		union

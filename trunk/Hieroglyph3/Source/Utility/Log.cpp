@@ -28,7 +28,6 @@ Log& Log::Get()
 bool Log::Open()
 {
 	FileSystem fs;
-
 	std::wstring filename = fs.GetLogFolder() + L"\\Log.txt";
 	AppLog.open( filename.c_str() );
 

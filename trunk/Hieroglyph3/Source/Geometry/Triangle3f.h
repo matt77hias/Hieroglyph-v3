@@ -24,10 +24,10 @@ namespace Glyph3
 	{
 	public:
 		Triangle3f( );
-		Triangle3f( Vector3f& v1, Vector3f& v2, Vector3f& v3 );
+		Triangle3f( const Vector3f& v1, const Vector3f& v2, const Vector3f& v3 );
 		virtual ~Triangle3f( );
 
-		virtual eSHAPE GetShapeType( );
+		virtual eSHAPE GetShapeType( ) const;
 
 	protected:
 		Vector3f v[3];

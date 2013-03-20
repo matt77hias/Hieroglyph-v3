@@ -28,9 +28,7 @@ namespace Glyph3
 		virtual ~InputAssemblerStateDX11();
 
 		void SetFeautureLevel( D3D_FEATURE_LEVEL level );
-
 		void ClearState( );
-
 		void SetSisterState( InputAssemblerStateDX11* pState );
 		void ResetUpdateFlags( );
 
@@ -48,10 +46,9 @@ namespace Glyph3
 
 		D3D_FEATURE_LEVEL				m_FeatureLevel;
 
-		unsigned int					AvailableSlotCount;
-
 		InputAssemblerStateDX11*		m_pSisterState;
 
+		unsigned int					AvailableSlotCount;
 	};
 };
 //--------------------------------------------------------------------------------

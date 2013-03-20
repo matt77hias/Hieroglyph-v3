@@ -28,9 +28,7 @@ namespace Glyph3
 		virtual ~RasterizerStageStateDX11();
 
 		void SetFeautureLevel( D3D_FEATURE_LEVEL level );
-
 		void ClearState( );
-
 		void SetSisterState( RasterizerStageStateDX11* pState );
 		void ResetUpdateFlags( );
 

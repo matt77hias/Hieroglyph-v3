@@ -70,8 +70,6 @@ namespace Glyph3
 
 	class RenderEffectDX11;
 
-	//class RenderParameterDX11;
-
 	class IParameterManager;
 	class PipelineManagerDX11;
 
@@ -227,7 +225,7 @@ namespace Glyph3
 		BlendStatePtr									GetBlendState( int index );
 		DepthStencilStatePtr							GetDepthState( int index );
 		RasterizerStatePtr								GetRasterizerState( int index );
-		ViewPortDX11*									GetViewPort( int index );
+		const ViewPortDX11&								GetViewPort( int index );
 
 		InputLayoutDX11*								GetInputLayout( int index );
 		SamplerStateDX11*								GetSamplerState( int index );
@@ -338,5 +336,10 @@ extern HANDLE						g_aThreadHandles[NUM_THREADS];
 extern Glyph3::ThreadPayLoad		g_aPayload[NUM_THREADS];
 extern HANDLE						g_aBeginEventHandle[NUM_THREADS];
 extern HANDLE						g_aEndEventHandle[NUM_THREADS];
+
+template <class T>
+void LogObjectVector( std::vector<T> objects );
+template <class T>
+void LogObjectPtrVector( std::vector<T> objects );
 
 #endif // RendererDX11_h

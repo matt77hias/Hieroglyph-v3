@@ -12,6 +12,7 @@
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 #include "Win32RenderWindow.h"
+#include "Vector2f.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -123,5 +124,14 @@ void Win32RenderWindow::Shutdown()
 void Win32RenderWindow::Paint()
 {
 	
+}
+//--------------------------------------------------------------------------------
+Vector2f Win32RenderWindow::GetCursorPosition()
+{
+	POINT p;
+	GetCursorPos( &p );
+	ScreenToClient( m_hWnd, &p );
+
+	return( Vector2f( static_cast<float>(p.x), static_cast<float>(p.y) ) );
 }
 //--------------------------------------------------------------------------------

@@ -23,11 +23,13 @@ namespace Glyph3
 	class ViewPortDX11
 	{
 	public:
+		ViewPortDX11();
 		ViewPortDX11( D3D11_VIEWPORT viewport );
-		virtual ~ViewPortDX11();
+		~ViewPortDX11();
 
 		float GetWidth() const;
 		float GetHeight() const;
+		Vector2f GetNormalizedPosition( const Vector2f& screen ) const;
 
 	protected:
 		D3D11_VIEWPORT			m_ViewPort;

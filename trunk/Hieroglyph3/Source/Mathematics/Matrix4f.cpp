@@ -232,7 +232,7 @@ Matrix4f Matrix4f::Inverse() const
     return( kInv );
 }
 //----------------------------------------------------------------------------------------------------
-Vector3f Matrix4f::GetBasisX()
+Vector3f Matrix4f::GetBasisX() const
 {
 	Vector3f Basis;
 
@@ -242,7 +242,7 @@ Vector3f Matrix4f::GetBasisX()
 	return( Basis );
 }
 //----------------------------------------------------------------------------------------------------
-Vector3f Matrix4f::GetBasisY()
+Vector3f Matrix4f::GetBasisY() const
 {
 	Vector3f Basis;
 
@@ -252,7 +252,7 @@ Vector3f Matrix4f::GetBasisY()
 	return( Basis );
 }
 //----------------------------------------------------------------------------------------------------
-Vector3f Matrix4f::GetBasisZ()
+Vector3f Matrix4f::GetBasisZ() const
 {
 	Vector3f Basis;
 
@@ -262,7 +262,7 @@ Vector3f Matrix4f::GetBasisZ()
 	return( Basis );
 }
 //----------------------------------------------------------------------------------------------------
-Vector3f Matrix4f::GetTranslation()
+Vector3f Matrix4f::GetTranslation() const
 {
 	Vector3f Pos;
 
@@ -278,7 +278,7 @@ void Matrix4f::SetTranslation( const Vector3f& Trans )
 		m_afEntry[I(3,i)] = Trans[i];
 }
 //----------------------------------------------------------------------------------------------------
-Matrix3f Matrix4f::GetRotation()
+Matrix3f Matrix4f::GetRotation() const
 {
 	Matrix3f mRet;
 

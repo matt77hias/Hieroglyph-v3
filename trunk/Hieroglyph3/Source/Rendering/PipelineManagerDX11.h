@@ -70,16 +70,17 @@ namespace Glyph3
 		// applied or cleared all at once with these calls.  This reduces the number 
 		// of API function calls needed to configure the pipeline.
 
-		void ApplyInputResources( );
-		void ClearInputResources( );
+		void ApplyInputResources();
+		void ClearInputResources();
 		
-		void ApplyPipelineResources( );
-		void ClearPipelineResources( );
+		void ApplyPipelineResources();
+		void ClearPipelineResources();
 
-		void ClearRenderTargets( );	
-		void ApplyRenderTargets( );
+		void ClearRenderTargets();	
+		void ApplyRenderTargets();
 		
-		void ClearPipelineState( );
+		void ClearPipelineState();
+		void ClearPipelineSRVs();
 
 
 		// Pipeline execution calls - these are the methods for executing the 

@@ -361,6 +361,20 @@ void PipelineManagerDX11::ClearPipelineState( )
 	}
 }
 //--------------------------------------------------------------------------------
+void PipelineManagerDX11::ClearPipelineSRVs()
+{
+	// Here we reset all of the shader resource view states.  This is useful for
+	// ensuring that the pipeline is free from resources that may be used for 
+	// output in a subsequent rendering pass.
+
+	VertexShaderStage.DesiredState.ShaderResourceViews.InitializeStates();
+	HullShaderStage.DesiredState.ShaderResourceViews.InitializeStates();
+	DomainShaderStage.DesiredState.ShaderResourceViews.InitializeStates();
+	GeometryShaderStage.DesiredState.ShaderResourceViews.InitializeStates();
+	PixelShaderStage.DesiredState.ShaderResourceViews.InitializeStates();
+	ComputeShaderStage.DesiredState.ShaderResourceViews.InitializeStates();
+}
+//--------------------------------------------------------------------------------
 void PipelineManagerDX11::DrawIndexed( UINT IndexCount, UINT StartIndex, int VertexOffset )
 {
 	m_pContext->DrawIndexed( IndexCount, StartIndex, VertexOffset );

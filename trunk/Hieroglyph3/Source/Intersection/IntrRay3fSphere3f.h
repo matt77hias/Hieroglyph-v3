@@ -11,6 +11,8 @@
 //--------------------------------------------------------------------------------
 // IntrRay3fSphere3f
 //
+// This class is based off of the WildMagic engine by Dave Eberly.  Check it out
+// at http://www.geometrictools.com, or check out one of his books.
 //--------------------------------------------------------------------------------
 #ifndef IntrRay3fSphere3f_h
 #define IntrRay3fSphere3f_h

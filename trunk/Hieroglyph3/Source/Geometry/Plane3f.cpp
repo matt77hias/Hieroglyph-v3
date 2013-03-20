@@ -44,7 +44,7 @@ void Plane3f::Normalize()
 	}
 }
 //--------------------------------------------------------------------------------
-float Plane3f::DistanceToPoint(const Vector3f& pt)
+float Plane3f::DistanceToPoint( const Vector3f& pt ) const
 {
 	return (A * pt.x +
 			B * pt.y +
@@ -92,7 +92,7 @@ float& Plane3f::d()
 	return(D);
 }
 //--------------------------------------------------------------------------------
-eSHAPE Plane3f::GetShapeType( )
+eSHAPE Plane3f::GetShapeType( ) const
 {
 	return( PLANE );
 }

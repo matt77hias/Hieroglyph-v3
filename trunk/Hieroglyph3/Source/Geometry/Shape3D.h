@@ -35,7 +35,7 @@ namespace Glyph3
 		Shape3D( );
 		virtual ~Shape3D( );
 
-		virtual eSHAPE GetShapeType( ) = 0;
+		virtual eSHAPE GetShapeType( ) const = 0;
 	};
 };
 //--------------------------------------------------------------------------------

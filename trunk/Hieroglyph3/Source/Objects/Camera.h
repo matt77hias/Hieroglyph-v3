@@ -63,14 +63,13 @@ namespace Glyph3
 		float GetFieldOfView();
 
 		SpatialController& Spatial();
+		const Matrix4f& ProjMatrix() const;
 
-        const Matrix4f& ProjMatrix();
+		Ray3f GetWorldSpacePickRay( const Vector2f& location ) const;
 
         virtual bool HandleEvent( EventPtr pEvent );
         virtual std::wstring GetName();
 
-
-	public:
 		ParameterContainer Parameters;
 
 	protected:

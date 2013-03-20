@@ -82,9 +82,10 @@ namespace Glyph3
 		// geometry shader and outputting a SV_ViewportArrayIndex semantic attribute. The
 		// functions assume a single viewport unless otherwise specified.
 
-		virtual void SetViewPort( int viewport, unsigned int index = 0 );
-		virtual void SetViewPortCount( unsigned int count );
+		void SetViewPort( int viewport, unsigned int index = 0 );
+		void SetViewPortCount( unsigned int count );
 		void ConfigureViewports( PipelineManagerDX11* pPipeline );
+		const ViewPortDX11& GetViewPort( unsigned int index );
 
 
 		virtual void SetBackColor( const Vector4f& color );

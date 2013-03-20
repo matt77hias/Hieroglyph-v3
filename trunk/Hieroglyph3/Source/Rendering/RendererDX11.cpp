@@ -347,6 +347,9 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 //--------------------------------------------------------------------------------
 void RendererDX11::Shutdown()
 {
+	// Print some details about the renderer's status at shutdown.
+	LogObjectPtrVector<ShaderDX11*>( m_vShaders );
+
 	// Shutdown all of the threads
 	for ( int i = 0; i < NUM_THREADS; i++ )
 	{
@@ -1195,7 +1198,7 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 
 	// Store the compiled shader in the shader wrapper for use later on in creating
 	// and checking input and output signatures.
-	pShaderWrapper->pCompiledShader = pCompiledShader;
+	pShaderWrapper->m_pCompiledShader = pCompiledShader;
 
 
 	ShaderReflectionDX11* pReflection = ShaderReflectionFactoryDX11::GenerateReflection( *pShaderWrapper );
@@ -1225,7 +1228,7 @@ int RendererDX11::CreateInputLayout( std::vector<D3D11_INPUT_ELEMENT_DESC>& elem
 		pElements[i] = elements[i];
 	
 	// Attempt to create the input layout from the input information.
-	ID3DBlob* pCompiledShader = m_vShaders[ShaderID]->pCompiledShader;
+	ID3DBlob* pCompiledShader = m_vShaders[ShaderID]->m_pCompiledShader;
 	ID3D11InputLayout* pLayout = 0;
 
 	HRESULT hr = m_pDevice->CreateInputLayout( pElements, elements.size(), 
@@ -1263,14 +1266,6 @@ ResourcePtr RendererDX11::LoadTexture( std::wstring filename /*, D3DX11_IMAGE_LO
 		filename.c_str(),
 		&pTexture,
 		0 );
-	//HRESULT hr = D3DX11CreateTextureFromFile(
-	//	m_pDevice,
-	//	filename.c_str(),
-	//	pLoadInfo,
-	//	0,
-	//	&pTexture,
-	//	0
-	//);
 
 	if ( FAILED( hr ) )
 	{
@@ -1445,29 +1440,47 @@ Vector2f RendererDX11::GetDesktopResolution()
 //--------------------------------------------------------------------------------
 BlendStatePtr RendererDX11::GetBlendState( int index )
 {
-	return( m_vBlendStates[index] ); 
+	// TODO: There should be a default blend state that can be returned which will
+	//       put the blend state into the default D3D11 state...
+
+	if ( index >= 0 )
+		return( m_vBlendStates[index] ); 
+	else
+		return( m_vBlendStates[0] );
 }
 //--------------------------------------------------------------------------------
 DepthStencilStatePtr RendererDX11::GetDepthState( int index )
 {
-	return( m_vDepthStencilStates[index] );
+	// TODO: There should be a default blend state that can be returned which will
+	//       put the blend state into the default D3D11 state...
+
+	if ( index >= 0 )
+		return( m_vDepthStencilStates[index] );
+	else
+		return( m_vDepthStencilStates[0] );
 }
 //--------------------------------------------------------------------------------
 RasterizerStatePtr RendererDX11::GetRasterizerState( int index )
 {
-	return( m_vRasterizerStates[index] );
+	// TODO: There should be a default blend state that can be returned which will
+	//       put the blend state into the default D3D11 state...
+
+	if ( index >= 0 )
+		return( m_vRasterizerStates[index] );
+	else
+		return( m_vRasterizerStates[0] );
 }
 //--------------------------------------------------------------------------------
-ViewPortDX11* RendererDX11::GetViewPort( int ID )
+const ViewPortDX11& RendererDX11::GetViewPort( int ID )
 {
-	ViewPortDX11* pViewport = nullptr;
+	ViewPortDX11 Viewport;
 
 	unsigned int index = static_cast<unsigned int>( ID );
 
 	if ( index < m_vViewPorts.size() )
-		pViewport = m_vViewPorts[index];
+		Viewport = *m_vViewPorts[index];
 		
-	return( pViewport );
+	return( Viewport );
 }
 //--------------------------------------------------------------------------------
 ResourceDX11* RendererDX11::GetResourceByIndex( int ID )
@@ -1919,5 +1932,19 @@ void RendererDX11::DeleteResource( int index )
 		delete pResource;
 		m_vResources[index & 0xffff] = nullptr;
 	}
+}
+//--------------------------------------------------------------------------------
+template <class T>
+void LogObjectVector( std::vector<T> objects )
+{
+	for ( auto object : objects )
+		Log::Get().Write( object.ToString() );
+}
+//--------------------------------------------------------------------------------
+template <class T>
+void LogObjectPtrVector( std::vector<T> objects )
+{
+	for ( auto object : objects )
+		Log::Get().Write( object->ToString() );
 }
 //--------------------------------------------------------------------------------

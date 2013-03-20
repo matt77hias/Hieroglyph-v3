@@ -101,3 +101,10 @@ void SceneRenderTask::ConfigureViewports( PipelineManagerDX11* pPipeline )
 	}
 }
 //--------------------------------------------------------------------------------
+const ViewPortDX11& SceneRenderTask::GetViewPort( unsigned int index )
+{
+	assert( index < m_uiViewportCount );
+
+	return( RendererDX11::Get()->GetViewPort( m_iViewports[index] ) );
+}
+//--------------------------------------------------------------------------------

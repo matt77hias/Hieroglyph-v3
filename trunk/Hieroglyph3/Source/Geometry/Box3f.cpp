@@ -18,8 +18,8 @@ Box3f::Box3f()
 {
 }
 //--------------------------------------------------------------------------------
-Box3f::Box3f( Vector3f& center, Vector3f& forward, Vector3f& up, 
-			Vector3f& right, float fextents, float uextents, float rextents )
+Box3f::Box3f( const Vector3f& center, const Vector3f& forward, const Vector3f& up, 
+			const Vector3f& right, float fextents, float uextents, float rextents )
 {
 	Center = center;
 
@@ -36,7 +36,7 @@ Box3f::~Box3f()
 {
 }
 //--------------------------------------------------------------------------------
-eSHAPE Box3f::GetShapeType( )
+eSHAPE Box3f::GetShapeType( ) const
 {
 	return( BOX );
 }

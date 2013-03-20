@@ -34,7 +34,6 @@ namespace Glyph3
 
 		const RasterizerStageStateDX11& GetCurrentState() const;
 
-
 		// The desired state is a public member that will allow the user of this
 		// class to configure the state as desired before applying the state.
 

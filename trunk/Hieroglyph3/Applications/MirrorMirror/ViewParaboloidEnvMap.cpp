@@ -116,6 +116,11 @@ void ViewParaboloidEnvMap::ExecuteTask( PipelineManagerDX11* pPipelineManager, I
 {
 	if ( m_pRoot )
 	{
+		// Remove any shader resource views from the pipeline to ensure there are
+		// no conflicts with leftover resource bindings from a previous pass.
+		pPipelineManager->ClearPipelineSRVs();
+		pPipelineManager->ApplyPipelineResources();
+
 		// Set the parameters for rendering this view
 		pPipelineManager->ClearRenderTargets();
 		pPipelineManager->OutputMergerStage.DesiredState.RenderTargetViews.SetState( 0, m_RenderTarget->m_iResourceRTV );

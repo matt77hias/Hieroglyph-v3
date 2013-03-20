@@ -14,6 +14,16 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
+ViewPortDX11::ViewPortDX11()
+{
+	m_ViewPort.Width = 1.0f;
+	m_ViewPort.Height = 1.0f;
+	m_ViewPort.TopLeftX = 0.0f;
+	m_ViewPort.TopLeftY = 0.0f;
+	m_ViewPort.MinDepth = 0.0f;
+	m_ViewPort.MaxDepth = 1.0f;
+}
+//--------------------------------------------------------------------------------
 ViewPortDX11::ViewPortDX11( D3D11_VIEWPORT viewport )
 {
 	m_ViewPort = viewport;
@@ -31,5 +41,11 @@ float ViewPortDX11::GetWidth() const
 float ViewPortDX11::GetHeight() const
 {
 	return( m_ViewPort.Height );
+}
+//--------------------------------------------------------------------------------
+Vector2f ViewPortDX11::GetNormalizedPosition( const Vector2f& screen ) const
+{
+	return(	Vector2f( ( ( screen.x / m_ViewPort.Width ) - 0.5f ) * 2.0f,
+					 -( ( screen.y / m_ViewPort.Height ) - 0.5f ) * 2.0f ) );
 }
 //--------------------------------------------------------------------------------

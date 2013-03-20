@@ -19,20 +19,14 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-int Entity3D::m_iEntityCount = 0;
-Entity3D* Entity3D::m_pRoot = NULL;
-//--------------------------------------------------------------------------------
-Entity3D::Entity3D()
+Entity3D::Entity3D() :
+	m_pParent( nullptr ),
+	m_Name( L"" ),
+	m_bHidden( false ),
+	m_bPickable( true ),
+	m_bCalcLocal( true ),
+	CompositeShape()
 {
-	// Remember who is the first created - this should always be the root node!!!
-	if ( Entity3D::m_pRoot == NULL )
-		Entity3D::m_pRoot = this;
-
-	// Record the entity ID
-	m_iEntityID = Entity3D::m_iEntityCount++;
-
-	m_pParent = 0;
-
 	m_vTranslation.MakeZero();
 	m_mRotation.MakeIdentity();
 	m_fScale = 1.0f;
@@ -43,20 +37,12 @@ Entity3D::Entity3D()
 	m_ModelBoundingSphere.Center.MakeZero();
 	m_ModelBoundingSphere.Radius = 1.0f;
 	m_WorldBoundingSphere.Radius = 1.0f;
-
-	m_pComposite = new CompositeShape();
-
-	m_bHidden = false;
-	m_bCalcLocal = true;
 }
 //--------------------------------------------------------------------------------
 Entity3D::~Entity3D()
 {
 	for ( auto pController : m_Controllers )
 		delete pController;
-
-	if ( m_pComposite )
-		delete m_pComposite;
 }
 //--------------------------------------------------------------------------------
 Vector3f& Entity3D::Position()
@@ -74,14 +60,24 @@ float& Entity3D::Scale( )
 	return( m_fScale );
 }
 //--------------------------------------------------------------------------------
-bool Entity3D::IsHidden()
+void Entity3D::SetHidden( bool bHide )
+{
+	m_bHidden = bHide;
+}
+//--------------------------------------------------------------------------------
+bool Entity3D::IsHidden() const
 {
 	return( m_bHidden );
 }
 //--------------------------------------------------------------------------------
-int Entity3D::GetEntityID()
+void Entity3D::SetPickable( bool bPickable )
 {
-	return( m_iEntityID );
+	m_bPickable = bPickable;
+}
+//--------------------------------------------------------------------------------
+bool Entity3D::IsPickable() const
+{
+	return( m_bPickable );
 }
 //--------------------------------------------------------------------------------
 Entity3D* Entity3D::GetParent()
@@ -184,7 +180,7 @@ Matrix4f& Entity3D::LocalMatrix()
 	return( m_mLocal );
 }
 //--------------------------------------------------------------------------------
-Matrix4f Entity3D::GetView()
+Matrix4f Entity3D::GetView() const
 {
 	Vector3f Eye;
 	Vector3f At;
@@ -243,11 +239,6 @@ void Entity3D::SetRenderParams( IParameterManager* pParamManager )
 	Parameters.SetRenderParams( pParamManager );
 }
 //--------------------------------------------------------------------------------
-void Entity3D::Hide( bool bHide )
-{
-	m_bHidden = bHide;
-}
-//--------------------------------------------------------------------------------
 void Entity3D::GetIntersectingEntities( std::vector< Entity3D* >& set, Frustum3f& bounds )
 {
 	if ( bounds.Intersects( m_WorldBoundingSphere ) )
@@ -268,19 +259,19 @@ int Entity3D::GraphDepth( )
 		return( m_pParent->GraphDepth() + 1 );
 }
 //--------------------------------------------------------------------------------
-std::string Entity3D::toString( )
+std::wstring Entity3D::toString( )
 {
-	std::stringstream objString;
+	std::wstringstream objString;
 
 	for ( int i = 0; i < GraphDepth(); i++ )
 	{
 		if ( i < GraphDepth() - 1 )
-			objString << "| ";
+			objString << L"| ";
 		else
-			objString << "+-";
+			objString << L"+-";
 	}
 
-	objString << "Entity3D : ID : " << m_iEntityID << "\n";
+	objString << L"Entity3D ID:" << this << L", Name:" << GetName() << L"\n";
 
 	return( objString.str() );
 }
@@ -290,42 +281,46 @@ void Entity3D::BuildPickRecord( Ray3f& ray, std::vector<PickRecord>& record )
 	// If the entity has a composite shape then use it, otherwise simply use
 	// the world bounding sphere to check for a hit.
 
-	if ( m_pComposite && ( m_pComposite->GetNumberOfShapes() > 0 ) )
+	if ( IsPickable() )
 	{
-		Matrix4f InvWorld = m_mWorld.Inverse();
-		Vector4f position = Vector4f( ray.Origin.x, ray.Origin.y, ray.Origin.z, 1.0f );
-		Vector4f direction = Vector4f( ray.Direction.x, ray.Direction.y, ray.Direction.z, 0.0f );
+		if ( CompositeShape.GetNumberOfShapes() > 0 )
+		{
+			Matrix4f InvWorld = m_mWorld.Inverse();
+			Vector4f position = Vector4f( ray.Origin.x, ray.Origin.y, ray.Origin.z, 1.0f );
+			Vector4f direction = Vector4f( ray.Direction.x, ray.Direction.y, ray.Direction.z, 0.0f );
 		
-		position = InvWorld * position;
-		direction = InvWorld * direction;
+			position = InvWorld * position;
+			direction = InvWorld * direction;
 
-		Ray3f ObjectRay;
-		ObjectRay.Origin.x = position.x;
-		ObjectRay.Origin.y = position.y;
-		ObjectRay.Origin.z = position.z;
-		ObjectRay.Direction.x = direction.x;
-		ObjectRay.Direction.y = direction.y;
-		ObjectRay.Direction.z = direction.z;
+			Ray3f ObjectRay;
+			ObjectRay.Origin.x = position.x;
+			ObjectRay.Origin.y = position.y;
+			ObjectRay.Origin.z = position.z;
+			ObjectRay.Direction.x = direction.x;
+			ObjectRay.Direction.y = direction.y;
+			ObjectRay.Direction.z = direction.z;
 
-		float fT = 10000000000.0f;
-		if ( m_pComposite->RayIntersection( ObjectRay, &fT ) )
-		{
-			PickRecord Record;
-			Record.pEntity = this;
-			Record.fDistance = fT;
-			record.push_back( Record );
+			float fT = 10000000000.0f;
+			if ( CompositeShape.RayIntersection( ObjectRay, &fT ) )
+			{
+				PickRecord Record;
+				Record.pEntity = this;
+				Record.fDistance = fT;
+				record.push_back( Record );
+			}
 		}
-	}
-	else
-	{
-		IntrRay3fSphere3f Intersector( ray, m_WorldBoundingSphere );
-		if ( Intersector.Find() )
+		else
 		{
-			PickRecord Record;
-			Record.pEntity = this;
-			//Record.fDistance = std::min( Intersector.m_afRayT[0], Intersector.m_afRayT[1] ); 
-			Record.fDistance = min( Intersector.m_afRayT[0], Intersector.m_afRayT[1] ); 
-			record.push_back( Record );
+			IntrRay3fSphere3f Intersector( ray, m_WorldBoundingSphere );
+			if ( Intersector.Find() )
+			{
+				PickRecord Record;
+
+				Record.pEntity = this;
+				Record.fDistance = min( Intersector.m_afRayT[0], Intersector.m_afRayT[1] ); 
+				
+				record.push_back( Record );
+			}
 		}
 	}
 }
@@ -345,21 +340,6 @@ IController* Entity3D::GetController( unsigned int index )
 		return( nullptr );
 
 	return( m_Controllers[index] );
-}
-//--------------------------------------------------------------------------------
-void Entity3D::SetCompositeShape( CompositeShape* pShape )
-{
-	// Delete the existing shape before setting the new one.
-
-	if ( m_pComposite )
-		delete m_pComposite;
-
-	m_pComposite = pShape;
-}
-//--------------------------------------------------------------------------------
-CompositeShape* Entity3D::GetCompositeShape( )
-{
-	return( m_pComposite );
 }
 //--------------------------------------------------------------------------------
 void Entity3D::SetMaterial( MaterialPtr pMaterial )
@@ -416,5 +396,15 @@ ExecutorPtr Entity3D::GetGeometry( )
 void Entity3D::SetLocalMatrixCalculation( bool bCalc )
 {
 	m_bCalcLocal = bCalc;
+}
+//--------------------------------------------------------------------------------
+void Entity3D::SetName( const std::wstring& name )
+{
+	m_Name = name;
+}
+//--------------------------------------------------------------------------------
+std::wstring Entity3D::GetName() const
+{
+	return( m_Name );
 }
 //--------------------------------------------------------------------------------

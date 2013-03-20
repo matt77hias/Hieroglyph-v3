@@ -30,18 +30,18 @@ namespace Glyph3
 	{
 	public:
 		Frustum3f();
-		Frustum3f( Matrix4f& ViewProjection );
+		Frustum3f( const Matrix4f& ViewProjection );
 		virtual ~Frustum3f();
 
-		void Update( Matrix4f& ViewProjection, bool bNormalize );
-		bool Test( Vector3f& TestPoint );
-		bool Test( Sphere3f& TestSphere );
+		void Update( const Matrix4f& ViewProjection, bool bNormalize );
+		bool Test( const Vector3f& TestPoint ) const;
+		bool Test( const Sphere3f& TestSphere ) const;
 
 		// for use with the CEntity interface
-		bool Intersects( Sphere3f& test );
-		bool Envelops( Sphere3f& test );
+		bool Intersects( const Sphere3f& test ) const;
+		bool Envelops( const Sphere3f& test ) const;
 
-		virtual eSHAPE GetShapeType( );		
+		virtual eSHAPE GetShapeType( ) const;		
 
 	protected:
 		Plane3f m_Planes[6];

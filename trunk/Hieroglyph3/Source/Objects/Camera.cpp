@@ -12,6 +12,7 @@
 #include "PCH.h"
 #include "Camera.h"
 #include "Scene.h"
+#include "ViewPortDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -34,6 +35,10 @@ Camera::Camera()
     m_ProjMatrix.MakeIdentity();
 
 	m_pViewPositionWriter = Parameters.SetVectorParameter( L"ViewPosition", Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
+
+	// By default, the camera body is not pickable.  This behavior can be updated
+	// by the client simply by setting a the value accordingly.
+	GetBody()->SetPickable( false );
 }
 //--------------------------------------------------------------------------------
 Camera::~Camera()
@@ -173,7 +178,7 @@ void Camera::ApplyProjectionParams()
 		m_pCameraView->SetProjMatrix( m_ProjMatrix );	
 }
 //--------------------------------------------------------------------------------
-const Matrix4f& Camera::ProjMatrix()
+const Matrix4f& Camera::ProjMatrix() const
 {
     return( m_ProjMatrix );
 }
@@ -192,6 +197,48 @@ bool Camera::HandleEvent( EventPtr pEvent )
 //--------------------------------------------------------------------------------
 std::wstring Camera::GetName()
 {
-    return L"Camera";
+    return( L"Camera" );
+}
+//--------------------------------------------------------------------------------
+Ray3f Camera::GetWorldSpacePickRay( const Vector2f& location ) const
+{
+	// Given an input coordinate pair, we need to use the SceneRenderTask's 
+	// render target size to be able to calculate the view space pick ray.
+
+	ViewPortDX11 Viewport = m_pCameraView->GetViewPort( 0 );
+	Vector2f normalized = Viewport.GetNormalizedPosition( location );
+
+	// Create a point that represents the clip space location on the screen surface.
+
+	Vector4f ScreenPoint = Vector4f( normalized.x, normalized.y, 0.0f, 1.0f );
+
+	// Calculate the view matrix inverse, and the view*proj inverse.  These are 
+	// used to calculate the corresponding world space points that we need to
+	// build the ray.
+
+	Matrix4f View = GetBody()->GetView();
+	Matrix4f ViewProj = View * ProjMatrix(); //ProjMatrix() * View;
+	Matrix4f ViewInverse = View.Inverse();
+	Matrix4f ViewProjInverse = ViewProj.Inverse();
+	
+	// The world space screen point takes the clip space position on the near
+	// clip plane and back projects it to world space by multiplying by the 
+	// view projection inverse.  The eye point in world space is found by taking
+	// the origin in view space (which is, by default, the location of the camera)
+	// and multiplying by the inverse of the view matrix.
+
+	Vector4f ScreenPointWS = ViewProjInverse * ScreenPoint;
+	ScreenPointWS = ScreenPointWS / ScreenPointWS.w;
+
+	Vector4f EyePointWS = ViewInverse * Vector4f( 0.0f, 0.0f, 0.0f, 1.0f );
+
+	// Construct the ray as having direction from the world space eye point to the
+	// world space location on the near clipping plane that we are pointing to. 
+	// The origin of the ray is the world space camera location.
+
+	Vector3f direction = Vector3f::Normalize( ScreenPointWS.xyz() - EyePointWS.xyz() );
+	Vector3f origin = EyePointWS.xyz();
+
+	return( Ray3f( origin, direction ) );
 }
 //--------------------------------------------------------------------------------

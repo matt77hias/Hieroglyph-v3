@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------------------------------
 namespace Glyph3
 {
+	class Vector2f;
     class Vector3f;
 
 	class Vector4f
@@ -59,13 +60,16 @@ namespace Glyph3
 		Vector4f& operator+= ( const Vector4f& Vector );
 		Vector4f& operator-= ( const Vector4f& Vector );
 		Vector4f& operator*= ( float fScalar );
-        Vector4f& operator*= ( const Vector4f& Vectorr );
+        Vector4f& operator*= ( const Vector4f& Vector );
 		Vector4f& operator/= ( float fScalar );
-        Vector4f& operator/= ( const Vector4f& Vectorr );
+        Vector4f& operator/= ( const Vector4f& Vector );
 
 		unsigned int toARGB( );
 		unsigned int toRGBA( );
 		void fromARGB( unsigned int color );
+
+		Vector3f xyz() const;
+		Vector2f xy() const;
 
 	public:
 		float x;

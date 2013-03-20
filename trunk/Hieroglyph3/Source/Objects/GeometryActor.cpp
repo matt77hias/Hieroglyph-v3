@@ -174,6 +174,8 @@ void GeometryActor::AddIndices( const unsigned int i1, const unsigned int i2, co
 //--------------------------------------------------------------------------------
 void GeometryActor::DrawSphere( const Vector3f& center, float radius, unsigned int stacks, unsigned int slices )
 {
+	Sphere3f sphere( center, radius );
+
 	if ( stacks < 2 ) stacks = 2;
 	if ( slices < 4 ) slices = 4;
 
@@ -187,26 +189,21 @@ void GeometryActor::DrawSphere( const Vector3f& center, float radius, unsigned i
 
 	unsigned int baseVertex = m_pGeometry->GetVertexCount();
 
+	Vector3f position, normal;
+	Vector2f texcoords;
+
 	for ( unsigned int stack = 0; stack <= stacks; stack++ ) {
 		for ( unsigned int slice = 0; slice <= slices; slice++ ) {
 
 			float theta = sliceStep * static_cast<float>( slice );
 			float phi = stackStep * static_cast<float>( stack );
 
-			Vector3f position;
+			sphere.SamplePositionAndNormal( position, normal, theta, phi );
 
-			position.x = radius * sinf( phi ) * cosf( theta );
-			position.y = radius * cosf( phi );
-			position.z = radius * sinf( phi ) * sinf( theta );
-
-			Vector3f normal = position;
-			normal.Normalize();
-
-			Vector2f texcoords;
 			texcoords.x = uStep * static_cast<float>( slice );
 			texcoords.y = vStep * static_cast<float>( stack );
 
-			AddVertex( position + center, normal, texcoords );
+			AddVertex( position, normal, texcoords );
 		}
 	}
 

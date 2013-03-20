@@ -22,6 +22,8 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
+	class Vector2f;
+
 	class Win32RenderWindow : public RenderWindow
 	{
 	public:
@@ -31,6 +33,8 @@ namespace Glyph3
 		virtual void Initialize( IWindowProc* WindowProcObj );
 		virtual void Shutdown();
 		virtual void Paint();
+
+		Vector2f GetCursorPosition();
 	};
 };
 //--------------------------------------------------------------------------------

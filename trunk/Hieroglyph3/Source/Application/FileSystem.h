@@ -16,6 +16,11 @@
 // with non-static members.  Just make sure you set these paths before doing 
 // anything else in the application, including any of the initialization functions
 // if you need specialized locations.
+//
+// Please note that the Monostate pattern requires that the state be set *outside*
+// of any code that is executed pre-main.  This includes constructors of 
+// statically declared objects, such as the application object.  So if you are
+// going to modify the paths, do so outside of the application constructor!
 //--------------------------------------------------------------------------------
 #ifndef FileSystem_h
 #define FileSystem_h

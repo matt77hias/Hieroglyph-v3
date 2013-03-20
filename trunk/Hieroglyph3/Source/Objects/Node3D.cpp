@@ -103,14 +103,14 @@ void Node3D::GetIntersectingEntities( std::vector< Entity3D* >& set, Sphere3f& b
 	}
 }
 //--------------------------------------------------------------------------------
-std::string Node3D::toString( )
+std::wstring Node3D::toString( )
 {
-	std::stringstream objString;
+	std::wstringstream objString;
 
 	for ( int i = 0; i < GraphDepth(); i++ )
-		objString << "  ";
+		objString << L"  ";
 
-	objString << "Node3D : ID : " << m_iEntityID << "\n";
+	objString << L"Node3D ID: " << this << L", Name:" << GetName() << L"\n";
 
 	for ( auto pChild : m_vChildren )
 	{
