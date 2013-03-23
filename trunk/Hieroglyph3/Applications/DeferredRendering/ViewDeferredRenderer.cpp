@@ -12,7 +12,7 @@
 #include "PCH.h"
 #include "ViewDeferredRenderer.h"
 #include "Entity3D.h"
-#include "Node3D.h"
+#include "Scene.h"
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
 #include "ActorGenerator.h"
@@ -178,10 +178,10 @@ void ViewDeferredRenderer::QueuePreTasks( RendererDX11* pRenderer )
 	// Queue this view into the renderer for processing.
 	pRenderer->QueueTask( this );
 
-	if ( m_pRoot )
+	if ( m_pScene )
 	{
 		// Run through the graph and pre-render the entities
-		m_pRoot->PreRender( pRenderer, VT_PERSPECTIVE );
+		m_pScene->GetRoot()->PreRender( pRenderer, VT_PERSPECTIVE );
 	}
 
 	// Next we call the predraw method of each of the supporting views.
@@ -358,14 +358,14 @@ void ViewDeferredRenderer::SetProjMatrix( const Matrix4f& matrix )
 	m_pLightsView->SetProjMatrix( matrix );
 }
 //--------------------------------------------------------------------------------
-void ViewDeferredRenderer::SetRoot( Node3D* pRoot )
+void ViewDeferredRenderer::SetScene( Scene* pScene )
 {
 	// Perform the root setting call for this view.
-	m_pRoot = pRoot;
+	m_pScene = pScene;
 
 	// Propagate the root setting call.
-	m_pGBufferView->SetRoot( pRoot );
-	m_pLightsView->SetRoot( pRoot );
+	m_pGBufferView->SetScene( pScene );
+	m_pLightsView->SetScene( pScene );
 }
 //--------------------------------------------------------------------------------
 void ViewDeferredRenderer::SetEntity( Entity3D* pEntity )

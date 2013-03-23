@@ -55,7 +55,7 @@ bool App::ConfigureEngineComponents()
 		return( false );
 	}
 
-	//m_pRenderer11->SetMultiThreadingState( false );
+	SetMultiThreadedMode( false );
 
 	return( true );
 }

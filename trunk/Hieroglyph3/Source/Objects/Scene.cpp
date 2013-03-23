@@ -55,6 +55,13 @@ void Scene::Render( RendererDX11* pRenderer )
 	}
 }
 //--------------------------------------------------------------------------------
+void Scene::PreRender( RendererDX11* pRenderer, VIEWTYPE type )
+{
+	// Apply the pre-render operation to the objects within the scene.
+
+	m_pRoot->PreRender( pRenderer, type );
+}
+//--------------------------------------------------------------------------------
 void Scene::AddCamera( Camera* camera )
 {
 	m_vCameras.push_back( camera );

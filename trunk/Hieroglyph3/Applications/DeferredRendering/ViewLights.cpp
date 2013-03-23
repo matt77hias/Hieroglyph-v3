@@ -11,7 +11,7 @@
 //--------------------------------------------------------------------------------
 #include "ViewLights.h"
 #include "Entity3D.h"
-#include "Node3D.h"
+#include "Scene.h"
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
 #include "IParameterManager.h"
@@ -439,9 +439,9 @@ void ViewLights::SetRenderParams( IParameterManager* pParamManager )
     pParamManager->SetMatrixParameter( m_pInvProjMatrix, &invProj );
     pParamManager->SetMatrixParameter( m_pProjMatrix, &ProjMatrix );
 
-    if ( m_pRoot != NULL )
+    if ( m_pScene != NULL )
     {
-        Vector4f cameraPos( m_pRoot->Position(), 1.0f );
+        Vector4f cameraPos( m_pScene->GetRoot()->Position(), 1.0f );
         pParamManager->SetVectorParameter( m_pCameraPos, &cameraPos );
     }
 

@@ -12,7 +12,7 @@
 #include "PCH.h"
 #include "ViewParaboloidEnvMap.h"
 #include "Entity3D.h"
-#include "Node3D.h"
+#include "Scene.h"
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
 #include "IParameterManager.h"
@@ -98,10 +98,10 @@ void ViewParaboloidEnvMap::QueuePreTasks( RendererDX11* pRenderer )
 		// Queue this view into the renderer for processing.
 		pRenderer->QueueTask( this );
 
-		if ( m_pRoot )
+		if ( m_pScene )
 		{
 			std::vector<Entity3D*> set;
-			m_pRoot->GetEntities( set );
+			m_pScene->GetRoot()->GetEntities( set );
 
 			for ( auto pEntity : set )
 			{
@@ -114,7 +114,7 @@ void ViewParaboloidEnvMap::QueuePreTasks( RendererDX11* pRenderer )
 //--------------------------------------------------------------------------------
 void ViewParaboloidEnvMap::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
-	if ( m_pRoot )
+	if ( m_pScene )
 	{
 		// Remove any shader resource views from the pipeline to ensure there are
 		// no conflicts with leftover resource bindings from a previous pass.
@@ -137,7 +137,7 @@ void ViewParaboloidEnvMap::ExecuteTask( PipelineManagerDX11* pPipelineManager, I
 
 		// Run through the graph and render each of the entities
 		std::vector<Entity3D*> set;
-		m_pRoot->GetEntities( set );
+		m_pScene->GetRoot()->GetEntities( set );
 
 		for ( auto pEntity : set )
 		{

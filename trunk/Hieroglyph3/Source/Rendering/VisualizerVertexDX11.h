@@ -9,48 +9,45 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// Scene
+// VisualizerVertexDX11
 //
+// This class represents a simple solid color vertex type for use in one of the
+// pipeline executor templates.  This vertex structure requires an instanced
+// rendering method to render properly.
 //--------------------------------------------------------------------------------
-
+#ifndef VisualizerVertexDX11_h
+#define VisualizerVertexDX11_h
 //--------------------------------------------------------------------------------
-#ifndef Scene_h
-#define Scene_h
-//--------------------------------------------------------------------------------
-#include "Node3D.h"
-#include "Camera.h"
-#include "ParameterContainer.h"
+#include "PCH.h"
+#include "Vector3f.h"
+#include "Vector4f.h"
+#include "Matrix4f.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class Scene
+	class VisualizerVertexDX11
 	{
-	public:
-		Scene();
-		virtual ~Scene();
-
-		virtual void Update( float time );
-		virtual void PreRender( RendererDX11* pRenderer, VIEWTYPE type );
-		virtual void Render( RendererDX11* Renderer );
-
-		void AddCamera( Camera* camera );
-
-		void AddActor( Actor* actor );
-		void RemoveActor( Actor* actor );
-
-		// Geometric queries
-		void BuildPickRecord( Ray3f& ray, std::vector<PickRecord>& record );
-
-		Node3D* GetRoot();
 
 	public:
-		ParameterContainer Parameters;
+		VisualizerVertexDX11();
+		~VisualizerVertexDX11();
 
-	protected:
-		Node3D* m_pRoot;
-		std::vector< Camera* > m_vCameras;
-		std::vector< Actor* > m_vActors;
+		
+		struct VertexData
+		{
+			Vector3f position;
+		};
+
+		struct InstanceData
+		{
+			Matrix4f transform;
+			Vector4f color;
+		};
+
+		static unsigned int GetElementCount();
+		static D3D11_INPUT_ELEMENT_DESC Elements[6];
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // Scene_h
+#endif // VisualizerVertexDX11_h
+//--------------------------------------------------------------------------------

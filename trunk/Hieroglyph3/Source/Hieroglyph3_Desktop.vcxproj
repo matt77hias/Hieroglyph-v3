@@ -64,6 +64,7 @@
     <ClCompile Include="Mathematics\Vector4f.cpp" />
     <ClCompile Include="Objects\Actor.cpp" />
     <ClCompile Include="Objects\ActorGenerator.cpp" />
+    <ClCompile Include="Objects\BoundsVisualizerActor.cpp" />
     <ClCompile Include="Objects\Camera.cpp" />
     <ClCompile Include="Objects\Entity3D.cpp" />
     <ClCompile Include="Objects\FirstPersonCamera.cpp" />
@@ -194,6 +195,7 @@
     <ClCompile Include="Rendering\ViewPerspective.cpp" />
     <ClCompile Include="Rendering\ViewPortDX11.cpp" />
     <ClCompile Include="Rendering\ViewTextOverlay.cpp" />
+    <ClCompile Include="Rendering\VisualizerVertexDX11.cpp" />
     <ClCompile Include="Rendering\VolumeTextureVertexDX11.cpp" />
     <ClCompile Include="Scripting\LuaApp.cpp" />
     <ClCompile Include="Scripting\LuaGeometryActor.cpp" />
@@ -266,6 +268,7 @@
     <ClInclude Include="Mathematics\Vector4f.h" />
     <ClInclude Include="Objects\Actor.h" />
     <ClInclude Include="Objects\ActorGenerator.h" />
+    <ClInclude Include="Objects\BoundsVisualizerActor.h" />
     <ClInclude Include="Objects\Camera.h" />
     <ClInclude Include="Objects\Entity3D.h" />
     <ClInclude Include="Objects\FirstPersonCamera.h" />
@@ -403,6 +406,7 @@
     <ClInclude Include="Rendering\ViewPerspective.h" />
     <ClInclude Include="Rendering\ViewPortDX11.h" />
     <ClInclude Include="Rendering\ViewTextOverlay.h" />
+    <ClInclude Include="Rendering\VisualizerVertexDX11.h" />
     <ClInclude Include="Rendering\VolumeTextureVertexDX11.h" />
     <ClInclude Include="Scripting\IScriptInterface.h" />
     <ClInclude Include="Scripting\LuaApp.h" />

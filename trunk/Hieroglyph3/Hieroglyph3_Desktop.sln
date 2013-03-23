@@ -36,11 +36,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicScripting_Desktop", "A
 		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81} = {0F6D257E-70D5-46C5-8A12-7BDF93C35E81}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicRenderViews_Desktop", "Applications\BasicRenderViews\BasicRenderViews_Desktop.vcxproj", "{5020A317-8AD5-4CE8-BBBA-4A856F57EB1E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81} = {0F6D257E-70D5-46C5-8A12-7BDF93C35E81}
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicScenes_Desktop", "Applications\BasicScenes\BasicScenes_Desktop.vcxproj", "{9949FBDC-23FC-46C6-97CB-C021319F6D57}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81} = {0F6D257E-70D5-46C5-8A12-7BDF93C35E81}
@@ -179,12 +174,6 @@ Global
 		{23D41450-1ECF-4B11-9982-A135C7F9B748}.Release|Win32.ActiveCfg = Release|Win32
 		{23D41450-1ECF-4B11-9982-A135C7F9B748}.Release|Win32.Build.0 = Release|Win32
 		{23D41450-1ECF-4B11-9982-A135C7F9B748}.Release|x64.ActiveCfg = Release|Win32
-		{5020A317-8AD5-4CE8-BBBA-4A856F57EB1E}.Debug|Win32.ActiveCfg = Debug|Win32
-		{5020A317-8AD5-4CE8-BBBA-4A856F57EB1E}.Debug|Win32.Build.0 = Debug|Win32
-		{5020A317-8AD5-4CE8-BBBA-4A856F57EB1E}.Debug|x64.ActiveCfg = Debug|Win32
-		{5020A317-8AD5-4CE8-BBBA-4A856F57EB1E}.Release|Win32.ActiveCfg = Release|Win32
-		{5020A317-8AD5-4CE8-BBBA-4A856F57EB1E}.Release|Win32.Build.0 = Release|Win32
-		{5020A317-8AD5-4CE8-BBBA-4A856F57EB1E}.Release|x64.ActiveCfg = Release|Win32
 		{9949FBDC-23FC-46C6-97CB-C021319F6D57}.Debug|Win32.ActiveCfg = Debug|Win32
 		{9949FBDC-23FC-46C6-97CB-C021319F6D57}.Debug|Win32.Build.0 = Debug|Win32
 		{9949FBDC-23FC-46C6-97CB-C021319F6D57}.Debug|x64.ActiveCfg = Debug|Win32

@@ -66,7 +66,7 @@ void Camera::RenderFrame( RendererDX11* pRenderer )
 		// Set the scene's root into the render view
 
 		if ( m_pScene ) {
-			m_pCameraView->SetRoot( m_pScene->GetRoot() );
+			m_pCameraView->SetScene( m_pScene );
 		}
 
 

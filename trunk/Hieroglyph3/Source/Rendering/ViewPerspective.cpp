@@ -12,12 +12,13 @@
 #include "PCH.h"
 #include "ViewPerspective.h"
 #include "Entity3D.h"
-#include "Node3D.h"
+#include "Scene.h"
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
 #include "IParameterManager.h"
 #include "PipelineManagerDX11.h"
 #include "Texture2dDX11.h"
+#include "BoundsVisualizerActor.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -100,16 +101,16 @@ void ViewPerspective::QueuePreTasks( RendererDX11* pRenderer )
 	// Queue this view into the renderer for processing.
 	pRenderer->QueueTask( this );
 
-	if ( m_pRoot )
+	if ( m_pScene )
 	{
 		// Run through the graph and pre-render the entities
-		m_pRoot->PreRender( pRenderer, VT_PERSPECTIVE );
+		m_pScene->PreRender( pRenderer, VT_PERSPECTIVE );
 	}
 }
 //--------------------------------------------------------------------------------
 void ViewPerspective::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
-	if ( m_pRoot )
+	if ( m_pScene )
 	{
 		// Set the parameters for rendering this view
 		pPipelineManager->ClearRenderTargets();
@@ -126,7 +127,19 @@ void ViewPerspective::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParam
 		SetRenderParams( pParamManager );
 
 		// Run through the graph and render each of the entities
-		m_pRoot->Render( pPipelineManager, pParamManager, VT_PERSPECTIVE );
+		m_pScene->GetRoot()->Render( pPipelineManager, pParamManager, VT_PERSPECTIVE );
+
+		// If the debug view is enabled, then we can render some additional scene
+		// related information as an overlay on this view.  Note that this is
+		// accomplished without the actor being attached to the scene!
+		if ( m_bDebugViewEnabled )
+		{
+			std::vector<Entity3D*> list;
+			m_pScene->GetRoot()->GetEntities( list );
+			m_pDebugVisualizer->UpdateBoundsData( list );
+
+			m_pDebugVisualizer->GetBody()->Render( pPipelineManager, pParamManager, VT_PERSPECTIVE );
+		}
 	}
 }
 //--------------------------------------------------------------------------------

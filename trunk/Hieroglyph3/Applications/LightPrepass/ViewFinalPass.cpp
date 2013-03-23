@@ -11,7 +11,7 @@
 //--------------------------------------------------------------------------------
 #include "ViewFinalPass.h"
 #include "Entity3D.h"
-#include "Node3D.h"
+#include "Scene.h"
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
 #include "IParameterManager.h"
@@ -47,16 +47,16 @@ void ViewFinalPass::QueuePreTasks( RendererDX11* pRenderer )
     // Queue this view into the renderer for processing.
     pRenderer->QueueTask( this );
 
-    if ( m_pRoot )
+    if ( m_pScene )
     {
         // Run through the graph and pre-render the entities
-        m_pRoot->PreRender( pRenderer, VT_FINALPASS );
+        m_pScene->GetRoot()->PreRender( pRenderer, VT_FINALPASS );
     }
 }
 //--------------------------------------------------------------------------------
 void ViewFinalPass::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
-    if ( m_pRoot )
+    if ( m_pScene )
     {
 	    // Set the render target for the final pass, and clear it
 		pPipelineManager->ClearRenderTargets();
@@ -75,7 +75,7 @@ void ViewFinalPass::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParamet
         SetRenderParams( pParamManager );
 
         // Run through the graph and render each of the entities
-        m_pRoot->Render( pPipelineManager, pParamManager, VT_FINALPASS );
+        m_pScene->GetRoot()->Render( pPipelineManager, pParamManager, VT_FINALPASS );
     }
 }
 //--------------------------------------------------------------------------------

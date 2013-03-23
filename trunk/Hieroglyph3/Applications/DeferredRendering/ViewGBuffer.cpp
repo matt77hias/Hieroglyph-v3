@@ -11,7 +11,7 @@
 //--------------------------------------------------------------------------------
 #include "ViewGBuffer.h"
 #include "Entity3D.h"
-#include "Node3D.h"
+#include "Scene.h"
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
 #include "IParameterManager.h"
@@ -46,16 +46,16 @@ void ViewGBuffer::QueuePreTasks( RendererDX11* pRenderer )
 	// Queue this view into the renderer for processing.
 	pRenderer->QueueTask( this );
 
-	if ( m_pRoot )
+	if ( m_pScene )
 	{
 		// Run through the graph and pre-render the entities
-		m_pRoot->PreRender( pRenderer, VT_GBUFFER );
+		m_pScene->GetRoot()->PreRender( pRenderer, VT_GBUFFER );
 	}
 }
 //--------------------------------------------------------------------------------
 void ViewGBuffer::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
-	if ( m_pRoot )
+	if ( m_pScene )
 	{
 		// Set the parameters for rendering this view
 		pPipelineManager->ClearRenderTargets();
@@ -75,7 +75,7 @@ void ViewGBuffer::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameter
 		SetRenderParams( pParamManager );
 
 		// Run through the graph and render each of the entities
-		m_pRoot->Render( pPipelineManager, pParamManager, VT_GBUFFER );
+		m_pScene->GetRoot()->Render( pPipelineManager, pParamManager, VT_GBUFFER );
 	}
 }
 //--------------------------------------------------------------------------------

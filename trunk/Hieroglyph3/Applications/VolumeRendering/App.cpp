@@ -138,7 +138,6 @@ void App::Update()
 		Matrix4f::TranslationMatrix( 5.0f, 5.0f, 0.0f ),
 		Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
-	
 	// Update the scene, and then render all cameras within the scene.
 
 	m_pScene->Update( m_pTimer->Elapsed() );
@@ -153,6 +152,8 @@ void App::Update()
 //--------------------------------------------------------------------------------
 void App::Shutdown()
 {
+	Log::Get().Write( m_pScene->GetRoot()->toString() );
+
 	// Print the framerate out for the log before shutting down.
 
 	std::wstringstream out;

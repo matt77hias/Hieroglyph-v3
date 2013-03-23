@@ -9,48 +9,31 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// Scene
+// BoundsVisualizerActor
 //
 //--------------------------------------------------------------------------------
-
+#ifndef BoundsVisualizerActor_h
+#define BoundsVisualizerActor_h
 //--------------------------------------------------------------------------------
-#ifndef Scene_h
-#define Scene_h
-//--------------------------------------------------------------------------------
-#include "Node3D.h"
-#include "Camera.h"
-#include "ParameterContainer.h"
+#include "PCH.h"
+#include "Actor.h"
+#include "DrawIndexedInstancedExecutorDX11.h"
+#include "VisualizerVertexDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class Scene
+	typedef std::shared_ptr<DrawIndexedInstancedExecutorDX11<VisualizerVertexDX11::VertexData, VisualizerVertexDX11::InstanceData>> VisualizerGeometryPtr;
+
+	class BoundsVisualizerActor : public Actor
 	{
 	public:
-		Scene();
-		virtual ~Scene();
+		BoundsVisualizerActor();
+		virtual ~BoundsVisualizerActor();
 
-		virtual void Update( float time );
-		virtual void PreRender( RendererDX11* pRenderer, VIEWTYPE type );
-		virtual void Render( RendererDX11* Renderer );
+		void UpdateBoundsData( std::vector<Entity3D*>& entities );
 
-		void AddCamera( Camera* camera );
-
-		void AddActor( Actor* actor );
-		void RemoveActor( Actor* actor );
-
-		// Geometric queries
-		void BuildPickRecord( Ray3f& ray, std::vector<PickRecord>& record );
-
-		Node3D* GetRoot();
-
-	public:
-		ParameterContainer Parameters;
-
-	protected:
-		Node3D* m_pRoot;
-		std::vector< Camera* > m_vCameras;
-		std::vector< Actor* > m_vActors;
+		VisualizerGeometryPtr				m_pGeometry;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // Scene_h
+#endif // BoundsVisualizerActor_h

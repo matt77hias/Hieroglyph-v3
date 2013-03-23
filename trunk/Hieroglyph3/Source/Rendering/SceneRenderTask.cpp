@@ -15,19 +15,26 @@
 #include "Entity3D.h"
 #include "Node3D.h"
 #include "Log.h"
+#include "BoundsVisualizerActor.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-SceneRenderTask::SceneRenderTask( )
+SceneRenderTask::SceneRenderTask( ) :
+	m_pEntity( nullptr ),
+	m_pScene( nullptr ),
+	m_bDebugViewEnabled( false ),
+	m_pDebugVisualizer( new BoundsVisualizerActor() ),
+	m_vColor( ),
+	m_iViewports(),
+	m_uiViewportCount( 1 ),
+	ViewMatrix(),
+	ProjMatrix()
 {
-	m_pEntity = 0;
-	m_pRoot = 0;
-
-	m_uiViewportCount = 1;
 }
 //--------------------------------------------------------------------------------
 SceneRenderTask::~SceneRenderTask( )
 {
+	SAFE_DELETE( m_pDebugVisualizer );
 }
 //--------------------------------------------------------------------------------
 void SceneRenderTask::SetRenderParams( IParameterManager* pParamManager )
@@ -46,9 +53,9 @@ void SceneRenderTask::SetEntity( Entity3D* pEntity )
 	m_pEntity = pEntity;
 }
 //--------------------------------------------------------------------------------
-void SceneRenderTask::SetRoot( Node3D* pRoot )
+void SceneRenderTask::SetScene( Scene* pScene )
 {
-	m_pRoot = pRoot;
+	m_pScene = pScene;
 }
 //--------------------------------------------------------------------------------
 void SceneRenderTask::SetViewMatrix( const Matrix4f& matrix )
@@ -106,5 +113,15 @@ const ViewPortDX11& SceneRenderTask::GetViewPort( unsigned int index )
 	assert( index < m_uiViewportCount );
 
 	return( RendererDX11::Get()->GetViewPort( m_iViewports[index] ) );
+}
+//--------------------------------------------------------------------------------
+void SceneRenderTask::SetDebugViewEnabled( bool debug )
+{
+	m_bDebugViewEnabled = debug;
+}
+//--------------------------------------------------------------------------------
+bool SceneRenderTask::IsDebugViewEnabled()
+{
+	return( m_bDebugViewEnabled );
 }
 //--------------------------------------------------------------------------------

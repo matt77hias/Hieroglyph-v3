@@ -170,13 +170,13 @@ void ViewAmbientOcclusion::SetProjMatrix( const Matrix4f& matrix )
 	pDepthNormalView->SetProjMatrix( matrix );
 }
 //--------------------------------------------------------------------------------
-void ViewAmbientOcclusion::SetRoot( Node3D* pRoot )
+void ViewAmbientOcclusion::SetScene( Scene* pScene )
 {
 	// Perform the root setting call for this view.
-	m_pRoot = pRoot;
+	m_pScene = pScene;
 
 	// Propagate the root setting call to the depth/normal view.
-	pDepthNormalView->SetRoot( pRoot );
+	pDepthNormalView->SetScene( pScene );
 }
 //--------------------------------------------------------------------------------
 void ViewAmbientOcclusion::SetEntity( Entity3D* pEntity )

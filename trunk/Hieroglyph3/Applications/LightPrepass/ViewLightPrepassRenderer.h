@@ -47,7 +47,7 @@ namespace Glyph3
 		virtual void Resize( UINT width, UINT height );
 
 		virtual void SetEntity( Entity3D* pEntity );
-		virtual void SetRoot( Node3D* pRoot );
+		virtual void SetScene( Scene* pScene );
 
 		virtual void SetRenderParams( IParameterManager* pParamManager );
 		virtual void SetUsageParams( IParameterManager* pParamManager );

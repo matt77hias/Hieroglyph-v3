@@ -12,7 +12,7 @@
 #include "PCH.h"
 #include "ViewDepthNormal.h"
 #include "Entity3D.h"
-#include "Node3D.h"
+#include "Scene.h"
 #include "Texture2dConfigDX11.h"
 #include "Log.h"
 #include "IParameterManager.h"
@@ -47,16 +47,16 @@ void ViewDepthNormal::QueuePreTasks( RendererDX11* pRenderer )
 	// Queue this view into the renderer for processing.
 	pRenderer->QueueTask( this );
 
-	if ( m_pRoot )
+	if ( m_pScene )
 	{
 		// Run through the graph and pre-render the entities
-		m_pRoot->PreRender( pRenderer, VT_LINEAR_DEPTH_NORMAL );
+		m_pScene->PreRender( pRenderer, VT_LINEAR_DEPTH_NORMAL );
 	}
 }
 //--------------------------------------------------------------------------------
 void ViewDepthNormal::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager )
 {
-	if ( m_pRoot )
+	if ( m_pScene )
 	{
 		// Set the parameters for rendering this view
 		pPipelineManager->ClearRenderTargets();
@@ -73,7 +73,7 @@ void ViewDepthNormal::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParam
 		SetRenderParams( pParamManager );
 
 		// Run through the graph and render each of the entities
-		m_pRoot->Render( pPipelineManager, pParamManager, VT_LINEAR_DEPTH_NORMAL );
+		m_pScene->GetRoot()->Render( pPipelineManager, pParamManager, VT_LINEAR_DEPTH_NORMAL );
 	}
 }
 //--------------------------------------------------------------------------------

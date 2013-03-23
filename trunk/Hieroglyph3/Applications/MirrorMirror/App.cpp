@@ -109,7 +109,7 @@ void App::Initialize()
 	{
 		ReflectiveSphereEntity* pReflector = new ReflectiveSphereEntity();
 		pReflector->Position() = Vector3f( -1.0, 1.0f+(i*3), 0.0f );
-		pReflector->m_pParaboloidView->SetRoot( m_pScene->GetRoot() );
+		pReflector->m_pParaboloidView->SetScene( m_pScene );
 		m_vReflectors.push_back( pReflector );
 		m_pActor->AddElement( pReflector );
 		m_pActor->GetNode()->AttachChild( pReflector );

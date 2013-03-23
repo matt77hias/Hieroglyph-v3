@@ -50,7 +50,7 @@ namespace Glyph3
 		virtual void SetUsageParams( IParameterManager* pParamManager );
 
 		virtual void SetEntity( Entity3D* pEntity );
-		virtual void SetRoot( Node3D* pRoot );
+		virtual void SetScene( Scene* pScene );
 
 		virtual void SetViewMatrix( const Matrix4f& matrix );
 		virtual void SetProjMatrix( const Matrix4f& matrix );

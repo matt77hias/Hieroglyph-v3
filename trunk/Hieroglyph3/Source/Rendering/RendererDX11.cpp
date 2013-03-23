@@ -1070,7 +1070,11 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 	// Check the existing list of shader files to see if there are any matches
 	// before trying to load it up again.  This will reduce the load times,
 	// and should speed up rendering in many cases since the shader object won't 
-	// have to be bound again.
+	// have to be bound again.  
+	//
+	// In the case that there are any defines passed in, we skip returning the 
+	// cached shader - we assume that something is different about the shader due
+	// to the defines, so we can't just reuse a previously loaded one.
 	
 	for ( int i = 0; i < m_vShaders.size(); i++ )
 	{
@@ -1078,7 +1082,8 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 
 		if ( pShader->FileName.compare( filename ) == 0
 			&& pShader->Function.compare( function ) == 0
-			&& pShader->ShaderModel.compare( model ) == 0 )
+			&& pShader->ShaderModel.compare( model ) == 0
+			&& pDefines == nullptr )
 		{
 			return( i );
 		}
@@ -1473,14 +1478,11 @@ RasterizerStatePtr RendererDX11::GetRasterizerState( int index )
 //--------------------------------------------------------------------------------
 const ViewPortDX11& RendererDX11::GetViewPort( int ID )
 {
-	ViewPortDX11 Viewport;
-
 	unsigned int index = static_cast<unsigned int>( ID );
+	
+	assert( index < m_vViewPorts.size() );
 
-	if ( index < m_vViewPorts.size() )
-		Viewport = *m_vViewPorts[index];
-		
-	return( Viewport );
+	return( *m_vViewPorts[index] );
 }
 //--------------------------------------------------------------------------------
 ResourceDX11* RendererDX11::GetResourceByIndex( int ID )

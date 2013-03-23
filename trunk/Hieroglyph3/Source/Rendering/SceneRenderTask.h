@@ -31,7 +31,8 @@
 namespace Glyph3
 {
 	class Entity3D;
-	class Node3D;
+	class Scene;
+	class BoundsVisualizerActor;
 
 	// The view type is used to allow a view to identify what type of
 	// view it is.  This identifier is also used by objects to specify
@@ -72,10 +73,9 @@ namespace Glyph3
 
 		virtual void SetEntity( Entity3D* pEntity );
 
-		// A second reference is used to specify the root node of the entities that
-		// the view will be rendering from.
+		// A reference to the scene that will be rendered is provided.
 
-		virtual void SetRoot( Node3D* pRoot );
+		virtual void SetScene( Scene* pScene );
 
 		// The viewports are specified through these interfaces. Traditionally you would
 		// only use a single viewport, but it is possible to use multiples when using a 
@@ -95,10 +95,15 @@ namespace Glyph3
 		Matrix4f GetViewMatrix( );
 		Matrix4f GetProjMatrix( );
 
+		void SetDebugViewEnabled( bool debug );
+		bool IsDebugViewEnabled();
+
 	protected:
 
 		Entity3D* m_pEntity;
-		Node3D* m_pRoot;
+		Scene* m_pScene;
+
+		BoundsVisualizerActor* m_pDebugVisualizer;
 
 		Vector4f		m_vColor;
 		int				m_iViewports[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
@@ -106,6 +111,8 @@ namespace Glyph3
 
 		Matrix4f ViewMatrix;
 		Matrix4f ProjMatrix;
+
+		bool m_bDebugViewEnabled;
 	};
 };
 //--------------------------------------------------------------------------------
