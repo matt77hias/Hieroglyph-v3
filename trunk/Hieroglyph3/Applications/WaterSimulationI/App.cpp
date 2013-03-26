@@ -219,6 +219,7 @@ bool App::HandleEvent( EventPtr pEvent )
 		EvtKeyUpPtr pKeyUp = std::static_pointer_cast<EvtKeyUp>( pEvent );
 
 		unsigned int key = pKeyUp->GetCharacterCode();
+
 	}
 	
 	// Call the parent class's event handler if we haven't handled the event.

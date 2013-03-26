@@ -16,21 +16,25 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-Camera::Camera()
+Camera::Camera() :
+	m_pCameraView( nullptr ),
+	m_pOverlayView( nullptr ),
+	m_pScene( nullptr ),
+	m_fNear( 0.1f ),
+	m_fFar( 100.0f ),
+	m_fAspect( 1280.0f / 800.0f ),
+	m_fFov( static_cast<float>( GLYPH_PI ) / 4.0f ),
+	m_fWidth( 1280.0f ),
+	m_fHeight( 800.0f ),
+	m_ProjMatrix(),
+	m_pViewPositionWriter( nullptr ),
+	m_pSpatialController( nullptr )
 {
-	m_pCameraView = nullptr;
-	m_pOverlayView = nullptr;
-	m_pScene = nullptr;
-
 	// Create the spatial controller, which will be used to manipulate the node
 	// in a simple way.
+
 	m_pSpatialController = new SpatialController();
 	GetNode()->AttachController( m_pSpatialController );
-
-	m_fNear = 0.1f;
-	m_fFar = 100.0f;
-	m_fAspect = 1280.0f / 800.0f;
-	m_fFov = static_cast<float>( GLYPH_PI ) / 4.0f;
 
     m_ProjMatrix.MakeIdentity();
 
@@ -38,6 +42,7 @@ Camera::Camera()
 
 	// By default, the camera body is not pickable.  This behavior can be updated
 	// by the client simply by setting a the value accordingly.
+
 	GetBody()->SetPickable( false );
 }
 //--------------------------------------------------------------------------------
@@ -128,6 +133,16 @@ void Camera::SetProjectionParams( float zn, float zf, float aspect, float fov )
 	ApplyProjectionParams();
 }
 //--------------------------------------------------------------------------------
+void Camera::SetOrthographicParams( float zn, float zf, float width, float height )
+{
+	m_fNear = zn;
+	m_fFar = zf;
+	m_fWidth = width;
+	m_fHeight = height;
+
+	ApplyOrthographicParams();
+}
+//--------------------------------------------------------------------------------
 void Camera::SetClipPlanes( float zn, float zf )
 {
 	m_fNear = zn;
@@ -178,6 +193,14 @@ void Camera::ApplyProjectionParams()
 		m_pCameraView->SetProjMatrix( m_ProjMatrix );	
 }
 //--------------------------------------------------------------------------------
+void Camera::ApplyOrthographicParams()
+{
+	m_ProjMatrix = Matrix4f::OrthographicLHMatrix( m_fNear, m_fFar, m_fWidth, m_fHeight );
+
+	if ( m_pCameraView )
+		m_pCameraView->SetProjMatrix( m_ProjMatrix );	
+}
+//--------------------------------------------------------------------------------
 const Matrix4f& Camera::ProjMatrix() const
 {
     return( m_ProjMatrix );
@@ -217,7 +240,7 @@ Ray3f Camera::GetWorldSpacePickRay( const Vector2f& location ) const
 	// build the ray.
 
 	Matrix4f View = GetBody()->GetView();
-	Matrix4f ViewProj = View * ProjMatrix(); //ProjMatrix() * View;
+	Matrix4f ViewProj = View * ProjMatrix();
 	Matrix4f ViewInverse = View.Inverse();
 	Matrix4f ViewProjInverse = ViewProj.Inverse();
 	

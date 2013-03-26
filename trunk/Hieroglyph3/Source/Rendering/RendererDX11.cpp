@@ -1322,6 +1322,21 @@ ResourcePtr RendererDX11::LoadTexture( void* pData, SIZE_T sizeInBytes/*, D3DX11
 	return( ResourcePtr( new ResourceProxyDX11( ResourceID, &TextureConfig, this ) ) );
 }
 //--------------------------------------------------------------------------------
+ResourcePtr RendererDX11::LoadTexture( ID3D11Texture2D* pTexture )
+{
+	// Add a reference to the texture to ensure it doesn't get destroyed while we 
+	// are using it.
+
+	pTexture->AddRef();
+
+    int ResourceID = StoreNewResource( new Texture2dDX11( reinterpret_cast< ID3D11Texture2D* >( pTexture ) ) );
+
+    Texture2dConfigDX11 TextureConfig;
+    pTexture->GetDesc( &TextureConfig.m_State );
+
+    return( ResourcePtr( new ResourceProxyDX11( ResourceID, &TextureConfig, this ) ) );
+}
+//--------------------------------------------------------------------------------
 int RendererDX11::CreateBlendState( BlendStateConfigDX11* pConfig )
 {
 	ID3D11BlendState* pState = 0;
@@ -1934,6 +1949,11 @@ void RendererDX11::DeleteResource( int index )
 		delete pResource;
 		m_vResources[index & 0xffff] = nullptr;
 	}
+}
+//--------------------------------------------------------------------------------
+ID3D11Device* RendererDX11::GetDevice()
+{
+    return( m_pDevice );
 }
 //--------------------------------------------------------------------------------
 template <class T>

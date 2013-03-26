@@ -50,6 +50,9 @@ namespace Glyph3
 		void SetCaption( std::wstring& caption );
 		std::wstring GetCaption();
 
+		void SetStyle( DWORD dStyle );
+		DWORD GetStyle(); 
+
 	protected:
 
 		void UpdateWindowState();

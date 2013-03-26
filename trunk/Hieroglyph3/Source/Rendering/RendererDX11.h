@@ -208,6 +208,7 @@ namespace Glyph3
 
 		ResourcePtr LoadTexture( std::wstring filename /*, D3DX11_IMAGE_LOAD_INFO* pLoadInfo = NULL*/ );
 		ResourcePtr LoadTexture( void* pData, SIZE_T sizeInBytes /*, D3DX11_IMAGE_LOAD_INFO* pLoadInfo = NULL*/ );
+		ResourcePtr LoadTexture( ID3D11Texture2D* pTexture );
 
 		// These methods are used to take an existing texture resource and to resize it.  This
 		// will recreate the texture and its associated views with the exact same configuration
@@ -235,6 +236,11 @@ namespace Glyph3
 		// Here is the caching API functions
 		void QueueTask( Task* pTask );
 		void ProcessTaskQueue( );
+
+		// This method is here for allowing easy integration with other libraries
+		// which require access to the device.  Do not use this interface to create 
+		// objects unless those objects are then registered with this renderer class!!!
+		ID3D11Device* GetDevice();
 
 	protected:
 

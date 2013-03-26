@@ -162,3 +162,15 @@ void RenderWindow::UpdateWindowState()
 	}
 }
 //--------------------------------------------------------------------------------
+void RenderWindow::SetStyle( DWORD dStyle )
+{
+	m_dStyle = dStyle;
+
+	SetWindowLongPtr( m_hWnd, GWL_EXSTYLE, m_dStyle );
+}
+//--------------------------------------------------------------------------------
+DWORD RenderWindow::GetStyle()
+{
+	return( m_dStyle );
+}
+//--------------------------------------------------------------------------------

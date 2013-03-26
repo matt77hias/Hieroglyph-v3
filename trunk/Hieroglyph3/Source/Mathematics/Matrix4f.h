@@ -60,6 +60,7 @@ namespace Glyph3
 		static Matrix4f TranslationMatrix( float fX, float fY, float fZ );
 		static Matrix4f LookAtLHMatrix( Vector3f& eye, Vector3f& at, Vector3f& up );
 		static Matrix4f PerspectiveFovLHMatrix( float fovy, float aspect, float zn, float zf );
+		static Matrix4f OrthographicLHMatrix( float zn, float zf, float width, float height );
 
 		void MakeZero( );
 		void MakeIdentity( );

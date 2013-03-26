@@ -431,6 +431,40 @@ Matrix4f Matrix4f::PerspectiveFovLHMatrix( float fovy, float aspect, float zn, f
 	return( ret );
 }
 //----------------------------------------------------------------------------------------------------
+Matrix4f Matrix4f::OrthographicLHMatrix( float zn, float zf, float width, float height )
+{
+	// This method is based on the method of the same name from the D3DX library.
+
+	Matrix4f ret;
+
+
+	if ( zn == zf ) zf = zn + 0.1f;
+	if ( width <= 0.0f ) width = 1.0f;
+	if ( height <= 0.0f ) height = 1.0f;
+
+	ret.m_afEntry[ 0] = 2.0f / width;
+	ret.m_afEntry[ 1] = 0.0f;
+	ret.m_afEntry[ 2] = 0.0f;
+	ret.m_afEntry[ 3] = 0.0f;
+
+	ret.m_afEntry[ 4] = 0.0f;
+	ret.m_afEntry[ 5] = 2.0f / height;
+	ret.m_afEntry[ 6] = 0.0f;
+	ret.m_afEntry[ 7] = 0.0f;
+
+	ret.m_afEntry[ 8] = 0.0f;
+	ret.m_afEntry[ 9] = 0.0f;
+	ret.m_afEntry[10] = 1.0f / ( zf-zn );
+	ret.m_afEntry[11] = 0.0f;
+
+	ret.m_afEntry[12] = 0.0f;
+	ret.m_afEntry[13] = 0.0f;
+	ret.m_afEntry[14] = zn / ( zn-zf );
+	ret.m_afEntry[15] = 1.0f;
+
+	return( ret );
+}
+//----------------------------------------------------------------------------------------------------
 float Matrix4f::operator[] ( int iPos ) const
 {
     return( m_afEntry[iPos] );

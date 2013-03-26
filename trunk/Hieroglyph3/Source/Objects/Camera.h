@@ -53,6 +53,8 @@ namespace Glyph3
 		void RenderFrame( RendererDX11* pRenderer );
 
 		void SetProjectionParams( float zn, float zf, float aspect, float fov );
+		void SetOrthographicParams( float zn, float zf, float width, float height );
+
 		void SetClipPlanes( float zn, float zf );
 		void SetAspectRatio( float aspect );
 		void SetFieldOfView( float fov );
@@ -75,6 +77,7 @@ namespace Glyph3
 	protected:
 
 		void ApplyProjectionParams();
+		void ApplyOrthographicParams();
 
 		SceneRenderTask* m_pCameraView;
 		Task* m_pOverlayView;
@@ -84,6 +87,9 @@ namespace Glyph3
 		float m_fFar;
 		float m_fAspect;
 		float m_fFov;
+
+		float m_fWidth;
+		float m_fHeight;
 
         Matrix4f m_ProjMatrix;
 		VectorParameterWriterDX11* m_pViewPositionWriter;
