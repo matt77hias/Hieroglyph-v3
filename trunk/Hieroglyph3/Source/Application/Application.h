@@ -69,6 +69,7 @@ namespace Glyph3
 		static Application* GetApplication( );
 
 		// Overloadable functions for end user
+		virtual bool ConfigureCommandLine( LPSTR lpcmdline );
 		virtual bool ConfigureEngineComponents() = 0;
 		virtual void ShutdownEngineComponents() = 0;
 		virtual void Initialize() = 0;

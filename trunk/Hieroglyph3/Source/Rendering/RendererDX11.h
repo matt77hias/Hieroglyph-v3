@@ -208,6 +208,9 @@ namespace Glyph3
 
 		ResourcePtr LoadTexture( std::wstring filename /*, D3DX11_IMAGE_LOAD_INFO* pLoadInfo = NULL*/ );
 		ResourcePtr LoadTexture( void* pData, SIZE_T sizeInBytes /*, D3DX11_IMAGE_LOAD_INFO* pLoadInfo = NULL*/ );
+		
+		// NOTE: This method is likely to be removed in the near future, since there should not
+		//       be any situations where there is a raw texture pointer being given to the renderer!
 		ResourcePtr LoadTexture( ID3D11Texture2D* pTexture );
 
 		// These methods are used to take an existing texture resource and to resize it.  This
@@ -240,6 +243,8 @@ namespace Glyph3
 		// This method is here for allowing easy integration with other libraries
 		// which require access to the device.  Do not use this interface to create 
 		// objects unless those objects are then registered with this renderer class!!!
+		// NOTE: This method is likely to be removed in the near future!
+
 		ID3D11Device* GetDevice();
 
 	protected:

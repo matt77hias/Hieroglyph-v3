@@ -31,6 +31,15 @@ int WINAPI WinMain(	HINSTANCE h_Inst, HINSTANCE h_PrevInst,	LPSTR lpcmdline, int
 		return(-1);
 	}
 
+	// Give the application a chance to process the command line arguments.  The
+	// default behavior is to simply return without doing anything on the parameters,
+	// but a customized application can do as they wish with the command line.
+
+	if ( !m_pApp->ConfigureCommandLine( lpcmdline ) )
+	{
+        Log::Get().Write( L"Failed to process the command line arguments!" );
+        return(-1);
+    }
 
 	// Call the application's ConfigureEngineComponent method.  This will load
 	// and create each of the engine components that are needed by the application,

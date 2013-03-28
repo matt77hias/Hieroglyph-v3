@@ -72,6 +72,12 @@ Application* Application::GetApplication( )
 	return( ms_pApplication );
 }
 //--------------------------------------------------------------------------------
+bool Application::ConfigureCommandLine( LPSTR lpcmdline )
+{
+	// Default to returning true, but allow sub-classes to override this behavior.
+	return( true );
+}
+//--------------------------------------------------------------------------------
 void Application::RequestTermination( )
 {
 	// This triggers the termination of the application
