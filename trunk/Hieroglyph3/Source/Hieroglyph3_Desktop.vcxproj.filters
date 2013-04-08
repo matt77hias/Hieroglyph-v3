@@ -186,6 +186,9 @@
     <Filter Include="Rendering\Pipeline System\Stages\Common">
       <UniqueIdentifier>{750a93a7-cd31-4661-ab6c-caaa19b69fe7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering\Pipeline System\Executors\Vertex Layouts\Tessellation Toolkit">
+      <UniqueIdentifier>{5bee33c2-1f5b-4b20-ab84-093b499a1007}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation\AnimationStream.cpp">
@@ -1392,6 +1395,18 @@
     </ClInclude>
     <ClInclude Include="Objects\BoundsVisualizerActor.h">
       <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\VertexEvaluator2f.h">
+      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts\Tessellation Toolkit</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\AttributeEvaluator2f.h">
+      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts\Tessellation Toolkit</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\SphereAttributes.h">
+      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts\Tessellation Toolkit</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\GridTessellator2f.h">
+      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts\Tessellation Toolkit</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

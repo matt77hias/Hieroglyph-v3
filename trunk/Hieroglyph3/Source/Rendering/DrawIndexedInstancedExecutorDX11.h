@@ -39,9 +39,13 @@ namespace Glyph3
 		void AddInstance( const TInstance& data );
 		unsigned int GetInstanceCount();
 
+		void SetInstanceRange( unsigned int start, unsigned int end );
+
 	protected:
 		
 		TGrowableVertexBufferDX11<TInstance> InstanceBuffer;
+		unsigned int m_uiStart;
+		unsigned int m_uiCount;
 	};
 
 	#include "DrawIndexedInstancedExecutorDX11.inl"

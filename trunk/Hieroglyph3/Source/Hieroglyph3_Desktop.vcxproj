@@ -287,6 +287,7 @@
     <ClInclude Include="Objects\TextureSpaceCameraPositionWriter.h" />
     <ClInclude Include="Objects\TextureSpaceLightPositionWriter.h" />
     <ClInclude Include="Objects\VolumeActor.h" />
+    <ClInclude Include="Rendering\AttributeEvaluator2f.h" />
     <ClInclude Include="Rendering\BasicVertexDX11.h" />
     <ClInclude Include="Rendering\BlendStateConfigDX11.h" />
     <ClInclude Include="Rendering\BlendStateDX11.h" />
@@ -317,6 +318,7 @@
     <ClInclude Include="Rendering\GeometryLoaderDX11.h" />
     <ClInclude Include="Rendering\GeometryShaderDX11.h" />
     <ClInclude Include="Rendering\GeometryStageDX11.h" />
+    <ClInclude Include="Rendering\GridTessellator2f.h" />
     <ClInclude Include="Rendering\HullShaderDX11.h" />
     <ClInclude Include="Rendering\HullStageDX11.h" />
     <ClInclude Include="Rendering\IndexBufferDX11.h" />
@@ -398,7 +400,9 @@
     <ClInclude Include="Rendering\VectorParameterWriterDX11.h" />
     <ClInclude Include="Rendering\VertexBufferDX11.h" />
     <ClInclude Include="Rendering\VertexElementDX11.h" />
+    <ClInclude Include="Rendering\VertexEvaluator2f.h" />
     <ClInclude Include="Rendering\VertexShaderDX11.h" />
+    <ClInclude Include="Rendering\SphereAttributes.h" />
     <ClInclude Include="Rendering\VertexStageDX11.h" />
     <ClInclude Include="Rendering\ViewAmbientOcclusion.h" />
     <ClInclude Include="Rendering\ViewDepthNormal.h" />

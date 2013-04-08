@@ -13,6 +13,9 @@
 #include "GeometryActor.h"
 #include "MaterialGeneratorDX11.h"
 #include "ShaderResourceParameterWriterDX11.h"
+#include "VertexEvaluator2f.h"
+#include "SphereAttributes.h"
+#include "GridTessellator2f.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -179,51 +182,117 @@ void GeometryActor::DrawSphere( const Vector3f& center, float radius, unsigned i
 	if ( stacks < 2 ) stacks = 2;
 	if ( slices < 4 ) slices = 4;
 
-	float sliceStep = static_cast<float>( 2.0 * GLYPH_PI ) / static_cast<float>( slices );
-	float stackStep = static_cast<float>( GLYPH_PI ) / static_cast<float>( stacks );
-
-	float uStep = 2.0f / static_cast<float>( slices );
-	float vStep = 2.0f / static_cast<float>( stacks );
-
-	// Generate all of the vertices according to the specified input parameters.
-
 	unsigned int baseVertex = m_pGeometry->GetVertexCount();
 
-	Vector3f position, normal;
-	Vector2f texcoords;
+	// Build up a vertex evaluator, which will allow us to 'sample' a vertex's
+	// attributes in a particular location.  In this case, we are defining an
+	// evaluator that works in a 2D space.  In addition, we are provide the
+	// evaluator with a Sphere3f to be it's 'model' and we tell it its vertex
+	// type - both through template parameters.
 
-	for ( unsigned int stack = 0; stack <= stacks; stack++ ) {
-		for ( unsigned int slice = 0; slice <= slices; slice++ ) {
+	VertexEvaluator2f< Sphere3f, BasicVertexDX11::Vertex > evaluator;
 
-			float theta = sliceStep * static_cast<float>( slice );
-			float phi = stackStep * static_cast<float>( stack );
+	// Once the evaluator is created, then we add some AttributeEvaluators to 
+	// it.  These objects are also templated according to the model and vertex
+	// types, and they provide an 'evaluate' method to calculate a single vertex 
+	// attribute that attribute is written directly into a passed in vertex.  We
+	// add them to a list, and just iterate over it to create a complete vertex.
 
-			sphere.SamplePositionAndNormal( position, normal, theta, phi );
+	evaluator.Evaluators.push_back( std::make_shared<SurfacePositionFromSphere<BasicVertexDX11::Vertex>>() );
+	evaluator.Evaluators.push_back( std::make_shared<SurfaceNormalFromSphere<BasicVertexDX11::Vertex>>() );
+	evaluator.Evaluators.push_back( std::make_shared<TexcoordsFromSphere<BasicVertexDX11::Vertex>>() );
+	evaluator.Evaluators.push_back( std::make_shared<ConstantColorFromSphere<BasicVertexDX11::Vertex>>( m_Color ) );
 
-			texcoords.x = uStep * static_cast<float>( slice );
-			texcoords.y = vStep * static_cast<float>( stack );
+	// Now we provide the evaluator with the instance of its model type.  This will
+	// be passed to the attribute evaluators so they can determine what value they
+	// should have.
 
-			AddVertex( position, normal, texcoords );
-		}
-	}
+	evaluator.SetModel( sphere );
 
-	// Generate all of the indices according to the specified input parameters.
+	// Next we create a tessellator object, and provide our vertex evaluator type
+	// and the receiving object type as template parameters.  These two types 
+	// basically describe the 'vertex producer' and the 'vertex consumer'.  The
+	// tessellator also takes a few parameters to define how we want it to do the
+	// sampling over its space.
 
-	for ( unsigned int z = 0; z < stacks; z++ ) {
-		for ( unsigned int x = 0; x < slices; x++ ) {
+	GridTessellator2f<
+		VertexEvaluator2f< Sphere3f, BasicVertexDX11::Vertex >, 
+		DrawIndexedExecutorDX11<BasicVertexDX11::Vertex>
+	> tessellator( stacks, slices );
+	
+	// The tessellator then fires off its activities using the supplied vertex
+	// attribute evaluator and containers.  We simply specify the parameters 
+	// indicating the ranges we want to sweep through the 2D manifold and the
+	// rest is done for us.  In this case, we are tessellating a sphere, so we
+	// pass in [0,2*pi] for theta and [0,pi] for phi.
 
-			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+0 );
-			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+1 );
-			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+0 );
-
-			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+1 );
-			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+1 );
-			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+0 );
-
-		}
-	}
+	tessellator.TessellateTriGrid<BasicVertexDX11::Vertex>( 
+		evaluator, *m_pGeometry,
+		0.0f, static_cast<float>( 2.0 * GLYPH_PI ),
+		0.0f, static_cast<float>( 1.0 * GLYPH_PI ) );
 
 }
+//--------------------------------------------------------------------------------
+//void GeometryActor::DrawSphere( const Vector3f& center, float radius, unsigned int stacks, unsigned int slices )
+//{
+//	Sphere3f sphere( center, radius );
+//
+//	if ( stacks < 2 ) stacks = 2;
+//	if ( slices < 4 ) slices = 4;
+//
+//	float sliceStep = static_cast<float>( 2.0 * GLYPH_PI ) / static_cast<float>( slices );
+//	float stackStep = static_cast<float>( GLYPH_PI ) / static_cast<float>( stacks );
+//
+//	float uStep = 2.0f / static_cast<float>( slices );
+//	float vStep = 2.0f / static_cast<float>( stacks );
+//
+//	// Generate all of the vertices according to the specified input parameters.
+//
+//	unsigned int baseVertex = m_pGeometry->GetVertexCount();
+//
+//	Vector3f position, normal;
+//	Vector2f texcoords;
+//
+//	//BasicVertexDX11::Vertex v;
+//
+//	for ( unsigned int stack = 0; stack <= stacks; stack++ ) {
+//		for ( unsigned int slice = 0; slice <= slices; slice++ ) {
+//
+//			float theta = sliceStep * static_cast<float>( slice );
+//			float phi = stackStep * static_cast<float>( stack );
+//
+//			sphere.SamplePositionAndNormal( position, normal, theta, phi );
+//			//PositionFromSphere<BasicVertexDX11::Vertex>( v, sphere, theta, phi );
+//			//NormalFromSphere<BasicVertexDX11::Vertex>( v, sphere, theta, phi );
+//
+//			//v.texcoords.x = uStep * static_cast<float>( slice );
+//			//v.texcoords.y = vStep * static_cast<float>( stack );
+//			texcoords.x = uStep * static_cast<float>( slice );
+//			texcoords.y = vStep * static_cast<float>( stack );
+//			//v.color = m_Color;
+//
+//			AddVertex( position, normal, texcoords );
+//			//AddVertex( v );
+//		}
+//	}
+//
+//	// Generate all of the indices according to the specified input parameters.
+//
+//	for ( unsigned int z = 0; z < stacks; z++ ) {
+//		for ( unsigned int x = 0; x < slices; x++ ) {
+//
+//			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+0 );
+//			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+1 );
+//			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+0 );
+//
+//			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+1 );
+//			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+1 );
+//			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+0 );
+//
+//		}
+//	}
+//
+//}
 //--------------------------------------------------------------------------------
 void GeometryActor::DrawDisc( const Vector3f& center, const Vector3f& normal, float radius, unsigned int slices )
 {

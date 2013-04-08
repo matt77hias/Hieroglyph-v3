@@ -10,11 +10,12 @@
 
 //--------------------------------------------------------------------------------
 template <class TVertex, class TInstance>
-DrawIndexedInstancedExecutorDX11<TVertex,TInstance>::DrawIndexedInstancedExecutorDX11( )
+DrawIndexedInstancedExecutorDX11<TVertex,TInstance>::DrawIndexedInstancedExecutorDX11( ) :
+	m_uiStart( 0 ),
+	m_uiCount( 0 )
 {
 	// Initialize our buffer to a reasonable size
 	InstanceBuffer.SetMaxVertexCount( 1000 );
-
 }
 //--------------------------------------------------------------------------------
 template <class TVertex, class TInstance>
@@ -57,7 +58,11 @@ void DrawIndexedInstancedExecutorDX11<TVertex,TInstance>::Execute( PipelineManag
 
 		// Here we provide an index count and an instance count to the indexed 
 		// instanced draw call.
-		pPipeline->DrawIndexedInstanced( IndexBuffer.GetIndexCount(), InstanceBuffer.GetVertexCount(), 0, 0, 0 );
+		if ( m_uiCount == 0 ) {
+			pPipeline->DrawIndexedInstanced( IndexBuffer.GetIndexCount(), InstanceBuffer.GetVertexCount(), 0, 0, 0 );
+		} else {
+			pPipeline->DrawIndexedInstanced( IndexBuffer.GetIndexCount(), m_uiCount, 0, 0, m_uiStart );
+		}
 	}
 }
 //--------------------------------------------------------------------------------
@@ -75,6 +80,8 @@ template <class TVertex, class TInstance>
 void DrawIndexedInstancedExecutorDX11<TVertex,TInstance>::ResetInstances()
 {
 	InstanceBuffer.ResetVertices();
+	m_uiStart = 0;
+	m_uiCount = 0;
 }
 //--------------------------------------------------------------------------------
 template <class TVertex, class TInstance>
@@ -90,5 +97,18 @@ unsigned int DrawIndexedInstancedExecutorDX11<TVertex,TInstance>::GetInstanceCou
 	// per-instance vertex buffer.
 
 	return( InstanceBuffer.GetVertexCount() );
+}
+//--------------------------------------------------------------------------------
+template <class TVertex, class TInstance>
+void DrawIndexedInstancedExecutorDX11<TVertex,TInstance>::SetInstanceRange( unsigned int start, unsigned int end )
+{
+	// Validate the data before accepting it.
+	if ( start < end && end < InstanceBuffer.GetVertexCount() ) {
+		m_uiStart = start;
+		m_uiCount = end-start;
+	} else {
+		m_uiStart = 0;
+		m_uiCount = 0;
+	}
 }
 //--------------------------------------------------------------------------------
