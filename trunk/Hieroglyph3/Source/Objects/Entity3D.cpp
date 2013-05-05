@@ -29,7 +29,7 @@ Entity3D::Entity3D() :
 {
 	m_vTranslation.MakeZero();
 	m_mRotation.MakeIdentity();
-	m_fScale = 1.0f;
+	m_vScale = Vector3f( 1.0f, 1.0f, 1.0f );
 
 	m_mWorld.MakeIdentity();
 	m_mLocal.MakeIdentity();
@@ -55,9 +55,9 @@ Matrix3f& Entity3D::Rotation()
 	return( m_mRotation );
 }
 //--------------------------------------------------------------------------------
-float& Entity3D::Scale( )
+Vector3f& Entity3D::Scale( )
 {
-	return( m_fScale );
+	return( m_vScale );
 }
 //--------------------------------------------------------------------------------
 void Entity3D::SetHidden( bool bHide )
@@ -141,8 +141,7 @@ void Entity3D::UpdateLocal( float fTime )
 
 	if ( m_bCalcLocal )
 	{
-		Matrix4f scale;
-		scale.Scale( m_fScale );
+		Matrix4f scale = Matrix4f::ScaleMatrix( m_vScale );
 		
 		m_mLocal.MakeIdentity();
 		m_mLocal.SetRotation( m_mRotation );

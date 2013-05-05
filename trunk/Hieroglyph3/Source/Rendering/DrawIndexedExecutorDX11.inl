@@ -195,3 +195,9 @@ unsigned int DrawIndexedExecutorDX11<TVertex>::GetPrimitiveCount()
 	return( count );
 }
 //--------------------------------------------------------------------------------
+template <class TVertex>
+void DrawIndexedExecutorDX11<TVertex>::SetMaxIndexCount( unsigned int count )
+{
+	IndexBuffer.SetMaxIndexCount( count );
+}
+//--------------------------------------------------------------------------------

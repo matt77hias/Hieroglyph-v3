@@ -52,6 +52,8 @@ namespace Glyph3
 		unsigned int GetIndexCount();
 		virtual unsigned int GetPrimitiveCount();
 
+		void SetMaxIndexCount( unsigned int count );
+
 	protected:
 		
 		TGrowableIndexBufferDX11<unsigned int> IndexBuffer;

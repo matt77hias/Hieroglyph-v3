@@ -9,37 +9,35 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// ViewPortDX11
+// ObjectSpaceCameraPositionWriter
 //
+// This parameter writer will read the current value of the 'CameraPosition'
+// vector parameter and calculate its position in object space, according to the
+// current world transform (its inverse actually).  It then writes the value to 
+// the 'CameraPositionOS' vector parameter.
 //--------------------------------------------------------------------------------
-#ifndef ViewPortDX11_h
-#define ViewPortDX11_h
+#ifndef ObjectSpaceCameraPositionWriter_h
+#define ObjectSpaceCameraPositionWriter_h
 //--------------------------------------------------------------------------------
-#include "RendererDX11.h"
-#include "RasterizerStageDX11.h"
+#include "VectorParameterWriterDX11.h"
+#include "Matrix4f.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class ViewPortDX11
+	class ObjectSpaceCameraPositionWriter : public VectorParameterWriterDX11
 	{
 	public:
-		ViewPortDX11();
-		ViewPortDX11( D3D11_VIEWPORT viewport );
-		~ViewPortDX11();
+		ObjectSpaceCameraPositionWriter();
+		virtual ~ObjectSpaceCameraPositionWriter();
 
-		float GetWidth() const;
-		float GetHeight() const;
-		Vector2f GetClipSpacePosition( const Vector2f& screen ) const;
-		Vector2f GetScreenSpacePosition( const Vector2f& clip ) const;
+		virtual void WriteParameter( IParameterManager* pParamMgr );
 
 	protected:
-		D3D11_VIEWPORT			m_ViewPort;
-
-		friend RasterizerStageDX11;
-		friend RendererDX11;
+		VectorParameterDX11*			m_pCameraPositionParameter;
+		MatrixParameterDX11*			m_pWorldMatrixParameter;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // ViewPortDX11_h
+#endif // ObjectSpaceCameraPositionWriter_h
 //--------------------------------------------------------------------------------
 

@@ -44,6 +44,7 @@
     <ClCompile Include="Events\IEventListener.cpp" />
     <ClCompile Include="Geometry\Box3f.cpp" />
     <ClCompile Include="Geometry\CompositeShape.cpp" />
+    <ClCompile Include="Geometry\Cone3f.cpp" />
     <ClCompile Include="Geometry\Frustum3f.cpp" />
     <ClCompile Include="Geometry\LineIndices.cpp" />
     <ClCompile Include="Geometry\Plane3f.cpp" />
@@ -75,9 +76,11 @@
     <ClCompile Include="Objects\IController.cpp" />
     <ClCompile Include="Objects\Light.cpp" />
     <ClCompile Include="Objects\Node3D.cpp" />
+    <ClCompile Include="Objects\ObjectSpaceCameraPositionWriter.cpp" />
     <ClCompile Include="Objects\PickRecord.cpp" />
     <ClCompile Include="Objects\RotationController.cpp" />
     <ClCompile Include="Objects\Scene.cpp" />
+    <ClCompile Include="Objects\ScaleSetpointController.cpp" />
     <ClCompile Include="Objects\SkinnedActor.cpp" />
     <ClCompile Include="Objects\SkinnedBoneController.cpp" />
     <ClCompile Include="Objects\SpatialController.cpp" />
@@ -248,6 +251,7 @@
     <ClInclude Include="Events\IEventListener.h" />
     <ClInclude Include="Geometry\Box3f.h" />
     <ClInclude Include="Geometry\CompositeShape.h" />
+    <ClInclude Include="Geometry\Cone3f.h" />
     <ClInclude Include="Geometry\Frustum3f.h" />
     <ClInclude Include="Geometry\LineIndices.h" />
     <ClInclude Include="Geometry\Plane3f.h" />
@@ -263,6 +267,7 @@
     <ClInclude Include="Mathematics\Matrix3f.h" />
     <ClInclude Include="Mathematics\Matrix4f.h" />
     <ClInclude Include="Mathematics\PerlinNoise.h" />
+    <ClInclude Include="Mathematics\Tween.h" />
     <ClInclude Include="Mathematics\Vector2f.h" />
     <ClInclude Include="Mathematics\Vector3f.h" />
     <ClInclude Include="Mathematics\Vector4f.h" />
@@ -277,9 +282,12 @@
     <ClInclude Include="Objects\IController.h" />
     <ClInclude Include="Objects\Light.h" />
     <ClInclude Include="Objects\Node3D.h" />
+    <ClInclude Include="Objects\ObjectSpaceCameraPositionWriter.h" />
     <ClInclude Include="Objects\PickRecord.h" />
     <ClInclude Include="Objects\RotationController.h" />
     <ClInclude Include="Objects\Scene.h" />
+    <ClInclude Include="Objects\ScaleSetpointController.h" />
+    <ClInclude Include="Objects\SetpointController.h" />
     <ClInclude Include="Objects\SkinnedActor.h" />
     <ClInclude Include="Objects\SkinnedBoneController.h" />
     <ClInclude Include="Objects\SpatialController.h" />
@@ -300,6 +308,7 @@
     <ClInclude Include="Rendering\ConstantBufferDX11.h" />
     <ClInclude Include="Rendering\ConstantBufferParameterDX11.h" />
     <ClInclude Include="Rendering\ConstantBufferParameterWriterDX11.h" />
+    <ClInclude Include="Rendering\ConeAttributes.h" />
     <ClInclude Include="Rendering\D3DEnumConversion.h" />
     <ClInclude Include="Rendering\DepthStencilStateConfigDX11.h" />
     <ClInclude Include="Rendering\DepthStencilStateDX11.h" />
@@ -389,6 +398,7 @@
     <ClInclude Include="Rendering\Texture3dConfigDX11.h" />
     <ClInclude Include="Rendering\Texture3dDX11.h" />
     <ClInclude Include="Rendering\TGrowableIndexBufferDX11.h" />
+    <ClInclude Include="Rendering\TGrowableStructuredBufferDX11.h" />
     <ClInclude Include="Rendering\TGrowableVertexBufferDX11.h" />
     <ClInclude Include="Rendering\TStateArrayMonitor.h" />
     <ClInclude Include="Rendering\TStateMonitor.h" />
@@ -427,10 +437,13 @@
     <ClInclude Include="Utility\Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Mathematics\Tween.inl" />
+    <None Include="Objects\SetpointController.inl" />
     <None Include="Rendering\DrawExecutorDX11.inl" />
     <None Include="Rendering\DrawIndexedExecutorDX11.inl" />
     <None Include="Rendering\DrawIndexedInstancedExecutorDX11.inl" />
     <None Include="Rendering\TGrowableIndexBufferDX11.inl" />
+    <None Include="Rendering\TGrowableStructuredBufferDX11.inl" />
     <None Include="Rendering\TGrowableVertexBufferDX11.inl" />
     <None Include="Rendering\TStateArrayMonitor.inl" />
     <None Include="Rendering\TStateMonitor.inl" />
@@ -491,6 +504,7 @@
       <Command>copy Application\*.h ..\SDK\Include
 copy Events\*.h ..\SDK\Include
 copy Mathematics\*.h ..\SDK\Include
+copy Mathematics\*.inl ..\SDK\Include
 copy Scripting\*.h ..\SDK\Include
 copy Utility\*.h ..\SDK\Include
 copy Utility\*.inl ..\SDK\Include
@@ -499,6 +513,7 @@ copy Rendering\*.inl ..\SDK\Include
 copy Geometry\*.h ..\SDK\Include
 copy Intersection\*.h ..\SDK\Include
 copy Objects\*.h ..\SDK\Include
+copy Objects\*.inl ..\SDK\Include
 copy Animation\*.h ..\SDK\Include
 copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”</Command>
     </PostBuildEvent>
@@ -528,6 +543,7 @@ copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)\Appl
       <Command>copy Application\*.h ..\SDK\Include
 copy Events\*.h ..\SDK\Include
 copy Mathematics\*.h ..\SDK\Include
+copy Mathematics\*.inl ..\SDK\Include
 copy Scripting\*.h ..\SDK\Include
 copy Utility\*.h ..\SDK\Include
 copy Utility\*.inl ..\SDK\Include
@@ -536,6 +552,7 @@ copy Rendering\*.inl ..\SDK\Include
 copy Geometry\*.h ..\SDK\Include
 copy Intersection\*.h ..\SDK\Include
 copy Objects\*.h ..\SDK\Include
+copy Objects\*.inl ..\SDK\Include
 copy Animation\*.h ..\SDK\Include
 copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”</Command>
     </PostBuildEvent>

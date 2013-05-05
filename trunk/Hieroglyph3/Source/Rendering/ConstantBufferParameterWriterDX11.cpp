@@ -39,7 +39,7 @@ void ConstantBufferParameterWriterDX11::WriteParameter( IParameterManager* pPara
 //--------------------------------------------------------------------------------
 void ConstantBufferParameterWriterDX11::InitializeParameter( )
 {
-	m_pParameter->InitializeParameterData( &m_Value );
+	m_pParameter->InitializeParameterData( &m_Value->m_iResource );
 }
 //--------------------------------------------------------------------------------
 RenderParameterDX11* ConstantBufferParameterWriterDX11::GetRenderParameterRef()

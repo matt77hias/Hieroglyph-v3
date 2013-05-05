@@ -45,7 +45,7 @@ namespace Glyph3
 
 		Vector3f& Position( );
 		Matrix3f& Rotation( );
-		float& Scale( );
+		Vector3f& Scale( );
 
 		virtual void Update( float time );
 		virtual void UpdateLocal( float time );
@@ -116,7 +116,7 @@ namespace Glyph3
 
 		Vector3f m_vTranslation;	// The translation and rotation varaibles are updated
 		Matrix3f m_mRotation;		// during the update phase and used to generate the
-		float    m_fScale;			// local matrix.  Then, the world matrix is updated
+		Vector3f m_vScale;			// local matrix.  Then, the world matrix is updated
 		Matrix4f m_mWorld;			// with the new local matrix and the entity's parent
 		Matrix4f m_mLocal;			// world matrix.
 

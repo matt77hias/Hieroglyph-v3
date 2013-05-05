@@ -229,7 +229,7 @@ Ray3f Camera::GetWorldSpacePickRay( const Vector2f& location ) const
 	// render target size to be able to calculate the view space pick ray.
 
 	ViewPortDX11 Viewport = m_pCameraView->GetViewPort( 0 );
-	Vector2f normalized = Viewport.GetNormalizedPosition( location );
+	Vector2f normalized = Viewport.GetClipSpacePosition( location );
 
 	// Create a point that represents the clip space location on the screen surface.
 
@@ -263,5 +263,62 @@ Ray3f Camera::GetWorldSpacePickRay( const Vector2f& location ) const
 	Vector3f origin = EyePointWS.xyz();
 
 	return( Ray3f( origin, direction ) );
+}
+//--------------------------------------------------------------------------------
+Vector2f Camera::WorldToScreenSpace( const Vector3f& point )
+{
+	// Get the view and projection matrices from the SceneRenderTask, and then 
+	// calculate the world to clip space matrix (i.e. view*proj).
+
+	Matrix4f view = this->GetCameraView()->GetViewMatrix();
+    Matrix4f proj = this->GetCameraView()->GetProjMatrix();
+
+    Matrix4f viewProj = view * proj;
+
+	// Transform from world to clip space, and then normalize the w component.
+	// This produces the point in the < [-1,1], [-1,1], [0,1], 1 > ranges.
+
+    Vector4f modelViewProjPos = viewProj * Vector4f(point.x, point.y, point.z, 1);
+	modelViewProjPos = modelViewProjPos / modelViewProjPos.w;
+
+	// Map the clips space to screen space using the viewport.
+
+	ViewPortDX11 Viewport = m_pCameraView->GetViewPort( 0 );
+	Vector2f screen = Viewport.GetScreenSpacePosition( modelViewProjPos.xy() );
+
+	return( screen );
+}
+//--------------------------------------------------------------------------------
+Vector3f Camera::ScreenToWorldSpace( const Vector2f& cursor )
+{
+	// This method returns the world space position of the given screen space
+	// coordinates on the near clipping plane.  That means this is the projection
+	// of the screen space point onto the near clipping plane!
+
+	// Given an input coordinate pair, we need to use the SceneRenderTask's 
+	// render target size to be able to calculate the world space location.
+
+	ViewPortDX11 Viewport = m_pCameraView->GetViewPort( 0 );
+	Vector2f normalized = Viewport.GetClipSpacePosition( cursor );
+
+	// Create a point that represents the clip space location on the screen surface.
+
+	Vector4f ScreenPoint = Vector4f( normalized.x, normalized.y, 0.0f, 1.0f );
+
+	// Calculate the view*proj inverse.  These are used to calculate the 
+	// corresponding world space points to the screen coordinate.
+
+	Matrix4f View = GetBody()->GetView();
+	Matrix4f ViewProj = View * ProjMatrix();
+	Matrix4f ViewProjInverse = ViewProj.Inverse();
+	
+	// The world space screen point takes the clip space position on the near
+	// clip plane and back projects it to world space by multiplying by the 
+	// view projection inverse.
+
+	Vector4f ScreenPointWS = ViewProjInverse * ScreenPoint;
+	ScreenPointWS = ScreenPointWS / ScreenPointWS.w;
+
+	return( ScreenPointWS.xyz() );
 }
 //--------------------------------------------------------------------------------

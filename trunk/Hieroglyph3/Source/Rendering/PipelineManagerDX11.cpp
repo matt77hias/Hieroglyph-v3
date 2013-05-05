@@ -880,6 +880,14 @@ void PipelineManagerDX11::CopySubresourceRegion( ResourcePtr DestResource, UINT 
 		pSrcResource, SrcSubresource, pSrcBox );
 }
 //--------------------------------------------------------------------------------
+void PipelineManagerDX11::CopyResource( ResourcePtr DestResource, ResourcePtr SrcResource )
+{
+	ID3D11Resource* pDestResource = RendererDX11::Get()->GetResourceByIndex(DestResource->m_iResource)->GetResource();
+	ID3D11Resource* pSrcResource = RendererDX11::Get()->GetResourceByIndex(SrcResource->m_iResource)->GetResource();
+
+	m_pContext->CopyResource( pDestResource, pSrcResource );
+}
+//--------------------------------------------------------------------------------
 void PipelineManagerDX11::GenerateCommandList( CommandListDX11* pList )
 {
 	if ( m_pContext->GetType() == D3D11_DEVICE_CONTEXT_DEFERRED )

@@ -47,10 +47,10 @@ namespace Glyph3
 			for ( unsigned int row = 0; row <= m_rows; row++ ) {
 				for ( unsigned int col = 0; col <= m_cols; col++ ) {
 
-					float theta = colStep * static_cast<float>( col );
-					float phi = rowStep * static_cast<float>( row );
+					float x = colStep * static_cast<float>( col );
+					float y = rowStep * static_cast<float>( row );
 
-					e.evaluate( v, theta, phi );
+					e.evaluate( v, x, y );
 					c.AddVertex( v );
 				}
 			}

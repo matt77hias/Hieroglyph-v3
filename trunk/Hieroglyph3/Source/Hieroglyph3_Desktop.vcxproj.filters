@@ -186,7 +186,7 @@
     <Filter Include="Rendering\Pipeline System\Stages\Common">
       <UniqueIdentifier>{750a93a7-cd31-4661-ab6c-caaa19b69fe7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Rendering\Pipeline System\Executors\Vertex Layouts\Tessellation Toolkit">
+    <Filter Include="Rendering\Tessellation Toolkit">
       <UniqueIdentifier>{5bee33c2-1f5b-4b20-ab84-093b499a1007}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -769,6 +769,15 @@
     </ClCompile>
     <ClCompile Include="Objects\BoundsVisualizerActor.cpp">
       <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry\Cone3f.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\ScaleSetpointController.cpp">
+      <Filter>Objects\Controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\ObjectSpaceCameraPositionWriter.cpp">
+      <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1397,16 +1406,37 @@
       <Filter>Objects\Scene Objects\Actors</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\VertexEvaluator2f.h">
-      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts\Tessellation Toolkit</Filter>
+      <Filter>Rendering\Tessellation Toolkit</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\AttributeEvaluator2f.h">
-      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts\Tessellation Toolkit</Filter>
+      <Filter>Rendering\Tessellation Toolkit</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\SphereAttributes.h">
-      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts\Tessellation Toolkit</Filter>
+      <Filter>Rendering\Tessellation Toolkit</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\GridTessellator2f.h">
-      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts\Tessellation Toolkit</Filter>
+      <Filter>Rendering\Tessellation Toolkit</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\Cone3f.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\ConeAttributes.h">
+      <Filter>Rendering\Tessellation Toolkit</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\ScaleSetpointController.h">
+      <Filter>Objects\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\SetpointController.h">
+      <Filter>Objects\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="Mathematics\Tween.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\TGrowableStructuredBufferDX11.h">
+      <Filter>Rendering\Pipeline System\Executors\Executors\Basis Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\ObjectSpaceCameraPositionWriter.h">
+      <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1433,6 +1463,15 @@
     </None>
     <None Include="Rendering\TStateMonitor.inl">
       <Filter>Rendering\Pipeline System\Stages\Common</Filter>
+    </None>
+    <None Include="Objects\SetpointController.inl">
+      <Filter>Objects\Controllers</Filter>
+    </None>
+    <None Include="Mathematics\Tween.inl">
+      <Filter>Mathematics</Filter>
+    </None>
+    <None Include="Rendering\TGrowableStructuredBufferDX11.inl">
+      <Filter>Rendering\Pipeline System\Executors\Executors\Basis Objects</Filter>
     </None>
   </ItemGroup>
 </Project>

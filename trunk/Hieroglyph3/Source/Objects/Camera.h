@@ -68,6 +68,8 @@ namespace Glyph3
 		const Matrix4f& ProjMatrix() const;
 
 		Ray3f GetWorldSpacePickRay( const Vector2f& location ) const;
+		Vector2f WorldToScreenSpace( const Vector3f& point );
+		Vector3f ScreenToWorldSpace( const Vector2f& cursor );
 
         virtual bool HandleEvent( EventPtr pEvent );
         virtual std::wstring GetName();

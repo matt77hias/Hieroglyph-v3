@@ -39,7 +39,7 @@ void ShaderResourceParameterWriterDX11::SetValue( ResourcePtr Value )
 //--------------------------------------------------------------------------------
 void ShaderResourceParameterWriterDX11::InitializeParameter( )
 {
-	m_pParameter->InitializeParameterData( &m_Value );
+	m_pParameter->InitializeParameterData( &m_Value->m_iResourceSRV );
 }
 //--------------------------------------------------------------------------------
 RenderParameterDX11* ShaderResourceParameterWriterDX11::GetRenderParameterRef()

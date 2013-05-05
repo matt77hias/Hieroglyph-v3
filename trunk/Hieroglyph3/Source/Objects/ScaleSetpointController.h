@@ -9,35 +9,34 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// Shape3D
+// ScaleSetpointController
 //
 //--------------------------------------------------------------------------------
-#ifndef Shape3D_h
-#define Shape3D_h
+#ifndef ScaleSetpointController_h
+#define ScaleSetpointController_h
 //--------------------------------------------------------------------------------
+#include "IController.h"
 #include "Vector3f.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	enum eSHAPE
-	{
-		SPHERE,
-		BOX,
-		TRIANGLE,
-		RAY,
-		PLANE,
-		FRUSTUM,
-		CONE
-	};
-
-	class Shape3D
+	class ScaleSetpointController : public IController
 	{
 	public:
-		Shape3D( );
-		virtual ~Shape3D( );
+		ScaleSetpointController( );
+		virtual ~ScaleSetpointController( );
 
-		virtual eSHAPE GetShapeType( ) const = 0;
+		virtual void Update( float fTime );
+
+		void SetSetpoint( const Vector3f& scale, float duration );
+
+	protected:
+		Vector3f		m_vStartpoint;
+		Vector3f		m_vSetpoint;
+		float			m_fDuration;
+		float			m_fElapsed;
+		bool			m_bActive;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // Shape3D_h
+#endif // ScaleSetpointController_h

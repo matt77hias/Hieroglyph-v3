@@ -170,6 +170,8 @@ namespace Glyph3
 		void CopySubresourceRegion( ResourcePtr DestResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ,
 			ResourcePtr SrcResource, UINT SrcSubresource, D3D11_BOX* pSrcBox );
 
+		void CopyResource( ResourcePtr DestResource, ResourcePtr SrcResource );
+
         // Resolve a subresource from a MSAA texture to a non-MSAA texture.
         
         void ResolveSubresource ( ResourcePtr DestResource, UINT DstSubresource, 

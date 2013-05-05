@@ -9,35 +9,38 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// Shape3D
+// Cone3f
 //
+// This class represents a cone with two points, and the cone radius at each of 
+// those two points.  This configuration can also be used to represent a cylinder
+// when the two radii are equal, or even a partial cone with its top cut off.
 //--------------------------------------------------------------------------------
-#ifndef Shape3D_h
-#define Shape3D_h
+#ifndef Cone3f_h
+#define Cone3f_h
 //--------------------------------------------------------------------------------
+#include "Shape3D.h"
 #include "Vector3f.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	enum eSHAPE
-	{
-		SPHERE,
-		BOX,
-		TRIANGLE,
-		RAY,
-		PLANE,
-		FRUSTUM,
-		CONE
-	};
-
-	class Shape3D
+	class Cone3f : public Shape3D
 	{
 	public:
-		Shape3D( );
-		virtual ~Shape3D( );
+		Cone3f( );
+		Cone3f( const Vector3f& p1, float r1, const Vector3f& p2, float r2 );
+		virtual ~Cone3f( );
 
-		virtual eSHAPE GetShapeType( ) const = 0;
+		void SamplePosition( Vector3f& position, float theta, float height ) const;
+		void SampleNormal( Vector3f& normal, float theta, float height ) const;
+		void SamplePositionAndNormal( Vector3f& position, Vector3f& normal, float theta, float height ) const;
+
+		virtual eSHAPE GetShapeType( ) const;
+
+		Vector3f	P1;
+		Vector3f	P2;
+		float		R1;
+		float		R2;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // Shape3D_h
+#endif // Cone3f_h

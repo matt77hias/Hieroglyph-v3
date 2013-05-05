@@ -59,6 +59,8 @@ namespace Glyph3
 		unsigned int GetVertexCount();
 		virtual unsigned int GetPrimitiveCount();
 
+		void SetMaxVertexCount( unsigned int count );
+
 	protected:
 
 		// The type of primitives listed in the index buffer

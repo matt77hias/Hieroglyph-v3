@@ -15,6 +15,7 @@
 #include "ShaderResourceParameterWriterDX11.h"
 #include "VertexEvaluator2f.h"
 #include "SphereAttributes.h"
+#include "ConeAttributes.h"
 #include "GridTessellator2f.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
@@ -233,67 +234,6 @@ void GeometryActor::DrawSphere( const Vector3f& center, float radius, unsigned i
 
 }
 //--------------------------------------------------------------------------------
-//void GeometryActor::DrawSphere( const Vector3f& center, float radius, unsigned int stacks, unsigned int slices )
-//{
-//	Sphere3f sphere( center, radius );
-//
-//	if ( stacks < 2 ) stacks = 2;
-//	if ( slices < 4 ) slices = 4;
-//
-//	float sliceStep = static_cast<float>( 2.0 * GLYPH_PI ) / static_cast<float>( slices );
-//	float stackStep = static_cast<float>( GLYPH_PI ) / static_cast<float>( stacks );
-//
-//	float uStep = 2.0f / static_cast<float>( slices );
-//	float vStep = 2.0f / static_cast<float>( stacks );
-//
-//	// Generate all of the vertices according to the specified input parameters.
-//
-//	unsigned int baseVertex = m_pGeometry->GetVertexCount();
-//
-//	Vector3f position, normal;
-//	Vector2f texcoords;
-//
-//	//BasicVertexDX11::Vertex v;
-//
-//	for ( unsigned int stack = 0; stack <= stacks; stack++ ) {
-//		for ( unsigned int slice = 0; slice <= slices; slice++ ) {
-//
-//			float theta = sliceStep * static_cast<float>( slice );
-//			float phi = stackStep * static_cast<float>( stack );
-//
-//			sphere.SamplePositionAndNormal( position, normal, theta, phi );
-//			//PositionFromSphere<BasicVertexDX11::Vertex>( v, sphere, theta, phi );
-//			//NormalFromSphere<BasicVertexDX11::Vertex>( v, sphere, theta, phi );
-//
-//			//v.texcoords.x = uStep * static_cast<float>( slice );
-//			//v.texcoords.y = vStep * static_cast<float>( stack );
-//			texcoords.x = uStep * static_cast<float>( slice );
-//			texcoords.y = vStep * static_cast<float>( stack );
-//			//v.color = m_Color;
-//
-//			AddVertex( position, normal, texcoords );
-//			//AddVertex( v );
-//		}
-//	}
-//
-//	// Generate all of the indices according to the specified input parameters.
-//
-//	for ( unsigned int z = 0; z < stacks; z++ ) {
-//		for ( unsigned int x = 0; x < slices; x++ ) {
-//
-//			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+0 );
-//			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+1 );
-//			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+0 );
-//
-//			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+1 );
-//			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+1 );
-//			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+0 );
-//
-//		}
-//	}
-//
-//}
-//--------------------------------------------------------------------------------
 void GeometryActor::DrawDisc( const Vector3f& center, const Vector3f& normal, float radius, unsigned int slices )
 {
 	if ( slices < 4 ) slices = 4;
@@ -358,82 +298,140 @@ void GeometryActor::DrawDisc( const Vector3f& center, const Vector3f& normal, fl
 //--------------------------------------------------------------------------------
 void GeometryActor::DrawCylinder( const Vector3f& p1, const Vector3f& p2, float r1, float r2, unsigned int stacks, unsigned int slices )
 {
+	Cone3f cone( p1, r1, p2, r2 );
+
 	if ( stacks < 2 ) stacks = 2;
 	if ( slices < 4 ) slices = 4;
 
-	// Define the axis of the cylinder, and find its length.
-	Vector3f v = p1 - p2;
-	Vector3f vnorm = Vector3f::Normalize( v );
-	float l = v.Magnitude();
-
-	Vector3f up = Vector3f( 0.0f, 1.0f, 0.0f );
-
-	// Find the unit vector perpendicular to the axis, that is pointing closest to the (0,1,0) direction.
-	// If the axis points in the (0,1,0) direction, then use (1,0,0) as the unit vector.
-	Vector3f unit;
-	if ( vnorm == up || vnorm == -up ) {
-		unit = Vector3f( 1.0f, 0.0f, 0.0f );
-	} else {
-		Vector3f temp = Vector3f::Cross( vnorm, up );
-		unit = Vector3f::Cross( temp, vnorm );
-		unit.Normalize();
-	}
-
-	float sliceStep = static_cast<float>( 2.0 * GLYPH_PI ) / static_cast<float>( slices );
-	float stackStep = l / static_cast<float>( stacks );
-	float radiusStep = ( r1 - r2 ) / static_cast<float>( stacks );
-
-	float uStep = 2.0f / static_cast<float>( slices );
-	float vStep = 2.0f / static_cast<float>( stacks );
-
-	float normalSlope = ( r2 - r1 ) / l;
-
-	// Generate all of the vertices according to the specified input parameters.
-
 	unsigned int baseVertex = m_pGeometry->GetVertexCount();
-	Matrix3f r;
 
-	for ( unsigned int stack = 0; stack <= stacks; stack++ ) {
-		for ( unsigned int slice = 0; slice <= slices; slice++ ) {
+	// Build up a vertex evaluator, which will allow us to 'sample' a vertex's
+	// attributes in a particular location.  In this case, we are defining an
+	// evaluator that works in a 2D space.  In addition, we are provide the
+	// evaluator with a Cone3f to be it's 'model' and we tell it its vertex
+	// type - both through template parameters.
 
-			float theta = sliceStep * static_cast<float>( slice );
-			float height = stackStep * static_cast<float>( stack );
-			float currentRadius = r2 + radiusStep * static_cast<float>( stack );
+	VertexEvaluator2f< Cone3f, BasicVertexDX11::Vertex > evaluator;
 
-			// Calculate the position, which is a combination of an offset to the p2 endpoint,
-			// shifted along the axis of the cylinder, and a rotated and scaled radius component.
-			r.RotationEuler( vnorm, theta );
-			Vector3f position = p2 + ( vnorm * height ) + ( r * unit * currentRadius );
+	// Once the evaluator is created, then we add some AttributeEvaluators to 
+	// it.  These objects are also templated according to the model and vertex
+	// types, and they provide an 'evaluate' method to calculate a single vertex 
+	// attribute that attribute is written directly into a passed in vertex.  We
+	// add them to a list, and just iterate over it to create a complete vertex.
 
-			// Calculate the normal vector, which is dependent on the delta in radii at each
-			// end of the cylinder.
-			Vector3f normal = r * unit * currentRadius + vnorm * normalSlope * currentRadius;
-			normal.Normalize();
+	evaluator.Evaluators.push_back( std::make_shared<SurfacePositionFromCone<BasicVertexDX11::Vertex>>() );
+	evaluator.Evaluators.push_back( std::make_shared<SurfaceNormalFromCone<BasicVertexDX11::Vertex>>() );
+	evaluator.Evaluators.push_back( std::make_shared<TexcoordsFromCone<BasicVertexDX11::Vertex>>() );
+	evaluator.Evaluators.push_back( std::make_shared<ConstantColorFromCone<BasicVertexDX11::Vertex>>( m_Color ) );
 
-			Vector2f texcoords;
-			texcoords.x = uStep * static_cast<float>( slice );
-			texcoords.y = vStep * static_cast<float>( stack );
+	// Now we provide the evaluator with the instance of its model type.  This will
+	// be passed to the attribute evaluators so they can determine what value they
+	// should have.
 
-			AddVertex( position, normal, texcoords );
-		}
-	}
+	evaluator.SetModel( cone );
 
-	// Generate all of the indices according to the specified input parameters.
+	// Next we create a tessellator object, and provide our vertex evaluator type
+	// and the receiving object type as template parameters.  These two types 
+	// basically describe the 'vertex producer' and the 'vertex consumer'.  The
+	// tessellator also takes a few parameters to define how we want it to do the
+	// sampling over its space.
 
-	for ( unsigned int z = 0; z < stacks; z++ ) {
-		for ( unsigned int x = 0; x < slices; x++ ) {
+	GridTessellator2f<
+		VertexEvaluator2f< Cone3f, BasicVertexDX11::Vertex >, 
+		DrawIndexedExecutorDX11<BasicVertexDX11::Vertex>
+	> tessellator( stacks, slices );
+	
+	// The tessellator then fires off its activities using the supplied vertex
+	// attribute evaluator and containers.  We simply specify the parameters 
+	// indicating the ranges we want to sweep through the 2D manifold and the
+	// rest is done for us.  In this case, we are tessellating a sphere, so we
+	// pass in [0,2*pi] for theta and [0,pi] for phi.
 
-			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+0 );
-			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+1 );
-			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+0 );
-
-			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+1 );
-			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+1 );
-			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+0 );
-		}
-	}
-
+	tessellator.TessellateTriGrid<BasicVertexDX11::Vertex>( 
+		evaluator, *m_pGeometry,
+		0.0f, static_cast<float>( 2.0 * GLYPH_PI ),
+		0.0f, 1.0f );
 }
+//--------------------------------------------------------------------------------
+//
+//void GeometryActor::DrawCylinder( const Vector3f& p1, const Vector3f& p2, float r1, float r2, unsigned int stacks, unsigned int slices )
+//{
+//	if ( stacks < 2 ) stacks = 2;
+//	if ( slices < 4 ) slices = 4;
+//
+//	// Define the axis of the cylinder, and find its length.
+//	Vector3f v = p1 - p2;
+//	Vector3f vnorm = Vector3f::Normalize( v );
+//	float l = v.Magnitude();
+//
+//	Vector3f up = Vector3f( 0.0f, 1.0f, 0.0f );
+//
+//	// Find the unit vector perpendicular to the axis, that is pointing closest to the (0,1,0) direction.
+//	// If the axis points in the (0,1,0) direction, then use (1,0,0) as the unit vector.
+//	Vector3f unit;
+//	if ( vnorm == up || vnorm == -up ) {
+//		unit = Vector3f( 1.0f, 0.0f, 0.0f );
+//	} else {
+//		Vector3f temp = Vector3f::Cross( vnorm, up );
+//		unit = Vector3f::Cross( temp, vnorm );
+//		unit.Normalize();
+//	}
+//
+//	float sliceStep = static_cast<float>( 2.0 * GLYPH_PI ) / static_cast<float>( slices );
+//	float stackStep = l / static_cast<float>( stacks );
+//	float radiusStep = ( r1 - r2 ) / static_cast<float>( stacks );
+//
+//	float uStep = 2.0f / static_cast<float>( slices );
+//	float vStep = 2.0f / static_cast<float>( stacks );
+//
+//	float normalSlope = ( r2 - r1 ) / l;
+//
+//	// Generate all of the vertices according to the specified input parameters.
+//
+//	unsigned int baseVertex = m_pGeometry->GetVertexCount();
+//	Matrix3f r;
+//
+//	for ( unsigned int stack = 0; stack <= stacks; stack++ ) {
+//		for ( unsigned int slice = 0; slice <= slices; slice++ ) {
+//
+//			float theta = sliceStep * static_cast<float>( slice );
+//			float height = stackStep * static_cast<float>( stack );
+//			float currentRadius = r2 + radiusStep * static_cast<float>( stack );
+//
+//			// Calculate the position, which is a combination of an offset to the p2 endpoint,
+//			// shifted along the axis of the cylinder, and a rotated and scaled radius component.
+//			r.RotationEuler( vnorm, theta );
+//			Vector3f position = p2 + ( vnorm * height ) + ( r * unit * currentRadius );
+//
+//			// Calculate the normal vector, which is dependent on the delta in radii at each
+//			// end of the cylinder.
+//			Vector3f normal = r * unit * currentRadius + vnorm * normalSlope * currentRadius;
+//			normal.Normalize();
+//
+//			Vector2f texcoords;
+//			texcoords.x = uStep * static_cast<float>( slice );
+//			texcoords.y = vStep * static_cast<float>( stack );
+//
+//			AddVertex( position, normal, texcoords );
+//		}
+//	}
+//
+//	// Generate all of the indices according to the specified input parameters.
+//
+//	for ( unsigned int z = 0; z < stacks; z++ ) {
+//		for ( unsigned int x = 0; x < slices; x++ ) {
+//
+//			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+0 );
+//			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+1 );
+//			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+0 );
+//
+//			m_pGeometry->AddIndex( baseVertex + (z+0)*(slices+1) + x+1 );
+//			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+1 );
+//			m_pGeometry->AddIndex( baseVertex + (z+1)*(slices+1) + x+0 );
+//		}
+//	}
+//
+//}
 //--------------------------------------------------------------------------------
 void GeometryActor::DrawBox( const Vector3f& center, const Vector3f& xdir, const Vector3f& ydir, const Vector3f& zdir, const Vector3f& extents )
 {

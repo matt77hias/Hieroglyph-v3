@@ -56,6 +56,7 @@ namespace Glyph3
 		static Matrix4f RotationMatrixY( float fRadians );
 		static Matrix4f RotationMatrixZ( float fRadians );
 		static Matrix4f ScaleMatrix( float fScale );
+		static Matrix4f ScaleMatrix( const Vector3f& scale );
 		static Matrix4f ScaleMatrixXYZ( float fX, float fY, float fZ );
 		static Matrix4f TranslationMatrix( float fX, float fY, float fZ );
 		static Matrix4f LookAtLHMatrix( Vector3f& eye, Vector3f& at, Vector3f& up );
@@ -106,6 +107,27 @@ namespace Glyph3
 
 		// matrix - vector operations
 		Vector4f operator* ( const Vector4f& V ) const;  // M * v
+
+		static const int m11 = 0;
+		static const int m12 = 1;
+		static const int m13 = 2;
+		static const int m14 = 3;
+
+		static const int m21 = 4;
+		static const int m22 = 5;
+		static const int m23 = 6;
+		static const int m24 = 7;
+		
+		static const int m31 = 8;
+		static const int m32 = 9;
+		static const int m33 = 10;
+		static const int m34 = 11;
+
+		static const int m41 = 12;
+		static const int m42 = 13;
+		static const int m43 = 14;
+		static const int m44 = 15;
+
 
 	protected:
 		float m_afEntry[4*4];

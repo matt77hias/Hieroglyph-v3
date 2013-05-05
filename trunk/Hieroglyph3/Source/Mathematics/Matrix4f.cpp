@@ -324,6 +324,33 @@ Matrix4f Matrix4f::ScaleMatrix( float fScale )
 	return( ret );
 }
 //----------------------------------------------------------------------------------------------------
+Matrix4f Matrix4f::ScaleMatrix( const Vector3f& scale )
+{
+	Matrix4f ret;
+
+	ret.m_afEntry[ 0] = scale.x;
+	ret.m_afEntry[ 1] = 0.0f;
+	ret.m_afEntry[ 2] = 0.0f;
+	ret.m_afEntry[ 3] = 0.0f;
+
+	ret.m_afEntry[ 4] = 0.0f;
+	ret.m_afEntry[ 5] = scale.y;
+	ret.m_afEntry[ 6] = 0.0f;
+	ret.m_afEntry[ 7] = 0.0f;
+
+	ret.m_afEntry[ 8] = 0.0f;
+	ret.m_afEntry[ 9] = 0.0f;
+	ret.m_afEntry[10] = scale.z;
+	ret.m_afEntry[11] = 0.0f;
+
+	ret.m_afEntry[12] = 0.0f;
+	ret.m_afEntry[13] = 0.0f;
+	ret.m_afEntry[14] = 0.0f;
+	ret.m_afEntry[15] = 1.0f;
+	
+	return( ret );
+}
+//----------------------------------------------------------------------------------------------------
 Matrix4f Matrix4f::ScaleMatrixXYZ( float fX, float fY, float fZ )
 {
 	Matrix4f ret;
