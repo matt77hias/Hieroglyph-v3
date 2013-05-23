@@ -59,6 +59,14 @@ namespace Glyph3
 		Matrix4f& WorldMatrix( );
 		Matrix4f GetView( ) const;
 
+		Vector4f LocalToWorldSpace( const Vector4f& input );
+		Vector4f WorldToLocalSpace( const Vector4f& input );
+		Vector3f LocalVectorToWorldSpace( const Vector3f& input );
+		Vector3f LocalPointToWorldSpace( const Vector3f& input );
+		Vector3f WorldVectorToLocalSpace( const Vector3f& input );
+		Vector3f WorldPointToLocalSpace( const Vector3f& input );
+
+
 		void SetMaterial( MaterialPtr pMaterial );
 		MaterialPtr GetMaterial( );
 

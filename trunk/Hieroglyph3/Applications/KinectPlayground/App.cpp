@@ -119,7 +119,7 @@ void App::Initialize()
 
 	m_pDepthMapViewer->GetNode()->Position() = Vector3f( 1.0f, 0.0f, 2.0f );
 	m_pDepthMapViewer->GetNode()->Rotation().RotationX( 0.0f );
-	m_pDepthMapViewer->GetNode()->Scale() = 7.0f;
+	m_pDepthMapViewer->GetNode()->Scale() = Vector3f( 7.0f, 7.0f, 7.0f );
 
 
 

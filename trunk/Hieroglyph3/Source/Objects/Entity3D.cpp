@@ -192,6 +192,48 @@ Matrix4f Entity3D::GetView() const
 	return( Matrix4f::LookAtLHMatrix( Eye, At, Up ) );
 }
 //--------------------------------------------------------------------------------
+Vector4f Entity3D::LocalToWorldSpace( const Vector4f& input )
+{
+	Vector4f result = WorldMatrix() * input;
+
+    return( result );
+}
+//--------------------------------------------------------------------------------
+Vector4f Entity3D::WorldToLocalSpace( const Vector4f& input )
+{
+	Vector4f result = WorldMatrix().Inverse() * input;
+
+    return( result );
+}
+//--------------------------------------------------------------------------------
+Vector3f Entity3D::LocalVectorToWorldSpace( const Vector3f& input )
+{
+	Vector4f result = LocalToWorldSpace( Vector4f( input, 0.0f ) ); 
+
+	return( result.xyz() );
+}
+//--------------------------------------------------------------------------------
+Vector3f Entity3D::LocalPointToWorldSpace( const Vector3f& input )
+{
+	Vector4f result = LocalToWorldSpace( Vector4f( input, 1.0f ) ); 
+
+	return( result.xyz() );
+}
+//--------------------------------------------------------------------------------
+Vector3f Entity3D::WorldVectorToLocalSpace( const Vector3f& input )
+{
+	Vector4f result = WorldToLocalSpace( Vector4f( input, 0.0f ) ); 
+
+	return( result.xyz() );
+}
+//--------------------------------------------------------------------------------
+Vector3f Entity3D::WorldPointToLocalSpace( const Vector3f& input )
+{
+	Vector4f result = WorldToLocalSpace( Vector4f( input, 1.0f ) ); 
+
+	return( result.xyz() );
+}
+//--------------------------------------------------------------------------------
 void Entity3D::PreRender( RendererDX11* pRenderer, VIEWTYPE view )
 {
 	// Perform the pre-render function only if the material has been set

@@ -86,7 +86,10 @@ void Scene::RemoveActor( Actor* pActor )
 	auto it = m_vActors.begin();
 
 	while ( it != m_vActors.end() ) {
-		if ( *it == pActor ) it = m_vActors.erase( it );
+		if ( *it == pActor ) 
+			it = m_vActors.erase( it );
+		else
+			it++;
 	}
 
 	// Now we remove the actor's node from the scene's root node, if it is there.

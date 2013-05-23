@@ -297,9 +297,10 @@ void SpriteRendererDX11::RenderText( PipelineManagerDX11* pipeline,
 
 	Matrix4f textTransform = Matrix4f::Identity();
 
-	UINT numCharsToDraw = min( length, MaxBatchSize );
+	size_t numCharsToDraw = min( length, MaxBatchSize );
 	UINT currentDraw = 0;
-	for (UINT i = 0; i < numCharsToDraw; ++i)
+
+	for (size_t i = 0; i < numCharsToDraw; ++i)
 	{
 		wchar_t character = text[i];
 		if(character == ' ')

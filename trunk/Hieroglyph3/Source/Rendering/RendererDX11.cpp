@@ -184,7 +184,7 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 	std::vector<DXGIAdapter*> vAdapters;
 	std::vector<DXGIOutput*> vOutputs;
 
-	while( pFactory->EnumAdapters1( vAdapters.size(), &pCurrentAdapter ) != DXGI_ERROR_NOT_FOUND )
+	while( pFactory->EnumAdapters1( static_cast<UINT>(vAdapters.size()), &pCurrentAdapter ) != DXGI_ERROR_NOT_FOUND )
 	{
 		vAdapters.push_back( new DXGIAdapter( pCurrentAdapter ) );
 

@@ -39,5 +39,5 @@ Hieroglyph requires the use of VS2012 for building.  In addition, the following 
 3. DirectXTK - I have included a copy of the DirectXTK source code in the source distribution.  Please note the license for using this library and act accordingly!  Upgrading to new versions of this library should be very easy, and just requires copying the source code into the Dependencies\DirectXTK folder.
 4. Kinect SDK - If you want to use the Kinect sensor as input, then you need to install the latest Kinect for Windows SDK.  Please follow the instructions on the Kinect SDK website, and everything else should be ready to go.  Please note that this requires Windows 7 or 8 to compile the Kinect samples (sorry Vista users)!
 
-With these dependencies taken care of, you should be able to easily build the projects and try out the sample programs.  If you encounter issues or problems, please post an issue in the Hieroglyph 3 codeplex site!
-
+With these dependencies taken care of, you should be able to easily build the projects and try out the sample programs.  In addition, both x86 and x64 build targets are now available.
+If you encounter issues or problems, please post an issue in the Hieroglyph 3 codeplex site!

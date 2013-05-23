@@ -37,7 +37,7 @@ Win32RenderWindow::~Win32RenderWindow()
 //--------------------------------------------------------------------------------
 LRESULT CALLBACK InternalWindowProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam )
 {
-	LONG ObjPtr = GetWindowLongPtr(hwnd, 0);
+	LONG_PTR ObjPtr = GetWindowLongPtr(hwnd, 0);
 
 	if (ObjPtr == 0) {
         return( DefWindowProc( hwnd, msg, wparam, lparam ) );
@@ -106,7 +106,7 @@ void Win32RenderWindow::Initialize(IWindowProc* WindowProcObj)
 	if (m_hWnd) {
 		// Set in the "extra" bytes the pointer to the IWindowProc object
 		// which handles messages for the window
-        SetWindowLong(m_hWnd, 0, (LONG)WindowProcObj);
+        SetWindowLongPtr(m_hWnd, 0, (LONG_PTR)WindowProcObj);
     	// Initially display the window
 		ShowWindow( m_hWnd, SW_SHOWNORMAL );
 		UpdateWindow( m_hWnd );

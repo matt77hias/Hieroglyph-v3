@@ -68,7 +68,10 @@ void Actor::RemoveElement( Entity3D* pElement )
 	auto it = m_Elements.begin();
 
 	while ( it != m_Elements.end() ) {
-		if ( *it == pElement ) it = m_Elements.erase( it );
+		if ( *it == pElement ) 
+			it = m_Elements.erase( it );
+		else
+			it++;
 	}
 
 	// Removing an element from this list does not automatically remove any sub-

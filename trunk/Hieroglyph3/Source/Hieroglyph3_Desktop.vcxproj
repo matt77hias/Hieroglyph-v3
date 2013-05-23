@@ -5,9 +5,17 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
@@ -71,6 +79,7 @@
     <ClCompile Include="Objects\FirstPersonCamera.cpp" />
     <ClCompile Include="Objects\GeometryActor.cpp">
       <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</PreprocessToFile>
+      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</PreprocessToFile>
     </ClCompile>
     <ClCompile Include="Objects\GlyphletActor.cpp" />
     <ClCompile Include="Objects\IController.cpp" />
@@ -112,6 +121,7 @@
     <ClCompile Include="Rendering\EntityRenderParams.cpp" />
     <ClCompile Include="Rendering\GeometryDX11.cpp">
       <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</PreprocessToFile>
+      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</PreprocessToFile>
     </ClCompile>
     <ClCompile Include="Rendering\GeometryGeneratorDX11.cpp" />
     <ClCompile Include="Rendering\GeometryLoaderDX11.cpp" />
@@ -211,7 +221,9 @@
     <ClCompile Include="Utility\Log.cpp" />
     <ClCompile Include="Utility\PCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Utility\Timer.cpp" />
   </ItemGroup>
@@ -461,7 +473,20 @@
     <PlatformToolset>v110</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
@@ -474,17 +499,31 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>..\SDK\Library\$(Configuration)\</OutDir>
-    <IntDir>Bin\$(Configuration)\</IntDir>
+    <OutDir>..\SDK\Library\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>..\SDK\Library\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>..\SDK\Library\$(Configuration)\</OutDir>
-    <IntDir>Bin\$(Configuration)\</IntDir>
+    <OutDir>..\SDK\Library\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>..\SDK\Library\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -518,7 +557,43 @@ copy Animation\*.h ..\SDK\Include
 copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”</Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>..\Dependencies\DirectXTK\Bin\Desktop_2012\Win32\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\Dependencies\DirectXTK\Bin\Desktop_2012\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DirectXTK.lib;D3DCompiler.lib;DXGUID.lib</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation;..\Dependencies\DirectXTK\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessToFile>false</PreprocessToFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy Application\*.h ..\SDK\Include
+copy Events\*.h ..\SDK\Include
+copy Mathematics\*.h ..\SDK\Include
+copy Mathematics\*.inl ..\SDK\Include
+copy Scripting\*.h ..\SDK\Include
+copy Utility\*.h ..\SDK\Include
+copy Utility\*.inl ..\SDK\Include
+copy Rendering\*.h ..\SDK\Include
+copy Rendering\*.inl ..\SDK\Include
+copy Geometry\*.h ..\SDK\Include
+copy Intersection\*.h ..\SDK\Include
+copy Objects\*.h ..\SDK\Include
+copy Objects\*.inl ..\SDK\Include
+copy Animation\*.h ..\SDK\Include
+copy “$(WindowsSdkDir)redist\d3d\x64\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”</Command>
+    </PostBuildEvent>
+    <Lib>
+      <AdditionalLibraryDirectories>..\Dependencies\DirectXTK\Bin\Desktop_2012\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>DirectXTK.lib;D3DCompiler.lib;DXGUID.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
@@ -557,7 +632,46 @@ copy Animation\*.h ..\SDK\Include
 copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”</Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>..\Dependencies\DirectXTK\Bin\Desktop_2012\Win32\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\Dependencies\DirectXTK\Bin\Desktop_2012\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DirectXTK.lib;D3DCompiler.lib;DXGUID.lib</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation;..\Dependencies\DirectXTK\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy Application\*.h ..\SDK\Include
+copy Events\*.h ..\SDK\Include
+copy Mathematics\*.h ..\SDK\Include
+copy Mathematics\*.inl ..\SDK\Include
+copy Scripting\*.h ..\SDK\Include
+copy Utility\*.h ..\SDK\Include
+copy Utility\*.inl ..\SDK\Include
+copy Rendering\*.h ..\SDK\Include
+copy Rendering\*.inl ..\SDK\Include
+copy Geometry\*.h ..\SDK\Include
+copy Intersection\*.h ..\SDK\Include
+copy Objects\*.h ..\SDK\Include
+copy Objects\*.inl ..\SDK\Include
+copy Animation\*.h ..\SDK\Include
+copy “$(WindowsSdkDir)redist\d3d\x64\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”</Command>
+    </PostBuildEvent>
+    <Lib>
+      <AdditionalLibraryDirectories>..\Dependencies\DirectXTK\Bin\Desktop_2012\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>DirectXTK.lib;D3DCompiler.lib;DXGUID.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>

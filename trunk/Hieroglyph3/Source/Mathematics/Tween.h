@@ -9,32 +9,28 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// CompositeShape
+// Tween
 //
 //--------------------------------------------------------------------------------
-#ifndef CompositeShape_h
-#define CompositeShape_h
+#ifndef Tween_h
+#define Tween_h
 //--------------------------------------------------------------------------------
-#include "Shape3D.h"
-#include "Ray3f.h"
+#include "IController.h"
+#include <functional>
+#include "Entity3D.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class CompositeShape
+	template <class TValue>
+	class Tween
 	{
 	public:
-		CompositeShape( );
-		virtual ~CompositeShape( );
-
-		CompositeShape* DeepCopy( );
-
-		void AddShape( Shape3D* pShape );
-		bool RayIntersection( Ray3f pRay, float* fDist );
-
-		int GetNumberOfShapes();
-
-		std::vector< Shape3D* > m_Shapes;
+		static TValue Linear( TValue start, TValue end, float t );
+		static TValue QuadraticInOut( TValue start, TValue end, float t );
 	};
+
+	#include "Tween.inl"
 };
 //--------------------------------------------------------------------------------
-#endif // CompositeShape_h
+#endif // Tween_h
+//--------------------------------------------------------------------------------
