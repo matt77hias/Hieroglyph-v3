@@ -477,6 +477,11 @@ void GeometryActor::DrawBox( const Vector3f& center, const Vector3f& extents )
 	DrawBox( center, Vector3f( 1.0f, 0.0f, 0.0f ), Vector3f( 0.0f, 1.0f, 0.0f ), Vector3f( 0.0f, 0.0f, 1.0f ), extents );
 }
 //--------------------------------------------------------------------------------
+void GeometryActor::DrawAxisAlignedBox( const Vector3f& pt1, const Vector3f& pt2 )
+{
+	DrawBox( (pt1+pt2) * 0.5f, Vector3f( 1.0f, 0.0f, 0.0f ), Vector3f( 0.0f, 1.0f, 0.0f ), Vector3f( 0.0f, 0.0f, 1.0f ), pt2 - pt1 );
+}
+//--------------------------------------------------------------------------------
 void GeometryActor::DrawRect( const Vector3f& center, const Vector3f& xdir, const Vector3f& ydir, const Vector2f& extents )
 {
 	// Generate all of the vertices according to the specified input parameters.

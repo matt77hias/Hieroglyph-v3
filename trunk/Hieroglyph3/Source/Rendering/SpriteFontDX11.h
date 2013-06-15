@@ -82,6 +82,8 @@ namespace Glyph3
 		float SpaceWidth() const;
 		float CharHeight() const;
 
+		float GetStringWidth( const std::wstring& line );
+
 	protected:
 		std::wstring m_FontName;
 		float m_fSize;

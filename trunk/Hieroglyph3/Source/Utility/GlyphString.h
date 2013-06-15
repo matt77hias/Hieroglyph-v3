@@ -22,8 +22,8 @@ namespace Glyph3
 	class GlyphString
 	{
 	public:
-		static std::string ToAscii( std::wstring& input );
-		static std::wstring ToUnicode( std::string& input );            
+		static std::string ToAscii( const std::wstring& input );
+		static std::wstring ToUnicode( const std::string& input );            
 
 	private:
 		GlyphString();

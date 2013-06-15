@@ -111,6 +111,8 @@ bool RenderApplication::ConfigureRenderingEngineComponents( UINT width, UINT hei
 
 	SetMultiThreadedMode( true );
 
+	SetScreenShotName( GetName() );
+
 	return( true );
 }
 //--------------------------------------------------------------------------------
@@ -243,7 +245,12 @@ void RenderApplication::TakeScreenShot()
 	if ( m_bSaveScreenshot  )
 	{
 		m_bSaveScreenshot = false;
-		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, GetName() /*, D3DX11_IFF_BMP*/ );
+		m_pRenderer11->pImmPipeline->SaveTextureScreenShot( 0, m_ScreenShotName );
 	}
+}
+//--------------------------------------------------------------------------------
+void RenderApplication::SetScreenShotName( const std::wstring name )
+{
+	m_ScreenShotName = name;
 }
 //--------------------------------------------------------------------------------

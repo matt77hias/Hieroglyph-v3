@@ -38,6 +38,11 @@ void VectorParameterWriterDX11::SetValue( Vector4f& Value )
 	m_Value = Value;
 }
 //--------------------------------------------------------------------------------
+Vector4f VectorParameterWriterDX11::GetValue()
+{
+	return( m_Value );
+}
+//--------------------------------------------------------------------------------
 void VectorParameterWriterDX11::InitializeParameter( )
 {
 	m_pParameter->InitializeParameterData( &m_Value );

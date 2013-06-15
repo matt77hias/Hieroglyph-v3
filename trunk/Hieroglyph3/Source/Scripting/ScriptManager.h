@@ -103,7 +103,7 @@ namespace Glyph3
 		void* GetObjectPointer( unsigned int ID );
 		unsigned int GetObjectHandle( void* pObject );
 
-		void Run( char *fp_szFileName );
+		void Run( const char *fp_szFileName );
 		lua_State* GetState( );
 
 		void ReportErrors();

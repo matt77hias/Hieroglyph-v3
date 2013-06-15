@@ -45,6 +45,7 @@ namespace Glyph3
 		bool GetMultiThreadedMode();
 
 		virtual void TakeScreenShot();
+		virtual void SetScreenShotName( const std::wstring name );
 
 	protected:
 
@@ -60,6 +61,8 @@ namespace Glyph3
 		ViewTextOverlay*		m_pTextOverlayView;
 
 		bool					m_bMultithreadedMode;
+
+		std::wstring			m_ScreenShotName;
 
 	public:
 		Camera*					m_pCamera;

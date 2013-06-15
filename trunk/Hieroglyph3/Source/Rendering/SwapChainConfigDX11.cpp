@@ -44,7 +44,13 @@ void SwapChainConfigDX11::SetDefaults()
 	m_State.OutputWindow = 0;
 	m_State.Windowed = true;
 	m_State.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-	m_State.Flags = 0;
+
+	// If you are creating a full screen swap chain, you may want to include the 
+	// DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH flag in the flags below, which will
+	// override the default DXGI behavior.  See here for more details:
+	// http://msdn.microsoft.com/en-us/library/windows/desktop/ee417025%28v=vs.85%29.aspx
+
+	m_State.Flags = 0; 
 }
 //--------------------------------------------------------------------------------
 void SwapChainConfigDX11::SetWidth( UINT width )

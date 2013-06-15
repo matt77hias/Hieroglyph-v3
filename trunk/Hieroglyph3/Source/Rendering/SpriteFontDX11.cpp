@@ -257,3 +257,30 @@ ResourcePtr SpriteFontDX11::TextureResource() const
 	return m_pTexture;
 }
 //--------------------------------------------------------------------------------
+float SpriteFontDX11::GetStringWidth( const std::wstring& text )
+{
+	float fWidth = 0.0f;
+
+	for ( UINT i = 0; i < text.length(); i++ )
+	{
+		wchar_t character = text[i];
+
+		if ( character == ' ' ) 
+		{
+			// Add the width of one space.
+			fWidth += SpaceWidth();
+		} 
+		else if ( character == '\n' )
+		{
+			// Do nothing - don't count a newline in the width calculation.
+		} 
+		else 
+		{
+			// Lookup the character's width and add it to the tally.
+			fWidth += this->GetCharDescriptor( character ).Width;
+		}
+	}
+
+	return( fWidth );
+}
+//--------------------------------------------------------------------------------

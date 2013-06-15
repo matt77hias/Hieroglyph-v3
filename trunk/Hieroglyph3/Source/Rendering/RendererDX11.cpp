@@ -204,8 +204,8 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 
 	D3D_FEATURE_LEVEL level[] = { FeatureLevel };
 	hr = D3D11CreateDevice(
-				0, //vAdapters[0]->m_pAdapter,
-				DriverType,
+				0,				//vAdapters[0]->m_pAdapter,
+				DriverType,		//D3D_DRIVER_TYPE_UNKNOWN, 
 				0,
 				CreateDeviceFlags,
 				level,
@@ -424,7 +424,7 @@ void RendererDX11::Present( HWND hWnd, int SwapChain )
 
 	if ( index < m_vSwapChains.size() ) {
 		SwapChainDX11* pSwapChain = m_vSwapChains[SwapChain];
-		pSwapChain->m_pSwapChain->Present( 0, 0 );
+		HRESULT hr = pSwapChain->m_pSwapChain->Present( 0, 0 );
 	}
 	else {
 		Log::Get().Write( L"Tried to present an invalid swap chain index!" );

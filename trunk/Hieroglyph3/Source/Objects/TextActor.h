@@ -39,6 +39,20 @@ namespace Glyph3
 {
 	typedef std::shared_ptr<DrawIndexedExecutorDX11<BasicVertexDX11::Vertex>> IndexedImmediateGeometryPtr;
 
+	enum TextOriginReference
+	{
+		TOP,
+		MIDDLE,
+		BOTTOM
+	};
+
+	enum LineJustification
+	{
+		LEFT,
+		CENTER,
+		RIGHT
+	};
+
 	class TextActor : public Actor
 	{
 	public:
@@ -58,6 +72,7 @@ namespace Glyph3
 		// advance the 'cursor' with a space, or start a new line of text.
 
 		void DrawCharacter( const wchar_t& character );
+		void DrawLine( const std::wstring& line );
 		void DrawString( const std::wstring& text );
 		void AdvanceCursor( float distance );
 		void Space();
@@ -81,6 +96,8 @@ namespace Glyph3
 
 		void SetFont( SpriteFontPtr pFont );
 		void SetCharacterHeight( float scale );
+		void SetTextLineReference( TextOriginReference reference );
+		void SetLineJustification( LineJustification justification );
 		
 	private:
 		void AddVertex( const Vector3f& position, const Vector2f& texcoords );
@@ -105,6 +122,9 @@ namespace Glyph3
 		float									m_fPhysicalScale;
 		float									m_fTextureXScale;
 		float									m_fTextureYScale;
+
+		TextOriginReference						m_TextReference;
+		LineJustification						m_LineJustification;
 	};
 };
 //--------------------------------------------------------------------------------

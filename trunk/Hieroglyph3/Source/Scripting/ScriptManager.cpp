@@ -46,7 +46,7 @@ ScriptManager* ScriptManager::Get()
 	return( ms_pScriptManager );
 }
 //--------------------------------------------------------------------------------
-void ScriptManager::Run( char* FileName )
+void ScriptManager::Run( const char* FileName )
 {
 //	char AsciiFileName[1024];
 //	WideCharToMultiByte( CP_ACP, 0, FileName, -1, AsciiFileName, 1024, NULL, NULL);

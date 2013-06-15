@@ -30,7 +30,9 @@ TextActor::TextActor()
 	  m_fCharacterHeight( 0.8f ),
 	  m_fPhysicalScale( m_fCharacterHeight / 20.0f ),
 	  m_fTextureXScale( 0.1f ),
-	  m_fTextureYScale( 0.1f )
+	  m_fTextureYScale( 0.1f ),
+	  m_TextReference( TOP ),
+	  m_LineJustification( LEFT )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
 
@@ -122,9 +124,23 @@ void TextActor::SetTextOrigin( const Vector3f& location )
 	// makes the line start location as well as the cursor location default to
 	// the origin.
 
-	m_Origin = location;
-	m_LineStart = location;
-	m_Cursor = location;
+	//m_Origin = location;
+
+	switch ( m_TextReference )
+	{
+	case TOP:
+		m_Origin = location;
+		break;
+	case MIDDLE:
+		m_Origin = location + m_ydir * m_fCharacterHeight * 0.5f;
+		break;
+	case BOTTOM:
+		m_Origin = location + m_ydir * m_fCharacterHeight * 1.0f;
+		break;
+	}
+
+	m_LineStart = m_Origin;
+	m_Cursor = m_LineStart;
 }
 //--------------------------------------------------------------------------------
 void TextActor::SetTextOrientation( const Vector3f& xdir, const Vector3f& ydir )
@@ -178,6 +194,38 @@ void TextActor::AddVertex( const Vector3f& position, const Vector2f& texcoords )
 //--------------------------------------------------------------------------------
 void TextActor::DrawString( const std::wstring& text )
 {
+	std::wstringstream			tempStream( text );
+	std::wstring				line;
+
+	while ( std::getline( tempStream, line ) ) 
+	{
+		DrawLine( line );
+	}
+
+}
+//--------------------------------------------------------------------------------
+void TextActor::DrawLine( const std::wstring& text )
+{
+	// Check the length of the string, and use the line justification to advance 
+	// the cursor an appropriate amount before actually drawing the line of text.
+
+	float fWidth = m_pSpriteFont->GetStringWidth( text ) * m_fPhysicalScale;
+
+	switch( m_LineJustification )
+	{
+	case LEFT:
+		// No change needed - just draw the text from teh current cursor position
+		break;
+	case MIDDLE:
+		// Advance cursor to the 'left' by half the string width
+		AdvanceCursor( -fWidth * 0.5f );
+		break;
+	case RIGHT:
+		// Advance the cursor by the full size of the string.
+		AdvanceCursor( -fWidth );
+	}
+
+
 	for ( UINT i = 0; i < text.length(); i++ )
 	{
 		wchar_t character = text[i];
@@ -200,6 +248,8 @@ void TextActor::DrawString( const std::wstring& text )
 
 		}
 	}
+
+	NewLine();
 }
 //--------------------------------------------------------------------------------
 void TextActor::DrawCharacter( const wchar_t& character )
@@ -290,5 +340,15 @@ void TextActor::SetCharacterHeight( float height )
 {
 	m_fCharacterHeight = height;
 	m_fPhysicalScale = m_fCharacterHeight / m_pSpriteFont->CharHeight();
+}
+//--------------------------------------------------------------------------------
+void TextActor::SetTextLineReference( TextOriginReference reference )
+{
+	m_TextReference = reference;
+}
+//--------------------------------------------------------------------------------
+void TextActor::SetLineJustification( LineJustification justification )
+{
+	m_LineJustification = justification;
 }
 //--------------------------------------------------------------------------------

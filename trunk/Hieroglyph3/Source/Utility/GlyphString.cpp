@@ -18,7 +18,7 @@ GlyphString::GlyphString( )
 {
 }
 //--------------------------------------------------------------------------------
-std::string GlyphString::ToAscii( std::wstring& s )
+std::string GlyphString::ToAscii( const std::wstring& s )
 {
 	std::string temp(s.length(), ' ');
 	#pragma warning( disable : 4244 )
@@ -26,7 +26,7 @@ std::string GlyphString::ToAscii( std::wstring& s )
 	return temp;
 }
 //--------------------------------------------------------------------------------
-std::wstring GlyphString::ToUnicode( std::string& s )
+std::wstring GlyphString::ToUnicode( const std::string& s )
 {
 	std::wstring temp(s.length(),L' ');
 	std::copy(s.begin(), s.end(), temp.begin());
