@@ -189,6 +189,9 @@
     <Filter Include="Rendering\Tessellation Toolkit">
       <UniqueIdentifier>{5bee33c2-1f5b-4b20-ab84-093b499a1007}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering\Pipeline System\Stages\Fixed Stages\Stream Output">
+      <UniqueIdentifier>{b4bb4fe3-e716-4e8c-9f22-1109e88e4788}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation\AnimationStream.cpp">
@@ -778,6 +781,12 @@
     </ClCompile>
     <ClCompile Include="Objects\ObjectSpaceCameraPositionWriter.cpp">
       <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\StreamOutputStageDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Stream Output</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\StreamOutputStageStateDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Stream Output</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1437,6 +1446,12 @@
     </ClInclude>
     <ClInclude Include="Objects\ObjectSpaceCameraPositionWriter.h">
       <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\StreamOutputStageDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Stream Output</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\StreamOutputStageStateDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Stream Output</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

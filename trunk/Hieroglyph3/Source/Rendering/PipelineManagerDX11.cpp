@@ -110,6 +110,7 @@ void PipelineManagerDX11::SetDeviceContext( ID3D11DeviceContext* pContext, D3D_F
 	ShaderStages[COMPUTE_SHADER]->SetFeatureLevel( level );
 
 	InputAssemblerStage.SetFeautureLevel( level );
+	StreamOutputStage.SetFeautureLevel( level );
 	RasterizerStage.SetFeatureLevel( level );
 	OutputMergerStage.SetFeautureLevel( level );
 }
@@ -305,6 +306,7 @@ void PipelineManagerDX11::ApplyPipelineResources( )
 	// TODO: this may not be the correct place to set this state! The Rasterizer
 	// state should probably be split into two parts like the OM state.
 
+	StreamOutputStage.ApplyDesiredState( m_pContext );
 	RasterizerStage.ApplyDesiredState( m_pContext );
 	OutputMergerStage.ApplyDesiredBlendAndDepthStencilStates( m_pContext );
 }
@@ -317,6 +319,8 @@ void PipelineManagerDX11::ClearPipelineResources( )
 	GeometryShaderStage.ClearDesiredState( );
 	PixelShaderStage.ClearDesiredState( );
 	ComputeShaderStage.ClearDesiredState( );
+
+	StreamOutputStage.ClearDesiredState( );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ClearPipelineState( )
@@ -337,6 +341,9 @@ void PipelineManagerDX11::ClearPipelineState( )
 
 	GeometryShaderStage.ClearCurrentState();
 	GeometryShaderStage.ClearDesiredState();
+
+	StreamOutputStage.ClearCurrentState();
+	StreamOutputStage.ClearDesiredState();
 
 	RasterizerStage.ClearCurrentState( );
 	RasterizerStage.ClearDesiredState( );
@@ -912,6 +919,9 @@ void PipelineManagerDX11::GenerateCommandList( CommandListDX11* pList )
 		GeometryShaderStage.ClearCurrentState();
 		GeometryShaderStage.ClearDesiredState();
 
+		StreamOutputStage.ClearCurrentState();
+		StreamOutputStage.ClearDesiredState();
+
 		RasterizerStage.ClearCurrentState( );
 		RasterizerStage.ClearDesiredState( );
 
@@ -946,6 +956,9 @@ void PipelineManagerDX11::ExecuteCommandList( CommandListDX11* pList )
 
 	GeometryShaderStage.ClearCurrentState();
 	GeometryShaderStage.ClearDesiredState();
+
+	StreamOutputStage.ClearCurrentState();
+	StreamOutputStage.ClearDesiredState();
 
 	RasterizerStage.ClearCurrentState( );
 	RasterizerStage.ClearDesiredState( );

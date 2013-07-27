@@ -69,6 +69,13 @@ void Scene::AddCamera( Camera* camera )
 	AddActor( camera );
 }
 //--------------------------------------------------------------------------------
+Camera* Scene::GetCamera( unsigned int index )
+{
+	assert( index < m_vCameras.size() );
+
+	return( m_vCameras[index] );
+}
+//--------------------------------------------------------------------------------
 void Scene::AddActor( Actor* actor )
 {
 	// Link the actor's node into the scene, and then add the actor to the list

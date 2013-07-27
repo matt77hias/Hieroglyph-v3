@@ -56,7 +56,7 @@ void Node3D::Update( float time )
 void Node3D::AttachChild( Entity3D* Child )
 {
 	// Check for open spots in the vector
-	for ( auto pChild : m_vChildren )
+	for ( auto& pChild : m_vChildren )
 	{
 		if ( pChild == nullptr )
 		{
@@ -73,7 +73,7 @@ void Node3D::AttachChild( Entity3D* Child )
 //--------------------------------------------------------------------------------
 void Node3D::DetachChild( Entity3D* Child )
 {
-	for ( auto pChild : m_vChildren )
+	for ( auto& pChild : m_vChildren )
 	{
 		if ( pChild == Child )
 		{

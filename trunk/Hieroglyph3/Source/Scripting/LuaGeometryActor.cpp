@@ -71,10 +71,10 @@ int LuaGeometryActor::SetColor( lua_State* L )
 	GeometryActor* pActor = CheckType( L, 1 );
 	
 	Vector4f c;
-	c.x = luaL_checknumber( L, 2 );
-	c.y = luaL_checknumber( L, 3 );
-	c.z = luaL_checknumber( L, 4 );
-	c.w = luaL_checknumber( L, 5 );
+	c.x = static_cast<float>( luaL_checknumber( L, 2 ) );
+	c.y = static_cast<float>( luaL_checknumber( L, 3 ) );
+	c.z = static_cast<float>( luaL_checknumber( L, 4 ) );
+	c.w = static_cast<float>( luaL_checknumber( L, 5 ) );
 	
 	pActor->SetColor( c );
 
@@ -86,10 +86,10 @@ int LuaGeometryActor::DrawSphere( lua_State* L )
 	GeometryActor* pActor = CheckType( L, 1 );
 	
 	Vector3f p;
-	p.x = luaL_checknumber( L, 2 );
-	p.y = luaL_checknumber( L, 3 );
-	p.z = luaL_checknumber( L, 4 );
-	float r = luaL_checknumber( L, 5 );
+	p.x = static_cast<float>( luaL_checknumber( L, 2 ) );
+	p.y = static_cast<float>( luaL_checknumber( L, 3 ) );
+	p.z = static_cast<float>( luaL_checknumber( L, 4 ) );
+	float r = static_cast<float>( luaL_checknumber( L, 5 ) );
 	
 	pActor->DrawSphere( p, r );
 
@@ -104,15 +104,15 @@ int LuaGeometryActor::DrawDisc( lua_State* L )
 	Vector3f normal;
 	float radius;
 	
-	center.x = luaL_checknumber( L, 2 );
-	center.y = luaL_checknumber( L, 3 );
-	center.z = luaL_checknumber( L, 4 );
+	center.x = static_cast<float>( luaL_checknumber( L, 2 ) );
+	center.y = static_cast<float>( luaL_checknumber( L, 3 ) );
+	center.z = static_cast<float>( luaL_checknumber( L, 4 ) );
 
-	normal.x = luaL_checknumber( L, 5 );
-	normal.y = luaL_checknumber( L, 6 );
-	normal.z = luaL_checknumber( L, 7 );
+	normal.x = static_cast<float>( luaL_checknumber( L, 5 ) );
+	normal.y = static_cast<float>( luaL_checknumber( L, 6 ) );
+	normal.z = static_cast<float>( luaL_checknumber( L, 7 ) );
 
-	radius = luaL_checknumber( L, 8 );
+	radius = static_cast<float>( luaL_checknumber( L, 8 ) );
 
 	pActor->DrawDisc( center, normal, radius );
 
@@ -128,16 +128,16 @@ int LuaGeometryActor::DrawCylinder( lua_State* L )
 	float r1;
 	float r2;
 	
-	p1.x = luaL_checknumber( L, 2 );
-	p1.y = luaL_checknumber( L, 3 );
-	p1.z = luaL_checknumber( L, 4 );
+	p1.x = static_cast<float>( luaL_checknumber( L, 2 ) );
+	p1.y = static_cast<float>( luaL_checknumber( L, 3 ) );
+	p1.z = static_cast<float>( luaL_checknumber( L, 4 ) );
 
-	p2.x = luaL_checknumber( L, 5 );
-	p2.y = luaL_checknumber( L, 6 );
-	p2.z = luaL_checknumber( L, 7 );
+	p2.x = static_cast<float>( luaL_checknumber( L, 5 ) );
+	p2.y = static_cast<float>( luaL_checknumber( L, 6 ) );
+	p2.z = static_cast<float>( luaL_checknumber( L, 7 ) );
 
-	r1 = luaL_checknumber( L, 8 );
-	r2 = luaL_checknumber( L, 9 );
+	r1 = static_cast<float>( luaL_checknumber( L, 8 ) );
+	r2 = static_cast<float>( luaL_checknumber( L, 9 ) );
 
 	pActor->DrawCylinder( p1, p2, r1, r2 );
 
@@ -154,25 +154,25 @@ int LuaGeometryActor::DrawBox( lua_State* L )
 	Vector3f zdir;
 	Vector3f extents;
 	
-	center.x = luaL_checknumber( L, 2 );
-	center.y = luaL_checknumber( L, 3 );
-	center.z = luaL_checknumber( L, 4 );
+	center.x = static_cast<float>( luaL_checknumber( L, 2 ) );
+	center.y = static_cast<float>( luaL_checknumber( L, 3 ) );
+	center.z = static_cast<float>( luaL_checknumber( L, 4 ) );
 
-	xdir.x = luaL_checknumber( L, 5 );
-	xdir.y = luaL_checknumber( L, 6 );
-	xdir.z = luaL_checknumber( L, 7 );
+	xdir.x = static_cast<float>( luaL_checknumber( L, 5 ) );
+	xdir.y = static_cast<float>( luaL_checknumber( L, 6 ) );
+	xdir.z = static_cast<float>( luaL_checknumber( L, 7 ) );
 
-	ydir.x = luaL_checknumber( L, 8 );
-	ydir.y = luaL_checknumber( L, 9 );
-	ydir.z = luaL_checknumber( L, 10 );
+	ydir.x = static_cast<float>( luaL_checknumber( L, 8 ) );
+	ydir.y = static_cast<float>( luaL_checknumber( L, 9 ) );
+	ydir.z = static_cast<float>( luaL_checknumber( L, 10 ) );
 
-	zdir.x = luaL_checknumber( L, 11 );
-	zdir.y = luaL_checknumber( L, 12 );
-	zdir.z = luaL_checknumber( L, 13 );
+	zdir.x = static_cast<float>( luaL_checknumber( L, 11 ) );
+	zdir.y = static_cast<float>( luaL_checknumber( L, 12 ) );
+	zdir.z = static_cast<float>( luaL_checknumber( L, 13 ) );
 
-	extents.x = luaL_checknumber( L, 14 );
-	extents.y = luaL_checknumber( L, 15 );
-	extents.z = luaL_checknumber( L, 16 );
+	extents.x = static_cast<float>( luaL_checknumber( L, 14 ) );
+	extents.y = static_cast<float>( luaL_checknumber( L, 15 ) );
+	extents.z = static_cast<float>( luaL_checknumber( L, 16 ) );
 
 	pActor->DrawBox( center, xdir, ydir, zdir, extents );
 
@@ -188,20 +188,20 @@ int LuaGeometryActor::DrawRect( lua_State* L )
 	Vector3f ydir;
 	Vector2f extents;
 	
-	center.x = luaL_checknumber( L, 2 );
-	center.y = luaL_checknumber( L, 3 );
-	center.z = luaL_checknumber( L, 4 );
+	center.x = static_cast<float>( luaL_checknumber( L, 2 ) );
+	center.y = static_cast<float>( luaL_checknumber( L, 3 ) );
+	center.z = static_cast<float>( luaL_checknumber( L, 4 ) );
 
-	xdir.x = luaL_checknumber( L, 5 );
-	xdir.y = luaL_checknumber( L, 6 );
-	xdir.z = luaL_checknumber( L, 7 );
+	xdir.x = static_cast<float>( luaL_checknumber( L, 5 ) );
+	xdir.y = static_cast<float>( luaL_checknumber( L, 6 ) );
+	xdir.z = static_cast<float>( luaL_checknumber( L, 7 ) );
 
-	ydir.x = luaL_checknumber( L, 8 );
-	ydir.y = luaL_checknumber( L, 9 );
-	ydir.z = luaL_checknumber( L, 10 );
+	ydir.x = static_cast<float>( luaL_checknumber( L, 8 ) );
+	ydir.y = static_cast<float>( luaL_checknumber( L, 9 ) );
+	ydir.z = static_cast<float>( luaL_checknumber( L, 10 ) );
 
-	extents.x = luaL_checknumber( L, 11 );
-	extents.y = luaL_checknumber( L, 12 );
+	extents.x = static_cast<float>( luaL_checknumber( L, 11 ) );
+	extents.y = static_cast<float>( luaL_checknumber( L, 12 ) );
 
 	pActor->DrawRect( center, xdir, ydir, extents );
 

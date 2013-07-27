@@ -150,7 +150,7 @@ int LuaTextActor::SetFont( lua_State* L )
 	std::string fontName = luaL_checkstring( L, 2 );
 	float fontSize = static_cast<float>( luaL_checknumber( L, 3 ) );
 	unsigned int fontStyle = static_cast<unsigned int>( luaL_checknumber( L, 4 ) );
-	bool antialiased = static_cast<bool>( luaL_checknumber( L, 5 ) );
+	bool antialiased = ( lua_toboolean( L, 5 ) );
 
 	SpriteFontPtr pFont = SpriteFontLoaderDX11::LoadFont( GlyphString::ToUnicode(fontName), fontSize, fontStyle, antialiased );
 

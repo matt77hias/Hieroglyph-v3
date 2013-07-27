@@ -50,7 +50,7 @@
 // Define the number of threads to use for 
 #define NUM_THREADS 4
 
-#define GLYPH_PI 3.14159265
+#define GLYPH_PI 3.14159265f
 
 
 #endif // PCH_h

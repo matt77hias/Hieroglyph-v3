@@ -80,7 +80,7 @@ void RasterizerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 		
 		D3D11_VIEWPORT aViewports[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
 		
-		for ( unsigned int i = 0; i < DesiredState.ViewportCount.GetState(); i++ ) {
+		for ( int i = 0; i < DesiredState.ViewportCount.GetState(); i++ ) {
 
 			const ViewPortDX11& Viewport = pRenderer->GetViewPort( DesiredState.Viewports.GetState( i ) );
 			

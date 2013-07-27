@@ -120,6 +120,14 @@ namespace Glyph3
 		void SetName( const std::wstring& name );
 		std::wstring GetName() const;
 
+		// Provide the ability for a user to add custom data to this entity.  There is no
+		// usage of this pointer from within the entity - it is purely a convenience for
+		// users.  This also means that the user has to ensure that the object pointed to
+		// by pData must be properly managed (i.e. deleted or protected appropriately).
+
+		void SetUserData( void* pData );
+		void* GetUserData() const;
+
 	protected:
 
 		Vector3f m_vTranslation;	// The translation and rotation varaibles are updated
@@ -152,6 +160,8 @@ namespace Glyph3
 
 		CompositeShape CompositeShape;
 		
+		// Storage for the custom user data
+		void* m_pUserData;
 
 		friend IController;
 	};

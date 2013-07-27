@@ -25,6 +25,7 @@ Entity3D::Entity3D() :
 	m_bHidden( false ),
 	m_bPickable( true ),
 	m_bCalcLocal( true ),
+	m_pUserData( nullptr ),
 	CompositeShape()
 {
 	m_vTranslation.MakeZero();
@@ -447,5 +448,15 @@ void Entity3D::SetName( const std::wstring& name )
 std::wstring Entity3D::GetName() const
 {
 	return( m_Name );
+}
+//--------------------------------------------------------------------------------
+void Entity3D::SetUserData( void* pData )
+{
+	m_pUserData = pData;
+}
+//--------------------------------------------------------------------------------
+void* Entity3D::GetUserData() const
+{
+	return( m_pUserData );
 }
 //--------------------------------------------------------------------------------

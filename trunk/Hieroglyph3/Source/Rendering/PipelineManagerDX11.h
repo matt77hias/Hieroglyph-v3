@@ -19,6 +19,7 @@
 #include "HullStageDX11.h"
 #include "DomainStageDX11.h"
 #include "GeometryStageDX11.h"
+#include "StreamOutputStageDX11.h"
 #include "RasterizerStageDX11.h"
 #include "PixelStageDX11.h"
 #include "ComputeStageDX11.h"
@@ -230,8 +231,8 @@ namespace Glyph3
 
 		ShaderStageDX11*	ShaderStages[6];
 
-	public:
 		InputAssemblerStageDX11	InputAssemblerStage;
+		StreamOutputStageDX11	StreamOutputStage;
 		RasterizerStageDX11		RasterizerStage;
 		OutputMergerStageDX11	OutputMergerStage;
 

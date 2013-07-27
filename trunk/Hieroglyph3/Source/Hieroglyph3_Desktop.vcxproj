@@ -182,6 +182,8 @@
     <ClCompile Include="Rendering\SpriteFontLoaderDX11.cpp" />
     <ClCompile Include="Rendering\SpriteRendererDX11.cpp" />
     <ClCompile Include="Rendering\SpriteVertexDX11.cpp" />
+    <ClCompile Include="Rendering\StreamOutputStageDX11.cpp" />
+    <ClCompile Include="Rendering\StreamOutputStageStateDX11.cpp" />
     <ClCompile Include="Rendering\StructuredBufferDX11.cpp" />
     <ClCompile Include="Rendering\SwapChainConfigDX11.cpp" />
     <ClCompile Include="Rendering\SwapChainDX11.cpp" />
@@ -399,6 +401,8 @@
     <ClInclude Include="Rendering\SpriteFontLoaderDX11.h" />
     <ClInclude Include="Rendering\SpriteRendererDX11.h" />
     <ClInclude Include="Rendering\SpriteVertexDX11.h" />
+    <ClInclude Include="Rendering\StreamOutputStageDX11.h" />
+    <ClInclude Include="Rendering\StreamOutputStageStateDX11.h" />
     <ClInclude Include="Rendering\StructuredBufferDX11.h" />
     <ClInclude Include="Rendering\SwapChainConfigDX11.h" />
     <ClInclude Include="Rendering\SwapChainDX11.h" />
@@ -534,6 +538,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation;..\Dependencies\DirectXTK\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessToFile>false</PreprocessToFile>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -607,6 +612,7 @@ copy “$(WindowsSdkDir)redist\d3d\x64\D3DCompile*.DLL” “$(SolutionDir)\Appl
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation;..\Dependencies\DirectXTK\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

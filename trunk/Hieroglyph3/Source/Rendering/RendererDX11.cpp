@@ -1076,7 +1076,7 @@ int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstr
 	// cached shader - we assume that something is different about the shader due
 	// to the defines, so we can't just reuse a previously loaded one.
 	
-	for ( int i = 0; i < m_vShaders.size(); i++ )
+	for ( unsigned int i = 0; i < m_vShaders.size(); i++ )
 	{
 		ShaderDX11* pShader = m_vShaders[i];
 

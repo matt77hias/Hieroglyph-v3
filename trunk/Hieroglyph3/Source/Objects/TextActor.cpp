@@ -66,6 +66,10 @@ TextActor::TextActor()
 
 	m_pMaterial->Params[VT_PERSPECTIVE].pEffect->m_iBlendState = pRenderer->CreateBlendState( &blendConfig );
 
+	DepthStencilStateConfigDX11 ds;
+	ds.DepthEnable = false;
+	m_pMaterial->Params[VT_PERSPECTIVE].pEffect->m_iDepthStencilState = pRenderer->CreateDepthStencilState( &ds );
+
 
 	GetBody()->SetGeometry( m_pGeometry );
 	GetBody()->SetMaterial( m_pMaterial );
@@ -197,9 +201,12 @@ void TextActor::DrawString( const std::wstring& text )
 	std::wstringstream			tempStream( text );
 	std::wstring				line;
 
+
 	while ( std::getline( tempStream, line ) ) 
 	{
 		DrawLine( line );
+		if ( !tempStream.eof() )
+			NewLine();
 	}
 
 }
@@ -249,7 +256,7 @@ void TextActor::DrawLine( const std::wstring& text )
 		}
 	}
 
-	NewLine();
+	//NewLine();
 }
 //--------------------------------------------------------------------------------
 void TextActor::DrawCharacter( const wchar_t& character )

@@ -9,49 +9,42 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// Scene
+// StreamOutputStageStateDX11
 //
 //--------------------------------------------------------------------------------
-
+#ifndef StreamOutputStageStateDX11_h
+#define StreamOutputStageStateDX11_h
 //--------------------------------------------------------------------------------
-#ifndef Scene_h
-#define Scene_h
-//--------------------------------------------------------------------------------
-#include "Node3D.h"
-#include "Camera.h"
-#include "ParameterContainer.h"
+#include "PCH.h"
+#include "TStateMonitor.h"
+#include "TStateArrayMonitor.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class Scene
+	class StreamOutputStageStateDX11
 	{
 	public:
-		Scene();
-		virtual ~Scene();
+		StreamOutputStageStateDX11();
+		virtual ~StreamOutputStageStateDX11();
 
-		virtual void Update( float time );
-		virtual void PreRender( RendererDX11* pRenderer, VIEWTYPE type );
-		virtual void Render( RendererDX11* Renderer );
+		void SetFeautureLevel( D3D_FEATURE_LEVEL level );
+		void ClearState( );
+		void SetSisterState( StreamOutputStageStateDX11* pState );
+		void ResetUpdateFlags( );
 
-		void AddCamera( Camera* camera );
-		Camera* GetCamera( unsigned int index );
+		int GetBufferCount() const;
 
-		void AddActor( Actor* actor );
-		void RemoveActor( Actor* actor );
-
-		// Geometric queries
-		void BuildPickRecord( Ray3f& ray, std::vector<PickRecord>& record );
-
-		Node3D* GetRoot();
-
-	public:
-		ParameterContainer Parameters;
+		TStateArrayMonitor< int, 4 >  StreamBuffers;
+		TStateArrayMonitor< unsigned int, 4 > StreamOffsets;
 
 	protected:
-		Node3D* m_pRoot;
-		std::vector< Camera* > m_vCameras;
-		std::vector< Actor* > m_vActors;
+
+		D3D_FEATURE_LEVEL				m_FeatureLevel;
+
+		StreamOutputStageStateDX11*		m_pSisterState;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // Scene_h
+#endif // StreamOutputStageStateDX11_h
+//--------------------------------------------------------------------------------
+
