@@ -302,7 +302,7 @@ void ViewLightPrepassRenderer::SetClipPlanes( float NearClip, float FarClip )
 void ViewLightPrepassRenderer::SetupLights( )
 {
     // Set the lights to render
-    Light light;
+    LightParams light;
     light.Type = Point;
     light.Range = 2.0f;
 

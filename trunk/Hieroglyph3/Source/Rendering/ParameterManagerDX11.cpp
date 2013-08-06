@@ -54,107 +54,107 @@ unsigned int ParameterManagerDX11::GetID()
 	return( m_ID );
 }
 //--------------------------------------------------------------------------------
-void ParameterManagerDX11::SetParameter( RenderParameterDX11* pParameter )
-{
-	const std::wstring& name = pParameter->GetName();
-	RenderParameterDX11* pCurrent = m_Parameters[name];
-
-	if ( pParameter )
-	{
-		if ( pParameter->GetParameterType() == VECTOR )
-		{
-			// Only create the new parameter if it hasn't already been registered
-			if ( pCurrent == 0 )
-			{
-				pCurrent = new VectorParameterDX11();
-				pCurrent->SetName( name );
-				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
-			}
-
-			*reinterpret_cast<VectorParameterDX11*>( pCurrent )
-				= *reinterpret_cast<VectorParameterDX11*>( pParameter );
-		}
-		if ( pParameter->GetParameterType() == MATRIX )
-		{
-			// Only create the new parameter if it hasn't already been registered
-			if ( pCurrent == 0 )
-			{
-				pCurrent = new MatrixParameterDX11();
-				pCurrent->SetName( name );
-				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
-			}
-
-			*reinterpret_cast<MatrixParameterDX11*>( pCurrent )
-				= *reinterpret_cast<MatrixParameterDX11*>( pParameter );
-		}
-		if ( pParameter->GetParameterType() == MATRIX_ARRAY )
-		{
-			// Only create the new parameter if it hasn't already been registered
-			if ( pCurrent == 0 )
-			{
-				int count = reinterpret_cast<MatrixArrayParameterDX11*>( pParameter )->GetMatrixCount();
-				pCurrent = new MatrixArrayParameterDX11( count );
-				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
-			}
-
-			// This assignment performs a deep copy of the matrix array.
-			*reinterpret_cast<MatrixArrayParameterDX11*>( pCurrent )
-				= *reinterpret_cast<MatrixArrayParameterDX11*>( pParameter );
-		}
-		if ( pParameter->GetParameterType() == SHADER_RESOURCE )
-		{
-			// Only create the new parameter if it hasn't already been registered
-			if ( pCurrent == 0 )
-			{
-				pCurrent = new ShaderResourceParameterDX11();
-				pCurrent->SetName( name );
-				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
-			}
-
-			*reinterpret_cast<ShaderResourceParameterDX11*>( pCurrent )
-				= *reinterpret_cast<ShaderResourceParameterDX11*>( pParameter );
-		}
-		if ( pParameter->GetParameterType() == UNORDERED_ACCESS )
-		{
-			// Only create the new parameter if it hasn't already been registered
-			if ( pCurrent == 0 )
-			{
-				pCurrent = new UnorderedAccessParameterDX11();
-				pCurrent->SetName( name );
-				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
-			}
-
-			*reinterpret_cast<UnorderedAccessParameterDX11*>( pCurrent )
-				= *reinterpret_cast<UnorderedAccessParameterDX11*>( pParameter );
-		}
-		if ( pParameter->GetParameterType() == CBUFFER )
-		{
-			// Only create the new parameter if it hasn't already been registered
-			if ( pCurrent == 0 )
-			{
-				pCurrent = new ConstantBufferParameterDX11();
-				pCurrent->SetName( name );
-				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
-			}
-
-			*reinterpret_cast<ConstantBufferParameterDX11*>( pCurrent )
-				= *reinterpret_cast<ConstantBufferParameterDX11*>( pParameter );
-		}
-		if ( pParameter->GetParameterType() == SAMPLER )
-		{
-			// Only create the new parameter if it hasn't already been registered
-			if ( pCurrent == 0 )
-			{
-				pCurrent = new SamplerParameterDX11();
-				pCurrent->SetName( name );
-				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
-			}
-
-			*reinterpret_cast<SamplerParameterDX11*>( pCurrent )
-				= *reinterpret_cast<SamplerParameterDX11*>( pParameter );
-		}
-	}
-}
+//void ParameterManagerDX11::SetParameter( RenderParameterDX11* pParameter )
+//{
+//	const std::wstring& name = pParameter->GetName();
+//	RenderParameterDX11* pCurrent = m_Parameters[name];
+//
+//	if ( pParameter )
+//	{
+//		if ( pParameter->GetParameterType() == VECTOR )
+//		{
+//			// Only create the new parameter if it hasn't already been registered
+//			if ( pCurrent == 0 )
+//			{
+//				pCurrent = new VectorParameterDX11();
+//				pCurrent->SetName( name );
+//				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
+//			}
+//
+//			*reinterpret_cast<VectorParameterDX11*>( pCurrent )
+//				= *reinterpret_cast<VectorParameterDX11*>( pParameter );
+//		}
+//		if ( pParameter->GetParameterType() == MATRIX )
+//		{
+//			// Only create the new parameter if it hasn't already been registered
+//			if ( pCurrent == 0 )
+//			{
+//				pCurrent = new MatrixParameterDX11();
+//				pCurrent->SetName( name );
+//				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
+//			}
+//
+//			*reinterpret_cast<MatrixParameterDX11*>( pCurrent )
+//				= *reinterpret_cast<MatrixParameterDX11*>( pParameter );
+//		}
+//		if ( pParameter->GetParameterType() == MATRIX_ARRAY )
+//		{
+//			// Only create the new parameter if it hasn't already been registered
+//			if ( pCurrent == 0 )
+//			{
+//				int count = reinterpret_cast<MatrixArrayParameterDX11*>( pParameter )->GetMatrixCount();
+//				pCurrent = new MatrixArrayParameterDX11( count );
+//				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
+//			}
+//
+//			// This assignment performs a deep copy of the matrix array.
+//			*reinterpret_cast<MatrixArrayParameterDX11*>( pCurrent )
+//				= *reinterpret_cast<MatrixArrayParameterDX11*>( pParameter );
+//		}
+//		if ( pParameter->GetParameterType() == SHADER_RESOURCE )
+//		{
+//			// Only create the new parameter if it hasn't already been registered
+//			if ( pCurrent == 0 )
+//			{
+//				pCurrent = new ShaderResourceParameterDX11();
+//				pCurrent->SetName( name );
+//				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
+//			}
+//
+//			*reinterpret_cast<ShaderResourceParameterDX11*>( pCurrent )
+//				= *reinterpret_cast<ShaderResourceParameterDX11*>( pParameter );
+//		}
+//		if ( pParameter->GetParameterType() == UNORDERED_ACCESS )
+//		{
+//			// Only create the new parameter if it hasn't already been registered
+//			if ( pCurrent == 0 )
+//			{
+//				pCurrent = new UnorderedAccessParameterDX11();
+//				pCurrent->SetName( name );
+//				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
+//			}
+//
+//			*reinterpret_cast<UnorderedAccessParameterDX11*>( pCurrent )
+//				= *reinterpret_cast<UnorderedAccessParameterDX11*>( pParameter );
+//		}
+//		if ( pParameter->GetParameterType() == CBUFFER )
+//		{
+//			// Only create the new parameter if it hasn't already been registered
+//			if ( pCurrent == 0 )
+//			{
+//				pCurrent = new ConstantBufferParameterDX11();
+//				pCurrent->SetName( name );
+//				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
+//			}
+//
+//			*reinterpret_cast<ConstantBufferParameterDX11*>( pCurrent )
+//				= *reinterpret_cast<ConstantBufferParameterDX11*>( pParameter );
+//		}
+//		if ( pParameter->GetParameterType() == SAMPLER )
+//		{
+//			// Only create the new parameter if it hasn't already been registered
+//			if ( pCurrent == 0 )
+//			{
+//				pCurrent = new SamplerParameterDX11();
+//				pCurrent->SetName( name );
+//				m_Parameters[name] = reinterpret_cast<RenderParameterDX11*>( pCurrent );
+//			}
+//
+//			*reinterpret_cast<SamplerParameterDX11*>( pCurrent )
+//				= *reinterpret_cast<SamplerParameterDX11*>( pParameter );
+//		}
+//	}
+//}
 //--------------------------------------------------------------------------------
 void ParameterManagerDX11::SetVectorParameter( const std::wstring& name, Vector4f* pVector )
 {

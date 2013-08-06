@@ -37,6 +37,7 @@ GeometryActor::GeometryActor() :
 	GetBody()->SetGeometry( m_pGeometry );
 
 	UseSolidMaterial();
+	SetSpecular( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
 }
 //--------------------------------------------------------------------------------
 GeometryActor::~GeometryActor()
@@ -555,5 +556,23 @@ void GeometryActor::UseTexturedMaterial( ResourcePtr texture )
 
 		pWriter->SetValue( texture );
 	}
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::SetSpecular( const Vector4f& color )
+{
+	auto pMaterial = GetBody()->GetMaterial();
+
+	assert( pMaterial != nullptr );
+
+	pMaterial->Parameters.SetVectorParameter( L"Ks", color );
+}
+//--------------------------------------------------------------------------------
+Vector4f GeometryActor::GetSpecular( ) const
+{
+	auto pMaterial = GetBody()->GetMaterial();
+
+	assert( pMaterial != nullptr );
+
+	return( pMaterial->Parameters.GetVectorParameterWriter( L"Ks" )->GetValue( ) );
 }
 //--------------------------------------------------------------------------------

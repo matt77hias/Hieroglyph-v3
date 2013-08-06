@@ -87,6 +87,8 @@
     <ClCompile Include="Objects\Node3D.cpp" />
     <ClCompile Include="Objects\ObjectSpaceCameraPositionWriter.cpp" />
     <ClCompile Include="Objects\PickRecord.cpp" />
+    <ClCompile Include="Objects\PointLight.cpp" />
+    <ClCompile Include="Objects\PositionExtractorController.cpp" />
     <ClCompile Include="Objects\RotationController.cpp" />
     <ClCompile Include="Objects\Scene.cpp" />
     <ClCompile Include="Objects\ScaleSetpointController.cpp" />
@@ -298,6 +300,8 @@
     <ClInclude Include="Objects\Node3D.h" />
     <ClInclude Include="Objects\ObjectSpaceCameraPositionWriter.h" />
     <ClInclude Include="Objects\PickRecord.h" />
+    <ClInclude Include="Objects\PointLight.h" />
+    <ClInclude Include="Objects\PositionExtractorController.h" />
     <ClInclude Include="Objects\RotationController.h" />
     <ClInclude Include="Objects\Scene.h" />
     <ClInclude Include="Objects\ScaleSetpointController.h" />
@@ -413,6 +417,7 @@
     <ClInclude Include="Rendering\Texture2dDX11.h" />
     <ClInclude Include="Rendering\Texture3dConfigDX11.h" />
     <ClInclude Include="Rendering\Texture3dDX11.h" />
+    <ClInclude Include="Rendering\TGrowableBufferDX11.h" />
     <ClInclude Include="Rendering\TGrowableIndexBufferDX11.h" />
     <ClInclude Include="Rendering\TGrowableStructuredBufferDX11.h" />
     <ClInclude Include="Rendering\TGrowableVertexBufferDX11.h" />
@@ -458,6 +463,7 @@
     <None Include="Rendering\DrawExecutorDX11.inl" />
     <None Include="Rendering\DrawIndexedExecutorDX11.inl" />
     <None Include="Rendering\DrawIndexedInstancedExecutorDX11.inl" />
+    <None Include="Rendering\TGrowableBufferDX11.inl" />
     <None Include="Rendering\TGrowableIndexBufferDX11.inl" />
     <None Include="Rendering\TGrowableStructuredBufferDX11.inl" />
     <None Include="Rendering\TGrowableVertexBufferDX11.inl" />

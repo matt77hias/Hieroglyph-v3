@@ -108,35 +108,13 @@ void App::Initialize()
 	m_pTextActor->GetNode()->Position() = Vector3f( 0.0f, 7.0f, 0.0f );
 	m_pScene->AddActor( m_pTextActor );
 
+	// Add a single point light to the scene.
+	m_pLight = new PointLight();
+	m_pScene->AddLight( m_pLight );
 
-	// Do a one time initialization of the scene lighting parameters here
-	Vector4f Ka( 0.2f, 0.2f, 0.2f, 0.2f );
-	VectorParameterDX11* FactorKa = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Ka" ) );
-	FactorKa->InitializeParameterData( &Ka );
-
-	Vector4f Kd( 0.5f, 0.5f, 0.5f, 0.5f );
-	VectorParameterDX11* FactorKd = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Kd" ) );
-	FactorKd->InitializeParameterData( &Kd );
-
-	Vector4f Ks( 1.0f, 1.0f, 1.0f, 1.0f );
-	VectorParameterDX11* FactorKs = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Ks" ) );
-	FactorKs->InitializeParameterData( &Ks );
-
-	Vector4f LightPosition( 100.0f, 100.0f, -100.0f, 0.0f );
-	VectorParameterDX11* FactorLightPosition = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"LightPosition" ) );
-	FactorLightPosition->InitializeParameterData( &LightPosition );
-
-	Vector4f Ia( 0.25f, 0.25f, 0.25f, 0.25f );
-	VectorParameterDX11* FactorIa = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Ia" ) );
-	FactorIa->InitializeParameterData( &Ia );
-
-	Vector4f Id( 0.5f, 0.5f, 0.5f, 1.0f );
-	VectorParameterDX11* FactorId = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Id" ) );
-	FactorId->InitializeParameterData( &Id );
-
-	Vector4f Is( 1.0f, 1.0f, 1.0f, 1.0f );
-	VectorParameterDX11* FactorIs = m_pRenderer11->m_pParamMgr->GetVectorParameterRef( std::wstring( L"Is" ) );
-	FactorIs->InitializeParameterData( &Is );
+	m_pLight->GetNode()->AttachController( new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), -1.0f ) );
+	m_pLight->GetNode()->Position() = Vector3f( 0.0f, 50.0f, 0.0f );
+	m_pLight->GetBody()->Position() = Vector3f( 50.0f, 0.0f, 0.0f );
 }
 //--------------------------------------------------------------------------------
 void App::Update()

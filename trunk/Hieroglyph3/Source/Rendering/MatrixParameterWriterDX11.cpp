@@ -33,7 +33,7 @@ void MatrixParameterWriterDX11::WriteParameter( IParameterManager* pParamMgr )
 	pParamMgr->SetMatrixParameter( m_pParameter, &m_Value );
 }
 //--------------------------------------------------------------------------------
-void MatrixParameterWriterDX11::SetValue( Matrix4f& Value )
+void MatrixParameterWriterDX11::SetValue( const Matrix4f& Value )
 {
 	m_Value = Value;
 }

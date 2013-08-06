@@ -76,6 +76,30 @@ Camera* Scene::GetCamera( unsigned int index )
 	return( m_vCameras[index] );
 }
 //--------------------------------------------------------------------------------
+unsigned int Scene::GetCameraCount( )
+{
+	return( m_vCameras.size() );
+}
+//--------------------------------------------------------------------------------
+void Scene::AddLight( Light* pLight )
+{
+	m_vLights.push_back( pLight );
+	
+	AddActor( pLight );
+}
+//--------------------------------------------------------------------------------
+Light* Scene::GetLight( unsigned int index )
+{
+	assert( index < m_vLights.size() );
+
+	return( m_vLights[index] );
+}
+//--------------------------------------------------------------------------------
+unsigned int Scene::GetLightCount( )
+{
+	return( m_vLights.size() );
+}
+//--------------------------------------------------------------------------------
 void Scene::AddActor( Actor* actor )
 {
 	// Link the actor's node into the scene, and then add the actor to the list

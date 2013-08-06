@@ -8,37 +8,31 @@
 // Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
 
+
 //--------------------------------------------------------------------------------
-// ShaderResourceParameterDX11
+// PointLight
 //
 //--------------------------------------------------------------------------------
-#ifndef ShaderResourceParameterDX11_h
-#define ShaderResourceParameterDX11_h
+
 //--------------------------------------------------------------------------------
-#include "RenderParameterDX11.h"
+#ifndef PointLight_h
+#define PointLight_h
+//--------------------------------------------------------------------------------
+#include "Light.h"
+#include "PositionExtractorController.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class ShaderResourceParameterDX11 : public RenderParameterDX11
+	class PointLight : public Light
 	{
 	public:
-		ShaderResourceParameterDX11();
-		ShaderResourceParameterDX11( ShaderResourceParameterDX11& copy );
-		virtual ~ShaderResourceParameterDX11();
-
-		virtual void SetParameterData( void* pData, unsigned int threadID = 0 );
-		//virtual void ResetParameterData( void* pData, unsigned int threadID = 0 );
-
-		virtual const ParameterType GetParameterType();
-		int GetIndex( unsigned int threadID );
-
-		//void UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID = 0 );
+		PointLight();
+		virtual ~PointLight();
 
 	protected:
-		int		m_iShaderResourceView[NUM_THREADS+1];
+		VectorParameterWriterDX11* m_PositionWriter;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // ShaderResourceParameterDX11_h
+#endif // PointLight_h
 //--------------------------------------------------------------------------------
-

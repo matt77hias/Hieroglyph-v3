@@ -26,11 +26,11 @@ void DrawExecutorDX11<TVertex>::Execute( PipelineManagerDX11* pPipeline, IParame
 {
 	// If any vertices have been added, then render them!
 
-	if ( VertexBuffer.GetVertexCount() > 0 ) {
+	if ( VertexBuffer.GetElementCount() > 0 ) {
 
 		// First upload the data to the D3D11 buffer resource (this only uploads
 		// if something has been changed since last upload).
-		VertexBuffer.UploadVertexData( pPipeline );
+		VertexBuffer.UploadData( pPipeline );
 	
 		pPipeline->InputAssemblerStage.ClearDesiredState();
 
@@ -38,14 +38,14 @@ void DrawExecutorDX11<TVertex>::Execute( PipelineManagerDX11* pPipeline, IParame
 		int layout = GetInputLayout( pPipeline->ShaderStages[VERTEX_SHADER]->DesiredState.ShaderProgram.GetState() );
 		pPipeline->InputAssemblerStage.DesiredState.InputLayout.SetState( layout );
 		pPipeline->InputAssemblerStage.DesiredState.PrimitiveTopology.SetState( m_ePrimType );
-		pPipeline->InputAssemblerStage.DesiredState.VertexBuffers.SetState( 0, VertexBuffer.GetVertexBuffer()->m_iResource );
+		pPipeline->InputAssemblerStage.DesiredState.VertexBuffers.SetState( 0, VertexBuffer.GetBuffer()->m_iResource );
 		pPipeline->InputAssemblerStage.DesiredState.VertexBufferStrides.SetState( 0, sizeof( TVertex ) );
 		pPipeline->InputAssemblerStage.DesiredState.VertexBufferOffsets.SetState( 0, 0 );
 	
 		pPipeline->ApplyInputResources();
 
 		// Perform a draw call without any indices, instances, or indirect anything!
-		pPipeline->Draw( VertexBuffer.GetVertexCount(), 0 );
+		pPipeline->Draw( VertexBuffer.GetElementCount(), 0 );
 	}
 }
 //--------------------------------------------------------------------------------
@@ -60,13 +60,13 @@ void DrawExecutorDX11<TVertex>::ResetGeometry()
 template <class TVertex>
 void DrawExecutorDX11<TVertex>::ResetVertices()
 {
-	VertexBuffer.ResetVertices();
+	VertexBuffer.ResetData();
 }
 //--------------------------------------------------------------------------------
 template <class TVertex>
 void DrawExecutorDX11<TVertex>::AddVertex( const TVertex& vertex )
 {
-	VertexBuffer.AddVertex( vertex );
+	VertexBuffer.AddElement( vertex );
 }
 //--------------------------------------------------------------------------------
 template <class TVertex>
@@ -84,14 +84,14 @@ void DrawExecutorDX11<TVertex>::SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY type 
 template <class TVertex>
 unsigned int DrawExecutorDX11<TVertex>::GetVertexCount()
 {
-	return( VertexBuffer.GetVertexCount() );
+	return( VertexBuffer.GetElementCount() );
 }
 //--------------------------------------------------------------------------------
 template <class TVertex>
 unsigned int DrawExecutorDX11<TVertex>::GetPrimitiveCount()
 {
 	unsigned int count = 0;
-	unsigned int referencedVertices = VertexBuffer.GetVertexCount();
+	unsigned int referencedVertices = VertexBuffer.GetElementCount();
 
 	switch ( m_ePrimType )
 	{

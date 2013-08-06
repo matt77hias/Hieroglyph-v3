@@ -126,6 +126,11 @@ void ViewPerspective::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParam
 		// Set this view's render parameters
 		SetRenderParams( pParamManager );
 
+		// Set the light parameters (currently only supporting the first light...)
+		if ( m_pScene->GetLightCount() > 0 ) {
+			m_pScene->GetLight( 0 )->Parameters.SetRenderParams( pParamManager );
+		}
+
 		// Run through the graph and render each of the entities
 		m_pScene->GetRoot()->Render( pPipelineManager, pParamManager, VT_PERSPECTIVE );
 

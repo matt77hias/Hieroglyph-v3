@@ -36,7 +36,7 @@ namespace Glyph3
     };
 
     // Light parameters
-    struct Light
+    struct LightParams
     {
         Vector3f Position;
         Vector3f Color;
@@ -46,7 +46,7 @@ namespace Glyph3
         float SpotOuterAngle;
         LightType Type;
 
-        Light() : Position( 0.0f, 0.0f, 0.0f ), Color( 1.0f, 1.0f, 1.0f ), Direction( -1.0f, -1.0f, 1.0f ),
+        LightParams() : Position( 0.0f, 0.0f, 0.0f ), Color( 1.0f, 1.0f, 1.0f ), Direction( -1.0f, -1.0f, 1.0f ),
                 Range( 2.0f ), SpotInnerAngle( 0 ), SpotOuterAngle ( 0 ), Type ( Point ) {}
     };
 
@@ -69,7 +69,7 @@ namespace Glyph3
         virtual void SetRenderParams( IParameterManager* pParamManager );
         virtual void SetUsageParams( IParameterManager* pParamManager );
 
-        void AddLight( const Light& light );
+        void AddLight( const LightParams& light );
         void SetTargets( ResourcePtr GBufferTarget, ResourcePtr pRenderTarget,
                             ResourcePtr DepthTarget, int Viewport);
         void SetClipPlanes( float NearClip, float FarClip );
@@ -102,9 +102,9 @@ namespace Glyph3
         int                     m_iSpotLightIL;
         int                     m_iDirectionalLightIL;
 
-        std::vector<Light>      m_PointLights;
-        std::vector<Light>      m_SpotLights;
-        std::vector<Light>      m_DirectionalLights;
+        std::vector<LightParams>      m_PointLights;
+        std::vector<LightParams>      m_SpotLights;
+        std::vector<LightParams>      m_DirectionalLights;
         Matrix4f                m_WorldMatrix;
 
 		MatrixParameterDX11*	m_pInvProjMatrix;

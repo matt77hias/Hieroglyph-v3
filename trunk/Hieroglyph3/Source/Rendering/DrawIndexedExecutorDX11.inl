@@ -25,11 +25,11 @@ void DrawIndexedExecutorDX11<TVertex>::Execute( PipelineManagerDX11* pPipeline, 
 	// Since we are doing indexed rendering, we only want to proceed if some
 	// indices are available (otherwise no primitives would be generated).
 
-	if ( IndexBuffer.GetIndexCount() > 0 ) {
+	if ( IndexBuffer.GetElementCount() > 0 ) {
 
 		// Upload the vertex and index data (only if they have been modified).
-		VertexBuffer.UploadVertexData( pPipeline );
-		IndexBuffer.UploadIndexData( pPipeline );
+		VertexBuffer.UploadData( pPipeline );
+		IndexBuffer.UploadData( pPipeline );
 	
 		pPipeline->InputAssemblerStage.ClearDesiredState();
 
@@ -37,17 +37,17 @@ void DrawIndexedExecutorDX11<TVertex>::Execute( PipelineManagerDX11* pPipeline, 
 		int layout = GetInputLayout( pPipeline->ShaderStages[VERTEX_SHADER]->DesiredState.ShaderProgram.GetState() );
 		pPipeline->InputAssemblerStage.DesiredState.InputLayout.SetState( layout );
 		pPipeline->InputAssemblerStage.DesiredState.PrimitiveTopology.SetState( m_ePrimType );
-		pPipeline->InputAssemblerStage.DesiredState.VertexBuffers.SetState( 0, VertexBuffer.GetVertexBuffer()->m_iResource );
+		pPipeline->InputAssemblerStage.DesiredState.VertexBuffers.SetState( 0, VertexBuffer.GetBuffer()->m_iResource );
 		pPipeline->InputAssemblerStage.DesiredState.VertexBufferStrides.SetState( 0, sizeof( TVertex ) );
 		pPipeline->InputAssemblerStage.DesiredState.VertexBufferOffsets.SetState( 0, 0 );
-		pPipeline->InputAssemblerStage.DesiredState.IndexBuffer.SetState( IndexBuffer.GetIndexBuffer()->m_iResource );
+		pPipeline->InputAssemblerStage.DesiredState.IndexBuffer.SetState( IndexBuffer.GetBuffer()->m_iResource );
 
 		pPipeline->ApplyInputResources();
 
 		// Perform the indexed draw call, which only depends on the number of 
 		// indices that are available.  The number of primitives generated will be
 		// a function of how many indices and the primitive topology set above.
-		pPipeline->DrawIndexed( IndexBuffer.GetIndexCount(), 0, 0 );
+		pPipeline->DrawIndexed( IndexBuffer.GetElementCount(), 0, 0 );
 	}
 }
 //--------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ void DrawIndexedExecutorDX11<TVertex>::ResetGeometry()
 template <class TVertex>
 void DrawIndexedExecutorDX11<TVertex>::ResetIndices()
 {
-	IndexBuffer.ResetIndices();
+	IndexBuffer.ResetData();
 }
 //--------------------------------------------------------------------------------
 template <class TVertex>
@@ -74,7 +74,7 @@ void DrawIndexedExecutorDX11<TVertex>::AddIndex( const unsigned int index )
 	// the number of vertices that are out there. User's are allowed to do what they
 	// want with this data, but have to ensure that the indices are correct!
 
-	IndexBuffer.AddIndex( index );
+	IndexBuffer.AddElement( index );
 }
 //--------------------------------------------------------------------------------
 template <class TVertex>
@@ -95,14 +95,14 @@ void DrawIndexedExecutorDX11<TVertex>::AddIndices( const unsigned int i1, const 
 template <class TVertex>
 unsigned int DrawIndexedExecutorDX11<TVertex>::GetIndexCount()
 {
-	return( IndexBuffer.GetIndexCount() );
+	return( IndexBuffer.GetElementCount() );
 }
 //--------------------------------------------------------------------------------
 template <class TVertex>
 unsigned int DrawIndexedExecutorDX11<TVertex>::GetPrimitiveCount()
 {
 	unsigned int count = 0;
-	unsigned int referencedIndices = IndexBuffer.GetIndexCount();
+	unsigned int referencedIndices = IndexBuffer.GetElementCount();
 
 	switch ( m_ePrimType )
 	{
@@ -198,6 +198,6 @@ unsigned int DrawIndexedExecutorDX11<TVertex>::GetPrimitiveCount()
 template <class TVertex>
 void DrawIndexedExecutorDX11<TVertex>::SetMaxIndexCount( unsigned int count )
 {
-	IndexBuffer.SetMaxIndexCount( count );
+	IndexBuffer.SetMaxElementCount( count );
 }
 //--------------------------------------------------------------------------------

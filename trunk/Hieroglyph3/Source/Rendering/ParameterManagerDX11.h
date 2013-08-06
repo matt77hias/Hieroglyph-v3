@@ -31,7 +31,7 @@ namespace Glyph3
 		// during rendering.  Setting the value for a non-existing parameter will create
 		// a new one and initialize all of the available slots to the provided data.
 
-		void SetParameter( RenderParameterDX11* pParameter );
+		//void SetParameter( RenderParameterDX11* pParameter );
 		void SetVectorParameter( const std::wstring& name, Vector4f* pVector );
 		void SetMatrixParameter( const std::wstring& name, Matrix4f* pMatrix );
 		void SetSamplerParameter( const std::wstring& name, int* pID );

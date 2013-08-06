@@ -33,7 +33,7 @@ void VectorParameterWriterDX11::WriteParameter( IParameterManager* pParamMgr )
 	pParamMgr->SetVectorParameter( m_pParameter, &m_Value );
 }
 //--------------------------------------------------------------------------------
-void VectorParameterWriterDX11::SetValue( Vector4f& Value )
+void VectorParameterWriterDX11::SetValue( const Vector4f& Value )
 {
 	m_Value = Value;
 }

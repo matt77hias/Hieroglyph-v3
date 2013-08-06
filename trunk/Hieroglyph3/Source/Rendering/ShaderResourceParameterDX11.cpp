@@ -38,15 +38,15 @@ void ShaderResourceParameterDX11::SetParameterData( void* pData, unsigned int th
 	m_iShaderResourceView[threadID] = *reinterpret_cast<int*>( pData );
 }
 //--------------------------------------------------------------------------------
-void ShaderResourceParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
-{
-	assert( threadID >= 0 );
-	assert( threadID < NUM_THREADS+1 );
-
-	if ( m_iShaderResourceView[threadID] == *reinterpret_cast<int*>( pData ) ) {
-		m_iShaderResourceView[threadID] = -1;
-	}
-}
+//void ShaderResourceParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
+//{
+//	assert( threadID >= 0 );
+//	assert( threadID < NUM_THREADS+1 );
+//
+//	if ( m_iShaderResourceView[threadID] == *reinterpret_cast<int*>( pData ) ) {
+//		m_iShaderResourceView[threadID] = -1;
+//	}
+//}
 //--------------------------------------------------------------------------------
 const ParameterType ShaderResourceParameterDX11::GetParameterType()
 {
@@ -61,18 +61,18 @@ int ShaderResourceParameterDX11::GetIndex( unsigned int threadID )
 	return( m_iShaderResourceView[threadID] );
 }
 //--------------------------------------------------------------------------------
-void ShaderResourceParameterDX11::UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID )
-{
-	assert( threadID >= 0 );
-	assert( threadID < NUM_THREADS+1 );
-
-	if ( pParameter )
-	{
-		if ( ( pParameter->GetParameterType() == SHADER_RESOURCE ) && ( pParameter->GetName() == this->GetName() ) )
-		{
-			ShaderResourceParameterDX11* pBuffer = (ShaderResourceParameterDX11*)pParameter;
-			m_iShaderResourceView[threadID] = pBuffer->GetIndex( threadID );
-		}
-	}
-}
+//void ShaderResourceParameterDX11::UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID )
+//{
+//	assert( threadID >= 0 );
+//	assert( threadID < NUM_THREADS+1 );
+//
+//	if ( pParameter )
+//	{
+//		if ( ( pParameter->GetParameterType() == SHADER_RESOURCE ) && ( pParameter->GetName() == this->GetName() ) )
+//		{
+//			ShaderResourceParameterDX11* pBuffer = (ShaderResourceParameterDX11*)pParameter;
+//			m_iShaderResourceView[threadID] = pBuffer->GetIndex( threadID );
+//		}
+//	}
+//}
 //--------------------------------------------------------------------------------

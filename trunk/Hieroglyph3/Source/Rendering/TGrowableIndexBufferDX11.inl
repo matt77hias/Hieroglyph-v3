@@ -9,99 +9,23 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------------
 template <class T>
-TGrowableIndexBufferDX11<T>::TGrowableIndexBufferDX11()
+TGrowableIndexBufferDX11<T>::TGrowableIndexBufferDX11() :
+    m_IB( nullptr )
 {
-	m_uiMaxIndexCount = 0;
-	m_uiIndexCount = 0;
-	m_bUploadNeeded = false;
-
-	m_pIndexArray = nullptr;
-
 	// Initialize our buffer to a reasonable size
-	SetMaxIndexCount( 128 );
+	SetMaxElementCount( 128 );
 }
 //--------------------------------------------------------------------------------
 template <class T>
 TGrowableIndexBufferDX11<T>::~TGrowableIndexBufferDX11()
 {
-	SAFE_DELETE_ARRAY( m_pIndexArray );
 }
 //--------------------------------------------------------------------------------
 template <class T>
-void TGrowableIndexBufferDX11<T>::SetMaxIndexCount( unsigned int maxIndices )
+void TGrowableIndexBufferDX11<T>::UploadData( PipelineManagerDX11* pPipeline )
 {
-	// if this is different than the current size, then release the existing
-	// local array, plus resize the resource.
-
-	if ( maxIndices != m_uiMaxIndexCount ) {
-
-		// Create the new array, temporarily in a local variable.
-		T* pNewArray = new T[maxIndices];
-
-		// Truncate the index count if more than the new max are already loaded 
-		// which could happen if the array is being shrunken.
-		if ( m_uiIndexCount > maxIndices ) {
-			m_uiIndexCount = maxIndices;
-		}
-
-		// Copy the existing index data over, if any has been added.
-		if ( m_uiIndexCount > 0 ) {
-			memcpy( pNewArray, m_pIndexArray, m_uiIndexCount * sizeof( T ) );
-		}
-
-		// Remember the maximum number of indices to allow, and the 
-		// current count of indices is left as it is.
-		m_uiMaxIndexCount = maxIndices;
-
-		// Release system memory for the old array so that we can set a new one
-		SAFE_DELETE_ARRAY( m_pIndexArray );
-		m_pIndexArray = pNewArray;
-
-		// Delete the existing resource if it already existed
-		if ( nullptr != m_IB ) {
-			RendererDX11::Get()->DeleteResource( m_IB );
-			m_IB = nullptr;
-		}
-
-		// Create the new index buffer, with the dynamic flag set to true
-		BufferConfigDX11 ibuffer;
-		ibuffer.SetDefaultIndexBuffer( m_uiMaxIndexCount * sizeof( T ), true );
-		m_IB = RendererDX11::Get()->CreateIndexBuffer( &ibuffer, nullptr );
-		
-		m_bUploadNeeded = true;
-	}
-}
-//--------------------------------------------------------------------------------
-template <class T>
-unsigned int TGrowableIndexBufferDX11<T>::GetMaxIndexCount()
-{
-	return( m_uiMaxIndexCount );
-}
-//--------------------------------------------------------------------------------
-template <class T>
-unsigned int TGrowableIndexBufferDX11<T>::GetIndexCount()
-{
-	return( m_uiIndexCount );
-}
-//--------------------------------------------------------------------------------
-template <class T>
-void TGrowableIndexBufferDX11<T>::AddIndex( const T& index )
-{
-	EnsureIndexCapacity( );
-
-	m_pIndexArray[m_uiIndexCount] = index;
-	m_uiIndexCount++;
-
-	m_bUploadNeeded = true;
-}
-//--------------------------------------------------------------------------------
-template <class T>
-void TGrowableIndexBufferDX11<T>::UploadIndexData( PipelineManagerDX11* pPipeline )
-{
-	if ( m_uiIndexCount > 0 && m_bUploadNeeded == true ) {
+	if ( m_uiElementCount > 0 && m_bUploadNeeded == true ) {
 
 		m_bUploadNeeded = false;
 
@@ -112,7 +36,7 @@ void TGrowableIndexBufferDX11<T>::UploadIndexData( PipelineManagerDX11* pPipelin
 
 		// Only copy as much of the data as you actually have filled up
 	
-		memcpy( resource.pData, m_pIndexArray, m_uiIndexCount * sizeof( T ) );
+		memcpy( resource.pData, m_pDataArray, m_uiElementCount * sizeof( T ) );
 
 		// Unmap the index buffer
 
@@ -121,26 +45,29 @@ void TGrowableIndexBufferDX11<T>::UploadIndexData( PipelineManagerDX11* pPipelin
 }
 //--------------------------------------------------------------------------------
 template <class T>
-void TGrowableIndexBufferDX11<T>::ResetIndices()
+ResourcePtr TGrowableIndexBufferDX11<T>::GetBuffer()
 {
-	// Reset the index count here to prepare for the next drawing pass.
-	m_uiIndexCount = 0;
+    return( m_IB );
+}
+//--------------------------------------------------------------------------------
+template <class T>
+void TGrowableIndexBufferDX11<T>::CreateResource( unsigned int elements )
+{
+	// Create the new index buffer, with the dynamic flag set to true
 
-	m_bUploadNeeded = false;
+	BufferConfigDX11 ibuffer;
+	ibuffer.SetDefaultIndexBuffer( elements * sizeof( T ), true );
+	m_IB = RendererDX11::Get()->CreateIndexBuffer( &ibuffer, nullptr );
 }
 //--------------------------------------------------------------------------------
 template <class T>
-void TGrowableIndexBufferDX11<T>::EnsureIndexCapacity( )
+void TGrowableIndexBufferDX11<T>::DeleteResource( )
 {
-	// If the next index would put us over the limit, then resize the array.
-	if ( m_uiIndexCount + 1 >= m_uiMaxIndexCount ) {
-		SetMaxIndexCount( m_uiMaxIndexCount + 1024 );
+	// Delete the existing resource if it already existed
+
+	if ( nullptr != m_IB ) {
+		RendererDX11::Get()->DeleteResource( m_IB );
+		m_IB = nullptr;
 	}
-}
-//--------------------------------------------------------------------------------
-template <class T>
-ResourcePtr TGrowableIndexBufferDX11<T>::GetIndexBuffer()
-{
-	return( m_IB );
 }
 //--------------------------------------------------------------------------------

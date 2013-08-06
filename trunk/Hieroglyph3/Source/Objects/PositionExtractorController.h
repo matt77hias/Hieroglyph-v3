@@ -9,36 +9,30 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// ShaderResourceParameterDX11
+// PositionExtractorController
 //
 //--------------------------------------------------------------------------------
-#ifndef ShaderResourceParameterDX11_h
-#define ShaderResourceParameterDX11_h
+#ifndef PositionExtractorController_h
+#define PositionExtractorController_h
 //--------------------------------------------------------------------------------
-#include "RenderParameterDX11.h"
+#include "IController.h"
+#include "VectorParameterWriterDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class ShaderResourceParameterDX11 : public RenderParameterDX11
+	class PositionExtractorController : public IController
 	{
 	public:
-		ShaderResourceParameterDX11();
-		ShaderResourceParameterDX11( ShaderResourceParameterDX11& copy );
-		virtual ~ShaderResourceParameterDX11();
+		PositionExtractorController( );
+		virtual ~PositionExtractorController( );
 
-		virtual void SetParameterData( void* pData, unsigned int threadID = 0 );
-		//virtual void ResetParameterData( void* pData, unsigned int threadID = 0 );
+		virtual void Update( float fTime );
 
-		virtual const ParameterType GetParameterType();
-		int GetIndex( unsigned int threadID );
-
-		//void UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID = 0 );
+		void SetParameterWriter( VectorParameterWriterDX11* pWriter );
 
 	protected:
-		int		m_iShaderResourceView[NUM_THREADS+1];
+		VectorParameterWriterDX11*		m_pWriter;
 	};
 };
 //--------------------------------------------------------------------------------
-#endif // ShaderResourceParameterDX11_h
-//--------------------------------------------------------------------------------
-
+#endif // PositionExtractorController_h

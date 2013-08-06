@@ -15,7 +15,7 @@ DrawIndexedInstancedExecutorDX11<TVertex,TInstance>::DrawIndexedInstancedExecuto
 	m_uiCount( 0 )
 {
 	// Initialize our buffer to a reasonable size
-	InstanceBuffer.SetMaxVertexCount( 1000 );
+	InstanceBuffer.SetMaxElementCount( 1000 );
 }
 //--------------------------------------------------------------------------------
 template <class TVertex, class TInstance>
@@ -29,12 +29,12 @@ void DrawIndexedInstancedExecutorDX11<TVertex,TInstance>::Execute( PipelineManag
 	// With instanced rendering, we only proceed if there are instances there to 
 	// render.
 
-	if ( InstanceBuffer.GetVertexCount() > 0 ) {
+	if ( InstanceBuffer.GetElementCount() > 0 ) {
 
 		// Upload all the data to our D3D11 buffer resources.
-		VertexBuffer.UploadVertexData( pPipeline );
-		IndexBuffer.UploadIndexData( pPipeline );
-		InstanceBuffer.UploadVertexData( pPipeline );
+		VertexBuffer.UploadData( pPipeline );
+		IndexBuffer.UploadData( pPipeline );
+		InstanceBuffer.UploadData( pPipeline );
 	
 		pPipeline->InputAssemblerStage.ClearDesiredState();
 
@@ -43,15 +43,15 @@ void DrawIndexedInstancedExecutorDX11<TVertex,TInstance>::Execute( PipelineManag
 		pPipeline->InputAssemblerStage.DesiredState.InputLayout.SetState( layout );
 		pPipeline->InputAssemblerStage.DesiredState.PrimitiveTopology.SetState( m_ePrimType );
 
-		pPipeline->InputAssemblerStage.DesiredState.VertexBuffers.SetState( 0, VertexBuffer.GetVertexBuffer()->m_iResource );
+		pPipeline->InputAssemblerStage.DesiredState.VertexBuffers.SetState( 0, VertexBuffer.GetBuffer()->m_iResource );
 		pPipeline->InputAssemblerStage.DesiredState.VertexBufferStrides.SetState( 0, sizeof( TVertex ) );
 		pPipeline->InputAssemblerStage.DesiredState.VertexBufferOffsets.SetState( 0, 0 );
 
-		pPipeline->InputAssemblerStage.DesiredState.VertexBuffers.SetState( 1, InstanceBuffer.GetVertexBuffer()->m_iResource );
+		pPipeline->InputAssemblerStage.DesiredState.VertexBuffers.SetState( 1, InstanceBuffer.GetBuffer()->m_iResource );
 		pPipeline->InputAssemblerStage.DesiredState.VertexBufferStrides.SetState( 1, sizeof( TInstance ) );
 		pPipeline->InputAssemblerStage.DesiredState.VertexBufferOffsets.SetState( 1, 0 );
 
-		pPipeline->InputAssemblerStage.DesiredState.IndexBuffer.SetState( IndexBuffer.GetIndexBuffer()->m_iResource );
+		pPipeline->InputAssemblerStage.DesiredState.IndexBuffer.SetState( IndexBuffer.GetBuffer()->m_iResource );
 		pPipeline->InputAssemblerStage.DesiredState.IndexBufferFormat.SetState( DXGI_FORMAT_R32_UINT );
 	
 		pPipeline->ApplyInputResources();
@@ -59,9 +59,9 @@ void DrawIndexedInstancedExecutorDX11<TVertex,TInstance>::Execute( PipelineManag
 		// Here we provide an index count and an instance count to the indexed 
 		// instanced draw call.
 		if ( m_uiCount == 0 ) {
-			pPipeline->DrawIndexedInstanced( IndexBuffer.GetIndexCount(), InstanceBuffer.GetVertexCount(), 0, 0, 0 );
+			pPipeline->DrawIndexedInstanced( IndexBuffer.GetElementCount(), InstanceBuffer.GetElementCount(), 0, 0, 0 );
 		} else {
-			pPipeline->DrawIndexedInstanced( IndexBuffer.GetIndexCount(), m_uiCount, 0, 0, m_uiStart );
+			pPipeline->DrawIndexedInstanced( IndexBuffer.GetElementCount(), m_uiCount, 0, 0, m_uiStart );
 		}
 	}
 }
@@ -79,7 +79,7 @@ void DrawIndexedInstancedExecutorDX11<TVertex,TInstance>::ResetGeometry()
 template <class TVertex, class TInstance>
 void DrawIndexedInstancedExecutorDX11<TVertex,TInstance>::ResetInstances()
 {
-	InstanceBuffer.ResetVertices();
+	InstanceBuffer.ResetData();
 	m_uiStart = 0;
 	m_uiCount = 0;
 }
@@ -87,7 +87,7 @@ void DrawIndexedInstancedExecutorDX11<TVertex,TInstance>::ResetInstances()
 template <class TVertex, class TInstance>
 void DrawIndexedInstancedExecutorDX11<TVertex,TInstance>::AddInstance( const TInstance& data )
 {
-	InstanceBuffer.AddVertex( data );
+	InstanceBuffer.AddElement( data );
 }
 //--------------------------------------------------------------------------------
 template <class TVertex, class TInstance>
@@ -96,14 +96,14 @@ unsigned int DrawIndexedInstancedExecutorDX11<TVertex,TInstance>::GetInstanceCou
 	// The number of instances is directly the number of vertices in the 
 	// per-instance vertex buffer.
 
-	return( InstanceBuffer.GetVertexCount() );
+	return( InstanceBuffer.GetElementCount() );
 }
 //--------------------------------------------------------------------------------
 template <class TVertex, class TInstance>
 void DrawIndexedInstancedExecutorDX11<TVertex,TInstance>::SetInstanceRange( unsigned int start, unsigned int end )
 {
 	// Validate the data before accepting it.
-	if ( start < end && end < InstanceBuffer.GetVertexCount() ) {
+	if ( start < end && end < InstanceBuffer.GetElementCount() ) {
 		m_uiStart = start;
 		m_uiCount = end-start;
 	} else {

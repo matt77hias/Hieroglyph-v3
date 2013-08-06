@@ -53,11 +53,11 @@ void RenderParameterDX11::InitializeParameterData( void* pData )
 		SetParameterData( pData, i );
 }
 //--------------------------------------------------------------------------------
-void RenderParameterDX11::UnInitializeParameterData( void* pData )
-{
-	for ( int i = 0; i <= NUM_THREADS; i++ )
-		ResetParameterData( pData, i );
-}
+//void RenderParameterDX11::UnInitializeParameterData( void* pData )
+//{
+//	for ( int i = 0; i <= NUM_THREADS; i++ )
+//		ResetParameterData( pData, i );
+//}
 //--------------------------------------------------------------------------------
 unsigned int RenderParameterDX11::GetValueID( unsigned int threadID )
 {

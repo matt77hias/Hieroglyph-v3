@@ -11,6 +11,7 @@
 #include "Actor.h"
 #include "GeometryActor.h"
 #include "TextActor.h"
+#include "PointLight.h"
 
 using namespace Glyph3;
 
@@ -32,7 +33,7 @@ public:
 	virtual std::wstring GetName( );
 
 protected:
-
+	PointLight*					m_pLight;
 	GeometryActor*				m_pIndexedActor;
 	GeometryActor*				m_pGeometryActor;
 	TextActor*					m_pTextActor;

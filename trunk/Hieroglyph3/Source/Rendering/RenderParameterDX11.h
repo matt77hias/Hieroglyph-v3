@@ -55,7 +55,7 @@ namespace Glyph3
 		// to a default value if the parameter's data matches the passed in data.
 
 		void InitializeParameterData( void* pData );
-		void UnInitializeParameterData( void* pData );
+		//void UnInitializeParameterData( void* pData );
 
 		// Setting parameter data does what it sounds like - it takes a pointer
 		// to the data and sets it in the data copy indicated by its thread ID.
@@ -63,14 +63,14 @@ namespace Glyph3
 		// data.
 
 		virtual void SetParameterData( void* pData, unsigned int threadID = 0 ) = 0;
-		virtual void ResetParameterData( void* pData, unsigned int threadID = 0 ) = 0;
+		//virtual void ResetParameterData( void* pData, unsigned int threadID = 0 ) = 0;
 
 		// This update function is a convenience function to allow 
 		// RenderParameterDX11 subclasses to be referred to by their parent class
 		// and automatically update the parameter stored in the parameter
 		// manager.
 		
-		virtual void UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID = 0 ) = 0;
+		//virtual void UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID = 0 ) = 0;
 
 		// The value ID is used to efficiently determine when a parameter's value
 		// has been changed.  Each parameter type will increment the value ID

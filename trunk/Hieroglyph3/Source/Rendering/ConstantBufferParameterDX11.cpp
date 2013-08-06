@@ -38,15 +38,15 @@ void ConstantBufferParameterDX11::SetParameterData( void* pData, unsigned int th
 	m_iCBuffer[threadID] = *reinterpret_cast<int*>( pData );
 }
 //--------------------------------------------------------------------------------
-void ConstantBufferParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
-{
-	assert( threadID >= 0 );
-	assert( threadID < NUM_THREADS+1 );
-
-	if ( m_iCBuffer[threadID] == *reinterpret_cast<int*>( pData ) ) {
-		m_iCBuffer[threadID] = -1;
-	}
-}
+//void ConstantBufferParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
+//{
+//	assert( threadID >= 0 );
+//	assert( threadID < NUM_THREADS+1 );
+//
+//	if ( m_iCBuffer[threadID] == *reinterpret_cast<int*>( pData ) ) {
+//		m_iCBuffer[threadID] = -1;
+//	}
+//}
 //--------------------------------------------------------------------------------
 const ParameterType ConstantBufferParameterDX11::GetParameterType()
 {
@@ -61,18 +61,18 @@ int ConstantBufferParameterDX11::GetIndex( unsigned int threadID )
 	return( m_iCBuffer[threadID] );
 }
 //--------------------------------------------------------------------------------
-void ConstantBufferParameterDX11::UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID )
-{
-	assert( threadID >= 0 );
-	assert( threadID < NUM_THREADS+1 );
-
-	if ( pParameter )
-	{
-		if ( ( pParameter->GetParameterType() == CBUFFER ) && ( pParameter->GetName() == this->GetName() ) )
-		{
-			ConstantBufferParameterDX11* pBuffer = (ConstantBufferParameterDX11*)pParameter;
-			m_iCBuffer[threadID] = pBuffer->GetIndex( threadID );
-		}
-	}
-}
+//void ConstantBufferParameterDX11::UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID )
+//{
+//	assert( threadID >= 0 );
+//	assert( threadID < NUM_THREADS+1 );
+//
+//	if ( pParameter )
+//	{
+//		if ( ( pParameter->GetParameterType() == CBUFFER ) && ( pParameter->GetName() == this->GetName() ) )
+//		{
+//			ConstantBufferParameterDX11* pBuffer = (ConstantBufferParameterDX11*)pParameter;
+//			m_iCBuffer[threadID] = pBuffer->GetIndex( threadID );
+//		}
+//	}
+//}
 //--------------------------------------------------------------------------------

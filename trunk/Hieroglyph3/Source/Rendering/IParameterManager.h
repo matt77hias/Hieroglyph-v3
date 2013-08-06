@@ -39,7 +39,7 @@ namespace Glyph3
 		// parameters are then available for setting their value and subsequent use 
 		// during rendering.
 
-		virtual void SetParameter( RenderParameterDX11* pParameter ) = 0;
+		//virtual void SetParameter( RenderParameterDX11* pParameter ) = 0;
 		virtual void SetVectorParameter( const std::wstring& name, Vector4f* pVector ) = 0;
 		virtual void SetMatrixParameter( const std::wstring& name, Matrix4f* pMatrix ) = 0;
 		virtual void SetSamplerParameter( const std::wstring& name, int* pID ) = 0;

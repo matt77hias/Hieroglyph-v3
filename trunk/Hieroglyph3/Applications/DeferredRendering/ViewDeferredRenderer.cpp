@@ -390,7 +390,7 @@ void ViewDeferredRenderer::SetupViews( )
 {
     // Set the lights to render. We'll create a 3D grid of point lights
     // with different colors.
-    Light light;
+    LightParams light;
     light.Type = Point;
 
     const int cubeSize = 3 + LightMode::Value * 2;

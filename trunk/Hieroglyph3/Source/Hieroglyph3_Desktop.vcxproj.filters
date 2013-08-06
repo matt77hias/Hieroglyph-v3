@@ -392,9 +392,6 @@
     <ClCompile Include="Objects\FirstPersonCamera.cpp">
       <Filter>Objects\Scene Objects\Cameras</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\Light.cpp">
-      <Filter>Objects\Scene Objects\Lights</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\Scene.cpp">
       <Filter>Objects\Scene Objects</Filter>
     </ClCompile>
@@ -788,6 +785,15 @@
     <ClCompile Include="Rendering\StreamOutputStageStateDX11.cpp">
       <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Stream Output</Filter>
     </ClCompile>
+    <ClCompile Include="Objects\PointLight.cpp">
+      <Filter>Objects\Scene Objects\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\PositionExtractorController.cpp">
+      <Filter>Objects\Controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Light.cpp">
+      <Filter>Objects\Scene Objects\Lights</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationStream.h">
@@ -990,9 +996,6 @@
     </ClInclude>
     <ClInclude Include="Objects\FirstPersonCamera.h">
       <Filter>Objects\Scene Objects\Cameras</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\Light.h">
-      <Filter>Objects\Scene Objects\Lights</Filter>
     </ClInclude>
     <ClInclude Include="Objects\Scene.h">
       <Filter>Objects\Scene Objects</Filter>
@@ -1453,6 +1456,18 @@
     <ClInclude Include="Rendering\StreamOutputStageStateDX11.h">
       <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Stream Output</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\TGrowableBufferDX11.h">
+      <Filter>Rendering\Pipeline System\Executors\Executors\Basis Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\PointLight.h">
+      <Filter>Objects\Scene Objects\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\PositionExtractorController.h">
+      <Filter>Objects\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Light.h">
+      <Filter>Objects\Scene Objects\Lights</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Rendering\TGrowableIndexBufferDX11.inl">
@@ -1486,6 +1501,9 @@
       <Filter>Mathematics</Filter>
     </None>
     <None Include="Rendering\TGrowableStructuredBufferDX11.inl">
+      <Filter>Rendering\Pipeline System\Executors\Executors\Basis Objects</Filter>
+    </None>
+    <None Include="Rendering\TGrowableBufferDX11.inl">
       <Filter>Rendering\Pipeline System\Executors\Executors\Basis Objects</Filter>
     </None>
   </ItemGroup>

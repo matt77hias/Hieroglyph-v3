@@ -26,7 +26,7 @@ namespace Glyph3
 		virtual ~VectorParameterWriterDX11();
 
 		void SetRenderParameterRef( VectorParameterDX11* pParam );
-		void SetValue( Vector4f& Value );
+		void SetValue( const Vector4f& Value );
 		Vector4f GetValue();
 
 		virtual void WriteParameter( IParameterManager* pParamMgr );

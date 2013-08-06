@@ -36,7 +36,7 @@ static float Clamp( float x, float low, float high )
     return x;
 }
 //--------------------------------------------------------------------------------
-static void DrawLightType( const std::vector<Light>& lights, RenderEffectDX11 effects[2], 
+static void DrawLightType( const std::vector<LightParams>& lights, RenderEffectDX11 effects[2], 
                             ResourcePtr vb, int inputLayout, PipelineManagerDX11* pPipelineManager,
                             IParameterManager* pParamManager )
 {
@@ -45,17 +45,17 @@ static void DrawLightType( const std::vector<Light>& lights, RenderEffectDX11 ef
         // Copy in the light data for each vertex
         D3D11_MAPPED_SUBRESOURCE mapped;
         mapped = pPipelineManager->MapResource( vb->m_iResource, 0, D3D11_MAP_WRITE_DISCARD, 0 );
-        memcpy( mapped.pData, &lights[0], sizeof( Light ) * lights.size() );
+        memcpy( mapped.pData, &lights[0], sizeof( LightParams ) * lights.size() );
         pPipelineManager->UnMapResource( vb->m_iResource, 0 );
 
         // Render the lights for non-edge pixels. We'll render as a point list.
         pPipelineManager->DrawNonIndexed( effects[0], vb, inputLayout,
-                                            D3D11_PRIMITIVE_TOPOLOGY_POINTLIST, sizeof( Light ),
+                                            D3D11_PRIMITIVE_TOPOLOGY_POINTLIST, sizeof( LightParams ),
                                             lights.size(), 0, pParamManager );
 
         // Render the lights for edge pixels. We'll render as a point list.
         pPipelineManager->DrawNonIndexed( effects[1], vb, inputLayout, 
-                                            D3D11_PRIMITIVE_TOPOLOGY_POINTLIST, sizeof( Light ),
+                                            D3D11_PRIMITIVE_TOPOLOGY_POINTLIST, sizeof( LightParams ),
                                             lights.size(), 0, pParamManager );
     }
 }
@@ -133,7 +133,7 @@ ViewLights::ViewLights( RendererDX11& Renderer)
     // Create a dynamic vertex buffer full of points, where each point is a single light source
     BufferConfigDX11 vbConfig;
     vbConfig.SetBindFlags( D3D11_BIND_VERTEX_BUFFER );
-    vbConfig.SetByteWidth( MaxNumLights * sizeof(Light) );
+    vbConfig.SetByteWidth( MaxNumLights * sizeof(LightParams) );
     vbConfig.SetCPUAccessFlags( D3D11_CPU_ACCESS_WRITE );
     vbConfig.SetUsage( D3D11_USAGE_DYNAMIC );
     m_pVertexBuffer = Renderer.CreateVertexBuffer( &vbConfig, NULL );
@@ -385,7 +385,7 @@ void ViewLights::SetUsageParams( IParameterManager* pParamManager )
 
 }
 //--------------------------------------------------------------------------------
-void ViewLights::AddLight( const Light& light )
+void ViewLights::AddLight( const LightParams& light )
 {
     if ( light.Type == Point )
         m_PointLights.push_back( light );

@@ -29,13 +29,13 @@ namespace Glyph3
 		virtual ~MatrixArrayParameterDX11();
 
 		virtual void SetParameterData( void* pData, unsigned int threadID = 0 );
-		virtual void ResetParameterData( void* pData, unsigned int threadID = 0 );
+		//virtual void ResetParameterData( void* pData, unsigned int threadID = 0 );
 
 		virtual const ParameterType GetParameterType();
 		int GetMatrixCount();
 		Matrix4f* GetMatrices( unsigned int threadID = 0 );
 
-		void UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID = 0 );
+		//void UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID = 0 );
 
 	protected:
 		int				m_iMatrixCount;

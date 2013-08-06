@@ -9,6 +9,7 @@
 //--------------------------------------------------------------------------------
 #include "RenderApplication.h"
 #include "VolumeActor.h"
+#include "PointLight.h"
 
 using namespace Glyph3;
 
@@ -32,4 +33,5 @@ public:
 protected:
 	VolumeActor*					m_pActor1;
 	VolumeActor*					m_pActor2;
+	PointLight*						m_pLight;
 };

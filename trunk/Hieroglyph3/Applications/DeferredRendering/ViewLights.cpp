@@ -291,7 +291,7 @@ void ViewLights::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterM
     // Loop through the lights
     for ( unsigned int i = 0; i < m_Lights.size(); ++i )
     {
-        const Light& light = m_Lights[i];
+        const LightParams& light = m_Lights[i];
 
         // Pick the effect based on the shader
         RenderEffectDX11* pEffect = NULL;
@@ -467,7 +467,7 @@ void ViewLights::SetUsageParams( IParameterManager* pParamManager )
 
 }
 //--------------------------------------------------------------------------------
-void ViewLights::AddLight( const Light& light )
+void ViewLights::AddLight( const LightParams& light )
 {
 	m_Lights.push_back( light );
 }

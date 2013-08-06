@@ -19,6 +19,7 @@
 //--------------------------------------------------------------------------------
 #include "Node3D.h"
 #include "Camera.h"
+#include "Light.h"
 #include "ParameterContainer.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
@@ -35,6 +36,11 @@ namespace Glyph3
 
 		void AddCamera( Camera* camera );
 		Camera* GetCamera( unsigned int index );
+		unsigned int GetCameraCount();
+
+		void AddLight( Light* pLight );
+		Light* GetLight( unsigned int index );
+		unsigned int GetLightCount();
 
 		void AddActor( Actor* actor );
 		void RemoveActor( Actor* actor );
@@ -50,6 +56,7 @@ namespace Glyph3
 	protected:
 		Node3D* m_pRoot;
 		std::vector< Camera* > m_vCameras;
+		std::vector< Light* > m_vLights;
 		std::vector< Actor* > m_vActors;
 	};
 };

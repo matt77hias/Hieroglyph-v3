@@ -41,16 +41,16 @@ void VectorParameterDX11::SetParameterData( void* pData, unsigned int threadID )
 	}
 }
 //--------------------------------------------------------------------------------
-void VectorParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
-{
-	assert( threadID >= 0 );
-	assert( threadID < NUM_THREADS+1 );
-
-	if ( m_Vector[threadID] == *reinterpret_cast<Vector4f*>( pData ) ) {
-		m_auiValueID[threadID]++;
-		m_Vector[threadID].MakeZero();
-	}
-}
+//void VectorParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
+//{
+//	assert( threadID >= 0 );
+//	assert( threadID < NUM_THREADS+1 );
+//
+//	if ( m_Vector[threadID] == *reinterpret_cast<Vector4f*>( pData ) ) {
+//		m_auiValueID[threadID]++;
+//		m_Vector[threadID].MakeZero();
+//	}
+//}
 //--------------------------------------------------------------------------------
 const ParameterType VectorParameterDX11::GetParameterType()
 {
@@ -73,21 +73,21 @@ void VectorParameterDX11::SetVector( Vector4f v, unsigned int threadID )
 	}
 }
 //--------------------------------------------------------------------------------
-void VectorParameterDX11::UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID )
-{
-	assert( threadID >= 0 );
-	assert( threadID < NUM_THREADS+1 );
-
-	if ( pParameter )
-	{
-		if ( ( pParameter->GetParameterType() == VECTOR ) && ( pParameter->GetName() == this->GetName() ) )
-		{
-			VectorParameterDX11* pVector = (VectorParameterDX11*)pParameter;
-			if ( m_Vector[threadID] != pVector->GetVector( threadID ) ) {
-				m_auiValueID[threadID]++;
-				m_Vector[threadID] = pVector->GetVector();
-			}
-		}
-	}
-}
+//void VectorParameterDX11::UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID )
+//{
+//	assert( threadID >= 0 );
+//	assert( threadID < NUM_THREADS+1 );
+//
+//	if ( pParameter )
+//	{
+//		if ( ( pParameter->GetParameterType() == VECTOR ) && ( pParameter->GetName() == this->GetName() ) )
+//		{
+//			VectorParameterDX11* pVector = (VectorParameterDX11*)pParameter;
+//			if ( m_Vector[threadID] != pVector->GetVector( threadID ) ) {
+//				m_auiValueID[threadID]++;
+//				m_Vector[threadID] = pVector->GetVector();
+//			}
+//		}
+//	}
+//}
 //--------------------------------------------------------------------------------

@@ -80,19 +80,19 @@ void MatrixArrayParameterDX11::SetParameterData( void* pData, unsigned int threa
 	
 }
 //--------------------------------------------------------------------------------
-void MatrixArrayParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
-{
-	assert( threadID >= 0 );
-	assert( threadID < NUM_THREADS+1 );
-
-	// TODO: This method doesn't do anything at the moment - it doesn't make sense
-	//       to reset a resource that just holds data (this mechanism is intended
-	//       for resource parameters...).
-
-	//m_auiValueID[threadID]++;
-	//memcpy( m_pMatrices[threadID], pData, m_iMatrixCount * sizeof( Matrix4f ) );
-	//m_Matrix = *reinterpret_cast<Matrix4f*>( pData );
-}
+//void MatrixArrayParameterDX11::ResetParameterData( void* pData, unsigned int threadID )
+//{
+//	assert( threadID >= 0 );
+//	assert( threadID < NUM_THREADS+1 );
+//
+//	// TODO: This method doesn't do anything at the moment - it doesn't make sense
+//	//       to reset a resource that just holds data (this mechanism is intended
+//	//       for resource parameters...).
+//
+//	//m_auiValueID[threadID]++;
+//	//memcpy( m_pMatrices[threadID], pData, m_iMatrixCount * sizeof( Matrix4f ) );
+//	//m_Matrix = *reinterpret_cast<Matrix4f*>( pData );
+//}
 //--------------------------------------------------------------------------------
 const ParameterType MatrixArrayParameterDX11::GetParameterType()
 {
@@ -112,21 +112,21 @@ Matrix4f* MatrixArrayParameterDX11::GetMatrices( unsigned int threadID )
 	return( m_pMatrices[threadID] );
 }
 //--------------------------------------------------------------------------------
-void MatrixArrayParameterDX11::UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID )
-{
-	if ( pParameter )
-	{
-		if ( ( pParameter->GetParameterType() == MATRIX_ARRAY ) && ( pParameter->GetName() == this->GetName() ) )
-		{
-			MatrixArrayParameterDX11* pBuffer = (MatrixArrayParameterDX11*)pParameter;
-			if ( this->GetMatrixCount() == pBuffer->GetMatrixCount() )
-			{
-				if ( 0 != memcmp( pBuffer->GetMatrices( threadID ), &(m_pMatrices[threadID]), m_iMatrixCount * sizeof( Matrix4f ) ) ) {
-					m_auiValueID[threadID]++;
-					memcpy( (void*)m_pMatrices, (void*)pBuffer->GetMatrices( threadID ), m_iMatrixCount * sizeof( Matrix4f ) );
-				}
-			}
-		}
-	}
-}
+//void MatrixArrayParameterDX11::UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID )
+//{
+//	if ( pParameter )
+//	{
+//		if ( ( pParameter->GetParameterType() == MATRIX_ARRAY ) && ( pParameter->GetName() == this->GetName() ) )
+//		{
+//			MatrixArrayParameterDX11* pBuffer = (MatrixArrayParameterDX11*)pParameter;
+//			if ( this->GetMatrixCount() == pBuffer->GetMatrixCount() )
+//			{
+//				if ( 0 != memcmp( pBuffer->GetMatrices( threadID ), &(m_pMatrices[threadID]), m_iMatrixCount * sizeof( Matrix4f ) ) ) {
+//					m_auiValueID[threadID]++;
+//					memcpy( (void*)m_pMatrices, (void*)pBuffer->GetMatrices( threadID ), m_iMatrixCount * sizeof( Matrix4f ) );
+//				}
+//			}
+//		}
+//	}
+//}
 //--------------------------------------------------------------------------------

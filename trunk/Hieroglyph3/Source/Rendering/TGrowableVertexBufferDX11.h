@@ -11,68 +11,35 @@
 //--------------------------------------------------------------------------------
 // TGrowableVertexBufferDX11
 //
-// This template class provides 
 //--------------------------------------------------------------------------------
 #ifndef TGrowableVertexBufferDX11_h
 #define TGrowableVertexBufferDX11_h
 //--------------------------------------------------------------------------------
 #include "PipelineManagerDX11.h"
-#include "BufferConfigDX11.h"
+#include "TGrowableBufferDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
 	template <class T>
-	class TGrowableVertexBufferDX11
+	class TGrowableVertexBufferDX11 : public TGrowableBufferDX11<T>
 	{
 	public:
 		TGrowableVertexBufferDX11();
-		~TGrowableVertexBufferDX11();
+		virtual ~TGrowableVertexBufferDX11();
 
+		virtual void UploadData( PipelineManagerDX11* pPipeline );
+		virtual ResourcePtr GetBuffer();
 
-		// Setting the size of the vertex buffer will create a new array, and 
-		// copy as much of the existing array as possible.
-
-		void SetMaxVertexCount( unsigned int maxVertices );
-		
-		unsigned int GetMaxVertexCount();
-		unsigned int GetVertexCount();
-
-		
-		// Vertices are added one at a time, with a template method.
-
-		void AddVertex( const T& vertex );
-		
-
-		// These methods allow the user to either upload the vertex data to
-		// the buffer resource, or alternatively they can 'reset' the 
-		// vertices, which essentially just resets the vertex counters
-		// (i.e. - no data is actually cleared from the system memory
-		// array).
-
-		void UploadVertexData( PipelineManagerDX11* pPipeline );
-		void ResetVertices();
-
-
-		ResourcePtr GetVertexBuffer();
+	protected:
+        virtual void CreateResource( unsigned int elements );
+        virtual void DeleteResource( );
 
 	private:
-
-		void EnsureVertexCapacity( );
-
 		ResourcePtr m_VB;
-
-		// The sizes
-		unsigned int m_uiMaxVertexCount;
-		unsigned int m_uiVertexCount;
-
-		bool m_bUploadNeeded;
-
-		// The pointer to our array of vertex data
-		T* m_pVertexArray;
-
 	};
 
 #include "TGrowableVertexBufferDX11.inl"
 };
 //--------------------------------------------------------------------------------
 #endif // TGrowableVertexBufferDX11_h
+//--------------------------------------------------------------------------------

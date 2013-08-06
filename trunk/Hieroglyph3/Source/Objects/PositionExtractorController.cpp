@@ -9,36 +9,36 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// ShaderResourceParameterDX11
-//
+#include "PCH.h"
+#include "PositionExtractorController.h"
+#include "Entity3D.h"
+#include "Vector4f.h"
 //--------------------------------------------------------------------------------
-#ifndef ShaderResourceParameterDX11_h
-#define ShaderResourceParameterDX11_h
+using namespace Glyph3;
 //--------------------------------------------------------------------------------
-#include "RenderParameterDX11.h"
-//--------------------------------------------------------------------------------
-namespace Glyph3
+PositionExtractorController::PositionExtractorController() :
+	m_pWriter( nullptr )
 {
-	class ShaderResourceParameterDX11 : public RenderParameterDX11
+}
+//--------------------------------------------------------------------------------
+PositionExtractorController::~PositionExtractorController()
+{
+}
+//--------------------------------------------------------------------------------
+void PositionExtractorController::Update( float fTime )
+{
+	// If there is an entity and a writer set, then 
+	// set in this controller.
+
+	if ( nullptr != m_pEntity && nullptr != m_pWriter )
 	{
-	public:
-		ShaderResourceParameterDX11();
-		ShaderResourceParameterDX11( ShaderResourceParameterDX11& copy );
-		virtual ~ShaderResourceParameterDX11();
-
-		virtual void SetParameterData( void* pData, unsigned int threadID = 0 );
-		//virtual void ResetParameterData( void* pData, unsigned int threadID = 0 );
-
-		virtual const ParameterType GetParameterType();
-		int GetIndex( unsigned int threadID );
-
-		//void UpdateValue( RenderParameterDX11* pParameter, unsigned int threadID = 0 );
-
-	protected:
-		int		m_iShaderResourceView[NUM_THREADS+1];
-	};
-};
+		Vector3f WorldPosition = m_pEntity->LocalPointToWorldSpace( m_pEntity->Position() );
+		m_pWriter->SetValue( Vector4f( WorldPosition, 1.0f ) );
+	}
+}
 //--------------------------------------------------------------------------------
-#endif // ShaderResourceParameterDX11_h
+void PositionExtractorController::SetParameterWriter( VectorParameterWriterDX11* pWriter )
+{
+	m_pWriter = pWriter;
+}
 //--------------------------------------------------------------------------------
-
