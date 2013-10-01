@@ -14,13 +14,12 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-DXGIOutput::DXGIOutput( IDXGIOutput* pOutput )
+DXGIOutput::DXGIOutput( Microsoft::WRL::ComPtr<IDXGIOutput> pOutput )
 {
 	m_pOutput = pOutput;
 }
 //--------------------------------------------------------------------------------
 DXGIOutput::~DXGIOutput()
 {
-	SAFE_RELEASE( m_pOutput );
 }
 //--------------------------------------------------------------------------------

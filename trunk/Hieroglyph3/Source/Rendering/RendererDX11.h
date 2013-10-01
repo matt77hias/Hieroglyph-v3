@@ -27,9 +27,6 @@
 
 #include "ResourceProxyDX11.h"
 #include "ShaderDX11.h"
-#include "BlendStateDX11.h"
-#include "DepthStencilStateDX11.h"
-#include "RasterizerStateDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -61,9 +58,6 @@ namespace Glyph3
 	class DepthStencilViewDX11;
 	class UnorderedAccessViewDX11;
 
-	class InputLayoutDX11;
-	class SamplerStateDX11;
-
 	class BlendStateConfigDX11;
 	class DepthStencilStateConfigDX11;
 	class RasterizerStateConfigDX11;
@@ -75,6 +69,24 @@ namespace Glyph3
 
 	class Task;
 
+	typedef Microsoft::WRL::ComPtr<ID3D11DeviceContext> DeviceContextComPtr;
+	typedef Microsoft::WRL::ComPtr<ID3D11Query> QueryComPtr;
+
+	typedef Microsoft::WRL::ComPtr<ID3D11Buffer> BufferComPtr;
+	typedef Microsoft::WRL::ComPtr<ID3D11Texture1D> Texture1DComPtr;
+	typedef Microsoft::WRL::ComPtr<ID3D11Texture2D> Texture2DComPtr;
+	typedef Microsoft::WRL::ComPtr<ID3D11Texture3D> Texture3DComPtr;
+
+	typedef Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ShaderResourceViewComPtr;
+	typedef Microsoft::WRL::ComPtr<ID3D11DepthStencilView> DepthStencilViewComPtr;
+	typedef Microsoft::WRL::ComPtr<ID3D11RenderTargetView> RenderTargetViewComPtr;
+	typedef Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> UnorderedAccessViewComPtr;
+
+	typedef Microsoft::WRL::ComPtr<ID3D11BlendState> BlendStateComPtr;
+	typedef Microsoft::WRL::ComPtr<ID3D11DepthStencilState> DepthStencilStateComPtr;
+	typedef Microsoft::WRL::ComPtr<ID3D11RasterizerState> RasterizerStateComPtr;
+	typedef Microsoft::WRL::ComPtr<ID3D11SamplerState> SamplerStateComPtr;
+	typedef Microsoft::WRL::ComPtr<ID3D11InputLayout> InputLayoutComPtr;
 
 	enum ResourceType
 	{
@@ -117,6 +129,10 @@ namespace Glyph3
 
 		D3D_FEATURE_LEVEL GetAvailableFeatureLevel( D3D_DRIVER_TYPE DriverType );
 		D3D_FEATURE_LEVEL GetCurrentFeatureLevel();
+
+		// Provide an estimate of the available video memory.
+
+		UINT64 GetAvailableVideoMemory();
 
 		// Renderer initialization and shutdown methods.  These methods
 		// obtain and release all of the hardware specific resources that
@@ -226,13 +242,13 @@ namespace Glyph3
 		void ResizeViewport( int ID, UINT width, UINT height );
 
 		// Provide access to the pipeline states.
-		BlendStatePtr									GetBlendState( int index );
-		DepthStencilStatePtr							GetDepthState( int index );
-		RasterizerStatePtr								GetRasterizerState( int index );
+		BlendStateComPtr								GetBlendState( int index );
+		DepthStencilStateComPtr							GetDepthState( int index );
+		RasterizerStateComPtr							GetRasterizerState( int index );
 		const ViewPortDX11&								GetViewPort( int index );
 
-		InputLayoutDX11*								GetInputLayout( int index );
-		SamplerStateDX11*								GetSamplerState( int index );
+		InputLayoutComPtr								GetInputLayout( int index );
+		SamplerStateComPtr								GetSamplerState( int index );
 
 		ShaderDX11*										GetShader( int index );
 
@@ -250,9 +266,9 @@ namespace Glyph3
 	protected:
 
 		// The main API interfaces used in the renderer.
-		ID3D11Device*				m_pDevice;
-		ID3D11Debug*				m_pDebugger;
-		D3D_DRIVER_TYPE				m_driverType;
+		Microsoft::WRL::ComPtr<ID3D11Device>	m_pDevice;
+		Microsoft::WRL::ComPtr<ID3D11Debug>		m_pDebugger;
+		D3D_DRIVER_TYPE							m_driverType;
 
 		// Static renderer access - used for accessing the renderer when no reference
 		// is already available.
@@ -273,10 +289,10 @@ namespace Glyph3
 		// Resource view containers.  These are indexed by the application for
 		// the various pipeline binding operations.
 
-		std::vector<ShaderResourceViewDX11*>	m_vShaderResourceViews;
-		std::vector<RenderTargetViewDX11*>		m_vRenderTargetViews;
-		std::vector<DepthStencilViewDX11*>		m_vDepthStencilViews;
-		std::vector<UnorderedAccessViewDX11*>	m_vUnorderedAccessViews;
+		std::vector<ShaderResourceViewDX11>		m_vShaderResourceViews;
+		std::vector<RenderTargetViewDX11>		m_vRenderTargetViews;
+		std::vector<DepthStencilViewDX11>		m_vDepthStencilViews;
+		std::vector<UnorderedAccessViewDX11>	m_vUnorderedAccessViews;
 
 		// The shader programs are stored in an expandable array of their base classes.
 
@@ -288,13 +304,13 @@ namespace Glyph3
 		// destroying many resources, and allow the renderer clients to have greater access
 		// the objects without querying the renderer.
 
-		std::vector<BlendStatePtr>				m_vBlendStates;
-		std::vector<DepthStencilStatePtr>		m_vDepthStencilStates;
-		std::vector<RasterizerStatePtr>			m_vRasterizerStates;
+		std::vector<BlendStateComPtr>			m_vBlendStates;
+		std::vector<DepthStencilStateComPtr>	m_vDepthStencilStates;
+		std::vector<RasterizerStateComPtr>		m_vRasterizerStates;
 
-		std::vector<InputLayoutDX11*>			m_vInputLayouts;
-		std::vector<SamplerStateDX11*>			m_vSamplerStates;
-		std::vector<ViewPortDX11*>				m_vViewPorts;
+		std::vector<InputLayoutComPtr>			m_vInputLayouts;
+		std::vector<SamplerStateComPtr>			m_vSamplerStates;
+		std::vector<ViewPortDX11>				m_vViewPorts;
 
 	public:
 		IParameterManager*						m_pParamMgr;
@@ -320,10 +336,10 @@ namespace Glyph3
 
 		// Resource view accessors
 
-		RenderTargetViewDX11*		GetRenderTargetViewByIndex( int rid );
-		DepthStencilViewDX11*		GetDepthStencilViewByIndex( int rid );
-		ShaderResourceViewDX11*		GetShaderResourceViewByIndex( int rid );
-		UnorderedAccessViewDX11*	GetUnorderedAccessViewByIndex( int rid );
+		RenderTargetViewDX11&		GetRenderTargetViewByIndex( int rid );
+		DepthStencilViewDX11&		GetDepthStencilViewByIndex( int rid );
+		ShaderResourceViewDX11&		GetShaderResourceViewByIndex( int rid );
+		UnorderedAccessViewDX11&	GetUnorderedAccessViewByIndex( int rid );
 
 		TConfiguration<bool>		MultiThreadingConfig;
 

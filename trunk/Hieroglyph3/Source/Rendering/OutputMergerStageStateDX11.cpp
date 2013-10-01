@@ -18,9 +18,9 @@ OutputMergerStageStateDX11::OutputMergerStageStateDX11() :
 	BlendState( -1 ),
 	DepthStencilState( -1 ),
 	StencilRef( 0 ),
-	RenderTargetViews( -1 ),
-	DepthTargetViews( -1 ),
-	UnorderedAccessViews( -1 ),
+	RenderTargetViews( 0 ),
+	DepthTargetViews( 0 ),
+	UnorderedAccessViews( 0 ),
 	UAVInitialCounts( -1 ),
 	m_FeatureLevel( D3D_FEATURE_LEVEL_9_1 ),
 	m_pSisterState( nullptr )

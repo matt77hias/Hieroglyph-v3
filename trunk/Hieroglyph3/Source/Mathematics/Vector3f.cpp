@@ -326,6 +326,11 @@ float Vector3f::Dot( const Vector3f& A, const Vector3f& B )
     return A.Dot( B );
 }
 //----------------------------------------------------------------------------------------------------
+float Vector3f::LengthSq( const Vector3f& A )
+{
+    return Dot(A, A);
+}
+//----------------------------------------------------------------------------------------------------
 Vector3f Vector3f::Normalize( const Vector3f& A )
 {
     Vector3f vec = A;

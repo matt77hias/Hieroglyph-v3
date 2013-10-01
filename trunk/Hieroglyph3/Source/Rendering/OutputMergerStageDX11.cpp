@@ -67,41 +67,30 @@ void OutputMergerStageDX11::ApplyDesiredRenderTargetStates( ID3D11DeviceContext*
 
 		for ( int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++ ) {
 
-			RenderTargetViewDX11* pRenderTargetView = pRenderer->GetRenderTargetViewByIndex( DesiredState.RenderTargetViews.GetState( i ) );
-			
-			if ( pRenderTargetView != 0 ) {
+			RenderTargetViewDX11& rtv = pRenderer->GetRenderTargetViewByIndex( DesiredState.RenderTargetViews.GetState( i ) );
+			rtvs[i] = rtv.m_pRenderTargetView.Get();
+
+			if ( rtvs[i] != nullptr ) {
 				rtvCount = i+1; // Record the number of non-null rtvs...
-				rtvs[i] = pRenderTargetView->m_pRenderTargetView;
-			} else {
-				rtvs[i] = 0;
 			}
 		}
 
 		for ( int i = 0; i < D3D11_PS_CS_UAV_REGISTER_COUNT; i++ ) {
 
-			UnorderedAccessViewDX11* pUnorderedAccessView = pRenderer->GetUnorderedAccessViewByIndex( DesiredState.UnorderedAccessViews.GetState( i ) );
-			
-			if ( pUnorderedAccessView != 0 ) {
+			UnorderedAccessViewDX11& uav = pRenderer->GetUnorderedAccessViewByIndex( DesiredState.UnorderedAccessViews.GetState( i ) );
+			uavs[i] = uav.m_pUnorderedAccessView.Get();
+
+			if ( uavs[i] != nullptr ) {
 				uavCount = i+1; // Record the number of non-null uavs...
-				uavs[i] = pUnorderedAccessView->m_pUnorderedAccessView;
-			} else {
-				uavs[i] = 0;
 			}
 		}
 
 		
-		DepthStencilViewDX11* pDepthStencilView = pRenderer->GetDepthStencilViewByIndex( DesiredState.DepthTargetViews.GetState() );
-
-		if ( pDepthStencilView ) {
-			dsv = pDepthStencilView->m_pDepthStencilView;
-		} else {
-			dsv = 0;
-		}
+		DepthStencilViewDX11& DSV = pRenderer->GetDepthStencilViewByIndex( DesiredState.DepthTargetViews.GetState() );
+		dsv = DSV.m_pDepthStencilView.Get();
 
 		// TODO: convert this to bind the UAVs too...
 		pContext->OMSetRenderTargets( D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, rtvs, dsv );
-
-		// 
 		//pContext->OMSetRenderTargetsAndUnorderedAccessViews( rtvCount, rtvs, dsv, 
 		//	rtvCount, uavCount, uavs, (UINT*)&DesiredState.UAVInitialCounts );
 
@@ -131,11 +120,11 @@ void OutputMergerStageDX11::ApplyDesiredBlendAndDepthStencilStates( ID3D11Device
 
 	if ( DesiredState.BlendState.IsUpdateNeeded() ) {
 
-		BlendStatePtr pGlyphBlendState = pRenderer->GetBlendState( DesiredState.BlendState.GetState() );
+		BlendStateComPtr pGlyphBlendState = pRenderer->GetBlendState( DesiredState.BlendState.GetState() );
 
 		if ( nullptr != pGlyphBlendState ) {
 			
-			ID3D11BlendState* pBlendState = pGlyphBlendState->m_pState;
+			ID3D11BlendState* pBlendState = pGlyphBlendState.Get();
 
 			// TODO: Add in the blend factors as states to the OutputMergerStageStateDX11 class!
 			if ( pBlendState ) {
@@ -150,11 +139,11 @@ void OutputMergerStageDX11::ApplyDesiredBlendAndDepthStencilStates( ID3D11Device
 
 	if ( DesiredState.DepthStencilState.IsUpdateNeeded() || DesiredState.StencilRef.IsUpdateNeeded() ) {
 
-		DepthStencilStatePtr pGlyphDepthStencilState = pRenderer->GetDepthState( DesiredState.DepthStencilState.GetState() );
+		DepthStencilStateComPtr pGlyphDepthStencilState = pRenderer->GetDepthState( DesiredState.DepthStencilState.GetState() );
 		
 		if ( nullptr != pGlyphDepthStencilState ) {
 
-			ID3D11DepthStencilState* pDepthState = pGlyphDepthStencilState->m_pState;
+			ID3D11DepthStencilState* pDepthState = pGlyphDepthStencilState.Get();
 
 			if ( pDepthState ) {
 				pContext->OMSetDepthStencilState( pDepthState, DesiredState.StencilRef.GetState() );

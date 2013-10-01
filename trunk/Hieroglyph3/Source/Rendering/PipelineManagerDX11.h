@@ -35,6 +35,8 @@ namespace Glyph3
 
 	class CommandListDX11;
 
+	typedef Microsoft::WRL::ComPtr<ID3DUserDefinedAnnotation> UserDefinedAnnotationComPtr;
+
 	class PipelineManagerDX11
 	{
 	public:
@@ -43,7 +45,7 @@ namespace Glyph3
 
 		// Allow the creator to set the context and feature level
 
-		void SetDeviceContext( ID3D11DeviceContext* pContext, D3D_FEATURE_LEVEL level );
+		void SetDeviceContext( DeviceContextComPtr pContext, D3D_FEATURE_LEVEL level );
 
 		// All of the 'Bind/Unbind' functions below are used to bind various resources to the
 		// pipeline.  Currently only the CS can accept unordered access views.  A method is
@@ -207,14 +209,14 @@ namespace Glyph3
 		void SaveTextureScreenShot( int ID, std::wstring filename );
 
 
-		D3D_FEATURE_LEVEL			m_FeatureLevel;
-
-		ID3D11DeviceContext*		            m_pContext;
-		ID3DUserDefinedAnnotation*				m_pAnnotation;
+		D3D_FEATURE_LEVEL						m_FeatureLevel;
+		
+		DeviceContextComPtr			            m_pContext;
+		UserDefinedAnnotationComPtr				m_pAnnotation;
 		
         static const int                        NumQueries = 3;
         int                                     m_iCurrentQuery;
-        ID3D11Query*				            m_Queries[NumQueries];
+        QueryComPtr					            m_Queries[NumQueries];
 		D3D11_QUERY_DATA_PIPELINE_STATISTICS	m_PipelineStatsData;
 
 		// The shader stage resources are managed by these classes.

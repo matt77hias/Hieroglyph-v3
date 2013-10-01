@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <map>
 #include <vector>
+#include <exception>
 
 // Standard C Library includes
 #include <stdio.h>
@@ -41,7 +42,8 @@
 // DirectX includes
 #include <d3d11_1.h>
 #include <d3dCompiler.h>
-//#include <d3dx11.h>
+
+#include <wrl.h>
 
 #define SAFE_RELEASE( x ) {if(x){(x)->Release();(x)=NULL;}}
 #define SAFE_DELETE( x ) {if(x){delete (x);(x)=NULL;}}

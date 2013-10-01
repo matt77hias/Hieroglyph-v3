@@ -15,23 +15,19 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-DXGIAdapter::DXGIAdapter( IDXGIAdapter1* pAdapter )
+DXGIAdapter::DXGIAdapter( Microsoft::WRL::ComPtr<IDXGIAdapter1> pAdapter )
 {
 	m_pAdapter = pAdapter;
 
-	IDXGIOutput* pOutput = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIOutput> pOutput;
 
-	while ( pAdapter->EnumOutputs( m_vOutputs.size(), &pOutput ) != DXGI_ERROR_NOT_FOUND )
+	while ( pAdapter->EnumOutputs( m_vOutputs.size(), pOutput.ReleaseAndGetAddressOf() ) != DXGI_ERROR_NOT_FOUND )
 	{
-		m_vOutputs.push_back( new DXGIOutput( pOutput ) );
+		m_vOutputs.push_back( pOutput );
 	}
 }
 //--------------------------------------------------------------------------------
 DXGIAdapter::~DXGIAdapter()
 {
-	for ( auto pOutput : m_vOutputs )
-		delete pOutput;
-
-	SAFE_RELEASE( m_pAdapter );
 }
 //--------------------------------------------------------------------------------

@@ -15,19 +15,18 @@
 #ifndef ShaderResourceViewDX11_h
 #define ShaderResourceViewDX11_h
 //--------------------------------------------------------------------------------
-#include "ResourceViewDX11.h"
 #include "PipelineManagerDx11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class ShaderResourceViewDX11 : public ResourceViewDX11
+	class ShaderResourceViewDX11
 	{
 	public:
-		ShaderResourceViewDX11( ID3D11ShaderResourceView* pView );
-		virtual ~ShaderResourceViewDX11();
+		ShaderResourceViewDX11( ShaderResourceViewComPtr pView );
+		~ShaderResourceViewDX11();
 
 	protected:
-		ID3D11ShaderResourceView*			m_pShaderResourceView;
+		ShaderResourceViewComPtr		m_pShaderResourceView;
 		
 		friend PipelineManagerDX11;
 		friend RendererDX11;

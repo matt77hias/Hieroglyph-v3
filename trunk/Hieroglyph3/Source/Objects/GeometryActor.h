@@ -47,8 +47,11 @@ namespace Glyph3
 		void AddIndices( const unsigned int i1, const unsigned int i2 );
 		void AddIndices( const unsigned int i1, const unsigned int i2, const unsigned int i3 );
 
+		void SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY topology );
+
 		// Higher level geometric object manipulation can be performed with these methods.
 
+		void DrawLine( const Vector3f& p1, const Vector3f& p2 );
 		void DrawSphere( const Vector3f& center, float radius, unsigned int stacks = 6, unsigned int slices = 12 );
 		void DrawDisc( const Vector3f& center, const Vector3f& normal, float radius, unsigned int slices = 12 );
 		void DrawCylinder( const Vector3f& p1, const Vector3f& p2, float r1, float r2, unsigned int stacks = 2, unsigned int slices = 10 );

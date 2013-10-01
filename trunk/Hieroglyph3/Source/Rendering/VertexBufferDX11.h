@@ -22,7 +22,7 @@ namespace Glyph3
 	class VertexBufferDX11 : public BufferDX11
 	{
 	public:
-		VertexBufferDX11( ID3D11Buffer* pBuffer );
+		VertexBufferDX11( Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer );
 		virtual ~VertexBufferDX11();
 
 		virtual ResourceType				GetType();

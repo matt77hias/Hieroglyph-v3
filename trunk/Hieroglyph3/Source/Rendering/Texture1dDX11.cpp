@@ -14,7 +14,7 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-Texture1dDX11::Texture1dDX11( ID3D11Texture1D* pTex )
+Texture1dDX11::Texture1dDX11( Microsoft::WRL::ComPtr<ID3D11Texture1D> pTex )
 {
 	m_pTexture = pTex;
 
@@ -24,7 +24,6 @@ Texture1dDX11::Texture1dDX11( ID3D11Texture1D* pTex )
 //--------------------------------------------------------------------------------
 Texture1dDX11::~Texture1dDX11()
 {
-	SAFE_RELEASE( m_pTexture );
 }
 //--------------------------------------------------------------------------------
 ResourceType Texture1dDX11::GetType()
@@ -54,7 +53,7 @@ void Texture1dDX11::SetDesiredDescription( D3D11_TEXTURE1D_DESC description )
 //--------------------------------------------------------------------------------
 ID3D11Resource* Texture1dDX11::GetResource()
 {
-	return( m_pTexture );
+	return( m_pTexture.Get() );
 }
 //--------------------------------------------------------------------------------
 UINT Texture1dDX11::GetEvictionPriority()

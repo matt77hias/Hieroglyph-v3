@@ -15,19 +15,18 @@
 #ifndef UnorderedAccessViewDX11_h
 #define UnorderedAccessViewDX11_h
 //--------------------------------------------------------------------------------
-#include "ResourceViewDX11.h"
 #include "PipelineManagerDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class UnorderedAccessViewDX11 : public ResourceViewDX11
+	class UnorderedAccessViewDX11
 	{
 	public:
-		UnorderedAccessViewDX11( ID3D11UnorderedAccessView* pView );
-		virtual ~UnorderedAccessViewDX11();
+		UnorderedAccessViewDX11( UnorderedAccessViewComPtr pView );
+		~UnorderedAccessViewDX11();
 
 	protected:
-		ID3D11UnorderedAccessView*			m_pUnorderedAccessView;
+		UnorderedAccessViewComPtr			m_pUnorderedAccessView;
 		
 		friend OutputMergerStageDX11;
 		friend PipelineManagerDX11;

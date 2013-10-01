@@ -14,13 +14,12 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-RenderTargetViewDX11::RenderTargetViewDX11( ID3D11RenderTargetView* pView )
+RenderTargetViewDX11::RenderTargetViewDX11( RenderTargetViewComPtr pView )
 {
 	m_pRenderTargetView = pView;
 }
 //--------------------------------------------------------------------------------
 RenderTargetViewDX11::~RenderTargetViewDX11()
 {
-	SAFE_RELEASE( m_pRenderTargetView );
 }
 //--------------------------------------------------------------------------------

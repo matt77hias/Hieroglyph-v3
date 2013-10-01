@@ -34,7 +34,7 @@ namespace Glyph3
 	class ConstantBufferDX11 : public BufferDX11
 	{
 	public:
-		ConstantBufferDX11( ID3D11Buffer* pBuffer );
+		ConstantBufferDX11( Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer );
 		virtual ~ConstantBufferDX11();
 
 		virtual ResourceType				GetType( );

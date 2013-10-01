@@ -57,11 +57,11 @@ void RasterizerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 	// Compare the current state vs. the desired state and set it if necesary.
 	if ( DesiredState.RasterizerState.IsUpdateNeeded() )
 	{
-		RasterizerStatePtr pGlyphRasterizerState 
+		RasterizerStateComPtr pGlyphRasterizerState 
 			= pRenderer->GetRasterizerState( DesiredState.RasterizerState.GetState() );
 		
 		if ( pGlyphRasterizerState != nullptr ) {
-			ID3D11RasterizerState* pRasterizerState = pGlyphRasterizerState->m_pState;
+			ID3D11RasterizerState* pRasterizerState = pGlyphRasterizerState.Get();
 			pContext->RSSetState( pRasterizerState );
 		}
 	}

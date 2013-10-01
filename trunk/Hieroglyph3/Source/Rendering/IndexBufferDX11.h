@@ -22,7 +22,7 @@ namespace Glyph3
 	class IndexBufferDX11 : public BufferDX11
 	{
 	public:
-		IndexBufferDX11( ID3D11Buffer* pBuffer );
+		IndexBufferDX11( Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer );
 		virtual ~IndexBufferDX11();
 
 		virtual ResourceType				GetType();

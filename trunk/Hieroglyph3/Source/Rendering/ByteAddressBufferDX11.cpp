@@ -14,14 +14,13 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-ByteAddressBufferDX11::ByteAddressBufferDX11( ID3D11Buffer* pBuffer )
+ByteAddressBufferDX11::ByteAddressBufferDX11( Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer )
 {
 	m_pBuffer = pBuffer;
 }
 //--------------------------------------------------------------------------------
 ByteAddressBufferDX11::~ByteAddressBufferDX11()
 {
-	// Buffer is released in the BufferDX11 destructor
 }
 //--------------------------------------------------------------------------------
 ResourceType ByteAddressBufferDX11::GetType()

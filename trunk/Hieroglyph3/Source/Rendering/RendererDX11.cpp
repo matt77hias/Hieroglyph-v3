@@ -38,12 +38,6 @@
 #include "DepthStencilViewDX11.h"
 #include "UnorderedAccessViewDX11.h"
 
-#include "InputLayoutDX11.h"
-#include "BlendStateDX11.h"
-#include "DepthStencilStateDX11.h"
-#include "RasterizerStateDX11.h"
-#include "SamplerStateDX11.h"
-
 #include "BlendStateConfigDX11.h"
 #include "DepthStencilStateConfigDX11.h"
 #include "RasterizerStateConfigDX11.h"
@@ -92,6 +86,7 @@
 #pragma comment( lib, "d3d11.lib" )
 #pragma comment( lib, "DXGI.lib" )
 
+using Microsoft::WRL::ComPtr;
 
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
@@ -103,8 +98,8 @@ RendererDX11::RendererDX11()
 	if ( m_spRenderer == 0 )
 		m_spRenderer = this;
 
-	m_pDevice = 0;
-	m_pDebugger = 0;
+//	m_pDevice = 0;
+//	m_pDebugger = 0;
 	m_driverType = D3D_DRIVER_TYPE_NULL;
 
 
@@ -141,16 +136,16 @@ D3D_FEATURE_LEVEL RendererDX11::GetAvailableFeatureLevel( D3D_DRIVER_TYPE Driver
 		FeatureLevel = m_pDevice->GetFeatureLevel();
 	} else {
 		hr = D3D11CreateDevice(
-			NULL,
+			nullptr,
 			DriverType,
-			NULL,
+			nullptr,
 			0,
-			NULL,
+			nullptr,
 			0,
 			D3D11_SDK_VERSION,
-			NULL,
+			nullptr,
 			&FeatureLevel,
-			NULL );
+			nullptr );
 
 		if ( FAILED( hr ) ) {
 			Log::Get().Write( L"Failed to determine the available hardware feature level!" );
@@ -166,6 +161,33 @@ D3D_FEATURE_LEVEL RendererDX11::GetCurrentFeatureLevel()
 	return( m_FeatureLevel );
 }
 //--------------------------------------------------------------------------------
+UINT64 RendererDX11::GetAvailableVideoMemory()
+{
+    // Acquire the DXGI device, then the adapter.
+	// TODO: This method needs to be capable of checking on multiple adapters!
+
+    ComPtr<IDXGIDevice> pDXGIDevice;
+    ComPtr<IDXGIAdapter> pDXGIAdapter;
+    
+	HRESULT hr = m_pDevice.CopyTo( pDXGIDevice.GetAddressOf() );
+	pDXGIDevice->GetAdapter( pDXGIAdapter.GetAddressOf() );
+    
+	// Use the adapter interface to get its description.  Then grab the available
+	// video memory based on if there is dedicated or shared memory for the GPU.
+
+    DXGI_ADAPTER_DESC AdapterDesc;
+    pDXGIAdapter->GetDesc( &AdapterDesc );
+
+	UINT64 availableVideoMem = 0;
+
+    if ( AdapterDesc.DedicatedVideoMemory )
+        availableVideoMem = AdapterDesc.DedicatedVideoMemory;
+    else
+        availableVideoMem = AdapterDesc.SharedSystemMemory;
+
+    return( availableVideoMem );
+}
+//--------------------------------------------------------------------------------
 bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL FeatureLevel )
 {
 
@@ -173,20 +195,19 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 
 	// Create a factory to enumerate all of the hardware in the system.
 
-	IDXGIFactory1* pFactory = 0;
-	hr = CreateDXGIFactory1( __uuidof(IDXGIFactory), (void**)(&pFactory) );
+	ComPtr<IDXGIFactory1> pFactory;
+	hr = CreateDXGIFactory1( __uuidof(IDXGIFactory), reinterpret_cast<void**>( pFactory.GetAddressOf() ) );
 
 
 	// Enumerate all of the adapters in the current system.  This includes all
 	// adapters, even the ones that don't support the ID3D11Device interface.
 
-	IDXGIAdapter1* pCurrentAdapter;
-	std::vector<DXGIAdapter*> vAdapters;
-	std::vector<DXGIOutput*> vOutputs;
+	ComPtr<IDXGIAdapter1> pCurrentAdapter;
+	std::vector<DXGIAdapter> vAdapters;
 
-	while( pFactory->EnumAdapters1( static_cast<UINT>(vAdapters.size()), &pCurrentAdapter ) != DXGI_ERROR_NOT_FOUND )
+	while( pFactory->EnumAdapters1( static_cast<UINT>(vAdapters.size()), pCurrentAdapter.ReleaseAndGetAddressOf() ) != DXGI_ERROR_NOT_FOUND )
 	{
-		vAdapters.push_back( new DXGIAdapter( pCurrentAdapter ) );
+		vAdapters.push_back( pCurrentAdapter );
 
 		DXGI_ADAPTER_DESC1 desc;
 		pCurrentAdapter->GetDesc1( &desc );
@@ -200,36 +221,61 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
     CreateDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-	ID3D11DeviceContext* pContext = 0;
+	DeviceContextComPtr pContext;
 
 	D3D_FEATURE_LEVEL level[] = { FeatureLevel };
-	hr = D3D11CreateDevice(
-				0,				//vAdapters[0]->m_pAdapter,
-				DriverType,		//D3D_DRIVER_TYPE_UNKNOWN, 
-				0,
-				CreateDeviceFlags,
-				level,
-				1,
-				D3D11_SDK_VERSION,
-				&m_pDevice,
-				0,
-				&pContext
-			);
+	D3D_FEATURE_LEVEL CreatedLevel;
 
-	// Release the adapters and the factory for now...
+	// If we are trying to get a hardware device, then loop through all available
+	// adapters until we successfully create it.  This is useful for multi-adapter
+	// systems, where the built in GPU may or may not be capable of the most recent
+	// feature levels.
+	//
+	// If it isn't a hardware device, then we simply use nullptr for the adapter with
+	// the appropriate driver type.  See the following page for more details on device 
+	// creation: http://msdn.microsoft.com/en-us/library/windows/desktop/ff476082%28v=vs.85%29.aspx
 
-	for ( auto pAdapter : vAdapters )
-		delete pAdapter;
+    if ( DriverType == D3D_DRIVER_TYPE_HARDWARE )
+    {
+        for ( auto pAdapter : vAdapters )
+        {
+            hr = D3D11CreateDevice(
+				pAdapter.m_pAdapter.Get(),
+                D3D_DRIVER_TYPE_UNKNOWN,
+                nullptr,
+                CreateDeviceFlags,
+                level,
+                1,
+                D3D11_SDK_VERSION,
+				m_pDevice.GetAddressOf(),
+                &CreatedLevel,
+				pContext.GetAddressOf() );
 
-	SAFE_RELEASE( pFactory );
+            if (hr == S_OK)
+                break;
+        }
+    }
+    else
+    {
+        hr = D3D11CreateDevice(
+            nullptr,
+            DriverType,
+            nullptr,
+            CreateDeviceFlags,
+            level,
+            1,
+            D3D11_SDK_VERSION,
+            m_pDevice.GetAddressOf(),
+            &CreatedLevel,
+			pContext.GetAddressOf() );
+    }
 
 	if( FAILED( hr ) )
         return false;
 
 	// Get the debugger interface from the device.
 
-	m_pDebugger = 0;
-	hr = m_pDevice->QueryInterface( __uuidof(ID3D11Debug), (void **)&m_pDebugger );
+	hr = m_pDevice.CopyTo( m_pDebugger.GetAddressOf() );
 
 	if ( FAILED( hr ) )
 	{
@@ -264,6 +310,16 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 
 	BlendStateConfigDX11 BlendState;
 	pImmPipeline->OutputMergerStage.DesiredState.BlendState.SetState( CreateBlendState( &BlendState ) );
+
+
+	// Create the default resource views for each category.  This has the effect
+	// of allowing the '0' index to be the default state.
+
+	m_vShaderResourceViews.emplace_back( ShaderResourceViewComPtr() );
+	m_vUnorderedAccessViews.emplace_back( UnorderedAccessViewComPtr() );
+	m_vRenderTargetViews.emplace_back( RenderTargetViewComPtr() );
+	m_vDepthStencilViews.emplace_back( DepthStencilViewComPtr() );
+
 
 	// Create a query object to be used to gather statistics on the pipeline.
 
@@ -308,8 +364,8 @@ bool RendererDX11::Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL Fea
 		g_aPayload[i].id = i;
 
 		// Create a deferred context for each thread's pipeline.
-		ID3D11DeviceContext* pDeferred = 0;
-		m_pDevice->CreateDeferredContext( 0, &pDeferred );
+		DeviceContextComPtr pDeferred;
+		m_pDevice->CreateDeferredContext( 0, pDeferred.GetAddressOf() );
 
 		// Create the pipeline and set the context.
 		g_aPayload[i].pPipeline = new PipelineManagerDX11();
@@ -375,30 +431,17 @@ void RendererDX11::Shutdown()
 	m_vBlendStates.clear();
 	m_vDepthStencilStates.clear();
 	m_vRasterizerStates.clear();
-
-	for ( auto pLayout : m_vInputLayouts )
-		delete pLayout;
-
-	for ( auto pSamplers : m_vSamplerStates )
-		delete pSamplers;
-
-	for ( auto pViewports : m_vViewPorts )
-		delete pViewports;
+	m_vSamplerStates.clear();
+	m_vInputLayouts.clear();
+	m_vViewPorts.clear();
 
 	for ( auto pShader : m_vShaders )
 		delete pShader;
 
-	for ( auto pSRV : m_vShaderResourceViews )
-		delete pSRV;
-
-	for ( auto pRTV : m_vRenderTargetViews )
-		delete pRTV;
-
-	for ( auto pDSV : m_vDepthStencilViews )
-		delete pDSV;
-
-	for ( auto pUAV : m_vUnorderedAccessViews )
-		delete pUAV;
+	m_vShaderResourceViews.clear();
+	m_vRenderTargetViews.clear();
+	m_vDepthStencilViews.clear();
+	m_vUnorderedAccessViews.clear();
 
 	for ( auto pResource : m_vResources )
 		delete pResource;
@@ -412,8 +455,8 @@ void RendererDX11::Shutdown()
 
 	// Clear the context and the device
 
-	SAFE_RELEASE( m_pDevice );
-	SAFE_RELEASE( m_pDebugger );
+	//SAFE_RELEASE( m_pDevice );
+	//SAFE_RELEASE( m_pDebugger );
 }
 //--------------------------------------------------------------------------------
 void RendererDX11::Present( HWND hWnd, int SwapChain )
@@ -435,27 +478,23 @@ int RendererDX11::CreateSwapChain( SwapChainConfigDX11* pConfig )
 {
 	// Attempt to create the DXGI Factory.
 
-	IDXGIDevice * pDXGIDevice;
-	HRESULT hr = m_pDevice->QueryInterface(__uuidof(IDXGIDevice), (void **)&pDXGIDevice);
+	ComPtr<IDXGIDevice> pDXGIDevice;
+	HRESULT hr = m_pDevice.CopyTo( pDXGIDevice.GetAddressOf() );
 
-	IDXGIAdapter * pDXGIAdapter;
-	hr = pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), (void **)&pDXGIAdapter);
+	ComPtr<IDXGIAdapter> pDXGIAdapter;
+	hr = pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void **>( pDXGIAdapter.GetAddressOf() ) );
 
-	IDXGIFactory * pFactory;
-	pDXGIAdapter->GetParent(__uuidof(IDXGIFactory), (void **)&pFactory);
+	ComPtr<IDXGIFactory> pFactory;
+	pDXGIAdapter->GetParent(__uuidof(IDXGIFactory), reinterpret_cast<void **>( pFactory.GetAddressOf() ) );
 
 
 	// Attempt to create the swap chain.
 
-	IDXGISwapChain* pSwapChain = 0;
-	hr = pFactory->CreateSwapChain( m_pDevice, &pConfig->m_State, &pSwapChain );
+	ComPtr<IDXGISwapChain> pSwapChain;
+	hr = pFactory->CreateSwapChain( m_pDevice.Get(), &pConfig->m_State, pSwapChain.GetAddressOf() );
 
 
 	// Release the factory regardless of pass or fail.
-
-	pDXGIDevice->Release();
-	pDXGIAdapter->Release();
-	pFactory->Release();
 
 	if ( FAILED( hr ) )
 	{
@@ -466,8 +505,8 @@ int RendererDX11::CreateSwapChain( SwapChainConfigDX11* pConfig )
 
 	// Acquire the texture interface from the swap chain.
 
-	ID3D11Texture2D* pSwapChainBuffer = 0;
-	hr = pSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), reinterpret_cast< void** >( &pSwapChainBuffer ) );
+	Texture2DComPtr pSwapChainBuffer;
+	hr = pSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), reinterpret_cast< void** >( pSwapChainBuffer.GetAddressOf() ) );
 
 	if ( FAILED( hr ) )
 	{
@@ -501,8 +540,8 @@ int RendererDX11::CreateSwapChain( SwapChainConfigDX11* pConfig )
 ResourcePtr RendererDX11::CreateVertexBuffer( BufferConfigDX11* pConfig,  D3D11_SUBRESOURCE_DATA* pData )
 {
 	// Create the buffer with the specified configuration.
-	ID3D11Buffer* pBuffer = 0;
-	HRESULT hr = m_pDevice->CreateBuffer( &pConfig->m_State, pData, &pBuffer );
+	BufferComPtr pBuffer;
+	HRESULT hr = m_pDevice->CreateBuffer( &pConfig->m_State, pData, pBuffer.GetAddressOf() );
 
 	if ( pBuffer )
 	{
@@ -525,8 +564,8 @@ ResourcePtr RendererDX11::CreateIndexBuffer( BufferConfigDX11* pConfig,  D3D11_S
 {
 	// Create the buffer with the specified configuration.
 
-	ID3D11Buffer* pBuffer = 0;
-	HRESULT hr = m_pDevice->CreateBuffer( &pConfig->m_State, pData, &pBuffer );
+	BufferComPtr pBuffer;
+	HRESULT hr = m_pDevice->CreateBuffer( &pConfig->m_State, pData, pBuffer.GetAddressOf() );
 
 	if ( pBuffer )
 	{
@@ -549,8 +588,8 @@ ResourcePtr RendererDX11::CreateStructuredBuffer( BufferConfigDX11* pConfig,  D3
 {
 	// Create the buffer with the specified configuration.
 
-	ID3D11Buffer* pBuffer = 0;
-	HRESULT hr = m_pDevice->CreateBuffer( &pConfig->m_State, pData, &pBuffer );
+	BufferComPtr pBuffer;
+	HRESULT hr = m_pDevice->CreateBuffer( &pConfig->m_State, pData, pBuffer.GetAddressOf() );
 
 	if ( pBuffer )
 	{
@@ -573,8 +612,8 @@ ResourcePtr RendererDX11::CreateByteAddressBuffer( BufferConfigDX11* pConfig,  D
 {
 	// Create the buffer with the specified configuration.
 
-	ID3D11Buffer* pBuffer = 0;
-	HRESULT hr = m_pDevice->CreateBuffer( &pConfig->m_State, pData, &pBuffer );
+	BufferComPtr pBuffer;
+	HRESULT hr = m_pDevice->CreateBuffer( &pConfig->m_State, pData, pBuffer.GetAddressOf() );
 
 	if ( pBuffer )
 	{
@@ -597,8 +636,8 @@ ResourcePtr RendererDX11::CreateIndirectArgsBuffer( BufferConfigDX11* pConfig,  
 {
 	// Create the buffer with the specified configuration.
 
-	ID3D11Buffer* pBuffer = 0;
-	HRESULT hr = m_pDevice->CreateBuffer( &pConfig->m_State, pData, &pBuffer );
+	BufferComPtr pBuffer;
+	HRESULT hr = m_pDevice->CreateBuffer( &pConfig->m_State, pData, pBuffer.GetAddressOf() );
 
 	if ( pBuffer )
 	{
@@ -622,8 +661,8 @@ ResourcePtr RendererDX11::CreateConstantBuffer( BufferConfigDX11* pConfig,  D3D1
 	// Set the constant buffer flag in addition to any other flags that
 	// the user has set.
 
-	ID3D11Buffer* pBuffer = 0;
-	HRESULT hr = m_pDevice->CreateBuffer( &pConfig->m_State, pData, &pBuffer );
+	BufferComPtr pBuffer;
+	HRESULT hr = m_pDevice->CreateBuffer( &pConfig->m_State, pData, pBuffer.GetAddressOf() );
 
 	if ( pBuffer )
 	{
@@ -647,8 +686,8 @@ ResourcePtr RendererDX11::CreateTexture1D( Texture1dConfigDX11* pConfig, D3D11_S
                                           RenderTargetViewConfigDX11* pRTVConfig,
                                           UnorderedAccessViewConfigDX11* pUAVConfig )
 {
-	ID3D11Texture1D* pTexture = 0;
-	HRESULT hr = m_pDevice->CreateTexture1D( &pConfig->m_State, pData, &pTexture );
+	Texture1DComPtr pTexture;
+	HRESULT hr = m_pDevice->CreateTexture1D( &pConfig->m_State, pData, pTexture.GetAddressOf() );
 
 	if ( pTexture )
 	{
@@ -672,8 +711,8 @@ ResourcePtr RendererDX11::CreateTexture2D( Texture2dConfigDX11* pConfig, D3D11_S
                                           UnorderedAccessViewConfigDX11* pUAVConfig,
                                           DepthStencilViewConfigDX11* pDSVConfig )
 {
-	ID3D11Texture2D* pTexture = 0;
-	HRESULT hr = m_pDevice->CreateTexture2D( &pConfig->m_State, pData, &pTexture );
+	Texture2DComPtr pTexture;
+	HRESULT hr = m_pDevice->CreateTexture2D( &pConfig->m_State, pData, pTexture.GetAddressOf() );
 
 	if ( pTexture )
 	{
@@ -696,8 +735,8 @@ ResourcePtr RendererDX11::CreateTexture3D( Texture3dConfigDX11* pConfig, D3D11_S
                                           RenderTargetViewConfigDX11* pRTVConfig,
                                           UnorderedAccessViewConfigDX11* pUAVConfig )
 {
-	ID3D11Texture3D* pTexture = 0;
-	HRESULT hr = m_pDevice->CreateTexture3D( &pConfig->m_State, pData, &pTexture );
+	Texture3DComPtr pTexture;
+	HRESULT hr = m_pDevice->CreateTexture3D( &pConfig->m_State, pData, pTexture.GetAddressOf() );
 
 	if ( pTexture )
 	{
@@ -724,13 +763,11 @@ int RendererDX11::CreateShaderResourceView( int ResourceID, D3D11_SHADER_RESOURC
 		pRawResource = pResource->GetResource();
 
 		if ( pRawResource ) {
-			ID3D11ShaderResourceView* pView = 0;
-			HRESULT hr = m_pDevice->CreateShaderResourceView( pRawResource, pDesc, &pView );
+			ShaderResourceViewComPtr pView;
+			HRESULT hr = m_pDevice->CreateShaderResourceView( pRawResource, pDesc, pView.GetAddressOf() );
 
 			if ( pView ) {
-				ShaderResourceViewDX11* pShaderResource = new ShaderResourceViewDX11( pView );
-				m_vShaderResourceViews.push_back( pShaderResource );
-
+				m_vShaderResourceViews.push_back( pView );
 				return( m_vShaderResourceViews.size() - 1 );
 			}
 		}
@@ -748,13 +785,11 @@ int RendererDX11::CreateRenderTargetView( int ResourceID, D3D11_RENDER_TARGET_VI
 		pRawResource = pResource->GetResource();
 
 		if ( pRawResource ) {
-			ID3D11RenderTargetView* pView = 0;
-			HRESULT hr = m_pDevice->CreateRenderTargetView( pRawResource, pDesc, &pView );
+			RenderTargetViewComPtr pView;
+			HRESULT hr = m_pDevice->CreateRenderTargetView( pRawResource, pDesc, pView.GetAddressOf() );
 
 			if ( pView ) {
-				RenderTargetViewDX11* pRenderTarget = new RenderTargetViewDX11( pView );
-				m_vRenderTargetViews.push_back( pRenderTarget );
-
+				m_vRenderTargetViews.push_back( pView );
 				return( m_vRenderTargetViews.size() - 1 );
 			}
 		}
@@ -773,13 +808,11 @@ int RendererDX11::CreateDepthStencilView( int ResourceID, D3D11_DEPTH_STENCIL_VI
 
 		if ( pRawResource ) {
 
-			ID3D11DepthStencilView* pView = 0;
-			HRESULT hr = m_pDevice->CreateDepthStencilView( pRawResource, pDesc, &pView );
+			DepthStencilViewComPtr pView;
+			HRESULT hr = m_pDevice->CreateDepthStencilView( pRawResource, pDesc, pView.GetAddressOf() );
 
 			if ( pView ) {
-				DepthStencilViewDX11* pDepthStencil = new DepthStencilViewDX11( pView );
-				m_vDepthStencilViews.push_back( pDepthStencil );
-
+				m_vDepthStencilViews.push_back( pView );
 				return( m_vDepthStencilViews.size() - 1 );
 			}
 		}
@@ -797,13 +830,11 @@ int RendererDX11::CreateUnorderedAccessView( int ResourceID, D3D11_UNORDERED_ACC
 		pRawResource = pResource->GetResource();
 
 		if ( pRawResource ) {
-			ID3D11UnorderedAccessView* pView = 0;
-			HRESULT hr = m_pDevice->CreateUnorderedAccessView( pRawResource, pDesc, &pView );
+			UnorderedAccessViewComPtr pView;
+			HRESULT hr = m_pDevice->CreateUnorderedAccessView( pRawResource, pDesc, pView.GetAddressOf() );
 
 			if ( pView ) {
-				UnorderedAccessViewDX11* pUnorderedAccess = new UnorderedAccessViewDX11( pView );
-				m_vUnorderedAccessViews.push_back( pUnorderedAccess );
-
+				m_vUnorderedAccessViews.push_back( pView );
 				return( m_vUnorderedAccessViews.size() - 1 );
 			}
 		}
@@ -820,24 +851,19 @@ void RendererDX11::ResizeTexture( ResourcePtr texture, UINT width, UINT height )
 	int rid = texture->m_iResource;
 
 	// Grab the old texture description and update it for the new size.
-	Texture2dDX11* pOldTexture = GetTexture2DByIndex( rid );
-	D3D11_TEXTURE2D_DESC TexDesc = pOldTexture->GetActualDescription();
+	Texture2dDX11* pTexture = GetTexture2DByIndex( rid );
+	D3D11_TEXTURE2D_DESC TexDesc = pTexture->GetActualDescription();
 	TexDesc.Width = width;
 	TexDesc.Height = height;
 
-	// Create the new texture...
-	ID3D11Texture2D* pTexture = 0;
-	if ( FAILED( m_pDevice->CreateTexture2D( &TexDesc, 0, &pTexture ) ) ) {
+	// Release the old texture, and replace it with the new one.
+	if ( FAILED( m_pDevice->CreateTexture2D( &TexDesc, 0, pTexture->m_pTexture.ReleaseAndGetAddressOf() ) ) ) {
 		Log::Get().Write( L"Error trying to resize texture..." );
 	}
 	
-	// Release the old texture, and replace it with the new one.
-	pOldTexture->m_pTexture->Release(); 
-	pOldTexture->m_pTexture = pTexture;
-
 	// Update the description of the texture for future reference.
-	pOldTexture->m_ActualDesc = TexDesc;
-	pOldTexture->m_DesiredDesc = TexDesc;
+	pTexture->m_ActualDesc = TexDesc;
+	pTexture->m_DesiredDesc = TexDesc;
 	texture->m_pTexture2dConfig->m_State = TexDesc; 
 
 	// Resize each of the resource views, if required.
@@ -850,7 +876,7 @@ void RendererDX11::ResizeTexture( ResourcePtr texture, UINT width, UINT height )
 void RendererDX11::ResizeTextureSRV( int RID, int SRVID, UINT width, UINT height )
 {
 	// Check to make sure we are supposed to do anything...
-	if ( SRVID == -1 ) {
+	if ( SRVID == 0 ) {
 		return;
 	}
 
@@ -865,27 +891,26 @@ void RendererDX11::ResizeTextureSRV( int RID, int SRVID, UINT width, UINT height
 	}
 
 	// Get the existing UAV.
-	ShaderResourceViewDX11* pOldSRV = m_vShaderResourceViews[index];
+	ShaderResourceViewDX11& SRV = m_vShaderResourceViews[index];
 
 	// Get its description.
 	D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
-	pOldSRV->m_pShaderResourceView->GetDesc( &SRVDesc );
+	SRV.m_pShaderResourceView->GetDesc( &SRVDesc );
 	
 	// Create the new one.
-	ID3D11ShaderResourceView* pView = 0;
-	if ( FAILED( m_pDevice->CreateShaderResourceView( pResource->GetResource(), &SRVDesc, &pView ) ) ) {
+	if ( FAILED( m_pDevice->CreateShaderResourceView( 
+		pResource->GetResource(), 
+		&SRVDesc, 
+		SRV.m_pShaderResourceView.ReleaseAndGetAddressOf() ) ) )
+	{
 		Log::Get().Write( L"Error trying to resize a SRV!!!!" );
 	}
-
-	// Release the old one and replace it with the new one.
-	pOldSRV->m_pShaderResourceView->Release();
-	pOldSRV->m_pShaderResourceView = pView;
 }
 //--------------------------------------------------------------------------------
 void RendererDX11::ResizeTextureRTV( int RID, int RTVID, UINT width, UINT height )
 {
 	// Check to make sure we are supposed to do anything...
-	if ( RTVID == -1 ) {
+	if ( RTVID == 0 ) {
 		return;
 	}
 
@@ -900,27 +925,26 @@ void RendererDX11::ResizeTextureRTV( int RID, int RTVID, UINT width, UINT height
 	}
 
 	// Get the existing UAV.
-	RenderTargetViewDX11* pOldRTV = m_vRenderTargetViews[index];
+	RenderTargetViewDX11& RTV = m_vRenderTargetViews[index];
 
 	// Get its description.
 	D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
-	pOldRTV->m_pRenderTargetView->GetDesc( &RTVDesc );
+	RTV.m_pRenderTargetView->GetDesc( &RTVDesc );
 	
 	// Create the new one.
-	ID3D11RenderTargetView* pView = 0;
-	if ( FAILED( m_pDevice->CreateRenderTargetView( pResource->GetResource(), &RTVDesc, &pView ) ) ) {
+	if ( FAILED( m_pDevice->CreateRenderTargetView( 
+		pResource->GetResource(), 
+		&RTVDesc, 
+		RTV.m_pRenderTargetView.ReleaseAndGetAddressOf() ) ) )
+	{
 		Log::Get().Write( L"Error trying to resize a RTV!!!!" );
 	}
-
-	// Release the old one and replace it with the new one.
-	pOldRTV->m_pRenderTargetView->Release();
-	pOldRTV->m_pRenderTargetView = pView;
 }
 //--------------------------------------------------------------------------------
 void RendererDX11::ResizeTextureDSV( int RID, int DSVID, UINT width, UINT height )
 {
 	// Check to make sure we are supposed to do anything...
-	if ( DSVID == -1 ) {
+	if ( DSVID == 0 ) {
 		return;
 	}
 
@@ -935,27 +959,26 @@ void RendererDX11::ResizeTextureDSV( int RID, int DSVID, UINT width, UINT height
 	}
 
 	// Get the existing UAV.
-	DepthStencilViewDX11* pOldDSV = m_vDepthStencilViews[index];
+	DepthStencilViewDX11& DSV = m_vDepthStencilViews[index];
 
 	// Get its description.
 	D3D11_DEPTH_STENCIL_VIEW_DESC DSVDesc;
-	pOldDSV->m_pDepthStencilView->GetDesc( &DSVDesc );
+	DSV.m_pDepthStencilView->GetDesc( &DSVDesc );
 	
 	// Create the new one.
-	ID3D11DepthStencilView* pView = 0;
-	if ( FAILED(  m_pDevice->CreateDepthStencilView( pResource->GetResource(), &DSVDesc, &pView ) ) ) {
+	if ( FAILED(  m_pDevice->CreateDepthStencilView( 
+		pResource->GetResource(), 
+		&DSVDesc,
+		DSV.m_pDepthStencilView.ReleaseAndGetAddressOf() ) ) )
+	{
 		Log::Get().Write( L"Error trying to resize a DSV!!!!" );
 	}
-
-	// Release the old one and replace it with the new one.
-	pOldDSV->m_pDepthStencilView->Release();
-	pOldDSV->m_pDepthStencilView = pView;
 }
 //--------------------------------------------------------------------------------
 void RendererDX11::ResizeTextureUAV( int RID, int UAVID, UINT width, UINT height )
 {
 	// Check to make sure we are supposed to do anything...
-	if ( UAVID == -1 ) {
+	if ( UAVID == 0 ) {
 		return;
 	}
 
@@ -970,21 +993,20 @@ void RendererDX11::ResizeTextureUAV( int RID, int UAVID, UINT width, UINT height
 	}
 
 	// Get the existing UAV.
-	UnorderedAccessViewDX11* pOldUAV = m_vUnorderedAccessViews[index];
+	UnorderedAccessViewDX11& UAV = m_vUnorderedAccessViews[index];
 
 	// Get its description.
 	D3D11_UNORDERED_ACCESS_VIEW_DESC UAVDesc;
-	pOldUAV->m_pUnorderedAccessView->GetDesc( &UAVDesc );
+	UAV.m_pUnorderedAccessView->GetDesc( &UAVDesc );
 	
 	// Create the new one.
-	ID3D11UnorderedAccessView* pView = 0;
-	if ( FAILED( m_pDevice->CreateUnorderedAccessView( pResource->GetResource(), &UAVDesc, &pView ) ) ) {
+	if ( FAILED( m_pDevice->CreateUnorderedAccessView( 
+		pResource->GetResource(),
+		&UAVDesc,
+		UAV.m_pUnorderedAccessView.ReleaseAndGetAddressOf() ) ) )
+	{
 		Log::Get().Write( L"Error trying to resize a UAV!!!!" );
 	}
-
-	// Release the old one and replace it with the new one.
-	pOldUAV->m_pUnorderedAccessView->Release();
-	pOldUAV->m_pUnorderedAccessView = pView;
 }
 //--------------------------------------------------------------------------------
 void RendererDX11::ResizeSwapChain( int SID, UINT width, UINT height )
@@ -996,22 +1018,21 @@ void RendererDX11::ResizeSwapChain( int SID, UINT width, UINT height )
 		return;
 	}
 
+	// In order to resize a swap chain, you first have to release all outstanding
+	// references to it.  In our case, this means to release the texture and 
+	// render target view that we maintain in the renderer.
+
 	SwapChainDX11* pSwapChain = m_vSwapChains[index];
 
-
 	Texture2dDX11* pBackBuffer = GetTexture2DByIndex( pSwapChain->m_Resource->m_iResource );
-	pBackBuffer->m_pTexture->Release();
+	pBackBuffer->m_pTexture.Reset();
 
-	RenderTargetViewDX11* pRTV = m_vRenderTargetViews[pSwapChain->m_Resource->m_iResourceRTV];
+	RenderTargetViewDX11& RTV = m_vRenderTargetViews[pSwapChain->m_Resource->m_iResourceRTV];
 	
-
-
 	// Get its description.
 	D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
-	pRTV->m_pRenderTargetView->GetDesc( &RTVDesc );
-	
-	pRTV->m_pRenderTargetView->Release();
-
+	RTV.m_pRenderTargetView->GetDesc( &RTVDesc );
+	RTV.m_pRenderTargetView.Reset();
 
 
 	this->pImmPipeline->ClearPipelineState();
@@ -1028,20 +1049,11 @@ void RendererDX11::ResizeSwapChain( int SID, UINT width, UINT height )
 	}
 
 	// Re-acquire the back buffer reference.
-	ID3D11Texture2D* pSwapChainBuffer = 0;
 	hr = pSwapChain->m_pSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), 
-		reinterpret_cast< void** >( &pSwapChainBuffer ) );
-
-	pBackBuffer->m_pTexture = pSwapChainBuffer;
-
+		reinterpret_cast< void** >( pBackBuffer->m_pTexture.GetAddressOf() ) );
 
 	// Create the new one.
-	ID3D11RenderTargetView* pView = 0;
-	hr = m_pDevice->CreateRenderTargetView( pSwapChainBuffer, &RTVDesc, &pView );
-
-	// Release the old one and replace it with the new one.
-	pRTV->m_pRenderTargetView = pView;
-
+	hr = m_pDevice->CreateRenderTargetView( pBackBuffer->m_pTexture.Get(), &RTVDesc, RTV.m_pRenderTargetView.GetAddressOf() );
 }
 //--------------------------------------------------------------------------------
 void RendererDX11::ResizeViewport( int ID, UINT width, UINT height )
@@ -1052,9 +1064,9 @@ void RendererDX11::ResizeViewport( int ID, UINT width, UINT height )
 		Log::Get().Write( L"Error trying to resize viewport!" );
 	}
 
-	ViewPortDX11* pViewport = m_vViewPorts[index];
-	pViewport->m_ViewPort.Width = static_cast<float>( width );
-	pViewport->m_ViewPort.Height = static_cast<float>( height );
+	ViewPortDX11& pViewport = m_vViewPorts[index];
+	pViewport.m_ViewPort.Width = static_cast<float>( width );
+	pViewport.m_ViewPort.Height = static_cast<float>( height );
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::LoadShader( ShaderType type, std::wstring& filename, std::wstring& function, 
@@ -1234,10 +1246,10 @@ int RendererDX11::CreateInputLayout( std::vector<D3D11_INPUT_ELEMENT_DESC>& elem
 	
 	// Attempt to create the input layout from the input information.
 	ID3DBlob* pCompiledShader = m_vShaders[ShaderID]->m_pCompiledShader;
-	ID3D11InputLayout* pLayout = 0;
+	InputLayoutComPtr pLayout;
 
 	HRESULT hr = m_pDevice->CreateInputLayout( pElements, elements.size(), 
-		pCompiledShader->GetBufferPointer(), pCompiledShader->GetBufferSize(), &pLayout );
+		pCompiledShader->GetBufferPointer(), pCompiledShader->GetBufferSize(), pLayout.GetAddressOf() );
 
 	// Release the input elements array.
 	delete[] pElements;
@@ -1249,27 +1261,24 @@ int RendererDX11::CreateInputLayout( std::vector<D3D11_INPUT_ELEMENT_DESC>& elem
 		return( -1 );
 	}
 
-	// Create the input layout wrapper instance and store it in the renderer's list.
-	InputLayoutDX11* pLayoutWrapper = new InputLayoutDX11( pLayout );
-	m_vInputLayouts.push_back( pLayoutWrapper );
-	int index = m_vInputLayouts.size() - 1;
-
+	m_vInputLayouts.push_back( pLayout );
+	
 	// Return the index for referencing later on.
-	return( index );
+	return( m_vInputLayouts.size() - 1 );
 }
 //--------------------------------------------------------------------------------
 ResourcePtr RendererDX11::LoadTexture( std::wstring filename /*, D3DX11_IMAGE_LOAD_INFO* pLoadInfo*/ )
 {
-	ID3D11Resource* pTexture = 0;
+	ComPtr<ID3D11Resource> pResource;
 
 	FileSystem fs;
 	filename = fs.GetTextureFolder() + filename;
 
 	HRESULT hr = DirectX::CreateWICTextureFromFile(
-		m_pDevice,
-		pImmPipeline->m_pContext,
+		m_pDevice.Get(),
+		pImmPipeline->m_pContext.Get(),
 		filename.c_str(),
-		&pTexture,
+		pResource.GetAddressOf(),
 		0 );
 
 	if ( FAILED( hr ) )
@@ -1278,35 +1287,28 @@ ResourcePtr RendererDX11::LoadTexture( std::wstring filename /*, D3DX11_IMAGE_LO
 		return( ResourcePtr( new ResourceProxyDX11() ) );
 	}
 
-	int ResourceID = StoreNewResource( new Texture2dDX11( reinterpret_cast< ID3D11Texture2D* >( pTexture ) ) );
+	ComPtr<ID3D11Texture2D> pTexture;
+	pResource.CopyTo( pTexture.GetAddressOf() );
+
+	int ResourceID = StoreNewResource( new Texture2dDX11( pTexture ) );
 
 	Texture2dConfigDX11 TextureConfig;
-	reinterpret_cast< ID3D11Texture2D* >( pTexture )->GetDesc( &TextureConfig.m_State );
+	pTexture->GetDesc( &TextureConfig.m_State );
 
 	return( ResourcePtr( new ResourceProxyDX11( ResourceID, &TextureConfig, this ) ) );
 }
 //--------------------------------------------------------------------------------
 ResourcePtr RendererDX11::LoadTexture( void* pData, SIZE_T sizeInBytes/*, D3DX11_IMAGE_LOAD_INFO* pLoadInfo*/ )
 {
-	ID3D11Resource* pTexture = 0;
+	ComPtr<ID3D11Resource> pResource;
 
 	HRESULT hr = DirectX::CreateWICTextureFromMemory(
-		m_pDevice,
-		pImmPipeline->m_pContext,
+		m_pDevice.Get(),
+		pImmPipeline->m_pContext.Get(),
 		static_cast<uint8_t*>(pData),
 		sizeInBytes,
-		&pTexture,
+		pResource.GetAddressOf(),
 		0 );
-
-	//HRESULT hr = D3DX11CreateTextureFromMemory(
-	//	m_pDevice,
-	//	pData,
-	//	sizeInBytes,
-	//	pLoadInfo,
-	//	0,
-	//	&pTexture,
-	//	0
-	//);
 
 	if ( FAILED( hr ) )
 	{
@@ -1314,10 +1316,13 @@ ResourcePtr RendererDX11::LoadTexture( void* pData, SIZE_T sizeInBytes/*, D3DX11
 		return( ResourcePtr( new ResourceProxyDX11() ) );
 	}
 
-	int ResourceID = StoreNewResource( new Texture2dDX11( reinterpret_cast< ID3D11Texture2D* >( pTexture ) ) );
+	ComPtr<ID3D11Texture2D> pTexture;
+	pResource.CopyTo( pTexture.GetAddressOf() );
+
+	int ResourceID = StoreNewResource( new Texture2dDX11( pTexture ) );
 
 	Texture2dConfigDX11 TextureConfig;
-	reinterpret_cast< ID3D11Texture2D* >( pTexture )->GetDesc( &TextureConfig.m_State );
+	pTexture->GetDesc( &TextureConfig.m_State );
 
 	return( ResourcePtr( new ResourceProxyDX11( ResourceID, &TextureConfig, this ) ) );
 }
@@ -1327,9 +1332,12 @@ ResourcePtr RendererDX11::LoadTexture( ID3D11Texture2D* pTexture )
 	// Add a reference to the texture to ensure it doesn't get destroyed while we 
 	// are using it.
 
-	pTexture->AddRef();
+	// TODO: This method has to be double checked to ensure that the reference 
+	//       counting functions properly with the externally created texture!
 
-    int ResourceID = StoreNewResource( new Texture2dDX11( reinterpret_cast< ID3D11Texture2D* >( pTexture ) ) );
+	ComPtr<ID3D11Texture2D> pTexturePtr( pTexture );
+
+    int ResourceID = StoreNewResource( new Texture2dDX11( pTexture ) );
 
     Texture2dConfigDX11 TextureConfig;
     pTexture->GetDesc( &TextureConfig.m_State );
@@ -1339,9 +1347,9 @@ ResourcePtr RendererDX11::LoadTexture( ID3D11Texture2D* pTexture )
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateBlendState( BlendStateConfigDX11* pConfig )
 {
-	ID3D11BlendState* pState = 0;
+	BlendStateComPtr pState;
 
-	HRESULT hr = m_pDevice->CreateBlendState( dynamic_cast<D3D11_BLEND_DESC*>( pConfig ), &pState );
+	HRESULT hr = m_pDevice->CreateBlendState( dynamic_cast<D3D11_BLEND_DESC*>( pConfig ), pState.GetAddressOf() );
 
 	if ( FAILED( hr ) )
 	{
@@ -1349,17 +1357,16 @@ int RendererDX11::CreateBlendState( BlendStateConfigDX11* pConfig )
 		return( -1 );
 	}
 
-	BlendStatePtr ptr = BlendStatePtr( new BlendStateDX11( pState ) );
-	m_vBlendStates.push_back( ptr );
+	m_vBlendStates.push_back( pState );
 
 	return( m_vBlendStates.size() - 1 );
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateDepthStencilState( DepthStencilStateConfigDX11* pConfig )
 {
-	ID3D11DepthStencilState* pState = 0;
+	DepthStencilStateComPtr pState;
 
-	HRESULT hr = m_pDevice->CreateDepthStencilState( dynamic_cast<D3D11_DEPTH_STENCIL_DESC*>( pConfig ), &pState );
+	HRESULT hr = m_pDevice->CreateDepthStencilState( dynamic_cast<D3D11_DEPTH_STENCIL_DESC*>( pConfig ), pState.GetAddressOf() );
 
 	if ( FAILED( hr ) )
 	{
@@ -1367,17 +1374,16 @@ int RendererDX11::CreateDepthStencilState( DepthStencilStateConfigDX11* pConfig 
 		return( -1 );
 	}
 
-	DepthStencilStatePtr ptr = DepthStencilStatePtr( new DepthStencilStateDX11( pState ) );
-	m_vDepthStencilStates.push_back( ptr );
+	m_vDepthStencilStates.push_back( pState );
 
 	return( m_vDepthStencilStates.size() - 1 );
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateRasterizerState( RasterizerStateConfigDX11* pConfig )
 {
-	ID3D11RasterizerState* pState = 0;
+	RasterizerStateComPtr pState;
 
-	HRESULT hr = m_pDevice->CreateRasterizerState( dynamic_cast<D3D11_RASTERIZER_DESC*>( pConfig ), &pState );
+	HRESULT hr = m_pDevice->CreateRasterizerState( dynamic_cast<D3D11_RASTERIZER_DESC*>( pConfig ), pState.GetAddressOf() );
 
 	if ( FAILED( hr ) )
 	{
@@ -1385,17 +1391,16 @@ int RendererDX11::CreateRasterizerState( RasterizerStateConfigDX11* pConfig )
 		return( -1 );
 	}
 
-	RasterizerStatePtr ptr = RasterizerStatePtr( new RasterizerStateDX11( pState ) );
-	m_vRasterizerStates.push_back( ptr );
+	m_vRasterizerStates.push_back( pState );
 
 	return( m_vRasterizerStates.size() - 1 );
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateSamplerState( D3D11_SAMPLER_DESC* pDesc )
 {
-	ID3D11SamplerState* pState = 0;
+	SamplerStateComPtr pState;
 
-	HRESULT hr = m_pDevice->CreateSamplerState( pDesc, &pState );
+	HRESULT hr = m_pDevice->CreateSamplerState( pDesc, pState.GetAddressOf() );
 
 	if ( FAILED( hr ) )
 	{
@@ -1403,15 +1408,14 @@ int RendererDX11::CreateSamplerState( D3D11_SAMPLER_DESC* pDesc )
 		return( -1 );
 	}
 
-	m_vSamplerStates.push_back( new SamplerStateDX11( pState ) );
+	m_vSamplerStates.push_back( pState );
 
 	return( m_vSamplerStates.size() - 1 );
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateViewPort( D3D11_VIEWPORT viewport )
 {
-	ViewPortDX11* pViewPort = new ViewPortDX11( viewport );
-	m_vViewPorts.push_back( pViewPort );
+	m_vViewPorts.emplace_back( viewport );
 
 	return( m_vViewPorts.size() - 1 );
 }
@@ -1432,33 +1436,27 @@ Vector2f RendererDX11::GetDesktopResolution()
 {
 	// Acquire the DXGI device, then the adapter, then the output...
 
-	IDXGIDevice * pDXGIDevice;
-	HRESULT hr = m_pDevice->QueryInterface(__uuidof(IDXGIDevice), (void **)&pDXGIDevice);
-	IDXGIAdapter * pDXGIAdapter;
-	hr = pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), (void **)&pDXGIAdapter);
+	ComPtr<IDXGIDevice> pDXGIDevice;
+	HRESULT hr = m_pDevice.CopyTo( pDXGIDevice.GetAddressOf() );
+	ComPtr<IDXGIAdapter> pDXGIAdapter;
+	hr = pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void **>( pDXGIAdapter.GetAddressOf() ) );
 
 	// Take the first output in the adapter.
 
-	IDXGIOutput* pDXGIOutput;
-	pDXGIAdapter->EnumOutputs( 0, &pDXGIOutput );
+	ComPtr<IDXGIOutput> pDXGIOutput;
+	pDXGIAdapter->EnumOutputs( 0, pDXGIOutput.GetAddressOf() );
 
 	// Use the output interface to get the output description.
 
 	DXGI_OUTPUT_DESC desc;
 	pDXGIOutput->GetDesc( &desc );
 
-	// Release all of the interfaces
-
-	pDXGIOutput->Release();
-	pDXGIAdapter->Release();
-	pDXGIDevice->Release();
-
 	// Return the current output's resolution from the description.
 	return( Vector2f( static_cast<float>( desc.DesktopCoordinates.right - desc.DesktopCoordinates.left ),
 						static_cast<float>( desc.DesktopCoordinates.bottom - desc.DesktopCoordinates.top ) ) );
 }
 //--------------------------------------------------------------------------------
-BlendStatePtr RendererDX11::GetBlendState( int index )
+BlendStateComPtr RendererDX11::GetBlendState( int index )
 {
 	// TODO: There should be a default blend state that can be returned which will
 	//       put the blend state into the default D3D11 state...
@@ -1469,7 +1467,7 @@ BlendStatePtr RendererDX11::GetBlendState( int index )
 		return( m_vBlendStates[0] );
 }
 //--------------------------------------------------------------------------------
-DepthStencilStatePtr RendererDX11::GetDepthState( int index )
+DepthStencilStateComPtr RendererDX11::GetDepthState( int index )
 {
 	// TODO: There should be a default blend state that can be returned which will
 	//       put the blend state into the default D3D11 state...
@@ -1480,7 +1478,7 @@ DepthStencilStatePtr RendererDX11::GetDepthState( int index )
 		return( m_vDepthStencilStates[0] );
 }
 //--------------------------------------------------------------------------------
-RasterizerStatePtr RendererDX11::GetRasterizerState( int index )
+RasterizerStateComPtr RendererDX11::GetRasterizerState( int index )
 {
 	// TODO: There should be a default blend state that can be returned which will
 	//       put the blend state into the default D3D11 state...
@@ -1497,7 +1495,7 @@ const ViewPortDX11& RendererDX11::GetViewPort( int ID )
 	
 	assert( index < m_vViewPorts.size() );
 
-	return( *m_vViewPorts[index] );
+	return( m_vViewPorts[index] );
 }
 //--------------------------------------------------------------------------------
 ResourceDX11* RendererDX11::GetResourceByIndex( int ID )
@@ -1518,12 +1516,12 @@ ResourceDX11* RendererDX11::GetResourceByIndex( int ID )
 	return( pResource );
 }
 //--------------------------------------------------------------------------------
-InputLayoutDX11* RendererDX11::GetInputLayout( int index )
+InputLayoutComPtr RendererDX11::GetInputLayout( int index )
 {
 	return( m_vInputLayouts[index] );
 }
 //--------------------------------------------------------------------------------
-SamplerStateDX11* RendererDX11::GetSamplerState( int index )
+SamplerStateComPtr RendererDX11::GetSamplerState( int index )
 {
 	return( m_vSamplerStates[index] );
 }
@@ -1817,80 +1815,36 @@ StructuredBufferDX11* RendererDX11::GetStructuredBufferByIndex( int rid )
 	return( pResult );
 }
 //--------------------------------------------------------------------------------
-RenderTargetViewDX11* RendererDX11::GetRenderTargetViewByIndex( int rid )
+RenderTargetViewDX11& RendererDX11::GetRenderTargetViewByIndex( int rid )
 {
-	RenderTargetViewDX11* pResult = 0;
+	assert( rid >= 0 );
+	assert( rid < m_vRenderTargetViews.size() );
 
-	if ( rid != -1 ) {
-
-		unsigned int index = static_cast<unsigned int>( rid );
-
-		// Check if this ID is in range
-		if ( index < m_vRenderTargetViews.size() ) {
-			pResult = m_vRenderTargetViews[index];
-		} else {
-			Log::Get().Write( L"Trying to access a non-render target view!!!!" );
-		}
-	}
-
-	return( pResult );
+	return( m_vRenderTargetViews[rid] );
 }
 //--------------------------------------------------------------------------------
-DepthStencilViewDX11* RendererDX11::GetDepthStencilViewByIndex( int rid )
+DepthStencilViewDX11& RendererDX11::GetDepthStencilViewByIndex( int rid )
 {
-	DepthStencilViewDX11* pResult = 0;
+	assert( rid >= 0 );
+	assert( rid < m_vDepthStencilViews.size() );
 
-	if ( rid != -1 ) {
-
-		unsigned int index = static_cast<unsigned int>( rid );
-
-		// Check if this ID is in range
-		if ( index < m_vDepthStencilViews.size() ) {
-			pResult = m_vDepthStencilViews[index];
-		} else {
-			Log::Get().Write( L"Trying to access a non-depth stencil view!!!!" );
-		}
-	}
-
-	return( pResult );
+	return( m_vDepthStencilViews[rid] );
 }
 //--------------------------------------------------------------------------------
-ShaderResourceViewDX11* RendererDX11::GetShaderResourceViewByIndex( int rid )
+ShaderResourceViewDX11& RendererDX11::GetShaderResourceViewByIndex( int rid )
 {
-	ShaderResourceViewDX11* pResult = nullptr;
+	assert( rid >= 0 );
+	assert( rid < m_vShaderResourceViews.size() );
 
-	if ( rid != -1 ) {
-
-		unsigned int index = static_cast<unsigned int>( rid );
-
-		// Check if this ID is in range
-		if ( index < m_vShaderResourceViews.size() ) {
-			pResult = m_vShaderResourceViews[index];
-		} else {
-			Log::Get().Write( L"Trying to access a non-shader resource view!!!!" );
-		}
-	}
-
-	return( pResult );
+	return( m_vShaderResourceViews[rid] );
 }
 //--------------------------------------------------------------------------------
-UnorderedAccessViewDX11* RendererDX11::GetUnorderedAccessViewByIndex( int rid )
+UnorderedAccessViewDX11& RendererDX11::GetUnorderedAccessViewByIndex( int rid )
 {
-	UnorderedAccessViewDX11* pResult = 0;
+	assert( rid >= 0 );
+	assert( rid < m_vUnorderedAccessViews.size() );
 
-	if ( rid != -1 ) {
-
-		unsigned int index = static_cast<unsigned int>( rid );
-
-		// Check if this ID is in range
-		if ( index < m_vUnorderedAccessViews.size() ) {
-			pResult = m_vUnorderedAccessViews[index];
-		} else {
-			Log::Get().Write( L"Trying to access a non-unordered access view!!!!" );
-		}
-	}
-
-	return( pResult );
+	return( m_vUnorderedAccessViews[rid] );
 }
 //--------------------------------------------------------------------------------
 int	RendererDX11::GetUnusedResourceIndex()
@@ -1953,7 +1907,7 @@ void RendererDX11::DeleteResource( int index )
 //--------------------------------------------------------------------------------
 ID3D11Device* RendererDX11::GetDevice()
 {
-    return( m_pDevice );
+    return( m_pDevice.Get() );
 }
 //--------------------------------------------------------------------------------
 template <class T>

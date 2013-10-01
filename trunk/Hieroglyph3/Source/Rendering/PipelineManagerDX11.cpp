@@ -10,12 +10,8 @@
 #include "PCH.h"
 #include "PipelineManagerDX11.h"
 #include "Log.h"
-#include "BlendStateDX11.h"
-#include "DepthStencilStateDX11.h"
-#include "RasterizerStateDX11.h"
 #include "ViewPortDX11.h"
-#include "SamplerStateDX11.h"
-#include "InputLayoutDX11.h"
+
 #include "IParameterManager.h"
 #include "ResourceDX11.h"
 
@@ -61,10 +57,7 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 PipelineManagerDX11::PipelineManagerDX11()
 {
-	m_pContext = 0;
     m_iCurrentQuery = 0;
-    for( int i = 0; i < NumQueries; ++i)
-	    m_Queries[i] = 0;
 
     ZeroMemory(&m_PipelineStatsData, sizeof(D3D11_QUERY_DATA_PIPELINE_STATISTICS));
 
@@ -80,23 +73,17 @@ PipelineManagerDX11::PipelineManagerDX11()
 //--------------------------------------------------------------------------------
 PipelineManagerDX11::~PipelineManagerDX11()
 {
-	if ( m_pAnnotation ) m_pAnnotation->Release();
-
 	if( m_pContext ) m_pContext->ClearState();
 	if( m_pContext ) m_pContext->Flush();
-
-	SAFE_RELEASE( m_pContext );
-    for( int i = 0; i < NumQueries; ++i)
-	    SAFE_RELEASE( m_Queries[i] );	
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::SetDeviceContext( ID3D11DeviceContext* pContext, D3D_FEATURE_LEVEL level )
+void PipelineManagerDX11::SetDeviceContext( DeviceContextComPtr pContext, D3D_FEATURE_LEVEL level )
 {
 	m_pContext = pContext;
 	m_FeatureLevel = level;
 
 	m_pAnnotation = nullptr;
-	HRESULT hr = m_pContext->QueryInterface( __uuidof( ID3DUserDefinedAnnotation ), (void**)&m_pAnnotation );
+	HRESULT hr = m_pContext.CopyTo( m_pAnnotation.GetAddressOf() );
 	
 
 	// For each pipeline stage object, set its feature level here so they know
@@ -169,23 +156,9 @@ void PipelineManagerDX11::BindShaderResourceParameter( ShaderType type, RenderPa
 
 			int ID = pResource->GetIndex( tID ); 
 
-			ShaderResourceViewDX11* pView = pRenderer->GetShaderResourceViewByIndex( ID );
+			ShaderResourceViewDX11& view = pRenderer->GetShaderResourceViewByIndex( ID );
+			ShaderStages[type]->DesiredState.ShaderResourceViews.SetState( slot, view.m_pShaderResourceView.Get() );
 
-			// Allow a range including -1 up to the number of resources views
-			if ( pView || ( ID == -1 ) ) {
-
-				// Get the resource to be set, and pass it in to the desired shader type
-
-				ID3D11ShaderResourceView* pResourceView = 0;
-
-				if ( ID >= 0 ) {
-					pResourceView = pView->m_pShaderResourceView;
-				}
-
-				ShaderStages[type]->DesiredState.ShaderResourceViews.SetState( slot, pResourceView );
-			} else {
-				Log::Get().Write( L"Tried to set an invalid shader resource ID!" );
-			}
 		} else {
 			Log::Get().Write( L"Tried to set a non-shader resource ID as a shader resource!" );
 		}
@@ -212,24 +185,11 @@ void PipelineManagerDX11::BindUnorderedAccessParameter( ShaderType type, RenderP
 			int ID = pResource->GetIndex( tID ); 
 			unsigned int initial = pResource->GetInitialCount( tID );
 
-			UnorderedAccessViewDX11* pView = pRenderer->GetUnorderedAccessViewByIndex( ID );
+			UnorderedAccessViewDX11& view = pRenderer->GetUnorderedAccessViewByIndex( ID );
 
-			// Allow a range including -1 up to the number of resources views
-			if ( pView || ( ID == -1 ) ) {
+			ShaderStages[type]->DesiredState.UnorderedAccessViews.SetState( slot, view.m_pUnorderedAccessView.Get() );
+			ShaderStages[type]->DesiredState.UAVInitialCounts.SetState( slot, initial );
 
-				// Get the resource to be set, and pass it in to the desired shader type
-
-				ID3D11UnorderedAccessView* pResourceView = 0;
-
-				if ( ID >= 0 ) {
-					pResourceView = pView->m_pUnorderedAccessView;
-				}
-
-				ShaderStages[type]->DesiredState.UnorderedAccessViews.SetState( slot, pResourceView );
-				ShaderStages[type]->DesiredState.UAVInitialCounts.SetState( slot, initial );
-			} else {
-				Log::Get().Write( L"Tried to set an invalid unordered access ID!" );
-			} 
 		} else {
 			Log::Get().Write( L"Tried to set a non-unordered access view ID as a unordered access view!" );
 		}
@@ -260,8 +220,8 @@ void PipelineManagerDX11::BindSamplerStateParameter( ShaderType type, RenderPara
 			ID3D11SamplerState* pSampler = nullptr;
 
 			if ( ID >= 0 ) {
-				SamplerStateDX11* pState = pRenderer->GetSamplerState( ID );
-				pSampler = pState->m_pState; 
+				SamplerStateComPtr pState = pRenderer->GetSamplerState( ID );
+				pSampler = pState.Get();
 			}
 
 			ShaderStages[type]->DesiredState.SamplerStates.SetState( slot, pSampler );
@@ -281,12 +241,12 @@ void PipelineManagerDX11::ClearRenderTargets( )
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ApplyRenderTargets( )
 {
-	OutputMergerStage.ApplyDesiredRenderTargetStates( m_pContext );
+	OutputMergerStage.ApplyDesiredRenderTargetStates( m_pContext.Get() );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ApplyInputResources( )
 {
-	InputAssemblerStage.ApplyDesiredState( m_pContext );
+	InputAssemblerStage.ApplyDesiredState( m_pContext.Get() );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ClearInputResources( )
@@ -296,19 +256,19 @@ void PipelineManagerDX11::ClearInputResources( )
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ApplyPipelineResources( )
 {
-	VertexShaderStage.ApplyDesiredState( m_pContext );
-	HullShaderStage.ApplyDesiredState( m_pContext );
-	DomainShaderStage.ApplyDesiredState( m_pContext );
-	GeometryShaderStage.ApplyDesiredState( m_pContext );
-	PixelShaderStage.ApplyDesiredState( m_pContext );
-	ComputeShaderStage.ApplyDesiredState( m_pContext );
+	VertexShaderStage.ApplyDesiredState( m_pContext.Get() );
+	HullShaderStage.ApplyDesiredState( m_pContext.Get() );
+	DomainShaderStage.ApplyDesiredState( m_pContext.Get() );
+	GeometryShaderStage.ApplyDesiredState( m_pContext.Get() );
+	PixelShaderStage.ApplyDesiredState( m_pContext.Get() );
+	ComputeShaderStage.ApplyDesiredState( m_pContext.Get() );
 
 	// TODO: this may not be the correct place to set this state! The Rasterizer
 	// state should probably be split into two parts like the OM state.
 
-	StreamOutputStage.ApplyDesiredState( m_pContext );
-	RasterizerStage.ApplyDesiredState( m_pContext );
-	OutputMergerStage.ApplyDesiredBlendAndDepthStencilStates( m_pContext );
+	StreamOutputStage.ApplyDesiredState( m_pContext.Get() );
+	RasterizerStage.ApplyDesiredState( m_pContext.Get() );
+	OutputMergerStage.ApplyDesiredBlendAndDepthStencilStates( m_pContext.Get() );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::ClearPipelineResources( )
@@ -439,7 +399,7 @@ void PipelineManagerDX11::Draw( RenderEffectDX11& effect, ResourcePtr vb, Resour
 	}
 
 	// Set and apply the state in this pipeline manager's input assembler.
-	InputAssemblerStage.ApplyDesiredState( m_pContext );
+	InputAssemblerStage.ApplyDesiredState( m_pContext.Get() );
 
 	// Use the effect to load all of the pipeline stages here.
 	ClearPipelineResources();
@@ -468,7 +428,7 @@ void PipelineManagerDX11::DrawNonIndexed( RenderEffectDX11& effect, ResourcePtr 
 	InputAssemblerStage.DesiredState.InputLayout.SetState( inputLayout );
 
 	// Set and apply the state in this pipeline manager's input assembler.
-	InputAssemblerStage.ApplyDesiredState( m_pContext );
+	InputAssemblerStage.ApplyDesiredState( m_pContext.Get() );
 
     // Use the effect to load all of the pipeline stages here.
     ClearPipelineResources();
@@ -516,7 +476,7 @@ void PipelineManagerDX11::DrawInstanced( RenderEffectDX11& effect, ResourcePtr v
 	InputAssemblerStage.DesiredState.InputLayout.SetState( inputLayout );
 
 	// Set and apply the state in this pipeline manager's input assembler.
-	InputAssemblerStage.ApplyDesiredState( m_pContext );
+	InputAssemblerStage.ApplyDesiredState( m_pContext.Get() );
 
 	// Use the effect to load all of the pipeline stages here.
 
@@ -579,7 +539,7 @@ void PipelineManagerDX11::DrawIndirect( RenderEffectDX11& effect,
 	InputAssemblerStage.DesiredState.InputLayout.SetState( inputLayout );
 
 	// Set and apply the state in this pipeline manager's input assembler.
-	InputAssemblerStage.ApplyDesiredState( m_pContext );
+	InputAssemblerStage.ApplyDesiredState( m_pContext.Get() );
 
 	// Use the effect to load all of the pipeline stages here.
 	ClearPipelineResources();
@@ -612,15 +572,11 @@ void PipelineManagerDX11::CopyStructureCount( ResourcePtr dest, UINT offset, Res
 		pRawArgsBuffer = (ID3D11Buffer*)pArgsBuffer->GetResource(); // TODO: add ID3D11Buffer accessor to the buffer resource classes!
 	}
 
-	UnorderedAccessViewDX11* pView = RendererDX11::Get()->GetUnorderedAccessViewByIndex( uav->m_iResourceUAV );
+	UnorderedAccessViewDX11& view = RendererDX11::Get()->GetUnorderedAccessViewByIndex( uav->m_iResourceUAV );
 	ID3D11UnorderedAccessView* pRawView = 0;
 
-	if ( pView ) {
-		pRawView = pView->m_pUnorderedAccessView;
-	}
-
-	if ( pArgsBuffer != nullptr && pView != nullptr ) {
-		m_pContext->CopyStructureCount( pRawArgsBuffer, offset, pRawView );
+	if ( pArgsBuffer != nullptr ) {
+		m_pContext->CopyStructureCount( pRawArgsBuffer, offset, view.m_pUnorderedAccessView.Get() );
 	} else {
 		Log::Get().Write( L"ERROR: Trying to copy structure count with null values!" );
 	}
@@ -644,9 +600,9 @@ void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth, UINT stenci
 	{
 	    float clearColours[] = { color.x, color.y, color.z, color.w }; // RGBA
 		int rtv = OutputMergerStage.GetCurrentState().RenderTargetViews.GetState( i );
-		RenderTargetViewDX11* pRTV = RendererDX11::Get()->GetRenderTargetViewByIndex( rtv );
-		if ( pRTV != 0 ) {
-			pRenderTargetViews[i] = pRTV->m_pRenderTargetView; 
+		RenderTargetViewDX11& RTV = RendererDX11::Get()->GetRenderTargetViewByIndex( rtv );
+		pRenderTargetViews[i] = RTV.m_pRenderTargetView.Get(); 
+		if ( pRenderTargetViews[i] != nullptr ) {
 			m_pContext->ClearRenderTargetView( pRenderTargetViews[i], clearColours );
 		}
 	}
@@ -656,12 +612,11 @@ void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth, UINT stenci
 	if ( OutputMergerStage.GetCurrentState().DepthTargetViews.GetState() != -1 )
 	{
 		int dsv = OutputMergerStage.GetCurrentState().DepthTargetViews.GetState();
-		DepthStencilViewDX11* pDSV = RendererDX11::Get()->GetDepthStencilViewByIndex( dsv );
-		if ( pDSV != 0 ) {
-			pDepthStencilView = pDSV->m_pDepthStencilView;
+		DepthStencilViewDX11 DSV = RendererDX11::Get()->GetDepthStencilViewByIndex( dsv );
+		pDepthStencilView = DSV.m_pDepthStencilView.Get();
+		if ( pDepthStencilView != nullptr ) {
 			m_pContext->ClearDepthStencilView( pDepthStencilView, D3D11_CLEAR_DEPTH, depth, stencil );
 		}
-		
 	}
 }
 //--------------------------------------------------------------------------------
@@ -739,7 +694,7 @@ D3D11_MAPPED_SUBRESOURCE PipelineManagerDX11::MapResource( ResourceDX11* pGlyphR
 		Log::Get().Write( L"Trying to map a subresource that doesn't exist!!!" );
 		return( Data );
 	}
-
+	// TODO: Update this to use a ComPtr!
 	// Acquire the native resource pointer.
 	ID3D11Resource* pResource = 0;
 	pResource = pGlyphResource->GetResource();
@@ -806,7 +761,7 @@ void PipelineManagerDX11::UpdateSubresource( int rid, UINT DstSubresource, const
 void PipelineManagerDX11::StartPipelineStatistics( )
 {
 	if ( m_Queries[m_iCurrentQuery] )            
-		m_pContext->Begin( m_Queries[m_iCurrentQuery] );    
+		m_pContext->Begin( m_Queries[m_iCurrentQuery].Get() );    
 	else
 		Log::Get().Write( L"Tried to begin pipeline statistics without a query object!" );
 }
@@ -815,16 +770,18 @@ void PipelineManagerDX11::EndPipelineStatistics( )
 {
 	if ( m_Queries[m_iCurrentQuery] )
 	{        
-		m_pContext->End( m_Queries[m_iCurrentQuery] );
+		m_pContext->End( m_Queries[m_iCurrentQuery].Get() );
      
         m_iCurrentQuery = ( m_iCurrentQuery + 1 ) % NumQueries;
-        HRESULT hr = m_pContext->GetData( m_Queries[m_iCurrentQuery], &m_PipelineStatsData, 
+        HRESULT hr = m_pContext->GetData( m_Queries[m_iCurrentQuery].Get(), &m_PipelineStatsData, 
                                             sizeof(D3D11_QUERY_DATA_PIPELINE_STATISTICS), 0);
         if ( FAILED( hr ) )
             Log::Get().Write( L"Failed attempting to retrieve query data" );        
 	}
 	else
+	{
 		Log::Get().Write( L"Tried to end pipeline statistics without a valid query object!" );
+	}
 }
 //--------------------------------------------------------------------------------
 std::wstring PipelineManagerDX11::PrintPipelineStatistics( )
@@ -861,7 +818,7 @@ void PipelineManagerDX11::SaveTextureScreenShot( int index, std::wstring filenam
 		out << filename << iScreenNum << L".bmp";
 
 		HRESULT hr = DirectX::SaveWICTextureToFile( 
-			m_pContext, 
+			m_pContext.Get(), 
 			pResource,
 			GUID_ContainerFormatBmp,
 			out.str().c_str() );

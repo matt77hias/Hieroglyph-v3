@@ -14,13 +14,12 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-DepthStencilViewDX11::DepthStencilViewDX11( ID3D11DepthStencilView* pView )
+DepthStencilViewDX11::DepthStencilViewDX11( DepthStencilViewComPtr pView )
 {
 	m_pDepthStencilView = pView;
 }
 //--------------------------------------------------------------------------------
 DepthStencilViewDX11::~DepthStencilViewDX11()
 {
-	SAFE_RELEASE( m_pDepthStencilView );
 }
 //--------------------------------------------------------------------------------

@@ -17,7 +17,7 @@ using namespace Glyph3;
 ShaderResourceParameterDX11::ShaderResourceParameterDX11()
 {
 	for ( int i = 0; i <= NUM_THREADS; i++ )
-		m_iShaderResourceView[i] = -1;
+		m_iShaderResourceView[i] = 0;
 }
 //--------------------------------------------------------------------------------
 ShaderResourceParameterDX11::ShaderResourceParameterDX11( ShaderResourceParameterDX11& copy )

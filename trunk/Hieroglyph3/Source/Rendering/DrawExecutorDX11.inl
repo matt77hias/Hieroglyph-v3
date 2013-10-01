@@ -187,6 +187,6 @@ unsigned int DrawExecutorDX11<TVertex>::GetPrimitiveCount()
 template <class TVertex>
 void DrawExecutorDX11<TVertex>::SetMaxVertexCount( unsigned int count )
 {
-	VertexBuffer.SetMaxVertexCount( count );
+	VertexBuffer.SetMaxElementCount( count );
 }
 //--------------------------------------------------------------------------------

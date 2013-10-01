@@ -16,6 +16,7 @@
 #include "RendererDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
+using Microsoft::WRL::ComPtr;
 //--------------------------------------------------------------------------------
 ShaderReflectionFactoryDX11::ShaderReflectionFactoryDX11( )
 {
@@ -38,9 +39,9 @@ ShaderReflectionDX11* ShaderReflectionFactoryDX11::GenerateReflection( ShaderDX1
 
 	ShaderReflectionDX11* pReflection = new ShaderReflectionDX11();
 
-	ID3D11ShaderReflection* pReflector = NULL;
+	ComPtr<ID3D11ShaderReflection> pReflector;
 	HRESULT hr = D3DReflect( shader.m_pCompiledShader->GetBufferPointer(), shader.m_pCompiledShader->GetBufferSize(),
-		IID_ID3D11ShaderReflection, (void**) &pReflector);
+		IID_ID3D11ShaderReflection, reinterpret_cast<void**>( pReflector.GetAddressOf() ));
 
 	if ( FAILED( hr ) )
 	{
@@ -170,10 +171,6 @@ ShaderReflectionDX11* ShaderReflectionFactoryDX11::GenerateReflection( ShaderDX1
 
 		pReflection->ResourceBindings.push_back( binddesc );
 	}
-
-
-	// Release the shader reflection interface
-	pReflector->Release();
 
 	return( pReflection );
 }

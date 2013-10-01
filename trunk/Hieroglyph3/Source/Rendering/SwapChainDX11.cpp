@@ -14,7 +14,7 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-SwapChainDX11::SwapChainDX11( IDXGISwapChain* pSwapChain, ResourcePtr resource )
+SwapChainDX11::SwapChainDX11( Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain, ResourcePtr resource )
 {
 	m_pSwapChain = pSwapChain;
 	m_Resource = resource;
@@ -22,6 +22,5 @@ SwapChainDX11::SwapChainDX11( IDXGISwapChain* pSwapChain, ResourcePtr resource )
 //--------------------------------------------------------------------------------
 SwapChainDX11::~SwapChainDX11()
 {
-	SAFE_RELEASE( m_pSwapChain );
 }
 //--------------------------------------------------------------------------------

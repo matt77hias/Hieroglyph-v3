@@ -14,13 +14,12 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-UnorderedAccessViewDX11::UnorderedAccessViewDX11( ID3D11UnorderedAccessView* pView )
+UnorderedAccessViewDX11::UnorderedAccessViewDX11( UnorderedAccessViewComPtr pView )
 {
 	m_pUnorderedAccessView = pView;
 }
 //--------------------------------------------------------------------------------
 UnorderedAccessViewDX11::~UnorderedAccessViewDX11()
 {
-	SAFE_RELEASE( m_pUnorderedAccessView );
 }
 //--------------------------------------------------------------------------------

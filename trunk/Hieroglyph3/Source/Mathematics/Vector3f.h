@@ -38,9 +38,11 @@ namespace Glyph3
         static Vector3f Clamp( const Vector3f& A );
         static Vector3f Cross( const Vector3f& A, const Vector3f& B );
         static float Dot( const Vector3f& A, const Vector3f& B );
-        static Vector3f Normalize( const Vector3f& A );
+        static float LengthSq( const Vector3f& A );
+		static Vector3f Normalize( const Vector3f& A );
         static Vector3f Perpendicular( const Vector3f& A );
 		static Vector3f Random( );
+
 
 		// assignment
 		Vector3f& operator= (const Vector3f& Vector);

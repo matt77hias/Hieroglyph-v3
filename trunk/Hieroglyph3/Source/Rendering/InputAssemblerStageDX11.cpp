@@ -13,7 +13,6 @@
 #include "RendererDX11.h"
 #include "Log.h"
 #include "InputAssemblerStageDX11.h"
-#include "InputLayoutDX11.h"
 #include "VertexBufferDX11.h"
 #include "IndexBufferDX11.h"
 //--------------------------------------------------------------------------------
@@ -55,10 +54,10 @@ void InputAssemblerStageDX11::ApplyDesiredState( ID3D11DeviceContext* pContext )
 	// Compare the primitive topology of the desired and current states
 	if ( DesiredState.InputLayout.IsUpdateNeeded() ) 
 	{
-		InputLayoutDX11* pLayout = pRenderer->GetInputLayout( DesiredState.InputLayout.GetState() );
+		InputLayoutComPtr pLayout = pRenderer->GetInputLayout( DesiredState.InputLayout.GetState() );
 
 		if ( pLayout ) {
-			pContext->IASetInputLayout( pLayout->m_pInputLayout );
+			pContext->IASetInputLayout( pLayout.Get() );
 		} else {
 			Log::Get().Write( L"Tried to bind an invalid input layout ID!" );
 		}

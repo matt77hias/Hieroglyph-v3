@@ -17,7 +17,7 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-ConstantBufferDX11::ConstantBufferDX11( ID3D11Buffer* pBuffer )
+ConstantBufferDX11::ConstantBufferDX11( Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer )
 {
 	m_pBuffer = pBuffer;
 	m_bAutoUpdate = true;

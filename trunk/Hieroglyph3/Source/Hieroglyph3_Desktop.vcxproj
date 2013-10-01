@@ -101,7 +101,6 @@
     <ClCompile Include="Objects\VolumeActor.cpp" />
     <ClCompile Include="Rendering\BasicVertexDX11.cpp" />
     <ClCompile Include="Rendering\BlendStateConfigDX11.cpp" />
-    <ClCompile Include="Rendering\BlendStateDX11.cpp" />
     <ClCompile Include="Rendering\BufferConfigDX11.cpp" />
     <ClCompile Include="Rendering\BufferDX11.cpp" />
     <ClCompile Include="Rendering\ByteAddressBufferDX11.cpp" />
@@ -113,7 +112,6 @@
     <ClCompile Include="Rendering\ConstantBufferParameterWriterDX11.cpp" />
     <ClCompile Include="Rendering\D3DEnumConversion.cpp" />
     <ClCompile Include="Rendering\DepthStencilStateConfigDX11.cpp" />
-    <ClCompile Include="Rendering\DepthStencilStateDX11.cpp" />
     <ClCompile Include="Rendering\DepthStencilViewConfigDX11.cpp" />
     <ClCompile Include="Rendering\DepthStencilViewDX11.cpp" />
     <ClCompile Include="Rendering\DomainShaderDX11.cpp" />
@@ -135,7 +133,6 @@
     <ClCompile Include="Rendering\IndirectArgsBufferDX11.cpp" />
     <ClCompile Include="Rendering\InputAssemblerStageDX11.cpp" />
     <ClCompile Include="Rendering\InputAssemblerStateDX11.cpp" />
-    <ClCompile Include="Rendering\InputLayoutDX11.cpp" />
     <ClCompile Include="Rendering\MaterialDX11.cpp" />
     <ClCompile Include="Rendering\MaterialGeneratorDX11.cpp" />
     <ClCompile Include="Rendering\MaterialManager.cpp" />
@@ -157,7 +154,6 @@
     <ClCompile Include="Rendering\RasterizerStageDX11.cpp" />
     <ClCompile Include="Rendering\RasterizerStageStateDX11.cpp" />
     <ClCompile Include="Rendering\RasterizerStateConfigDX11.cpp" />
-    <ClCompile Include="Rendering\RasterizerStateDX11.cpp" />
     <ClCompile Include="Rendering\RenderEffectDX11.cpp" />
     <ClCompile Include="Rendering\RendererDX11.cpp" />
     <ClCompile Include="Rendering\RenderParameterDX11.cpp" />
@@ -168,7 +164,6 @@
     <ClCompile Include="Rendering\SamplerParameterDX11.cpp" />
     <ClCompile Include="Rendering\SamplerParameterWriterDX11.cpp" />
     <ClCompile Include="Rendering\SamplerStateConfigDX11.cpp" />
-    <ClCompile Include="Rendering\SamplerStateDX11.cpp" />
     <ClCompile Include="Rendering\SceneRenderTask.cpp" />
     <ClCompile Include="Rendering\ShaderDX11.cpp" />
     <ClCompile Include="Rendering\ShaderFactoryDX11.cpp" />
@@ -316,7 +311,6 @@
     <ClInclude Include="Rendering\AttributeEvaluator2f.h" />
     <ClInclude Include="Rendering\BasicVertexDX11.h" />
     <ClInclude Include="Rendering\BlendStateConfigDX11.h" />
-    <ClInclude Include="Rendering\BlendStateDX11.h" />
     <ClInclude Include="Rendering\BufferConfigDX11.h" />
     <ClInclude Include="Rendering\BufferDX11.h" />
     <ClInclude Include="Rendering\ByteAddressBufferDX11.h" />
@@ -329,7 +323,6 @@
     <ClInclude Include="Rendering\ConeAttributes.h" />
     <ClInclude Include="Rendering\D3DEnumConversion.h" />
     <ClInclude Include="Rendering\DepthStencilStateConfigDX11.h" />
-    <ClInclude Include="Rendering\DepthStencilStateDX11.h" />
     <ClInclude Include="Rendering\DepthStencilViewConfigDX11.h" />
     <ClInclude Include="Rendering\DepthStencilViewDX11.h" />
     <ClInclude Include="Rendering\DomainShaderDX11.h" />
@@ -352,7 +345,6 @@
     <ClInclude Include="Rendering\IndirectArgsBufferDX11.h" />
     <ClInclude Include="Rendering\InputAssemblerStageDX11.h" />
     <ClInclude Include="Rendering\InputAssemblerStateDX11.h" />
-    <ClInclude Include="Rendering\InputLayoutDX11.h" />
     <ClInclude Include="Rendering\IParameterManager.h" />
     <ClInclude Include="Rendering\IRenderer.h" />
     <ClInclude Include="Rendering\MaterialDX11.h" />
@@ -377,7 +369,6 @@
     <ClInclude Include="Rendering\RasterizerStageDX11.h" />
     <ClInclude Include="Rendering\RasterizerStageStateDX11.h" />
     <ClInclude Include="Rendering\RasterizerStateConfigDX11.h" />
-    <ClInclude Include="Rendering\RasterizerStateDX11.h" />
     <ClInclude Include="Rendering\RenderEffectDX11.h" />
     <ClInclude Include="Rendering\RendererDX11.h" />
     <ClInclude Include="Rendering\RenderParameterDX11.h" />
@@ -385,11 +376,9 @@
     <ClInclude Include="Rendering\RenderTargetViewDX11.h" />
     <ClInclude Include="Rendering\ResourceDX11.h" />
     <ClInclude Include="Rendering\ResourceProxyDX11.h" />
-    <ClInclude Include="Rendering\ResourceViewDX11.h" />
     <ClInclude Include="Rendering\SamplerParameterDX11.h" />
     <ClInclude Include="Rendering\SamplerParameterWriterDX11.h" />
     <ClInclude Include="Rendering\SamplerStateConfigDX11.h" />
-    <ClInclude Include="Rendering\SamplerStateDX11.h" />
     <ClInclude Include="Rendering\SceneRenderTask.h" />
     <ClInclude Include="Rendering\ShaderDX11.h" />
     <ClInclude Include="Rendering\ShaderFactoryDX11.h" />

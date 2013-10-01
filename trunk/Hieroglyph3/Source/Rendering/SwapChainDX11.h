@@ -22,12 +22,12 @@ namespace Glyph3
 	class SwapChainDX11
 	{
 	public:
-		SwapChainDX11( IDXGISwapChain* pSwapChain, ResourcePtr resource );
+		explicit SwapChainDX11( Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain, ResourcePtr resource );
 		virtual ~SwapChainDX11();
 
 	protected:
-		IDXGISwapChain*			m_pSwapChain;
-		ResourcePtr				m_Resource;
+		Microsoft::WRL::ComPtr<IDXGISwapChain>	m_pSwapChain;
+		ResourcePtr								m_Resource;
 
 		friend RendererDX11;
 	};

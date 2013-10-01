@@ -18,7 +18,7 @@ UnorderedAccessParameterDX11::UnorderedAccessParameterDX11()
 {
 	for ( int i = 0; i <= NUM_THREADS; i++ )
 	{
-		m_ParameterData[i].m_iUnorderedAccessView = -1;
+		m_ParameterData[i].m_iUnorderedAccessView = 0;
 		m_ParameterData[i].m_iInitialCount = -1;
 	}
 }

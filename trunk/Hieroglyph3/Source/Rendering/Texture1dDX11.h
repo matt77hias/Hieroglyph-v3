@@ -22,7 +22,7 @@ namespace Glyph3
 	class Texture1dDX11 : public ResourceDX11
 	{
 	public:
-		Texture1dDX11( ID3D11Texture1D* pTex );
+		explicit Texture1dDX11( Microsoft::WRL::ComPtr<ID3D11Texture1D> pTex );
 		virtual ~Texture1dDX11();
 
 		D3D11_TEXTURE1D_DESC		GetActualDescription();
@@ -36,9 +36,9 @@ namespace Glyph3
 		virtual void						SetEvictionPriority( UINT EvictionPriority );
 
 	protected:
-		ID3D11Texture1D*			m_pTexture;
-		D3D11_TEXTURE1D_DESC		m_DesiredDesc;
-		D3D11_TEXTURE1D_DESC		m_ActualDesc;
+		Microsoft::WRL::ComPtr<ID3D11Texture1D>			m_pTexture;
+		D3D11_TEXTURE1D_DESC							m_DesiredDesc;
+		D3D11_TEXTURE1D_DESC							m_ActualDesc;
 
 		friend RendererDX11;
 	};

@@ -58,9 +58,9 @@ namespace Glyph3
 		virtual void						SetEvictionPriority( UINT EvictionPriority );
 
 	protected:
-		ID3D11Buffer*				m_pBuffer;
-		D3D11_BUFFER_DESC			m_DesiredDesc;
-		D3D11_BUFFER_DESC			m_ActualDesc;
+		Microsoft::WRL::ComPtr<ID3D11Buffer>		m_pBuffer;
+		D3D11_BUFFER_DESC							m_DesiredDesc;
+		D3D11_BUFFER_DESC							m_ActualDesc;
 
 		friend RendererDX11;
 	};

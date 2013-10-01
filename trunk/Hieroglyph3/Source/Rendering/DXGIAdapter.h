@@ -24,12 +24,12 @@ namespace Glyph3
 	class DXGIAdapter
 	{
 	public:
-		DXGIAdapter( IDXGIAdapter1* pAdapter );
+		DXGIAdapter( Microsoft::WRL::ComPtr<IDXGIAdapter1> pAdapter );
 		virtual ~DXGIAdapter();
 
 	protected:
-		IDXGIAdapter1*				m_pAdapter;
-		std::vector<DXGIOutput*>	m_vOutputs;
+		Microsoft::WRL::ComPtr<IDXGIAdapter1>		m_pAdapter;
+		std::vector<DXGIOutput>						m_vOutputs;
 
 		friend class RendererDX11;
 	};

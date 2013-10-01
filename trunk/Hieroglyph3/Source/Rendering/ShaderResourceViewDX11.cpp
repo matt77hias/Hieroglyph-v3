@@ -14,13 +14,12 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-ShaderResourceViewDX11::ShaderResourceViewDX11( ID3D11ShaderResourceView* pView )
+ShaderResourceViewDX11::ShaderResourceViewDX11( ShaderResourceViewComPtr pView )
 {
 	m_pShaderResourceView = pView;
 }
 //--------------------------------------------------------------------------------
 ShaderResourceViewDX11::~ShaderResourceViewDX11()
 {
-	SAFE_RELEASE( m_pShaderResourceView );
 }
 //--------------------------------------------------------------------------------

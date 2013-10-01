@@ -479,28 +479,13 @@
     <ClCompile Include="Rendering\BlendStateConfigDX11.cpp">
       <Filter>Rendering\Resource System\State Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\BlendStateDX11.cpp">
-      <Filter>Rendering\Resource System\State Objects</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\DepthStencilStateConfigDX11.cpp">
-      <Filter>Rendering\Resource System\State Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\DepthStencilStateDX11.cpp">
-      <Filter>Rendering\Resource System\State Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\InputLayoutDX11.cpp">
       <Filter>Rendering\Resource System\State Objects</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\RasterizerStateConfigDX11.cpp">
       <Filter>Rendering\Resource System\State Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\RasterizerStateDX11.cpp">
-      <Filter>Rendering\Resource System\State Objects</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\SamplerStateConfigDX11.cpp">
-      <Filter>Rendering\Resource System\State Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\SamplerStateDX11.cpp">
       <Filter>Rendering\Resource System\State Objects</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\ViewPortDX11.cpp">
@@ -1090,28 +1075,13 @@
     <ClInclude Include="Rendering\BlendStateConfigDX11.h">
       <Filter>Rendering\Resource System\State Objects</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\BlendStateDX11.h">
-      <Filter>Rendering\Resource System\State Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\DepthStencilStateConfigDX11.h">
-      <Filter>Rendering\Resource System\State Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DepthStencilStateDX11.h">
-      <Filter>Rendering\Resource System\State Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\InputLayoutDX11.h">
       <Filter>Rendering\Resource System\State Objects</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\RasterizerStateConfigDX11.h">
       <Filter>Rendering\Resource System\State Objects</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\RasterizerStateDX11.h">
-      <Filter>Rendering\Resource System\State Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\SamplerStateConfigDX11.h">
-      <Filter>Rendering\Resource System\State Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\SamplerStateDX11.h">
       <Filter>Rendering\Resource System\State Objects</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ViewPortDX11.h">
@@ -1232,9 +1202,6 @@
       <Filter>Rendering\Resource System\Resource Views</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\RenderTargetViewDX11.h">
-      <Filter>Rendering\Resource System\Resource Views</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\ResourceViewDX11.h">
       <Filter>Rendering\Resource System\Resource Views</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ShaderResourceViewConfigDX11.h">

@@ -15,19 +15,18 @@
 #ifndef DepthStencilViewDX11_h
 #define DepthStencilViewDX11_h
 //--------------------------------------------------------------------------------
-#include "ResourceViewDX11.h"
 #include "PipelineManagerDx11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class DepthStencilViewDX11 : public ResourceViewDX11
+	class DepthStencilViewDX11
 	{
 	public:
-		DepthStencilViewDX11( ID3D11DepthStencilView* pView );
-		virtual ~DepthStencilViewDX11();
+		DepthStencilViewDX11( DepthStencilViewComPtr pView );
+		~DepthStencilViewDX11();
 
 	protected:
-		ID3D11DepthStencilView*			m_pDepthStencilView;
+		DepthStencilViewComPtr			m_pDepthStencilView;
 		
 		friend PipelineManagerDX11;
 		friend OutputMergerStageDX11;

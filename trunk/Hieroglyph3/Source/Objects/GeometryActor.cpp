@@ -177,6 +177,21 @@ void GeometryActor::AddIndices( const unsigned int i1, const unsigned int i2, co
 	AddIndex( i3 );
 }
 //--------------------------------------------------------------------------------
+void GeometryActor::SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY topology )
+{
+	m_pGeometry->SetPrimitiveType( topology );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::DrawLine( const Vector3f& p1, const Vector3f& p2 )
+{
+	unsigned int baseVertex = m_pGeometry->GetVertexCount();
+
+	AddVertex( p1 );
+	AddVertex( p2 );
+
+	AddIndices( baseVertex, baseVertex+1 );
+}
+//--------------------------------------------------------------------------------
 void GeometryActor::DrawSphere( const Vector3f& center, float radius, unsigned int stacks, unsigned int slices )
 {
 	Sphere3f sphere( center, radius );

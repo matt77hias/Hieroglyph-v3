@@ -22,11 +22,11 @@ namespace Glyph3
 	class DXGIOutput
 	{
 	public:
-		DXGIOutput( IDXGIOutput* pOutput );
+		DXGIOutput( Microsoft::WRL::ComPtr<IDXGIOutput> pOutput );
 		virtual ~DXGIOutput();
 
 	protected:
-		IDXGIOutput*	m_pOutput;
+		Microsoft::WRL::ComPtr<IDXGIOutput>	m_pOutput;
 
 		friend class RendererDX11;
 	};

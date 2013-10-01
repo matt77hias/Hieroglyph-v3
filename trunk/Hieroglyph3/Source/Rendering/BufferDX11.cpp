@@ -16,15 +16,12 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 BufferDX11::BufferDX11()
 {
-	m_pBuffer = 0;
-
 	ZeroMemory( &m_DesiredDesc, sizeof( D3D11_BUFFER_DESC ) );
 	ZeroMemory( &m_ActualDesc, sizeof( D3D11_BUFFER_DESC ) );
 }
 //--------------------------------------------------------------------------------
 BufferDX11::~BufferDX11()
 {
-	SAFE_RELEASE( m_pBuffer );
 }
 //--------------------------------------------------------------------------------
 D3D11_BUFFER_DESC BufferDX11::GetActualDescription()
@@ -130,7 +127,7 @@ void BufferDX11::UnMap()
 //--------------------------------------------------------------------------------
 ID3D11Resource*	BufferDX11::GetResource()
 {
-	return( m_pBuffer );
+	return( m_pBuffer.Get() );
 }
 //--------------------------------------------------------------------------------
 UINT BufferDX11::GetEvictionPriority()

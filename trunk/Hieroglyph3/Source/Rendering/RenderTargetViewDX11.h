@@ -15,19 +15,18 @@
 #ifndef RenderTargetViewDX11_h
 #define RenderTargetViewDX11_h
 //--------------------------------------------------------------------------------
-#include "ResourceViewDX11.h"
 #include "PipelineManagerDx11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class RenderTargetViewDX11 : public ResourceViewDX11
+	class RenderTargetViewDX11
 	{
 	public:
-		RenderTargetViewDX11( ID3D11RenderTargetView* pView );
-		virtual ~RenderTargetViewDX11();
+		RenderTargetViewDX11( RenderTargetViewComPtr pView );
+		~RenderTargetViewDX11();
 
 	protected:
-		ID3D11RenderTargetView*			m_pRenderTargetView;
+		RenderTargetViewComPtr			m_pRenderTargetView;
 		
 		friend PipelineManagerDX11;
 		friend OutputMergerStageDX11;

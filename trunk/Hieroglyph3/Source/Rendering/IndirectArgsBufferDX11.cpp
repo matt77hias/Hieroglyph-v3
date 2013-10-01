@@ -14,7 +14,7 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-IndirectArgsBufferDX11::IndirectArgsBufferDX11( ID3D11Buffer* pBuffer )
+IndirectArgsBufferDX11::IndirectArgsBufferDX11( Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer )
 {
 	m_pBuffer = pBuffer;
 }

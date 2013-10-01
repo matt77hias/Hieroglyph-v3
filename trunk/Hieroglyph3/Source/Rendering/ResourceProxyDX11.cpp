@@ -88,15 +88,17 @@ ResourceProxyDX11::ResourceProxyDX11()
 {
 	// Initialize all indices and pointers to a neutral state.
 
-	m_iResource = m_iResourceSRV = m_iResourceRTV = m_iResourceDSV = m_iResourceUAV = -1;
-	m_pBufferConfig = NULL;
-	m_pTexture1dConfig = NULL;
-	m_pTexture2dConfig = NULL;
-	m_pTexture3dConfig = NULL;
-    m_pSRVConfig = NULL;
-    m_pRTVConfig = NULL;
-    m_pDSVConfig = NULL;
-    m_pUAVConfig = NULL;
+	m_iResource = -1;
+	m_iResourceSRV = m_iResourceRTV = m_iResourceDSV = m_iResourceUAV = 0;
+
+	m_pBufferConfig = nullptr;
+	m_pTexture1dConfig = nullptr;
+	m_pTexture2dConfig = nullptr;
+	m_pTexture3dConfig = nullptr;
+    m_pSRVConfig = nullptr;
+    m_pRTVConfig = nullptr;
+    m_pDSVConfig = nullptr;
+    m_pUAVConfig = nullptr;
 }
 //--------------------------------------------------------------------------------
 ResourceProxyDX11::~ResourceProxyDX11()
@@ -119,20 +121,20 @@ void ResourceProxyDX11::CommonConstructor( UINT BindFlags, int ResourceID, Rende
 {
     // Initialize all indices and pointers to a neutral state.    
     m_iResource = ResourceID;
-	m_iResourceSRV = -1;
-	m_iResourceRTV = -1;
-	m_iResourceDSV = -1;
-	m_iResourceUAV = -1;
+	m_iResourceSRV = 0;
+	m_iResourceRTV = 0;
+	m_iResourceDSV = 0;
+	m_iResourceUAV = 0;
 
 
-    m_pBufferConfig = NULL;
-    m_pTexture1dConfig = NULL;
-    m_pTexture2dConfig = NULL;
-    m_pTexture3dConfig = NULL;
-    m_pSRVConfig = NULL;
-    m_pRTVConfig = NULL;
-    m_pUAVConfig = NULL;
-    m_pDSVConfig = NULL;
+    m_pBufferConfig = nullptr;
+    m_pTexture1dConfig = nullptr;
+    m_pTexture2dConfig = nullptr;
+    m_pTexture3dConfig = nullptr;
+    m_pSRVConfig = nullptr;
+    m_pRTVConfig = nullptr;
+    m_pUAVConfig = nullptr;
+    m_pDSVConfig = nullptr;
 
     // Copy the config structures
     if ( pSRVConfig )
@@ -164,25 +166,25 @@ void ResourceProxyDX11::CommonConstructor( UINT BindFlags, int ResourceID, Rende
 
     if ( ( BindFlags & D3D11_BIND_SHADER_RESOURCE ) == D3D11_BIND_SHADER_RESOURCE )
     {
-        D3D11_SHADER_RESOURCE_VIEW_DESC* pDesc = pSRVConfig ? &pSRVConfig->GetSRVDesc() : NULL;
+        D3D11_SHADER_RESOURCE_VIEW_DESC* pDesc = pSRVConfig ? &pSRVConfig->GetSRVDesc() : nullptr;
         m_iResourceSRV = pRenderer->CreateShaderResourceView( m_iResource, pDesc );
     }
 
     if ( ( BindFlags & D3D11_BIND_RENDER_TARGET ) == D3D11_BIND_RENDER_TARGET )
     {
-        D3D11_RENDER_TARGET_VIEW_DESC* pDesc = pRTVConfig ? &pRTVConfig->GetRTVDesc() : NULL;
+        D3D11_RENDER_TARGET_VIEW_DESC* pDesc = pRTVConfig ? &pRTVConfig->GetRTVDesc() : nullptr;
         m_iResourceRTV = pRenderer->CreateRenderTargetView( m_iResource, pDesc );
     }
 
     if ( ( BindFlags & D3D11_BIND_DEPTH_STENCIL ) == D3D11_BIND_DEPTH_STENCIL )
     {
-        D3D11_DEPTH_STENCIL_VIEW_DESC* pDesc = pDSVConfig ? &pDSVConfig->GetDSVDesc() : NULL;
+        D3D11_DEPTH_STENCIL_VIEW_DESC* pDesc = pDSVConfig ? &pDSVConfig->GetDSVDesc() : nullptr;
         m_iResourceDSV = pRenderer->CreateDepthStencilView( m_iResource, pDesc );
     }
 
     if ( ( BindFlags & D3D11_BIND_UNORDERED_ACCESS ) == D3D11_BIND_UNORDERED_ACCESS )
     {
-        D3D11_UNORDERED_ACCESS_VIEW_DESC* pDesc = pUAVConfig ? &pUAVConfig->GetUAVDesc() : NULL;
+        D3D11_UNORDERED_ACCESS_VIEW_DESC* pDesc = pUAVConfig ? &pUAVConfig->GetUAVDesc() : nullptr;
         m_iResourceUAV = pRenderer->CreateUnorderedAccessView( m_iResource, pDesc );
     }
 }
