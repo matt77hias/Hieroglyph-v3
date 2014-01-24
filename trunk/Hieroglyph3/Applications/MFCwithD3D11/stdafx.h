@@ -63,7 +63,7 @@
 #include "EventManager.h"
 #include "ScriptManager.h"
 #include "RendererDX11.h"
-#include "IRenderView.h"
+//#include "IRenderView.h"
 #include "ViewPerspective.h"
 #include "ViewTextOverlay.h"
 #include "Camera.h"

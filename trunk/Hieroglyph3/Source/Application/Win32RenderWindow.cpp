@@ -21,6 +21,9 @@ extern LRESULT CALLBACK WindowProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 Win32RenderWindow::Win32RenderWindow( )
 {
 	m_hWnd = 0;
+
+	// Specify the window style
+	m_dStyle = (WS_OVERLAPPEDWINDOW | WS_VISIBLE);
 }
 //--------------------------------------------------------------------------------
 Win32RenderWindow::~Win32RenderWindow()
@@ -68,10 +71,6 @@ void Win32RenderWindow::Initialize(IWindowProc* WindowProcObj)
 	
 	// Register the window class
 	RegisterClassEx(&wc);
-
-	// Specify the window style
-	m_dStyle = (WS_OVERLAPPEDWINDOW | WS_VISIBLE);
-	
 
 	// Record the desired device size
 	RECT rc;

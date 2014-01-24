@@ -534,6 +534,7 @@
       <AdditionalIncludeDirectories>Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation;..\Dependencies\DirectXTK\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessToFile>false</PreprocessToFile>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -557,8 +558,10 @@ copy Animation\*.h ..\SDK\Include
 copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”</Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>..\Dependencies\DirectXTK\Bin\Desktop_2012\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DirectXTK.lib;D3DCompiler.lib;DXGUID.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -570,6 +573,7 @@ copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)\Appl
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation;..\Dependencies\DirectXTK\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessToFile>false</PreprocessToFile>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -593,8 +597,10 @@ copy Animation\*.h ..\SDK\Include
 copy “$(WindowsSdkDir)redist\d3d\x64\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”</Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>..\Dependencies\DirectXTK\Bin\Desktop_2012\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DirectXTK.lib;D3DCompiler.lib;DXGUID.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -633,8 +639,10 @@ copy Animation\*.h ..\SDK\Include
 copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”</Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>..\Dependencies\DirectXTK\Bin\Desktop_2012\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DirectXTK.lib;D3DCompiler.lib;DXGUID.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -647,6 +655,7 @@ copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)\Appl
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation;..\Dependencies\DirectXTK\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -672,8 +681,10 @@ copy Animation\*.h ..\SDK\Include
 copy “$(WindowsSdkDir)redist\d3d\x64\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”</Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>..\Dependencies\DirectXTK\Bin\Desktop_2012\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DirectXTK.lib;D3DCompiler.lib;DXGUID.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

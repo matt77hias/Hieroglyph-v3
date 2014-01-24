@@ -157,7 +157,7 @@ void CMFCwithD3D11View::OnSize(UINT nType, int cx, int cy)
 		pCamera->SetAspectRatio( static_cast<float>(cx) / static_cast<float>(cy) );
 		
 		// Update the render views being used to render the scene
-		Glyph3::IRenderView* pRenderView = pCamera->GetCameraView();
+		Glyph3::SceneRenderTask* pRenderView = pCamera->GetCameraView();
 
 		if ( pRenderView != 0 ) {
 			pRenderView->Resize( cx, cy );
