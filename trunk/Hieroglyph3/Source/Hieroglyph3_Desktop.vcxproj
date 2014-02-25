@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Animation\AnimationStream.cpp" />
+    <ClCompile Include="Animation\Animation.cpp" />
     <ClCompile Include="Application\Application.cpp" />
     <ClCompile Include="Application\ConsoleWindow.cpp" />
     <ClCompile Include="Application\FileLoader.cpp" />
@@ -227,6 +227,7 @@
     <ClCompile Include="Utility\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation\Animation.h" />
     <ClInclude Include="Animation\AnimationStream.h" />
     <ClInclude Include="Application\Application.h" />
     <ClInclude Include="Application\ConsoleWindow.h" />
@@ -447,6 +448,7 @@
     <ClInclude Include="Utility\Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Animation\AnimationStream.inl" />
     <None Include="Mathematics\Tween.inl" />
     <None Include="Objects\SetpointController.inl" />
     <None Include="Rendering\DrawExecutorDX11.inl" />
@@ -555,7 +557,14 @@ copy Intersection\*.h ..\SDK\Include
 copy Objects\*.h ..\SDK\Include
 copy Objects\*.inl ..\SDK\Include
 copy Animation\*.h ..\SDK\Include
-copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”</Command>
+copy Animation\*.inl ..\SDK\Include
+if "$(Platform)" == "Win32" (
+    echo "Hieroglyph3: Copying x86 version of D3DCompile*.dll to output bin folder."
+    copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”
+) else (
+    echo "Hieroglyph3: Copying x64 version of D3DCompile*.dll to output bin folder."
+    copy “$(WindowsSdkDir)redist\d3d\x64\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”
+)</Command>
     </PostBuildEvent>
     <Lib>
       <AdditionalLibraryDirectories>
@@ -594,7 +603,14 @@ copy Intersection\*.h ..\SDK\Include
 copy Objects\*.h ..\SDK\Include
 copy Objects\*.inl ..\SDK\Include
 copy Animation\*.h ..\SDK\Include
-copy “$(WindowsSdkDir)redist\d3d\x64\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”</Command>
+copy Animation\*.inl ..\SDK\Include
+if "$(Platform)" == "Win32" (
+    echo "Hieroglyph3: Copying x86 version of D3DCompile*.dll to output bin folder."
+    copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”
+) else (
+    echo "Hieroglyph3: Copying x64 version of D3DCompile*.dll to output bin folder."
+    copy “$(WindowsSdkDir)redist\d3d\x64\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”
+)</Command>
     </PostBuildEvent>
     <Lib>
       <AdditionalLibraryDirectories>
@@ -636,7 +652,14 @@ copy Intersection\*.h ..\SDK\Include
 copy Objects\*.h ..\SDK\Include
 copy Objects\*.inl ..\SDK\Include
 copy Animation\*.h ..\SDK\Include
-copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”</Command>
+copy Animation\*.inl ..\SDK\Include
+if "$(Platform)" == "Win32" (
+    echo "Hieroglyph3: Copying x86 version of D3DCompile*.dll to output bin folder."
+    copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”
+) else (
+    echo "Hieroglyph3: Copying x64 version of D3DCompile*.dll to output bin folder."
+    copy “$(WindowsSdkDir)redist\d3d\x64\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”
+)</Command>
     </PostBuildEvent>
     <Lib>
       <AdditionalLibraryDirectories>
@@ -678,7 +701,14 @@ copy Intersection\*.h ..\SDK\Include
 copy Objects\*.h ..\SDK\Include
 copy Objects\*.inl ..\SDK\Include
 copy Animation\*.h ..\SDK\Include
-copy “$(WindowsSdkDir)redist\d3d\x64\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”</Command>
+copy Animation\*.inl ..\SDK\Include
+if "$(Platform)" == "Win32" (
+    echo "Hieroglyph3: Copying x86 version of D3DCompile*.dll to output bin folder."
+    copy “$(WindowsSdkDir)redist\d3d\x86\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”
+) else (
+    echo "Hieroglyph3: Copying x64 version of D3DCompile*.dll to output bin folder."
+    copy “$(WindowsSdkDir)redist\d3d\x64\D3DCompile*.DLL” “$(SolutionDir)\Applications\Bin”
+)</Command>
     </PostBuildEvent>
     <Lib>
       <AdditionalLibraryDirectories>

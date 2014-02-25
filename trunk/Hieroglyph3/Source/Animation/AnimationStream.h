@@ -15,7 +15,11 @@
 #define AnimationStream_h
 //--------------------------------------------------------------------------------
 #include "PCH.h"
+#include "Animation.h"
 #include "Vector3f.h"
+#include "Log.h"
+#include "Tween.h"
+#include <functional>
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -23,40 +27,11 @@ namespace Glyph3
 	class AnimationState
 	{
 	public:
-		AnimationState()
-		{
-			m_fTimeStamp = 0.0f;
-		};
-		AnimationState( float time, T data )
-		{
-			m_tData = data;
-			m_fTimeStamp = time;
-		};
+		AnimationState() : m_fTimeStamp( 0.0f ), m_tData() { };
+		AnimationState( float time, T data ) : m_tData( data ), m_fTimeStamp( time ) { };
 
 		T		m_tData;			// Data to be interpolated
 		float	m_fTimeStamp;		// Time stamp within the current animation.
-	};
-
-	class Animation
-	{
-	public:
-		Animation()
-		{
-			m_Name = L"";
-			m_fStartTime = 0;
-			m_fEndTime = 0;
-		};
-
-		Animation( std::wstring name, float start, float stop )
-		{
-			m_Name = name;
-			m_fStartTime = start;
-			m_fEndTime = stop;
-		};
-
-		std::wstring m_Name;
-		float m_fStartTime;
-		float m_fEndTime;
 	};
 
 	template < class T >
@@ -72,21 +47,27 @@ namespace Glyph3
 		T& GetState();
 
 		void AddAnimation( Animation& animation );
-		void PlayAnimation( unsigned int index );
+		void PlayAnimation( size_t index );
 		void PlayAnimation( std::wstring& name );
 		void PlayAllAnimations( );
 
+		void SetInterpolationMethod( std::function<T(const T&,const T&,float)> func );
+
 	protected:
-		std::vector<AnimationState<T>>	m_vStates;
-		T								m_kCurrState;
-		unsigned int					m_uiCurrFrame;
-		unsigned int 					m_uiEndFrame;
+		std::vector<AnimationState<T>>					m_vStates;
+		T												m_kCurrState;
+		size_t											m_CurrFrame;
+		size_t		 									m_EndFrame;
 
-		bool							m_bRunning;
-		float							m_fAnimationTime;
+		bool											m_bRunning;
+		float											m_fAnimationTime;
 
-		std::vector<Animation>			m_vAnimations;
+		std::function<T(const T&,const T&,float)>		m_tweenFunc;
+		std::vector<Animation>							m_vAnimations;
 	};
+
+	#include "AnimationStream.inl"
 };
 //--------------------------------------------------------------------------------
 #endif // AnimationStream_h
+//--------------------------------------------------------------------------------

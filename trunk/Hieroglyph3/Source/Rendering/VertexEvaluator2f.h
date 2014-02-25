@@ -33,11 +33,11 @@ namespace Glyph3
 
 		void evaluate( TVertex& v, float x, float y ) {
 			for ( auto& pEvaluator : Evaluators ) {
-				pEvaluator->evaluate( m_Model, v, x, y );
+				pEvaluator.evaluate( m_Model, v, x, y );
 			}
 		};
 
-		std::vector< std::shared_ptr< AttributeEvaluator2f< TModel, TVertex > > > Evaluators;
+		std::vector< Evaluator< TModel, TVertex > > Evaluators;
 
 	protected:
 		TModel m_Model;

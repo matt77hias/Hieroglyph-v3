@@ -215,10 +215,10 @@ void GeometryActor::DrawSphere( const Vector3f& center, float radius, unsigned i
 	// attribute that attribute is written directly into a passed in vertex.  We
 	// add them to a list, and just iterate over it to create a complete vertex.
 
-	evaluator.Evaluators.push_back( std::make_shared<SurfacePositionFromSphere<BasicVertexDX11::Vertex>>() );
-	evaluator.Evaluators.push_back( std::make_shared<SurfaceNormalFromSphere<BasicVertexDX11::Vertex>>() );
-	evaluator.Evaluators.push_back( std::make_shared<TexcoordsFromSphere<BasicVertexDX11::Vertex>>() );
-	evaluator.Evaluators.push_back( std::make_shared<ConstantColorFromSphere<BasicVertexDX11::Vertex>>( m_Color ) );
+	evaluator.Evaluators.emplace_back( SurfacePositionFromSphere<BasicVertexDX11::Vertex>() );
+	evaluator.Evaluators.emplace_back( SurfaceNormalFromSphere<BasicVertexDX11::Vertex>() );
+	evaluator.Evaluators.emplace_back( TexcoordsFromSphere<BasicVertexDX11::Vertex>() );
+	evaluator.Evaluators.emplace_back( ConstantColorFromSphere<BasicVertexDX11::Vertex>( m_Color ) );
 
 	// Now we provide the evaluator with the instance of its model type.  This will
 	// be passed to the attribute evaluators so they can determine what value they
@@ -335,10 +335,10 @@ void GeometryActor::DrawCylinder( const Vector3f& p1, const Vector3f& p2, float 
 	// attribute that attribute is written directly into a passed in vertex.  We
 	// add them to a list, and just iterate over it to create a complete vertex.
 
-	evaluator.Evaluators.push_back( std::make_shared<SurfacePositionFromCone<BasicVertexDX11::Vertex>>() );
-	evaluator.Evaluators.push_back( std::make_shared<SurfaceNormalFromCone<BasicVertexDX11::Vertex>>() );
-	evaluator.Evaluators.push_back( std::make_shared<TexcoordsFromCone<BasicVertexDX11::Vertex>>() );
-	evaluator.Evaluators.push_back( std::make_shared<ConstantColorFromCone<BasicVertexDX11::Vertex>>( m_Color ) );
+	evaluator.Evaluators.emplace_back( SurfacePositionFromCone<BasicVertexDX11::Vertex>() );
+	evaluator.Evaluators.emplace_back( SurfaceNormalFromCone<BasicVertexDX11::Vertex>() );
+	evaluator.Evaluators.emplace_back( TexcoordsFromCone<BasicVertexDX11::Vertex>() );
+	evaluator.Evaluators.emplace_back( ConstantColorFromCone<BasicVertexDX11::Vertex>( m_Color ) );
 
 	// Now we provide the evaluator with the instance of its model type.  This will
 	// be passed to the attribute evaluators so they can determine what value they
@@ -498,7 +498,7 @@ void GeometryActor::DrawAxisAlignedBox( const Vector3f& pt1, const Vector3f& pt2
 	DrawBox( (pt1+pt2) * 0.5f, Vector3f( 1.0f, 0.0f, 0.0f ), Vector3f( 0.0f, 1.0f, 0.0f ), Vector3f( 0.0f, 0.0f, 1.0f ), pt2 - pt1 );
 }
 //--------------------------------------------------------------------------------
-void GeometryActor::DrawRect( const Vector3f& center, const Vector3f& xdir, const Vector3f& ydir, const Vector2f& extents )
+void GeometryActor::DrawRect( const Vector3f& center, const Vector3f& xdir, const Vector3f& ydir, const Vector2f& extents, const Vector2f& texscale )
 {
 	// Generate all of the vertices according to the specified input parameters.
 
@@ -511,10 +511,10 @@ void GeometryActor::DrawRect( const Vector3f& center, const Vector3f& xdir, cons
 	Vector3f x = xdir * extents.x;
 	Vector3f y = ydir * extents.y;
 
-	Vector2f tex00 = Vector2f( 0.0f, 0.0f );
-	Vector2f tex01 = Vector2f( 0.0f, 1.0f );
-	Vector2f tex10 = Vector2f( 1.0f, 0.0f );
-	Vector2f tex11 = Vector2f( 1.0f, 1.0f );
+	Vector2f tex00 = Vector2f( 0.0f, 0.0f ) * texscale;
+	Vector2f tex01 = Vector2f( 0.0f, 1.0f ) * texscale;
+	Vector2f tex10 = Vector2f( 1.0f, 0.0f ) * texscale;
+	Vector2f tex11 = Vector2f( 1.0f, 1.0f ) * texscale;
 
 	// Use a common normal vector for each vertex
 	normal = Vector3f::Cross( xdir, ydir );

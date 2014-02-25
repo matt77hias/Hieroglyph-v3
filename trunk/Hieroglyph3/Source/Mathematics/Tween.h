@@ -21,13 +21,14 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	template <class TValue>
-	class Tween
-	{
-	public:
-		static TValue Linear( TValue start, TValue end, float t );
-		static TValue QuadraticInOut( TValue start, TValue end, float t );
-	};
+	template <typename TValue>
+	TValue Linear( const TValue& start, const TValue& end, float t );
+
+	template <typename TValue>
+	TValue QuadraticInOut( const TValue& start, const TValue& end, float t );
+
+	template <typename TValue>
+	TValue Hermite( const TValue& start, const TValue& end, float t );
 
 	#include "Tween.inl"
 };

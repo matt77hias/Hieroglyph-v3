@@ -45,6 +45,7 @@ namespace Glyph3
 		// arithmetic operations
 		Vector2f operator+ ( const Vector2f& Vector ) const;
 		Vector2f operator- ( const Vector2f& Vector ) const;
+		Vector2f operator* ( const Vector2f& Vector ) const;
 		Vector2f operator* ( float fScalar ) const;
 		Vector2f operator/ ( float fScalar ) const;
 		Vector2f operator- ( ) const;

@@ -40,35 +40,9 @@ TextActor::TextActor()
 	m_pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	m_pGeometry->SetLayoutElements( BasicVertexDX11::GetElementCount(), BasicVertexDX11::Elements );
 
-	m_pMaterial = MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( *pRenderer );
+	m_pMaterial = MaterialGeneratorDX11::GenerateTextMaterial( *pRenderer );
 
 	SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
-
-
-	// Create a special blend state to allow blending based on the alpha channel of the
-	// source texture.  This allows the text to rendered without a background.  We set this
-	// directly in the material provided by the material generator.
-
-	BlendStateConfigDX11 blendConfig;
-	blendConfig.AlphaToCoverageEnable = false;
-	blendConfig.IndependentBlendEnable = false;
-	for ( int i = 0; i < 8; ++i )
-	{
-		blendConfig.RenderTarget[i].BlendEnable = true;
-		blendConfig.RenderTarget[i].BlendOp = D3D11_BLEND_OP_ADD;
-		blendConfig.RenderTarget[i].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-		blendConfig.RenderTarget[i].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-		blendConfig.RenderTarget[i].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-		blendConfig.RenderTarget[i].SrcBlendAlpha = D3D11_BLEND_ONE;
-		blendConfig.RenderTarget[i].DestBlendAlpha = D3D11_BLEND_ONE;
-		blendConfig.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-	}
-
-	m_pMaterial->Params[VT_PERSPECTIVE].pEffect->m_iBlendState = pRenderer->CreateBlendState( &blendConfig );
-
-	DepthStencilStateConfigDX11 ds;
-	ds.DepthEnable = false;
-	m_pMaterial->Params[VT_PERSPECTIVE].pEffect->m_iDepthStencilState = pRenderer->CreateDepthStencilState( &ds );
 
 
 	GetBody()->SetGeometry( m_pGeometry );

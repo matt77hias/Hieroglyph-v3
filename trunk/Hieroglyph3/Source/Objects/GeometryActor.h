@@ -60,7 +60,7 @@ namespace Glyph3
 		void DrawBox( const Vector3f& center, const Vector3f& extents );
 		void DrawAxisAlignedBox( const Vector3f& pt1, const Vector3f& pt2 );
 
-		void DrawRect( const Vector3f& center, const Vector3f& xdir, const Vector3f& ydir, const Vector2f& extents );
+		void DrawRect( const Vector3f& center, const Vector3f& xdir, const Vector3f& ydir, const Vector2f& extents, const Vector2f& texscale = Vector2f( 1.0f,1.0f ) );
 
 		void UseSolidMaterial();
 		void UseTexturedMaterial( ResourcePtr texture = nullptr );

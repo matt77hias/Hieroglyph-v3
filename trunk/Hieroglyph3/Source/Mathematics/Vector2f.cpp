@@ -118,6 +118,16 @@ Vector2f Vector2f::operator- ( const Vector2f& Vector ) const
 	return( diff );
 }
 //----------------------------------------------------------------------------------------------------
+Vector2f Vector2f::operator* ( const Vector2f& Vector ) const
+{
+	Vector2f prod;
+
+	prod.x = x * Vector.x;
+	prod.y = y * Vector.y;
+
+	return( prod );
+}
+//----------------------------------------------------------------------------------------------------
 Vector2f Vector2f::operator* ( float fScalar ) const
 {
 	Vector2f prod;

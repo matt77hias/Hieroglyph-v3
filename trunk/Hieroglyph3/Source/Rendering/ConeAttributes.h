@@ -25,10 +25,10 @@ namespace Glyph3
 	// Produces the surface position from a cone at the given coordinates.  
 
 	template <class TVertex>
-	class SurfacePositionFromCone : public AttributeEvaluator2f<Cone3f,TVertex>
+	class SurfacePositionFromCone //: public AttributeEvaluator2f<Cone3f,TVertex>
 	{
 	public:
-		virtual void evaluate( Cone3f& cone, TVertex& v, float theta, float height )
+		virtual void evaluate( Cone3f& cone, TVertex& v, float theta, float height ) const
 		{
 			cone.SamplePosition( v.position, theta, height );
 		};
@@ -38,10 +38,10 @@ namespace Glyph3
 	// Produces the surface normal vector from a cone at the given coordinates.
 	
 	template <class TVertex>
-	class SurfaceNormalFromCone : public AttributeEvaluator2f<Cone3f,TVertex>
+	class SurfaceNormalFromCone //: public AttributeEvaluator2f<Cone3f,TVertex>
 	{
 	public:
-		virtual void evaluate( Cone3f& cone, TVertex& v, float theta, float height )
+		virtual void evaluate( Cone3f& cone, TVertex& v, float theta, float height ) const
 		{
 			cone.SampleNormal( v.normal, theta, height );
 		};
@@ -52,10 +52,10 @@ namespace Glyph3
 	// to the theta and height arguments.
 
 	template <class TVertex>
-	class TexcoordsFromCone : public AttributeEvaluator2f<Cone3f,TVertex>
+	class TexcoordsFromCone //: public AttributeEvaluator2f<Cone3f,TVertex>
 	{
 	public:
-		virtual void evaluate( Cone3f& cone, TVertex& v, float theta, float height )
+		virtual void evaluate( Cone3f& cone, TVertex& v, float theta, float height ) const
 		{
 			v.texcoords.x = height / 1.0f;
 			v.texcoords.y = theta / 1.0f;
@@ -66,12 +66,13 @@ namespace Glyph3
 	// Produces a constant color that is specified when this object is created.
 
 	template <class TVertex>
-	class ConstantColorFromCone : public AttributeEvaluator2f<Cone3f,TVertex>
+	class ConstantColorFromCone //: public AttributeEvaluator2f<Cone3f,TVertex>
 	{
 	public:
 		ConstantColorFromCone( const Vector4f& color ) : Color( color ) {};
 
-		virtual void evaluate( Cone3f& cone, TVertex& v, float theta, float height ) {
+		virtual void evaluate( Cone3f& cone, TVertex& v, float theta, float height ) const
+		{
 			v.color = Color;
 		};
 

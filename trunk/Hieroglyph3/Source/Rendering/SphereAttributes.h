@@ -24,11 +24,11 @@ namespace Glyph3
 {
 	// Produces the surface position from a sphere at the given coordinates.  
 
-	template <class TVertex>
-	class SurfacePositionFromSphere : public AttributeEvaluator2f<Sphere3f,TVertex>
+	template <typename TVertex>
+	class SurfacePositionFromSphere // : public AttributeEvaluator2f<Sphere3f,TVertex>
 	{
 	public:
-		virtual void evaluate( Sphere3f& sphere, TVertex& v, float theta, float phi )
+		void evaluate( Sphere3f& sphere, TVertex& v, float theta, float phi ) const
 		{
 			sphere.SamplePosition( v.position, theta, phi );
 		};
@@ -37,10 +37,10 @@ namespace Glyph3
 	// Produces the surface normal vector from a sphere at the given coordinates.
 	
 	template <class TVertex>
-	class SurfaceNormalFromSphere : public AttributeEvaluator2f<Sphere3f,TVertex>
+	class SurfaceNormalFromSphere //: public AttributeEvaluator2f<Sphere3f,TVertex>
 	{
 	public:
-		virtual void evaluate( Sphere3f& sphere, TVertex& v, float theta, float phi )
+		virtual void evaluate( Sphere3f& sphere, TVertex& v, float theta, float phi ) const
 		{
 			sphere.SampleNormal( v.normal, theta, phi );
 		};
@@ -50,10 +50,10 @@ namespace Glyph3
 	// to the range of [0,2*pi] for theta and [0,pi] for phi.
 
 	template <class TVertex>
-	class TexcoordsFromSphere : public AttributeEvaluator2f<Sphere3f,TVertex>
+	class TexcoordsFromSphere //: public AttributeEvaluator2f<Sphere3f,TVertex>
 	{
 	public:
-		virtual void evaluate( Sphere3f& sphere, TVertex& v, float theta, float phi )
+		virtual void evaluate( Sphere3f& sphere, TVertex& v, float theta, float phi ) const
 		{
 			v.texcoords.x = theta / static_cast<float>(( GLYPH_PI * 2.0 ));
 			v.texcoords.y = phi / static_cast<float>(( GLYPH_PI ));
@@ -63,12 +63,13 @@ namespace Glyph3
 	// Produces a constant color that is specified when the object is created.
 
 	template <class TVertex>
-	class ConstantColorFromSphere : public AttributeEvaluator2f<Sphere3f,TVertex>
+	class ConstantColorFromSphere //: public AttributeEvaluator2f<Sphere3f,TVertex>
 	{
 	public:
 		ConstantColorFromSphere( const Vector4f& color ) : Color( color ) {};
 
-		virtual void evaluate( Sphere3f& sphere, TVertex& v, float theta, float phi ) {
+		virtual void evaluate( Sphere3f& sphere, TVertex& v, float theta, float phi ) const
+		{
 			v.color = Color;
 		};
 

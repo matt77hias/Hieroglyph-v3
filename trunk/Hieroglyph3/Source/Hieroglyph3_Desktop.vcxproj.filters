@@ -192,11 +192,17 @@
     <Filter Include="Rendering\Pipeline System\Stages\Fixed Stages\Stream Output">
       <UniqueIdentifier>{b4bb4fe3-e716-4e8c-9f22-1109e88e4788}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering\Tessellation Toolkit\Evaluation">
+      <UniqueIdentifier>{3f482093-5efd-4e08-b033-bf691e8ce5db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Tessellation Toolkit\Attributes">
+      <UniqueIdentifier>{5166398c-bca4-4f87-8e7a-db96bfebd2cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Tessellation Toolkit\Tessellators">
+      <UniqueIdentifier>{2d1a82ca-c449-448c-a076-c9e589e8d177}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Animation\AnimationStream.cpp">
-      <Filter>Animation</Filter>
-    </ClCompile>
     <ClCompile Include="Application\Application.cpp">
       <Filter>Application</Filter>
     </ClCompile>
@@ -779,11 +785,11 @@
     <ClCompile Include="Objects\Light.cpp">
       <Filter>Objects\Scene Objects\Lights</Filter>
     </ClCompile>
+    <ClCompile Include="Animation\Animation.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Animation\AnimationStream.h">
-      <Filter>Animation</Filter>
-    </ClInclude>
     <ClInclude Include="Application\Application.h">
       <Filter>Application</Filter>
     </ClInclude>
@@ -1384,23 +1390,8 @@
     <ClInclude Include="Objects\BoundsVisualizerActor.h">
       <Filter>Objects\Scene Objects\Actors</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\VertexEvaluator2f.h">
-      <Filter>Rendering\Tessellation Toolkit</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\AttributeEvaluator2f.h">
-      <Filter>Rendering\Tessellation Toolkit</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\SphereAttributes.h">
-      <Filter>Rendering\Tessellation Toolkit</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\GridTessellator2f.h">
-      <Filter>Rendering\Tessellation Toolkit</Filter>
-    </ClInclude>
     <ClInclude Include="Geometry\Cone3f.h">
       <Filter>Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\ConeAttributes.h">
-      <Filter>Rendering\Tessellation Toolkit</Filter>
     </ClInclude>
     <ClInclude Include="Objects\ScaleSetpointController.h">
       <Filter>Objects\Controllers</Filter>
@@ -1434,6 +1425,27 @@
     </ClInclude>
     <ClInclude Include="Objects\Light.h">
       <Filter>Objects\Scene Objects\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\AttributeEvaluator2f.h">
+      <Filter>Rendering\Tessellation Toolkit\Evaluation</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\SphereAttributes.h">
+      <Filter>Rendering\Tessellation Toolkit\Attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\ConeAttributes.h">
+      <Filter>Rendering\Tessellation Toolkit\Attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\VertexEvaluator2f.h">
+      <Filter>Rendering\Tessellation Toolkit\Evaluation</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\GridTessellator2f.h">
+      <Filter>Rendering\Tessellation Toolkit\Tessellators</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\Animation.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\AnimationStream.h">
+      <Filter>Animation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1472,6 +1484,9 @@
     </None>
     <None Include="Rendering\TGrowableBufferDX11.inl">
       <Filter>Rendering\Pipeline System\Executors\Executors\Basis Objects</Filter>
+    </None>
+    <None Include="Animation\AnimationStream.inl">
+      <Filter>Animation</Filter>
     </None>
   </ItemGroup>
 </Project>
