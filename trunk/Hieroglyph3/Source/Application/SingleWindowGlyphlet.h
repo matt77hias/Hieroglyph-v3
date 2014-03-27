@@ -42,9 +42,7 @@ namespace Glyph3
 		virtual void Initialize();
 		virtual void Update( float dt );
 		virtual void Shutdown();
-
 		virtual bool HandleEvent( EventPtr pEvent );
-		virtual std::wstring GetName( ) = 0;
 
 		EventManager			EvtManager;
 

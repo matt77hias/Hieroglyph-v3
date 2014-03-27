@@ -29,6 +29,7 @@
 #include "BufferConfigDX11.h"
 
 #include "IParameterManager.h"
+#include "Quaternion.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -39,6 +40,7 @@ App AppInstance; // Provides an instance of the application
 //--------------------------------------------------------------------------------
 App::App()
 {
+	Quaternion<float> q;
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()

@@ -1447,6 +1447,9 @@
     <ClInclude Include="Animation\AnimationStream.h">
       <Filter>Animation</Filter>
     </ClInclude>
+    <ClInclude Include="Mathematics\Quaternion.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Rendering\TGrowableIndexBufferDX11.inl">
@@ -1487,6 +1490,9 @@
     </None>
     <None Include="Animation\AnimationStream.inl">
       <Filter>Animation</Filter>
+    </None>
+    <None Include="Mathematics\Quaternion.inl">
+      <Filter>Mathematics</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -37,7 +37,7 @@ SingleWindowGlyphlet::SingleWindowGlyphlet()
 	m_pCamera->Spatial().SetRotation( Vector3f( 0.0f, 0.0f, 0.0f ) );
 	m_pCamera->Spatial().SetTranslation( Vector3f( 0.0f, 10.0f, -20.0f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
-	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>(m_iWidth) / static_cast<float>(m_iHeight), static_cast<float>( GLYPH_PI ) / 4.0f );
+	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, 1.0f / 1.0f, static_cast<float>( GLYPH_PI ) / 4.0f );
 
 	m_pScene->AddCamera( m_pCamera );
 }
@@ -62,6 +62,8 @@ void SingleWindowGlyphlet::Setup( ResourcePtr target )
 
 		m_iWidth = desc.Width;
 		m_iHeight = desc.Height;
+
+		m_pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>(m_iWidth) / static_cast<float>(m_iHeight), static_cast<float>( GLYPH_PI ) / 4.0f );
 	} else {
 		// TODO: add error handling here.
 	}

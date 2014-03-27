@@ -279,6 +279,7 @@
     <ClInclude Include="Mathematics\Matrix3f.h" />
     <ClInclude Include="Mathematics\Matrix4f.h" />
     <ClInclude Include="Mathematics\PerlinNoise.h" />
+    <ClInclude Include="Mathematics\Quaternion.h" />
     <ClInclude Include="Mathematics\Tween.h" />
     <ClInclude Include="Mathematics\Vector2f.h" />
     <ClInclude Include="Mathematics\Vector3f.h" />
@@ -449,6 +450,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Animation\AnimationStream.inl" />
+    <None Include="Mathematics\Quaternion.inl" />
     <None Include="Mathematics\Tween.inl" />
     <None Include="Objects\SetpointController.inl" />
     <None Include="Rendering\DrawExecutorDX11.inl" />
