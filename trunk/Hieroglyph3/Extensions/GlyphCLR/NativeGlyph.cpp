@@ -20,6 +20,7 @@ using namespace Glyph3;
 NativeGlyph::NativeGlyph()
 {
 	// Create the framework stuff to be used by the glyphlets...
+	Log::Get().Open();
 	m_pEventManager = new EventManager();
 	m_pRenderer = new RendererDX11();
 }
@@ -81,6 +82,7 @@ ID3D11Texture2D* NativeGlyph::GetRenderTarget()
 void NativeGlyph::Update( float time )
 {
 	m_pGlyphlet->Update( time );
+	m_pRenderer->pImmPipeline->m_pContext->Flush();
 }
 //--------------------------------------------------------------------------------
 void NativeGlyph::Shutdown()
