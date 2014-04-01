@@ -19,13 +19,9 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 NativeGlyph::NativeGlyph()
 {
-	FileSystem fs;
-	fs.SetDataFolder(std::wstring(L"../../../../Data/"));
-
 	// Create the framework stuff to be used by the glyphlets...
 	m_pEventManager = new EventManager();
 	m_pRenderer = new RendererDX11();
-
 }
 //--------------------------------------------------------------------------------
 void NativeGlyph::Initialize()
