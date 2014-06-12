@@ -4,7 +4,7 @@
         Title="MainWindow" Height="640" Width="840" Background="{x:Null}">
     <Grid Margin="0,0,0,1" Background="#FF898787">
         <Image x:Name="d3dScene" Width="800" Height="600" RenderOptions.BitmapScalingMode="HighQuality" Margin="10,10" />
-        <Button Height="44" Width="120" Content="WPF Button" VerticalAlignment="Top" HorizontalAlignment="Right"  />
+        <Button Height="44" Width="120" Content="WPF Button" Background="Transparent" VerticalAlignment="Top" HorizontalAlignment="Right"  />
 
     </Grid>
 </Window>

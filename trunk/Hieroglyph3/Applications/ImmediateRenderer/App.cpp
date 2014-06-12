@@ -9,6 +9,7 @@
 //--------------------------------------------------------------------------------
 #include "App.h"
 #include "Log.h"
+#include "FileSystem.h"
 
 #include <sstream>
 
@@ -23,6 +24,9 @@
 
 #include "VectorParameterDX11.h"
 #include "BasicVertexDX11.h"
+#include "DrawExecutorDX11.h"
+#include "MeshSTL.h"
+
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -115,6 +119,43 @@ void App::Initialize()
 	m_pLight->GetNode()->AttachController( new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), -1.0f ) );
 	m_pLight->GetNode()->Position() = Vector3f( 0.0f, 50.0f, 0.0f );
 	m_pLight->GetBody()->Position() = Vector3f( 50.0f, 0.0f, 0.0f );
+
+
+	// Load an STL file and configure an actor to use it.
+
+	FileSystem fs;
+	MeshSTL stl( fs.GetModelsFolder() + L"MeshedReconstruction.stl" );
+
+	m_pMeshActor = new Actor();
+	m_pScene->AddActor( m_pMeshActor );
+	m_pMeshActor->GetBody()->AttachController( new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), -1.0f ) );
+	m_pMeshActor->GetNode()->Position() = Vector3f( 5.0f, 5.0f, 0.0f );
+
+
+	m_pMeshActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *m_pRenderer11) );
+	auto pMeshExecutor = std::make_shared<DrawExecutorDX11<BasicVertexDX11::Vertex>>();
+	pMeshExecutor->SetLayoutElements( BasicVertexDX11::GetElementCount(), BasicVertexDX11::Elements );
+	pMeshExecutor->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	pMeshExecutor->SetMaxVertexCount( 3 * stl.faces.size() );
+	m_pMeshActor->GetBody()->SetGeometry( pMeshExecutor );
+
+
+	BasicVertexDX11::Vertex vertex;
+	vertex.color = Vector4f( 0.0f, 1.0f, 0.0f, 0.0f );
+
+	for ( auto& face : stl.faces )
+	{
+		vertex.normal = face.normal;
+
+		vertex.position = face.v0;
+		pMeshExecutor->AddVertex( vertex );
+
+		vertex.position = face.v1;
+		pMeshExecutor->AddVertex( vertex );
+
+		vertex.position = face.v2;
+		pMeshExecutor->AddVertex( vertex );
+	}
 }
 //--------------------------------------------------------------------------------
 void App::Update()

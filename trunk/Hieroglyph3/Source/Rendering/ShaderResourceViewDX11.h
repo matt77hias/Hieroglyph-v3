@@ -25,6 +25,8 @@ namespace Glyph3
 		ShaderResourceViewDX11( ShaderResourceViewComPtr pView );
 		~ShaderResourceViewDX11();
 
+		ID3D11ShaderResourceView* GetSRV();
+
 	protected:
 		ShaderResourceViewComPtr		m_pShaderResourceView;
 		

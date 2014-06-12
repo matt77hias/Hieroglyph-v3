@@ -1691,6 +1691,11 @@ Texture3dDX11* RendererDX11::GetTexture3DByIndex( int rid )
 	return( pResult );
 }
 //--------------------------------------------------------------------------------
+SwapChainDX11* RendererDX11::GetSwapChainByIndex( int sid )
+{
+	return( m_vSwapChains[sid] );
+}
+//--------------------------------------------------------------------------------
 BufferDX11* RendererDX11::GetGenericBufferByIndex( int rid )
 {
 	// This method returns a BufferDX11 pointer, which is useful for methods that

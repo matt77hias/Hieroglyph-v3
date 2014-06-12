@@ -968,3 +968,8 @@ void PipelineManagerDX11::SetMarker( std::wstring& name )
 	}
 }
 //--------------------------------------------------------------------------------
+ID3D11DeviceContext* PipelineManagerDX11::GetDeviceContext()
+{
+	return( m_pContext.Get() );
+}
+//--------------------------------------------------------------------------------

@@ -357,6 +357,7 @@
     <ClInclude Include="Rendering\MatrixArrayParameterWriterDX11.h" />
     <ClInclude Include="Rendering\MatrixParameterDX11.h" />
     <ClInclude Include="Rendering\MatrixParameterWriterDX11.h" />
+    <ClInclude Include="Rendering\MeshSTL.h" />
     <ClInclude Include="Rendering\ms3dspec.h" />
     <ClInclude Include="Rendering\MultiExecutorDX11.h" />
     <ClInclude Include="Rendering\OutputMergerStageDX11.h" />

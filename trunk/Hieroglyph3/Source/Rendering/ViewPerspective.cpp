@@ -131,6 +131,8 @@ void ViewPerspective::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParam
 			m_pScene->GetLight( 0 )->Parameters.SetRenderParams( pParamManager );
 		}
 
+		pPipelineManager->ClearPipelineResources();
+
 		// Run through the graph and render each of the entities
 		m_pScene->GetRoot()->Render( pPipelineManager, pParamManager, VT_PERSPECTIVE );
 

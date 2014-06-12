@@ -79,7 +79,7 @@ void Win32RenderWindow::Initialize(IWindowProc* WindowProcObj)
 	rc.bottom = m_iHeight;
 	
 	// Adjust the window size for correct device size
-	AdjustWindowRect(&rc, m_dStyle, FALSE);
+	AdjustWindowRectEx(&rc, m_dStyle, false, 0);
 
 	long lwidth = rc.right - rc.left;
 	long lheight = rc.bottom - rc.top;
@@ -102,6 +102,17 @@ void Win32RenderWindow::Initialize(IWindowProc* WindowProcObj)
 		NULL,							// instance of this application
 		NULL );							// extra creation parms
 	
+
+	// Update the size of the window according to the client area that was 
+	// created.  Due to limitations about the desktop size, this can cause some
+	// situations where the created window is smaller than requested.
+
+	RECT rect;
+	GetClientRect( m_hWnd, &rect );	
+	m_iWidth = rect.right - rect.left;
+	m_iHeight = rect.bottom - rect.top;
+
+
 	if (m_hWnd) {
 		// Set in the "extra" bytes the pointer to the IWindowProc object
 		// which handles messages for the window

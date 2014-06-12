@@ -23,3 +23,8 @@ RenderTargetViewDX11::~RenderTargetViewDX11()
 {
 }
 //--------------------------------------------------------------------------------
+ID3D11RenderTargetView* RenderTargetViewDX11::GetRTV()
+{
+	return( m_pRenderTargetView.Get() );
+}
+//--------------------------------------------------------------------------------

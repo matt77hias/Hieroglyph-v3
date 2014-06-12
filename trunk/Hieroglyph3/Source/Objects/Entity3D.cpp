@@ -260,7 +260,12 @@ void Entity3D::Render( PipelineManagerDX11* pPipelineManager, IParameterManager*
 			this->SetRenderParams( pParamManager );
 
 			// Configure the pipeline with the render effect supplied by the material.
-			pPipelineManager->ClearPipelineResources();
+
+			// This clear pipeline resources call has been removed, and is 
+			// expected to be implemented in the Task that controls the pipeline
+			// output configuration (i.e. ViewPerspective and his friends).
+			// pPipelineManager->ClearPipelineResources();
+
 			m_sParams.Material->Params[view].pEffect->ConfigurePipeline( pPipelineManager, pParamManager );
 			pPipelineManager->ApplyPipelineResources();
 

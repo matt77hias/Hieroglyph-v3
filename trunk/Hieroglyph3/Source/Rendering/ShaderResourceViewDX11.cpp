@@ -23,3 +23,8 @@ ShaderResourceViewDX11::~ShaderResourceViewDX11()
 {
 }
 //--------------------------------------------------------------------------------
+ID3D11ShaderResourceView* ShaderResourceViewDX11::GetSRV()
+{
+	return( m_pShaderResourceView.Get() );
+}
+//--------------------------------------------------------------------------------

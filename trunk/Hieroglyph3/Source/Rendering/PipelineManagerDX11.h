@@ -208,6 +208,8 @@ namespace Glyph3
 
 		void SaveTextureScreenShot( int ID, std::wstring filename );
 
+		ID3D11DeviceContext* GetDeviceContext();
+
 
 		D3D_FEATURE_LEVEL						m_FeatureLevel;
 		

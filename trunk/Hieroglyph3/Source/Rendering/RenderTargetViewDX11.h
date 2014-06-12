@@ -25,6 +25,8 @@ namespace Glyph3
 		RenderTargetViewDX11( RenderTargetViewComPtr pView );
 		~RenderTargetViewDX11();
 
+		ID3D11RenderTargetView* GetRTV();
+
 	protected:
 		RenderTargetViewComPtr			m_pRenderTargetView;
 		

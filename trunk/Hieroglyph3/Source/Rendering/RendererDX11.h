@@ -323,6 +323,7 @@ namespace Glyph3
 		Texture1dDX11*				GetTexture1DByIndex( int rid );
 		Texture2dDX11*				GetTexture2DByIndex( int rid );
 		Texture3dDX11*				GetTexture3DByIndex( int rid );
+		SwapChainDX11*				GetSwapChainByIndex( int sid );
 
 		// Buffer resource accessors
 

@@ -37,4 +37,5 @@ protected:
 	GeometryActor*				m_pIndexedActor;
 	GeometryActor*				m_pGeometryActor;
 	TextActor*					m_pTextActor;
+	Actor*						m_pMeshActor;
 };
