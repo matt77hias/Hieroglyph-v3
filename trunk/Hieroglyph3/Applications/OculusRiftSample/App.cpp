@@ -92,8 +92,6 @@ bool App::ConfigureRenderingSetup()
 
 	m_pCamera = new FirstPersonCamera();
 	m_pCamera->SetEventManager( &EvtManager );
-	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.0f, 0.0f, 0.0f ) );
-	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 5.0f, -10.0f );
 	m_pCamera->SetCameraView( m_pRenderView );
 	m_pCamera->SetOverlayView( m_pTextOverlayView );
 	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>(m_iWidth) / static_cast<float>(m_iHeight), static_cast<float>( GLYPH_PI ) / 4.0f );
@@ -116,7 +114,7 @@ void App::Initialize()
 	// from the camera's point of view of the scene.
 
 	m_pCamera->Spatial().SetRotation( Vector3f( 0.5f, 0.3f, 0.0f ) );
-	m_pCamera->Spatial().SetTranslation( Vector3f( -3.0f, 12.0f, -15.0f ) );
+	m_pCamera->Spatial().SetTranslation( Vector3f( -1.5f, 6.0f, -7.5f ) );
 	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.4f, 0.0f ) );
 
 

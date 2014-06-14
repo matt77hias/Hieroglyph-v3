@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include "Kernel/OVR_Math.h"
 #include "OVR_Stereo.h"
+#include "Log.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -24,6 +25,12 @@ RiftHMD::RiftHMD( RiftManagerPtr RiftMgr ) :
 	// exception to let the user know.
 
 	m_hmd = ovrHmd_Create(0);
+
+	if ( !m_hmd ) {
+		Log::Get().Write( L"Unable to find hardware Rift device, creating a debug device instead..." );
+		m_hmd = ovrHmd_CreateDebug( ovrHmd_DK1 );
+	}
+		
 	if ( !m_hmd ) throw std::invalid_argument( "No HMD Devices were found!" );
 	
 	// Start the sensor which provides the Rift’s pose and motion.
