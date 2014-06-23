@@ -1453,6 +1453,9 @@
     <ClInclude Include="Rendering\MeshSTL.h">
       <Filter>Rendering\Pipeline System\Executors\File Formats</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\MeshOBJ.h">
+      <Filter>Rendering\Pipeline System\Executors\File Formats</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Rendering\TGrowableIndexBufferDX11.inl">

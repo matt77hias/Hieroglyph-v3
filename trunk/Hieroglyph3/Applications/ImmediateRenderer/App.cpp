@@ -26,6 +26,7 @@
 #include "BasicVertexDX11.h"
 #include "DrawExecutorDX11.h"
 #include "MeshSTL.h"
+#include "MeshOBJ.h"
 
 
 using namespace Glyph3;
@@ -125,6 +126,7 @@ void App::Initialize()
 
 	FileSystem fs;
 	MeshSTL stl( fs.GetModelsFolder() + L"MeshedReconstruction.stl" );
+	MeshOBJ obj( fs.GetModelsFolder() + L"Capsule.obj" );
 
 	m_pMeshActor = new Actor();
 	m_pScene->AddActor( m_pMeshActor );
@@ -155,6 +157,36 @@ void App::Initialize()
 
 		vertex.position = face.v2;
 		pMeshExecutor->AddVertex( vertex );
+	}
+
+
+
+	Actor* m_pOBJMesh = new Actor();
+	m_pScene->AddActor( m_pOBJMesh );
+	m_pOBJMesh->GetBody()->AttachController( new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), -1.0f ) );
+	m_pOBJMesh->GetNode()->Position() = Vector3f( 0.0f, 0.0f, -5.0f );
+
+
+	m_pOBJMesh->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *m_pRenderer11) );
+	auto pOBJExecutor = std::make_shared<DrawExecutorDX11<BasicVertexDX11::Vertex>>();
+	pOBJExecutor->SetLayoutElements( BasicVertexDX11::GetElementCount(), BasicVertexDX11::Elements );
+	pOBJExecutor->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	pOBJExecutor->SetMaxVertexCount( obj.positions.size() );
+	m_pOBJMesh->GetBody()->SetGeometry( pOBJExecutor );
+
+
+	BasicVertexDX11::Vertex v;
+	v.color = Vector4f( 0.0f, 0.0f, 0.0f, 0.0f );
+
+
+	for ( auto& face : obj.faces )
+	{
+		for ( size_t i = 0; i < 3; ++i ) {
+			v.position = obj.positions[face.positionIndices[i]];
+			v.normal = obj.normals[face.normalIndices[i]];
+			v.texcoords = obj.coords[face.coordIndices[i]];
+			pOBJExecutor->AddVertex( v );
+		}
 	}
 }
 //--------------------------------------------------------------------------------
