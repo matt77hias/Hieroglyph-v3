@@ -114,10 +114,12 @@ copy *.h ..\..\SDK\Include\GlyphRift
 </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\$(PlatformName)\VS2012\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libovrd.lib</AdditionalDependencies>
     </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -139,10 +141,12 @@ copy *.h ..\..\SDK\Include\GlyphRift
 </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\$(PlatformName)\VS2012\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libovr64d.lib</AdditionalDependencies>
     </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -168,10 +172,12 @@ copy *.h ..\..\SDK\Include\GlyphRift
 </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\$(PlatformName)\VS2012\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libovr.lib</AdditionalDependencies>
     </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -197,10 +203,12 @@ copy *.h ..\..\SDK\Include\GlyphRift
 </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\$(PlatformName)\VS2012\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libovr64.lib</AdditionalDependencies>
     </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

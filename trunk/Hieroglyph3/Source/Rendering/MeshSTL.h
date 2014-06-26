@@ -24,7 +24,7 @@
 #include <fstream>
 #include "Vector3f.h"
 //--------------------------------------------------------------------------------
-namespace Glyph3 {
+namespace Glyph3 { namespace STL {
 
 template<typename T>
 void read( std::ifstream& s, T& item )
@@ -46,7 +46,7 @@ public:
 		std::ifstream stlFile( filename, std::ios::in | std::ios::ate | std::ios::binary );
 		if ( !stlFile.is_open() ) { return; }
 
-		unsigned int fileSize = stlFile.tellg();
+		unsigned int fileSize = static_cast<unsigned int>( stlFile.tellg() );
 
 		// Skip the header of the STL file, and read in the number of faces.  We
 		// then ensure that the file is actually large enough to handle that many
@@ -94,7 +94,7 @@ public:
 	std::vector<Face> faces;
 };
 
-}
+} }
 //--------------------------------------------------------------------------------
 #endif // MeshSTL_h
 //--------------------------------------------------------------------------------

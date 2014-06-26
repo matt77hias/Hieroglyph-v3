@@ -13,13 +13,14 @@
 //
 // ViewRift provides a rendering task for producing the stereoscopic view for use
 // with an Oculus Rift Head Mounted Display (HMD).  This code is based on the 
-// OculusSDK v0.3.1, and uses its C-API.
+// OculusSDK v0.3.2, and uses its C-API.
 //--------------------------------------------------------------------------------
 #ifndef ViewRift_h
 #define ViewRift_h
 //--------------------------------------------------------------------------------
 #include "SceneRenderTask.h"
 #include "RiftHMD.h"
+#include <array>
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -38,21 +39,18 @@ namespace Glyph3
 
 		virtual std::wstring GetName();
 
-	protected:
+	private:
 
-		ResourcePtr		m_LeftTarget;
-		ResourcePtr		m_RightTarget;
-		ResourcePtr		m_DepthTarget;
+		static const unsigned int eye_count = 2;
 
-		int m_LeftEyeViewport;
-		int m_RightEyeViewport;
+		std::array<Matrix4f,eye_count>			m_view;
+		std::array<Matrix4f,eye_count>			m_proj;
+
+		std::array<ResourcePtr,eye_count>		m_EyeTargets;
+		ResourcePtr								m_DepthTarget;
+
 
 		RiftHMDPtr m_pHmd;
-
-		Matrix4f leftView;
-		Matrix4f rightView;
-		Matrix4f leftProj;
-		Matrix4f rightProj;
 	};
 };
 //--------------------------------------------------------------------------------

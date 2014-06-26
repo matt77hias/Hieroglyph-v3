@@ -7,15 +7,16 @@
 //
 // Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
-// This is a simple loader for STL binary files.  The usage concept is that the
-// face data gets loaded into a vector, and the application can then use the face
-// data as it sees fit.  This simplifies the loading of the files, while not 
-// making decisions for the developer about how to use the data.
+// This is a simple loader for OBJ ascii files.  The usage concept is that the
+// raw data gets loaded into vectors, and the application can then use the data as
+// it sees fit.  This simplifies the loading of the files, while not making 
+// decisions for the developer about how to use the data.
 //
-// Our face representation eliminates the unused AttributeByteCount to allow each
-// face to align to 4 byte boundaries.  More information about the STL file format 
-// can be found on the wikipedia page:
-// http://en.wikipedia.org/wiki/STL_%28file_format%29.
+// The loader also will load and interpret the associated MTL files, which are
+// commonly used to indicate material properties for a model.  You can find more
+// information about OBJ and MTL files on their wikipedia page:
+// http://en.wikipedia.org/wiki/Wavefront_.obj_file and also on Paul Bourke's site
+// http://paulbourke.net/dataformats/obj/.
 //--------------------------------------------------------------------------------
 #ifndef MeshOBJ_h
 #define MeshOBJ_h
@@ -29,22 +30,22 @@
 #include "Vector2f.h"
 #include "Vector3f.h"
 //--------------------------------------------------------------------------------
-namespace Glyph3 {
+namespace Glyph3 { namespace OBJ {
 //--------------------------------------------------------------------------------
 Vector3f toVec3( const std::vector<std::string>& tokens )
 {
 	assert( tokens.size() >= 4 );
 
-	return Vector3f( atof( tokens[1].c_str() ),
-					 atof( tokens[2].c_str() ),
-					 atof( tokens[3].c_str() ) );
+	return Vector3f( static_cast<float>( atof( tokens[1].c_str() ) ),
+					 static_cast<float>( atof( tokens[2].c_str() ) ),
+					 static_cast<float>( atof( tokens[3].c_str() ) ) );
 }
 //--------------------------------------------------------------------------------
 Vector2f toVec2( const std::vector<std::string>& tokens )
 {
 	assert( tokens.size() >= 3 );
-	return Vector2f( atof( tokens[1].c_str() ),
-					 atof( tokens[2].c_str() ) );
+	return Vector2f( static_cast<float>( atof( tokens[1].c_str() ) ),
+					 static_cast<float>( atof( tokens[2].c_str() ) ) );
 }
 //--------------------------------------------------------------------------------
 std::array<int,3> toIndexTriple( const std::string s )
@@ -84,7 +85,7 @@ int relativeOffset( int index, int refVal )
 class MeshOBJ
 {
 public:
-	MeshOBJ( const std::wstring& filename ) : faces()
+	MeshOBJ( const std::wstring& filename )
 	{
 		// Open the file in text mode.  If there is an issue opening the file, 
 		// just exit since nothing has been allocated.
@@ -94,6 +95,10 @@ public:
 
 		// We will process the file one line at a time.
 		std::string line;
+
+		// Initialize to a single group in case none are declared within the file.
+		size_t current_group = 0;
+		objects.push_back( object_t() );
 
 		while( std::getline( objFile, line ) )
 		{
@@ -105,43 +110,64 @@ public:
 				tokenList.push_back( token );
 			}
 
-			if ( tokenList[0] == "v" ) {
-				positions.emplace_back( toVec3( tokenList ) );
-			} else if ( tokenList[0] == "vn" ) {
-				normals.emplace_back( toVec3( tokenList ) );
-			} else if ( tokenList[0] == "vt" ) {
-				coords.emplace_back( toVec2( tokenList ) );
-			} else if ( tokenList[0] == "f" ) {
-				Face f;
+			// Check for an empty line
+			if ( tokenList.size() != 0 ) {
+				if ( tokenList[0] == "v" ) {
+					positions.emplace_back( toVec3( tokenList ) );
+				} else if ( tokenList[0] == "vn" ) {
+					normals.emplace_back( toVec3( tokenList ) );
+				} else if ( tokenList[0] == "vt" ) {
+					coords.emplace_back( toVec2( tokenList ) );
+				} else if ( tokenList[0] == "f" ) {
+					face_t f;
 
-				for ( size_t i = 0; i < 3; ++i ) {
-					auto triple = toIndexTriple( tokenList[i+1] );
-					f.positionIndices[i] = relativeOffset( triple[0], positions.size() );
-					f.coordIndices[i] = relativeOffset( triple[1], coords.size() );
-					f.normalIndices[i] = relativeOffset( triple[2], normals.size() );
+					for ( size_t i = 0; i < 3; ++i ) {
+						auto triple = toIndexTriple( tokenList[i+1] );
+						f.positionIndices[i] = relativeOffset( triple[0], positions.size() );
+						f.coordIndices[i] = relativeOffset( triple[1], coords.size() );
+						f.normalIndices[i] = relativeOffset( triple[2], normals.size() );
+					}
+
+					objects.back().faces.emplace_back( f );
+				} else if ( tokenList[0] == "o" ) {
+					// Check if the default object is currently in use. If so,
+					// put this name on that object, otherwise we create a new one.
+					if ( objects.back().faces.size() == 0 ) {
+						objects.back().name = tokenList[1];
+					} else {
+						objects.push_back( object_t() );
+						objects.back().name = tokenList[1];
+					}
+				} else if ( tokenList[0] == "mtllib" ) {
+					material_libs.push_back( tokenList[1] );
 				}
-
-				faces.emplace_back( f );
 			}
 		}
 
 		// The file will close on its own when it goes out of scope.
 	}
 
-	struct Face
+	typedef struct
 	{
 		std::array<int,3> positionIndices;
 		std::array<int,3> normalIndices;
 		std::array<int,3> coordIndices;
-	};
+	} face_t;
+
+	typedef struct {
+		std::string name;
+		std::string material_name;
+		std::vector<face_t> faces;
+	} object_t;
 
 	std::vector<Vector3f> positions;
 	std::vector<Vector3f> normals;
 	std::vector<Vector2f> coords;
-	std::vector<Face> faces;
+	std::vector<object_t> objects;
+	std::vector<std::string> material_libs;
 };
 
-}
+} }
 //--------------------------------------------------------------------------------
 #endif // MeshOBJ_h
 //--------------------------------------------------------------------------------

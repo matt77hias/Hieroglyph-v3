@@ -23,7 +23,6 @@
 
 #include "GlyphRift/RiftController.h"
 #include "GlyphRift/ViewRift.h"
-#include "Kernel/OVR_Math.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -43,9 +42,10 @@ bool App::ConfigureEngineComponents()
 	
 	// The desired window size is based on the screen size of the Rift display.
 	
-	ovrHmdDesc HmdDesc = m_pRiftHmd->GetHMDDesc();
-
-	if ( !ConfigureRenderingEngineComponents( HmdDesc.Resolution.w, HmdDesc.Resolution.h, D3D_FEATURE_LEVEL_11_0 ) ) {
+	if ( !ConfigureRenderingEngineComponents( m_pRiftHmd->HmdDisplayWidth(),
+											  m_pRiftHmd->HmdDisplayHeight(), 
+											  D3D_FEATURE_LEVEL_11_0 ) )
+	{
 		return( false );
 	}
 
@@ -249,9 +249,10 @@ void App::Update()
 	// predicting features of the Rift.  Thus we use the delta time to perform
 	// our scene update, and then render the scene.
 
-	ovrFrameTiming frameTiming = ovrHmd_BeginFrame( m_pRiftHmd->GetHMD(), 0 );
+	float delta = m_pRiftHmd->BeginFrame();
+	//ovrFrameTiming frameTiming = ovrHmd_BeginFrame( m_pRiftHmd->GetHMD(), 0 );
 
-	m_pScene->Update( frameTiming.DeltaSeconds );
+	m_pScene->Update( /*frameTiming.DeltaSeconds*/ delta );
 	m_pScene->Render( m_pRenderer11 );
 
 
@@ -259,7 +260,8 @@ void App::Update()
 	// needed since the Rift does it for us as part of the distortion rendering
 	// process.  We just need to 'end the frame' here.
 
-	ovrHmd_EndFrame( m_pRiftHmd->GetHMD() );
+	m_pRiftHmd->EndFrame();
+	//ovrHmd_EndFrame( m_pRiftHmd->GetHMD() );
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()

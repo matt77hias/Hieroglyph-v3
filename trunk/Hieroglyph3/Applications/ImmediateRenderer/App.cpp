@@ -125,8 +125,8 @@ void App::Initialize()
 	// Load an STL file and configure an actor to use it.
 
 	FileSystem fs;
-	MeshSTL stl( fs.GetModelsFolder() + L"MeshedReconstruction.stl" );
-	MeshOBJ obj( fs.GetModelsFolder() + L"Capsule.obj" );
+	STL::MeshSTL stl( fs.GetModelsFolder() + L"MeshedReconstruction.stl" );
+	OBJ::MeshOBJ obj( fs.GetModelsFolder() + L"Capsule.obj" );
 
 	m_pMeshActor = new Actor();
 	m_pScene->AddActor( m_pMeshActor );
@@ -179,13 +179,16 @@ void App::Initialize()
 	v.color = Vector4f( 0.0f, 0.0f, 0.0f, 0.0f );
 
 
-	for ( auto& face : obj.faces )
+	for ( auto& object : obj.objects )
 	{
-		for ( size_t i = 0; i < 3; ++i ) {
-			v.position = obj.positions[face.positionIndices[i]];
-			v.normal = obj.normals[face.normalIndices[i]];
-			v.texcoords = obj.coords[face.coordIndices[i]];
-			pOBJExecutor->AddVertex( v );
+		for ( auto& face : object.faces )
+		{
+			for ( size_t i = 0; i < 3; ++i ) {
+				v.position = obj.positions[face.positionIndices[i]];
+				v.normal = obj.normals[face.normalIndices[i]];
+				v.texcoords = obj.coords[face.coordIndices[i]];
+				pOBJExecutor->AddVertex( v );
+			}
 		}
 	}
 }
