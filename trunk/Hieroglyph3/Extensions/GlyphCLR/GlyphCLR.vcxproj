@@ -99,7 +99,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Hieroglyph3_Desktop.lib;DirectXTK.lib;D3DCompiler.lib;DXGUID.lib;Shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Hieroglyph3_Desktop.lib;D3DCompiler.lib;DXGUID.lib;Shell32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -113,7 +113,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Hieroglyph3_Desktop.lib;DirectXTK.lib;D3DCompiler.lib;DXGUID.lib;Shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Hieroglyph3_Desktop.lib;D3DCompiler.lib;DXGUID.lib;Shell32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -126,7 +126,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Hieroglyph3_Desktop.lib;DirectXTK.lib;D3DCompiler.lib;DXGUID.lib;Shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Hieroglyph3_Desktop.lib;D3DCompiler.lib;DXGUID.lib;Shell32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -139,7 +139,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Hieroglyph3_Desktop.lib;DirectXTK.lib;D3DCompiler.lib;DXGUID.lib;Shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Hieroglyph3_Desktop.lib;D3DCompiler.lib;DXGUID.lib;Shell32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

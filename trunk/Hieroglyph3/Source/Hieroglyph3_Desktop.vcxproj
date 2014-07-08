@@ -75,6 +75,7 @@
     <ClCompile Include="Objects\ActorGenerator.cpp" />
     <ClCompile Include="Objects\BoundsVisualizerActor.cpp" />
     <ClCompile Include="Objects\Camera.cpp" />
+    <ClCompile Include="Objects\ConsoleActor.cpp" />
     <ClCompile Include="Objects\Entity3D.cpp" />
     <ClCompile Include="Objects\FirstPersonCamera.cpp" />
     <ClCompile Include="Objects\GeometryActor.cpp">
@@ -209,6 +210,7 @@
     <ClCompile Include="Rendering\ViewTextOverlay.cpp" />
     <ClCompile Include="Rendering\VisualizerVertexDX11.cpp" />
     <ClCompile Include="Rendering\VolumeTextureVertexDX11.cpp" />
+    <ClCompile Include="Scripting\Console.cpp" />
     <ClCompile Include="Scripting\LuaApp.cpp" />
     <ClCompile Include="Scripting\LuaGeometryActor.cpp" />
     <ClCompile Include="Scripting\LuaScene.cpp" />
@@ -288,6 +290,7 @@
     <ClInclude Include="Objects\ActorGenerator.h" />
     <ClInclude Include="Objects\BoundsVisualizerActor.h" />
     <ClInclude Include="Objects\Camera.h" />
+    <ClInclude Include="Objects\ConsoleActor.h" />
     <ClInclude Include="Objects\Entity3D.h" />
     <ClInclude Include="Objects\FirstPersonCamera.h" />
     <ClInclude Include="Objects\GeometryActor.h" />
@@ -437,6 +440,7 @@
     <ClInclude Include="Rendering\ViewTextOverlay.h" />
     <ClInclude Include="Rendering\VisualizerVertexDX11.h" />
     <ClInclude Include="Rendering\VolumeTextureVertexDX11.h" />
+    <ClInclude Include="Scripting\Console.h" />
     <ClInclude Include="Scripting\IScriptInterface.h" />
     <ClInclude Include="Scripting\LuaApp.h" />
     <ClInclude Include="Scripting\LuaGeometryActor.h" />
@@ -572,11 +576,12 @@ if "$(Platform)" == "Win32" (
 )</Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\DirectXTK\Bin\Desktop_2012\$(Platform)\$(Configuration)\;$(SolutionDir)Dependencies\Lua-5.1.4\LuaLib\Bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DirectXTK.lib;lualib.lib</AdditionalDependencies>
     </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -618,11 +623,12 @@ if "$(Platform)" == "Win32" (
 )</Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\DirectXTK\Bin\Desktop_2012\$(Platform)\$(Configuration)\;$(SolutionDir)Dependencies\Lua-5.1.4\LuaLib\Bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DirectXTK.lib;lualib.lib</AdditionalDependencies>
     </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -667,11 +673,12 @@ if "$(Platform)" == "Win32" (
 )</Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\DirectXTK\Bin\Desktop_2012\$(Platform)\$(Configuration)\;$(SolutionDir)Dependencies\Lua-5.1.4\LuaLib\Bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DirectXTK.lib;lualib.lib</AdditionalDependencies>
     </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -716,11 +723,12 @@ if "$(Platform)" == "Win32" (
 )</Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\DirectXTK\Bin\Desktop_2012\$(Platform)\$(Configuration)\;$(SolutionDir)Dependencies\Lua-5.1.4\LuaLib\Bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DirectXTK.lib;lualib.lib</AdditionalDependencies>
     </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

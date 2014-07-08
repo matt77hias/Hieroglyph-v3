@@ -48,7 +48,7 @@ TextActor::TextActor()
 	GetBody()->SetGeometry( m_pGeometry );
 	GetBody()->SetMaterial( m_pMaterial );
 
-	SpriteFontPtr pSpriteFont = SpriteFontLoaderDX11::LoadFont( std::wstring( L"Consolas" ), 20.0f, 0, true );
+	SpriteFontPtr pSpriteFont = SpriteFontLoaderDX11::LoadFont( std::wstring( L"Consolas" ), 40.0f, 0, true );
 	SetFont( pSpriteFont );
 }
 //--------------------------------------------------------------------------------
@@ -156,6 +156,7 @@ void TextActor::ResetCursor()
 	// advance downward by the scaled size of the character set height.
 
 	m_Cursor = m_Origin;
+	m_LineStart = m_Origin;
 }
 //--------------------------------------------------------------------------------
 void TextActor::AddVertex( const Vector3f& position, const Vector2f& texcoords )
@@ -280,7 +281,7 @@ void TextActor::DrawCharacter( const wchar_t& character )
 	m_pGeometry->AddIndices( baseVertex+3, baseVertex+2, baseVertex+1 );
 
 	// Advance to the next character and the subsequent next location.
-	AdvanceCursor( desc.Width * m_fPhysicalScale );
+	AdvanceCursor( (desc.Width+1) * m_fPhysicalScale );
 }
 //--------------------------------------------------------------------------------
 void TextActor::SetFont( SpriteFontPtr pFont )

@@ -788,6 +788,12 @@
     <ClCompile Include="Animation\Animation.cpp">
       <Filter>Animation</Filter>
     </ClCompile>
+    <ClCompile Include="Scripting\Console.cpp">
+      <Filter>Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\ConsoleActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Application.h">
@@ -1458,6 +1464,12 @@
     </ClInclude>
     <ClInclude Include="Rendering\MeshMTL.h">
       <Filter>Rendering\Pipeline System\Executors\File Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\Console.h">
+      <Filter>Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\ConsoleActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

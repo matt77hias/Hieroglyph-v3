@@ -105,7 +105,7 @@ void App::Initialize()
 	m_pTextActor->SetTextOrientation( Vector3f( 1.0f, 0.0f, 0.0f ), Vector3f( 0.0f, 1.0f, 0.0f ) );
 	m_pTextActor->SetText( std::wstring( L"Hello World! This is some \nsample text!" ) );
 	
-	m_pTextActor->SetColor( Vector4f( 0.0f, 1.0f, 0.0f, 0.5f ) );
+	m_pTextActor->SetColor( Vector4f( 0.0f, 1.0f, 0.0f, 0.6f ) );
 	m_pTextActor->NewLine();
 	m_pTextActor->SetCharacterHeight( 2.0f );
 	m_pTextActor->AppendText( L"Text is colored, scaled, and alpha blended..." );

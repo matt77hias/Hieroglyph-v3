@@ -38,8 +38,12 @@
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-RenderApplication::RenderApplication()
-	: m_bMultithreadedMode( false )
+RenderApplication::RenderApplication() :
+	m_bMultithreadedMode( false ),
+	CameraEventHub(),
+	ConsoleEventHub(),
+	m_InputMode( InputMode::Camera ),
+	m_pConsole( nullptr )
 {
 	m_pRenderer11 = 0;
 	m_pWindow = 0;
@@ -54,6 +58,12 @@ RenderApplication::RenderApplication()
 
 	// Register for window based events here.
 	RequestEvent( WINDOW_RESIZE );
+	RequestEvent( RENDER_FRAME_START );
+    RequestEvent( SYSTEM_RBUTTON_DOWN );
+    RequestEvent( SYSTEM_RBUTTON_UP );
+    RequestEvent( SYSTEM_MOUSE_MOVE );
+    RequestEvent( SYSTEM_MOUSE_LEAVE );
+    RequestEvent( RENDER_FRAME_START );
 }
 //--------------------------------------------------------------------------------
 RenderApplication::~RenderApplication( )
@@ -113,6 +123,11 @@ bool RenderApplication::ConfigureRenderingEngineComponents( UINT width, UINT hei
 
 	SetScreenShotName( GetName() );
 
+	// Create the console actor and 
+
+	m_pConsole = new ConsoleActor();
+	m_pConsole->SetEventManager( &ConsoleEventHub );
+	
 	return( true );
 }
 //--------------------------------------------------------------------------------
@@ -129,7 +144,7 @@ bool RenderApplication::ConfigureRenderingSetup()
 
 
 	m_pCamera = new FirstPersonCamera();
-	m_pCamera->SetEventManager( &EvtManager );
+	m_pCamera->SetEventManager( &CameraEventHub );
 	m_pCamera->GetNode()->Rotation().Rotation( Vector3f( 0.0f, 0.0f, 0.0f ) );
 	m_pCamera->GetNode()->Position() = Vector3f( 0.0f, 10.0f, -20.0f );
 	m_pCamera->SetCameraView( m_pRenderView );
@@ -152,6 +167,7 @@ void RenderApplication::ShutdownRenderingEngineComponents()
 //--------------------------------------------------------------------------------
 void RenderApplication::ShutdownRenderingSetup()
 {
+	SAFE_DELETE( m_pConsole );
 	SAFE_DELETE( m_pScene );
 }
 //--------------------------------------------------------------------------------
@@ -179,7 +195,35 @@ bool RenderApplication::HandleEvent( EventPtr pEvent )
 		if ( key == VK_F1 ) // 'F1' Key - Toggle the multithreading state
 		{
 			ToggleMultiThreadedMode();
-			return( true );
+			return true;
+		}
+		else if ( key == '\t' ) // TAB Key - Toggle the console on and off.
+		{
+			if ( m_InputMode == InputMode::Camera )
+			{
+				m_InputMode = InputMode::Console;
+				m_pScene->GetRoot()->AttachChild( m_pConsole->GetNode() );
+			}
+			else
+			{
+				m_InputMode = InputMode::Camera;
+				m_pScene->GetRoot()->DetachChild( m_pConsole->GetNode() );
+			}
+
+			return true;
+		}
+
+	}
+
+	if ( m_InputMode == InputMode::Camera ) {
+		if ( CameraEventHub.ProcessEvent( pEvent ) ) {
+			return true;
+		}
+	}
+
+	if ( m_InputMode == InputMode::Console ) {
+		if ( ConsoleEventHub.ProcessEvent( pEvent ) ) {
+			return true;
 		}
 	}
 

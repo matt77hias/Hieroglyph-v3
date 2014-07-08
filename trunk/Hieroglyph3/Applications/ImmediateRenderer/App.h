@@ -12,12 +12,11 @@
 #include "GeometryActor.h"
 #include "TextActor.h"
 #include "PointLight.h"
-
+//--------------------------------------------------------------------------------
 using namespace Glyph3;
-
+//--------------------------------------------------------------------------------
 class App : public RenderApplication
 {
-
 public:
 	App();
 	
@@ -39,3 +38,4 @@ protected:
 	TextActor*					m_pTextActor;
 	Actor*						m_pMeshActor;
 };
+//--------------------------------------------------------------------------------

@@ -18,6 +18,7 @@
 #include "ViewTextOverlay.h"
 #include "Camera.h"
 #include "Scene.h"
+#include "ConsoleActor.h"
 
 namespace Glyph3
 {
@@ -65,6 +66,24 @@ namespace Glyph3
 		std::wstring			m_ScreenShotName;
 
 	public:
+		
+		enum class InputMode
+		{
+			Console,
+			Camera
+		};
+
+		// For the camera, we have a reference to the object itself, and
+		// also provide another event manager for it to use.  This allows
+		// us to control when the camera receives events and when they 
+		// should be passed to a different object.
+
+		EventManager			CameraEventHub;
 		Camera*					m_pCamera;
+
+		EventManager			ConsoleEventHub;
+		ConsoleActor*			m_pConsole;
+
+		InputMode				m_InputMode;
 	};
 };

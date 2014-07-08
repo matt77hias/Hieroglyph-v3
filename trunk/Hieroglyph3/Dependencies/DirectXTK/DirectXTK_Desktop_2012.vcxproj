@@ -210,22 +210,22 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>Bin\Desktop_2012\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>Bin\Desktop_2012\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>DirectXTK</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>Bin\Desktop_2012\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>Bin\Desktop_2012\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>DirectXTK</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>Bin\Desktop_2012\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>Bin\Desktop_2012\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>DirectXTK</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>Bin\Desktop_2012\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>Bin\Desktop_2012\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>DirectXTK</TargetName>
   </PropertyGroup>

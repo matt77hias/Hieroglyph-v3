@@ -116,6 +116,7 @@ namespace Glyph3
 		MatrixParameterDX11* m_pViewMatrix;
 		MatrixParameterDX11* m_pProjMatrix;
 		MatrixParameterDX11* m_pWorldViewMatrix;
+		MatrixParameterDX11* m_pWorldProjMatrix;
 		MatrixParameterDX11* m_pViewProjMatrix;
 		MatrixParameterDX11* m_pWorldViewProjMatrix;
 	};

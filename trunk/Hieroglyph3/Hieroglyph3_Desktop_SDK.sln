@@ -12,12 +12,28 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTK_Desktop_2012", "Dependencies\DirectXTK\DirectXTK_Desktop_2012.vcxproj", "{E0B52AE7-E160-4D32-BF3F-910B785E5A8E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GlyphKinect_Desktop", "Extensions\GlyphKinect\GlyphKinect_Desktop.vcxproj", "{035D70FA-C8BE-4002-89BE-F53C8895D3BE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81} = {0F6D257E-70D5-46C5-8A12-7BDF93C35E81}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GlyphCLR", "Extensions\GlyphCLR\GlyphCLR.vcxproj", "{F0C4760E-8186-407E-BE25-C5EC3D3602EB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81} = {0F6D257E-70D5-46C5-8A12-7BDF93C35E81}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GlyphWPF", "Extensions\GlyphWPF\GlyphWPF.vcxproj", "{B6C86DC2-F850-475B-B07F-C1C509CCF8F6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F0C4760E-8186-407E-BE25-C5EC3D3602EB} = {F0C4760E-8186-407E-BE25-C5EC3D3602EB}
+		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81} = {0F6D257E-70D5-46C5-8A12-7BDF93C35E81}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GlyphRift_Desktop", "Extensions\GlyphRift\GlyphRift_Desktop.vcxproj", "{40BFB3A2-3D44-4064-8DBF-07F0C7E574BE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81} = {0F6D257E-70D5-46C5-8A12-7BDF93C35E81}
+		{CCFFB3F0-DDC4-4F01-8116-A5BFC53B331C} = {CCFFB3F0-DDC4-4F01-8116-A5BFC53B331C}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LibOVR", "Dependencies\OculusSDK\LibOVR\Projects\Win32\VS2012\LibOVR.vcxproj", "{CCFFB3F0-DDC4-4F01-8116-A5BFC53B331C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +99,14 @@ Global
 		{40BFB3A2-3D44-4064-8DBF-07F0C7E574BE}.Release|Win32.Build.0 = Release|Win32
 		{40BFB3A2-3D44-4064-8DBF-07F0C7E574BE}.Release|x64.ActiveCfg = Release|x64
 		{40BFB3A2-3D44-4064-8DBF-07F0C7E574BE}.Release|x64.Build.0 = Release|x64
+		{CCFFB3F0-DDC4-4F01-8116-A5BFC53B331C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CCFFB3F0-DDC4-4F01-8116-A5BFC53B331C}.Debug|Win32.Build.0 = Debug|Win32
+		{CCFFB3F0-DDC4-4F01-8116-A5BFC53B331C}.Debug|x64.ActiveCfg = Debug|x64
+		{CCFFB3F0-DDC4-4F01-8116-A5BFC53B331C}.Debug|x64.Build.0 = Debug|x64
+		{CCFFB3F0-DDC4-4F01-8116-A5BFC53B331C}.Release|Win32.ActiveCfg = Release|Win32
+		{CCFFB3F0-DDC4-4F01-8116-A5BFC53B331C}.Release|Win32.Build.0 = Release|Win32
+		{CCFFB3F0-DDC4-4F01-8116-A5BFC53B331C}.Release|x64.ActiveCfg = Release|x64
+		{CCFFB3F0-DDC4-4F01-8116-A5BFC53B331C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

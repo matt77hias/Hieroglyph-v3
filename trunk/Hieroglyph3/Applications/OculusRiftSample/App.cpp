@@ -91,7 +91,7 @@ bool App::ConfigureRenderingSetup()
 	// reactions from user's head movement.
 
 	m_pCamera = new FirstPersonCamera();
-	m_pCamera->SetEventManager( &EvtManager );
+	m_pCamera->SetEventManager( &CameraEventHub );
 	m_pCamera->SetCameraView( m_pRenderView );
 	m_pCamera->SetOverlayView( m_pTextOverlayView );
 	m_pCamera->SetProjectionParams( 0.1f, 1000.0f, static_cast<float>(m_iWidth) / static_cast<float>(m_iHeight), static_cast<float>( GLYPH_PI ) / 4.0f );

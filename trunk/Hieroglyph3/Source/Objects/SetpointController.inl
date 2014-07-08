@@ -19,7 +19,7 @@ SetpointController<T>::SetpointController(
 	m_bActive( false ),
 	m_get(get),
 	m_set(set),
-	m_default(Tween<T>::Linear)
+	m_default(Linear<T>)
 {
 }
 //--------------------------------------------------------------------------------

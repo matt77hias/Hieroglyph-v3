@@ -31,7 +31,7 @@
     <ClInclude Include="ViewRift.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{035D70FA-C8BE-4002-89BE-F53C8895D3BE}</ProjectGuid>
+    <ProjectGuid>{40BFB3A2-3D44-4064-8DBF-07F0C7E574BE}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Hieroglyph3_Desktop</RootNamespace>
   </PropertyGroup>
