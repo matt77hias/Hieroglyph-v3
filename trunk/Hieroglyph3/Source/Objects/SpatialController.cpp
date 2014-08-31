@@ -55,6 +55,16 @@ void SpatialController::SetTranslation( const Vector3f& translation )
 	m_vTranslation = translation;
 }
 //--------------------------------------------------------------------------------
+Vector3f SpatialController::GetRotation()
+{
+	return m_vRotation;
+}
+//--------------------------------------------------------------------------------
+Vector3f SpatialController::GetTranslation()
+{
+	return m_vTranslation;
+}
+//--------------------------------------------------------------------------------
 void SpatialController::RotateBy( const Vector3f& xyz )
 {
 	m_vRotation += xyz;

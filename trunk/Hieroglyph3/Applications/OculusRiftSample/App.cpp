@@ -23,6 +23,7 @@
 
 #include "GlyphRift/RiftController.h"
 #include "GlyphRift/ViewRift.h"
+#include "SwapChainConfigDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -31,6 +32,63 @@ App AppInstance; // Provides an instance of the application
 App::App()
 {
 	
+}
+//--------------------------------------------------------------------------------
+bool App::ConfigureRenderingEngineComponents( UINT width, UINT height, D3D_FEATURE_LEVEL desiredLevel, D3D_DRIVER_TYPE driverType )
+{
+	// Create the renderer and initialize it for the desired device
+	// type and feature level.
+
+	m_pRenderer11 = new RendererDX11();
+
+	if ( !m_pRenderer11->Initialize( driverType, desiredLevel ) )
+	{
+		Log::Get().Write( L"Could not create hardware device, trying to create the reference device..." );
+
+		if ( !m_pRenderer11->Initialize( D3D_DRIVER_TYPE_REFERENCE, D3D_FEATURE_LEVEL_11_0 ) )
+		{
+			MessageBox( 0, L"Could not create a hardware or software Direct3D 11 device - the program will now abort!", L"Hieroglyph 3 Rendering", MB_ICONEXCLAMATION | MB_SYSTEMMODAL );
+			RequestTermination();			
+			return( false );
+		}
+
+		// If using the reference device, utilize a fixed time step for any animations.
+		m_pTimer->SetFixedTimeStep( 1.0f / 10.0f );
+	}
+
+	// Create the window.
+	m_iWidth = width;
+	m_iHeight = height;
+
+	// Create the window wrapper class instance.
+	m_pWindow = CreateRenderWindow();
+	m_pWindow->SetPosition( 20, 20 );
+	m_pWindow->SetSize( m_iWidth, m_iHeight );
+	m_pWindow->SetCaption( GetName() );
+	m_pWindow->Initialize( this );
+
+	// Create a swap chain for the window.
+	SwapChainConfigDX11 Config;
+	Config.SetWidth( m_pWindow->GetWidth() );
+	Config.SetHeight( m_pWindow->GetHeight() );
+	Config.SetFormat( DXGI_FORMAT_R8G8B8A8_UNORM_SRGB );
+	Config.SetOutputWindow( m_pWindow->GetHandle() );
+	m_pWindow->SetSwapChain( m_pRenderer11->CreateSwapChain( &Config ) );
+
+	// We'll keep a copy of the swap chain's render target index to 
+	// use later.
+	m_BackBuffer = m_pRenderer11->GetSwapChainResource( m_pWindow->GetSwapChain() );
+
+	SetMultiThreadedMode( true );
+
+	SetScreenShotName( GetName() );
+
+	// Create the console actor and 
+
+	m_pConsole = new ConsoleActor();
+	m_pConsole->SetEventManager( &ConsoleEventHub );
+	
+	return( true );
 }
 //--------------------------------------------------------------------------------
 bool App::ConfigureEngineComponents()

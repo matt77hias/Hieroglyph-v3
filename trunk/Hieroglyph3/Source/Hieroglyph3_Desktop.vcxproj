@@ -97,6 +97,7 @@
     <ClCompile Include="Objects\SkinnedBoneController.cpp" />
     <ClCompile Include="Objects\SpatialController.cpp" />
     <ClCompile Include="Objects\TextActor.cpp" />
+    <ClCompile Include="Objects\TextureActor.cpp" />
     <ClCompile Include="Objects\TextureSpaceCameraPositionWriter.cpp" />
     <ClCompile Include="Objects\TextureSpaceLightPositionWriter.cpp" />
     <ClCompile Include="Objects\VolumeActor.cpp" />
@@ -192,6 +193,7 @@
     <ClCompile Include="Rendering\Texture2dDX11.cpp" />
     <ClCompile Include="Rendering\Texture3dConfigDX11.cpp" />
     <ClCompile Include="Rendering\Texture3dDX11.cpp" />
+    <ClCompile Include="Rendering\TexturedVertex.cpp" />
     <ClCompile Include="Rendering\UnorderedAccessParameterDX11.cpp" />
     <ClCompile Include="Rendering\UnorderedAccessParameterWriterDX11.cpp" />
     <ClCompile Include="Rendering\UnorderedAccessViewConfigDX11.cpp" />
@@ -310,6 +312,7 @@
     <ClInclude Include="Objects\SkinnedBoneController.h" />
     <ClInclude Include="Objects\SpatialController.h" />
     <ClInclude Include="Objects\TextActor.h" />
+    <ClInclude Include="Objects\TextureActor.h" />
     <ClInclude Include="Objects\TextureSpaceCameraPositionWriter.h" />
     <ClInclude Include="Objects\TextureSpaceLightPositionWriter.h" />
     <ClInclude Include="Objects\VolumeActor.h" />
@@ -414,6 +417,7 @@
     <ClInclude Include="Rendering\Texture2dDX11.h" />
     <ClInclude Include="Rendering\Texture3dConfigDX11.h" />
     <ClInclude Include="Rendering\Texture3dDX11.h" />
+    <ClInclude Include="Rendering\TexturedVertex.h" />
     <ClInclude Include="Rendering\TGrowableBufferDX11.h" />
     <ClInclude Include="Rendering\TGrowableIndexBufferDX11.h" />
     <ClInclude Include="Rendering\TGrowableStructuredBufferDX11.h" />
@@ -460,6 +464,7 @@
     <None Include="Mathematics\Quaternion.inl" />
     <None Include="Mathematics\Tween.inl" />
     <None Include="Objects\SetpointController.inl" />
+    <None Include="packages.config" />
     <None Include="Rendering\DrawExecutorDX11.inl" />
     <None Include="Rendering\DrawIndexedExecutorDX11.inl" />
     <None Include="Rendering\DrawIndexedInstancedExecutorDX11.inl" />
@@ -542,7 +547,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation;..\Dependencies\DirectXTK\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessToFile>false</PreprocessToFile>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -576,8 +581,8 @@ if "$(Platform)" == "Win32" (
 )</Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\DirectXTK\Bin\Desktop_2012\$(Platform)\$(Configuration)\;$(SolutionDir)Dependencies\Lua-5.1.4\LuaLib\Bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DirectXTK.lib;lualib.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Lua-5.1.4\LuaLib\Bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lualib.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -590,7 +595,7 @@ if "$(Platform)" == "Win32" (
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation;..\Dependencies\DirectXTK\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessToFile>false</PreprocessToFile>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
@@ -623,8 +628,8 @@ if "$(Platform)" == "Win32" (
 )</Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\DirectXTK\Bin\Desktop_2012\$(Platform)\$(Configuration)\;$(SolutionDir)Dependencies\Lua-5.1.4\LuaLib\Bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DirectXTK.lib;lualib.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Lua-5.1.4\LuaLib\Bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lualib.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -639,7 +644,7 @@ if "$(Platform)" == "Win32" (
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation;..\Dependencies\DirectXTK\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
@@ -673,8 +678,8 @@ if "$(Platform)" == "Win32" (
 )</Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\DirectXTK\Bin\Desktop_2012\$(Platform)\$(Configuration)\;$(SolutionDir)Dependencies\Lua-5.1.4\LuaLib\Bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DirectXTK.lib;lualib.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Lua-5.1.4\LuaLib\Bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lualib.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -689,7 +694,7 @@ if "$(Platform)" == "Win32" (
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation;..\Dependencies\DirectXTK\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Application;Mathematics;Scripting;Utility;Events;Rendering;Geometry;Intersection;Objects;Animation;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
@@ -723,8 +728,8 @@ if "$(Platform)" == "Win32" (
 )</Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\DirectXTK\Bin\Desktop_2012\$(Platform)\$(Configuration)\;$(SolutionDir)Dependencies\Lua-5.1.4\LuaLib\Bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DirectXTK.lib;lualib.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Lua-5.1.4\LuaLib\Bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lualib.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -732,5 +737,12 @@ if "$(Platform)" == "Win32" (
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\directxtk.2.22.13.23\build\native\directxtk.targets" Condition="Exists('..\packages\directxtk.2.22.13.23\build\native\directxtk.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\directxtk.2.22.13.23\build\native\directxtk.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk.2.22.13.23\build\native\directxtk.targets'))" />
+  </Target>
 </Project>

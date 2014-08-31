@@ -115,7 +115,7 @@ copy *.h ..\..\SDK\Include\GlyphRift
     </PostBuildEvent>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\$(PlatformName)\VS2012\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libovrd.lib</AdditionalDependencies>
+      <AdditionalDependencies>libovrd.lib;Hieroglyph3_Desktop.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -142,7 +142,7 @@ copy *.h ..\..\SDK\Include\GlyphRift
     </PostBuildEvent>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\$(PlatformName)\VS2012\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libovr64d.lib</AdditionalDependencies>
+      <AdditionalDependencies>libovr64d.lib;Hieroglyph3_Desktop.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -173,7 +173,7 @@ copy *.h ..\..\SDK\Include\GlyphRift
     </PostBuildEvent>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\$(PlatformName)\VS2012\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libovr.lib</AdditionalDependencies>
+      <AdditionalDependencies>libovr.lib;Hieroglyph3_Desktop.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -204,7 +204,7 @@ copy *.h ..\..\SDK\Include\GlyphRift
     </PostBuildEvent>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\$(PlatformName)\VS2012\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libovr64.lib</AdditionalDependencies>
+      <AdditionalDependencies>libovr64.lib;Hieroglyph3_Desktop.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>

@@ -222,8 +222,8 @@ namespace Glyph3
 
 		Vector2f GetDesktopResolution();
 
-		ResourcePtr LoadTexture( std::wstring filename /*, D3DX11_IMAGE_LOAD_INFO* pLoadInfo = NULL*/ );
-		ResourcePtr LoadTexture( void* pData, SIZE_T sizeInBytes /*, D3DX11_IMAGE_LOAD_INFO* pLoadInfo = NULL*/ );
+		ResourcePtr LoadTexture( std::wstring filename, bool sRGB = false );
+		ResourcePtr LoadTexture( void* pData, SIZE_T sizeInBytes );
 		
 		// NOTE: This method is likely to be removed in the near future, since there should not
 		//       be any situations where there is a raw texture pointer being given to the renderer!

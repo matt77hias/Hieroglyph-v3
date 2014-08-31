@@ -1267,17 +1267,23 @@ int RendererDX11::CreateInputLayout( std::vector<D3D11_INPUT_ELEMENT_DESC>& elem
 	return( m_vInputLayouts.size() - 1 );
 }
 //--------------------------------------------------------------------------------
-ResourcePtr RendererDX11::LoadTexture( std::wstring filename /*, D3DX11_IMAGE_LOAD_INFO* pLoadInfo*/ )
+ResourcePtr RendererDX11::LoadTexture( std::wstring filename, bool sRGB )
 {
 	ComPtr<ID3D11Resource> pResource;
 
 	FileSystem fs;
 	filename = fs.GetTextureFolder() + filename;
 
-	HRESULT hr = DirectX::CreateWICTextureFromFile(
+	HRESULT hr = DirectX::CreateWICTextureFromFileEx(
 		m_pDevice.Get(),
 		pImmPipeline->m_pContext.Get(),
 		filename.c_str(),
+		0,
+		D3D11_USAGE_DEFAULT,
+		D3D11_BIND_SHADER_RESOURCE,
+		0,
+		0,
+		sRGB,
 		pResource.GetAddressOf(),
 		0 );
 

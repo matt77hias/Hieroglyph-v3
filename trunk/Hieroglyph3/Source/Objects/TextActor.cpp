@@ -31,8 +31,8 @@ TextActor::TextActor()
 	  m_fPhysicalScale( m_fCharacterHeight / 20.0f ),
 	  m_fTextureXScale( 0.1f ),
 	  m_fTextureYScale( 0.1f ),
-	  m_TextReference( TOP ),
-	  m_LineJustification( LEFT )
+	  m_TextReference( TextOriginReference::TOP ),
+	  m_LineJustification( LineJustification::LEFT )
 {
 	RendererDX11* pRenderer = RendererDX11::Get();
 
@@ -106,13 +106,13 @@ void TextActor::SetTextOrigin( const Vector3f& location )
 
 	switch ( m_TextReference )
 	{
-	case TOP:
+	case TextOriginReference::TOP:
 		m_Origin = location;
 		break;
-	case MIDDLE:
+	case TextOriginReference::MIDDLE:
 		m_Origin = location + m_ydir * m_fCharacterHeight * 0.5f;
 		break;
-	case BOTTOM:
+	case TextOriginReference::BOTTOM:
 		m_Origin = location + m_ydir * m_fCharacterHeight * 1.0f;
 		break;
 	}
@@ -195,14 +195,14 @@ void TextActor::DrawLine( const std::wstring& text )
 
 	switch( m_LineJustification )
 	{
-	case LEFT:
+	case LineJustification::LEFT:
 		// No change needed - just draw the text from teh current cursor position
 		break;
-	case MIDDLE:
+	case LineJustification::CENTER:
 		// Advance cursor to the 'left' by half the string width
 		AdvanceCursor( -fWidth * 0.5f );
 		break;
-	case RIGHT:
+	case LineJustification::RIGHT:
 		// Advance the cursor by the full size of the string.
 		AdvanceCursor( -fWidth );
 	}

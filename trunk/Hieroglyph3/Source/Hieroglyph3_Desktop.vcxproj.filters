@@ -794,6 +794,12 @@
     <ClCompile Include="Objects\ConsoleActor.cpp">
       <Filter>Objects\Scene Objects\Actors</Filter>
     </ClCompile>
+    <ClCompile Include="Objects\TextureActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\TexturedVertex.cpp">
+      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Application.h">
@@ -1471,6 +1477,12 @@
     <ClInclude Include="Objects\ConsoleActor.h">
       <Filter>Objects\Scene Objects\Actors</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\TextureActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\TexturedVertex.h">
+      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Rendering\TGrowableIndexBufferDX11.inl">
@@ -1515,5 +1527,6 @@
     <None Include="Mathematics\Quaternion.inl">
       <Filter>Mathematics</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

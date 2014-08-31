@@ -9,37 +9,42 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// GlyphString
+// TextureActor
 //
 //--------------------------------------------------------------------------------
-#ifndef GlyphString_h
-#define GlyphString_h
+#ifndef TextureActor_h
+#define TextureActor_h
 //--------------------------------------------------------------------------------
-#include "PCH.h"
+#include "Actor.h"
+#include "TexturedVertex.h"
+#include "DrawExecutorDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class GlyphString
+	
+
+	class TextureActor : public Actor
 	{
 	public:
-		static std::string ToAscii( const std::wstring& input );
-		static std::wstring ToUnicode( const std::string& input );            
+		TextureActor( const ResourcePtr& texture, float scale = 1.0f );
+		virtual ~TextureActor();
 
-	private:
-		GlyphString();
-		
+		void SetTexture( const ResourcePtr& texture, float scale = 1.0f );
+
+		void SetColor( const Vector4f& color );
+		Vector4f GetColor( );
+
+	protected:
+
+		typedef std::shared_ptr<DrawExecutorDX11<TexturedVertex::Vertex>> DrawGeometryPtr;
+
+		DrawGeometryPtr							m_pGeometry;
+		MaterialPtr								m_pMaterial;
+		ResourcePtr								m_Texture;
+		Vector4f								m_Color;
+		float									m_scale;
 	};
-
-    // Converts a number to a string
-    template<typename T> inline std::wstring ToString(const T& val)
-    {
-        std::wostringstream stream;
-        if (!(stream << val))
-            return L"";
-        return stream.str();
-    }
 };
 //--------------------------------------------------------------------------------
-#endif // GlyphString_h
+#endif // TextureActor_h
 //--------------------------------------------------------------------------------
-

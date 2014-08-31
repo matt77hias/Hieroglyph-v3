@@ -23,6 +23,8 @@ class App : public RenderApplication
 public:
 	App();
 	
+	virtual bool ConfigureRenderingEngineComponents( UINT width, UINT height, D3D_FEATURE_LEVEL desiredLevel, D3D_DRIVER_TYPE driverType = D3D_DRIVER_TYPE_HARDWARE );
+
 	virtual bool ConfigureEngineComponents();
 	virtual void ShutdownEngineComponents();
 

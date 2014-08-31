@@ -39,14 +39,14 @@ namespace Glyph3
 {
 	typedef std::shared_ptr<DrawIndexedExecutorDX11<BasicVertexDX11::Vertex>> IndexedImmediateGeometryPtr;
 
-	enum TextOriginReference
+	enum class TextOriginReference
 	{
 		TOP,
 		MIDDLE,
 		BOTTOM
 	};
 
-	enum LineJustification
+	enum class LineJustification
 	{
 		LEFT,
 		CENTER,
@@ -129,3 +129,4 @@ namespace Glyph3
 };
 //--------------------------------------------------------------------------------
 #endif // TextActor_h
+//--------------------------------------------------------------------------------

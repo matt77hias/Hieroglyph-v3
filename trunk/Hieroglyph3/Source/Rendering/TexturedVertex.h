@@ -9,37 +9,39 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// GlyphString
+// TexturedVertex
 //
+// This class represents a textured vertex, with only a position and texture
+// coordinate.  This is intended to be used with a material that can provide
+// a texture SRV, and most likely also a color value to apply to the texture.  
+// That color would also provide an alpha value for transparency applied to the
+// texture.
 //--------------------------------------------------------------------------------
-#ifndef GlyphString_h
-#define GlyphString_h
+#ifndef TexturedVertex_h
+#define TexturedVertex_h
 //--------------------------------------------------------------------------------
 #include "PCH.h"
+#include "Vector2f.h"
+#include "Vector3f.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class GlyphString
+	class TexturedVertex
 	{
+
 	public:
-		static std::string ToAscii( const std::wstring& input );
-		static std::wstring ToUnicode( const std::string& input );            
+		TexturedVertex();
+		~TexturedVertex();
 
-	private:
-		GlyphString();
-		
+		struct Vertex {
+			Vector3f position;
+			Vector2f texcoords;
+		};
+
+		static unsigned int GetElementCount();
+		static D3D11_INPUT_ELEMENT_DESC Elements[2];
 	};
-
-    // Converts a number to a string
-    template<typename T> inline std::wstring ToString(const T& val)
-    {
-        std::wostringstream stream;
-        if (!(stream << val))
-            return L"";
-        return stream.str();
-    }
 };
 //--------------------------------------------------------------------------------
-#endif // GlyphString_h
+#endif // TexturedVertex_h
 //--------------------------------------------------------------------------------
-

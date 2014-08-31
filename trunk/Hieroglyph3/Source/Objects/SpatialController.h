@@ -32,6 +32,9 @@ namespace Glyph3
 		void SetRotation( const Vector3f& xyz );
 		void SetTranslation( const Vector3f& translation );
 
+		Vector3f GetRotation();
+		Vector3f GetTranslation();
+
 		void RotateBy( const Vector3f& xyz );
 		void RotateXBy( const float x );
 		void RotateYBy( const float y );
