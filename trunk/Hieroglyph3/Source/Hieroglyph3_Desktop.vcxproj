@@ -78,6 +78,7 @@
     <ClCompile Include="Objects\ConsoleActor.cpp" />
     <ClCompile Include="Objects\Entity3D.cpp" />
     <ClCompile Include="Objects\FirstPersonCamera.cpp" />
+    <ClCompile Include="Objects\FullscreenActor.cpp" />
     <ClCompile Include="Objects\GeometryActor.cpp">
       <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</PreprocessToFile>
       <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</PreprocessToFile>
@@ -95,6 +96,7 @@
     <ClCompile Include="Objects\ScaleSetpointController.cpp" />
     <ClCompile Include="Objects\SkinnedActor.cpp" />
     <ClCompile Include="Objects\SkinnedBoneController.cpp" />
+    <ClCompile Include="Objects\SkyboxActor.cpp" />
     <ClCompile Include="Objects\SpatialController.cpp" />
     <ClCompile Include="Objects\TextActor.cpp" />
     <ClCompile Include="Objects\TextureActor.cpp" />
@@ -295,6 +297,7 @@
     <ClInclude Include="Objects\ConsoleActor.h" />
     <ClInclude Include="Objects\Entity3D.h" />
     <ClInclude Include="Objects\FirstPersonCamera.h" />
+    <ClInclude Include="Objects\FullscreenActor.h" />
     <ClInclude Include="Objects\GeometryActor.h" />
     <ClInclude Include="Objects\GlyphletActor.h" />
     <ClInclude Include="Objects\IController.h" />
@@ -310,6 +313,7 @@
     <ClInclude Include="Objects\SetpointController.h" />
     <ClInclude Include="Objects\SkinnedActor.h" />
     <ClInclude Include="Objects\SkinnedBoneController.h" />
+    <ClInclude Include="Objects\SkyboxActor.h" />
     <ClInclude Include="Objects\SpatialController.h" />
     <ClInclude Include="Objects\TextActor.h" />
     <ClInclude Include="Objects\TextureActor.h" />

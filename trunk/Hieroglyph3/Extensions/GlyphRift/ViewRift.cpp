@@ -133,12 +133,23 @@ void ViewRift::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterMan
 
 		for ( unsigned int eye = 0; eye < 2; ++eye )
 		{
-			// Set up the view matrices for each eye
-			Matrix4f centerView = GetViewMatrix();
-			m_view[eye] = centerView * m_pHmd->GetEyeTranslation( eye );
+			// Set up the view matrices for this eye.  This starts by getting the 
+			// view matrix from the node that this view's entity is attached to.  
+			// That represents the camera's node (instead of its body).  We then apply
+			// the eye's spatial state (including position and orientation) to that
+			// parent location.
+			//
+			// NOTE: This view's entity location and orientation is updated according
+			//       to the Rift's *head* location.  That provides an approximate location
+			//       for using to visualize the location of the rift in world space.
+			//       This is why we need to grab the parent's view - the eye matrices are
+			//       in relation to the whole rift, as opposed to relative to the head.
+
+			Matrix4f centerView = m_pEntity->GetParent()->GetView();	
+			m_view[eye] = centerView * m_pHmd->GetEyeSpatialState( eye );
 
 			// Render the LEFT eye first
-			m_pHmd->BeginEyeRender( eye );
+			//m_pHmd->BeginEyeRender( eye );
 
 			// Set the parameters for rendering this view
 			pPipelineManager->ClearRenderTargets();
@@ -172,7 +183,7 @@ void ViewRift::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterMan
 				m_pDebugVisualizer->GetBody()->Render( pPipelineManager, pParamManager, VT_PERSPECTIVE );
 			}
 
-			m_pHmd->EndEyeRender( eye );
+			//m_pHmd->EndEyeRender( eye );
 		}
 	}
 }

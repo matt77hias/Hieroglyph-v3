@@ -13,7 +13,7 @@
 //
 // ViewRift provides a rendering task for producing the stereoscopic view for use
 // with an Oculus Rift Head Mounted Display (HMD).  This code is based on the 
-// OculusSDK v0.3.2, and uses its C-API.
+// OculusSDK v0.4.2, and uses its C-API.
 //--------------------------------------------------------------------------------
 #ifndef ViewRift_h
 #define ViewRift_h

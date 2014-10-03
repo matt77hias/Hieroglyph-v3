@@ -21,8 +21,6 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	
-
 	class TextureActor : public Actor
 	{
 	public:

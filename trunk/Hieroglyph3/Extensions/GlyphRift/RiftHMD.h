@@ -47,10 +47,9 @@ namespace Glyph3
 		Matrix3f GetOrientation( double time );
 		Matrix4f GetPerspectiveFov( unsigned int eye, float zn, float zf );
 		Matrix4f GetEyeTranslation( unsigned int eye );
+		Matrix4f GetEyeSpatialState( unsigned int eye );
 
 		float BeginFrame();
-		void BeginEyeRender( unsigned int eye );
-		void EndEyeRender( unsigned int eye );
 		void EndFrame();
 
 	private:

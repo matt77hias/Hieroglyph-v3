@@ -50,12 +50,12 @@ struct RiftHMD::Impl
 		if ( !m_hmd ) throw std::invalid_argument( "No HMD Devices were found!" );
 	
 		// Start the sensor which provides the Rift’s pose and motion.
-		ovrHmd_StartSensor( m_hmd, ovrSensorCap_Orientation |
-								ovrSensorCap_YawCorrection |
-								ovrSensorCap_Position, 0 );
+		ovrHmd_ConfigureTracking( m_hmd, 
+			ovrTrackingCap_Orientation |
+			ovrTrackingCap_MagYawCorrection | 
+			ovrTrackingCap_Position, 0);
 
-		ovrHmdDesc hmdDesc;
-		ovrHmd_GetDesc( m_hmd, &hmdDesc );
+		ovrHmdDesc hmdDesc = *m_hmd;
 
 		// Initialize FovSideTanMax, which allows us to change all Fov sides at once - Fov
 		// starts at default and is clamped to this value.
@@ -78,16 +78,14 @@ struct RiftHMD::Impl
 	//--------------------------------------------------------------------------------
 	unsigned int HmdDisplayWidth()
 	{
-		ovrHmdDesc hmdDesc;
-		ovrHmd_GetDesc( m_hmd, &hmdDesc );
+		ovrHmdDesc hmdDesc = *m_hmd;
 
 		return hmdDesc.Resolution.w;
 	}
 	//--------------------------------------------------------------------------------
 	unsigned int HmdDisplayHeight()
 	{
-		ovrHmdDesc hmdDesc;
-		ovrHmd_GetDesc( m_hmd, &hmdDesc );
+		ovrHmdDesc hmdDesc = *m_hmd;
 
 		return hmdDesc.Resolution.h;
 	}
@@ -97,8 +95,7 @@ struct RiftHMD::Impl
 		// Get the desired texture sizes for the render targets.  Note that these are
 		// typically larger than the resolution of the display panel itself.
 
-		ovrHmdDesc hmdDesc;
-		ovrHmd_GetDesc( m_hmd, &hmdDesc );
+		ovrHmdDesc hmdDesc = *m_hmd;
 
 		OVR::Sizei tex0Size = ovrHmd_GetFovTextureSize( m_hmd, ovrEye_Left, hmdDesc.DefaultEyeFov[ovrEye_Left], 1.0f );
 		OVR::Sizei tex1Size = ovrHmd_GetFovTextureSize( m_hmd, ovrEye_Right, hmdDesc.DefaultEyeFov[ovrEye_Right], 1.0f );
@@ -111,8 +108,7 @@ struct RiftHMD::Impl
 		// Get the desired texture sizes for the render targets.  Note that these are
 		// typically larger than the resolution of the display panel itself.
 
-		ovrHmdDesc hmdDesc;
-		ovrHmd_GetDesc( m_hmd, &hmdDesc );
+		ovrHmdDesc hmdDesc = *m_hmd;
 
 		OVR::Sizei tex0Size = ovrHmd_GetFovTextureSize( m_hmd, ovrEye_Left, hmdDesc.DefaultEyeFov[ovrEye_Left], 1.0f );
 		OVR::Sizei tex1Size = ovrHmd_GetFovTextureSize( m_hmd, ovrEye_Right, hmdDesc.DefaultEyeFov[ovrEye_Right], 1.0f );
@@ -123,21 +119,19 @@ struct RiftHMD::Impl
 	Matrix3f GetOrientation( double time )
 	{
 		// Query the HMD for the sensor state at a given time. "0.0" means "most recent time".
-		ovrSensorState ss = ovrHmd_GetSensorState( m_hmd, 0.0 );
+		ovrTrackingState ts = ovrHmd_GetTrackingState( m_hmd, 0.0 );
 
 		Matrix3f orientation;
 		orientation.MakeIdentity();
 
-		if ( ss.StatusFlags & ( ovrStatus_OrientationTracked | ovrStatus_PositionTracked ) )
+		if ( ts.StatusFlags & ( ovrStatus_OrientationTracked | ovrStatus_PositionTracked ) )
 		{
 			float yaw, eyePitch, eyeRoll = 0.0f;
 		
-			// Get the most recent pose information from the sensor state
-			OVR::Transformf movePose = ss.Recorded.Pose; //ss.Predicted.Pose;
-		
-			// Get the Euler angles from teh quaternion
-			movePose.Rotation.GetEulerAngles< OVR::Axis_Y, OVR::Axis_X, OVR::Axis_Z, OVR::Rotate_CCW, OVR::Handed_L >( &yaw, &eyePitch, &eyeRoll );
-	
+			// Get the pos of the head, and then extract the rotation angles
+			OVR::Posef pose = ts.HeadPose.ThePose;
+			pose.Rotation.GetEulerAngles<OVR::Axis_Y, OVR::Axis_X, OVR::Axis_Z>(&yaw, &eyePitch, &eyeRoll);
+			
 			// Apply those angles to our rotation matrix
 			orientation.Rotation( Vector3f( eyePitch, yaw, -eyeRoll ) );
 		}
@@ -193,6 +187,21 @@ struct RiftHMD::Impl
 											eyeRenderDesc[eye].ViewAdjust.z );
 	}
 	//--------------------------------------------------------------------------------
+	Matrix4f GetEyeSpatialState( unsigned int eye )
+	{
+		eyePose[eye] = ovrHmd_GetEyePose( m_hmd, static_cast<ovrEyeType>(eye) );
+
+		float yaw, eyePitch, eyeRoll = 0.0f;
+		OVR::Posef pose = eyePose[eye];
+		pose.Rotation.GetEulerAngles<OVR::Axis_Y, OVR::Axis_X, OVR::Axis_Z>(&yaw, &eyePitch, &eyeRoll);
+			
+		// Apply those angles to our rotation matrix
+		Matrix4f orientation = Matrix4f::RotationMatrixXYZ( eyePitch, yaw, -eyeRoll );
+		Matrix4f translation = Matrix4f::TranslationMatrix( pose.Translation.x, pose.Translation.y, pose.Translation.z );
+
+		return orientation * translation;
+	}
+	//--------------------------------------------------------------------------------
 	float BeginFrame()
 	{
 		ovrFrameTiming frameTiming = ovrHmd_BeginFrame( m_hmd, 0 );
@@ -200,20 +209,9 @@ struct RiftHMD::Impl
 		return( frameTiming.DeltaSeconds );
 	}
 	//--------------------------------------------------------------------------------
-	void BeginEyeRender( unsigned int eye )
-	{
-		assert( eye == 0 || eye == 1 );
-		eyePose[eye] = ovrHmd_BeginEyeRender( m_hmd, static_cast<ovrEyeType>( eye ) );
-	}
-	//--------------------------------------------------------------------------------
-	void EndEyeRender( unsigned int eye )
-	{
-		ovrHmd_EndEyeRender( m_hmd, static_cast<ovrEyeType>( eye ), eyePose[eye], &eyeTexture[eye].Texture);
-	}
-	//--------------------------------------------------------------------------------
 	void EndFrame()
 	{
-		ovrHmd_EndFrame( m_hmd );
+		ovrHmd_EndFrame( m_hmd, eyePose, eyeTexture );
 	}
 	//--------------------------------------------------------------------------------
 	void ConfigureRendering( const ResourcePtr& renderTarget, int swapchain )
@@ -247,18 +245,18 @@ struct RiftHMD::Impl
 		// Get the size of the passed in texture.
 		D3D11_TEXTURE2D_DESC desc = RendererDX11::Get()->GetTexture2DByIndex( texture->m_iResource )->GetActualDescription();
 
-		eyeTexture[eye].D3D11.Header.API = ovrRenderAPI_D3D11;
-		eyeTexture[eye].D3D11.Header.TextureSize = OVR::Sizei( desc.Width, desc.Height );
-		eyeTexture[eye].D3D11.Header.RenderViewport = OVR::Recti( 0, 0, desc.Width, desc.Height );
-		eyeTexture[eye].D3D11.pTexture = static_cast<ID3D11Texture2D*>( RendererDX11::Get()->GetTexture2DByIndex( texture->m_iResource )->GetResource() );
-		eyeTexture[eye].D3D11.pSRView = RendererDX11::Get()->GetShaderResourceViewByIndex( texture->m_iResourceSRV ).GetSRV();
+		((ovrD3D11Texture*)eyeTexture)[eye].D3D11.Header.API = ovrRenderAPI_D3D11;
+		((ovrD3D11Texture*)eyeTexture)[eye].D3D11.Header.TextureSize = OVR::Sizei( desc.Width, desc.Height );
+		((ovrD3D11Texture*)eyeTexture)[eye].D3D11.Header.RenderViewport = OVR::Recti( 0, 0, desc.Width, desc.Height );
+		((ovrD3D11Texture*)eyeTexture)[eye].D3D11.pTexture = static_cast<ID3D11Texture2D*>( RendererDX11::Get()->GetTexture2DByIndex( texture->m_iResource )->GetResource() );
+		((ovrD3D11Texture*)eyeTexture)[eye].D3D11.pSRView = RendererDX11::Get()->GetShaderResourceViewByIndex( texture->m_iResourceSRV ).GetSRV();
 	}
 	//--------------------------------------------------------------------------------
 	RiftManagerPtr m_RiftMgr;
 	ovrHmd m_hmd;
 	ovrFovPort eyeFov[2];
 	ovrEyeRenderDesc eyeRenderDesc[2];
-	ovrD3D11Texture eyeTexture[2];
+	ovrTexture eyeTexture[2];
 	ovrPosef eyePose[2];
 };
 //--------------------------------------------------------------------------------
@@ -311,19 +309,14 @@ Matrix4f RiftHMD::GetEyeTranslation( unsigned int eye )
 	return m_pImpl->GetEyeTranslation( eye );
 }
 //--------------------------------------------------------------------------------
+Matrix4f RiftHMD::GetEyeSpatialState( unsigned int eye )
+{
+	return m_pImpl->GetEyeSpatialState( eye );
+}
+//--------------------------------------------------------------------------------
 float RiftHMD::BeginFrame()
 {
 	return m_pImpl->BeginFrame();
-}
-//--------------------------------------------------------------------------------
-void RiftHMD::BeginEyeRender( unsigned int eye )
-{
-	return m_pImpl->BeginEyeRender( eye );
-}
-//--------------------------------------------------------------------------------
-void RiftHMD::EndEyeRender( unsigned int eye )
-{
-	return m_pImpl->EndEyeRender( eye );
 }
 //--------------------------------------------------------------------------------
 void RiftHMD::EndFrame()

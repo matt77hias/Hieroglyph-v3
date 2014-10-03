@@ -296,6 +296,21 @@ void Matrix4f::SetRotation( const Matrix3f& Rot )
             m_afEntry[I(i,j)] = Rot[(3*i+j)];
 }
 //----------------------------------------------------------------------------------------------------
+Matrix4f Matrix4f::RotationMatrixXYZ( float fRadiansX, float fRadiansY, float fRadiansZ )
+{
+	//Matrix4f mRot1;
+	//Matrix4f mRot2;
+	//
+	//mRot1.RotationZ(fRadiansZ);
+	//mRot2.RotationX(fRadiansX);
+	//mRot1 *= mRot2;
+	//mRot2.RotationY(fRadiansY);
+	//mRot1 *= mRot2;
+	//*this = mRot1;
+
+	return Matrix4f::RotationMatrixZ( fRadiansZ ) * Matrix4f::RotationMatrixX( fRadiansX ) * Matrix4f::RotationMatrixY( fRadiansY );
+}
+//----------------------------------------------------------------------------------------------------
 Matrix4f Matrix4f::RotationMatrixX( float fRadians )
 {
 	Matrix4f ret;

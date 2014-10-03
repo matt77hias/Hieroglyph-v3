@@ -81,6 +81,7 @@
 #include "D3DEnumConversion.h"
 
 #include "WICTextureLoader.h"
+#include "DDSTextureLoader.h"
 
 // Library imports
 #pragma comment( lib, "d3d11.lib" )
@@ -1274,18 +1275,43 @@ ResourcePtr RendererDX11::LoadTexture( std::wstring filename, bool sRGB )
 	FileSystem fs;
 	filename = fs.GetTextureFolder() + filename;
 
-	HRESULT hr = DirectX::CreateWICTextureFromFileEx(
-		m_pDevice.Get(),
-		pImmPipeline->m_pContext.Get(),
-		filename.c_str(),
-		0,
-		D3D11_USAGE_DEFAULT,
-		D3D11_BIND_SHADER_RESOURCE,
-		0,
-		0,
-		sRGB,
-		pResource.GetAddressOf(),
-		0 );
+	// Test whether this is a DDS file or not.
+	std::wstring extension = filename.substr( filename.size()-3, 3 );
+	std::transform( extension.begin(), extension.end(), extension.begin(), ::tolower );
+
+	HRESULT hr = S_OK;
+
+	if ( extension == L"dds" ) 
+	{
+		hr = DirectX::CreateDDSTextureFromFile(
+			m_pDevice.Get(),
+			filename.c_str(),
+			//0,
+			//D3D11_USAGE_DEFAULT,
+			//D3D11_BIND_SHADER_RESOURCE,
+			//0,
+			//0,
+			//sRGB,
+			pResource.GetAddressOf(),
+			nullptr );
+	}
+	else
+	{
+		hr = DirectX::CreateWICTextureFromFileEx(
+			m_pDevice.Get(),
+			pImmPipeline->m_pContext.Get(),
+			filename.c_str(),
+			0,
+			D3D11_USAGE_DEFAULT,
+			D3D11_BIND_SHADER_RESOURCE,
+			0,
+			0,
+			sRGB,
+			pResource.GetAddressOf(),
+			0 );
+	}
+
+
 
 	if ( FAILED( hr ) )
 	{

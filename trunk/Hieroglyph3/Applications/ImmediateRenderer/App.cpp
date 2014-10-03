@@ -29,6 +29,7 @@
 #include "MeshOBJ.h"
 
 #include "TextureActor.h"
+#include "SkyboxActor.h"
 
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -192,6 +193,10 @@ void App::Initialize()
 			}
 		}
 	}
+
+	ResourcePtr skyboxTexture = m_pRenderer11->LoadTexture( L"TropicalSunnyDay.dds" );
+	SkyboxActor* skybox = new SkyboxActor( skyboxTexture, 10.0f );
+	m_pScene->AddActor( skybox );
 }
 //--------------------------------------------------------------------------------
 void App::Update()

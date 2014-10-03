@@ -800,6 +800,12 @@
     <ClCompile Include="Rendering\TexturedVertex.cpp">
       <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
     </ClCompile>
+    <ClCompile Include="Objects\SkyboxActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\FullscreenActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Application.h">
@@ -1482,6 +1488,12 @@
     </ClInclude>
     <ClInclude Include="Rendering\TexturedVertex.h">
       <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\SkyboxActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\FullscreenActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
