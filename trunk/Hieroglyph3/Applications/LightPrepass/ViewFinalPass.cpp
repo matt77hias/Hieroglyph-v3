@@ -40,7 +40,7 @@ void ViewFinalPass::QueuePreTasks( RendererDX11* pRenderer )
 {
     if ( m_pEntity != NULL )
     {
-        Matrix4f view = m_pEntity->GetView();
+        Matrix4f view = m_pEntity->Transform.GetView();
         SetViewMatrix( view );
     }
 

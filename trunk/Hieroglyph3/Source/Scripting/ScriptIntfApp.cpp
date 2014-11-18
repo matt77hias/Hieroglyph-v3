@@ -63,8 +63,8 @@ int ScriptIntfApp::CreateActor( lua_State* pLuaState )
 	Actor* pActor = new Actor();
 	GeometryPtr Geometry = GeometryLoaderDX11::loadMS3DFile2( GlyphString::ToUnicode( std::string( geometry ) ) );
 	Geometry->LoadToBuffers();
-	pActor->GetBody()->SetGeometry( Geometry );
-	pActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GeneratePhong( *RendererDX11::Get() ) );
+	pActor->GetBody()->Visual.SetGeometry( Geometry );
+	pActor->GetBody()->Visual.SetMaterial( MaterialGeneratorDX11::GeneratePhong( *RendererDX11::Get() ) );
 
 	// Add this actor the application's scene.
 

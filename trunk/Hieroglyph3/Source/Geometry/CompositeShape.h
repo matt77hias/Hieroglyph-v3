@@ -29,9 +29,9 @@ namespace Glyph3
 		CompositeShape* DeepCopy( );
 
 		void AddShape( Shape3D* pShape );
-		bool RayIntersection( Ray3f pRay, float* fDist );
+		bool RayIntersection( const Ray3f& ray, float* fDist );
 
-		int GetNumberOfShapes();
+		int GetNumberOfShapes() const;
 
 		std::vector< Shape3D* > m_Shapes;
 	};

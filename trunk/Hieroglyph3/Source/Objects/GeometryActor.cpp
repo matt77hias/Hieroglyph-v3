@@ -34,7 +34,7 @@ GeometryActor::GeometryActor() :
 	m_pSolidMaterial = MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *pRenderer );
 	m_pTexturedMaterial = MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( *pRenderer );
 
-	GetBody()->SetGeometry( m_pGeometry );
+	GetBody()->Visual.SetGeometry( m_pGeometry );
 
 	UseSolidMaterial();
 	SetSpecular( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
@@ -554,12 +554,12 @@ void GeometryActor::DrawRect( const Vector3f& center, const Vector3f& xdir, cons
 //--------------------------------------------------------------------------------
 void GeometryActor::UseSolidMaterial()
 {
-	GetBody()->SetMaterial( m_pSolidMaterial );
+	GetBody()->Visual.SetMaterial( m_pSolidMaterial );
 }
 //--------------------------------------------------------------------------------
 void GeometryActor::UseTexturedMaterial( ResourcePtr texture )
 {
-	GetBody()->SetMaterial( m_pTexturedMaterial );
+	GetBody()->Visual.SetMaterial( m_pTexturedMaterial );
 
 	// Set the texture to be used if the passed in texture is not null...
 	if ( nullptr != texture ) {
@@ -575,7 +575,7 @@ void GeometryActor::UseTexturedMaterial( ResourcePtr texture )
 //--------------------------------------------------------------------------------
 void GeometryActor::SetSpecular( const Vector4f& color )
 {
-	auto pMaterial = GetBody()->GetMaterial();
+	auto pMaterial = GetBody()->Visual.GetMaterial();
 
 	assert( pMaterial != nullptr );
 
@@ -584,7 +584,7 @@ void GeometryActor::SetSpecular( const Vector4f& color )
 //--------------------------------------------------------------------------------
 Vector4f GeometryActor::GetSpecular( ) const
 {
-	auto pMaterial = GetBody()->GetMaterial();
+	auto pMaterial = GetBody()->Visual.GetMaterial();
 
 	assert( pMaterial != nullptr );
 

@@ -44,13 +44,13 @@ namespace Glyph3
 		Entity3D* GetGeometryEntity();
 
 	protected:
-		std::vector<SkinnedBoneController*>		m_Bones;
-		Matrix4f*								m_pMatrices;
-		Matrix4f*								m_pNormalMatrices;
-		Entity3D*								m_pGeometryEntity;
+		std::vector<SkinnedBoneController<Node3D>*>		m_Bones;
+		Matrix4f*										m_pMatrices;
+		Matrix4f*										m_pNormalMatrices;
+		Entity3D*										m_pGeometryEntity;
 
-		MatrixArrayParameterWriterDX11*			m_pSkinMatrixWriter;
-		MatrixArrayParameterWriterDX11*			m_pNormalMatrixWriter;
+		MatrixArrayParameterWriterDX11*					m_pSkinMatrixWriter;
+		MatrixArrayParameterWriterDX11*					m_pNormalMatrixWriter;
 	};
 };
 //--------------------------------------------------------------------------------

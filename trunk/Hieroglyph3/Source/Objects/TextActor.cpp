@@ -45,8 +45,8 @@ TextActor::TextActor()
 	SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 
-	GetBody()->SetGeometry( m_pGeometry );
-	GetBody()->SetMaterial( m_pMaterial );
+	GetBody()->Visual.SetGeometry( m_pGeometry );
+	GetBody()->Visual.SetMaterial( m_pMaterial );
 
 	SpriteFontPtr pSpriteFont = SpriteFontLoaderDX11::LoadFont( std::wstring( L"Consolas" ), 40.0f, 0, true );
 	SetFont( pSpriteFont );

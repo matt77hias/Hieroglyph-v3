@@ -14,11 +14,11 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-IntrRay3fBox3f::IntrRay3fBox3f( Ray3f& ray, Box3f& box )
+IntrRay3fBox3f::IntrRay3fBox3f( const Ray3f& ray, Box3f& box ) :
+	m_Ray( ray ),
+	m_Box( box ),
+	m_iQuantity( 0 )
 {
-	m_Ray = ray;
-	m_Box = box;
-	m_iQuantity = 0;
 }
 //--------------------------------------------------------------------------------
 IntrRay3fBox3f::~IntrRay3fBox3f()

@@ -34,6 +34,7 @@
 #define Actor_h
 //--------------------------------------------------------------------------------
 #include "Node3D.h"
+#include "Entity3D.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -51,15 +52,18 @@ namespace Glyph3
 
 		void AddElement( Entity3D* pElement );
 		void RemoveElement( Entity3D* pElement );
+		void AddElement( Node3D* pElement );
+		void RemoveElement( Node3D* pElement );
 
-		void AddSubtree( Node3D* pNode );
-		void RemoveSubtree( Node3D* pNode );
+		//void AddSubtree( Node3D* pNode );
+		//void RemoveSubtree( Node3D* pNode );
 
 	protected:
 		Node3D*					m_pRoot;
 		Entity3D*				m_pBody;
 
-		std::vector<Entity3D*>	m_Elements;
+		std::vector<Entity3D*>	m_EntityElements;
+		std::vector<Node3D*>	m_NodeElements;
 	};
 };
 //--------------------------------------------------------------------------------

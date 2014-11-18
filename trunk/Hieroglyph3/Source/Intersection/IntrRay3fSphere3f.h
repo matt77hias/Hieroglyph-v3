@@ -26,7 +26,7 @@ namespace Glyph3
 	class IntrRay3fSphere3f : public Intersector
 	{
 	public:
-		IntrRay3fSphere3f( Ray3f& ray, Sphere3f& sphere );
+		IntrRay3fSphere3f( const Ray3f& ray, Sphere3f& sphere );
 		virtual ~IntrRay3fSphere3f( );
 	
 		virtual bool Test();

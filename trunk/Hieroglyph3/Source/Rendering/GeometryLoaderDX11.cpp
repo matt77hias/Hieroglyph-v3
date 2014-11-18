@@ -504,7 +504,7 @@ GeometryPtr GeometryLoaderDX11::loadMS3DFileWithAnimation( std::wstring filename
 	if ( pActor )
 	{
 		// Set the geometry in the body of the actor
-		pActor->GetBody()->SetGeometry( MeshPtr );
+		pActor->GetBody()->Visual.SetGeometry( MeshPtr );
 
 		// Create an array of nodes, one for each joint.
 		std::map<std::string,Node3D*> JointNodes;

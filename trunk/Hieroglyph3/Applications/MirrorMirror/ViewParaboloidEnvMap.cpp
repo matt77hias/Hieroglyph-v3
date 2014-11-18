@@ -18,6 +18,7 @@
 #include "IParameterManager.h"
 #include "PipelineManagerDX11.h"
 #include "Texture2dDX11.h"
+#include "SceneGraph.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -86,7 +87,7 @@ void ViewParaboloidEnvMap::QueuePreTasks( RendererDX11* pRenderer )
 {
 	if ( m_pEntity != NULL )
 	{
-		m_ParaboloidBasis = m_pEntity->GetView();
+		m_ParaboloidBasis = m_pEntity->Transform.GetView();
 		SetViewMatrix( m_ParaboloidBasis );
 	}
 
@@ -101,7 +102,7 @@ void ViewParaboloidEnvMap::QueuePreTasks( RendererDX11* pRenderer )
 		if ( m_pScene )
 		{
 			std::vector<Entity3D*> set;
-			m_pScene->GetRoot()->GetEntities( set );
+			GetAllEntities( m_pScene->GetRoot(), set );
 
 			for ( auto pEntity : set )
 			{
@@ -137,7 +138,7 @@ void ViewParaboloidEnvMap::ExecuteTask( PipelineManagerDX11* pPipelineManager, I
 
 		// Run through the graph and render each of the entities
 		std::vector<Entity3D*> set;
-		m_pScene->GetRoot()->GetEntities( set );
+		GetAllEntities( m_pScene->GetRoot(), set );
 
 		for ( auto pEntity : set )
 		{

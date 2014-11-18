@@ -196,9 +196,9 @@ void App::Initialize()
 	// manually manipulating it.
 
 	m_pActor = new Actor();
-	m_pActor->GetBody()->SetGeometry( m_pGeometry );
-	m_pActor->GetBody()->SetMaterial( m_pMaterial );
-	m_pActor->GetNode()->Position() = Vector3f( 0.0f, 0.0f, 0.0f );
+	m_pActor->GetBody()->Visual.SetGeometry( m_pGeometry );
+	m_pActor->GetBody()->Visual.SetMaterial( m_pMaterial );
+	m_pActor->GetNode()->Transform.Position() = Vector3f( 0.0f, 0.0f, 0.0f );
 
 	m_pScene->AddActor( m_pActor );
 
@@ -224,7 +224,7 @@ void App::Update()
 
 	Matrix3f rotation;
 	rotation.RotationY( m_pTimer->Elapsed() );
-	m_pActor->GetNode()->Rotation() *= rotation;
+	m_pActor->GetNode()->Transform.Rotation() *= rotation;
 
 
 	// Update the scene, and then render all cameras within the scene.

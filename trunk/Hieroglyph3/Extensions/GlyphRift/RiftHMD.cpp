@@ -35,7 +35,8 @@ struct RiftHMD::Impl
 {
 	Impl( RiftManagerPtr RiftMgr ) : 
 		m_RiftMgr( RiftMgr ),
-		m_hmd( nullptr )
+		m_hmd( nullptr ),
+		frame( 0 )
 	{
 		// Create the first device available.  If it isn't available then we throw an
 		// exception to let the user know.
@@ -44,7 +45,7 @@ struct RiftHMD::Impl
 
 		if ( !m_hmd ) {
 			Log::Get().Write( L"Unable to find hardware Rift device, creating a debug device instead..." );
-			m_hmd = ovrHmd_CreateDebug( ovrHmd_DK1 );
+			m_hmd = ovrHmd_CreateDebug( ovrHmd_DK2 );
 		}
 		
 		if ( !m_hmd ) throw std::invalid_argument( "No HMD Devices were found!" );
@@ -116,6 +117,21 @@ struct RiftHMD::Impl
 		return max( tex0Size.h, tex1Size.h );
 	}
 	//--------------------------------------------------------------------------------
+	void ReadEyeData()
+	{
+		// Grab the two eye offsets in a contiguous array.
+		ovrVector3f offsets[2];
+		offsets[0] = eyeRenderDesc[0].HmdToEyeViewOffset;
+		offsets[1] = eyeRenderDesc[1].HmdToEyeViewOffset;
+
+		// Read out the state, and store the results in our member variables for use
+		// later on.
+		// TODO: Track the state and take default action if it is not tracking!
+
+		ovrTrackingState ts;
+		ovrHmd_GetEyePoses( m_hmd, frame, offsets, eyePose, &ts );
+	}
+	//--------------------------------------------------------------------------------
 	Matrix3f GetOrientation( double time )
 	{
 		// Query the HMD for the sensor state at a given time. "0.0" means "most recent time".
@@ -182,14 +198,19 @@ struct RiftHMD::Impl
 	//--------------------------------------------------------------------------------
 	Matrix4f GetEyeTranslation( unsigned int eye )
 	{
-		return Matrix4f::TranslationMatrix( eyeRenderDesc[eye].ViewAdjust.x,
-											eyeRenderDesc[eye].ViewAdjust.y,
-											eyeRenderDesc[eye].ViewAdjust.z );
+		return Matrix4f::TranslationMatrix( eyeRenderDesc[eye].HmdToEyeViewOffset.x,
+											eyeRenderDesc[eye].HmdToEyeViewOffset.y,
+											eyeRenderDesc[eye].HmdToEyeViewOffset.z );
 	}
 	//--------------------------------------------------------------------------------
 	Matrix4f GetEyeSpatialState( unsigned int eye )
 	{
-		eyePose[eye] = ovrHmd_GetEyePose( m_hmd, static_cast<ovrEyeType>(eye) );
+		// This method call was deprecated in OculusSDK 0.4.3.  Instead, the eye
+		// pose is read out from the API using RiftHMD::ReadEyeData() which collects
+		// the information for both eyes simultaneously.
+
+		//eyePose[eye] = ovrHmd_GetEyePose( m_hmd, static_cast<ovrEyeType>(eye) );
+		ReadEyeData();
 
 		float yaw, eyePitch, eyeRoll = 0.0f;
 		OVR::Posef pose = eyePose[eye];
@@ -197,14 +218,24 @@ struct RiftHMD::Impl
 			
 		// Apply those angles to our rotation matrix
 		Matrix4f orientation = Matrix4f::RotationMatrixXYZ( eyePitch, yaw, -eyeRoll );
-		Matrix4f translation = Matrix4f::TranslationMatrix( pose.Translation.x, pose.Translation.y, pose.Translation.z );
+		Matrix4f translation = Matrix4f::TranslationMatrix( -5.0f*pose.Translation.x, -5.0f*pose.Translation.y, 5.0f*pose.Translation.z );
 
-		return orientation * translation;
+		return translation * orientation;
 	}
 	//--------------------------------------------------------------------------------
 	float BeginFrame()
 	{
-		ovrFrameTiming frameTiming = ovrHmd_BeginFrame( m_hmd, 0 );
+		// Take care of the health and safety warning
+		ovrHSWDisplayState hswDisplayState;
+		ovrHmd_GetHSWDisplayState(m_hmd, &hswDisplayState);
+
+		if (hswDisplayState.Displayed) {
+			ovrHmd_DismissHSWDisplay(m_hmd);
+		}
+
+		frame++;
+
+		ovrFrameTiming frameTiming = ovrHmd_BeginFrame( m_hmd, frame );
 
 		return( frameTiming.DeltaSeconds );
 	}
@@ -230,7 +261,10 @@ struct RiftHMD::Impl
 		cfg.D3D11.pBackBufferRT = RendererDX11::Get()->GetRenderTargetViewByIndex( renderTarget->m_iResourceRTV ).GetRTV();
 		cfg.D3D11.pSwapChain = RendererDX11::Get()->GetSwapChainByIndex( swapchain )->GetSwapChain();
 
-		const unsigned   DistortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_TimeWarp;
+		// TODO: Time warp seems to introduce a stuttering during the rendering, which 
+		//       is clearly not correct.  This is probably due to how I am using the 
+		//       API, but it is disabled here until I can figure out why...
+		const unsigned   DistortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Overdrive; // | ovrDistortionCap_TimeWarp;
 
 		if ( !ovrHmd_ConfigureRendering( m_hmd, &cfg.Config, DistortionCaps, eyeFov, eyeRenderDesc ) ) {
 			throw std::invalid_argument( "Couldn't configure rift HMD rendering!" );
@@ -252,12 +286,18 @@ struct RiftHMD::Impl
 		((ovrD3D11Texture*)eyeTexture)[eye].D3D11.pSRView = RendererDX11::Get()->GetShaderResourceViewByIndex( texture->m_iResourceSRV ).GetSRV();
 	}
 	//--------------------------------------------------------------------------------
+	void AttachToWindow( HWND window )
+	{
+		ovrHmd_AttachToWindow( m_hmd, window, nullptr, nullptr );
+	}
+	//--------------------------------------------------------------------------------
 	RiftManagerPtr m_RiftMgr;
 	ovrHmd m_hmd;
 	ovrFovPort eyeFov[2];
 	ovrEyeRenderDesc eyeRenderDesc[2];
 	ovrTexture eyeTexture[2];
 	ovrPosef eyePose[2];
+	unsigned int frame;
 };
 //--------------------------------------------------------------------------------
 
@@ -292,6 +332,11 @@ unsigned int RiftHMD::DesiredEyeTextureWidth()
 unsigned int RiftHMD::DesiredEyeTextureHeight()
 {
 	return m_pImpl->DesiredEyeTextureHeight();
+}
+//--------------------------------------------------------------------------------
+void RiftHMD::ReadEyeData()
+{
+	return m_pImpl->ReadEyeData();
 }
 //--------------------------------------------------------------------------------
 Matrix3f RiftHMD::GetOrientation( double time )
@@ -332,5 +377,10 @@ void RiftHMD::ConfigureRendering( const ResourcePtr& renderTarget, int swapchain
 void RiftHMD::ConfigureEyeTexture( unsigned int eye, const ResourcePtr& texture )
 {
 	return m_pImpl->ConfigureEyeTexture( eye, texture );
+}
+//--------------------------------------------------------------------------------
+void RiftHMD::AttachToWindow( HWND window )
+{
+	return m_pImpl->AttachToWindow( window );
 }
 //--------------------------------------------------------------------------------

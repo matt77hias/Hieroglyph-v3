@@ -120,7 +120,7 @@ int LuaTextActor::SetTextOrigin( lua_State* L )
 	p.y = static_cast<float>( luaL_checknumber( L, 3 ) );
 	p.z = static_cast<float>( luaL_checknumber( L, 4 ) );
 	
-	pActor->GetNode()->Position() = p;
+	pActor->GetNode()->Transform.Position() = p;
 
 	return( 0 );
 }

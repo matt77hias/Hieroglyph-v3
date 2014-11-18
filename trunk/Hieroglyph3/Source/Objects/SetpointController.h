@@ -18,18 +18,18 @@
 #include "IController.h"
 #include <functional>
 #include <queue>
-#include "Entity3D.h"
+//#include "Entity3D.h"
 #include "Tween.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	template <class T>
-	class SetpointController : public IController
+	template <typename T, typename U>
+	class SetpointController : public IController<U>
 	{
 	public:
 		SetpointController( 
-			std::function<T(Entity3D*)> get, 
-			std::function<void(Entity3D*,T)> set );
+			std::function<T(U*)> get, 
+			std::function<void(U*,T)> set );
 		
 		virtual ~SetpointController( );
 
@@ -52,8 +52,8 @@ namespace Glyph3
 		float			m_fElapsed;
 		bool			m_bActive;
 
-		std::function<T(Entity3D*)>			m_get;
-		std::function<void(Entity3D*,T)>	m_set;
+		std::function<T(U*)>			m_get;
+		std::function<void(U*,T)>	m_set;
 		std::function<T(T,T,float)>			m_default;
 
 

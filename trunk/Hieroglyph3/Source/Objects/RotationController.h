@@ -21,7 +21,8 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class RotationController : public IController
+	template <typename T>
+	class RotationController : public IController<T>
 	{
 	public:
 		RotationController( );
@@ -36,6 +37,8 @@ namespace Glyph3
 		float			m_fSpeed;
 		Vector3f		m_kAxis;
 	};
+
+	#include "RotationController.inl"
 };
 //--------------------------------------------------------------------------------
 #endif // RotationController_h

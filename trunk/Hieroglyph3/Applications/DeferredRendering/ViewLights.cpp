@@ -259,7 +259,7 @@ void ViewLights::QueuePreTasks( RendererDX11* pRenderer )
 {
     if ( m_pEntity != NULL )
     {
-        Matrix4f view = m_pEntity->GetView();
+        Matrix4f view = m_pEntity->Transform.GetView();
         SetViewMatrix( view );
     }
 
@@ -441,7 +441,7 @@ void ViewLights::SetRenderParams( IParameterManager* pParamManager )
 
     if ( m_pScene != NULL )
     {
-        Vector4f cameraPos( m_pScene->GetRoot()->Position(), 1.0f );
+        Vector4f cameraPos( m_pScene->GetRoot()->Transform.Position(), 1.0f );
         pParamManager->SetVectorParameter( m_pCameraPos, &cameraPos );
     }
 

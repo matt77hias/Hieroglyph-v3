@@ -33,17 +33,15 @@ Camera::Camera() :
 	// Create the spatial controller, which will be used to manipulate the node
 	// in a simple way.
 
-	m_pSpatialController = new SpatialController();
-	GetNode()->AttachController( m_pSpatialController );
+	m_pSpatialController = new SpatialController<Node3D>();
+	GetNode()->Controllers.Attach( m_pSpatialController );
 
     m_ProjMatrix.MakeIdentity();
 
 	m_pViewPositionWriter = Parameters.SetVectorParameter( L"ViewPosition", Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 
 	// By default, the camera body is not pickable.  This behavior can be updated
-	// by the client simply by setting a the value accordingly.
-
-	GetBody()->SetPickable( false );
+	// by the client simply by adding the picking geometry to the entity.
 }
 //--------------------------------------------------------------------------------
 Camera::~Camera()
@@ -78,7 +76,7 @@ void Camera::RenderFrame( RendererDX11* pRenderer )
 		// Set the view position in the parameter system, for use by any of the
 		// views being used in this frame.
 
-		Vector3f p = GetNode()->Position() + GetBody()->Position();
+		Vector3f p = GetNode()->Transform.Position() + GetBody()->Transform.Position();
 		m_pViewPositionWriter->SetValue( Vector4f( p.x, p.y, p.z, 1.0f ) );
 
 		Parameters.InitRenderParams();
@@ -206,7 +204,7 @@ const Matrix4f& Camera::ProjMatrix() const
     return( m_ProjMatrix );
 }
 //--------------------------------------------------------------------------------
-SpatialController& Camera::Spatial()
+SpatialController<Node3D>& Camera::Spatial()
 {
 	return( *m_pSpatialController );
 }
@@ -239,7 +237,7 @@ Ray3f Camera::GetWorldSpacePickRay( const Vector2f& location ) const
 	// used to calculate the corresponding world space points that we need to
 	// build the ray.
 
-	Matrix4f View = GetBody()->GetView();
+	Matrix4f View = GetBody()->Transform.GetView();
 	Matrix4f ViewProj = View * ProjMatrix();
 	Matrix4f ViewInverse = View.Inverse();
 	Matrix4f ViewProjInverse = ViewProj.Inverse();
@@ -308,7 +306,7 @@ Vector3f Camera::ScreenToWorldSpace( const Vector2f& cursor )
 	// Calculate the view*proj inverse.  These are used to calculate the 
 	// corresponding world space points to the screen coordinate.
 
-	Matrix4f View = GetBody()->GetView();
+	Matrix4f View = GetBody()->Transform.GetView();
 	Matrix4f ViewProj = View * ProjMatrix();
 	Matrix4f ViewProjInverse = ViewProj.Inverse();
 	

@@ -21,7 +21,8 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class SkinnedBoneController : public IController
+	template <typename T>
+	class SkinnedBoneController : public IController<T>
 	{
 	public:
 		SkinnedBoneController( );
@@ -60,6 +61,8 @@ namespace Glyph3
 		Vector3f					m_kBindRotation;
 		bool						m_bActivate;
 	};
+
+	#include "SkinnedBoneController.inl"
 };
 //--------------------------------------------------------------------------------
 #endif // SkinnedBoneController_h

@@ -362,15 +362,6 @@
     <ClCompile Include="Objects\PickRecord.cpp">
       <Filter>Objects\Basic Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\IController.cpp">
-      <Filter>Objects\Controllers</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\RotationController.cpp">
-      <Filter>Objects\Controllers</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\SkinnedBoneController.cpp">
-      <Filter>Objects\Controllers</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TextureSpaceCameraPositionWriter.cpp">
       <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
     </ClCompile>
@@ -671,9 +662,6 @@
     <ClCompile Include="Utility\Timer.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\SpatialController.cpp">
-      <Filter>Objects\Controllers</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\BasicVertexDX11.cpp">
       <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
     </ClCompile>
@@ -697,9 +685,6 @@
     </ClCompile>
     <ClCompile Include="Rendering\MaterialManager.cpp">
       <Filter>Rendering\Material System</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\EntityRenderParams.cpp">
-      <Filter>Rendering\Material System\Components</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\MaterialDX11.cpp">
       <Filter>Rendering\Material System\Components</Filter>
@@ -764,9 +749,6 @@
     <ClCompile Include="Geometry\Cone3f.cpp">
       <Filter>Geometry</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\ScaleSetpointController.cpp">
-      <Filter>Objects\Controllers</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\ObjectSpaceCameraPositionWriter.cpp">
       <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
     </ClCompile>
@@ -778,9 +760,6 @@
     </ClCompile>
     <ClCompile Include="Objects\PointLight.cpp">
       <Filter>Objects\Scene Objects\Lights</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\PositionExtractorController.cpp">
-      <Filter>Objects\Controllers</Filter>
     </ClCompile>
     <ClCompile Include="Objects\Light.cpp">
       <Filter>Objects\Scene Objects\Lights</Filter>
@@ -805,6 +784,15 @@
     </ClCompile>
     <ClCompile Include="Objects\FullscreenActor.cpp">
       <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Transform3D.cpp">
+      <Filter>Objects\Basic Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Renderable.cpp">
+      <Filter>Rendering\Material System\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\SceneGraph.cpp">
+      <Filter>Objects\Basic Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1336,9 +1324,6 @@
     <ClInclude Include="Rendering\MaterialManager.h">
       <Filter>Rendering\Material System</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\EntityRenderParams.h">
-      <Filter>Rendering\Material System\Components</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\MaterialDX11.h">
       <Filter>Rendering\Material System\Components</Filter>
     </ClInclude>
@@ -1495,6 +1480,15 @@
     <ClInclude Include="Objects\FullscreenActor.h">
       <Filter>Objects\Scene Objects\Actors</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\Transform3D.h">
+      <Filter>Objects\Basic Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Renderable.h">
+      <Filter>Rendering\Material System\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\SceneGraph.h">
+      <Filter>Objects\Basic Objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Rendering\TGrowableIndexBufferDX11.inl">
@@ -1540,5 +1534,23 @@
       <Filter>Mathematics</Filter>
     </None>
     <None Include="packages.config" />
+    <None Include="Objects\IController.inl">
+      <Filter>Objects\Controllers</Filter>
+    </None>
+    <None Include="Objects\PositionExtractorController.inl">
+      <Filter>Objects\Controllers</Filter>
+    </None>
+    <None Include="Objects\RotationController.inl">
+      <Filter>Objects\Controllers</Filter>
+    </None>
+    <None Include="Objects\ScaleSetpointController.inl">
+      <Filter>Objects\Controllers</Filter>
+    </None>
+    <None Include="Objects\SkinnedBoneController.inl">
+      <Filter>Objects\Controllers</Filter>
+    </None>
+    <None Include="Objects\SpatialController.inl">
+      <Filter>Objects\Controllers</Filter>
+    </None>
   </ItemGroup>
 </Project>

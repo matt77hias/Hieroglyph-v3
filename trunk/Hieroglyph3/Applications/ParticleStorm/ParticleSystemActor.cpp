@@ -98,8 +98,8 @@ ParticleSystemActor::ParticleSystemActor()
 	GetBody()->Parameters.SetShaderResourceParameter( L"ParticleTexture", ParticleTexture );
 
 
-	GetBody()->SetGeometry( m_pExecutor );
-	GetBody()->SetMaterial( m_pMaterial );
+	GetBody()->Visual.SetGeometry( m_pExecutor );
+	GetBody()->Visual.SetMaterial( m_pMaterial );
 }
 //--------------------------------------------------------------------------------
 ParticleSystemActor::~ParticleSystemActor()

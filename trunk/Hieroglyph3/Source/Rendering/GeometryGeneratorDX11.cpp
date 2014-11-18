@@ -919,7 +919,7 @@ void GeometryGeneratorDX11::GenerateWeightedSkinnedCone( GeometryPtr pGeometry, 
 				Node3D* pRoot = m_Bones[i];
 
 				pActor->GetNode()->AttachChild( pRoot );
-				pActor->GetBody()->SetGeometry( pGeometry );
+				pActor->GetBody()->Visual.SetGeometry( pGeometry );
 						
 				pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );		
 

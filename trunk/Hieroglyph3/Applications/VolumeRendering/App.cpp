@@ -71,8 +71,8 @@ void App::Initialize()
 	m_pScene->AddActor( m_pActor1 );
 
 	// Throw a rotation onto the actor to slowly rotate it about the Y-axis.
-	RotationController* pRotController = new RotationController( Vector3f( -1.0f, 1.0f, 0.0f ), 0.2f );
-	m_pActor1->GetNode()->AttachController( pRotController );
+	RotationController<Node3D>* pRotController = new RotationController<Node3D>( Vector3f( -1.0f, 1.0f, 0.0f ), 0.2f );
+	m_pActor1->GetNode()->Controllers.Attach( pRotController );
 
 
 
@@ -80,12 +80,12 @@ void App::Initialize()
 	m_pScene->AddActor( m_pActor2 );
 
 	// Throw a rotation onto the actor to slowly rotate it about the Y-axis.
-	RotationController* pRotController2 = new RotationController( Vector3f( 1.0f, 1.0f, 0.0f ), -0.1f );
-	m_pActor2->GetNode()->AttachController( pRotController2 );
+	RotationController<Node3D>* pRotController2 = new RotationController<Node3D>( Vector3f( 1.0f, 1.0f, 0.0f ), -0.1f );
+	m_pActor2->GetNode()->Controllers.Attach( pRotController2 );
 
 
-	m_pActor1->GetNode()->Position() = Vector3f( -1.2f, 0.0f, 0.0f );
-	m_pActor2->GetNode()->Position() = Vector3f( 1.2f, 0.0f, 0.0f );
+	m_pActor1->GetNode()->Transform.Position() = Vector3f( -1.2f, 0.0f, 0.0f );
+	m_pActor2->GetNode()->Transform.Position() = Vector3f( 1.2f, 0.0f, 0.0f );
 
 	// Do a one time initialization of the scene lighting parameters here
 	Vector4f Ka( 0.2f, 0.2f, 0.2f, 0.2f );

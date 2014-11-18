@@ -17,38 +17,62 @@
 #ifndef Node3D_h
 #define Node3D_h
 //--------------------------------------------------------------------------------
-#include "Entity3D.h"
+#include "Transform3D.h"
+#include "Ray3f.h"
+#include "Frustum3f.h"
+#include "PickRecord.h"
+#include "IController.h"
+#include "ParameterContainer.h"
+#include "SceneRenderTask.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class Node3D : public Entity3D
+	class Entity3D;
+
+	class Node3D
 	{
 	public:
 		Node3D();
-		virtual ~Node3D();
+		~Node3D();
 
-		virtual void PreRender( RendererDX11* pRenderer, VIEWTYPE view );
-		virtual void Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view );
+
+		void PreRender( RendererDX11* pRenderer, VIEWTYPE view );
+		void Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view );
 		
-		virtual void Update( float time );
+		void Update( float time );
+		void UpdateLocal( float time );
+		void UpdateWorld( );
 
 		void AttachChild( Entity3D* Child );
+		void AttachChild( Node3D* Child );
 		void DetachChild( Entity3D* Child );
-		Entity3D* GetChild( unsigned int index );
+		void DetachChild( Node3D* Child );
 
-		virtual void GetIntersectingEntities( std::vector< Entity3D* >& set, Sphere3f& bounds );
-		virtual void GetIntersectingEntities( std::vector< Entity3D* >& set, Frustum3f& bounds );
-		
-		virtual void GetEntities( std::vector< Entity3D* >& set );
+		void AttachParent( Node3D* Parent );
+		void DetachParent( );
+		Node3D* GetParent( );
 
-		virtual void BuildPickRecord( Ray3f& ray, std::vector<PickRecord>& record );
+		//Entity3D* GetChild( unsigned int index );
 
-		virtual std::wstring toString( );
+		std::wstring toString( );
+		void SetName( const std::wstring& name );
+		std::wstring GetName() const;
 
+		const std::vector<Entity3D*>& Leafs();
+		const std::vector<Node3D*>& Nodes();
+
+		Transform3D Transform;
+		ControllerPack<Node3D> Controllers;
+	
 	protected:
-		std::vector< Entity3D* > m_vChildren;
+		std::wstring m_Name;
 
+		std::vector< Entity3D* > m_Leafs;
+		std::vector< Node3D* > m_Nodes;
+
+		Node3D* m_pParent;
 	};
 };
 //--------------------------------------------------------------------------------
 #endif // Node3D_h
+//--------------------------------------------------------------------------------

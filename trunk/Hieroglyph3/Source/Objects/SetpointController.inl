@@ -9,10 +9,10 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-template <class T>
-SetpointController<T>::SetpointController(
-	std::function<T (Entity3D*)> get, 
-	std::function<void (Entity3D*,T)> set ) :
+template <typename T, typename U>
+SetpointController<T,U>::SetpointController(
+	std::function<T (U*)> get, 
+	std::function<void (U*,T)> set ) :
 	m_vStartpoint( ),
 	m_Setpoint( ),
 	m_fElapsed( 0.0f ),
@@ -23,13 +23,13 @@ SetpointController<T>::SetpointController(
 {
 }
 //--------------------------------------------------------------------------------
-template <class T>
-SetpointController<T>::~SetpointController()
+template <typename T, typename U>
+SetpointController<T,U>::~SetpointController()
 {
 }
 //--------------------------------------------------------------------------------
-template <class T>
-void SetpointController<T>::Update( float fTime )
+template <typename T, typename U>
+void SetpointController<T,U>::Update( float fTime )
 {
 	if ( !m_bActive )
 	{
@@ -64,14 +64,14 @@ void SetpointController<T>::Update( float fTime )
 	}
 }
 //--------------------------------------------------------------------------------
-template <class T>
-void SetpointController<T>::AddSetpoint( const T& target, float duration )
+template <typename T, typename U>
+void SetpointController<T,U>::AddSetpoint( const T& target, float duration )
 {
 	AddSetpoint( target, duration, m_default );
 }
 //--------------------------------------------------------------------------------
-template <class T>
-void SetpointController<T>::AddSetpoint( const T& target, float duration, std::function<T(T,T,float)> tween )
+template <typename T, typename U>
+void SetpointController<T,U>::AddSetpoint( const T& target, float duration, std::function<T(T,T,float)> tween )
 {
 	Setpoint S;
 	S.target = target;

@@ -22,11 +22,14 @@
 #define IController_h
 //--------------------------------------------------------------------------------
 #include "Timer.h"
+#include <vector>
+//#include <functional>
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class Entity3D;
+	//class Entity3D;
 
+	template <typename T>
 	class IController
 	{
 	public:
@@ -34,13 +37,74 @@ namespace Glyph3
 		virtual ~IController( );
 		virtual void Update( float fTime ) = 0;
 
-		void SetEntity( Entity3D* pObject );
-		Entity3D* GetEntity( );
+		void SetEntity( T* pObject );
+		T* GetEntity( );
 
 	protected:
-		Entity3D* m_pEntity;
-
+		T* m_pEntity;
 	};
+
+	template <typename T>
+	class ControllerPack
+	{
+	public:
+		ControllerPack( T* host ) : m_host( host ) {};
+
+		~ControllerPack() {
+			for ( auto pController : m_Controllers )
+				delete pController;
+		};
+
+		void Attach( IController<T>* pController ) {
+			if ( pController ) {
+				m_Controllers.push_back( pController );
+				pController->SetEntity( m_host );
+			}
+		};
+
+		IController<T>* Get( unsigned int index ) {
+			if ( m_Controllers.size() <= index )
+				return( nullptr );
+
+			return m_Controllers[index];
+		};
+
+		void Update( float time ) {
+			for ( auto pController : m_Controllers ) {
+				pController->Update( time );
+			}
+		}
+
+	private:
+		T* m_host;
+		std::vector< IController<T>* > m_Controllers;
+	};
+
+	//template <typename T>
+	//class ModifierPack
+	//{
+	//public:
+	//	ModifierPack( ) {};
+	//	~ModifierPack( ) {};
+
+	//	void Update( T& client, float time ) {
+	//		for ( const auto& modify : Modifiers ) {
+	//			modify( client, time );
+	//		}
+	//	};
+
+
+	//	typedef std::function<void(T&,float)> modifier;
+
+	//	void AddModifier( const modifier& m ) {
+	//		Modifiers.push_back( m );
+	//	}
+
+	//public:
+	//	std::vector< modifier > Modifiers;
+	//};
+
+	#include "IController.inl"
 };
 //--------------------------------------------------------------------------------
 #endif // IController_h

@@ -14,11 +14,11 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-IntrRay3fSphere3f::IntrRay3fSphere3f( Ray3f& ray, Sphere3f& sphere )
+IntrRay3fSphere3f::IntrRay3fSphere3f( const Ray3f& ray, Sphere3f& sphere ) :
+	m_Ray( ray ),
+	m_Sphere( sphere ),
+	m_iQuantity( 0 )
 {
-	m_Ray = ray;
-	m_Sphere = sphere;
-	m_iQuantity = 0;
 }
 //--------------------------------------------------------------------------------
 IntrRay3fSphere3f::~IntrRay3fSphere3f()

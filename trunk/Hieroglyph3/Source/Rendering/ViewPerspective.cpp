@@ -19,6 +19,7 @@
 #include "PipelineManagerDX11.h"
 #include "Texture2dDX11.h"
 #include "BoundsVisualizerActor.h"
+#include "SceneGraph.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -94,7 +95,7 @@ void ViewPerspective::QueuePreTasks( RendererDX11* pRenderer )
 {
 	if ( m_pEntity != NULL )
 	{
-		Matrix4f view = m_pEntity->GetView();
+		Matrix4f view = m_pEntity->Transform.GetView();
 		SetViewMatrix( view );
 	}
 
@@ -142,7 +143,7 @@ void ViewPerspective::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParam
 		if ( m_bDebugViewEnabled )
 		{
 			std::vector<Entity3D*> list;
-			m_pScene->GetRoot()->GetEntities( list );
+			GetAllEntities( m_pScene->GetRoot(), list );
 			m_pDebugVisualizer->UpdateBoundsData( list );
 
 			m_pDebugVisualizer->GetBody()->Render( pPipelineManager, pParamManager, VT_PERSPECTIVE );

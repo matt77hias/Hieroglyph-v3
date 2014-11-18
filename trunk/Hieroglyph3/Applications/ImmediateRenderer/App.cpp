@@ -76,19 +76,19 @@ void App::Initialize()
 
 	m_pIndexedActor = new GeometryActor();
 	m_pScene->AddActor( m_pIndexedActor );
-	m_pIndexedActor->GetNode()->Position() = Vector3f( 3.0, 0.0f, 0.0f );
+	m_pIndexedActor->GetNode()->Transform.Position() = Vector3f( 3.0, 0.0f, 0.0f );
 	m_pIndexedActor->SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	m_pIndexedActor->UseTexturedMaterial( m_pRenderer11->LoadTexture( L"EyeOfHorus_128.png" ) );
 
 	// Throw a rotation onto the actor to slowly rotate it about the Y-axis.
-	RotationController* pIndexedRotController = new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), -0.1f );
-	m_pIndexedActor->GetNode()->AttachController( pIndexedRotController );
+	RotationController<Node3D>* pIndexedRotController = new RotationController<Node3D>( Vector3f( 0.0f, 1.0f, 0.0f ), -0.1f );
+	m_pIndexedActor->GetNode()->Controllers.Attach( pIndexedRotController );
 
 
 
 	m_pGeometryActor = new GeometryActor();
 	m_pScene->AddActor( m_pGeometryActor );
-	m_pGeometryActor->GetNode()->Position() = Vector3f( 0.0f, 2.5f, 0.0f );
+	m_pGeometryActor->GetNode()->Transform.Position() = Vector3f( 0.0f, 2.5f, 0.0f );
 
 	m_pGeometryActor->SetColor( Vector4f( 1.0f, 0.0f, 0.0f, 1.0f ) );
 	m_pGeometryActor->DrawSphere( Vector3f( 2.5f, 2.0f, 0.0f ), 1.5f, 16, 24 );
@@ -99,8 +99,8 @@ void App::Initialize()
 	m_pGeometryActor->SetColor( Vector4f( 0.0f, 0.0f, 1.0f, 1.0f ) );
 	m_pGeometryActor->DrawBox( Vector3f( 0.0f, 3.0f, 0.0f ), Vector3f( 1.0f, 1.0f, 1.0f ) );
 
-	RotationController* pGeometryRotController = new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), 0.4f );
-	m_pGeometryActor->GetNode()->AttachController( pGeometryRotController );
+	RotationController<Node3D>* pGeometryRotController = new RotationController<Node3D>( Vector3f( 0.0f, 1.0f, 0.0f ), 0.4f );
+	m_pGeometryActor->GetNode()->Controllers.Attach( pGeometryRotController );
 
 
 	m_pTextActor = new TextActor();
@@ -112,16 +112,16 @@ void App::Initialize()
 	m_pTextActor->SetCharacterHeight( 2.0f );
 	m_pTextActor->AppendText( L"Text is colored, scaled, and alpha blended..." );
 
-	m_pTextActor->GetNode()->Position() = Vector3f( 0.0f, 7.0f, 0.0f );
+	m_pTextActor->GetNode()->Transform.Position() = Vector3f( 0.0f, 7.0f, 0.0f );
 	m_pScene->AddActor( m_pTextActor );
 
 	// Add a single point light to the scene.
 	m_pLight = new PointLight();
 	m_pScene->AddLight( m_pLight );
 
-	m_pLight->GetNode()->AttachController( new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), -1.0f ) );
-	m_pLight->GetNode()->Position() = Vector3f( 0.0f, 50.0f, 0.0f );
-	m_pLight->GetBody()->Position() = Vector3f( 50.0f, 0.0f, 0.0f );
+	m_pLight->GetNode()->Controllers.Attach( new RotationController<Node3D>( Vector3f( 0.0f, 1.0f, 0.0f ), -1.0f ) );
+	m_pLight->GetNode()->Transform.Position() = Vector3f( 0.0f, 50.0f, 0.0f );
+	m_pLight->GetBody()->Transform.Position() = Vector3f( 50.0f, 0.0f, 0.0f );
 
 
 	// Load an STL file and configure an actor to use it.
@@ -132,16 +132,16 @@ void App::Initialize()
 
 	m_pMeshActor = new Actor();
 	m_pScene->AddActor( m_pMeshActor );
-	m_pMeshActor->GetBody()->AttachController( new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), -1.0f ) );
-	m_pMeshActor->GetNode()->Position() = Vector3f( 5.0f, 5.0f, 0.0f );
+	m_pMeshActor->GetBody()->Controllers.Attach( new RotationController<Entity3D>( Vector3f( 0.0f, 1.0f, 0.0f ), -1.0f ) );
+	m_pMeshActor->GetNode()->Transform.Position() = Vector3f( 5.0f, 5.0f, 0.0f );
 
 
-	m_pMeshActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *m_pRenderer11) );
+	m_pMeshActor->GetBody()->Visual.SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *m_pRenderer11) );
 	auto pMeshExecutor = std::make_shared<DrawExecutorDX11<BasicVertexDX11::Vertex>>();
 	pMeshExecutor->SetLayoutElements( BasicVertexDX11::GetElementCount(), BasicVertexDX11::Elements );
 	pMeshExecutor->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	pMeshExecutor->SetMaxVertexCount( 3 * stl.faces.size() );
-	m_pMeshActor->GetBody()->SetGeometry( pMeshExecutor );
+	m_pMeshActor->GetBody()->Visual.SetGeometry( pMeshExecutor );
 
 
 	BasicVertexDX11::Vertex vertex;
@@ -165,16 +165,16 @@ void App::Initialize()
 
 	Actor* m_pOBJMesh = new Actor();
 	m_pScene->AddActor( m_pOBJMesh );
-	m_pOBJMesh->GetBody()->AttachController( new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), -1.0f ) );
-	m_pOBJMesh->GetNode()->Position() = Vector3f( 0.0f, 0.0f, -5.0f );
+	m_pOBJMesh->GetBody()->Controllers.Attach( new RotationController<Entity3D>( Vector3f( 0.0f, 1.0f, 0.0f ), -1.0f ) );
+	m_pOBJMesh->GetNode()->Transform.Position() = Vector3f( 0.0f, 0.0f, -5.0f );
 
 
-	m_pOBJMesh->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *m_pRenderer11) );
+	m_pOBJMesh->GetBody()->Visual.SetMaterial( MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *m_pRenderer11) );
 	auto pOBJExecutor = std::make_shared<DrawExecutorDX11<BasicVertexDX11::Vertex>>();
 	pOBJExecutor->SetLayoutElements( BasicVertexDX11::GetElementCount(), BasicVertexDX11::Elements );
 	pOBJExecutor->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	pOBJExecutor->SetMaxVertexCount( obj.positions.size() );
-	m_pOBJMesh->GetBody()->SetGeometry( pOBJExecutor );
+	m_pOBJMesh->GetBody()->Visual.SetGeometry( pOBJExecutor );
 
 
 	BasicVertexDX11::Vertex v;

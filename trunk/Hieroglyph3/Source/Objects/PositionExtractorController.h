@@ -20,7 +20,8 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class PositionExtractorController : public IController
+	template <typename T>
+	class PositionExtractorController : public IController<T>
 	{
 	public:
 		PositionExtractorController( );
@@ -33,6 +34,8 @@ namespace Glyph3
 	protected:
 		VectorParameterWriterDX11*		m_pWriter;
 	};
+
+	#include "PositionExtractorController.inl"
 };
 //--------------------------------------------------------------------------------
 #endif // PositionExtractorController_h

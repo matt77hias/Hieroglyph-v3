@@ -126,8 +126,8 @@ VolumeActor::VolumeActor()
 	m_pGeometry->AddIndices( 5, 1, 0 );
 	m_pGeometry->AddIndices( 5, 0, 4 );
 
-	GetBody()->SetGeometry( m_pGeometry );
-	GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateVolumeGeometryMaterial( *RendererDX11::Get() ) );
+	GetBody()->Visual.SetGeometry( m_pGeometry );
+	GetBody()->Visual.SetMaterial( MaterialGeneratorDX11::GenerateVolumeGeometryMaterial( *RendererDX11::Get() ) );
 	GetBody()->Parameters.SetShaderResourceParameter( L"VolumeTexture", m_VolumeTexture );
 
 	Matrix4f ObjectToTextureSpaceMatrix = 

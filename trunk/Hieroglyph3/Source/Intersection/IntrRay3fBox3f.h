@@ -24,7 +24,7 @@ namespace Glyph3
 	class IntrRay3fBox3f : public Intersector
 	{
 	public:
-		IntrRay3fBox3f( Ray3f& ray, Box3f& box );
+		IntrRay3fBox3f( const Ray3f& ray, Box3f& box );
 		virtual ~IntrRay3fBox3f( );
 	
 		virtual bool Test();

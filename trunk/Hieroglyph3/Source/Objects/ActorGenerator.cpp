@@ -42,15 +42,15 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 	// Create/load the geometry to put around the visualization (i.e. the picture frame)
 	GeometryPtr frameGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"ScreenFrame.ms3d" ) );
 	frameGeometry->LoadToBuffers();
-	pFrame->SetGeometry( frameGeometry );
+	pFrame->Visual.SetGeometry( frameGeometry );
 		
 	// Create the material for the picture frame
-	pFrame->SetMaterial( MaterialGeneratorDX11::GeneratePhong( Renderer ) );
+	pFrame->Visual.SetMaterial( MaterialGeneratorDX11::GeneratePhong( Renderer ) );
 
 	// Create/load the geometry to put the visualization on (i.e. the picture)
 	GeometryPtr screenGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"Screen.ms3d" ) );
 	screenGeometry->LoadToBuffers();
-	pActor->GetBody()->SetGeometry( screenGeometry );
+	pActor->GetBody()->Visual.SetGeometry( screenGeometry );
 
 	// Use the passed in material to render the visualization.  This allows for 
 	// a user to create customized visualizations for special format textures.
@@ -77,8 +77,8 @@ Actor* ActorGenerator::GenerateVisualizationTexture2D( RendererDX11& Renderer,
 		pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
 	}
 
-	pActor->GetBody()->SetMaterial( pMaterial );
-	pActor->GetNode()->Position() = Vector3f( 0.0f, 2.0f, 0.0f );
+	pActor->GetBody()->Visual.SetMaterial( pMaterial );
+	pActor->GetNode()->Transform.Position() = Vector3f( 0.0f, 2.0f, 0.0f );
 	pActor->GetNode()->Update( 0.0f );
 
 

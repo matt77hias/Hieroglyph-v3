@@ -180,9 +180,9 @@ void App::Initialize()
 	for ( int i = 0; i < 10; i++ )
 	{
 		m_pEntity[i] = new Entity3D();
-		m_pEntity[i]->SetGeometry( m_pGeometry );
-		m_pEntity[i]->SetMaterial( m_pMaterial );
-		m_pEntity[i]->Position() = Vector3f( static_cast<float>( i ) * 4.0f, 4.0f * ( i % 2 ) - 2.0f, 0.0f );
+		m_pEntity[i]->Visual.SetGeometry( m_pGeometry );
+		m_pEntity[i]->Visual.SetMaterial( m_pMaterial );
+		m_pEntity[i]->Transform.Position() = Vector3f( static_cast<float>( i ) * 4.0f, 4.0f * ( i % 2 ) - 2.0f, 0.0f );
 
 		m_pActor->GetNode()->AttachChild( m_pEntity[i] );
 	}
@@ -208,7 +208,7 @@ void App::Update()
 
 	Matrix3f rotation;
 	rotation.RotationX( m_pTimer->Elapsed() );
-	m_pActor->GetNode()->Rotation() *= rotation;
+	m_pActor->GetNode()->Transform.Rotation() *= rotation;
 
 	// Update the scene, and then render all cameras within the scene.
 

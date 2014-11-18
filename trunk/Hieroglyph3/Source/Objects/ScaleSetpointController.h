@@ -20,7 +20,8 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class ScaleSetpointController : public IController
+	template <typename T>
+	class ScaleSetpointController : public IController<T>
 	{
 	public:
 		ScaleSetpointController( );
@@ -37,6 +38,8 @@ namespace Glyph3
 		float			m_fElapsed;
 		bool			m_bActive;
 	};
+
+	#include "ScaleSetpointController.inl"
 };
 //--------------------------------------------------------------------------------
 #endif // ScaleSetpointController_h

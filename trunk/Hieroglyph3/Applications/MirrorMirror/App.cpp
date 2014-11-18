@@ -87,7 +87,7 @@ void App::Initialize()
 
 	
 	m_pDiffuseActor = new Actor();
-	m_pDiffuseActor->GetNode()->AttachController( new RotationController( Vector3f::Random(), 0.05f ) );
+	m_pDiffuseActor->GetNode()->Controllers.Attach( new RotationController<Node3D>( Vector3f::Random(), 0.05f ) );
 
     DiffuseSphereEntity::LoadResources();
 	for ( int i = 0; i < 200; i++ )
@@ -96,8 +96,8 @@ void App::Initialize()
 		pos.Normalize();
 
 		Entity3D* pEntity = new DiffuseSphereEntity();
-		pEntity->Position() = pos * radius;
-		pEntity->AttachController( new RotationController( Vector3f::Random(), 1.0f ) );
+		pEntity->Transform.Position() = pos * radius;
+		pEntity->Controllers.Attach( new RotationController<Entity3D>( Vector3f::Random(), 1.0f ) );
 
 		m_pDiffuseActor->GetNode()->AttachChild( pEntity );
 		m_pDiffuseActor->AddElement( pEntity );
@@ -108,16 +108,16 @@ void App::Initialize()
 	for ( int i = 0; i < 3; i++ )
 	{
 		ReflectiveSphereEntity* pReflector = new ReflectiveSphereEntity();
-		pReflector->Position() = Vector3f( -1.0, 1.0f+(i*3), 0.0f );
+		pReflector->Transform.Position() = Vector3f( -1.0, 1.0f+(i*3), 0.0f );
 		pReflector->m_pParaboloidView->SetScene( m_pScene );
 		m_vReflectors.push_back( pReflector );
 		m_pActor->AddElement( pReflector );
 		m_pActor->GetNode()->AttachChild( pReflector );
 	}
 
-	m_vReflectors[0]->Position() = Vector3f( -1.0, 1.0f, 1.0f );
-	m_vReflectors[1]->Position() = Vector3f( 1.0, 1.0f, 1.0f );
-	m_vReflectors[2]->Position() = Vector3f( 0.0, -1.0f, 1.0f );
+	m_vReflectors[0]->Transform.Position() = Vector3f( -1.0, 1.0f, 1.0f );
+	m_vReflectors[1]->Transform.Position() = Vector3f( 1.0, 1.0f, 1.0f );
+	m_vReflectors[2]->Transform.Position() = Vector3f( 0.0, -1.0f, 1.0f );
 
 	m_vReflectors[0]->m_pParaboloidView->SetBackColor( Vector4f( 0.75f, 0.0f, 0.0f, 1.0f ) );
 	m_vReflectors[1]->m_pParaboloidView->SetBackColor( Vector4f( 0.0f, 0.75f, 0.0f, 1.0f ) );
@@ -144,10 +144,7 @@ void App::Update()
 	Vector4f TimeFactors = Vector4f( m_pTimer->Elapsed()*2.0f, (float)m_pTimer->Framerate(), 
 		m_pTimer->Runtime(), (float)m_pTimer->FrameCount() );
 
-	Vector4f ViewPosition = Vector4f( m_pCamera->GetNode()->Position().x,
-		                              m_pCamera->GetNode()->Position().y,
-		                              m_pCamera->GetNode()->Position().z,
-		                              1.0f );
+	Vector4f ViewPosition = Vector4f( m_pCamera->GetNode()->Transform.Position(), 1.0f );
 
 	m_pViewPosition->InitializeParameterData( &ViewPosition );
 	m_pTimeFactors->InitializeParameterData( &TimeFactors );
@@ -164,7 +161,7 @@ void App::Update()
 
 	Matrix3f rotation;
 	rotation.RotationY( m_pTimer->Elapsed() * 0.2f );
-	m_pActor->GetNode()->Rotation() *= rotation;
+	m_pActor->GetNode()->Transform.Rotation() *= rotation;
 
 	for ( int i = 0; i < 3; i++ ) {
 		m_vReflectors[i]->m_pParaboloidView->ResetRecurrence();

@@ -84,13 +84,13 @@ void App::Initialize()
 	m_pHeadline1 = new TextActor();
 	m_pHeadline1->SetFont( pSpriteFont );
 	m_pHeadline1->SetCharacterHeight( 0.8f );
-	m_pHeadline1->GetNode()->Position() = Vector3f( -5.0f, 12.0f, 10.1f );
+	m_pHeadline1->GetNode()->Transform.Position() = Vector3f( -5.0f, 12.0f, 10.1f );
 	m_pHeadline1->DrawString( L"Scripted Glyphlet:" );
 	m_pScene->AddActor( m_pHeadline1 );
 
 	m_pBodyText1 = new TextActor();
 	m_pBodyText1->SetCharacterHeight( 0.5f );
-	m_pBodyText1->GetNode()->Position() = Vector3f( -5.0f, 11.0f, 10.1f );
+	m_pBodyText1->GetNode()->Transform.Position() = Vector3f( -5.0f, 11.0f, 10.1f );
 	m_pBodyText1->DrawString( L"This scene is generated and controlled through Lua!" );
 	m_pScene->AddActor( m_pBodyText1 );
 
@@ -98,19 +98,19 @@ void App::Initialize()
 	SingleWindowGlyphletPtr pScriptedGlyphlet( new ScriptedGlyphlet() );
 	pScriptedGlyphlet->Initialize();
 	m_pActor1->SetGlyphlet( pScriptedGlyphlet );
-	m_pActor1->GetNode()->Position() = Vector3f( 0.0f, 7.5f, 10.0f );
+	m_pActor1->GetNode()->Transform.Position() = Vector3f( 0.0f, 7.5f, 10.0f );
 	m_pScene->AddActor( m_pActor1 );
 
 	m_pHeadline2 = new TextActor();
 	m_pHeadline2->SetFont( pSpriteFont );
 	m_pHeadline2->SetCharacterHeight( 0.8f );
-	m_pHeadline2->GetNode()->Position() = Vector3f( -5.0f, 4.0f, 10.1f );
+	m_pHeadline2->GetNode()->Transform.Position() = Vector3f( -5.0f, 4.0f, 10.1f );
 	m_pHeadline2->DrawString( L"Particle Storm Glyphlet:" );
 	m_pScene->AddActor( m_pHeadline2 );
 
 	m_pBodyText2 = new TextActor();
 	m_pBodyText2->SetCharacterHeight( 0.5f );
-	m_pBodyText2->GetNode()->Position() = Vector3f( -5.0f, 3.0f, 10.1f );
+	m_pBodyText2->GetNode()->Transform.Position() = Vector3f( -5.0f, 3.0f, 10.1f );
 	m_pBodyText2->DrawString( L"This scene is generated and controlled through C++!" );
 	m_pScene->AddActor( m_pBodyText2 );
 
@@ -118,7 +118,7 @@ void App::Initialize()
 	SingleWindowGlyphletPtr pParticleStormGlyphlet( new ParticleStormGlyphlet() );
 	pParticleStormGlyphlet->Initialize();
 	m_pActor2->SetGlyphlet( pParticleStormGlyphlet );
-	m_pActor2->GetNode()->Position() = Vector3f( 0.0f, -0.5f, 10.0f );
+	m_pActor2->GetNode()->Transform.Position() = Vector3f( 0.0f, -0.5f, 10.0f );
 	m_pScene->AddActor( m_pActor2 );
 
 

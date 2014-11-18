@@ -33,7 +33,7 @@ SkinnedActor::~SkinnedActor()
 	// controller's that are attached to the entity.
 	for ( auto pController : m_Bones )
 	{
-		Entity3D* pEntity = pController->GetEntity();
+		Node3D* pEntity = pController->GetEntity();
 		SAFE_DELETE( pEntity );
 	}
 
@@ -54,7 +54,7 @@ void SkinnedActor::AddBoneNode( Node3D* pBone, Vector3f BindPosition, Vector3f B
 		// Create a controller to apply all of the animation to the bone.  The 
 		// streams and the bind information are loaded into the controller.
 
-		SkinnedBoneController* pController = new SkinnedBoneController();
+		SkinnedBoneController<Node3D>* pController = new SkinnedBoneController<Node3D>();
 
 		pController->SetBindPosition( BindPosition );
 		pController->SetBindRotation( BindRotation );
@@ -63,12 +63,12 @@ void SkinnedActor::AddBoneNode( Node3D* pBone, Vector3f BindPosition, Vector3f B
 		pController->SetRotationStream( pRotations );
 
 		// Add the controller onto this bone node.  
-		pBone->AttachController( pController );
+		pBone->Controllers.Attach( pController );
 
 
 		// Set the bind pose on the bone.
-		pBone->Position() = BindPosition;
-		pBone->Rotation().Rotation( BindRotation );
+		pBone->Transform.Position() = BindPosition;
+		pBone->Transform.Rotation().Rotation( BindRotation );
 
 		// Store the node in the bones list.
 		m_Bones.push_back( pController );
@@ -80,12 +80,12 @@ void SkinnedActor::AddBoneNode( Node3D* pBone, Vector3f BindPosition, Vector3f B
 		RendererDX11* pRenderer = RendererDX11::Get();
 		
 		Entity3D* pAxes = new Entity3D();
-		pAxes->SetMaterial( MaterialGeneratorDX11::GenerateSolidColor( *pRenderer ) );
+		pAxes->Visual.SetMaterial( MaterialGeneratorDX11::GenerateSolidColor( *pRenderer ) );
 
 		GeometryPtr pGeometry = GeometryPtr( new GeometryDX11() );
 		GeometryGeneratorDX11::GenerateAxisGeometry( pGeometry );
 		pGeometry->LoadToBuffers();
-		pAxes->SetGeometry( pGeometry );
+		pAxes->Visual.SetGeometry( pGeometry );
 
 		pBone->AttachChild( pAxes );
 	}

@@ -111,6 +111,8 @@ bool App::ConfigureEngineComponents()
 		return( false );
 	}
 
+	m_pRiftHmd->AttachToWindow( m_pWindow->GetHandle() );
+
 	// We want single threaded operation when using the Oculus SDK, since it 
 	// manages some aspects of timing in the eye rendering functions.
 
@@ -160,8 +162,8 @@ bool App::ConfigureRenderingSetup()
 	// uses the input from the rift headset, but still allows for the traditional
 	// FirstPersonCamera controls to be applied to the node of the camera.
 
-	IController* pRiftController = new RiftController( m_pRiftHmd );
-	m_pCamera->GetBody()->AttachController( pRiftController );
+	IController<Entity3D>* pRiftController = new RiftController<Entity3D>( m_pRiftHmd );
+	m_pCamera->GetBody()->Controllers.Attach( pRiftController );
 
 	return( true );
 }
@@ -180,18 +182,18 @@ void App::Initialize()
 
 	m_pIndexedActor = new GeometryActor();
 	m_pScene->AddActor( m_pIndexedActor );
-	m_pIndexedActor->GetNode()->Position() = Vector3f( 3.0, 0.0f, 0.0f );
+	m_pIndexedActor->GetNode()->Transform.Position() = Vector3f( 3.0, 0.0f, 0.0f );
 	m_pIndexedActor->SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	m_pIndexedActor->UseTexturedMaterial( m_pRenderer11->LoadTexture( L"EyeOfHorus_128.png" ) );
 
 	// Throw a rotation onto the actor to slowly rotate it about the Y-axis.
-	RotationController* pIndexedRotController = new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), -0.1f );
-	m_pIndexedActor->GetNode()->AttachController( pIndexedRotController );
+	RotationController<Node3D>* pIndexedRotController = new RotationController<Node3D>( Vector3f( 0.0f, 1.0f, 0.0f ), -0.1f );
+	m_pIndexedActor->GetNode()->Controllers.Attach( pIndexedRotController );
 
 
 	m_pGeometryActor = new GeometryActor();
 	m_pScene->AddActor( m_pGeometryActor );
-	m_pGeometryActor->GetNode()->Position() = Vector3f( 0.0f, 2.5f, 0.0f );
+	m_pGeometryActor->GetNode()->Transform.Position() = Vector3f( 0.0f, 2.5f, 0.0f );
 
 	m_pGeometryActor->SetColor( Vector4f( 1.0f, 0.0f, 0.0f, 1.0f ) );
 	m_pGeometryActor->DrawSphere( Vector3f( 2.5f, 2.0f, 0.0f ), 1.5f, 16, 24 );
@@ -202,8 +204,8 @@ void App::Initialize()
 	m_pGeometryActor->SetColor( Vector4f( 0.0f, 0.0f, 1.0f, 1.0f ) );
 	m_pGeometryActor->DrawBox( Vector3f( 0.0f, 3.0f, 0.0f ), Vector3f( 1.0f, 1.0f, 1.0f ) );
 
-	RotationController* pGeometryRotController = new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), 0.4f );
-	m_pGeometryActor->GetNode()->AttachController( pGeometryRotController );
+	RotationController<Node3D>* pGeometryRotController = new RotationController<Node3D>( Vector3f( 0.0f, 1.0f, 0.0f ), 0.4f );
+	m_pGeometryActor->GetNode()->Controllers.Attach( pGeometryRotController );
 
 	m_pTextActor = new TextActor();
 	m_pTextActor->SetTextOrientation( Vector3f( 1.0f, 0.0f, 0.0f ), Vector3f( 0.0f, 1.0f, 0.0f ) );
@@ -214,16 +216,16 @@ void App::Initialize()
 	m_pTextActor->SetCharacterHeight( 2.0f );
 	m_pTextActor->AppendText( L"Text is colored, scaled, and alpha blended..." );
 
-	m_pTextActor->GetNode()->Position() = Vector3f( 0.0f, 7.0f, 0.0f );
+	m_pTextActor->GetNode()->Transform.Position() = Vector3f( 0.0f, 7.0f, 0.0f );
 	m_pScene->AddActor( m_pTextActor );
 
 	// Add a single point light to the scene.
 	m_pLight = new PointLight();
 	m_pScene->AddLight( m_pLight );
 
-	m_pLight->GetNode()->AttachController( new RotationController( Vector3f( 0.0f, 1.0f, 0.0f ), -1.0f ) );
-	m_pLight->GetNode()->Position() = Vector3f( 0.0f, 50.0f, 0.0f );
-	m_pLight->GetBody()->Position() = Vector3f( 50.0f, 0.0f, 0.0f );
+	m_pLight->GetNode()->Controllers.Attach( new RotationController<Node3D>( Vector3f( 0.0f, 1.0f, 0.0f ), -1.0f ) );
+	m_pLight->GetNode()->Transform.Position() = Vector3f( 0.0f, 50.0f, 0.0f );
+	m_pLight->GetBody()->Transform.Position() = Vector3f( 50.0f, 0.0f, 0.0f );
 }
 //--------------------------------------------------------------------------------
 void App::Update()

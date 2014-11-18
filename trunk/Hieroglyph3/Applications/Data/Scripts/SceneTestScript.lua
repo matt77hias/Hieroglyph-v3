@@ -39,7 +39,7 @@ end
 function OnKeyDown( char )
 
 	if char == 49 then
-		handle = App.CreateActor( "../Data/Models/box.ms3d", "Phong" );
+		handle = App.CreateActor( "box.ms3d", "Phong" );
 		local a = Actor:Create( handle );
 		a:SetPosition( math.random( -10, 10 ), math.random( -10, 10 ), math.random( -10, 10 ) );
 		a:SetRotation( math.random( 10 ), math.random( 10 ), math.random( 10 ) );

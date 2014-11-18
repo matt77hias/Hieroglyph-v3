@@ -131,8 +131,9 @@ BoundsVisualizerActor::BoundsVisualizerActor()
 	//m_pGeometry->AddIndices( 5, 1, 0 );
 	//m_pGeometry->AddIndices( 5, 0, 4 );
 
-	GetBody()->SetGeometry( m_pGeometry );
-	GetBody()->SetPickable( false );
+	GetBody()->Visual.SetGeometry( m_pGeometry );
+	
+	// If no shapes are added to the entity, then it will not be pickable.
 
 
 
@@ -167,7 +168,7 @@ BoundsVisualizerActor::BoundsVisualizerActor()
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
 	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
 
-	GetBody()->SetMaterial( pMaterial );
+	GetBody()->Visual.SetMaterial( pMaterial );
 }
 //--------------------------------------------------------------------------------
 BoundsVisualizerActor::~BoundsVisualizerActor()
@@ -188,9 +189,9 @@ void BoundsVisualizerActor::UpdateBoundsData( std::vector<Entity3D*>& entities )
 
 	for ( auto pEntity : entities )
 	{
-		if ( pEntity->IsPickable() )
+		if ( pEntity->Shape.GetNumberOfShapes() > 0 )
 		{
-			i.transform = pEntity->WorldMatrix();
+			i.transform = pEntity->Transform.WorldMatrix();
 			i.color = Vector4f( 1.0f, 0.0f, 0.0f, 1.0f );
 			m_pGeometry->AddInstance( i );
 		}

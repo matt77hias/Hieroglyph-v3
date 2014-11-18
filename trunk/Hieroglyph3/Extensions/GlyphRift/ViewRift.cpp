@@ -18,6 +18,7 @@
 #include "PipelineManagerDX11.h"
 #include "Texture2dDX11.h"
 #include "BoundsVisualizerActor.h"
+#include "SceneGraph.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -104,7 +105,7 @@ void ViewRift::QueuePreTasks( RendererDX11* pRenderer )
 {
 	if ( m_pEntity != NULL )
 	{
-		Matrix4f view = m_pEntity->GetView();
+		Matrix4f view = m_pEntity->Transform.GetView();
 		SetViewMatrix( view );
 	}
 
@@ -131,6 +132,8 @@ void ViewRift::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterMan
 		// same for both eyes, so we pull it out of the loop.
 		ConfigureViewports( pPipelineManager );
 
+//		m_pHmd->ReadEyeData();
+
 		for ( unsigned int eye = 0; eye < 2; ++eye )
 		{
 			// Set up the view matrices for this eye.  This starts by getting the 
@@ -145,11 +148,8 @@ void ViewRift::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterMan
 			//       This is why we need to grab the parent's view - the eye matrices are
 			//       in relation to the whole rift, as opposed to relative to the head.
 
-			Matrix4f centerView = m_pEntity->GetParent()->GetView();	
+			Matrix4f centerView = m_pEntity->GetParent()->Transform.GetView();	
 			m_view[eye] = centerView * m_pHmd->GetEyeSpatialState( eye );
-
-			// Render the LEFT eye first
-			//m_pHmd->BeginEyeRender( eye );
 
 			// Set the parameters for rendering this view
 			pPipelineManager->ClearRenderTargets();
@@ -177,13 +177,11 @@ void ViewRift::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterMan
 			if ( m_bDebugViewEnabled )
 			{
 				std::vector<Entity3D*> list;
-				m_pScene->GetRoot()->GetEntities( list );
+				GetAllEntities( m_pScene->GetRoot(), list );
 				m_pDebugVisualizer->UpdateBoundsData( list );
 
 				m_pDebugVisualizer->GetBody()->Render( pPipelineManager, pParamManager, VT_PERSPECTIVE );
 			}
-
-			//m_pHmd->EndEyeRender( eye );
 		}
 	}
 }

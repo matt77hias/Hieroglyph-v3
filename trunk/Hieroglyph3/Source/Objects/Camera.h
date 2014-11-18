@@ -34,7 +34,6 @@
 namespace Glyph3
 {
 	class Scene;
-	class SpatialController;
 
 	class Camera : public Actor, public IEventListener
 	{
@@ -64,7 +63,7 @@ namespace Glyph3
 		float GetAspectRatio();
 		float GetFieldOfView();
 
-		SpatialController& Spatial();
+		SpatialController<Node3D>& Spatial();
 		const Matrix4f& ProjMatrix() const;
 
 		Ray3f GetWorldSpacePickRay( const Vector2f& location ) const;
@@ -95,7 +94,7 @@ namespace Glyph3
 
         Matrix4f m_ProjMatrix;
 		VectorParameterWriterDX11* m_pViewPositionWriter;
-		SpatialController*	m_pSpatialController;
+		SpatialController<Node3D>*	m_pSpatialController;
 	};
 };
 //--------------------------------------------------------------------------------

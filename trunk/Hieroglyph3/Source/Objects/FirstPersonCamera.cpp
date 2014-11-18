@@ -24,7 +24,7 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 const UINT FirstPersonCamera::KeyBindings[NumControlKeys] = 
 {
-    'W', 'S', 'A', 'D', 'Q', 'E', VK_SPACE
+    'W', 'S', 'A', 'D', 'Q', 'E', VK_CONTROL
 };
 
 static const int InvalidMousePos = -99999;

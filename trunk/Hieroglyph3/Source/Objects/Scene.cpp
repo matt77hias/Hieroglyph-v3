@@ -12,6 +12,7 @@
 #include "PCH.h"
 #include "Scene.h"
 #include "Log.h"
+#include "SceneGraph.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -136,6 +137,6 @@ void Scene::RemoveActor( Actor* pActor )
 //--------------------------------------------------------------------------------
 void Scene::BuildPickRecord( Ray3f& ray, std::vector<PickRecord>& record )
 {
-	m_pRoot->BuildPickRecord( ray, record );
+	Glyph3::BuildPickRecord( m_pRoot, ray, record );
 }
 //--------------------------------------------------------------------------------

@@ -84,24 +84,20 @@
       <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</PreprocessToFile>
     </ClCompile>
     <ClCompile Include="Objects\GlyphletActor.cpp" />
-    <ClCompile Include="Objects\IController.cpp" />
     <ClCompile Include="Objects\Light.cpp" />
     <ClCompile Include="Objects\Node3D.cpp" />
     <ClCompile Include="Objects\ObjectSpaceCameraPositionWriter.cpp" />
     <ClCompile Include="Objects\PickRecord.cpp" />
     <ClCompile Include="Objects\PointLight.cpp" />
-    <ClCompile Include="Objects\PositionExtractorController.cpp" />
-    <ClCompile Include="Objects\RotationController.cpp" />
     <ClCompile Include="Objects\Scene.cpp" />
-    <ClCompile Include="Objects\ScaleSetpointController.cpp" />
+    <ClCompile Include="Objects\SceneGraph.cpp" />
     <ClCompile Include="Objects\SkinnedActor.cpp" />
-    <ClCompile Include="Objects\SkinnedBoneController.cpp" />
     <ClCompile Include="Objects\SkyboxActor.cpp" />
-    <ClCompile Include="Objects\SpatialController.cpp" />
     <ClCompile Include="Objects\TextActor.cpp" />
     <ClCompile Include="Objects\TextureActor.cpp" />
     <ClCompile Include="Objects\TextureSpaceCameraPositionWriter.cpp" />
     <ClCompile Include="Objects\TextureSpaceLightPositionWriter.cpp" />
+    <ClCompile Include="Objects\Transform3D.cpp" />
     <ClCompile Include="Objects\VolumeActor.cpp" />
     <ClCompile Include="Rendering\BasicVertexDX11.cpp" />
     <ClCompile Include="Rendering\BlendStateConfigDX11.cpp" />
@@ -122,7 +118,6 @@
     <ClCompile Include="Rendering\DomainStageDX11.cpp" />
     <ClCompile Include="Rendering\DXGIAdapter.cpp" />
     <ClCompile Include="Rendering\DXGIOutput.cpp" />
-    <ClCompile Include="Rendering\EntityRenderParams.cpp" />
     <ClCompile Include="Rendering\GeometryDX11.cpp">
       <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</PreprocessToFile>
       <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</PreprocessToFile>
@@ -158,6 +153,7 @@
     <ClCompile Include="Rendering\RasterizerStageDX11.cpp" />
     <ClCompile Include="Rendering\RasterizerStageStateDX11.cpp" />
     <ClCompile Include="Rendering\RasterizerStateConfigDX11.cpp" />
+    <ClCompile Include="Rendering\Renderable.cpp" />
     <ClCompile Include="Rendering\RenderEffectDX11.cpp" />
     <ClCompile Include="Rendering\RendererDX11.cpp" />
     <ClCompile Include="Rendering\RenderParameterDX11.cpp" />
@@ -310,6 +306,7 @@
     <ClInclude Include="Objects\RotationController.h" />
     <ClInclude Include="Objects\Scene.h" />
     <ClInclude Include="Objects\ScaleSetpointController.h" />
+    <ClInclude Include="Objects\SceneGraph.h" />
     <ClInclude Include="Objects\SetpointController.h" />
     <ClInclude Include="Objects\SkinnedActor.h" />
     <ClInclude Include="Objects\SkinnedBoneController.h" />
@@ -319,6 +316,7 @@
     <ClInclude Include="Objects\TextureActor.h" />
     <ClInclude Include="Objects\TextureSpaceCameraPositionWriter.h" />
     <ClInclude Include="Objects\TextureSpaceLightPositionWriter.h" />
+    <ClInclude Include="Objects\Transform3D.h" />
     <ClInclude Include="Objects\VolumeActor.h" />
     <ClInclude Include="Rendering\AttributeEvaluator2f.h" />
     <ClInclude Include="Rendering\BasicVertexDX11.h" />
@@ -344,7 +342,6 @@
     <ClInclude Include="Rendering\DrawIndexedInstancedExecutorDX11.h" />
     <ClInclude Include="Rendering\DXGIAdapter.h" />
     <ClInclude Include="Rendering\DXGIOutput.h" />
-    <ClInclude Include="Rendering\EntityRenderParams.h" />
     <ClInclude Include="Rendering\GeometryDX11.h" />
     <ClInclude Include="Rendering\GeometryGeneratorDX11.h" />
     <ClInclude Include="Rendering\GeometryLoaderDX11.h" />
@@ -384,6 +381,7 @@
     <ClInclude Include="Rendering\RasterizerStageDX11.h" />
     <ClInclude Include="Rendering\RasterizerStageStateDX11.h" />
     <ClInclude Include="Rendering\RasterizerStateConfigDX11.h" />
+    <ClInclude Include="Rendering\Renderable.h" />
     <ClInclude Include="Rendering\RenderEffectDX11.h" />
     <ClInclude Include="Rendering\RendererDX11.h" />
     <ClInclude Include="Rendering\RenderParameterDX11.h" />
@@ -467,7 +465,13 @@
     <None Include="Animation\AnimationStream.inl" />
     <None Include="Mathematics\Quaternion.inl" />
     <None Include="Mathematics\Tween.inl" />
+    <None Include="Objects\IController.inl" />
+    <None Include="Objects\PositionExtractorController.inl" />
+    <None Include="Objects\RotationController.inl" />
+    <None Include="Objects\ScaleSetpointController.inl" />
     <None Include="Objects\SetpointController.inl" />
+    <None Include="Objects\SkinnedBoneController.inl" />
+    <None Include="Objects\SpatialController.inl" />
     <None Include="packages.config" />
     <None Include="Rendering\DrawExecutorDX11.inl" />
     <None Include="Rendering\DrawIndexedExecutorDX11.inl" />

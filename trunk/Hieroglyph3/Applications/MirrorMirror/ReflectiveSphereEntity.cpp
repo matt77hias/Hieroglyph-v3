@@ -140,8 +140,8 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 	pEffect->ConfigurePipeline( pRenderer11->pImmPipeline, pRenderer11->m_pParamMgr );
 	pParabGenEffect->ConfigurePipeline( pRenderer11->pImmPipeline, pRenderer11->m_pParamMgr );
 
-	this->SetGeometry( pGeometry );
-	this->SetMaterial( pMaterial );
+	Visual.SetGeometry( pGeometry );
+	Visual.SetMaterial( pMaterial );
 }
 //--------------------------------------------------------------------------------
 ReflectiveSphereEntity::~ReflectiveSphereEntity()

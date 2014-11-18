@@ -36,8 +36,8 @@ MaterialPtr DiffuseSphereEntity::DiffuseMaterial = nullptr;
 //--------------------------------------------------------------------------------
 DiffuseSphereEntity::DiffuseSphereEntity()
 {
-	this->SetGeometry( SphereGeometry );
-	this->SetMaterial( DiffuseMaterial );
+	Visual.SetGeometry( SphereGeometry );
+	Visual.SetMaterial( DiffuseMaterial );
 }
 //--------------------------------------------------------------------------------
 DiffuseSphereEntity::~DiffuseSphereEntity()

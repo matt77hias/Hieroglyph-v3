@@ -43,6 +43,7 @@ namespace Glyph3
 
 		void ConfigureRendering( const ResourcePtr& renderTarget, int swapchain );
 		void ConfigureEyeTexture( unsigned int eye, const ResourcePtr& texture );
+		void ReadEyeData();
 
 		Matrix3f GetOrientation( double time );
 		Matrix4f GetPerspectiveFov( unsigned int eye, float zn, float zf );
@@ -51,6 +52,8 @@ namespace Glyph3
 
 		float BeginFrame();
 		void EndFrame();
+
+		void AttachToWindow( HWND window );
 
 	private:
 		struct Impl;

@@ -109,7 +109,7 @@ CompositeShape* CompositeShape::DeepCopy( )
 	return( pCopy );
 }
 //--------------------------------------------------------------------------------
-bool CompositeShape::RayIntersection( Ray3f Ray, float* fDist )
+bool CompositeShape::RayIntersection( const Ray3f& ray, float* fDist )
 {
 	float fMin = 10000000000.0f;
 	bool bHit = false;
@@ -123,7 +123,7 @@ bool CompositeShape::RayIntersection( Ray3f Ray, float* fDist )
 		case SPHERE:
 			{
 				Sphere3f* pSphere = (Sphere3f*)pShape;
-				IntrRay3fSphere3f Intr( Ray, *pSphere );
+				IntrRay3fSphere3f Intr( ray, *pSphere );
 				if ( Intr.Test() )
 				{
 					bHit = true;
@@ -135,7 +135,6 @@ bool CompositeShape::RayIntersection( Ray3f Ray, float* fDist )
 							*fDist = Intr.m_afRayT[j];
 					}
 				}
-					
 
 				break;
 			}
@@ -143,7 +142,7 @@ bool CompositeShape::RayIntersection( Ray3f Ray, float* fDist )
 		case BOX:
 			{
 				Box3f* pBox = (Box3f*)pShape;
-				IntrRay3fBox3f Intr( Ray, *pBox );
+				IntrRay3fBox3f Intr( ray, *pBox );
 				if ( Intr.Test() )
 				{
 					bHit = true;
@@ -189,7 +188,7 @@ bool CompositeShape::RayIntersection( Ray3f Ray, float* fDist )
 
 }
 //--------------------------------------------------------------------------------
-int CompositeShape::GetNumberOfShapes()
+int CompositeShape::GetNumberOfShapes() const
 {
 	return( m_Shapes.size() );
 }

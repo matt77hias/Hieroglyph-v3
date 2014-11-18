@@ -17,10 +17,15 @@
 //--------------------------------------------------------------------------------
 #include "IController.h"
 #include "Vector3f.h"
+#include "Entity3D.h"
+#include "Log.h"
+//--------------------------------------------------------------------------------
+
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class SpatialController : public IController
+	template <typename T>
+	class SpatialController : public IController<T>
 	{
 	public:
 		SpatialController( );
@@ -56,6 +61,8 @@ namespace Glyph3
 		Vector3f		m_vRotation;
 		Vector3f		m_vTranslation;
 	};
+
+	#include "SpatialController.inl"
 };
 //--------------------------------------------------------------------------------
 #endif // SpatialController_h

@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="RiftController.cpp" />
     <ClCompile Include="RiftHMD.cpp" />
     <ClCompile Include="RiftManager.cpp" />
     <ClCompile Include="ViewRift.cpp" />
@@ -29,6 +28,9 @@
     <ClInclude Include="RiftHMD.h" />
     <ClInclude Include="RiftManager.h" />
     <ClInclude Include="ViewRift.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="RiftController.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{40BFB3A2-3D44-4064-8DBF-07F0C7E574BE}</ProjectGuid>
@@ -111,6 +113,7 @@
     <PostBuildEvent>
       <Command>md ..\..\SDK\Include\GlyphRift
 copy *.h ..\..\SDK\Include\GlyphRift
+copy *.inl ..\..\SDK\Include\GlyphRift
 </Command>
     </PostBuildEvent>
     <Lib>
@@ -138,6 +141,7 @@ copy *.h ..\..\SDK\Include\GlyphRift
     <PostBuildEvent>
       <Command>md ..\..\SDK\Include\GlyphRift
 copy *.h ..\..\SDK\Include\GlyphRift
+copy *.inl ..\..\SDK\Include\GlyphRift
 </Command>
     </PostBuildEvent>
     <Lib>
@@ -169,6 +173,7 @@ copy *.h ..\..\SDK\Include\GlyphRift
     <PostBuildEvent>
       <Command>md ..\..\SDK\Include\GlyphRift
 copy *.h ..\..\SDK\Include\GlyphRift
+copy *.inl ..\..\SDK\Include\GlyphRift
 </Command>
     </PostBuildEvent>
     <Lib>
@@ -200,6 +205,7 @@ copy *.h ..\..\SDK\Include\GlyphRift
     <PostBuildEvent>
       <Command>md ..\..\SDK\Include\GlyphRift
 copy *.h ..\..\SDK\Include\GlyphRift
+copy *.inl ..\..\SDK\Include\GlyphRift
 </Command>
     </PostBuildEvent>
     <Lib>

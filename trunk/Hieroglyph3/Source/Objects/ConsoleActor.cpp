@@ -25,17 +25,17 @@ ConsoleActor::ConsoleActor() :
 	GetNode()->AttachChild( textActor.GetNode() );
 
 	textActor.SetTextOrientation( Vector3f( 1.0f, 0.0f, 0.0f ), Vector3f( 0.0f, 1.0f, 0.0f ) );
-	textActor.GetNode()->Position() = Vector3f( -0.5f, 0.2f, 1.0f );
+	textActor.GetNode()->Transform.Position() = Vector3f( -0.5f, 0.2f, 1.0f );
 	textActor.SetCharacterHeight( 0.02f );
 
 	// Modify the text actor's material with a view space version of its shaders.
-	textActor.GetBody()->GetMaterial()->Params[VT_PERSPECTIVE].pEffect->SetVertexShader( 
+	textActor.GetBody()->Visual.GetMaterial()->Params[VT_PERSPECTIVE].pEffect->SetVertexShader( 
 		RendererDX11::Get()->LoadShader( VERTEX_SHADER,
 		std::wstring( L"AlphaTestTexturedVS.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_4_0" ) ) );
 
-	textActor.GetBody()->GetMaterial()->Params[VT_PERSPECTIVE].pEffect->SetPixelShader( 
+	textActor.GetBody()->Visual.GetMaterial()->Params[VT_PERSPECTIVE].pEffect->SetPixelShader( 
 		RendererDX11::Get()->LoadShader( PIXEL_SHADER,
 		std::wstring( L"AlphaTestTexturedVS.hlsl" ),
 		std::wstring( L"PSMAIN" ),

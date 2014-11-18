@@ -299,8 +299,8 @@ void App::Initialize()
 	// manually manipulating it.
 
 	m_pActor = new Actor();
-	m_pActor->GetBody()->SetGeometry( pGeometry );
-	m_pActor->GetBody()->SetMaterial( pMaterial );
+	m_pActor->GetBody()->Visual.SetGeometry( pGeometry );
+	m_pActor->GetBody()->Visual.SetMaterial( pMaterial );
 
 	m_pScene->AddActor( m_pActor );
 

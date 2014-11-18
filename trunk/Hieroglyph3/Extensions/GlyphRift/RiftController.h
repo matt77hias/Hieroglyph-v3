@@ -23,7 +23,8 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class RiftController : public IController
+	template <typename T>
+	class RiftController : public IController<T>
 	{
 	public:
 		RiftController( RiftHMDPtr hmd );
@@ -33,6 +34,8 @@ namespace Glyph3
 	private:
 		RiftHMDPtr m_Hmd;
 	};
+
+	#include "RiftController.inl"
 };
 //--------------------------------------------------------------------------------
 #endif // RiftController_h

@@ -92,10 +92,10 @@ void App::Initialize()
 	GeometryPtr pGeometry = GeometryPtr( new GeometryDX11() );
 	GeometryGeneratorDX11::GenerateWeightedSkinnedCone( pGeometry, 16, 20, 2.0f, 40.0f, 6, m_pDisplacedActor );
 	pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
-	m_pDisplacedActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedSolid( *m_pRenderer11 ) );
+	m_pDisplacedActor->GetBody()->Visual.SetMaterial( MaterialGeneratorDX11::GenerateSkinnedSolid( *m_pRenderer11 ) );
 
-	RotationController* pRotController1 = new RotationController();
-	m_pDisplacedActor->GetNode()->AttachController( pRotController1 );
+	RotationController<Node3D>* pRotController1 = new RotationController<Node3D>();
+	m_pDisplacedActor->GetNode()->Controllers.Attach( pRotController1 );
 
 	
 	// Create the skinned actor without displacement
@@ -104,10 +104,10 @@ void App::Initialize()
 	GeometryPtr pSkinnedGeometry = GeometryPtr( new GeometryDX11() );
 	GeometryGeneratorDX11::GenerateWeightedSkinnedCone( pSkinnedGeometry, 16, 20, 2.0f, 40.0f, 6, m_pSkinnedActor );
 	pSkinnedGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-	m_pSkinnedActor->GetBody()->SetMaterial( MaterialGeneratorDX11::GenerateSkinnedTextured( *m_pRenderer11 ) );
+	m_pSkinnedActor->GetBody()->Visual.SetMaterial( MaterialGeneratorDX11::GenerateSkinnedTextured( *m_pRenderer11 ) );
 
-	RotationController* pRotController2 = new RotationController();
-	m_pSkinnedActor->GetNode()->AttachController( pRotController2 );
+	RotationController<Node3D>* pRotController2 = new RotationController<Node3D>();
+	m_pSkinnedActor->GetNode()->Controllers.Attach( pRotController2 );
 
 	
 	// Generate the static mesh, and attach a texture to its entity
@@ -116,11 +116,11 @@ void App::Initialize()
 	GeometryPtr pStaticGeometry = GeometryLoaderDX11::loadMS3DFile2( std::wstring( L"box.ms3d" ) );
 	pStaticGeometry->LoadToBuffers();
 	MaterialPtr pStaticMaterial = MaterialGeneratorDX11::GenerateStaticTextured( *m_pRenderer11 );
-	m_pStaticActor->GetBody()->SetGeometry( pStaticGeometry );
-	m_pStaticActor->GetBody()->SetMaterial( pStaticMaterial );
+	m_pStaticActor->GetBody()->Visual.SetGeometry( pStaticGeometry );
+	m_pStaticActor->GetBody()->Visual.SetMaterial( pStaticMaterial );
 
-	RotationController* pRotController3 = new RotationController();
-	m_pStaticActor->GetBody()->AttachController( pRotController3);
+	RotationController<Entity3D>* pRotController3 = new RotationController<Entity3D>();
+	m_pStaticActor->GetBody()->Controllers.Attach( pRotController3);
 
 	
 	ResourcePtr ColorTexture = RendererDX11::Get()->LoadTexture( L"Tiles.png" );
@@ -145,9 +145,9 @@ void App::Initialize()
 	m_pSkinnedActor->SetSkinningMatrices( *m_pRenderer11 );
 	m_pSkinnedActor->PlayAllAnimations();
 
-	m_pStaticActor->GetBody()->Position() = Vector3f( -20.0f, 10.0f, 15.0f );
-	m_pSkinnedActor->GetNode()->Position() = Vector3f( 0.0f, 0.0f, 20.0f );
-	m_pDisplacedActor->GetNode()->Position() = Vector3f( 20.0f, 0.0f, 20.0f );
+	m_pStaticActor->GetBody()->Transform.Position() = Vector3f( -20.0f, 10.0f, 15.0f );
+	m_pSkinnedActor->GetNode()->Transform.Position() = Vector3f( 0.0f, 0.0f, 20.0f );
+	m_pDisplacedActor->GetNode()->Transform.Position() = Vector3f( 20.0f, 0.0f, 20.0f );
 }
 //--------------------------------------------------------------------------------
 void App::Update()

@@ -16,11 +16,7 @@
 #define Entity3D_h
 //--------------------------------------------------------------------------------
 #include "PCH.h"
-#include "Vector3f.h"
-#include "Vector4f.h"
-#include "Sphere3f.h"
-#include "Matrix3f.h"
-#include "Matrix4f.h"
+#include "Transform3D.h"
 #include "Ray3f.h"
 #include "Frustum3f.h"
 #include "RendererDX11.h"
@@ -28,7 +24,7 @@
 #include "MaterialDX11.h"
 #include "IController.h"
 #include "CompositeShape.h"
-#include "EntityRenderParams.h"
+#include "Renderable.h"
 #include "ParameterContainer.h"
 
 #include <string>
@@ -37,84 +33,35 @@
 namespace Glyph3
 {
 
+	class Node3D;
+
 	class Entity3D
 	{
 	public:
 		Entity3D( );
-		virtual ~Entity3D( );
+		~Entity3D( );
 
-		Vector3f& Position( );
-		Matrix3f& Rotation( );
-		Vector3f& Scale( );
+		// Spatial related data and functionality
 
-		virtual void Update( float time );
-		virtual void UpdateLocal( float time );
-		virtual void UpdateWorld( );
+		void Update( float time );
+		void UpdateLocal( float time );
+		void UpdateWorld( );
 
+
+		// Rendering related data and functionality
 		void SetRenderParams( IParameterManager* pParamManager );
-		virtual void PreRender( RendererDX11* pRenderer, VIEWTYPE view );
-		virtual void Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view );
+		void PreRender( RendererDX11* pRenderer, VIEWTYPE view );
+		void Render( PipelineManagerDX11* pPipelineManager, IParameterManager* pParamManager, VIEWTYPE view );
 
-		Matrix4f& LocalMatrix( );
-		Matrix4f& WorldMatrix( );
-		Matrix4f GetView( ) const;
-
-		Vector4f LocalToWorldSpace( const Vector4f& input );
-		Vector4f WorldToLocalSpace( const Vector4f& input );
-		Vector3f LocalVectorToWorldSpace( const Vector3f& input );
-		Vector3f LocalPointToWorldSpace( const Vector3f& input );
-		Vector3f WorldVectorToLocalSpace( const Vector3f& input );
-		Vector3f WorldPointToLocalSpace( const Vector3f& input );
-
-
-		void SetMaterial( MaterialPtr pMaterial );
-		MaterialPtr GetMaterial( );
-
-		void SetGeometry( ExecutorPtr pExecutor );
-		ExecutorPtr GetGeometry( );
-
-
-		// Various entity properties are accessed here.
-
-		bool IsHidden( ) const;
-		void SetHidden( bool bHide );
-		bool IsPickable() const;
-		void SetPickable( bool bPickable );
-
-		void SetLocalMatrixCalculation( bool bCalc );
-
-
-		// Controller support is added here.  There can be multiple controllers which
-		// will be updated in the order that they are added to the entity.
-
-		void AttachController( IController* pController );
-		IController* GetController( unsigned int index );
-
-		virtual std::wstring toString( );
+		std::wstring toString( );
 
 		// Scene graph support is added by the following functions.  The graph is enforced
 		// by allowing only a single parent, and only Entity3D will be leaf nodes.
 
-		Entity3D* GetParent( );
-		Entity3D* GetRoot( );
-
-		void AttachParent( Entity3D* Parent );
+		void AttachParent( Node3D* Parent );
 		void DetachParent( );
+		Node3D* GetParent( );
 
-		// Some simple graph structure information is available through these recursive
-		// function calls.
-
-		bool IsRelated( Entity3D* Entity );
-		int GraphDepth( );
-
-		// The pick record is the correct way to build a list of the entities that are 
-		// intersecting the ray.  The other two methods are just as valid, but perform
-		// a different type of query than the pick record.
-
-		virtual void BuildPickRecord( Ray3f& ray, std::vector<PickRecord>& record );
-		virtual void GetIntersectingEntities( std::vector< Entity3D* >& set, Sphere3f& bounds );
-		virtual void GetIntersectingEntities( std::vector< Entity3D* >& set, Frustum3f& bounds );
-		virtual void GetEntities( std::vector< Entity3D* >& set );
 		
 
 		void SetName( const std::wstring& name );
@@ -130,41 +77,30 @@ namespace Glyph3
 
 	protected:
 
-		Vector3f m_vTranslation;	// The translation and rotation varaibles are updated
-		Matrix3f m_mRotation;		// during the update phase and used to generate the
-		Vector3f m_vScale;			// local matrix.  Then, the world matrix is updated
-		Matrix4f m_mWorld;			// with the new local matrix and the entity's parent
-		Matrix4f m_mLocal;			// world matrix.
-
-		// Entity flags
-		bool m_bPickable;
-		bool m_bHidden;
-		bool m_bCalcLocal;
-	
-		Entity3D* m_pParent;
-		//int m_iEntityID;
-		std::vector< IController* > m_Controllers;
-
+		Node3D* m_pParent;
 		std::wstring m_Name;
 
 	public:
-		EntityRenderParams m_sParams;
-		ParameterContainer Parameters;
+		Transform3D					Transform;
+		ControllerPack<Entity3D>	Controllers;
+		Renderable					Visual;
+		ParameterContainer			Parameters;
 
-		Sphere3f m_ModelBoundingSphere;
-		Sphere3f m_WorldBoundingSphere;
+		//Sphere3f m_ModelBoundingSphere;
 
 		// The composite shape consists of multiple shapes to represent the entity.
 		// It is currently used for ray picking, but will eventually be added to visibility
 		// tests, and possibly used to drive the physics shape generation.
 
-		CompositeShape CompositeShape;
-		
+		CompositeShape				Shape;
+
 		// Storage for the custom user data
 		void* m_pUserData;
 
-		friend IController;
+		// Entity flags
+		//bool m_bPickable;
 	};
 };
 //--------------------------------------------------------------------------------
 #endif // Entity3D_h
+//--------------------------------------------------------------------------------

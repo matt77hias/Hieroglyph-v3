@@ -65,8 +65,8 @@ TextureActor::TextureActor( const ResourcePtr& texture, float scale ) :
 	m_pMaterial->Params[VT_PERSPECTIVE].bRender = true;
 	m_pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
 
-	GetBody()->SetMaterial( m_pMaterial );
-	GetBody()->SetGeometry( m_pGeometry );
+	GetBody()->Visual.SetMaterial( m_pMaterial );
+	GetBody()->Visual.SetGeometry( m_pGeometry );
 
 	SetTexture( texture, scale );
 	SetColor( m_Color );

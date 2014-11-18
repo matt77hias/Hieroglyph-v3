@@ -37,7 +37,7 @@ int ScriptIntfActor::SetPosition( lua_State* pLuaState )
 
 	if ( pActor )
 	{
-		pActor->GetNode()->Position() = Vector3f( x, y, z );
+		pActor->GetNode()->Transform.Position() = Vector3f( x, y, z );
 		return( 0 );
 	}
 
@@ -54,9 +54,9 @@ int ScriptIntfActor::GetPosition( lua_State* pLuaState )
 
 	if ( pActor )
 	{
-		lua_pushnumber( pLuaState, pActor->GetNode()->Position().x );
-		lua_pushnumber( pLuaState, pActor->GetNode()->Position().y );
-		lua_pushnumber( pLuaState, pActor->GetNode()->Position().z );
+		lua_pushnumber( pLuaState, pActor->GetNode()->Transform.Position().x );
+		lua_pushnumber( pLuaState, pActor->GetNode()->Transform.Position().y );
+		lua_pushnumber( pLuaState, pActor->GetNode()->Transform.Position().z );
 	
 		return( 3 );
 	}
@@ -80,7 +80,7 @@ int ScriptIntfActor::SetRotation( lua_State* pLuaState )
 
 	if ( pActor )
 	{
-		pActor->GetNode()->Rotation().Rotation( Vector3f( x, y, z ) );
+		pActor->GetNode()->Transform.Rotation().Rotation( Vector3f( x, y, z ) );
 		return( 0 );
 	}
 
