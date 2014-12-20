@@ -254,7 +254,7 @@ struct RiftHMD::Impl
 
 		ovrD3D11Config cfg;
 		cfg.D3D11.Header.API = ovrRenderAPI_D3D11;
-		cfg.D3D11.Header.RTSize = size;
+		cfg.D3D11.Header.BackBufferSize = size;
 		cfg.D3D11.Header.Multisample = 1;
 		cfg.D3D11.pDevice = RendererDX11::Get()->GetDevice();
 		cfg.D3D11.pDeviceContext = RendererDX11::Get()->pImmPipeline->GetDeviceContext();

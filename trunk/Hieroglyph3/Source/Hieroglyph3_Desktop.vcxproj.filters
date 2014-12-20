@@ -144,12 +144,6 @@
     <Filter Include="Rendering\Pipeline System\Executors\Old Style Objects">
       <UniqueIdentifier>{f5a194fc-69bc-48df-9982-6b29b981def6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Rendering\Pipeline System\Executors\Executors">
-      <UniqueIdentifier>{2813316a-9132-461a-8675-d45569c218bd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Rendering\Pipeline System\Executors\Executors\Basis Objects">
-      <UniqueIdentifier>{9e97739e-4186-4dac-8ecc-9c3e6d85d4b6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Rendering\Pipeline System\Executors\Vertex Layouts">
       <UniqueIdentifier>{2b400be7-1a2d-4ae9-a9ae-491fca43e86d}</UniqueIdentifier>
     </Filter>
@@ -200,6 +194,9 @@
     </Filter>
     <Filter Include="Rendering\Tessellation Toolkit\Tessellators">
       <UniqueIdentifier>{2d1a82ca-c449-448c-a076-c9e589e8d177}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Executors\Basis Objects">
+      <UniqueIdentifier>{9e97739e-4186-4dac-8ecc-9c3e6d85d4b6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -549,7 +546,7 @@
       <Filter>Rendering\Pipeline System\Stages\Programmable Stages\States</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\VertexElementDX11.cpp">
-      <Filter>Rendering\Pipeline System\Executors\Executors\Basis Objects</Filter>
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\CommandListDX11.cpp">
       <Filter>Rendering\Renderer Components</Filter>
@@ -674,9 +671,6 @@
     <ClCompile Include="Rendering\GeometryLoaderDX11.cpp">
       <Filter>Rendering\Pipeline System\Executors\Old Style Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\PipelineExecutorDX11.cpp">
-      <Filter>Rendering\Pipeline System\Executors\Executors</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\VolumeTextureVertexDX11.cpp">
       <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
     </ClCompile>
@@ -694,9 +688,6 @@
     </ClCompile>
     <ClCompile Include="Rendering\MaterialTemplate.cpp">
       <Filter>Rendering\Material System\Components\Material Templates</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\MultiExecutorDX11.cpp">
-      <Filter>Rendering\Pipeline System\Executors\Executors</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\SpriteFontLoaderDX11.cpp">
       <Filter>Rendering\Sprite System</Filter>
@@ -793,6 +784,12 @@
     </ClCompile>
     <ClCompile Include="Objects\SceneGraph.cpp">
       <Filter>Objects\Basic Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\MultiExecutorDX11.cpp">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\PipelineExecutorDX11.cpp">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1160,13 +1157,13 @@
       <Filter>Rendering\Pipeline System\Stages\Programmable Stages\States</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\TGrowableIndexBufferDX11.h">
-      <Filter>Rendering\Pipeline System\Executors\Executors\Basis Objects</Filter>
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\TGrowableVertexBufferDX11.h">
-      <Filter>Rendering\Pipeline System\Executors\Executors\Basis Objects</Filter>
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\VertexElementDX11.h">
-      <Filter>Rendering\Pipeline System\Executors\Executors\Basis Objects</Filter>
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\ms3dspec.h">
       <Filter>Rendering\Pipeline System\Executors\File Formats</Filter>
@@ -1303,23 +1300,11 @@
     <ClInclude Include="Rendering\GeometryLoaderDX11.h">
       <Filter>Rendering\Pipeline System\Executors\Old Style Objects</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\DrawExecutorDX11.h">
-      <Filter>Rendering\Pipeline System\Executors\Executors</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DrawIndexedExecutorDX11.h">
-      <Filter>Rendering\Pipeline System\Executors\Executors</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\PipelineExecutorDX11.h">
-      <Filter>Rendering\Pipeline System\Executors\Executors</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\VolumeTextureVertexDX11.h">
       <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\SpriteVertexDX11.h">
       <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\DrawIndexedInstancedExecutorDX11.h">
-      <Filter>Rendering\Pipeline System\Executors\Executors</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\MaterialManager.h">
       <Filter>Rendering\Material System</Filter>
@@ -1332,9 +1317,6 @@
     </ClInclude>
     <ClInclude Include="Rendering\MaterialTemplate.h">
       <Filter>Rendering\Material System\Components\Material Templates</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\MultiExecutorDX11.h">
-      <Filter>Rendering\Pipeline System\Executors\Executors</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\SpriteFontLoaderDX11.h">
       <Filter>Rendering\Sprite System</Filter>
@@ -1406,7 +1388,7 @@
       <Filter>Mathematics</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\TGrowableStructuredBufferDX11.h">
-      <Filter>Rendering\Pipeline System\Executors\Executors\Basis Objects</Filter>
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
     </ClInclude>
     <ClInclude Include="Objects\ObjectSpaceCameraPositionWriter.h">
       <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
@@ -1418,7 +1400,7 @@
       <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Stream Output</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\TGrowableBufferDX11.h">
-      <Filter>Rendering\Pipeline System\Executors\Executors\Basis Objects</Filter>
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
     </ClInclude>
     <ClInclude Include="Objects\PointLight.h">
       <Filter>Objects\Scene Objects\Lights</Filter>
@@ -1489,25 +1471,31 @@
     <ClInclude Include="Objects\SceneGraph.h">
       <Filter>Objects\Basic Objects</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\DrawExecutorDX11.h">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DrawIndexedExecutorDX11.h">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\DrawIndexedInstancedExecutorDX11.h">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\MultiExecutorDX11.h">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\PipelineExecutorDX11.h">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Rendering\TGrowableIndexBufferDX11.inl">
-      <Filter>Rendering\Pipeline System\Executors\Executors\Basis Objects</Filter>
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
     </None>
     <None Include="Rendering\TGrowableVertexBufferDX11.inl">
-      <Filter>Rendering\Pipeline System\Executors\Executors\Basis Objects</Filter>
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
     </None>
     <None Include="Utility\TConfiguration.inl">
       <Filter>Utility</Filter>
-    </None>
-    <None Include="Rendering\DrawExecutorDX11.inl">
-      <Filter>Rendering\Pipeline System\Executors\Executors</Filter>
-    </None>
-    <None Include="Rendering\DrawIndexedExecutorDX11.inl">
-      <Filter>Rendering\Pipeline System\Executors\Executors</Filter>
-    </None>
-    <None Include="Rendering\DrawIndexedInstancedExecutorDX11.inl">
-      <Filter>Rendering\Pipeline System\Executors\Executors</Filter>
     </None>
     <None Include="Rendering\TStateArrayMonitor.inl">
       <Filter>Rendering\Pipeline System\Stages\Common</Filter>
@@ -1522,10 +1510,10 @@
       <Filter>Mathematics</Filter>
     </None>
     <None Include="Rendering\TGrowableStructuredBufferDX11.inl">
-      <Filter>Rendering\Pipeline System\Executors\Executors\Basis Objects</Filter>
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
     </None>
     <None Include="Rendering\TGrowableBufferDX11.inl">
-      <Filter>Rendering\Pipeline System\Executors\Executors\Basis Objects</Filter>
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
     </None>
     <None Include="Animation\AnimationStream.inl">
       <Filter>Animation</Filter>
@@ -1533,7 +1521,6 @@
     <None Include="Mathematics\Quaternion.inl">
       <Filter>Mathematics</Filter>
     </None>
-    <None Include="packages.config" />
     <None Include="Objects\IController.inl">
       <Filter>Objects\Controllers</Filter>
     </None>
@@ -1552,5 +1539,15 @@
     <None Include="Objects\SpatialController.inl">
       <Filter>Objects\Controllers</Filter>
     </None>
+    <None Include="Rendering\DrawExecutorDX11.inl">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </None>
+    <None Include="Rendering\DrawIndexedExecutorDX11.inl">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </None>
+    <None Include="Rendering\DrawIndexedInstancedExecutorDX11.inl">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

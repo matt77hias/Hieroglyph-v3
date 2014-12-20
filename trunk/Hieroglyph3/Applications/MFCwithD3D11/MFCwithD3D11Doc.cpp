@@ -46,9 +46,9 @@ BOOL CMFCwithD3D11Doc::OnNewDocument()
     pGeometry->LoadToBuffers();
     pGeometry->SetPrimitiveType( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	
-	pActor->GetBody()->SetGeometry( pGeometry );
-	pActor->GetBody()->SetMaterial( Glyph3::MaterialGeneratorDX11::GeneratePhong( *Glyph3::RendererDX11::Get() ) );
-	pActor->GetBody()->AttachController( new Glyph3::RotationController( Glyph3::Vector3f::Random(), 1.0f ) );
+	pActor->GetBody()->Visual.SetGeometry( pGeometry );
+	pActor->GetBody()->Visual.SetMaterial( Glyph3::MaterialGeneratorDX11::GeneratePhong( *Glyph3::RendererDX11::Get() ) );
+	pActor->GetBody()->Controllers.Attach( new Glyph3::RotationController<Glyph3::Entity3D>( Glyph3::Vector3f::Random(), 1.0f ) );
 
 	pScene->AddActor( pActor );
 	pScene->Update( 0.0f );
