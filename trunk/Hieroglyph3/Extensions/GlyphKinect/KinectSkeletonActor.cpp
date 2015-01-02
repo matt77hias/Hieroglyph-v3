@@ -10,7 +10,7 @@
 
 //--------------------------------------------------------------------------------
 #include "PCH.h"
-#include "KinectSkeletonActor.h"
+#include "GlyphKinect/KinectSkeletonActor.h"
 #include "RendererDX11.h"
 #include "Log.h"
 #include "GeometryLoaderDX11.h"

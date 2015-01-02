@@ -9,37 +9,25 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// IRenderer
+// ArmsForwardPose
 //
-// This interface class provides the basis of which all of the renderer classes
-// are built upon.  
 //--------------------------------------------------------------------------------
-#ifndef IRenderer_h
-#define IRenderer_h
+#ifndef ArmsForwardPose_h
+#define ArmsForwardPose_h
 //--------------------------------------------------------------------------------
 #include "PCH.h"
+#include "NuiApi.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	enum RendererType
-	{
-		DX11
-	};
-
-	class IRenderer
+	class ArmsForwardPose
 	{
 	public:
-		virtual ~IRenderer() {};
+		ArmsForwardPose();
+		virtual ~ArmsForwardPose();
 
-		virtual bool Initialize( int w, int h, bool windowed, HWND handle ) { return false; };
-		virtual void Shutdown() = 0;
-		virtual void Present( HWND hWnd = 0, int SwapChain = -1 ) = 0;
-
-	protected:
-		IRenderer& operator=(const IRenderer&);
+		virtual bool TestPose( NUI_SKELETON_DATA& data );
 	};
-};
+}
 //--------------------------------------------------------------------------------
-#endif // IRenderer_h
-//--------------------------------------------------------------------------------
-
+#endif // ArmsForwardPose_h

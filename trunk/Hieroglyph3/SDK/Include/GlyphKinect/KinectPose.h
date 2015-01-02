@@ -9,30 +9,25 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-#include "RiftController.h"
-#include "Entity3D.h"
-#include "Log.h"
+// KinectPose
+//
 //--------------------------------------------------------------------------------
-using namespace Glyph3;
+#ifndef KinectPose_h
+#define KinectPose_h
 //--------------------------------------------------------------------------------
-RiftController::RiftController( RiftHMDPtr hmd ) :
-	m_Hmd( hmd )
+#include "PCH.h"
+#include "NuiApi.h"
+//--------------------------------------------------------------------------------
+namespace Glyph3
 {
-}
-//--------------------------------------------------------------------------------
-RiftController::~RiftController()
-{
-}
-//--------------------------------------------------------------------------------
-void RiftController::Update( float fTime )
-{
-	// This controller has one simple mission in life - if it is attached to an
-	// entity, then it should get the orientation from the Rift and apply it to 
-	// the entity.
-
-	if ( m_pEntity )
+	class KinectPose
 	{
-		m_pEntity->Rotation() = m_Hmd->GetOrientation( 0.0 );
-	}
+	public:
+		KinectPose();
+		virtual ~KinectPose();
+
+		virtual bool TestPose( NUI_SKELETON_DATA& data ) = 0;
+	};
 }
 //--------------------------------------------------------------------------------
+#endif // KinectPose_h

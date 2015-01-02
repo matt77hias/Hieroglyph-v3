@@ -7,7 +7,7 @@
 //
 // Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
-#include "KinectPose.h"
+#include "GlyphKinect/KinectPose.h"
 #include "Log.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;

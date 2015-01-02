@@ -460,7 +460,7 @@ void RendererDX11::Shutdown()
 	//SAFE_RELEASE( m_pDebugger );
 }
 //--------------------------------------------------------------------------------
-void RendererDX11::Present( HWND hWnd, int SwapChain )
+void RendererDX11::Present(HWND hWnd, int SwapChain, UINT SyncInterval, UINT PresentFlags )
 {
 	// Present to the window
 
@@ -468,7 +468,7 @@ void RendererDX11::Present( HWND hWnd, int SwapChain )
 
 	if ( index < m_vSwapChains.size() ) {
 		SwapChainDX11* pSwapChain = m_vSwapChains[SwapChain];
-		HRESULT hr = pSwapChain->m_pSwapChain->Present( 0, 0 );
+		HRESULT hr = pSwapChain->m_pSwapChain->Present( SyncInterval, PresentFlags );
 	}
 	else {
 		Log::Get().Write( L"Tried to present an invalid swap chain index!" );

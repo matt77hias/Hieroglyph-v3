@@ -24,13 +24,13 @@
     <ClCompile Include="ViewRift.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RiftController.h" />
-    <ClInclude Include="RiftHMD.h" />
-    <ClInclude Include="RiftManager.h" />
-    <ClInclude Include="ViewRift.h" />
+    <ClInclude Include="..\..\Include\GlyphRift\RiftController.h" />
+    <ClInclude Include="..\..\Include\GlyphRift\RiftHMD.h" />
+    <ClInclude Include="..\..\Include\GlyphRift\RiftManager.h" />
+    <ClInclude Include="..\..\Include\GlyphRift\ViewRift.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="RiftController.inl" />
+    <None Include="..\..\Include\GlyphRift\RiftController.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{40BFB3A2-3D44-4064-8DBF-07F0C7E574BE}</ProjectGuid>
@@ -81,20 +81,20 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)Library\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>Bin\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IntDir>Bin\$(Platform)\$(Configuration)\</IntDir>
-    <OutDir>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)Library\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)Library\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>Bin\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IntDir>Bin\$(Platform)\$(Configuration)\</IntDir>
-    <OutDir>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)Library\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -103,7 +103,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>OVR_BUILD_DEBUG;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDK\Include;$(SolutionDir)Dependencies\OculusSDK\LibOVR\Include;$(SolutionDir)Dependencies\OculusSDK\LibOVR\Src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include;$(SolutionDir)Dependencies\OculusSDK\LibOVR\Include;$(SolutionDir)Dependencies\OculusSDK\LibOVR\Src</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
@@ -111,13 +111,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>md ..\..\SDK\Include\GlyphRift
-copy *.h ..\..\SDK\Include\GlyphRift
-copy *.inl ..\..\SDK\Include\GlyphRift
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\$(PlatformName)\VS2013\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\$(PlatformName)\VS2013\</AdditionalLibraryDirectories>
       <AdditionalDependencies>libovrd.lib;Hieroglyph3_Desktop.lib;ws2_32.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
@@ -131,7 +129,7 @@ copy *.inl ..\..\SDK\Include\GlyphRift
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>OVR_BUILD_DEBUG;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDK\Include;$(SolutionDir)Dependencies\OculusSDK\LibOVR\Include;$(SolutionDir)Dependencies\OculusSDK\LibOVR\Src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include;$(SolutionDir)Dependencies\OculusSDK\LibOVR\Include;$(SolutionDir)Dependencies\OculusSDK\LibOVR\Src</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
@@ -139,13 +137,11 @@ copy *.inl ..\..\SDK\Include\GlyphRift
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>md ..\..\SDK\Include\GlyphRift
-copy *.h ..\..\SDK\Include\GlyphRift
-copy *.inl ..\..\SDK\Include\GlyphRift
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\$(PlatformName)\VS2013\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\$(PlatformName)\VS2013\</AdditionalLibraryDirectories>
       <AdditionalDependencies>libovr64d.lib;Hieroglyph3_Desktop.lib;ws2_32.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
@@ -161,7 +157,7 @@ copy *.inl ..\..\SDK\Include\GlyphRift
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDK\Include;$(SolutionDir)Dependencies\OculusSDK\LibOVR\Include;$(SolutionDir)Dependencies\OculusSDK\LibOVR\Src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include;$(SolutionDir)Dependencies\OculusSDK\LibOVR\Include;$(SolutionDir)Dependencies\OculusSDK\LibOVR\Src</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
@@ -171,13 +167,11 @@ copy *.inl ..\..\SDK\Include\GlyphRift
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>md ..\..\SDK\Include\GlyphRift
-copy *.h ..\..\SDK\Include\GlyphRift
-copy *.inl ..\..\SDK\Include\GlyphRift
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\$(PlatformName)\VS2013\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\$(PlatformName)\VS2013\</AdditionalLibraryDirectories>
       <AdditionalDependencies>libovr.lib;Hieroglyph3_Desktop.lib;ws2_32.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
@@ -193,7 +187,7 @@ copy *.inl ..\..\SDK\Include\GlyphRift
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDK\Include;$(SolutionDir)Dependencies\OculusSDK\LibOVR\Include;$(SolutionDir)Dependencies\OculusSDK\LibOVR\Src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include;$(SolutionDir)Dependencies\OculusSDK\LibOVR\Include;$(SolutionDir)Dependencies\OculusSDK\LibOVR\Src</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
@@ -203,13 +197,11 @@ copy *.inl ..\..\SDK\Include\GlyphRift
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>md ..\..\SDK\Include\GlyphRift
-copy *.h ..\..\SDK\Include\GlyphRift
-copy *.inl ..\..\SDK\Include\GlyphRift
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\$(PlatformName)\VS2013\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\$(PlatformName)\VS2013\</AdditionalLibraryDirectories>
       <AdditionalDependencies>libovr64.lib;Hieroglyph3_Desktop.lib;ws2_32.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>

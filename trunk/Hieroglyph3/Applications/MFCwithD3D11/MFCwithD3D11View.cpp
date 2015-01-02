@@ -55,7 +55,7 @@ void CMFCwithD3D11View::OnDraw(CDC* /*pDC*/)
 	pCamera->SetScene( pDoc->pScene );
 	pCamera->RenderFrame( Glyph3::RendererDX11::Get() );
 
-	Glyph3::RendererDX11::Get()->Present( this->GetSafeHwnd(), SwapChain );
+	Glyph3::RendererDX11::Get()->Present( this->GetSafeHwnd(), SwapChain, 1, 0 );
 }
 //--------------------------------------------------------------------------------
 #ifdef _DEBUG

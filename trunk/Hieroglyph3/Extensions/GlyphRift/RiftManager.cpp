@@ -7,7 +7,7 @@
 //
 // Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
-#include "RiftManager.h"
+#include "GlyphRift/RiftManager.h"
 #include "OVR_CAPI.h"
 #include "Log.h"
 //--------------------------------------------------------------------------------

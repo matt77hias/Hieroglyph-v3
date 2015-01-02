@@ -9,7 +9,7 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-#include "ViewRift.h"
+#include "GlyphRift/ViewRift.h"
 #include "Entity3D.h"
 #include "Scene.h"
 #include "Texture2dConfigDX11.h"

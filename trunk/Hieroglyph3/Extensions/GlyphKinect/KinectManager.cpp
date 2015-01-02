@@ -7,7 +7,7 @@
 //
 // Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
-#include "KinectManager.h"
+#include "GlyphKinect/KinectManager.h"
 #include "NuiApi.h"
 #include "Log.h"
 //--------------------------------------------------------------------------------

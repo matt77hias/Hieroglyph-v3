@@ -7,7 +7,7 @@
 //
 // Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
-#include "ArmsForwardPose.h"
+#include "GlyphKinect/ArmsForwardPose.h"
 #include "Log.h"
 #include "Vector3f.h"
 //--------------------------------------------------------------------------------

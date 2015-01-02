@@ -9,7 +9,7 @@
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-#include "ViewKinect.h"
+#include "GlyphKinect/ViewKinect.h"
 #include "Entity3D.h"
 #include "Node3D.h"
 #include "Texture2dConfigDX11.h"
@@ -17,9 +17,9 @@
 #include <sstream>
 #include "IParameterManager.h"
 #include "Texture2dConfigDX11.h"
-#include "KinectManager.h"
+#include "GlyphKinect/KinectManager.h"
 
-#include "ArmsForwardPose.h"
+#include "GlyphKinect/ArmsForwardPose.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------

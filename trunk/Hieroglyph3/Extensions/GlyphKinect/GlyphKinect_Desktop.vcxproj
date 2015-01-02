@@ -26,11 +26,11 @@
     <ClCompile Include="ViewKinect.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ArmsForwardPose.h" />
-    <ClInclude Include="KinectManager.h" />
-    <ClInclude Include="KinectPose.h" />
-    <ClInclude Include="KinectSkeletonActor.h" />
-    <ClInclude Include="ViewKinect.h" />
+    <ClInclude Include="..\..\Include\GlyphKinect\ArmsForwardPose.h" />
+    <ClInclude Include="..\..\Include\GlyphKinect\KinectManager.h" />
+    <ClInclude Include="..\..\Include\GlyphKinect\KinectPose.h" />
+    <ClInclude Include="..\..\Include\GlyphKinect\KinectSkeletonActor.h" />
+    <ClInclude Include="..\..\Include\GlyphKinect\ViewKinect.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{035D70FA-C8BE-4002-89BE-F53C8895D3BE}</ProjectGuid>
@@ -81,7 +81,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)Library\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>Bin\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>$(KINECTSDK10_DIR)\inc;$(IncludePath)</IncludePath>
     <LibraryPath>$(KINECTSDK10_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
@@ -90,10 +90,10 @@
     <IncludePath>$(KINECTSDK10_DIR)\inc;$(IncludePath)</IncludePath>
     <LibraryPath>$(KINECTSDK10_DIR)\lib\amd64;$(LibraryPath)</LibraryPath>
     <IntDir>Bin\$(Platform)\$(Configuration)\</IntDir>
-    <OutDir>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)Library\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)Library\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>Bin\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>$(KINECTSDK10_DIR)\inc;$(IncludePath)</IncludePath>
     <LibraryPath>$(KINECTSDK10_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
@@ -102,7 +102,7 @@
     <IncludePath>$(KINECTSDK10_DIR)\inc;$(IncludePath)</IncludePath>
     <LibraryPath>$(KINECTSDK10_DIR)\lib\amd64;$(LibraryPath)</LibraryPath>
     <IntDir>Bin\$(Platform)\$(Configuration)\</IntDir>
-    <OutDir>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)Library\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -111,7 +111,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDK\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
@@ -119,12 +119,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>md ..\..\SDK\Include\GlyphKinect
-copy *.h ..\..\SDK\Include\GlyphKinect
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Library\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Hieroglyph3_Desktop.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
@@ -138,7 +137,7 @@ copy *.h ..\..\SDK\Include\GlyphKinect
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDK\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
@@ -146,12 +145,11 @@ copy *.h ..\..\SDK\Include\GlyphKinect
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>md ..\..\SDK\Include\GlyphKinect
-copy *.h ..\..\SDK\Include\GlyphKinect
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Library\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Hieroglyph3_Desktop.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
@@ -167,7 +165,7 @@ copy *.h ..\..\SDK\Include\GlyphKinect
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDK\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
@@ -177,12 +175,11 @@ copy *.h ..\..\SDK\Include\GlyphKinect
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>md ..\..\SDK\Include\GlyphKinect
-copy *.h ..\..\SDK\Include\GlyphKinect
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Library\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Hieroglyph3_Desktop.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
@@ -198,7 +195,7 @@ copy *.h ..\..\SDK\Include\GlyphKinect
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDK\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
@@ -208,12 +205,11 @@ copy *.h ..\..\SDK\Include\GlyphKinect
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>md ..\..\SDK\Include\GlyphKinect
-copy *.h ..\..\SDK\Include\GlyphKinect
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)SDK\Library\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Library\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Hieroglyph3_Desktop.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>

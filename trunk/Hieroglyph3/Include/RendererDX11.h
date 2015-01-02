@@ -17,7 +17,6 @@
 //--------------------------------------------------------------------------------
 #include "PCH.h"
 
-#include "IRenderer.h"
 #include "TConfiguration.h"
 
 #include "Vector2f.h"
@@ -113,11 +112,11 @@ namespace Glyph3
 
 
 
-	class RendererDX11 : public IRenderer
+	class RendererDX11
 	{
 	public:
 		RendererDX11();
-		virtual ~RendererDX11();
+		~RendererDX11();
 
 		// Access to the renderer.  There should only be a single instance
 		// of the renderer at any given time.
@@ -138,13 +137,13 @@ namespace Glyph3
 		// obtain and release all of the hardware specific resources that
 		// are used during rendering.
 
-		virtual bool Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL FeatureLevel );
-		virtual void Shutdown();
+		bool Initialize( D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL FeatureLevel );
+		void Shutdown();
 
 		// These methods provide rendering frame control.  They are closely
 		// related to the API for sequencing rendering batches.
 
-		virtual void Present( HWND hWnd = 0, int SwapChain = -1 );
+		void Present( HWND hWnd = 0, int SwapChain = -1, UINT SyncInterval = 0, UINT PresentFlags = 0 );
 
 		// Allow the application to create swap chains
 
