@@ -113,3 +113,8 @@ int Timer::FrameCount()
 	return( m_iFrameCount );
 }
 //--------------------------------------------------------------------------------
+float Timer::Frametime()
+{
+	return( 1.0f / static_cast<float>( m_iFramesPerSecond ) );
+}
+//--------------------------------------------------------------------------------

@@ -22,12 +22,14 @@
     <ClCompile Include="RiftHMD.cpp" />
     <ClCompile Include="RiftManager.cpp" />
     <ClCompile Include="ViewRift.cpp" />
+    <ClCompile Include="ViewRiftHighlight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\GlyphRift\RiftController.h" />
     <ClInclude Include="..\..\Include\GlyphRift\RiftHMD.h" />
     <ClInclude Include="..\..\Include\GlyphRift\RiftManager.h" />
     <ClInclude Include="..\..\Include\GlyphRift\ViewRift.h" />
+    <ClInclude Include="..\..\Include\GlyphRift\ViewRiftHighlight.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Include\GlyphRift\RiftController.inl" />

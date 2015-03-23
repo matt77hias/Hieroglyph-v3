@@ -20,4 +20,12 @@ DeferredRendering.sln
 LightPrepass.sln
 *.vsp
 ipch
+</Value></Property><Property><Name>svn:ignore</Name><Value>*.ncb
+*.psess
+*.suo
+DeferredRendering.sln
+LightPrepass.sln
+*.vsp
+ipch
+packages
 </Value></Property></Properties></ItemProperties>

@@ -791,6 +791,9 @@
     <ClCompile Include="D3DEnumConversion.cpp">
       <Filter>Rendering\Utility</Filter>
     </ClCompile>
+    <ClCompile Include="ViewPerspectiveHighlight.cpp">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\Animation.h">
@@ -1482,6 +1485,9 @@
     </ClInclude>
     <ClInclude Include="..\Include\GridTessellator2f.h">
       <Filter>Rendering\Tessellation Toolkit\Tessellators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ViewPerspectiveHighlight.h">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

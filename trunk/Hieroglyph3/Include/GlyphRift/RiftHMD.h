@@ -36,6 +36,8 @@ namespace Glyph3
 		RiftHMD( RiftManagerPtr RiftMgr );
 		~RiftHMD();
 
+		bool IsHardwareDevice();
+
 		unsigned int HmdDisplayWidth();
 		unsigned int HmdDisplayHeight();
 		unsigned int DesiredEyeTextureWidth();

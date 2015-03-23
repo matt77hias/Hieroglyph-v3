@@ -23,6 +23,7 @@
 
 #include "GlyphRift/RiftController.h"
 #include "GlyphRift/ViewRift.h"
+#include "GlyphRift/ViewRiftHighlight.h"
 #include "SwapChainConfigDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
@@ -132,7 +133,8 @@ bool App::ConfigureRenderingSetup()
 	// Create the render view that will produce the images for the left and right
 	// eyes in the Rift.
 
-	ViewRift* pRiftView = new ViewRift( m_pRiftHmd, m_BackBuffer, m_pWindow->GetSwapChain() );
+	//ViewRift* pRiftView = new ViewRift( m_pRiftHmd, m_BackBuffer, m_pWindow->GetSwapChain() );
+	ViewRiftHighlight* pRiftView = new ViewRiftHighlight( m_pRiftHmd, m_BackBuffer, m_pWindow->GetSwapChain() );
 	pRiftView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
 	m_pRenderView = pRiftView;
 
@@ -173,7 +175,7 @@ void App::Initialize()
 	// Create the camera, and the render view that will produce an image of the 
 	// from the camera's point of view of the scene.
 
-	m_pCamera->Spatial().SetRotation( Vector3f( 0.5f, 0.3f, 0.0f ) );
+	//m_pCamera->Spatial().SetRotation( Vector3f( 0.5f, 0.3f, 0.0f ) );
 	m_pCamera->Spatial().SetTranslation( Vector3f( -1.5f, 6.0f, -7.5f ) );
 	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.4f, 0.0f ) );
 

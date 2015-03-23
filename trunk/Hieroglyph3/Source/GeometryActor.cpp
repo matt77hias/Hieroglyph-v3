@@ -33,10 +33,12 @@ GeometryActor::GeometryActor() :
 
 	m_pSolidMaterial = MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *pRenderer );
 	m_pTexturedMaterial = MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( *pRenderer );
+	m_pTransparentMaterial = MaterialGeneratorDX11::GenerateImmediateGeometryTransparentMaterial( *pRenderer );
 
 	GetBody()->Visual.SetGeometry( m_pGeometry );
 
 	UseSolidMaterial();
+	SetDiffuse( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	SetSpecular( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
 }
 //--------------------------------------------------------------------------------
@@ -573,6 +575,11 @@ void GeometryActor::UseTexturedMaterial( ResourcePtr texture )
 	}
 }
 //--------------------------------------------------------------------------------
+void GeometryActor::UseTransparentMaterial( )
+{
+	GetBody()->Visual.SetMaterial( m_pTransparentMaterial );
+}
+//--------------------------------------------------------------------------------
 void GeometryActor::SetSpecular( const Vector4f& color )
 {
 	auto pMaterial = GetBody()->Visual.GetMaterial();
@@ -589,5 +596,23 @@ Vector4f GeometryActor::GetSpecular( ) const
 	assert( pMaterial != nullptr );
 
 	return( pMaterial->Parameters.GetVectorParameterWriter( L"Ks" )->GetValue( ) );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::SetDiffuse( const Vector4f& color )
+{
+	auto pMaterial = GetBody()->Visual.GetMaterial();
+
+	assert( pMaterial != nullptr );
+
+	pMaterial->Parameters.SetVectorParameter( L"Kd", color );
+}
+//--------------------------------------------------------------------------------
+Vector4f GeometryActor::GetDiffuse( ) const
+{
+	auto pMaterial = GetBody()->Visual.GetMaterial();
+
+	assert( pMaterial != nullptr );
+
+	return( pMaterial->Parameters.GetVectorParameterWriter( L"Kd" )->GetValue( ) );
 }
 //--------------------------------------------------------------------------------

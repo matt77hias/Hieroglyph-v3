@@ -216,6 +216,7 @@
     <ClCompile Include="ViewDepthNormal.cpp" />
     <ClCompile Include="ViewOcclusion.cpp" />
     <ClCompile Include="ViewPerspective.cpp" />
+    <ClCompile Include="ViewPerspectiveHighlight.cpp" />
     <ClCompile Include="ViewPortDX11.cpp" />
     <ClCompile Include="ViewTextOverlay.cpp" />
     <ClCompile Include="VisualizerVertexDX11.cpp" />
@@ -448,6 +449,7 @@
     <ClInclude Include="..\Include\ViewDepthNormal.h" />
     <ClInclude Include="..\Include\ViewOcclusion.h" />
     <ClInclude Include="..\Include\ViewPerspective.h" />
+    <ClInclude Include="..\Include\ViewPerspectiveHighlight.h" />
     <ClInclude Include="..\Include\ViewPortDX11.h" />
     <ClInclude Include="..\Include\ViewTextOverlay.h" />
     <ClInclude Include="..\Include\VisualizerVertexDX11.h" />

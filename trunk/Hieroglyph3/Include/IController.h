@@ -23,12 +23,9 @@
 //--------------------------------------------------------------------------------
 #include "Timer.h"
 #include <vector>
-//#include <functional>
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	//class Entity3D;
-
 	template <typename T>
 	class IController
 	{
@@ -79,30 +76,6 @@ namespace Glyph3
 		T* m_host;
 		std::vector< IController<T>* > m_Controllers;
 	};
-
-	//template <typename T>
-	//class ModifierPack
-	//{
-	//public:
-	//	ModifierPack( ) {};
-	//	~ModifierPack( ) {};
-
-	//	void Update( T& client, float time ) {
-	//		for ( const auto& modify : Modifiers ) {
-	//			modify( client, time );
-	//		}
-	//	};
-
-
-	//	typedef std::function<void(T&,float)> modifier;
-
-	//	void AddModifier( const modifier& m ) {
-	//		Modifiers.push_back( m );
-	//	}
-
-	//public:
-	//	std::vector< modifier > Modifiers;
-	//};
 
 	#include "IController.inl"
 };

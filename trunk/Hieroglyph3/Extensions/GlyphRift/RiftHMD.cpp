@@ -36,7 +36,8 @@ struct RiftHMD::Impl
 	Impl( RiftManagerPtr RiftMgr ) : 
 		m_RiftMgr( RiftMgr ),
 		m_hmd( nullptr ),
-		frame( 0 )
+		frame( 0 ),
+		hardwareDevice( true )
 	{
 		// Create the first device available.  If it isn't available then we throw an
 		// exception to let the user know.
@@ -45,6 +46,7 @@ struct RiftHMD::Impl
 
 		if ( !m_hmd ) {
 			Log::Get().Write( L"Unable to find hardware Rift device, creating a debug device instead..." );
+			hardwareDevice = false;
 			m_hmd = ovrHmd_CreateDebug( ovrHmd_DK2 );
 		}
 		
@@ -75,6 +77,11 @@ struct RiftHMD::Impl
 			ovrHmd_Destroy( m_hmd );
 			m_hmd = nullptr;
 		}
+	}
+	//--------------------------------------------------------------------------------
+	bool IsHardwareDevice()
+	{
+		return hardwareDevice;
 	}
 	//--------------------------------------------------------------------------------
 	unsigned int HmdDisplayWidth()
@@ -214,10 +221,15 @@ struct RiftHMD::Impl
 
 		float yaw, eyePitch, eyeRoll = 0.0f;
 		OVR::Posef pose = eyePose[eye];
-		pose.Rotation.GetEulerAngles<OVR::Axis_Y, OVR::Axis_X, OVR::Axis_Z>(&yaw, &eyePitch, &eyeRoll);
-			
+		
+		pose.Rotation.GetEulerAngles<OVR::Axis_Z, OVR::Axis_X, OVR::Axis_Y>(&eyeRoll, &eyePitch, &yaw);
+
 		// Apply those angles to our rotation matrix
-		Matrix4f orientation = Matrix4f::RotationMatrixXYZ( eyePitch, yaw, -eyeRoll );
+		//Matrix4f orientation = Matrix4f::RotationMatrixXYZ( eyePitch, yaw, -eyeRoll );
+		Matrix4f orientation = 
+			Matrix4f::RotationMatrixZ( -eyeRoll ) *
+			Matrix4f::RotationMatrixX( eyePitch ) *
+			Matrix4f::RotationMatrixY( yaw );
 		Matrix4f translation = Matrix4f::TranslationMatrix( -5.0f*pose.Translation.x, -5.0f*pose.Translation.y, 5.0f*pose.Translation.z );
 
 		return translation * orientation;
@@ -298,6 +310,7 @@ struct RiftHMD::Impl
 	ovrTexture eyeTexture[2];
 	ovrPosef eyePose[2];
 	unsigned int frame;
+	bool hardwareDevice;
 };
 //--------------------------------------------------------------------------------
 
@@ -312,6 +325,11 @@ RiftHMD::RiftHMD( RiftManagerPtr RiftMgr ) :
 RiftHMD::~RiftHMD()
 {
 	delete m_pImpl;
+}
+//--------------------------------------------------------------------------------
+bool RiftHMD::IsHardwareDevice()
+{
+	return m_pImpl->IsHardwareDevice();
 }
 //--------------------------------------------------------------------------------
 unsigned int RiftHMD::HmdDisplayWidth()
