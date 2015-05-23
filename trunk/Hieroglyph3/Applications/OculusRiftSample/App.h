@@ -34,6 +34,7 @@ public:
 	virtual void Update();
 	virtual void Shutdown();
 
+	virtual void HandleWindowResize( HWND handle, UINT width, UINT height );
 	virtual bool HandleEvent( EventPtr pEvent );
 	virtual std::wstring GetName( );
 
@@ -43,6 +44,7 @@ protected:
 	GeometryActor*				m_pGeometryActor;
 	TextActor*					m_pTextActor;
 	Actor*						m_pMeshActor;
+	ResourcePtr					m_MirrorTexture;
 
 public:
 	RiftManagerPtr m_pRiftMgr;

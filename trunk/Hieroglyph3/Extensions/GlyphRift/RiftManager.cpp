@@ -15,7 +15,11 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 RiftManager::RiftManager()
 {
-	ovr_Initialize();
+	ovrResult result = ovr_Initialize( nullptr );
+
+	if ( result != ovrSuccess ) {
+		Log::Get().Write( L"ERROR: libOVR failed to initialize!" );
+	}
 }
 //--------------------------------------------------------------------------------
 RiftManager::~RiftManager()

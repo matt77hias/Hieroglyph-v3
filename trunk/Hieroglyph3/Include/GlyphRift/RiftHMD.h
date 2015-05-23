@@ -43,8 +43,10 @@ namespace Glyph3
 		unsigned int DesiredEyeTextureWidth();
 		unsigned int DesiredEyeTextureHeight();
 
-		void ConfigureRendering( const ResourcePtr& renderTarget, int swapchain );
-		void ConfigureEyeTexture( unsigned int eye, const ResourcePtr& texture );
+		void ConfigureRendering( unsigned int max_w = 2048, unsigned int max_h = 2048, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB );
+		ResourcePtr GetEyeTexture( unsigned int eye );
+		ResourcePtr GetMirrorTexture( unsigned int w, unsigned int h, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB  );
+
 		void ReadEyeData();
 
 		Matrix3f GetOrientation( double time );
@@ -54,8 +56,6 @@ namespace Glyph3
 
 		float BeginFrame();
 		void EndFrame();
-
-		void AttachToWindow( HWND window );
 
 	private:
 		struct Impl;

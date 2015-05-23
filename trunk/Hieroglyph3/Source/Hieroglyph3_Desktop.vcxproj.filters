@@ -794,6 +794,9 @@
     <ClCompile Include="ViewPerspectiveHighlight.cpp">
       <Filter>Rendering\Material System\Components\Tasks</Filter>
     </ClCompile>
+    <ClCompile Include="Win32Window.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\Animation.h">
@@ -1488,6 +1491,9 @@
     </ClInclude>
     <ClInclude Include="..\Include\ViewPerspectiveHighlight.h">
       <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Win32Window.h">
+      <Filter>Application</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

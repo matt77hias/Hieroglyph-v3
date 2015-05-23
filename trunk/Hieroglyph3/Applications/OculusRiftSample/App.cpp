@@ -76,6 +76,8 @@ bool App::ConfigureRenderingEngineComponents( UINT width, UINT height, D3D_FEATU
 	Config.SetOutputWindow( m_pWindow->GetHandle() );
 	m_pWindow->SetSwapChain( m_pRenderer11->CreateSwapChain( &Config ) );
 
+	m_MirrorTexture = m_pRiftHmd->GetMirrorTexture( m_iWidth, m_iHeight );
+
 	// We'll keep a copy of the swap chain's render target index to 
 	// use later.
 	m_BackBuffer = m_pRenderer11->GetSwapChainResource( m_pWindow->GetSwapChain() );
@@ -101,8 +103,8 @@ bool App::ConfigureEngineComponents()
 	
 	// The desired window size is based on the screen size of the Rift display.
 	
-	if ( !ConfigureRenderingEngineComponents( m_pRiftHmd->HmdDisplayWidth(),
-											  m_pRiftHmd->HmdDisplayHeight(), 
+	if ( !ConfigureRenderingEngineComponents( m_pRiftHmd->HmdDisplayWidth() / 2,
+											  m_pRiftHmd->HmdDisplayHeight() / 2, 
 											  D3D_FEATURE_LEVEL_11_0 ) )
 	{
 		return( false );
@@ -111,8 +113,6 @@ bool App::ConfigureEngineComponents()
 	if ( !ConfigureRenderingSetup() ) {
 		return( false );
 	}
-
-	m_pRiftHmd->AttachToWindow( m_pWindow->GetHandle() );
 
 	// We want single threaded operation when using the Oculus SDK, since it 
 	// manages some aspects of timing in the eye rendering functions.
@@ -133,8 +133,8 @@ bool App::ConfigureRenderingSetup()
 	// Create the render view that will produce the images for the left and right
 	// eyes in the Rift.
 
-	//ViewRift* pRiftView = new ViewRift( m_pRiftHmd, m_BackBuffer, m_pWindow->GetSwapChain() );
-	ViewRiftHighlight* pRiftView = new ViewRiftHighlight( m_pRiftHmd, m_BackBuffer, m_pWindow->GetSwapChain() );
+	ViewRift* pRiftView = new ViewRift( m_pRiftHmd, m_BackBuffer, m_pWindow->GetSwapChain() );
+	//ViewRiftHighlight* pRiftView = new ViewRiftHighlight( m_pRiftHmd, m_BackBuffer, m_pWindow->GetSwapChain() );
 	pRiftView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
 	m_pRenderView = pRiftView;
 
@@ -312,18 +312,24 @@ void App::Update()
 	// our scene update, and then render the scene.
 
 	float delta = m_pRiftHmd->BeginFrame();
-	//ovrFrameTiming frameTiming = ovrHmd_BeginFrame( m_pRiftHmd->GetHMD(), 0 );
 
-	m_pScene->Update( /*frameTiming.DeltaSeconds*/ delta );
+	// Default to our local delta time if the rift isn't reporting time properly.
+	if ( delta == 0.0f ) delta = m_pTimer->Elapsed();
+	
+	m_pScene->Update( delta );
 	m_pScene->Render( m_pRenderer11 );
-
 
 	// The presentation to the swap chain would normally go here, but that isn't 
 	// needed since the Rift does it for us as part of the distortion rendering
 	// process.  We just need to 'end the frame' here.
 
 	m_pRiftHmd->EndFrame();
-	//ovrHmd_EndFrame( m_pRiftHmd->GetHMD() );
+
+	// Copy the mirror texture to the swap chain's render target, then present
+	// the swap chain to the window.
+
+	m_pRenderer11->pImmPipeline->CopyResource( m_BackBuffer, m_MirrorTexture );
+	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()
@@ -333,6 +339,37 @@ void App::Shutdown()
 	std::wstringstream out;
 	out << L"Max FPS: " << m_pTimer->MaxFramerate();
 	Log::Get().Write( out.str() );
+}
+//--------------------------------------------------------------------------------
+void App::HandleWindowResize( HWND handle, UINT width, UINT height )
+{
+	if ( width < 1 ) width = 1;
+	if ( height < 1 ) height = 1;
+	m_iWidth = width;
+	m_iHeight = height;
+
+	// Resize our rendering window state if the handle matches
+	if ( ( m_pWindow != 0 ) && ( m_pWindow->GetHandle() == handle ) ) {
+		m_pWindow->ResizeWindow( width, height );
+		m_pRenderer11->ResizeSwapChain( m_pWindow->GetSwapChain(), width, height );
+	}
+
+	// Update the projection matrix of our camera
+	if ( m_pCamera != 0 ) {
+		m_pCamera->SetAspectRatio( static_cast<float>(m_iWidth) / static_cast<float>(m_iHeight) );
+	}
+
+	// Update the render views being used to render the scene
+	if ( m_pRenderView != 0 ) {
+		m_pRenderView->Resize( width, height );
+	}
+
+	// Update the text render view being used to render the scene
+	if ( m_pTextOverlayView != 0 ) {
+		m_pTextOverlayView->Resize( width, height );
+	}
+
+	m_MirrorTexture = m_pRiftHmd->GetMirrorTexture( width, height );
 }
 //--------------------------------------------------------------------------------
 bool App::HandleEvent( EventPtr pEvent )

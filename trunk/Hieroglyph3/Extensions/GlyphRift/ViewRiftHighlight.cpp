@@ -40,23 +40,10 @@ ViewRiftHighlight::ViewRiftHighlight( RiftHMDPtr hmd, ResourcePtr RenderTarget, 
 	depthConfig.SetDepthBuffer( width, height );
 	m_DepthTarget = RendererDX11::Get()->CreateTexture2D( &depthConfig, 0 );
 
-	// Create two render targets - one for each eye.  These are created with both
-	// render target and shader resource bind points so that they can be used by
-	// the Oculus SDK to do the distortion rendering at the end of the frame.
-
-	Texture2dConfigDX11 renderConfig;
-	renderConfig.SetWidth( width );
-	renderConfig.SetHeight( height );
-	renderConfig.SetFormat( DXGI_FORMAT_R8G8B8A8_UNORM );
-	renderConfig.SetBindFlags( D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE );
-	m_EyeTargets[0] = RendererDX11::Get()->CreateTexture2D( &renderConfig, 0 );
-	m_EyeTargets[1] = RendererDX11::Get()->CreateTexture2D( &renderConfig, 0 );
-
 	// Read back the actual size of the texture created for use in the other
 	// setup functions below.
 
 	D3D11_TEXTURE2D_DESC desc = RendererDX11::Get()->GetTexture2DByIndex( m_DepthTarget->m_iResource )->GetActualDescription();
-
 
 	// Create a secondary texture to use for the silhouette render target.
 	Texture2dConfigDX11 SilhouetteConfig;
@@ -82,20 +69,12 @@ ViewRiftHighlight::ViewRiftHighlight( RiftHMDPtr hmd, ResourcePtr RenderTarget, 
 
 	m_iViewports[0] = RendererDX11::Get()->CreateViewPort( viewport );
 
+	// Configure the rendering for the rift's eye textures.  This is not dependent
+	// on the swap chain size, but we provide the option to limit the resolution
+	// for the eye textures here.  Default values are 2048 x 2048, essentially
+	// allowing whatever the rift requests.
 
-	// Set up the D3D texture data, including ID3D11Texture2D and 
-	// ID3D11ShaderResourceView pointers (which are both accessible through the
-	// passed in ResourcePtr object).  These will be used in distortion
-	// rendering.
-
-	m_pHmd->ConfigureEyeTexture( 0, m_EyeTargets[0] ); 
-	m_pHmd->ConfigureEyeTexture( 1, m_EyeTargets[1] );
-
-	// Pass the swap chain and render target to the Oculus HMD device.  This
-	// is used by the Oculus SDK to map the distorted eye textures to the 
-	// backbuffer and to synchronize GPU timing.
-
-	m_pHmd->ConfigureRendering( RenderTarget, SwapChain );
+	m_pHmd->ConfigureRendering( );
 
 
 	// Set up the projection matrices according to the FOV for each eye.  These
@@ -216,7 +195,7 @@ void ViewRiftHighlight::ExecuteTask( PipelineManagerDX11* pPipelineManager, IPar
 
 			// Set the parameters for rendering this view
 			pPipelineManager->ClearRenderTargets();
-			pPipelineManager->OutputMergerStage.DesiredState.RenderTargetViews.SetState( 0, m_EyeTargets[eye]->m_iResourceRTV );
+			pPipelineManager->OutputMergerStage.DesiredState.RenderTargetViews.SetState( 0, m_pHmd->GetEyeTexture(eye)->m_iResourceRTV );
 			pPipelineManager->OutputMergerStage.DesiredState.DepthTargetViews.SetState( m_DepthTarget->m_iResourceDSV );
 			pPipelineManager->ApplyRenderTargets();
 			pPipelineManager->ClearBuffers( m_vColor, 1.0f );
@@ -255,11 +234,14 @@ void ViewRiftHighlight::ExecuteTask( PipelineManagerDX11* pPipelineManager, IPar
 //--------------------------------------------------------------------------------
 void ViewRiftHighlight::Resize( UINT width, UINT height )
 {
-	RendererDX11::Get()->ResizeTexture( m_DepthTarget, width, height );
-	RendererDX11::Get()->ResizeTexture( m_SilhouetteTarget, width, height );
-	RendererDX11::Get()->ResizeViewport( m_iViewports[0], width, height );
+	// These sizes are determined by the Rift Headset, and should not change
+	// with window size changes.
 
-	m_SilhouetteActor.GetBody()->Parameters.SetVectorParameter( L"ScreenResolution", Vector4f( static_cast<float>( width ), static_cast<float>( height ), 1.0f / static_cast<float>( width ), 1.0f / static_cast<float>( height ) ) );
+	//RendererDX11::Get()->ResizeTexture( m_DepthTarget, width, height );
+	//RendererDX11::Get()->ResizeTexture( m_SilhouetteTarget, width, height );
+	//RendererDX11::Get()->ResizeViewport( m_iViewports[0], width, height );
+
+	//m_SilhouetteActor.GetBody()->Parameters.SetVectorParameter( L"ScreenResolution", Vector4f( static_cast<float>( width ), static_cast<float>( height ), 1.0f / static_cast<float>( width ), 1.0f / static_cast<float>( height ) ) );
 }
 //--------------------------------------------------------------------------------
 std::wstring ViewRiftHighlight::GetName()

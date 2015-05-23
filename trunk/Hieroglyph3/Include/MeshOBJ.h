@@ -97,8 +97,7 @@ public:
 		std::string line;
 
 		// Initialize to a single group in case none are declared within the file.
-		size_t current_group = 0;
-		objects.push_back( object_t() );
+		//objects.push_back( object_t() );
 
 		while( std::getline( objFile, line ) )
 		{
@@ -119,6 +118,7 @@ public:
 				} else if ( tokenList[0] == "vt" ) {
 					coords.emplace_back( toVec2( tokenList ) );
 				} else if ( tokenList[0] == "f" ) {
+					
 					face_t f;
 
 					for ( size_t i = 0; i < 3; ++i ) {
@@ -128,18 +128,24 @@ public:
 						f.normalIndices[i] = relativeOffset( triple[2], normals.size() );
 					}
 
-					objects.back().faces.emplace_back( f );
+					if (objects.size() == 0 ) { objects.push_back( object_t() ); }
+					assert( objects.back().subobjects.size() > 0 );
+					objects.back().subobjects.back().faces.emplace_back( f );
 				} else if ( tokenList[0] == "o" ) {
 					// Check if the default object is currently in use. If so,
 					// put this name on that object, otherwise we create a new one.
-					if ( objects.back().faces.size() == 0 ) {
+					if ( objects.size() == 1 && objects.back().subobjects.back().faces.size() == 0 ) {
 						objects.back().name = tokenList[1];
 					} else {
 						objects.push_back( object_t() );
 						objects.back().name = tokenList[1];
 					}
 				} else if ( tokenList[0] == "mtllib" ) {
-					material_libs.push_back( tokenList[1] );
+					material_libs.push_back( line.substr( 7 ) );
+				} else if ( tokenList[0] == "usemtl" ) {
+					if (objects.size() == 0 ) { objects.push_back( object_t() ); }
+					objects.back().subobjects.push_back( subobject_t() );
+					objects.back().subobjects.back().material_name = line.substr( 7 );
 				}
 			}
 		}
@@ -154,10 +160,15 @@ public:
 		std::array<int,3> coordIndices;
 	} face_t;
 
-	typedef struct {
-		std::string name;
+	typedef struct
+	{
 		std::string material_name;
 		std::vector<face_t> faces;
+	} subobject_t;
+
+	typedef struct {
+		std::string name;
+		std::vector<subobject_t> subobjects;
 	} object_t;
 
 	std::vector<Vector3f> positions;

@@ -22,10 +22,9 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-ViewRift::ViewRift( RiftHMDPtr hmd, ResourcePtr RenderTarget, int SwapChain  )
+ViewRift::ViewRift( RiftHMDPtr hmd, ResourcePtr RenderTarget, int SwapChain  ) :
+	m_pHmd( hmd )
 {
-	m_pHmd = hmd;
-
 	// Get the desired texture sizes for the eye render targets.  Note that these 
 	// are typically larger than the resolution of the HMD's display panel itself.
 
@@ -38,18 +37,6 @@ ViewRift::ViewRift( RiftHMDPtr hmd, ResourcePtr RenderTarget, int SwapChain  )
 	Texture2dConfigDX11 depthConfig;
 	depthConfig.SetDepthBuffer( width, height );
 	m_DepthTarget = RendererDX11::Get()->CreateTexture2D( &depthConfig, 0 );
-
-	// Create two render targets - one for each eye.  These are created with both
-	// render target and shader resource bind points so that they can be used by
-	// the Oculus SDK to do the distortion rendering at the end of the frame.
-
-	Texture2dConfigDX11 renderConfig;
-	renderConfig.SetWidth( width );
-	renderConfig.SetHeight( height );
-	renderConfig.SetFormat( DXGI_FORMAT_R8G8B8A8_UNORM );
-	renderConfig.SetBindFlags( D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE );
-	m_EyeTargets[0] = RendererDX11::Get()->CreateTexture2D( &renderConfig, 0 );
-	m_EyeTargets[1] = RendererDX11::Get()->CreateTexture2D( &renderConfig, 0 );
 
 	// Read back the actual size of the texture created for use in the other
 	// setup functions below.
@@ -69,20 +56,12 @@ ViewRift::ViewRift( RiftHMDPtr hmd, ResourcePtr RenderTarget, int SwapChain  )
 
 	m_iViewports[0] = RendererDX11::Get()->CreateViewPort( viewport );
 
+	// Configure the rendering for the rift's eye textures.  This is not dependent
+	// on the swap chain size, but we provide the option to limit the resolution
+	// for the eye textures here.  Default values are 2048 x 2048, essentially
+	// allowing whatever the rift requests.
 
-	// Set up the D3D texture data, including ID3D11Texture2D and 
-	// ID3D11ShaderResourceView pointers (which are both accessible through the
-	// passed in ResourcePtr object).  These will be used in distortion
-	// rendering.
-
-	m_pHmd->ConfigureEyeTexture( 0, m_EyeTargets[0] ); 
-	m_pHmd->ConfigureEyeTexture( 1, m_EyeTargets[1] );
-
-	// Pass the swap chain and render target to the Oculus HMD device.  This
-	// is used by the Oculus SDK to map the distorted eye textures to the 
-	// backbuffer and to synchronize GPU timing.
-
-	m_pHmd->ConfigureRendering( RenderTarget, SwapChain );
+	m_pHmd->ConfigureRendering( );
 
 
 	// Set up the projection matrices according to the FOV for each eye.  These
@@ -151,7 +130,7 @@ void ViewRift::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterMan
 
 			// Set the parameters for rendering this view
 			pPipelineManager->ClearRenderTargets();
-			pPipelineManager->OutputMergerStage.DesiredState.RenderTargetViews.SetState( 0, m_EyeTargets[eye]->m_iResourceRTV );
+			pPipelineManager->OutputMergerStage.DesiredState.RenderTargetViews.SetState( 0, m_pHmd->GetEyeTexture(eye)->m_iResourceRTV );
 			pPipelineManager->OutputMergerStage.DesiredState.DepthTargetViews.SetState( m_DepthTarget->m_iResourceDSV );
 			pPipelineManager->ApplyRenderTargets();
 			pPipelineManager->ClearBuffers( m_vColor, 1.0f );
@@ -186,8 +165,11 @@ void ViewRift::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterMan
 //--------------------------------------------------------------------------------
 void ViewRift::Resize( UINT width, UINT height )
 {
-	RendererDX11::Get()->ResizeTexture( m_DepthTarget, width, height );
-	RendererDX11::Get()->ResizeViewport( m_iViewports[0], width, height );
+	// These sizes are determined by the Rift Headset, and should not change
+	// with window size changes.
+
+	//RendererDX11::Get()->ResizeTexture( m_DepthTarget, width, height );
+	//RendererDX11::Get()->ResizeViewport( m_iViewports[0], width, height );
 }
 //--------------------------------------------------------------------------------
 std::wstring ViewRift::GetName()

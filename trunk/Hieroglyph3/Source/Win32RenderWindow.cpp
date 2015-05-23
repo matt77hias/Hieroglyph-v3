@@ -67,8 +67,11 @@ void Win32RenderWindow::Initialize(IWindowProc* WindowProcObj)
 	wc.lpszMenuName		= NULL;
 	wc.lpszClassName	= L"HieroglyphWin32";
 	wc.hIconSm			= LoadIcon(NULL, IDI_APPLICATION);
-	WindowProcObj->BeforeRegisterWindowClass(wc);
-	
+
+	if ( WindowProcObj != nullptr ) {
+		WindowProcObj->BeforeRegisterWindowClass(wc);
+	}
+
 	// Register the window class
 	RegisterClassEx(&wc);
 

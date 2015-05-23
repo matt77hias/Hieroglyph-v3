@@ -223,6 +223,7 @@
     <ClCompile Include="VolumeActor.cpp" />
     <ClCompile Include="VolumeTextureVertexDX11.cpp" />
     <ClCompile Include="Win32RenderWindow.cpp" />
+    <ClCompile Include="Win32Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\Actor.h" />
@@ -456,6 +457,7 @@
     <ClInclude Include="..\Include\VolumeActor.h" />
     <ClInclude Include="..\Include\VolumeTextureVertexDX11.h" />
     <ClInclude Include="..\Include\Win32RenderWindow.h" />
+    <ClInclude Include="..\Include\Win32Window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Include\AnimationStream.inl" />

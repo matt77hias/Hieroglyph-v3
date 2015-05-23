@@ -46,9 +46,7 @@ namespace Glyph3
 		std::array<Matrix4f,eye_count>			m_view;
 		std::array<Matrix4f,eye_count>			m_proj;
 
-		std::array<ResourcePtr,eye_count>		m_EyeTargets;
 		ResourcePtr								m_DepthTarget;
-
 
 		RiftHMDPtr m_pHmd;
 	};

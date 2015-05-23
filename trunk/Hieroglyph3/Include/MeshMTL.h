@@ -114,13 +114,13 @@ public:
 				} else if ( tokenList[0] == "illum" ) {
 					materials[current].illumination = toIllumModel( tokenList );
 				} else if ( tokenList[0] == "map_Ka" ) {
-					materials[current].ambient_texname == tokenList.back();
+					materials[current].ambient_texname = line.substr( 7 );
 				} else if ( tokenList[0] == "map_Kd" ) {
-					materials[current].diffuse_texname == tokenList.back();
+					materials[current].diffuse_texname = line.substr( 7 );
 				} else if ( tokenList[0] == "map_Ks" ) {
-					materials[current].specular_texname == tokenList.back();
+					materials[current].specular_texname = line.substr( 7 );
 				} else if ( tokenList[0] == "map_Ns" ) {
-					materials[current].shininess_texname == tokenList.back();
+					materials[current].shininess_texname = line.substr( 7 );
 				}
 			}
 		}

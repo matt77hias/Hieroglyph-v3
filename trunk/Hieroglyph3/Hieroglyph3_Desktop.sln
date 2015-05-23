@@ -1,7 +1,7 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 13.00
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Express 2013 for Windows Desktop
-VisualStudioVersion = 13.0.0.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hieroglyph3_Desktop", "Source\Hieroglyph3_Desktop.vcxproj", "{0F6D257E-70D5-46C5-8A12-7BDF93C35E81}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -111,6 +111,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VolumeRendering_Desktop", "
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Glyphlets_Desktop", "Applications\Glyphlets\Glyphlets_Desktop.vcxproj", "{32D8D2D4-BE73-40E1-A0C1-8C8F9594A9E0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81} = {0F6D257E-70D5-46C5-8A12-7BDF93C35E81}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicWindow_Desktop", "Applications\BasicWindow\BasicWindow_Desktop.vcxproj", "{98EE3236-CEB6-4030-82AD-1E1B6777779E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81} = {0F6D257E-70D5-46C5-8A12-7BDF93C35E81}
 	EndProjectSection
@@ -307,6 +312,14 @@ Global
 		{32D8D2D4-BE73-40E1-A0C1-8C8F9594A9E0}.Release|Win32.Build.0 = Release|Win32
 		{32D8D2D4-BE73-40E1-A0C1-8C8F9594A9E0}.Release|x64.ActiveCfg = Release|x64
 		{32D8D2D4-BE73-40E1-A0C1-8C8F9594A9E0}.Release|x64.Build.0 = Release|x64
+		{98EE3236-CEB6-4030-82AD-1E1B6777779E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{98EE3236-CEB6-4030-82AD-1E1B6777779E}.Debug|Win32.Build.0 = Debug|Win32
+		{98EE3236-CEB6-4030-82AD-1E1B6777779E}.Debug|x64.ActiveCfg = Debug|x64
+		{98EE3236-CEB6-4030-82AD-1E1B6777779E}.Debug|x64.Build.0 = Debug|x64
+		{98EE3236-CEB6-4030-82AD-1E1B6777779E}.Release|Win32.ActiveCfg = Release|Win32
+		{98EE3236-CEB6-4030-82AD-1E1B6777779E}.Release|Win32.Build.0 = Release|Win32
+		{98EE3236-CEB6-4030-82AD-1E1B6777779E}.Release|x64.ActiveCfg = Release|x64
+		{98EE3236-CEB6-4030-82AD-1E1B6777779E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

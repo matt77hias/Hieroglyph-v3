@@ -180,16 +180,18 @@ void App::Initialize()
 	BasicVertexDX11::Vertex v;
 	v.color = Vector4f( 0.0f, 0.0f, 0.0f, 0.0f );
 
-
-	for ( auto& object : obj.objects )
+	for ( auto& o : obj.objects )
 	{
-		for ( auto& face : object.faces )
+		for ( auto& subobject : o.subobjects )
 		{
-			for ( size_t i = 0; i < 3; ++i ) {
-				v.position = obj.positions[face.positionIndices[i]];
-				v.normal = obj.normals[face.normalIndices[i]];
-				v.texcoords = obj.coords[face.coordIndices[i]];
-				pOBJExecutor->AddVertex( v );
+			for ( auto& face : subobject.faces )
+			{
+				for ( size_t i = 0; i < 3; ++i ) {
+					v.position = obj.positions[face.positionIndices[i]];
+					v.normal = obj.normals[face.normalIndices[i]];
+					v.texcoords = obj.coords[face.coordIndices[i]];
+					pOBJExecutor->AddVertex( v );
+				}
 			}
 		}
 	}

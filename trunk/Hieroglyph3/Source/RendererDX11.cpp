@@ -1031,6 +1031,9 @@ void RendererDX11::ResizeSwapChain( int SID, UINT width, UINT height )
 	RenderTargetViewDX11& RTV = m_vRenderTargetViews[pSwapChain->m_Resource->m_iResourceRTV];
 	
 	// Get its description.
+	DXGI_SWAP_CHAIN_DESC SwapDesc;
+	pSwapChain->GetSwapChain()->GetDesc( &SwapDesc );
+
 	D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
 	RTV.m_pRenderTargetView->GetDesc( &RTVDesc );
 	RTV.m_pRenderTargetView.Reset();
@@ -1043,7 +1046,7 @@ void RendererDX11::ResizeSwapChain( int SID, UINT width, UINT height )
 	}
 
 	// Resize the buffers.
-	HRESULT hr = pSwapChain->m_pSwapChain->ResizeBuffers( 2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 0 );
+	HRESULT hr = pSwapChain->m_pSwapChain->ResizeBuffers( 2, width, height, SwapDesc.BufferDesc.Format, SwapDesc.Flags );
 
 	if ( FAILED(hr) ) {
 		Log::Get().Write( L"Failed to resize buffers!" );
