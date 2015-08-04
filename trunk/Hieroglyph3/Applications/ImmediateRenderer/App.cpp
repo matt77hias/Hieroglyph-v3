@@ -313,6 +313,16 @@ bool App::HandleEvent( EventPtr pEvent )
 		EvtKeyUpPtr pKeyUp = std::static_pointer_cast<EvtKeyUp>( pEvent );
 
 		unsigned int key = pKeyUp->GetCharacterCode();
+
+		if ( key == '1' ) {
+			m_pCamera->SetOffsetProjectionParams( -0.4f, 0.4f, -0.3f, 0.3f, 0.5f, 100.0f );
+		}
+		if ( key == '2' ) {
+			m_pCamera->SetOffsetProjectionParams( 0.0f, 0.8f, -0.3f, 0.3f, 0.5f, 100.0f );
+		}
+		if ( key == '3' ) {
+			m_pCamera->SetOffsetProjectionParams( -0.8f, 0.0f, -0.3f, 0.3f, 0.5f, 100.0f );
+		}
 	}
 
 	// Call the parent class's event handler if we haven't handled the event.

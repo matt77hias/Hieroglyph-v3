@@ -53,6 +53,7 @@ namespace Glyph3
 
 		void SetProjectionParams( float zn, float zf, float aspect, float fov );
 		void SetOrthographicParams( float zn, float zf, float width, float height );
+		void SetOffsetProjectionParams( float l, float r, float b, float t, float zn, float zf );
 
 		void SetClipPlanes( float zn, float zf );
 		void SetAspectRatio( float aspect );

@@ -797,6 +797,9 @@
     <ClCompile Include="Win32Window.cpp">
       <Filter>Application</Filter>
     </ClCompile>
+    <ClCompile Include="FullscreenTexturedActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\Animation.h">
@@ -1494,6 +1497,9 @@
     </ClInclude>
     <ClInclude Include="..\Include\Win32Window.h">
       <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\FullscreenTexturedActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

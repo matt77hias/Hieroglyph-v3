@@ -77,6 +77,7 @@ bool App::ConfigureRenderingEngineComponents( UINT width, UINT height, D3D_FEATU
 	m_pWindow->SetSwapChain( m_pRenderer11->CreateSwapChain( &Config ) );
 
 	m_MirrorTexture = m_pRiftHmd->GetMirrorTexture( m_iWidth, m_iHeight );
+	m_pFullscreenTexturedActor = new FullscreenTexturedActor( m_MirrorTexture );
 
 	// We'll keep a copy of the swap chain's render target index to 
 	// use later.
@@ -124,6 +125,8 @@ bool App::ConfigureEngineComponents()
 //--------------------------------------------------------------------------------
 void App::ShutdownEngineComponents()
 {
+	delete m_pFullscreenTexturedActor;
+
 	ShutdownRenderingSetup();
 	ShutdownRenderingEngineComponents();
 }
@@ -329,6 +332,14 @@ void App::Update()
 	// the swap chain to the window.
 
 	m_pRenderer11->pImmPipeline->CopyResource( m_BackBuffer, m_MirrorTexture );
+
+	//m_pRenderer11->pImmPipeline->ClearRenderTargets();
+	//m_pRenderer11->pImmPipeline->OutputMergerStage.DesiredState.RenderTargetViews.SetState( 0, m_BackBuffer->m_iResourceRTV );
+	//m_pRenderer11->pImmPipeline->ApplyRenderTargets();
+	//m_pFullscreenTexturedActor->GetNode()->Render( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, VT_PERSPECTIVE );
+
+
+
 	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
 }
 //--------------------------------------------------------------------------------

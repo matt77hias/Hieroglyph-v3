@@ -3,4 +3,8 @@ Release
 </Value></Property><Property><Name>svn:ignore</Name><Value>Debug
 Release
 Win32
+</Value></Property><Property><Name>svn:ignore</Name><Value>Debug
+Release
+Win32
+x64
 </Value></Property></Properties></ItemProperties>

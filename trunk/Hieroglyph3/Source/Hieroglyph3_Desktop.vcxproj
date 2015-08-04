@@ -77,6 +77,7 @@
     <ClCompile Include="FirstPersonCamera.cpp" />
     <ClCompile Include="Frustum3f.cpp" />
     <ClCompile Include="FullscreenActor.cpp" />
+    <ClCompile Include="FullscreenTexturedActor.cpp" />
     <ClCompile Include="GeometryActor.cpp" />
     <ClCompile Include="GeometryDX11.cpp" />
     <ClCompile Include="GeometryGeneratorDX11.cpp" />
@@ -289,6 +290,7 @@
     <ClInclude Include="..\Include\FirstPersonCamera.h" />
     <ClInclude Include="..\Include\Frustum3f.h" />
     <ClInclude Include="..\Include\FullscreenActor.h" />
+    <ClInclude Include="..\Include\FullscreenTexturedActor.h" />
     <ClInclude Include="..\Include\GeometryActor.h" />
     <ClInclude Include="..\Include\GeometryDX11.h" />
     <ClInclude Include="..\Include\GeometryGeneratorDX11.h" />

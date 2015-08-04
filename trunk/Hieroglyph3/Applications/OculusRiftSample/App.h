@@ -12,6 +12,7 @@
 #include "GeometryActor.h"
 #include "TextActor.h"
 #include "PointLight.h"
+#include "FullscreenTexturedActor.h"
 
 #include "GlyphRift\RiftManager.h"
 #include "GlyphRift\RiftHMD.h"
@@ -45,6 +46,7 @@ protected:
 	TextActor*					m_pTextActor;
 	Actor*						m_pMeshActor;
 	ResourcePtr					m_MirrorTexture;
+	FullscreenTexturedActor*	m_pFullscreenTexturedActor;
 
 public:
 	RiftManagerPtr m_pRiftMgr;

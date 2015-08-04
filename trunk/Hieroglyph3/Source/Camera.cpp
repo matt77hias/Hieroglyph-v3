@@ -141,6 +141,32 @@ void Camera::SetOrthographicParams( float zn, float zf, float width, float heigh
 	ApplyOrthographicParams();
 }
 //--------------------------------------------------------------------------------
+void Camera::SetOffsetProjectionParams( float l, float r, float b, float t, float zn, float zf )
+{
+	m_ProjMatrix[0] = 2.0f * zn / ( r - l );
+	m_ProjMatrix[1] = 0.0f;
+	m_ProjMatrix[2] = 0.0f;
+	m_ProjMatrix[3] = 0.0f;
+
+	m_ProjMatrix[4] = 0.0f;
+	m_ProjMatrix[5] = 2.0f * zn / ( t - b );
+	m_ProjMatrix[6] = 0.0f;
+	m_ProjMatrix[7] = 0.0f;
+
+	m_ProjMatrix[8] = (l+r)/(l-r);
+	m_ProjMatrix[9] = (t+b)/(b-t);
+	m_ProjMatrix[10] = zf/(zf-zn);
+	m_ProjMatrix[11] = 1.0f;
+
+	m_ProjMatrix[12] = 0.0f;
+	m_ProjMatrix[13] = 0.0f;
+	m_ProjMatrix[14] = zn*zf/(zn-zf);
+	m_ProjMatrix[15] = 0.0f;
+
+	if ( m_pCameraView )
+		m_pCameraView->SetProjMatrix( m_ProjMatrix );	
+}
+//--------------------------------------------------------------------------------
 void Camera::SetClipPlanes( float zn, float zf )
 {
 	m_fNear = zn;
