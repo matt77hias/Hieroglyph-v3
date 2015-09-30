@@ -13,7 +13,7 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-KinectManager::KinectManager(void)
+KinectManager::KinectManager()
 {
     m_hNextDepthFrameEvent = NULL;
     m_hNextVideoFrameEvent = NULL;
@@ -38,7 +38,7 @@ KinectManager::~KinectManager(void)
 	Log::Get().Write( out.str() );
 }
 //--------------------------------------------------------------------------------
-bool KinectManager::Initialize()
+bool KinectManager::Initialize( bool enable_skeleton, bool enable_color, bool enable_depth )
 {
 	HRESULT hr;
 
@@ -46,48 +46,60 @@ bool KinectManager::Initialize()
     m_hNextVideoFrameEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
     m_hNextSkeletonEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
 
-	hr = NuiInitialize( 
-        NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX | 
-		NUI_INITIALIZE_FLAG_USES_SKELETON | 
-		NUI_INITIALIZE_FLAG_USES_COLOR );
+	DWORD flags = 0;
+
+	if ( enable_skeleton ) flags |= NUI_INITIALIZE_FLAG_USES_SKELETON;
+	if ( enable_color ) flags |= NUI_INITIALIZE_FLAG_USES_COLOR;
+	if ( enable_depth ) flags |= NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX;
+
+	hr = NuiInitialize( flags );
 
 	if ( FAILED( hr ) ) {
         MessageBox( 0, L"Failed to initialize NUI library...", L"Hieroglyph 3 :: Info Message", MB_ICONINFORMATION | MB_SYSTEMMODAL );
         return false;
     }
 
-    hr = NuiSkeletonTrackingEnable( m_hNextSkeletonEvent, 0 );
+	if ( enable_skeleton )
+	{
+		hr = NuiSkeletonTrackingEnable( m_hNextSkeletonEvent, 0 );
 
-	if ( FAILED( hr ) ) {
-		MessageBox( 0, L"Failed to open skeletal stream...", L"Hieroglyph 3 :: Info Message", MB_ICONINFORMATION | MB_SYSTEMMODAL );
-        return false;
-    }
+		if ( FAILED( hr ) ) {
+			MessageBox( 0, L"Failed to open skeletal stream...", L"Hieroglyph 3 :: Info Message", MB_ICONINFORMATION | MB_SYSTEMMODAL );
+			return false;
+		}
+	}
 
-    hr = NuiImageStreamOpen(
-        NUI_IMAGE_TYPE_COLOR,
-        NUI_IMAGE_RESOLUTION_640x480,
-        0,
-        2,
-        m_hNextVideoFrameEvent,
-        &m_pVideoStreamHandle );
+	if ( enable_color )
+	{
+		hr = NuiImageStreamOpen(
+			NUI_IMAGE_TYPE_COLOR,
+			NUI_IMAGE_RESOLUTION_640x480,
+			0,
+			2,
+			m_hNextVideoFrameEvent,
+			&m_pVideoStreamHandle );
     
-	if ( FAILED( hr ) ) {
-        MessageBox( 0, L"Failed to open color image stream...", L"Hieroglyph 3 :: Info Message", MB_ICONINFORMATION | MB_SYSTEMMODAL );
-        return false;
-    }
+		if ( FAILED( hr ) ) {
+			MessageBox( 0, L"Failed to open color image stream...", L"Hieroglyph 3 :: Info Message", MB_ICONINFORMATION | MB_SYSTEMMODAL );
+			return false;
+		}
+	}
 
-    hr = NuiImageStreamOpen(
-        NUI_IMAGE_TYPE_DEPTH_AND_PLAYER_INDEX,
-        NUI_IMAGE_RESOLUTION_320x240,
-        0,
-        2,
-        m_hNextDepthFrameEvent,
-        &m_pDepthStreamHandle );
+	if ( enable_depth )
+	{
+		hr = NuiImageStreamOpen(
+			NUI_IMAGE_TYPE_DEPTH_AND_PLAYER_INDEX,
+			NUI_IMAGE_RESOLUTION_320x240,
+			0,
+			2,
+			m_hNextDepthFrameEvent,
+			&m_pDepthStreamHandle );
 
-    if ( FAILED( false ) ) {
-        MessageBox( 0, L"Failed to open depth image stream...", L"Hieroglyph 3 :: Info Message", MB_ICONINFORMATION | MB_SYSTEMMODAL );
-        return false;
-    }
+		if ( FAILED( false ) ) {
+			MessageBox( 0, L"Failed to open depth image stream...", L"Hieroglyph 3 :: Info Message", MB_ICONINFORMATION | MB_SYSTEMMODAL );
+			return false;
+		}
+	}
 
     // Start the Nui processing thread
     m_hEvNuiProcessStop=CreateEvent(NULL,FALSE,FALSE,NULL);

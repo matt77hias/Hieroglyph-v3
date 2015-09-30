@@ -40,62 +40,45 @@ eSHAPE Cone3f::GetShapeType( ) const
 	return( CONE );
 }
 //--------------------------------------------------------------------------------
-void Cone3f::SamplePosition( Vector3f& position, float theta, float height ) const
+void Cone3f::SamplePosition( Vector3f& position, float theta, float height_factor ) const
 {
-	// Define the axis of the cylinder, and find its length.
+	// Define the axis of the cylinder from P2 to P1, and find its length.
 
-	Vector3f v = P1 - P2;
-	Vector3f vnorm = Vector3f::Normalize( v );
-	float l = v.Magnitude();
+	Vector3f axis = P1 - P2;
+	Vector3f vnorm = Vector3f::Normalize( axis );
+	float height = axis.Magnitude();
 
-	Vector3f up = Vector3f( 0.0f, 1.0f, 0.0f );
+	// Find the unit vector perpendicular to the axis.  Note that if P1 and P2 are the
+	// same point, that unit will be the zero vector!
 
-	// Find the unit vector perpendicular to the axis, that is pointing closest to the (0,1,0) direction.
-	// If the axis points in the (0,1,0) direction, then use (1,0,0) as the unit vector.
+	Vector3f unit = Vector3f::Normalize( Vector3f::Perpendicular( axis ) );
 
-	Vector3f unit;
-	if ( vnorm == up || vnorm == -up ) {
-		unit = Vector3f( 1.0f, 0.0f, 0.0f );
-	} else {
-		Vector3f temp = Vector3f::Cross( vnorm, up );
-		unit = Vector3f::Cross( temp, vnorm );
-		unit.Normalize();
-	}
-
-	float slope = ( R2 - R1 ) / l;
-	float radius = R2 + slope * height * l;
+	float delta_radius = R1 - R2;
+	float radius = R2 + delta_radius * height_factor;
 
 	// Calculate the position, which is a combination of an offset to the p2 endpoint,
 	// shifted along the axis of the cylinder, and a rotated and scaled radius component.
 	Matrix3f r;
 	r.RotationEuler( vnorm, theta );
-	position = P2 + ( vnorm * l * height ) + ( r * unit * radius );
+	position = P2 + ( vnorm * height * height_factor ) + ( r * unit * radius );
 }
 //--------------------------------------------------------------------------------
-void Cone3f::SampleNormal( Vector3f& normal, float theta, float height ) const
+void Cone3f::SampleNormal( Vector3f& normal, float theta, float height_factor ) const
 {
 	// Define the axis of the cylinder, and find its length.
 
-	Vector3f v = P1 - P2;
-	Vector3f vnorm = Vector3f::Normalize( v );
-	float l = v.Magnitude();
+	Vector3f axis = P1 - P2;
+	Vector3f vnorm = Vector3f::Normalize( axis );
+	float height = axis.Magnitude();
 
-	Vector3f up = Vector3f( 0.0f, 1.0f, 0.0f );
+	// Find the unit vector perpendicular to the axis.  Note that if P1 and P2 are the
+	// same point, that unit will be the zero vector!
 
-	// Find the unit vector perpendicular to the axis, that is pointing closest to the (0,1,0) direction.
-	// If the axis points in the (0,1,0) direction, then use (1,0,0) as the unit vector.
+	Vector3f unit = Vector3f::Normalize( Vector3f::Perpendicular( axis ) );
 
-	Vector3f unit;
-	if ( vnorm == up || vnorm == -up ) {
-		unit = Vector3f( 1.0f, 0.0f, 0.0f );
-	} else {
-		Vector3f temp = Vector3f::Cross( vnorm, up );
-		unit = Vector3f::Cross( temp, vnorm );
-		unit.Normalize();
-	}
 
-	float slope = ( R2 - R1 ) / l;
-	float radius = R2 + slope * height * l;
+	float delta_radius = R1 - R2;
+	float slope = delta_radius / height;
 
 	// Calculate the position, which is a combination of an offset to the p2 endpoint,
 	// shifted along the axis of the cylinder, and a rotated and scaled radius component.
@@ -104,44 +87,36 @@ void Cone3f::SampleNormal( Vector3f& normal, float theta, float height ) const
 
 	// Calculate the normal vector, which is dependent on the delta in radii at each
 	// end of the cylinder.
-	normal = r * unit * radius + vnorm * slope * radius;
+	normal = r * unit - vnorm * slope;
 	normal.Normalize();
 }
 //--------------------------------------------------------------------------------
-void Cone3f::SamplePositionAndNormal( Vector3f& position, Vector3f& normal, float theta, float height ) const
+void Cone3f::SamplePositionAndNormal( Vector3f& position, Vector3f& normal, float theta, float height_factor ) const
 {
 	// Define the axis of the cylinder, and find its length.
 
-	Vector3f v = P1 - P2;
-	Vector3f vnorm = Vector3f::Normalize( v );
-	float l = v.Magnitude();
+	Vector3f axis = P1 - P2;
+	Vector3f vnorm = Vector3f::Normalize( axis );
+	float height = axis.Magnitude();
 
-	Vector3f up = Vector3f( 0.0f, 1.0f, 0.0f );
+	// Find the unit vector perpendicular to the axis.  Note that if P1 and P2 are the
+	// same point, that unit will be the zero vector!
 
-	// Find the unit vector perpendicular to the axis, that is pointing closest to the (0,1,0) direction.
-	// If the axis points in the (0,1,0) direction, then use (1,0,0) as the unit vector.
+	Vector3f unit = Vector3f::Normalize( Vector3f::Perpendicular( axis ) );
 
-	Vector3f unit;
-	if ( vnorm == up || vnorm == -up ) {
-		unit = Vector3f( 1.0f, 0.0f, 0.0f );
-	} else {
-		Vector3f temp = Vector3f::Cross( vnorm, up );
-		unit = Vector3f::Cross( temp, vnorm );
-		unit.Normalize();
-	}
-
-	float slope = ( R2 - R1 ) / l;
-	float radius = R2 + slope * height * l;
+	float delta_radius = R1 - R2;
+	float slope = delta_radius / height;
+	float radius = R2 + delta_radius * height_factor;
 
 	// Calculate the position, which is a combination of an offset to the p2 endpoint,
 	// shifted along the axis of the cylinder, and a rotated and scaled radius component.
 	Matrix3f r;
 	r.RotationEuler( vnorm, theta );
-	position = P2 + ( vnorm * l * height ) + ( r * unit * radius );
+	position = P2 + ( vnorm * height * height_factor ) + ( r * unit * radius );
 
 	// Calculate the normal vector, which is dependent on the delta in radii at each
 	// end of the cylinder.
-	normal = r * unit * radius + vnorm * slope * radius;
+	normal = r * unit - vnorm * slope;
 	normal.Normalize();
 }
 //--------------------------------------------------------------------------------

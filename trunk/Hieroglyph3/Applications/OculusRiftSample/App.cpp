@@ -24,6 +24,7 @@
 #include "GlyphRift/RiftController.h"
 #include "GlyphRift/ViewRift.h"
 #include "GlyphRift/ViewRiftHighlight.h"
+#include "ViewPerspective.h"
 #include "SwapChainConfigDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
@@ -76,8 +77,11 @@ bool App::ConfigureRenderingEngineComponents( UINT width, UINT height, D3D_FEATU
 	Config.SetOutputWindow( m_pWindow->GetHandle() );
 	m_pWindow->SetSwapChain( m_pRenderer11->CreateSwapChain( &Config ) );
 
-	m_MirrorTexture = m_pRiftHmd->GetMirrorTexture( m_iWidth, m_iHeight );
-	m_pFullscreenTexturedActor = new FullscreenTexturedActor( m_MirrorTexture );
+	if ( m_pRiftHmd ) {
+		m_MirrorTexture = m_pRiftHmd->GetMirrorTexture( m_iWidth, m_iHeight );
+	}
+
+	//m_pFullscreenTexturedActor = new FullscreenTexturedActor( m_MirrorTexture );
 
 	// We'll keep a copy of the swap chain's render target index to 
 	// use later.
@@ -100,16 +104,38 @@ bool App::ConfigureEngineComponents()
 	// Create and initialize the rift HMD objects.
 
 	m_pRiftMgr = std::make_shared<RiftManager>();
-	m_pRiftHmd = std::make_shared<RiftHMD>( m_pRiftMgr );
-	
-	// The desired window size is based on the screen size of the Rift display.
-	
-	if ( !ConfigureRenderingEngineComponents( m_pRiftHmd->HmdDisplayWidth() / 2,
-											  m_pRiftHmd->HmdDisplayHeight() / 2, 
-											  D3D_FEATURE_LEVEL_11_0 ) )
-	{
-		return( false );
+
+	try { 
+		m_pRiftHmd = std::make_shared<RiftHMD>( m_pRiftMgr ); 
 	}
+	catch( const std::exception& e ) 
+	{
+		// If the constructor throws, it likely means that there is no Rift connected.
+		// When that happens, this application can continue in 'desktop mode' using
+		// normal rendering.  We indicate this to the app by setting the HMD pointer
+		// to nullptr.
+
+		m_pRiftHmd = nullptr;
+	}
+
+	// The desired window size is based on the screen size of the Rift display.
+
+	if ( m_pRiftHmd ) {
+	
+		if ( !ConfigureRenderingEngineComponents( m_pRiftHmd->HmdDisplayWidth() / 2,
+												  m_pRiftHmd->HmdDisplayHeight() / 2, 
+												  D3D_FEATURE_LEVEL_11_0 ) ) 
+		{
+			return( false );
+		}
+	} else {
+
+		if ( !ConfigureRenderingEngineComponents( 1280, 720, D3D_FEATURE_LEVEL_11_0 ) )
+		{
+			return( false );
+		}
+	}
+
 
 	if ( !ConfigureRenderingSetup() ) {
 		return( false );
@@ -125,7 +151,7 @@ bool App::ConfigureEngineComponents()
 //--------------------------------------------------------------------------------
 void App::ShutdownEngineComponents()
 {
-	delete m_pFullscreenTexturedActor;
+	//delete m_pFullscreenTexturedActor;
 
 	ShutdownRenderingSetup();
 	ShutdownRenderingEngineComponents();
@@ -134,12 +160,17 @@ void App::ShutdownEngineComponents()
 bool App::ConfigureRenderingSetup()
 {
 	// Create the render view that will produce the images for the left and right
-	// eyes in the Rift.
+	// eyes in the Rift.  If there is not a hardware HMD available, then we will
+	// default to a standard 3D viewport.
+	
+	if ( m_pRiftHmd ) {
+		m_pRenderView = new ViewRift( m_pRiftHmd, m_BackBuffer, m_pWindow->GetSwapChain() );
+	} else {
+		m_pRenderView = new ViewPerspective( *m_pRenderer11, m_BackBuffer );
+	}
 
-	ViewRift* pRiftView = new ViewRift( m_pRiftHmd, m_BackBuffer, m_pWindow->GetSwapChain() );
-	//ViewRiftHighlight* pRiftView = new ViewRiftHighlight( m_pRiftHmd, m_BackBuffer, m_pWindow->GetSwapChain() );
-	pRiftView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
-	m_pRenderView = pRiftView;
+	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
+
 
 	// TODO: we need a special way to interact with the text overlay, since
 	//       it must be stereo compatible.  Currently this is just overwritten
@@ -167,8 +198,10 @@ bool App::ConfigureRenderingSetup()
 	// uses the input from the rift headset, but still allows for the traditional
 	// FirstPersonCamera controls to be applied to the node of the camera.
 
-	IController<Entity3D>* pRiftController = new RiftController<Entity3D>( m_pRiftHmd );
-	m_pCamera->GetBody()->Controllers.Attach( pRiftController );
+	if ( m_pRiftHmd ) {
+		IController<Entity3D>* pRiftController = new RiftController<Entity3D>( m_pRiftHmd );
+		m_pCamera->GetBody()->Controllers.Attach( pRiftController );
+	}
 
 	return( true );
 }
@@ -309,38 +342,45 @@ void App::Update()
 		Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 	
+
 	// We 'begin the frame' with the function call listed below.  This returns
 	// a structure that includes timing info that is in step with the time
 	// predicting features of the Rift.  Thus we use the delta time to perform
 	// our scene update, and then render the scene.
 
-	float delta = m_pRiftHmd->BeginFrame();
+	float delta( 0.0f );
 
-	// Default to our local delta time if the rift isn't reporting time properly.
-	if ( delta == 0.0f ) delta = m_pTimer->Elapsed();
-	
+	if ( m_pRiftHmd ) {
+		delta = m_pRiftHmd->BeginFrame();
+	} else {
+		delta = m_pTimer->Elapsed();
+	}
+
+	// Clamp the delta value to a maximum value.
+	if ( delta > 0.016f ) delta = 0.016f;
+	if ( delta < 0.000f ) delta = 0.000f;
+
 	m_pScene->Update( delta );
 	m_pScene->Render( m_pRenderer11 );
+
 
 	// The presentation to the swap chain would normally go here, but that isn't 
 	// needed since the Rift does it for us as part of the distortion rendering
 	// process.  We just need to 'end the frame' here.
 
-	m_pRiftHmd->EndFrame();
+	if ( m_pRiftHmd ) 
+	{
+		// Copy the mirror texture to the swap chain's render target, then present
+		// the swap chain to the window.
+		m_pRiftHmd->EndFrame();
+		m_pRenderer11->pImmPipeline->CopyResource( m_BackBuffer, m_MirrorTexture );
+		m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
+	}
+	else
+	{
+		m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain(), 1 );
+	}
 
-	// Copy the mirror texture to the swap chain's render target, then present
-	// the swap chain to the window.
-
-	m_pRenderer11->pImmPipeline->CopyResource( m_BackBuffer, m_MirrorTexture );
-
-	//m_pRenderer11->pImmPipeline->ClearRenderTargets();
-	//m_pRenderer11->pImmPipeline->OutputMergerStage.DesiredState.RenderTargetViews.SetState( 0, m_BackBuffer->m_iResourceRTV );
-	//m_pRenderer11->pImmPipeline->ApplyRenderTargets();
-	//m_pFullscreenTexturedActor->GetNode()->Render( m_pRenderer11->pImmPipeline, m_pRenderer11->m_pParamMgr, VT_PERSPECTIVE );
-
-
-
-	m_pRenderer11->Present( m_pWindow->GetHandle(), m_pWindow->GetSwapChain() );
 }
 //--------------------------------------------------------------------------------
 void App::Shutdown()
@@ -380,7 +420,9 @@ void App::HandleWindowResize( HWND handle, UINT width, UINT height )
 		m_pTextOverlayView->Resize( width, height );
 	}
 
-	m_MirrorTexture = m_pRiftHmd->GetMirrorTexture( width, height );
+	if ( m_pRiftHmd ) {
+		m_MirrorTexture = m_pRiftHmd->GetMirrorTexture( width, height );
+	}
 }
 //--------------------------------------------------------------------------------
 bool App::HandleEvent( EventPtr pEvent )

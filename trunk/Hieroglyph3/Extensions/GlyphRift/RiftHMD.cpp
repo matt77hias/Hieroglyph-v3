@@ -24,6 +24,8 @@
 #include "RenderTargetViewDX11.h"
 #include "ShaderResourceViewDX11.h"
 #include "Log.h"
+#include "EvtErrorMessage.h"
+#include "EventManager.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -33,29 +35,27 @@ struct RiftHMD::Impl
 		m_RiftMgr( RiftMgr ),
 		m_hmd( nullptr ),
 		frame( 0 ),
-		hardwareDevice( true ),
 		mirrorTexture( nullptr )
 	{
 		// Create the first device available.  If it isn't available then we throw an
 		// exception to let the user know.
 
-		ovrResult result = ovrHmd_Create( 0, &m_hmd );
+		ovrResult result = ovr_Create( &m_hmd, &m_luid );
 
 		if ( !m_hmd ) {
-			Log::Get().Write( L"Unable to find hardware Rift device, creating a debug device instead..." );
-			hardwareDevice = false;
-			result = ovrHmd_CreateDebug( ovrHmd_DK2, &m_hmd );
+			Log::Get().Write( L"Unable to find hardware Rift device!" );
+			throw std::exception( "No HMD Devices were found!" );
 		}
 		
-		if ( !m_hmd ) throw std::invalid_argument( "No HMD Devices were found!" );
 	
 		// Start the sensor which provides the Rift’s pose and motion.
-		ovrHmd_ConfigureTracking( m_hmd, 
+		
+		ovr_ConfigureTracking( m_hmd, 
 			ovrTrackingCap_Orientation |
 			ovrTrackingCap_MagYawCorrection | 
 			ovrTrackingCap_Position, 0);
 
-		ovrHmdDesc hmdDesc = *m_hmd;
+		ovrHmdDesc hmdDesc = ovr_GetHmdDesc( m_hmd );
 
 		// Initialize FovSideTanMax, which allows us to change all Fov sides at once - Fov
 		// starts at default and is clamped to this value.
@@ -74,30 +74,25 @@ struct RiftHMD::Impl
 	~Impl()
 	{
 		if ( mirrorTexture != nullptr ) {
-			ovrHmd_DestroyMirrorTexture( m_hmd, mirrorTexture );
+			ovr_DestroyMirrorTexture( m_hmd, mirrorTexture );
 		}
 
 		if ( m_hmd ) {
-			ovrHmd_Destroy( m_hmd );
+			ovr_Destroy( m_hmd );
 			m_hmd = nullptr;
 		}
 	}
 	//--------------------------------------------------------------------------------
-	bool IsHardwareDevice()
-	{
-		return hardwareDevice;
-	}
-	//--------------------------------------------------------------------------------
 	unsigned int HmdDisplayWidth()
 	{
-		ovrHmdDesc hmdDesc = *m_hmd;
+		ovrHmdDesc hmdDesc = ovr_GetHmdDesc( m_hmd );
 
 		return hmdDesc.Resolution.w;
 	}
 	//--------------------------------------------------------------------------------
 	unsigned int HmdDisplayHeight()
 	{
-		ovrHmdDesc hmdDesc = *m_hmd;
+		ovrHmdDesc hmdDesc = ovr_GetHmdDesc( m_hmd );
 
 		return hmdDesc.Resolution.h;
 	}
@@ -107,10 +102,10 @@ struct RiftHMD::Impl
 		// Get the desired texture sizes for the render targets.  Note that these are
 		// typically larger than the resolution of the display panel itself.
 
-		ovrHmdDesc hmdDesc = *m_hmd;
+		ovrHmdDesc hmdDesc = ovr_GetHmdDesc( m_hmd );
 
-		OVR::Sizei tex0Size = ovrHmd_GetFovTextureSize( m_hmd, ovrEye_Left, hmdDesc.DefaultEyeFov[ovrEye_Left], 1.0f );
-		OVR::Sizei tex1Size = ovrHmd_GetFovTextureSize( m_hmd, ovrEye_Right, hmdDesc.DefaultEyeFov[ovrEye_Right], 1.0f );
+		OVR::Sizei tex0Size = ovr_GetFovTextureSize( m_hmd, ovrEye_Left, hmdDesc.DefaultEyeFov[ovrEye_Left], 1.0f );
+		OVR::Sizei tex1Size = ovr_GetFovTextureSize( m_hmd, ovrEye_Right, hmdDesc.DefaultEyeFov[ovrEye_Right], 1.0f );
 
 		return max( tex0Size.w, tex1Size.w );
 	}
@@ -120,10 +115,10 @@ struct RiftHMD::Impl
 		// Get the desired texture sizes for the render targets.  Note that these are
 		// typically larger than the resolution of the display panel itself.
 
-		ovrHmdDesc hmdDesc = *m_hmd;
+		ovrHmdDesc hmdDesc = ovr_GetHmdDesc( m_hmd );
 
-		OVR::Sizei tex0Size = ovrHmd_GetFovTextureSize( m_hmd, ovrEye_Left, hmdDesc.DefaultEyeFov[ovrEye_Left], 1.0f );
-		OVR::Sizei tex1Size = ovrHmd_GetFovTextureSize( m_hmd, ovrEye_Right, hmdDesc.DefaultEyeFov[ovrEye_Right], 1.0f );
+		OVR::Sizei tex0Size = ovr_GetFovTextureSize( m_hmd, ovrEye_Left, hmdDesc.DefaultEyeFov[ovrEye_Left], 1.0f );
+		OVR::Sizei tex1Size = ovr_GetFovTextureSize( m_hmd, ovrEye_Right, hmdDesc.DefaultEyeFov[ovrEye_Right], 1.0f );
 
 		return max( tex0Size.h, tex1Size.h );
 	}
@@ -134,8 +129,8 @@ struct RiftHMD::Impl
         ovrVector3f      HmdToEyeViewOffset[2] = { eyeRenderDesc[0].HmdToEyeViewOffset,
                                                    eyeRenderDesc[1].HmdToEyeViewOffset };
 
-		ovrFrameTiming   ftiming  = ovrHmd_GetFrameTiming(m_hmd, 0);
-        ovrTrackingState hmdState = ovrHmd_GetTrackingState(m_hmd, ftiming.DisplayMidpointSeconds);
+		ovrFrameTiming   ftiming  = ovr_GetFrameTiming(m_hmd, 0);
+        ovrTrackingState hmdState = ovr_GetTrackingState(m_hmd, ftiming.DisplayMidpointSeconds);
         
 		ovr_CalcEyePoses( hmdState.HeadPose.ThePose, HmdToEyeViewOffset, eyePose );
 
@@ -154,7 +149,7 @@ struct RiftHMD::Impl
 	Matrix3f GetOrientation( double time )
 	{
 		// Query the HMD for the sensor state at a given time. "0.0" means "most recent time".
-		ovrTrackingState ts = ovrHmd_GetTrackingState( m_hmd, time );
+		ovrTrackingState ts = ovr_GetTrackingState( m_hmd, time );
 
 		Matrix3f orientation;
 		orientation.MakeIdentity();
@@ -253,7 +248,7 @@ struct RiftHMD::Impl
 
 		frame++;
 
-		ovrFrameTiming frameTiming = ovrHmd_GetFrameTiming( m_hmd, frame );
+		ovrFrameTiming frameTiming = ovr_GetFrameTiming( m_hmd, frame );
 
 		float delta = static_cast<float>( frameTiming.DisplayMidpointSeconds - frame_time );
 		frame_time = frameTiming.DisplayMidpointSeconds;
@@ -272,7 +267,7 @@ struct RiftHMD::Impl
 		const unsigned int layer_count = 1;
 
 		ovrLayerHeader* headers[layer_count] = { &layer.Header };
-		ovrResult result = ovrHmd_SubmitFrame( m_hmd, frame, nullptr, headers, layer_count );
+		ovrResult result = ovr_SubmitFrame( m_hmd, frame, nullptr, headers, layer_count );
 	}
 	//--------------------------------------------------------------------------------
 	void ConfigureRendering( unsigned int max_w, unsigned int max_h, DXGI_FORMAT format )
@@ -280,8 +275,10 @@ struct RiftHMD::Impl
 		// Get the rendering description for each eye, based on an input FOV.
 		// TODO: This FOV calculation could be modified to not use the default...
 
-		eyeRenderDesc[0] = ovrHmd_GetRenderDesc( m_hmd, ovrEye_Left, m_hmd->DefaultEyeFov[0] );
-		eyeRenderDesc[1] = ovrHmd_GetRenderDesc( m_hmd, ovrEye_Right, m_hmd->DefaultEyeFov[1] );
+		ovrHmdDesc hmdDesc = ovr_GetHmdDesc( m_hmd );
+
+		eyeRenderDesc[0] = ovr_GetRenderDesc( m_hmd, ovrEye_Left, hmdDesc.DefaultEyeFov[0] );
+		eyeRenderDesc[1] = ovr_GetRenderDesc( m_hmd, ovrEye_Right, hmdDesc.DefaultEyeFov[1] );
 
 		// Get the desired texture sizes for the eye render targets.  Note that these 
 		// are typically larger than the resolution of the HMD's display panel itself.
@@ -305,11 +302,11 @@ struct RiftHMD::Impl
 		D3D11_TEXTURE2D_DESC desc = renderConfig.GetTextureDesc();
 
 
-		if ( ovrHmd_CreateSwapTextureSetD3D11( m_hmd, RendererDX11::Get()->GetDevice(), &desc, &pTextureSets[0] ) != ovrSuccess ) {
+		if ( ovr_CreateSwapTextureSetD3D11( m_hmd, RendererDX11::Get()->GetDevice(), &desc, 0, &pTextureSets[0] ) != ovrSuccess ) {
 			Log::Get().Write( L"ERROR: Could not create swap texture sets!" );
 		}
 
-		if ( ovrHmd_CreateSwapTextureSetD3D11( m_hmd, RendererDX11::Get()->GetDevice(), &desc, &pTextureSets[1] ) != ovrSuccess ) {
+		if ( ovr_CreateSwapTextureSetD3D11( m_hmd, RendererDX11::Get()->GetDevice(), &desc, 0, &pTextureSets[1] ) != ovrSuccess ) {
 			Log::Get().Write( L"ERROR: Could not create swap texture sets!" );
 		}
 
@@ -358,7 +355,7 @@ struct RiftHMD::Impl
 		if ( mirrorTexture != nullptr )
 		{
 			if ( mirrorTexture->Header.TextureSize.w != w || mirrorTexture->Header.TextureSize.h != h ) {
-				ovrHmd_DestroyMirrorTexture( m_hmd, mirrorTexture );
+				ovr_DestroyMirrorTexture( m_hmd, mirrorTexture );
 				mirrorTexture = nullptr;
 			}
 		}
@@ -374,7 +371,7 @@ struct RiftHMD::Impl
 			desc.Usage            = D3D11_USAGE_DEFAULT;
 			desc.SampleDesc.Count = 1;
 			desc.MipLevels        = 1;
-			ovrHmd_CreateMirrorTextureD3D11( m_hmd, RendererDX11::Get()->GetDevice(), &desc, &mirrorTexture );
+			ovr_CreateMirrorTextureD3D11( m_hmd, RendererDX11::Get()->GetDevice(), &desc, 0, &mirrorTexture );
 		}
 
         ovrD3D11Texture* tex = (ovrD3D11Texture*)mirrorTexture;
@@ -385,6 +382,7 @@ struct RiftHMD::Impl
 	//--------------------------------------------------------------------------------
 	RiftManagerPtr m_RiftMgr;
 	ovrHmd m_hmd;
+	ovrGraphicsLuid m_luid;
 	ovrFovPort eyeFov[2];
 	ovrEyeRenderDesc eyeRenderDesc[2];
 	ovrPosef eyePose[2];
@@ -397,7 +395,6 @@ struct RiftHMD::Impl
 
 	unsigned int frame;
 	double frame_time;
-	bool hardwareDevice;
 };
 //--------------------------------------------------------------------------------
 
@@ -412,11 +409,6 @@ RiftHMD::RiftHMD( RiftManagerPtr RiftMgr ) :
 RiftHMD::~RiftHMD()
 {
 	delete m_pImpl;
-}
-//--------------------------------------------------------------------------------
-bool RiftHMD::IsHardwareDevice()
-{
-	return m_pImpl->IsHardwareDevice();
 }
 //--------------------------------------------------------------------------------
 unsigned int RiftHMD::HmdDisplayWidth()

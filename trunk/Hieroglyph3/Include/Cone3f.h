@@ -30,9 +30,9 @@ namespace Glyph3
 		Cone3f( const Vector3f& p1, float r1, const Vector3f& p2, float r2 );
 		virtual ~Cone3f( );
 
-		void SamplePosition( Vector3f& position, float theta, float height ) const;
-		void SampleNormal( Vector3f& normal, float theta, float height ) const;
-		void SamplePositionAndNormal( Vector3f& position, Vector3f& normal, float theta, float height ) const;
+		void SamplePosition( Vector3f& position, float theta, float height_factor ) const;
+		void SampleNormal( Vector3f& normal, float theta, float height_factor ) const;
+		void SamplePositionAndNormal( Vector3f& position, Vector3f& normal, float theta, float height_factor ) const;
 
 		virtual eSHAPE GetShapeType( ) const;
 

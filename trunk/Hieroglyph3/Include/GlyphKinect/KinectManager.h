@@ -32,7 +32,7 @@ namespace Glyph3
 		KinectManager();
 		~KinectManager();
 
-		bool Initialize();
+		bool Initialize( bool enable_skeleton = true, bool enable_color = true, bool enable_depth = true );
 		void Shutdown();
 
 		void Nui_GotDepthAlert( );

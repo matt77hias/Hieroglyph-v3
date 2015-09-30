@@ -375,12 +375,14 @@ MaterialPtr MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( Rende
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 
 	pEffect->SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
-		std::wstring( L"ImmediateGeometrySolid.hlsl" ),
+		//std::wstring( L"ImmediateGeometrySolid.hlsl" ),
+		std::wstring( L"PBR_test.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_4_0" ) ) );
 
 	pEffect->SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
-		std::wstring( L"ImmediateGeometrySolid.hlsl" ),
+		//std::wstring( L"ImmediateGeometrySolid.hlsl" ),
+		std::wstring( L"PBR_test.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_4_0" ) ) );
 
