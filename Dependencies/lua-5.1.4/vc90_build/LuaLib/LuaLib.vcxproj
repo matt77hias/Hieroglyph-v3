@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{DBA1913E-154D-420A-84A9-AD8A789851CC}</ProjectGuid>
+    <RootNamespace>LuaLib</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+    <PostBuildEvent>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\SDK\Library\Debug
+copy $(OutDir)$(TargetName).pdb ..\..\..\..\SDK\Library\Debug</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+    <PostBuildEvent>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\SDK\Library\Release
+copy $(OutDir)$(TargetName).pdb ..\..\..\..\SDK\Library\Release</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\lapi.c" />
+    <ClCompile Include="..\..\src\lcode.c" />
+    <ClCompile Include="..\..\src\ldebug.c" />
+    <ClCompile Include="..\..\src\ldo.c" />
+    <ClCompile Include="..\..\src\ldump.c" />
+    <ClCompile Include="..\..\src\lfunc.c" />
+    <ClCompile Include="..\..\src\lgc.c" />
+    <ClCompile Include="..\..\src\llex.c" />
+    <ClCompile Include="..\..\src\lmem.c" />
+    <ClCompile Include="..\..\src\lobject.c" />
+    <ClCompile Include="..\..\src\lopcodes.c" />
+    <ClCompile Include="..\..\src\lparser.c" />
+    <ClCompile Include="..\..\src\lstate.c" />
+    <ClCompile Include="..\..\src\lstring.c" />
+    <ClCompile Include="..\..\src\ltable.c" />
+    <ClCompile Include="..\..\src\ltm.c" />
+    <ClCompile Include="..\..\src\lundump.c" />
+    <ClCompile Include="..\..\src\lvm.c" />
+    <ClCompile Include="..\..\src\lzio.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\lapi.h" />
+    <ClInclude Include="..\..\src\lcode.h" />
+    <ClInclude Include="..\..\src\ldebug.h" />
+    <ClInclude Include="..\..\src\ldo.h" />
+    <ClInclude Include="..\..\src\lfunc.h" />
+    <ClInclude Include="..\..\src\lgc.h" />
+    <ClInclude Include="..\..\src\llex.h" />
+    <ClInclude Include="..\..\src\llimits.h" />
+    <ClInclude Include="..\..\src\lmem.h" />
+    <ClInclude Include="..\..\src\lobject.h" />
+    <ClInclude Include="..\..\src\lopcodes.h" />
+    <ClInclude Include="..\..\src\lparser.h" />
+    <ClInclude Include="..\..\src\lstate.h" />
+    <ClInclude Include="..\..\src\lstring.h" />
+    <ClInclude Include="..\..\src\ltable.h" />
+    <ClInclude Include="..\..\src\ltm.h" />
+    <ClInclude Include="..\..\src\lua.h" />
+    <ClInclude Include="..\..\src\luaconf.h" />
+    <ClInclude Include="..\..\src\lundump.h" />
+    <ClInclude Include="..\..\src\lvm.h" />
+    <ClInclude Include="..\..\src\lzio.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

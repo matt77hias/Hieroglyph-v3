@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="App.cpp" />
+    <ClCompile Include="ParticleStormGlyphlet.cpp">
+      <Filter>Particle Storm Glyphlet</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptedGlyphlet.cpp">
+      <Filter>Scripting Glyphlet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ParticleStorm\ParticleSystemExecutorDX11.cpp">
+      <Filter>Particle Storm Glyphlet\Files Referenced from ParticleStorm project</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ParticleStorm\ViewSimulation.cpp">
+      <Filter>Particle Storm Glyphlet\Files Referenced from ParticleStorm project</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ParticleStorm\ParticleSystemActor.cpp">
+      <Filter>Particle Storm Glyphlet\Files Referenced from ParticleStorm project</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="App.h" />
+    <ClInclude Include="ParticleStormGlyphlet.h">
+      <Filter>Particle Storm Glyphlet</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptedGlyphlet.h">
+      <Filter>Scripting Glyphlet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ParticleStorm\ParticleSystemExecutorDX11.h">
+      <Filter>Particle Storm Glyphlet\Files Referenced from ParticleStorm project</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ParticleStorm\ViewSimulation.h">
+      <Filter>Particle Storm Glyphlet\Files Referenced from ParticleStorm project</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ParticleStorm\ParticleSystemActor.h">
+      <Filter>Particle Storm Glyphlet\Files Referenced from ParticleStorm project</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Particle Storm Glyphlet">
+      <UniqueIdentifier>{768c9d3a-f338-4b70-8825-7ef3423a50da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripting Glyphlet">
+      <UniqueIdentifier>{25535849-7135-4551-ae9f-646e34defb20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Particle Storm Glyphlet\Files Referenced from ParticleStorm project">
+      <UniqueIdentifier>{cc1bd348-cb4e-4ffe-bc8f-d3ca9c8341ac}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>

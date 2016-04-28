@@ -1,0 +1,67 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hieroglyph3_Desktop", "Source\Hieroglyph3_Desktop.vcxproj", "{0F6D257E-70D5-46C5-8A12-7BDF93C35E81}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E252E0D3-A52B-447F-A108-647F9C52AE33} = {E252E0D3-A52B-447F-A108-647F9C52AE33}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LuaLib", "Dependencies\lua-5.1.4\LuaLib\LuaLib.vcxproj", "{E252E0D3-A52B-447F-A108-647F9C52AE33}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GlyphKinect_Desktop", "Extensions\GlyphKinect\GlyphKinect_Desktop.vcxproj", "{035D70FA-C8BE-4002-89BE-F53C8895D3BE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81} = {0F6D257E-70D5-46C5-8A12-7BDF93C35E81}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KinectPlayground_Desktop", "Applications\KinectPlayground\KinectPlayground_Desktop.vcxproj", "{1A122D9D-F8C2-4690-B133-CA65ECCE3951}"
+	ProjectSection(ProjectDependencies) = postProject
+		{035D70FA-C8BE-4002-89BE-F53C8895D3BE} = {035D70FA-C8BE-4002-89BE-F53C8895D3BE}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81}.Debug|Win32.Build.0 = Debug|Win32
+		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81}.Debug|x64.ActiveCfg = Debug|x64
+		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81}.Debug|x64.Build.0 = Debug|x64
+		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81}.Release|Win32.ActiveCfg = Release|Win32
+		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81}.Release|Win32.Build.0 = Release|Win32
+		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81}.Release|x64.ActiveCfg = Release|x64
+		{0F6D257E-70D5-46C5-8A12-7BDF93C35E81}.Release|x64.Build.0 = Release|x64
+		{E252E0D3-A52B-447F-A108-647F9C52AE33}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E252E0D3-A52B-447F-A108-647F9C52AE33}.Debug|Win32.Build.0 = Debug|Win32
+		{E252E0D3-A52B-447F-A108-647F9C52AE33}.Debug|x64.ActiveCfg = Debug|x64
+		{E252E0D3-A52B-447F-A108-647F9C52AE33}.Debug|x64.Build.0 = Debug|x64
+		{E252E0D3-A52B-447F-A108-647F9C52AE33}.Release|Win32.ActiveCfg = Release|Win32
+		{E252E0D3-A52B-447F-A108-647F9C52AE33}.Release|Win32.Build.0 = Release|Win32
+		{E252E0D3-A52B-447F-A108-647F9C52AE33}.Release|x64.ActiveCfg = Release|x64
+		{E252E0D3-A52B-447F-A108-647F9C52AE33}.Release|x64.Build.0 = Release|x64
+		{035D70FA-C8BE-4002-89BE-F53C8895D3BE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{035D70FA-C8BE-4002-89BE-F53C8895D3BE}.Debug|Win32.Build.0 = Debug|Win32
+		{035D70FA-C8BE-4002-89BE-F53C8895D3BE}.Debug|x64.ActiveCfg = Debug|x64
+		{035D70FA-C8BE-4002-89BE-F53C8895D3BE}.Debug|x64.Build.0 = Debug|x64
+		{035D70FA-C8BE-4002-89BE-F53C8895D3BE}.Release|Win32.ActiveCfg = Release|Win32
+		{035D70FA-C8BE-4002-89BE-F53C8895D3BE}.Release|Win32.Build.0 = Release|Win32
+		{035D70FA-C8BE-4002-89BE-F53C8895D3BE}.Release|x64.ActiveCfg = Release|x64
+		{035D70FA-C8BE-4002-89BE-F53C8895D3BE}.Release|x64.Build.0 = Release|x64
+		{1A122D9D-F8C2-4690-B133-CA65ECCE3951}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1A122D9D-F8C2-4690-B133-CA65ECCE3951}.Debug|Win32.Build.0 = Debug|Win32
+		{1A122D9D-F8C2-4690-B133-CA65ECCE3951}.Debug|x64.ActiveCfg = Debug|x64
+		{1A122D9D-F8C2-4690-B133-CA65ECCE3951}.Debug|x64.Build.0 = Debug|x64
+		{1A122D9D-F8C2-4690-B133-CA65ECCE3951}.Release|Win32.ActiveCfg = Release|Win32
+		{1A122D9D-F8C2-4690-B133-CA65ECCE3951}.Release|Win32.Build.0 = Release|Win32
+		{1A122D9D-F8C2-4690-B133-CA65ECCE3951}.Release|x64.ActiveCfg = Release|x64
+		{1A122D9D-F8C2-4690-B133-CA65ECCE3951}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

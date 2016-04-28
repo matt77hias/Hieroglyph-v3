@@ -1,0 +1,1577 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Animation">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Application">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Events">
+      <UniqueIdentifier>{0dd76ca3-cd09-4935-b0c5-5770e644eff9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Geometry">
+      <UniqueIdentifier>{6e364390-7295-443f-bdd1-4d11ca51a32b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Intersection">
+      <UniqueIdentifier>{b6d6b8d7-dfd5-4d16-83d5-0efa1ef11bcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mathematics">
+      <UniqueIdentifier>{3f857294-e05e-45cc-adfd-c01727b9c62c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects">
+      <UniqueIdentifier>{37e00fdd-a121-412c-9a6b-b5b85600dc43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering">
+      <UniqueIdentifier>{f1beee1e-4102-4b33-8d00-f9c040b5aefa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripting">
+      <UniqueIdentifier>{f9450bad-330d-4e33-97ba-7d934324d015}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{d64b5cd9-220c-439c-b279-7d597646fc27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events\Notifications">
+      <UniqueIdentifier>{80b0c1df-2d3f-48a1-be08-a4e8797be8bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events\Rendering Events">
+      <UniqueIdentifier>{3f3bcb28-1d55-4c04-9853-03d6ec0c7f06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events\Windows Messages">
+      <UniqueIdentifier>{4092a671-defc-4deb-89fd-5e6771cb0d15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events\Windows Messages\Keyboard">
+      <UniqueIdentifier>{35deb7ce-bb35-42f4-a51a-1da4cd0a8b3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events\Windows Messages\Mouse">
+      <UniqueIdentifier>{4a705df7-b48d-491d-a23c-77e49067a8ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events\Windows Messages\Window">
+      <UniqueIdentifier>{afd7ac7d-bc84-4d4f-a4a0-35b5df20e592}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Basic Objects">
+      <UniqueIdentifier>{8a7bd4dc-3681-4886-8012-b6a52b11d212}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Scene Objects">
+      <UniqueIdentifier>{32989379-071d-45f6-93e3-c05d76387220}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Scene Objects\Actors">
+      <UniqueIdentifier>{9562db6f-1457-45dc-932a-9c84c74c16ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Scene Objects\Cameras">
+      <UniqueIdentifier>{0536d354-653c-48fc-b62e-7dba1fb0f3d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Scene Objects\Lights">
+      <UniqueIdentifier>{44cc3b9f-b5b8-49c2-b1d7-85325864b772}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Scene Objects\Actors\Specialized Parameter Writers">
+      <UniqueIdentifier>{3da12ec7-9abb-4515-85ae-fca26cc5c068}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\DXGI">
+      <UniqueIdentifier>{858ccd04-682b-4fb9-85d6-8d7685320d2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Material System">
+      <UniqueIdentifier>{4f4f40ce-c9d8-469b-8441-20b64e2a1c38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Parameter System">
+      <UniqueIdentifier>{987991ea-bcc0-40d9-b4c7-11ab6a49f9bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System">
+      <UniqueIdentifier>{2da6ce19-8fe4-4092-86f4-186ecc0a2d97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Renderer Components">
+      <UniqueIdentifier>{a8171f1a-3c3c-4e26-ad16-792ef1dc5629}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Resource System">
+      <UniqueIdentifier>{f8a6c5d8-fd99-4c61-bdf7-4a09876d6051}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Sprite System">
+      <UniqueIdentifier>{3ce3c100-d892-43f3-9b7f-5f0ec596d2f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Utility">
+      <UniqueIdentifier>{fe3aee43-9c4d-40cf-bad5-7cc1bb599a83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Parameter System\Parameter Writers">
+      <UniqueIdentifier>{686970f9-f4eb-4d24-a4e5-e635fe939a5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Parameter System\Parameters">
+      <UniqueIdentifier>{84aadf7e-1ab8-459e-aefc-3c8434d667ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Resource System\State Objects">
+      <UniqueIdentifier>{cd847995-32c9-4457-bc39-d5bae20684ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Resource System\Buffers">
+      <UniqueIdentifier>{405e59b9-ba5a-402e-9222-522362fe761d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Resource System\Resource Views">
+      <UniqueIdentifier>{037ad5cd-0428-4feb-a69a-ffdd91dce9b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Resource System\Textures">
+      <UniqueIdentifier>{eac17d6e-0aaa-4e6d-82e3-4da7efa80261}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripting\Interfaces">
+      <UniqueIdentifier>{b6e53ec0-d76e-467e-adb6-ad125012fc14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Material System\Components">
+      <UniqueIdentifier>{c25ae441-b273-4869-b43f-5585840c09d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Material System\Components\Material Templates">
+      <UniqueIdentifier>{fd4a0249-dfec-421c-aea7-992b7109520d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripting\New Interfaces">
+      <UniqueIdentifier>{4012733d-e510-4651-8a9b-b6339d383531}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application\Glyphlets">
+      <UniqueIdentifier>{67267e42-6de0-4dd5-bea4-1b47003272af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Material System\Components\Tasks">
+      <UniqueIdentifier>{e7c809f6-8040-45de-91ba-944550f2ecc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Controllers">
+      <UniqueIdentifier>{a20ae4db-4d27-4342-87b4-c5544ff0359f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Scene Objects\Actors\Actor Creation">
+      <UniqueIdentifier>{4e6d423b-ea0c-497b-9c03-01c7e1fe8601}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Executors">
+      <UniqueIdentifier>{2fc4f7d7-da9b-4c37-b208-b8beb7caef57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Executors\File Formats">
+      <UniqueIdentifier>{bf39b617-7434-4e8c-8a33-c33730ef5711}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Executors\Old Style Objects">
+      <UniqueIdentifier>{f5a194fc-69bc-48df-9982-6b29b981def6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Executors\Vertex Layouts">
+      <UniqueIdentifier>{2b400be7-1a2d-4ae9-a9ae-491fca43e86d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Stages">
+      <UniqueIdentifier>{11d212bd-6ea6-414f-8c91-857465fb23ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Stages\Programmable Stages">
+      <UniqueIdentifier>{a0472b3d-c023-4336-8b6f-c487d2584071}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs">
+      <UniqueIdentifier>{c5559abb-2563-472a-ae7e-ec492806b78d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs\Reflection">
+      <UniqueIdentifier>{1001c132-67bf-4cd9-a26e-b5d7cd086d31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Stages\Programmable Stages\Stages">
+      <UniqueIdentifier>{fac63cd2-d226-4641-bfd2-64c01aaa20f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Stages\Programmable Stages\States">
+      <UniqueIdentifier>{1aa4fc4f-5576-4cf0-a5be-c32aa3a17951}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Stages\Fixed Stages">
+      <UniqueIdentifier>{80e1301b-3050-4e8f-ae3f-19e83e745c87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Stages\Fixed Stages\Input Assembler">
+      <UniqueIdentifier>{6679adda-a7db-4d86-a08f-77ae78f932ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Stages\Fixed Stages\Rasterizer">
+      <UniqueIdentifier>{90981dd3-7093-4bc5-9ad6-ccb431676bbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Stages\Fixed Stages\Output Merger">
+      <UniqueIdentifier>{f994eadc-3be9-4c18-ba2e-519c4c38026a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Stages\Common">
+      <UniqueIdentifier>{750a93a7-cd31-4661-ab6c-caaa19b69fe7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Tessellation Toolkit">
+      <UniqueIdentifier>{5bee33c2-1f5b-4b20-ab84-093b499a1007}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Stages\Fixed Stages\Stream Output">
+      <UniqueIdentifier>{b4bb4fe3-e716-4e8c-9f22-1109e88e4788}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Tessellation Toolkit\Evaluation">
+      <UniqueIdentifier>{3f482093-5efd-4e08-b033-bf691e8ce5db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Tessellation Toolkit\Attributes">
+      <UniqueIdentifier>{5166398c-bca4-4f87-8e7a-db96bfebd2cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Tessellation Toolkit\Tessellators">
+      <UniqueIdentifier>{2d1a82ca-c449-448c-a076-c9e589e8d177}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Pipeline System\Executors\Basis Objects">
+      <UniqueIdentifier>{9e97739e-4186-4dac-8ecc-9c3e6d85d4b6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="SingleWindowGlyphlet.cpp">
+      <Filter>Application\Glyphlets</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsoleWindow.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="FileLoader.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderApplication.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderWindow.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Win32RenderWindow.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="EventManager.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="IEventListener.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtErrorMessage.cpp">
+      <Filter>Events\Notifications</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtInfoMessage.cpp">
+      <Filter>Events\Notifications</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtFrameStart.cpp">
+      <Filter>Events\Rendering Events</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtWindowMsg.cpp">
+      <Filter>Events\Windows Messages</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtChar.cpp">
+      <Filter>Events\Windows Messages\Keyboard</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtKeyboardMsg.cpp">
+      <Filter>Events\Windows Messages\Keyboard</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtKeyDown.cpp">
+      <Filter>Events\Windows Messages\Keyboard</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtKeyUp.cpp">
+      <Filter>Events\Windows Messages\Keyboard</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtWindowResize.cpp">
+      <Filter>Events\Windows Messages\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtMouseLButtonDown.cpp">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtMouseLButtonUp.cpp">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtMouseLeave.cpp">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtMouseMButtonDown.cpp">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtMouseMButtonUp.cpp">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtMouseMove.cpp">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtMouseMsg.cpp">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtMouseRButtonDown.cpp">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtMouseRButtonUp.cpp">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="EvtMouseWheel.cpp">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="Box3f.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="CompositeShape.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Cone3f.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Frustum3f.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="LineIndices.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Plane3f.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="PointIndices.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Ray3f.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Sphere3f.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Triangle3f.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="TriangleIndices.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Intersector.cpp">
+      <Filter>Intersection</Filter>
+    </ClCompile>
+    <ClCompile Include="IntrRay3fBox3f.cpp">
+      <Filter>Intersection</Filter>
+    </ClCompile>
+    <ClCompile Include="IntrRay3fSphere3f.cpp">
+      <Filter>Intersection</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix3f.cpp">
+      <Filter>Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix4f.cpp">
+      <Filter>Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="PerlinNoise.cpp">
+      <Filter>Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector2f.cpp">
+      <Filter>Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector3f.cpp">
+      <Filter>Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector4f.cpp">
+      <Filter>Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity3D.cpp">
+      <Filter>Objects\Basic Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Node3D.cpp">
+      <Filter>Objects\Basic Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="PickRecord.cpp">
+      <Filter>Objects\Basic Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneGraph.cpp">
+      <Filter>Objects\Basic Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform3D.cpp">
+      <Filter>Objects\Basic Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Objects\Scene Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="BoundsVisualizerActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsoleActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="FullscreenActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="GlyphletActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="SkinnedActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyboxActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="TextActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="VolumeActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="ActorGenerator.cpp">
+      <Filter>Objects\Scene Objects\Actors\Actor Creation</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectSpaceCameraPositionWriter.cpp">
+      <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureSpaceCameraPositionWriter.cpp">
+      <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureSpaceLightPositionWriter.cpp">
+      <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Objects\Scene Objects\Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="FirstPersonCamera.cpp">
+      <Filter>Objects\Scene Objects\Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Objects\Scene Objects\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>Objects\Scene Objects\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="GlyphString.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Log.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="PCH.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Console.cpp">
+      <Filter>Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptManager.cpp">
+      <Filter>Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptIntfActor.cpp">
+      <Filter>Scripting\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptIntfApp.cpp">
+      <Filter>Scripting\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaApp.cpp">
+      <Filter>Scripting\New Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaGeometryActor.cpp">
+      <Filter>Scripting\New Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaScene.cpp">
+      <Filter>Scripting\New Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaTextActor.cpp">
+      <Filter>Scripting\New Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="RendererDX11.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="DXGIAdapter.cpp">
+      <Filter>Rendering\DXGI</Filter>
+    </ClCompile>
+    <ClCompile Include="DXGIOutput.cpp">
+      <Filter>Rendering\DXGI</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialGeneratorDX11.cpp">
+      <Filter>Rendering\Material System</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialManager.cpp">
+      <Filter>Rendering\Material System</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialDX11.cpp">
+      <Filter>Rendering\Material System\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderable.cpp">
+      <Filter>Rendering\Material System\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderEffectDX11.cpp">
+      <Filter>Rendering\Material System\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialTemplate.cpp">
+      <Filter>Rendering\Material System\Components\Material Templates</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneRenderTask.cpp">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="Task.cpp">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewAmbientOcclusion.cpp">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewDepthNormal.cpp">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewOcclusion.cpp">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewPerspective.cpp">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewTextOverlay.cpp">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="ParameterContainer.cpp">
+      <Filter>Rendering\Parameter System</Filter>
+    </ClCompile>
+    <ClCompile Include="ParameterManagerDX11.cpp">
+      <Filter>Rendering\Parameter System</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantBufferParameterWriterDX11.cpp">
+      <Filter>Rendering\Parameter System\Parameter Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="MatrixArrayParameterWriterDX11.cpp">
+      <Filter>Rendering\Parameter System\Parameter Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="MatrixParameterWriterDX11.cpp">
+      <Filter>Rendering\Parameter System\Parameter Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="ParameterWriter.cpp">
+      <Filter>Rendering\Parameter System\Parameter Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="SamplerParameterWriterDX11.cpp">
+      <Filter>Rendering\Parameter System\Parameter Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderResourceParameterWriterDX11.cpp">
+      <Filter>Rendering\Parameter System\Parameter Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="UnorderedAccessParameterWriterDX11.cpp">
+      <Filter>Rendering\Parameter System\Parameter Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorParameterWriterDX11.cpp">
+      <Filter>Rendering\Parameter System\Parameter Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantBufferParameterDX11.cpp">
+      <Filter>Rendering\Parameter System\Parameters</Filter>
+    </ClCompile>
+    <ClCompile Include="MatrixArrayParameterDX11.cpp">
+      <Filter>Rendering\Parameter System\Parameters</Filter>
+    </ClCompile>
+    <ClCompile Include="MatrixParameterDX11.cpp">
+      <Filter>Rendering\Parameter System\Parameters</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderParameterDX11.cpp">
+      <Filter>Rendering\Parameter System\Parameters</Filter>
+    </ClCompile>
+    <ClCompile Include="SamplerParameterDX11.cpp">
+      <Filter>Rendering\Parameter System\Parameters</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderResourceParameterDX11.cpp">
+      <Filter>Rendering\Parameter System\Parameters</Filter>
+    </ClCompile>
+    <ClCompile Include="UnorderedAccessParameterDX11.cpp">
+      <Filter>Rendering\Parameter System\Parameters</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorParameterDX11.cpp">
+      <Filter>Rendering\Parameter System\Parameters</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineManagerDX11.cpp">
+      <Filter>Rendering\Pipeline System</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiExecutorDX11.cpp">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineExecutorDX11.cpp">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexElementDX11.cpp">
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryDX11.cpp">
+      <Filter>Rendering\Pipeline System\Executors\Old Style Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryGeneratorDX11.cpp">
+      <Filter>Rendering\Pipeline System\Executors\Old Style Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryLoaderDX11.cpp">
+      <Filter>Rendering\Pipeline System\Executors\Old Style Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="BasicVertexDX11.cpp">
+      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteVertexDX11.cpp">
+      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
+    </ClCompile>
+    <ClCompile Include="TexturedVertex.cpp">
+      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
+    </ClCompile>
+    <ClCompile Include="VisualizerVertexDX11.cpp">
+      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
+    </ClCompile>
+    <ClCompile Include="VolumeTextureVertexDX11.cpp">
+      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
+    </ClCompile>
+    <ClCompile Include="InputAssemblerStageDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Input Assembler</Filter>
+    </ClCompile>
+    <ClCompile Include="InputAssemblerStateDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Input Assembler</Filter>
+    </ClCompile>
+    <ClCompile Include="OutputMergerStageDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Output Merger</Filter>
+    </ClCompile>
+    <ClCompile Include="OutputMergerStageStateDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Output Merger</Filter>
+    </ClCompile>
+    <ClCompile Include="RasterizerStageDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="RasterizerStageStateDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="StreamOutputStageDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Stream Output</Filter>
+    </ClCompile>
+    <ClCompile Include="StreamOutputStageStateDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Stream Output</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderReflectionDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderReflectionFactoryDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="ComputeShaderDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs</Filter>
+    </ClCompile>
+    <ClCompile Include="DomainShaderDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryShaderDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs</Filter>
+    </ClCompile>
+    <ClCompile Include="HullShaderDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelShaderDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderFactoryDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexShaderDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs</Filter>
+    </ClCompile>
+    <ClCompile Include="ComputeStageDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="DomainStageDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryStageDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="HullStageDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelStageDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderStageDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexStageDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Stages</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderStageStateDX11.cpp">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\States</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandListDX11.cpp">
+      <Filter>Rendering\Renderer Components</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceDX11.cpp">
+      <Filter>Rendering\Resource System</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceProxyDX11.cpp">
+      <Filter>Rendering\Resource System</Filter>
+    </ClCompile>
+    <ClCompile Include="BufferConfigDX11.cpp">
+      <Filter>Rendering\Resource System\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="BufferDX11.cpp">
+      <Filter>Rendering\Resource System\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="ByteAddressBufferDX11.cpp">
+      <Filter>Rendering\Resource System\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantBufferDX11.cpp">
+      <Filter>Rendering\Resource System\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="IndexBufferDX11.cpp">
+      <Filter>Rendering\Resource System\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="IndirectArgsBufferDX11.cpp">
+      <Filter>Rendering\Resource System\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="StructuredBufferDX11.cpp">
+      <Filter>Rendering\Resource System\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexBufferDX11.cpp">
+      <Filter>Rendering\Resource System\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthStencilViewConfigDX11.cpp">
+      <Filter>Rendering\Resource System\Resource Views</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthStencilViewDX11.cpp">
+      <Filter>Rendering\Resource System\Resource Views</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderTargetViewConfigDX11.cpp">
+      <Filter>Rendering\Resource System\Resource Views</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderTargetViewDX11.cpp">
+      <Filter>Rendering\Resource System\Resource Views</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderResourceViewConfigDX11.cpp">
+      <Filter>Rendering\Resource System\Resource Views</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderResourceViewDX11.cpp">
+      <Filter>Rendering\Resource System\Resource Views</Filter>
+    </ClCompile>
+    <ClCompile Include="UnorderedAccessViewConfigDX11.cpp">
+      <Filter>Rendering\Resource System\Resource Views</Filter>
+    </ClCompile>
+    <ClCompile Include="UnorderedAccessViewDX11.cpp">
+      <Filter>Rendering\Resource System\Resource Views</Filter>
+    </ClCompile>
+    <ClCompile Include="BlendStateConfigDX11.cpp">
+      <Filter>Rendering\Resource System\State Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthStencilStateConfigDX11.cpp">
+      <Filter>Rendering\Resource System\State Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="RasterizerStateConfigDX11.cpp">
+      <Filter>Rendering\Resource System\State Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="SamplerStateConfigDX11.cpp">
+      <Filter>Rendering\Resource System\State Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewPortDX11.cpp">
+      <Filter>Rendering\Resource System\State Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="SwapChainConfigDX11.cpp">
+      <Filter>Rendering\Resource System\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="SwapChainDX11.cpp">
+      <Filter>Rendering\Resource System\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture1dConfigDX11.cpp">
+      <Filter>Rendering\Resource System\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture1dDX11.cpp">
+      <Filter>Rendering\Resource System\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture2dConfigDX11.cpp">
+      <Filter>Rendering\Resource System\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture2dDX11.cpp">
+      <Filter>Rendering\Resource System\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture3dConfigDX11.cpp">
+      <Filter>Rendering\Resource System\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture3dDX11.cpp">
+      <Filter>Rendering\Resource System\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteFontDX11.cpp">
+      <Filter>Rendering\Sprite System</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteFontLoaderDX11.cpp">
+      <Filter>Rendering\Sprite System</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteRendererDX11.cpp">
+      <Filter>Rendering\Sprite System</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DEnumConversion.cpp">
+      <Filter>Rendering\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewPerspectiveHighlight.cpp">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="Win32Window.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="FullscreenTexturedActor.cpp">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshOBJ.cpp">
+      <Filter>Rendering\Pipeline System\Executors\File Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="Segment3f.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="AxisAlignedBox.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Include\Animation.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\AnimationStream.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Glyphlet.h">
+      <Filter>Application\Glyphlets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SingleWindowGlyphlet.h">
+      <Filter>Application\Glyphlets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Application.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ConsoleWindow.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\FileLoader.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\FileSystem.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\IWindowProc.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\RenderApplication.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\RenderWindow.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Win32RenderWindow.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EventManager.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\IEvent.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\IEventListener.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtErrorMessage.h">
+      <Filter>Events\Notifications</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtInfoMessage.h">
+      <Filter>Events\Notifications</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtFrameStart.h">
+      <Filter>Events\Rendering Events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtWindowMsg.h">
+      <Filter>Events\Windows Messages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtChar.h">
+      <Filter>Events\Windows Messages\Keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtKeyboardMsg.h">
+      <Filter>Events\Windows Messages\Keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtKeyDown.h">
+      <Filter>Events\Windows Messages\Keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtKeyUp.h">
+      <Filter>Events\Windows Messages\Keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtWindowResize.h">
+      <Filter>Events\Windows Messages\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtMouseLButtonDown.h">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtMouseLButtonUp.h">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtMouseLeave.h">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtMouseMButtonDown.h">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtMouseMButtonUp.h">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtMouseMove.h">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtMouseMsg.h">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtMouseRButtonDown.h">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtMouseRButtonUp.h">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EvtMouseWheel.h">
+      <Filter>Events\Windows Messages\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Box3f.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\CompositeShape.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Cone3f.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Frustum3f.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\LineIndices.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Plane3f.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\PointIndices.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Ray3f.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Sphere3f.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Triangle3f.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TriangleIndices.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Intersector.h">
+      <Filter>Intersection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\IntrRay3fBox3f.h">
+      <Filter>Intersection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\IntrRay3fSphere3f.h">
+      <Filter>Intersection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Matrix3f.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Matrix4f.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\PerlinNoise.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Quaternion.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Tween.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Vector2f.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Vector3f.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Vector4f.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Entity3D.h">
+      <Filter>Objects\Basic Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Node3D.h">
+      <Filter>Objects\Basic Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\PickRecord.h">
+      <Filter>Objects\Basic Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SceneGraph.h">
+      <Filter>Objects\Basic Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Transform3D.h">
+      <Filter>Objects\Basic Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\IController.h">
+      <Filter>Objects\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\PositionExtractorController.h">
+      <Filter>Objects\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\RotationController.h">
+      <Filter>Objects\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ScaleSetpointController.h">
+      <Filter>Objects\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SetpointController.h">
+      <Filter>Objects\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SkinnedBoneController.h">
+      <Filter>Objects\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SpatialController.h">
+      <Filter>Objects\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Scene.h">
+      <Filter>Objects\Scene Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Actor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\BoundsVisualizerActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ConsoleActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\FullscreenActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\GeometryActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\GlyphletActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SkinnedActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SkyboxActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TextActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TextureActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\VolumeActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ActorGenerator.h">
+      <Filter>Objects\Scene Objects\Actors\Actor Creation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ObjectSpaceCameraPositionWriter.h">
+      <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TextureSpaceCameraPositionWriter.h">
+      <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TextureSpaceLightPositionWriter.h">
+      <Filter>Objects\Scene Objects\Actors\Specialized Parameter Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Camera.h">
+      <Filter>Objects\Scene Objects\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\FirstPersonCamera.h">
+      <Filter>Objects\Scene Objects\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Light.h">
+      <Filter>Objects\Scene Objects\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\PointLight.h">
+      <Filter>Objects\Scene Objects\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\GlyphString.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Log.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\PCH.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TConfiguration.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Timer.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Console.h">
+      <Filter>Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\IScriptInterface.h">
+      <Filter>Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ScriptManager.h">
+      <Filter>Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ScriptIntfActor.h">
+      <Filter>Scripting\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ScriptIntfApp.h">
+      <Filter>Scripting\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\LuaApp.h">
+      <Filter>Scripting\New Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\LuaGeometryActor.h">
+      <Filter>Scripting\New Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\LuaScene.h">
+      <Filter>Scripting\New Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\LuaTextActor.h">
+      <Filter>Scripting\New Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\RendererDX11.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\DXGIAdapter.h">
+      <Filter>Rendering\DXGI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\DXGIOutput.h">
+      <Filter>Rendering\DXGI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MaterialGeneratorDX11.h">
+      <Filter>Rendering\Material System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MaterialManager.h">
+      <Filter>Rendering\Material System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MaterialDX11.h">
+      <Filter>Rendering\Material System\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Renderable.h">
+      <Filter>Rendering\Material System\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\RenderEffectDX11.h">
+      <Filter>Rendering\Material System\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MaterialTemplate.h">
+      <Filter>Rendering\Material System\Components\Material Templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SceneRenderTask.h">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Task.h">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ViewAmbientOcclusion.h">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ViewDepthNormal.h">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ViewOcclusion.h">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ViewPerspective.h">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ViewTextOverlay.h">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\IParameterManager.h">
+      <Filter>Rendering\Parameter System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ParameterContainer.h">
+      <Filter>Rendering\Parameter System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ParameterManagerDX11.h">
+      <Filter>Rendering\Parameter System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ConstantBufferParameterWriterDX11.h">
+      <Filter>Rendering\Parameter System\Parameter Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MatrixArrayParameterWriterDX11.h">
+      <Filter>Rendering\Parameter System\Parameter Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MatrixParameterWriterDX11.h">
+      <Filter>Rendering\Parameter System\Parameter Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ParameterWriter.h">
+      <Filter>Rendering\Parameter System\Parameter Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SamplerParameterWriterDX11.h">
+      <Filter>Rendering\Parameter System\Parameter Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ShaderResourceParameterWriterDX11.h">
+      <Filter>Rendering\Parameter System\Parameter Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\UnorderedAccessParameterWriterDX11.h">
+      <Filter>Rendering\Parameter System\Parameter Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\VectorParameterWriterDX11.h">
+      <Filter>Rendering\Parameter System\Parameter Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ConstantBufferParameterDX11.h">
+      <Filter>Rendering\Parameter System\Parameters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MatrixArrayParameterDX11.h">
+      <Filter>Rendering\Parameter System\Parameters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MatrixParameterDX11.h">
+      <Filter>Rendering\Parameter System\Parameters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\RenderParameterDX11.h">
+      <Filter>Rendering\Parameter System\Parameters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SamplerParameterDX11.h">
+      <Filter>Rendering\Parameter System\Parameters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ShaderResourceParameterDX11.h">
+      <Filter>Rendering\Parameter System\Parameters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\UnorderedAccessParameterDX11.h">
+      <Filter>Rendering\Parameter System\Parameters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\VectorParameterDX11.h">
+      <Filter>Rendering\Parameter System\Parameters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\PipelineManagerDX11.h">
+      <Filter>Rendering\Pipeline System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\DrawExecutorDX11.h">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\DrawIndexedExecutorDX11.h">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\DrawIndexedInstancedExecutorDX11.h">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MultiExecutorDX11.h">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\PipelineExecutorDX11.h">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TGrowableBufferDX11.h">
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TGrowableIndexBufferDX11.h">
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TGrowableStructuredBufferDX11.h">
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TGrowableVertexBufferDX11.h">
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\VertexElementDX11.h">
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MeshMTL.h">
+      <Filter>Rendering\Pipeline System\Executors\File Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MeshOBJ.h">
+      <Filter>Rendering\Pipeline System\Executors\File Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MeshSTL.h">
+      <Filter>Rendering\Pipeline System\Executors\File Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ms3dspec.h">
+      <Filter>Rendering\Pipeline System\Executors\File Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\GeometryDX11.h">
+      <Filter>Rendering\Pipeline System\Executors\Old Style Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\GeometryGeneratorDX11.h">
+      <Filter>Rendering\Pipeline System\Executors\Old Style Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\GeometryLoaderDX11.h">
+      <Filter>Rendering\Pipeline System\Executors\Old Style Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\BasicVertexDX11.h">
+      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SpriteVertexDX11.h">
+      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TexturedVertex.h">
+      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\VisualizerVertexDX11.h">
+      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\VolumeTextureVertexDX11.h">
+      <Filter>Rendering\Pipeline System\Executors\Vertex Layouts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TStateArrayMonitor.h">
+      <Filter>Rendering\Pipeline System\Stages\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TStateMonitor.h">
+      <Filter>Rendering\Pipeline System\Stages\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\InputAssemblerStageDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Input Assembler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\InputAssemblerStateDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Input Assembler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\OutputMergerStageDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Output Merger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\OutputMergerStageStateDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Output Merger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\RasterizerStageDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\RasterizerStageStateDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\StreamOutputStageDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Stream Output</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\StreamOutputStageStateDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Fixed Stages\Stream Output</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ShaderReflectionDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ShaderReflectionFactoryDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ComputeShaderDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\DomainShaderDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\GeometryShaderDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\HullShaderDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\PixelShaderDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ShaderDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ShaderFactoryDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\VertexShaderDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Shader Programs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ComputeStageDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\DomainStageDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\GeometryStageDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\HullStageDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\PixelStageDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ShaderStageDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\VertexStageDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\Stages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ShaderStageStateDX11.h">
+      <Filter>Rendering\Pipeline System\Stages\Programmable Stages\States</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\CommandListDX11.h">
+      <Filter>Rendering\Renderer Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ResourceDX11.h">
+      <Filter>Rendering\Resource System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ResourceProxyDX11.h">
+      <Filter>Rendering\Resource System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\BufferConfigDX11.h">
+      <Filter>Rendering\Resource System\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\BufferDX11.h">
+      <Filter>Rendering\Resource System\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ByteAddressBufferDX11.h">
+      <Filter>Rendering\Resource System\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ConstantBufferDX11.h">
+      <Filter>Rendering\Resource System\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\IndexBufferDX11.h">
+      <Filter>Rendering\Resource System\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\IndirectArgsBufferDX11.h">
+      <Filter>Rendering\Resource System\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\StructuredBufferDX11.h">
+      <Filter>Rendering\Resource System\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\VertexBufferDX11.h">
+      <Filter>Rendering\Resource System\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\DepthStencilViewConfigDX11.h">
+      <Filter>Rendering\Resource System\Resource Views</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\DepthStencilViewDX11.h">
+      <Filter>Rendering\Resource System\Resource Views</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\RenderTargetViewConfigDX11.h">
+      <Filter>Rendering\Resource System\Resource Views</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\RenderTargetViewDX11.h">
+      <Filter>Rendering\Resource System\Resource Views</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ShaderResourceViewConfigDX11.h">
+      <Filter>Rendering\Resource System\Resource Views</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ShaderResourceViewDX11.h">
+      <Filter>Rendering\Resource System\Resource Views</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\UnorderedAccessViewConfigDX11.h">
+      <Filter>Rendering\Resource System\Resource Views</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\UnorderedAccessViewDX11.h">
+      <Filter>Rendering\Resource System\Resource Views</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\BlendStateConfigDX11.h">
+      <Filter>Rendering\Resource System\State Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\DepthStencilStateConfigDX11.h">
+      <Filter>Rendering\Resource System\State Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\RasterizerStateConfigDX11.h">
+      <Filter>Rendering\Resource System\State Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SamplerStateConfigDX11.h">
+      <Filter>Rendering\Resource System\State Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ViewPortDX11.h">
+      <Filter>Rendering\Resource System\State Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SwapChainConfigDX11.h">
+      <Filter>Rendering\Resource System\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SwapChainDX11.h">
+      <Filter>Rendering\Resource System\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Texture1dConfigDX11.h">
+      <Filter>Rendering\Resource System\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Texture1dDX11.h">
+      <Filter>Rendering\Resource System\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Texture2dConfigDX11.h">
+      <Filter>Rendering\Resource System\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Texture2dDX11.h">
+      <Filter>Rendering\Resource System\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Texture3dConfigDX11.h">
+      <Filter>Rendering\Resource System\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Texture3dDX11.h">
+      <Filter>Rendering\Resource System\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SpriteFontDX11.h">
+      <Filter>Rendering\Sprite System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SpriteFontLoaderDX11.h">
+      <Filter>Rendering\Sprite System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SpriteRendererDX11.h">
+      <Filter>Rendering\Sprite System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\D3DEnumConversion.h">
+      <Filter>Rendering\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ConeAttributes.h">
+      <Filter>Rendering\Tessellation Toolkit\Attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SphereAttributes.h">
+      <Filter>Rendering\Tessellation Toolkit\Attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\AttributeEvaluator2f.h">
+      <Filter>Rendering\Tessellation Toolkit\Evaluation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\VertexEvaluator2f.h">
+      <Filter>Rendering\Tessellation Toolkit\Evaluation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\GridTessellator2f.h">
+      <Filter>Rendering\Tessellation Toolkit\Tessellators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ViewPerspectiveHighlight.h">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Win32Window.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\FullscreenTexturedActor.h">
+      <Filter>Objects\Scene Objects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Segment3f.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\AxisAlignedBox.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="..\Include\AnimationStream.inl">
+      <Filter>Animation</Filter>
+    </None>
+    <None Include="..\Include\Quaternion.inl">
+      <Filter>Mathematics</Filter>
+    </None>
+    <None Include="..\Include\Tween.inl">
+      <Filter>Mathematics</Filter>
+    </None>
+    <None Include="..\Include\IController.inl">
+      <Filter>Objects\Controllers</Filter>
+    </None>
+    <None Include="..\Include\PositionExtractorController.inl">
+      <Filter>Objects\Controllers</Filter>
+    </None>
+    <None Include="..\Include\RotationController.inl">
+      <Filter>Objects\Controllers</Filter>
+    </None>
+    <None Include="..\Include\ScaleSetpointController.inl">
+      <Filter>Objects\Controllers</Filter>
+    </None>
+    <None Include="..\Include\SetpointController.inl">
+      <Filter>Objects\Controllers</Filter>
+    </None>
+    <None Include="..\Include\SkinnedBoneController.inl">
+      <Filter>Objects\Controllers</Filter>
+    </None>
+    <None Include="..\Include\SpatialController.inl">
+      <Filter>Objects\Controllers</Filter>
+    </None>
+    <None Include="..\Include\TConfiguration.inl">
+      <Filter>Utility</Filter>
+    </None>
+    <None Include="..\Include\DrawExecutorDX11.inl">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </None>
+    <None Include="..\Include\DrawIndexedExecutorDX11.inl">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </None>
+    <None Include="..\Include\DrawIndexedInstancedExecutorDX11.inl">
+      <Filter>Rendering\Pipeline System\Executors</Filter>
+    </None>
+    <None Include="..\Include\TGrowableBufferDX11.inl">
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
+    </None>
+    <None Include="..\Include\TGrowableIndexBufferDX11.inl">
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
+    </None>
+    <None Include="..\Include\TGrowableStructuredBufferDX11.inl">
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
+    </None>
+    <None Include="..\Include\TGrowableVertexBufferDX11.inl">
+      <Filter>Rendering\Pipeline System\Executors\Basis Objects</Filter>
+    </None>
+    <None Include="..\Include\TStateArrayMonitor.inl">
+      <Filter>Rendering\Pipeline System\Stages\Common</Filter>
+    </None>
+    <None Include="..\Include\TStateMonitor.inl">
+      <Filter>Rendering\Pipeline System\Stages\Common</Filter>
+    </None>
+  </ItemGroup>
+</Project>
