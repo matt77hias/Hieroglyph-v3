@@ -118,7 +118,7 @@ float4 PSMAIN( in VS_OUTPUT input ) : SV_Target
 
 	float3 F0 = input.color.rgb;
 
-	float roughness = 0.85f;
+	float roughness = 0.5f;
 	float alpha = pow( roughness, 2.0f );
 	float alphaSquared = pow( alpha, 2.0f );
 	float k = pow( roughness + 1.0f, 2.0f ) / 8.0f;
@@ -129,7 +129,7 @@ float4 PSMAIN( in VS_OUTPUT input ) : SV_Target
 
 	float3 Fr = (F*G*D) / (4.0f*NdotL*NdotV);
 	
-	float3 Fd = input.color.rgb;
+	float3 Fd = input.color.rgb / 3.14;
 
 	float3 output = (Fr + Fd) * (Id * NdotL);
 

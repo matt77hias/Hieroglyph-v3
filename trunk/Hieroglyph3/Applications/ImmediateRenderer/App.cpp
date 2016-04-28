@@ -99,6 +99,9 @@ void App::Initialize()
 	m_pGeometryActor->SetColor( Vector4f( 0.0f, 0.0f, 1.0f, 1.0f ) );
 	m_pGeometryActor->DrawBox( Vector3f( 0.0f, 3.0f, 0.0f ), Vector3f( 1.0f, 1.0f, 1.0f ) );
 
+	m_pGeometryActor->SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_pGeometryActor->DrawArrow( Vector3f( 0.0f, 0.0f, 0.0f ), Vector3f( 5.0f, 0.0f, 0.0f ), 0.5f, 1.0f, 1.0f );
+
 	RotationController<Node3D>* pGeometryRotController = new RotationController<Node3D>( Vector3f( 0.0f, 1.0f, 0.0f ), 0.4f );
 	m_pGeometryActor->GetNode()->Controllers.Attach( pGeometryRotController );
 
@@ -195,6 +198,8 @@ void App::Initialize()
 			}
 		}
 	}
+
+
 
 	ResourcePtr skyboxTexture = m_pRenderer11->LoadTexture( L"TropicalSunnyDay.dds" );
 	SkyboxActor* skybox = new SkyboxActor( skyboxTexture, 10.0f );

@@ -107,6 +107,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)Include;$(SolutionDir)Dependencies\OculusSDK\LibOVR\Include</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -118,11 +119,14 @@
     </PostBuildEvent>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\Windows\$(PlatformName)\$(Configuration)\VS2013\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libOVR.lib;Hieroglyph3_Desktop.lib;ws2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>libOVR.lib;ws2_32.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -144,7 +148,7 @@
     </PostBuildEvent>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\Windows\$(PlatformName)\$(Configuration)\VS2013\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libOVR.lib;Hieroglyph3_Desktop.lib;ws2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>libOVR.lib;ws2_32.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -174,7 +178,7 @@
     </PostBuildEvent>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\Windows\$(PlatformName)\$(Configuration)\VS2013\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libOVR.lib;Hieroglyph3_Desktop.lib;ws2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>libOVR.lib;ws2_32.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -204,7 +208,7 @@
     </PostBuildEvent>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)Library\$(Platform)\$(Configuration);$(SolutionDir)Dependencies\OculusSDK\LibOVR\Lib\Windows\$(PlatformName)\$(Configuration)\VS2013\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libOVR.lib;Hieroglyph3_Desktop.lib;ws2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>libOVR.lib;ws2_32.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
