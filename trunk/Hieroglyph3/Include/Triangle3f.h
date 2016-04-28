@@ -15,23 +15,21 @@
 #ifndef Triangle3f_h
 #define Triangle3f_h
 //--------------------------------------------------------------------------------
-#include "Shape3D.h"
 #include "Vector3f.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class Triangle3f : public Shape3D
+	struct Triangle3f
 	{
-	public:
 		Triangle3f( );
-		Triangle3f( const Vector3f& v1, const Vector3f& v2, const Vector3f& v3 );
-		virtual ~Triangle3f( );
+		Triangle3f( const Vector3f& P1, const Vector3f& P2, const Vector3f& P3 );
+		~Triangle3f( );
 
-		virtual eSHAPE GetShapeType( ) const;
-
-	protected:
-		Vector3f v[3];
+		Vector3f p1;
+		Vector3f p2;
+		Vector3f p3;
 	};
 };
 //--------------------------------------------------------------------------------
 #endif // Triangle3f_h
+//--------------------------------------------------------------------------------

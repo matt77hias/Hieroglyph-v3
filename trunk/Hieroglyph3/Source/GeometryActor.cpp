@@ -554,6 +554,26 @@ void GeometryActor::DrawRect( const Vector3f& center, const Vector3f& xdir, cons
 
 }
 //--------------------------------------------------------------------------------
+void GeometryActor::DrawArrow(const Vector3f& base, const Vector3f& point, const float shaft_radius, const float head_radius, const float head_length)
+{
+	// Generate the base properties of the overall arrow for use in the drawing
+	// functions.
+
+	Vector3f arrow( point - base );
+	float arrow_length = Vector3f::Magnitude( arrow );
+	Vector3f unit_arrow( arrow / arrow_length );
+	Vector3f shaft_end( base + (unit_arrow * (arrow_length - head_length)) );
+
+	// Draw the base shaft first
+
+	DrawCylinder( base, shaft_end, shaft_radius, shaft_radius );
+
+	// Draw the arrow head next
+
+	DrawCylinder( shaft_end, point, head_radius, 0.0f );
+	DrawDisc( shaft_end, -unit_arrow, head_radius );
+}
+//--------------------------------------------------------------------------------
 void GeometryActor::UseSolidMaterial()
 {
 	GetBody()->Visual.SetMaterial( m_pSolidMaterial );

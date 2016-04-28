@@ -14,30 +14,34 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-Box3f::Box3f()
+Box3f::Box3f() :
+center(),
+axes(),
+extents()
 {
 }
 //--------------------------------------------------------------------------------
-Box3f::Box3f( const Vector3f& center, const Vector3f& forward, const Vector3f& up, 
-			const Vector3f& right, float fextents, float uextents, float rextents )
+Box3f::Box3f( const Vector3f& Center, const Vector3f& Forward, const Vector3f& Up, 
+			const Vector3f& Right, float fextents, float uextents, float rextents )
+			//center( Center),
+			//axes{ forward, up, right },
+			//extents{ fextents, uextents, rextents }
 {
-	Center = center;
+	// TODO: The initializer list constructor is not implemented in VS2013. I need
+	//       to check if this is implemented in VS2015.  Till then, we use direct
+	//       initialization.
+	center = Center;
 
-	Axis[0] = forward;
-	Axis[1] = up;
-	Axis[2] = right;
+	axes[0] = Forward;
+	axes[1] = Up;
+	axes[2] = Right;
 
-	Extent[0] = fextents;
-	Extent[1] = uextents;
-	Extent[2] = rextents;
+	extents[0] = fextents;
+	extents[1] = uextents;
+	extents[2] = rextents;
 }
 //--------------------------------------------------------------------------------
 Box3f::~Box3f()
 {
-}
-//--------------------------------------------------------------------------------
-eSHAPE Box3f::GetShapeType( ) const
-{
-	return( BOX );
 }
 //--------------------------------------------------------------------------------

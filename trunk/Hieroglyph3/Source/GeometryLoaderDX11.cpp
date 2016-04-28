@@ -167,9 +167,9 @@ GeometryPtr GeometryLoaderDX11::loadMS3DFile2( std::wstring filename )
 	for ( int i = 0; i < usTriangleCount; i++ )
 	{
 
-		face.P1() = 3*i+0;
-		face.P2() = 3*i+2;
-		face.P3() = 3*i+1;
+		face.i1 = 3*i+0;
+		face.i2 = 3*i+2;
+		face.i3 = 3*i+1;
 
 		pPos[3*i+0].x = pMS3DVertices[pMS3DTriangles[i].vertexIndices[0]].vertex[0];
 		pPos[3*i+0].y = pMS3DVertices[pMS3DTriangles[i].vertexIndices[0]].vertex[1];
@@ -450,9 +450,9 @@ GeometryPtr GeometryLoaderDX11::loadMS3DFileWithAnimation( std::wstring filename
 	for ( int i = 0; i < usTriangleCount; i++ )
 	{
 
-		face.P1() = 3*i+0;
-		face.P2() = 3*i+2;
-		face.P3() = 3*i+1;
+		face.i1 = 3*i+0;
+		face.i2 = 3*i+2;
+		face.i3 = 3*i+1;
 
 		pPos[3*i+0].x = pMS3DVertices[pMS3DTriangles[i].vertexIndices[0]].vertex[0];
 		pPos[3*i+0].y = pMS3DVertices[pMS3DTriangles[i].vertexIndices[0]].vertex[1];

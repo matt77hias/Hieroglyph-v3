@@ -15,27 +15,23 @@
 #ifndef Box3f_h
 #define Box3f_h
 //--------------------------------------------------------------------------------
-#include "Shape3D.h"
 #include "Vector3f.h"
+#include <array>
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class Box3f : public Shape3D
+	struct Box3f
 	{
-	public:
 		Box3f( );
-		Box3f( const Vector3f& center, const Vector3f& forward, const Vector3f& up, 
-			const Vector3f& right, float fextents, float uextents, float rextents );
-		virtual ~Box3f( );
+		Box3f( const Vector3f& Center, const Vector3f& Forward, const Vector3f& Up, 
+			const Vector3f& Right, float fextents, float uextents, float rextents );
+		~Box3f( );
 
-		virtual eSHAPE GetShapeType( ) const;
-
-	public:
-		Vector3f Center;
-
-		Vector3f Axis[3];
-		float Extent[3];
+		Vector3f				center;
+		std::array<Vector3f,3>	axes;
+		std::array<float,3>		extents;
 	};
 };
 //--------------------------------------------------------------------------------
 #endif // Box3f_h
+//--------------------------------------------------------------------------------

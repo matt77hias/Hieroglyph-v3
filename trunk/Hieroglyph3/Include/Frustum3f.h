@@ -18,20 +18,19 @@
 #ifndef Frustum3f_h
 #define Frustum3f_h
 //--------------------------------------------------------------------------------
-#include "Shape3D.h"
 #include "Plane3f.h"
 #include "Vector3f.h"
 #include "Sphere3f.h"
 #include "Matrix4f.h"
+#include <array>
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class Frustum3f : public Shape3D
+	struct Frustum3f
 	{
-	public:
 		Frustum3f();
 		Frustum3f( const Matrix4f& ViewProjection );
-		virtual ~Frustum3f();
+		~Frustum3f();
 
 		void Update( const Matrix4f& ViewProjection, bool bNormalize );
 		bool Test( const Vector3f& TestPoint ) const;
@@ -41,12 +40,9 @@ namespace Glyph3
 		bool Intersects( const Sphere3f& test ) const;
 		bool Envelops( const Sphere3f& test ) const;
 
-		virtual eSHAPE GetShapeType( ) const;		
-
-	protected:
-		Plane3f m_Planes[6];
-			
+		std::array<Plane3f,6> planes;
 	};
 };
 //--------------------------------------------------------------------------------
 #endif // Frustum3f_h
+//--------------------------------------------------------------------------------

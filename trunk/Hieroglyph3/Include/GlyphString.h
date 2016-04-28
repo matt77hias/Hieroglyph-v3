@@ -23,7 +23,10 @@ namespace Glyph3
 	{
 	public:
 		static std::string ToAscii( const std::wstring& input );
-		static std::wstring ToUnicode( const std::string& input );            
+		static std::wstring ToUnicode( const std::string& input );
+
+		static std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
+		static std::vector<std::string> split(const std::string &s, char delim);
 
 	private:
 		GlyphString();

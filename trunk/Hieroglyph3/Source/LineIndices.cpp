@@ -16,14 +16,14 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 LineIndices::LineIndices()
 {
-	m_uiIndices[0] = 0;
-	m_uiIndices[1] = 0;
+	i1 = 0;
+	i2 = 0;
 }
 //--------------------------------------------------------------------------------
-LineIndices::LineIndices( unsigned int P1, unsigned int P2 )
+LineIndices::LineIndices( unsigned int I1, unsigned int I2 )
 {
-	m_uiIndices[0] = P1;
-	m_uiIndices[1] = P2;
+	i1 = I1;
+	i2 = I2;
 }
 //--------------------------------------------------------------------------------
 LineIndices::~LineIndices()
@@ -32,36 +32,16 @@ LineIndices::~LineIndices()
 //--------------------------------------------------------------------------------
 LineIndices& LineIndices::operator= ( const LineIndices& Line )
 {
-	m_uiIndices[0] = Line.m_uiIndices[0];
-	m_uiIndices[1] = Line.m_uiIndices[1];
+	i1 = Line.i1;
+	i2 = Line.i2;
 
 	return( *this );
 }
 //--------------------------------------------------------------------------------
-unsigned int LineIndices::P1() const
+void LineIndices::swap12( )
 {
-	return( m_uiIndices[0] );
-}
-//--------------------------------------------------------------------------------
-unsigned int& LineIndices::P1()
-{
-	return( m_uiIndices[0] );
-}
-//--------------------------------------------------------------------------------
-unsigned int LineIndices::P2() const
-{
-	return( m_uiIndices[1] );
-}
-//--------------------------------------------------------------------------------
-unsigned int& LineIndices::P2()
-{
-	return( m_uiIndices[1] );
-}
-//--------------------------------------------------------------------------------
-void LineIndices::swapP1P2( )
-{
-	unsigned int swap = m_uiIndices[0];
-	m_uiIndices[0] = m_uiIndices[1];
-	m_uiIndices[1] = swap;
+	unsigned int swap = i1;
+	i1 = i2;
+	i2 = swap;
 }
 //--------------------------------------------------------------------------------

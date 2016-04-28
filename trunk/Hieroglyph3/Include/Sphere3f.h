@@ -17,21 +17,15 @@
 #ifndef Sphere3f_h
 #define Sphere3f_h
 //--------------------------------------------------------------------------------
-#include "Shape3D.h"
 #include "Vector3f.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class Sphere3f : public Shape3D
+	struct Sphere3f
 	{
-	public:
 		Sphere3f( );
-		Sphere3f( const Vector3f& center, float radius );
-		virtual ~Sphere3f( );
-
-		void Update( const Vector3f& center, float radius );
-		void UpdateCenter( const Vector3f& center );
-		void UpdateRadius( float radius );
+		Sphere3f( const Vector3f& Center, float Radius );
+		~Sphere3f( );
 
 		bool Intersects( const Sphere3f& test ) const;
 		bool Envelops( const Sphere3f& test ) const;
@@ -40,11 +34,10 @@ namespace Glyph3
 		void SampleNormal( Vector3f& normal, float theta, float phi ) const;
 		void SamplePositionAndNormal( Vector3f& position, Vector3f& normal, float theta, float phi ) const;
 
-		virtual eSHAPE GetShapeType( ) const;
-
-		Vector3f	Center;
-		float		Radius;
+		Vector3f	center;
+		float		radius;
 	};
 };
 //--------------------------------------------------------------------------------
 #endif // Sphere3f_h
+//--------------------------------------------------------------------------------

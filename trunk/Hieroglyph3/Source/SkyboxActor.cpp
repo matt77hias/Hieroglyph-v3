@@ -14,6 +14,7 @@
 #include "Texture2dDX11.h"
 #include "BlendStateConfigDX11.h"
 #include "DepthStencilStateConfigDX11.h"
+#include "SamplerStateConfigDX11.h"
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -51,6 +52,11 @@ SkyboxActor::SkyboxActor( const ResourcePtr& texture, float scale ) :
 	// Enable the material to render the given view type, and set its effect.
 	m_pMaterial->Params[VT_PERSPECTIVE].bRender = true;
 	m_pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
+
+	// Add a sampler to the material for sampling the cube map.
+	SamplerStateConfigDX11 SamplerConfig;
+	int LinearSampler = RendererDX11::Get()->CreateSamplerState( &SamplerConfig );
+	m_pMaterial->Parameters.SetSamplerParameter( L"LinearSampler", LinearSampler );
 
 	GetBody()->Visual.SetMaterial( m_pMaterial );
 	GetBody()->Visual.SetGeometry( m_pGeometry );

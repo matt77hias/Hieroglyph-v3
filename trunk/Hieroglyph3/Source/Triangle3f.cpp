@@ -18,19 +18,14 @@ Triangle3f::Triangle3f()
 {
 }
 //--------------------------------------------------------------------------------
-Triangle3f::Triangle3f( const Vector3f& v1, const Vector3f& v2, const Vector3f& v3 )
+Triangle3f::Triangle3f( const Vector3f& P1, const Vector3f& P2, const Vector3f& P3 )
 {
-	v[0] = v1;
-	v[1] = v2;
-	v[2] = v3;
+	p1 = P1;
+	p2 = P2;
+	p3 = P3;
 }
 //--------------------------------------------------------------------------------
 Triangle3f::~Triangle3f()
 {
-}
-//--------------------------------------------------------------------------------
-eSHAPE Triangle3f::GetShapeType( ) const
-{
-	return( TRIANGLE );
 }
 //--------------------------------------------------------------------------------

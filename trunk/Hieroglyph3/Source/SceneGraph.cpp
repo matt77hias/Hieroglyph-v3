@@ -25,6 +25,25 @@ void Glyph3::GetAllEntities( Node3D* node, std::vector< Entity3D* >& set ) {
 	}
 }
 //--------------------------------------------------------------------------------
+bool Glyph3::EntityInSubTree( Node3D* node, Entity3D* entity )
+{
+	for ( const auto& e : node->Leafs())
+	{
+		if ( e == entity ) {
+			return true;
+		}
+	}
+
+	for ( const auto& n : node->Nodes())
+	{
+		if ( EntityInSubTree(n, entity)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+//--------------------------------------------------------------------------------
 void Glyph3::GetIntersectingEntities( Node3D* node, std::vector< Entity3D* >& set, Frustum3f& bounds )
 {
 	// TODO: THis has to be fixed!
@@ -50,19 +69,13 @@ void Glyph3::BuildPickRecord( Node3D* node, const Ray3f& ray, std::vector<PickRe
 		if ( entity->Shape.GetNumberOfShapes() > 0 )
 		{
 			Matrix4f InvWorld = entity->Transform.WorldMatrix().Inverse();
-			Vector4f position = Vector4f( ray.Origin.x, ray.Origin.y, ray.Origin.z, 1.0f );
-			Vector4f direction = Vector4f( ray.Direction.x, ray.Direction.y, ray.Direction.z, 0.0f );
+			Vector4f position = Vector4f( ray.origin, 1.0f );
+			Vector4f direction = Vector4f( ray.direction, 0.0f );
 		
 			position = InvWorld * position;
 			direction = InvWorld * direction;
 
-			Ray3f ObjectRay;
-			ObjectRay.Origin.x = position.x;
-			ObjectRay.Origin.y = position.y;
-			ObjectRay.Origin.z = position.z;
-			ObjectRay.Direction.x = direction.x;
-			ObjectRay.Direction.y = direction.y;
-			ObjectRay.Direction.z = direction.z;
+			Ray3f ObjectRay(position.xyz(), direction.xyz());
 
 			float fT = 10000000000.0f;
 			if ( entity->Shape.RayIntersection( ObjectRay, &fT ) )

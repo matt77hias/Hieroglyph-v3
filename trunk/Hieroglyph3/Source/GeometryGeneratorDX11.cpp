@@ -127,13 +127,13 @@ void GeometryGeneratorDX11::GenerateTexturedPlane( GeometryPtr pGeometry, int Si
 			TriangleIndices f1;
 			TriangleIndices f2;
 
-			f1.P1() = j*SizeX + i;
-			f1.P2() = (j*SizeX + i) + SizeX;
-			f1.P3() = (j*SizeX + i) + 1;
+			f1.i1 = j*SizeX + i;
+			f1.i2 = (j*SizeX + i) + SizeX;
+			f1.i3 = (j*SizeX + i) + 1;
 
-			f2.P1() = (j*SizeX + i) + 1;
-			f2.P2() = (j*SizeX + i) + SizeX;
-			f2.P3() = (j*SizeX + i) + SizeX + 1;
+			f2.i1 = (j*SizeX + i) + 1;
+			f2.i2 = (j*SizeX + i) + SizeX;
+			f2.i3 = (j*SizeX + i) + SizeX + 1;
 
 			pGeometry->AddFace( f1 );
 			pGeometry->AddFace( f2 );
@@ -215,38 +215,38 @@ void GeometryGeneratorDX11::GenerateSkinnedBiped( GeometryPtr pGeometry )
 	LineIndices line;
 		
 	// Base to waist
-	line.P1() = 0;
-	line.P2() = 1;
+	line.i1 = 0;
+	line.i2 = 1;
 	pGeometry->AddLine( line );
 
 	// Waist to left leg
-	line.P1() = 1;
-	line.P2() = 2;
+	line.i1 = 1;
+	line.i2 = 2;
 	pGeometry->AddLine( line );
 
 	// Waist to right leg
-	line.P1() = 1;
-	line.P2() = 3;
+	line.i1 = 1;
+	line.i2 = 3;
 	pGeometry->AddLine( line );
 
 	// Waist to shoulder
-	line.P1() = 1;
-	line.P2() = 4;
+	line.i1 = 1;
+	line.i2 = 4;
 	pGeometry->AddLine( line );
 
 	// Shoulder to left arm
-	line.P1() = 4;
-	line.P2() = 5;
+	line.i1 = 4;
+	line.i2 = 5;
 	pGeometry->AddLine( line );
 
 	// Shoulder to right arm
-	line.P1() = 4;
-	line.P2() = 6;
+	line.i1 = 4;
+	line.i2 = 6;
 	pGeometry->AddLine( line );
 
 	// Shoulder to head
-	line.P1() = 4;
-	line.P2() = 7;
+	line.i1 = 4;
+	line.i2 = 7;
 	pGeometry->AddLine( line );
 
 	// Add the vertex elements to the geometry object.
@@ -336,66 +336,66 @@ void GeometryGeneratorDX11::GenerateAxisGeometry( GeometryPtr pGeometry )
 	// Generate and add each line segment.
 	TriangleIndices tri;
 		
-	tri.P1() = 0;
-	tri.P2() = 1;
-	tri.P3() = 4;
+	tri.i1 = 0;
+	tri.i2 = 1;
+	tri.i3 = 4;
 	pGeometry->AddFace( tri );
 
-	tri.P1() = 1;
-	tri.P2() = 2;
-	tri.P3() = 4;
+	tri.i1 = 1;
+	tri.i2 = 2;
+	tri.i3 = 4;
 	pGeometry->AddFace( tri );
 
-	tri.P1() = 2;
-	tri.P2() = 3;
-	tri.P3() = 4;
+	tri.i1 = 2;
+	tri.i2 = 3;
+	tri.i3 = 4;
 	pGeometry->AddFace( tri );
 
-	tri.P1() = 3;
-	tri.P2() = 0;
-	tri.P3() = 4;
-	pGeometry->AddFace( tri );
-
-
-	tri.P1() = 5;
-	tri.P2() = 6;
-	tri.P3() = 9;
-	pGeometry->AddFace( tri );
-
-	tri.P1() = 6;
-	tri.P2() = 7;
-	tri.P3() = 9;
-	pGeometry->AddFace( tri );
-
-	tri.P1() = 7;
-	tri.P2() = 8;
-	tri.P3() = 9;
-	pGeometry->AddFace( tri );
-
-	tri.P1() = 8;
-	tri.P2() = 5;
-	tri.P3() = 9;
+	tri.i1 = 3;
+	tri.i2 = 0;
+	tri.i3 = 4;
 	pGeometry->AddFace( tri );
 
 
-	tri.P1() = 10;
-	tri.P2() = 11;
-	tri.P3() = 14;
+	tri.i1 = 5;
+	tri.i2 = 6;
+	tri.i3 = 9;
 	pGeometry->AddFace( tri );
 
-	tri.P1() = 11;
-	tri.P2() = 12;
-	tri.P3() = 14;
+	tri.i1 = 6;
+	tri.i2 = 7;
+	tri.i3 = 9;
 	pGeometry->AddFace( tri );
 
-	tri.P1() = 12;
-	tri.P2() = 13;
-	tri.P3() = 14;
+	tri.i1 = 7;
+	tri.i2 = 8;
+	tri.i3 = 9;
 	pGeometry->AddFace( tri );
 
-	tri.P1() = 13;
-	tri.P2() = 10;
-	tri.P3() = 14;
+	tri.i1 = 8;
+	tri.i2 = 5;
+	tri.i3 = 9;
+	pGeometry->AddFace( tri );
+
+
+	tri.i1 = 10;
+	tri.i2 = 11;
+	tri.i3 = 14;
+	pGeometry->AddFace( tri );
+
+	tri.i1 = 11;
+	tri.i2 = 12;
+	tri.i3 = 14;
+	pGeometry->AddFace( tri );
+
+	tri.i1 = 12;
+	tri.i2 = 13;
+	tri.i3 = 14;
+	pGeometry->AddFace( tri );
+
+	tri.i1 = 13;
+	tri.i2 = 10;
+	tri.i3 = 14;
 	pGeometry->AddFace( tri );
 
 	// Add the vertex elements to the geometry object.

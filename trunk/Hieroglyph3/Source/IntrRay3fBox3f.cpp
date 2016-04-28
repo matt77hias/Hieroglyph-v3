@@ -29,53 +29,53 @@ bool IntrRay3fBox3f::Test()
 {
     float afWdU[3], afAWdU[3], afDdU[3], afADdU[3], afAWxDdU[3], fRhs;
 
-    Vector3f kDiff = m_Ray.Origin - m_Box.Center;
+    Vector3f kDiff = m_Ray.origin - m_Box.center;
 
-    afWdU[0] = m_Ray.Direction.Dot( m_Box.Axis[0] );
+    afWdU[0] = m_Ray.direction.Dot( m_Box.axes[0] );
     afAWdU[0] = fabs(afWdU[0]);
-    afDdU[0] = kDiff.Dot(m_Box.Axis[0]);
+    afDdU[0] = kDiff.Dot(m_Box.axes[0]);
     afADdU[0] = fabs(afDdU[0]);
-    if (afADdU[0] > m_Box.Extent[0] && afDdU[0]*afWdU[0] >= 0.0f)
+    if (afADdU[0] > m_Box.extents[0] && afDdU[0]*afWdU[0] >= 0.0f)
     {
         return false;
     }
 
-    afWdU[1] = m_Ray.Direction.Dot(m_Box.Axis[1]);
+    afWdU[1] = m_Ray.direction.Dot(m_Box.axes[1]);
     afAWdU[1] = fabs(afWdU[1]);
-    afDdU[1] = kDiff.Dot(m_Box.Axis[1]);
+    afDdU[1] = kDiff.Dot(m_Box.axes[1]);
     afADdU[1] = fabs(afDdU[1]);
-    if (afADdU[1] > m_Box.Extent[1] && afDdU[1]*afWdU[1] >= 0.0)
+    if (afADdU[1] > m_Box.extents[1] && afDdU[1]*afWdU[1] >= 0.0)
     {
         return false;
     }
 
-    afWdU[2] = m_Ray.Direction.Dot(m_Box.Axis[2]);
+    afWdU[2] = m_Ray.direction.Dot(m_Box.axes[2]);
     afAWdU[2] = fabs(afWdU[2]);
-    afDdU[2] = kDiff.Dot(m_Box.Axis[2]);
+    afDdU[2] = kDiff.Dot(m_Box.axes[2]);
     afADdU[2] = fabs(afDdU[2]);
-    if (afADdU[2] > m_Box.Extent[2] && afDdU[2]*afWdU[2] >= 0.0)
+    if (afADdU[2] > m_Box.extents[2] && afDdU[2]*afWdU[2] >= 0.0)
     {
         return false;
     }
 
-    Vector3f kWxD = m_Ray.Direction.Cross( kDiff );
+    Vector3f kWxD = m_Ray.direction.Cross( kDiff );
 
-    afAWxDdU[0] = fabs(kWxD.Dot(m_Box.Axis[0]));
-    fRhs = m_Box.Extent[1]*afAWdU[2] + m_Box.Extent[2]*afAWdU[1];
+    afAWxDdU[0] = fabs(kWxD.Dot(m_Box.axes[0]));
+    fRhs = m_Box.extents[1]*afAWdU[2] + m_Box.extents[2]*afAWdU[1];
     if (afAWxDdU[0] > fRhs)
     {
         return false;
     }
 
-    afAWxDdU[1] = fabs(kWxD.Dot(m_Box.Axis[1]));
-    fRhs = m_Box.Extent[0]*afAWdU[2] + m_Box.Extent[2]*afAWdU[0];
+    afAWxDdU[1] = fabs(kWxD.Dot(m_Box.axes[1]));
+    fRhs = m_Box.extents[0]*afAWdU[2] + m_Box.extents[2]*afAWdU[0];
     if (afAWxDdU[1] > fRhs)
     {
         return false;
     }
 
-    afAWxDdU[2] = fabs(kWxD.Dot(m_Box.Axis[2]));
-    fRhs = m_Box.Extent[0]*afAWdU[1] + m_Box.Extent[1]*afAWdU[0];
+    afAWxDdU[2] = fabs(kWxD.Dot(m_Box.axes[2]));
+    fRhs = m_Box.extents[0]*afAWdU[1] + m_Box.extents[1]*afAWdU[0];
     if (afAWxDdU[2] > fRhs)
     {
         return false;
@@ -90,29 +90,29 @@ bool IntrRay3fBox3f::Find()
 	float fT1 = 10000000000.0f;
 
     // convert linear component to box coordinates
-    Vector3f kDiff = m_Ray.Origin - m_Box.Center;
+    Vector3f kDiff = m_Ray.origin - m_Box.center;
     
 	Vector3f kBOrigin(
-        kDiff.Dot(m_Box.Axis[0]),
-        kDiff.Dot(m_Box.Axis[1]),
-        kDiff.Dot(m_Box.Axis[2])
+        kDiff.Dot(m_Box.axes[0]),
+        kDiff.Dot(m_Box.axes[1]),
+        kDiff.Dot(m_Box.axes[2])
     );
 
     Vector3f kBDirection(
-        m_Ray.Direction.Dot(m_Box.Axis[0]),
-        m_Ray.Direction.Dot(m_Box.Axis[1]),
-        m_Ray.Direction.Dot(m_Box.Axis[2])
+        m_Ray.direction.Dot(m_Box.axes[0]),
+        m_Ray.direction.Dot(m_Box.axes[1]),
+        m_Ray.direction.Dot(m_Box.axes[2])
     );
 
     float fSaveT0 = fT0, fSaveT1 = fT1;
 
 	bool bNotAllClipped =
-        Clip(+kBDirection.x,-kBOrigin.x-m_Box.Extent[0],fT0,fT1) &&
-        Clip(-kBDirection.x,+kBOrigin.x-m_Box.Extent[0],fT0,fT1) &&
-        Clip(+kBDirection.y,-kBOrigin.y-m_Box.Extent[1],fT0,fT1) &&
-        Clip(-kBDirection.y,+kBOrigin.y-m_Box.Extent[1],fT0,fT1) &&
-        Clip(+kBDirection.z,-kBOrigin.z-m_Box.Extent[2],fT0,fT1) &&
-        Clip(-kBDirection.z,+kBOrigin.z-m_Box.Extent[2],fT0,fT1);
+        Clip(+kBDirection.x,-kBOrigin.x-m_Box.extents[0],fT0,fT1) &&
+        Clip(-kBDirection.x,+kBOrigin.x-m_Box.extents[0],fT0,fT1) &&
+        Clip(+kBDirection.y,-kBOrigin.y-m_Box.extents[1],fT0,fT1) &&
+        Clip(-kBDirection.y,+kBOrigin.y-m_Box.extents[1],fT0,fT1) &&
+        Clip(+kBDirection.z,-kBOrigin.z-m_Box.extents[2],fT0,fT1) &&
+        Clip(-kBDirection.z,+kBOrigin.z-m_Box.extents[2],fT0,fT1);
 
     if ( bNotAllClipped && ( true || fT0 != fSaveT0 || fT1 != fSaveT1 ) )
     {
@@ -122,15 +122,15 @@ bool IntrRay3fBox3f::Find()
             m_iQuantity = 2;
 			m_afRayT[0] = fT0;
 			m_afRayT[1] = fT1;
-            m_aPoints[0] = m_Ray.Origin + m_Ray.Direction * fT0;
-            m_aPoints[1] = m_Ray.Origin + m_Ray.Direction * fT1;
+            m_aPoints[0] = m_Ray.origin + m_Ray.direction * fT0;
+            m_aPoints[1] = m_Ray.origin + m_Ray.direction * fT1;
         }
         else
         {
             //riIntrType = IT_POINT;
             m_iQuantity = 1;
 			m_afRayT[0] = fT0;
-            m_aPoints[0] = m_Ray.Origin + m_Ray.Direction * fT0;
+            m_aPoints[0] = m_Ray.origin + m_Ray.direction * fT0;
         }
     }
     else

@@ -18,22 +18,15 @@
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class PointIndices
+	struct PointIndices
 	{
-	public:
 		PointIndices();
-		PointIndices( unsigned int P1 );
+		PointIndices( unsigned int I1 );
 		~PointIndices();
 
-		PointIndices& operator= ( const PointIndices& Point );
-
-		// member access
-		unsigned int P1( ) const;
-		unsigned int& P1( );
-
-	protected:
-		unsigned int m_uiIndices[1];
+		unsigned int i1;
 	};
 };
 //--------------------------------------------------------------------------------
 #endif // PointIndices_h
+//--------------------------------------------------------------------------------

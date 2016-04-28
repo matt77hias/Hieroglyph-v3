@@ -35,6 +35,7 @@ namespace Glyph3
         Vector3f Perpendicular( );
 
         // static vector ops
+		static float Magnitude(const Vector3f& A);
         static Vector3f Clamp( const Vector3f& A );
         static Vector3f Cross( const Vector3f& A, const Vector3f& B );
         static float Dot( const Vector3f& A, const Vector3f& B );

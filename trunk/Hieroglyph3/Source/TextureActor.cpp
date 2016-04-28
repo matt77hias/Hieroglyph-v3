@@ -82,14 +82,20 @@ void TextureActor::SetTexture( const ResourcePtr& texture, float scale )
 	m_Texture = texture;
 	m_scale = scale;
 
+	Vector2f size( 1.0f, 1.0f );
+
 	// Inspect the texture to get its size
 	ResourceDX11* pResource = RendererDX11::Get()->GetResourceByIndex( m_Texture->m_iResource );
-	assert( pResource->GetType() == RT_TEXTURE2D );
 
-	Texture2dDX11* pTexture = (Texture2dDX11*)pResource;
-	D3D11_TEXTURE2D_DESC desc = pTexture->GetActualDescription();
+	if ( pResource != nullptr )
+	{
+		assert( pResource->GetType() == RT_TEXTURE2D );
 
-	Vector2f size( static_cast<float>(desc.Width), static_cast<float>(desc.Height) );
+		Texture2dDX11* pTexture = (Texture2dDX11*)pResource;
+		D3D11_TEXTURE2D_DESC desc = pTexture->GetActualDescription();
+
+		size = Vector2f( static_cast<float>(desc.Width), static_cast<float>(desc.Height) );
+	}
 
 	// Create the geometry according to the resolution of the texture and the 
 	// scale selection.

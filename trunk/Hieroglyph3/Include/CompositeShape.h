@@ -15,8 +15,8 @@
 #ifndef CompositeShape_h
 #define CompositeShape_h
 //--------------------------------------------------------------------------------
-#include "Shape3D.h"
 #include "Ray3f.h"
+#include "Sphere3f.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -24,17 +24,16 @@ namespace Glyph3
 	{
 	public:
 		CompositeShape( );
-		virtual ~CompositeShape( );
-
-		CompositeShape* DeepCopy( );
-
-		void AddShape( Shape3D* pShape );
+		~CompositeShape( );
+		
+		void AddSphere( const Sphere3f& sphere );
 		bool RayIntersection( const Ray3f& ray, float* fDist );
 
 		int GetNumberOfShapes() const;
 
-		std::vector< Shape3D* > m_Shapes;
+		std::vector<Sphere3f> m_spheres;
 	};
 };
 //--------------------------------------------------------------------------------
 #endif // CompositeShape_h
+//--------------------------------------------------------------------------------

@@ -18,48 +18,26 @@
 #ifndef Plane3f_h
 #define Plane3f_h
 //--------------------------------------------------------------------------------
-#include "Shape3D.h"
 #include "Vector3f.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class Plane3f : public Shape3D
+	struct Plane3f
 	{
-	public:
 		Plane3f( );
-		Plane3f( float a, float b, float c, float d );
-		virtual ~Plane3f( );
+		Plane3f( float A, float B, float C, float D );
+		~Plane3f( );
 
 		// Operations
 		void Normalize();
 		float DistanceToPoint( const Vector3f& pt ) const;
 
-		// Member Access
-		float a() const;
-		float& a();
-		float b() const;
-		float& b();
-		float c() const;
-		float& c();
-		float d() const;
-		float& d();
-
-		virtual eSHAPE GetShapeType( ) const;
-
-	protected:
-		union
-		{
-			struct 
-			{
-				float A;
-				float B;
-				float C;
-				float D;
-			};
-            float m_fComponents[4];
-		};
-
+		float a;
+		float b;
+		float c;
+		float d;
 	};
 };
 //--------------------------------------------------------------------------------
 #endif // Plane3f_h
+//--------------------------------------------------------------------------------

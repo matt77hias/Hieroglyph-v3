@@ -15,24 +15,20 @@
 #ifndef Ray3f_h
 #define Ray3f_h
 //--------------------------------------------------------------------------------
-#include "Shape3D.h"
 #include "Vector3f.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
-	class Ray3f : public Shape3D
+	struct Ray3f
 	{
-	public:
 		Ray3f( );
 		Ray3f( const Vector3f& position, const Vector3f& direction );
-		virtual ~Ray3f( );
+		~Ray3f( );
 
-		virtual eSHAPE GetShapeType( ) const;
-
-	public:
-		Vector3f Origin;
-		Vector3f Direction;
+		Vector3f origin;
+		Vector3f direction;
 	};
 };
 //--------------------------------------------------------------------------------
 #endif // Ray3f_h
+//--------------------------------------------------------------------------------

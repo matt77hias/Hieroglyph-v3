@@ -62,6 +62,8 @@ namespace Glyph3
 
 		void DrawRect( const Vector3f& center, const Vector3f& xdir, const Vector3f& ydir, const Vector2f& extents, const Vector2f& texscale = Vector2f( 1.0f,1.0f ) );
 
+		void DrawArrow( const Vector3f& base, const Vector3f& point, const float shaft_radius, const float head_radius, const float head_length );
+
 		void UseSolidMaterial();
 		void UseTexturedMaterial( ResourcePtr texture = nullptr );
 		void UseTransparentMaterial();

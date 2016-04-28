@@ -815,12 +815,12 @@ void PipelineManagerDX11::SaveTextureScreenShot( int index, std::wstring filenam
 
 		// Build the output file name
 		std::wstringstream out;
-		out << filename << iScreenNum << L".bmp";
+		out << filename << iScreenNum << L".png";
 
 		HRESULT hr = DirectX::SaveWICTextureToFile( 
 			m_pContext.Get(), 
 			pResource,
-			GUID_ContainerFormatBmp,
+			GUID_ContainerFormatPng,
 			out.str().c_str() );
 
 		// Note: Use this version for WP8!

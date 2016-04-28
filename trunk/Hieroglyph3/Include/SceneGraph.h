@@ -46,6 +46,7 @@ namespace Glyph3
 		return element;
 	}
 
+	
 	template <typename T>
 	int GraphDepth( T* element ) {
 
@@ -67,6 +68,7 @@ namespace Glyph3
 	// a different type of query than the pick record.
 
 	void BuildPickRecord( Node3D* node, const Ray3f& ray, std::vector<PickRecord>& record );
+	bool EntityInSubTree( Node3D* node, Entity3D* entity );
 	void GetIntersectingEntities( Node3D* node, std::vector< Entity3D* >& set, Sphere3f& bounds );
 	void GetIntersectingEntities( Node3D* node, std::vector< Entity3D* >& set, Frustum3f& bounds );
 };

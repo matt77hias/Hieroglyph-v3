@@ -31,9 +31,9 @@ Vector3f toVec3( const std::vector<std::string>& tokens )
 {
 	assert( tokens.size() >= 4 );
 
-	return Vector3f( atof( tokens[1].c_str() ),
-					 atof( tokens[2].c_str() ),
-					 atof( tokens[3].c_str() ) );
+	return Vector3f( std::stof( tokens[1] ),
+					 std::stof( tokens[2] ),
+					 std::stof( tokens[3] ) );
 }
 //--------------------------------------------------------------------------------
 int toIllumModel( const std::vector<std::string>& tokens )
@@ -106,11 +106,11 @@ public:
 				} else if ( tokenList[0] == "Tf" ) {
 					materials[current].transmittance = toVec3( tokenList );
 				} else if ( tokenList[0] == "Ns" ) {
-					materials[current].shininess = atof( tokenList[1].c_str() );
+					materials[current].shininess = std::stof( tokenList[1] );
 				} else if ( tokenList[0] == "Ni" ) {
-					materials[current].ior = atof( tokenList[1].c_str() );
+					materials[current].ior = std::stof( tokenList[1] );
 				} else if ( tokenList[0] == "d" ) {
-					materials[current].dissolve = atof( tokenList[1].c_str() );
+					materials[current].dissolve = std::stof( tokenList[1] );
 				} else if ( tokenList[0] == "illum" ) {
 					materials[current].illumination = toIllumModel( tokenList );
 				} else if ( tokenList[0] == "map_Ka" ) {

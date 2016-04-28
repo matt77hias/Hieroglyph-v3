@@ -31,10 +31,10 @@ Entity3D::Entity3D() :
 	Controllers( this ),
 	Visual()
 {
-	Sphere3f* pBoundingSphere = new Sphere3f();
-	pBoundingSphere->Center.MakeZero();
-	pBoundingSphere->Radius = 1.0f;
-	Shape.AddShape( pBoundingSphere );
+	//Sphere3f* pBoundingSphere = new Sphere3f();
+	//pBoundingSphere->Center.MakeZero();
+	//pBoundingSphere->Radius = 1.0f;
+	//Shape.AddShape( pBoundingSphere );
 }
 //--------------------------------------------------------------------------------
 Entity3D::~Entity3D()
