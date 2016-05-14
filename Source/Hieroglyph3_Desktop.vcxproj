@@ -486,6 +486,7 @@
     <None Include="..\Include\TStateMonitor.inl" />
     <None Include="..\Include\Tween.inl" />
     <None Include="packages.config" />
+    <None Include="Source.licenseheader" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0F6D257E-70D5-46C5-8A12-7BDF93C35E81}</ProjectGuid>

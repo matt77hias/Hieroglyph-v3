@@ -76,7 +76,9 @@ namespace Glyph3
 		void SetColor( const Vector4f& color );
 		Vector4f GetColor( );
 
-	protected:
+		void ReserveVertexCount( unsigned int count );
+		void ReserveIndexCount( unsigned int count );
+
 		IndexedImmediateGeometryPtr				m_pGeometry;
 		MaterialPtr								m_pSolidMaterial;
 		MaterialPtr								m_pTexturedMaterial;

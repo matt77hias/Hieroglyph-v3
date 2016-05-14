@@ -7,14 +7,17 @@
 //
 // Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
+
+
+//--------------------------------------------------------------------------------
 // This is a simple loader for STL binary files.  The usage concept is that the
 // face data gets loaded into a vector, and the application can then use the face
-// data as it sees fit.  This simplifies the loading of the files, while not 
+// data as it sees fit.  This simplifies the loading of the files, while not
 // making decisions for the developer about how to use the data.
 //
-// Our face representation eliminates the unused AttributeByteCount to allow each
-// face to align to 4 byte boundaries.  More information about the STL file format 
-// can be found on the wikipedia page:
+// Our face representation eliminates teh unused AttributeByteCount to allow each
+// face to align to 4 byte boundaries.  More information about the STL file format
+// can be found ont eh wikipedia page:
 // http://en.wikipedia.org/wiki/STL_%28file_format%29.
 //--------------------------------------------------------------------------------
 #ifndef MeshSTL_h

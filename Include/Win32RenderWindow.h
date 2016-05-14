@@ -7,12 +7,13 @@
 //
 // Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
-// History:
-// Nov 15, 2011  F. Piette added argument IWindowProc to Initialize method
 
 //--------------------------------------------------------------------------------
 // Win32RenderWindow
 //
+//--------------------------------------------------------------------------------
+// History:
+// Nov 15, 2011 F. Piette added argument IWindowProc to Initialize method
 //--------------------------------------------------------------------------------
 #ifndef Win32RenderWindow_h
 #define Win32RenderWindow_h

@@ -105,15 +105,23 @@ MeshOBJ::MeshOBJ(const std::wstring& filename)
 
 				face_t f;
 
-				for (size_t i = 0; i < 3; ++i) {
-					auto triple = toIndexTriple(tokenList[i + 1]);
-					f.positionIndices[i] = relativeOffset(triple[0], positions.size());
-					f.coordIndices[i] = relativeOffset(triple[1], coords.size());
-					f.normalIndices[i] = relativeOffset(triple[2], normals.size());
+				for ( size_t i = 1; i < tokenList.size(); ++i ) {
+					auto triple = toIndexTriple( tokenList[i] );
+					f.positionIndices.push_back( relativeOffset( triple[0], positions.size() ) );
+					f.coordIndices.push_back( relativeOffset( triple[1], coords.size() ) );
+					f.normalIndices.push_back( relativeOffset( triple[2], normals.size() ) );
 				}
 
-				if (objects.size() == 0) { objects.push_back(object_t()); }
-				assert(objects.back().subobjects.size() > 0);
+				// If no object has been declared yet, then add one along with
+				// a subobject.  Otherwise, ensure that the current object has
+				// at least one subobject already with which to add the face to.
+				if ( objects.size() == 0 ) { 
+					objects.push_back(object_t());
+					objects.back().subobjects.push_back(subobject_t());
+				} else {
+					assert( objects.back().subobjects.size() > 0 );
+				}
+				
 				objects.back().subobjects.back().faces.emplace_back(f);
 			}
 			else if (tokenList[0] == "o") {

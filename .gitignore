@@ -1,4 +1,5 @@
 packages/
+*.tmp
 #Ignore Visual studio files
 *.sdf
 *.suo

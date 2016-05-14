@@ -7,17 +7,21 @@
 //
 // Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------
 // This is a simple loader for OBJ ascii files.  The usage concept is that the
 // raw data gets loaded into vectors, and the application can then use the data as
-// it sees fit.  This simplifies the loading of the files, while not making 
+// it sees fit.  This simplifies the loading of the files, while not making
 // decisions for the developer about how to use the data.
 //
 // The loader also will load and interpret the associated MTL files, which are
 // commonly used to indicate material properties for a model.  You can find more
-// information about OBJ and MTL files on their wikipedia page:
-// http://en.wikipedia.org/wiki/Wavefront_.obj_file and also on Paul Bourke's site
+// information about OBJ and MTL files on their wikipedia pages:
+// http://en.wikipedia.org/wiki/Wavefront_.obj_file
 // http://paulbourke.net/dataformats/obj/.
 //--------------------------------------------------------------------------------
+
+
 #ifndef MeshOBJ_h
 #define MeshOBJ_h
 //--------------------------------------------------------------------------------
@@ -39,9 +43,9 @@ public:
 
 	typedef struct
 	{
-		std::array<int,3> positionIndices;
-		std::array<int,3> normalIndices;
-		std::array<int,3> coordIndices;
+		std::vector<int> positionIndices;
+		std::vector<int> normalIndices;
+		std::vector<int> coordIndices;
 	} face_t;
 
 	typedef struct

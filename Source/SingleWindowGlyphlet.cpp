@@ -7,6 +7,7 @@
 //
 // Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
+
 #include "PCH.h"
 #include "SingleWindowGlyphlet.h"
 #include "ViewPerspective.h"

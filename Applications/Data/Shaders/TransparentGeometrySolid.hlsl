@@ -37,6 +37,7 @@ struct VS_INPUT
 {
 	float3 position : POSITION;
 	float3 normal   : NORMAL;
+	float4 color    : COLOR;
 };
 
 struct VS_OUTPUT
@@ -59,7 +60,7 @@ VS_OUTPUT VSMAIN( in VS_INPUT input )
 	output.position = mul( float4( input.position, 1.0f ), WorldViewProjMatrix );
 	output.worldPos = P;	
 	output.normal = N;
-	output.color = Kd;
+	output.color = input.color * Kd;
 	
 	return output;
 }

@@ -90,7 +90,9 @@ void App::Initialize()
 	m_pScene->AddActor( m_pGeometryActor );
 	m_pGeometryActor->GetNode()->Transform.Position() = Vector3f( 0.0f, 2.5f, 0.0f );
 
-	m_pGeometryActor->SetColor( Vector4f( 1.0f, 0.0f, 0.0f, 1.0f ) );
+	m_pGeometryActor->UseTransparentMaterial();
+	m_pGeometryActor->SetDiffuse( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_pGeometryActor->SetColor( Vector4f( 1.0f, 0.0f, 0.0f, 0.5f ) );
 	m_pGeometryActor->DrawSphere( Vector3f( 2.5f, 2.0f, 0.0f ), 1.5f, 16, 24 );
 	m_pGeometryActor->SetColor( Vector4f( 0.0f, 1.0f, 0.0f, 1.0f ) );
 	m_pGeometryActor->DrawCylinder( Vector3f( -1.5f, -1.0f, 0.0f ), Vector3f( -1.5f, 3.0f, 0.0f ), 1.5f, 0.0f, 8, 24 );
@@ -189,11 +191,15 @@ void App::Initialize()
 		{
 			for ( auto& face : subobject.faces )
 			{
-				for ( size_t i = 0; i < 3; ++i ) {
-					v.position = obj.positions[face.positionIndices[i]];
-					v.normal = obj.normals[face.normalIndices[i]];
-					v.texcoords = obj.coords[face.coordIndices[i]];
-					pOBJExecutor->AddVertex( v );
+				// Only grab faces with 3 vertices - i.e. triangles!
+				if ( face.positionIndices.size() == 3 )
+				{
+					for ( size_t i = 0; i < 3; ++i ) {
+						v.position = obj.positions[face.positionIndices[i]];
+						v.normal = obj.normals[face.normalIndices[i]];
+						v.texcoords = obj.coords[face.coordIndices[i]];
+						pOBJExecutor->AddVertex( v );
+					}
 				}
 			}
 		}

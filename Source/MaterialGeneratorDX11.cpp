@@ -483,8 +483,8 @@ MaterialPtr MaterialGeneratorDX11::GenerateImmediateGeometryTransparentMaterial(
 
 	DepthStencilStateConfigDX11 ds;
 	//ds.DepthEnable = false;
-	ds.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-	pEffect->m_iDepthStencilState = RendererDX11::Get()->CreateDepthStencilState( &ds );
+	//ds.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	//pEffect->m_iDepthStencilState = RendererDX11::Get()->CreateDepthStencilState( &ds );
 
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;

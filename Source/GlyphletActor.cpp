@@ -21,7 +21,7 @@ GlyphletActor::GlyphletActor()
 	// Glyphlet.
 
 	Texture2dConfigDX11 config;
-	config.SetFormat( DXGI_FORMAT_R8G8B8A8_UNORM );
+	config.SetFormat( DXGI_FORMAT_R8G8B8A8_UNORM_SRGB );
 	config.SetBindFlags( D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE );
 	config.SetWidth( 640 );
 	config.SetHeight( 480 );
@@ -29,6 +29,7 @@ GlyphletActor::GlyphletActor()
 	m_RenderTexture = RendererDX11::Get()->CreateTexture2D( &config, nullptr );
 
 	UseTexturedMaterial( m_RenderTexture );
+	SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	DrawRect( Vector3f( 0.0f, 0.0f, 0.0f ), Vector3f( -1.0f, 0.0f, 0.0f ), Vector3f( 0.0f, 1.0f, 0.0f ), Vector2f( 3.2f, 2.4f ) );
 }
 //--------------------------------------------------------------------------------

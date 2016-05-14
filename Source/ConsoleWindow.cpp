@@ -7,6 +7,7 @@
 //
 // Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
+
 #include "PCH.h"
 #include "ConsoleWindow.h"
 #include "ScriptManager.h"

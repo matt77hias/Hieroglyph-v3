@@ -7,9 +7,7 @@
 //
 // Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
-// 06.02.2012: Initialization of WNDCLASSEX structure to zero added by Francois
-//             Piette.
-//--------------------------------------------------------------------------------
+
 #include "PCH.h"
 #include "Win32RenderWindow.h"
 #include "Vector2f.h"

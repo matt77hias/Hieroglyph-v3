@@ -51,6 +51,16 @@ void GeometryActor::ResetGeometry()
 	m_pGeometry->ResetGeometry();
 }
 //--------------------------------------------------------------------------------
+void GeometryActor::ReserveVertexCount( unsigned int count )
+{
+	m_pGeometry->SetMaxVertexCount( count );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::ReserveIndexCount( unsigned int count )
+{
+	m_pGeometry->SetMaxIndexCount( count );
+}
+//--------------------------------------------------------------------------------
 void GeometryActor::SetColor( const Vector4f& color )
 {
 	m_Color = color;
@@ -577,11 +587,13 @@ void GeometryActor::DrawArrow(const Vector3f& base, const Vector3f& point, const
 void GeometryActor::UseSolidMaterial()
 {
 	GetBody()->Visual.SetMaterial( m_pSolidMaterial );
+	GetBody()->Visual.iPass = Renderable::GEOMETRY;
 }
 //--------------------------------------------------------------------------------
 void GeometryActor::UseTexturedMaterial( ResourcePtr texture )
 {
 	GetBody()->Visual.SetMaterial( m_pTexturedMaterial );
+	GetBody()->Visual.iPass = Renderable::GEOMETRY;
 
 	// Set the texture to be used if the passed in texture is not null...
 	if ( nullptr != texture ) {
@@ -598,41 +610,26 @@ void GeometryActor::UseTexturedMaterial( ResourcePtr texture )
 void GeometryActor::UseTransparentMaterial( )
 {
 	GetBody()->Visual.SetMaterial( m_pTransparentMaterial );
+	GetBody()->Visual.iPass = Renderable::ALPHA;
 }
 //--------------------------------------------------------------------------------
 void GeometryActor::SetSpecular( const Vector4f& color )
 {
-	auto pMaterial = GetBody()->Visual.GetMaterial();
-
-	assert( pMaterial != nullptr );
-
-	pMaterial->Parameters.SetVectorParameter( L"Ks", color );
+	GetBody()->Parameters.SetVectorParameter( L"Ks", color );
 }
 //--------------------------------------------------------------------------------
 Vector4f GeometryActor::GetSpecular( ) const
 {
-	auto pMaterial = GetBody()->Visual.GetMaterial();
-
-	assert( pMaterial != nullptr );
-
-	return( pMaterial->Parameters.GetVectorParameterWriter( L"Ks" )->GetValue( ) );
+	return( GetBody()->Parameters.GetVectorParameterWriter( L"Ks" )->GetValue( ) );
 }
 //--------------------------------------------------------------------------------
 void GeometryActor::SetDiffuse( const Vector4f& color )
 {
-	auto pMaterial = GetBody()->Visual.GetMaterial();
-
-	assert( pMaterial != nullptr );
-
-	pMaterial->Parameters.SetVectorParameter( L"Kd", color );
+	GetBody()->Parameters.SetVectorParameter( L"Kd", color );
 }
 //--------------------------------------------------------------------------------
 Vector4f GeometryActor::GetDiffuse( ) const
 {
-	auto pMaterial = GetBody()->Visual.GetMaterial();
-
-	assert( pMaterial != nullptr );
-
-	return( pMaterial->Parameters.GetVectorParameterWriter( L"Kd" )->GetValue( ) );
+	return( GetBody()->Parameters.GetVectorParameterWriter( L"Kd" )->GetValue( ) );
 }
 //--------------------------------------------------------------------------------

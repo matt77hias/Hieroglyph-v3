@@ -22,6 +22,7 @@
 #include "SceneGraph.h"
 #include "BlendStateConfigDX11.h"
 #include "DepthStencilStateConfigDX11.h"
+#include <algorithm>
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
@@ -203,10 +204,23 @@ void ViewPerspectiveHighlight::ExecuteTask( PipelineManagerDX11* pPipelineManage
 
 		pPipelineManager->ClearPipelineResources();
 
-		// Run through the graph and render each of the entities
-		m_pScene->GetRoot()->Render( pPipelineManager, pParamManager, VT_PERSPECTIVE );
+		// Run through the graph and render each of the entities.  This will sort the entities 
+		// based on whether or not they are transparent.
+		
+		std::vector<Entity3D*> entity_list;
+		GetAllEntities( m_pScene->GetRoot(), entity_list );
 
+		auto const transparent_check = []( Entity3D* entity) { 
+			return entity->Visual.iPass != Renderable::ALPHA;
+		};
 
+		// We use stable partition to sort, and return the first transparent entity.
+		auto const iter_first_alpha = std::stable_partition(begin(entity_list), end(entity_list), transparent_check);
+
+		// Now we can render all entities in the sorted order.
+		for ( auto& entity : entity_list ) {
+			entity->Render( pPipelineManager, pParamManager, VT_PERSPECTIVE );
+		}
 
 
 		// Set the silhouette buffer as a shader resource, then draw the full screen

@@ -7,6 +7,7 @@
 //
 // Copyright (c) Jason Zink 
 //--------------------------------------------------------------------------------
+
 #include "PCH.h"
 #include "PipelineManagerDX11.h"
 #include "Log.h"

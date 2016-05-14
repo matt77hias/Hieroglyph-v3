@@ -1573,5 +1573,6 @@
     <None Include="..\Include\TStateMonitor.inl">
       <Filter>Rendering\Pipeline System\Stages\Common</Filter>
     </None>
+    <None Include="Source.licenseheader" />
   </ItemGroup>
 </Project>
