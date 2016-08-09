@@ -14,11 +14,50 @@
 //--------------------------------------------------------------------------------
 using namespace Glyph3;
 //--------------------------------------------------------------------------------
-MaterialTemplate::MaterialTemplate()
+MaterialTemplate::MaterialTemplate() :
+material( std::make_shared<MaterialDX11>() )
 {
 }
 //--------------------------------------------------------------------------------
 MaterialTemplate::~MaterialTemplate()
 {
+}
+//--------------------------------------------------------------------------------
+void MaterialTemplate::SetColorMode( ColorMode mode )
+{
+	if ( mode == ColorMode::ObjectColor )
+	{
+	
+	}
+	else if ( mode == ColorMode::VertexColor )
+	{
+	
+	}
+	else if ( mode == ColorMode::TexturedColor )
+	{
+
+	}
+}
+//--------------------------------------------------------------------------------
+void MaterialTemplate::SetLightingMode( LightingMode mode )
+{
+	if ( mode == LightingMode::Flat )
+	{
+	}
+	else if ( mode == LightingMode::Point )
+	{
+	}
+}
+//--------------------------------------------------------------------------------
+void MaterialTemplate::SetTransparencyMode( TransparencyMode mode )
+{
+	if ( mode == TransparencyMode::Off )
+	{
+	
+	}
+	else if ( mode == TransparencyMode::Alpha )
+	{
+	
+	}
 }
 //--------------------------------------------------------------------------------

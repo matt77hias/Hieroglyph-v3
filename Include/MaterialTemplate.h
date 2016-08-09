@@ -16,18 +16,47 @@
 #define MaterialTemplate_h
 //--------------------------------------------------------------------------------
 #include "PCH.h"
+#include "MaterialDX11.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
+	// TODO: Take a reference to either an entity or a renderable, and provide
+	//       standardized methods for manipulating common properties that we would
+	//       expect for this rendering standard.
+	//
+	//       It may also be interesting to insert options for a quality level here
+	//       as well.
 
 	class MaterialTemplate
 	{
 	public:
 		MaterialTemplate();
-		virtual ~MaterialTemplate();
+		~MaterialTemplate();
 
-	public:
+		enum ColorMode
+		{
+			ObjectColor,
+			VertexColor,
+			TexturedColor
+		};
 
+		enum LightingMode
+		{
+			Flat,
+			Point
+		};
+
+		enum TransparencyMode
+		{
+			Off,
+			Alpha
+		};
+
+		void SetColorMode( ColorMode mode );
+		void SetLightingMode( LightingMode mode );
+		void SetTransparencyMode( TransparencyMode mode );
+
+		MaterialPtr	material;
 	};
 };
 //--------------------------------------------------------------------------------

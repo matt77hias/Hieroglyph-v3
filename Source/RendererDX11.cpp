@@ -1318,7 +1318,7 @@ ResourcePtr RendererDX11::LoadTexture( std::wstring filename, bool sRGB )
 
 	if ( FAILED( hr ) )
 	{
-		Log::Get().Write( L"Failed to load texture from file!" );
+		Log::Get().Write( L"Failed to load texture from file: " + filename );
 		return( ResourcePtr( new ResourceProxyDX11() ) );
 	}
 

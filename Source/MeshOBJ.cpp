@@ -101,7 +101,9 @@ MeshOBJ::MeshOBJ(const std::wstring& filename)
 			else if (tokenList[0] == "vt") {
 				coords.emplace_back(toVec2(tokenList));
 			}
-			else if (tokenList[0] == "f") {
+			else if (tokenList[0] == "f" ||
+				     tokenList[0] == "l" ||
+					 tokenList[0] == "p" ) {
 
 				face_t f;
 
@@ -117,9 +119,10 @@ MeshOBJ::MeshOBJ(const std::wstring& filename)
 				// at least one subobject already with which to add the face to.
 				if ( objects.size() == 0 ) { 
 					objects.push_back(object_t());
+				} 
+
+				if ( objects.back().subobjects.size() == 0 ) {
 					objects.back().subobjects.push_back(subobject_t());
-				} else {
-					assert( objects.back().subobjects.size() > 0 );
 				}
 				
 				objects.back().subobjects.back().faces.emplace_back(f);

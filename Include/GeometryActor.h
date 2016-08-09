@@ -67,6 +67,7 @@ namespace Glyph3
 		void UseSolidMaterial();
 		void UseTexturedMaterial( ResourcePtr texture = nullptr );
 		void UseTransparentMaterial();
+		void UseTransparentFlatMaterial();
 
 		void SetSpecular( const Vector4f& color );
 		Vector4f GetSpecular( ) const;
@@ -83,6 +84,7 @@ namespace Glyph3
 		MaterialPtr								m_pSolidMaterial;
 		MaterialPtr								m_pTexturedMaterial;
 		MaterialPtr								m_pTransparentMaterial;
+		MaterialPtr								m_pTransparentFlatMaterial;
 
 		Vector4f								m_Color;
 	};

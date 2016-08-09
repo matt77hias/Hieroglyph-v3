@@ -34,6 +34,8 @@ GeometryActor::GeometryActor() :
 	m_pSolidMaterial = MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *pRenderer );
 	m_pTexturedMaterial = MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( *pRenderer );
 	m_pTransparentMaterial = MaterialGeneratorDX11::GenerateImmediateGeometryTransparentMaterial( *pRenderer );
+	m_pTransparentFlatMaterial = MaterialGeneratorDX11::GenerateImmediateGeometryTransparentFlatMaterial( *pRenderer );
+
 
 	GetBody()->Visual.SetGeometry( m_pGeometry );
 
@@ -610,6 +612,12 @@ void GeometryActor::UseTexturedMaterial( ResourcePtr texture )
 void GeometryActor::UseTransparentMaterial( )
 {
 	GetBody()->Visual.SetMaterial( m_pTransparentMaterial );
+	GetBody()->Visual.iPass = Renderable::ALPHA;
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::UseTransparentFlatMaterial()
+{
+	GetBody()->Visual.SetMaterial( m_pTransparentFlatMaterial );
 	GetBody()->Visual.iPass = Renderable::ALPHA;
 }
 //--------------------------------------------------------------------------------
