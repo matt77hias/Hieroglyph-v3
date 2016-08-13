@@ -152,8 +152,6 @@ void ViewRiftHighlight::ExecuteTask( PipelineManagerDX11* pPipelineManager, IPar
 		// same for both eyes, so we pull it out of the loop.
 		ConfigureViewports( pPipelineManager );
 
-//		m_pHmd->ReadEyeData();
-
 		for ( unsigned int eye = 0; eye < 2; ++eye )
 		{
 			// Set up the view matrices for this eye.  This starts by getting the 

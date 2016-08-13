@@ -47,34 +47,35 @@ struct RiftHMD::Impl
 			throw std::exception( "No HMD Devices were found!" );
 		}
 		
-	
-		// Start the sensor which provides the Rift’s pose and motion.
-		
-		ovr_ConfigureTracking( m_hmd, 
-			ovrTrackingCap_Orientation |
-			ovrTrackingCap_MagYawCorrection | 
-			ovrTrackingCap_Position, 0);
-
 		ovrHmdDesc hmdDesc = ovr_GetHmdDesc( m_hmd );
 
 		// Initialize FovSideTanMax, which allows us to change all Fov sides at once - Fov
 		// starts at default and is clamped to this value.
+
 		float FovSideTanLimit = OVR::FovPort::Max( hmdDesc.MaxEyeFov[0], hmdDesc.MaxEyeFov[1] ).GetMaxSideTan();
 		float FovSideTanMax   = OVR::FovPort::Max( hmdDesc.DefaultEyeFov[0], hmdDesc.DefaultEyeFov[1] ).GetMaxSideTan();
 
 		// Clamp Fov based on our dynamically adjustable FovSideTanMax.
 		// Most apps should use the default, but reducing Fov does reduce rendering cost.
+		
 		eyeFov[0] = OVR::FovPort::Min( hmdDesc.DefaultEyeFov[0], OVR::FovPort(FovSideTanMax) );
 		eyeFov[1] = OVR::FovPort::Min( hmdDesc.DefaultEyeFov[1], OVR::FovPort(FovSideTanMax) );
 
 		// Initialize the frame time for future delta calculations.
-		frame_time = ovr_GetTimeInSeconds();
+
+		last_frame_time = ovr_GetTimeInSeconds();
 	}
 	//--------------------------------------------------------------------------------
 	~Impl()
 	{
 		if ( mirrorTexture != nullptr ) {
 			ovr_DestroyMirrorTexture( m_hmd, mirrorTexture );
+		}
+
+		for ( int eye = 0; eye < 2; ++eye ) {
+			if ( textureSets[eye] != nullptr ) {
+				ovr_DestroyTextureSwapChain( m_hmd, textureSets[eye] );
+			}
 		}
 
 		if ( m_hmd ) {
@@ -126,21 +127,17 @@ struct RiftHMD::Impl
 	void ReadEyeData()
 	{
         // Get both eye poses simultaneously, with IPD offset already included. 
-        ovrVector3f      HmdToEyeViewOffset[2] = { eyeRenderDesc[0].HmdToEyeViewOffset,
-                                                   eyeRenderDesc[1].HmdToEyeViewOffset };
+        ovrVector3f      HmdToEyeViewOffset[2] = { eyeRenderDesc[0].HmdToEyeOffset,
+                                                   eyeRenderDesc[1].HmdToEyeOffset };
 
-		ovrFrameTiming   ftiming  = ovr_GetFrameTiming(m_hmd, 0);
-        ovrTrackingState hmdState = ovr_GetTrackingState(m_hmd, ftiming.DisplayMidpointSeconds);
+		double timing = ovr_GetPredictedDisplayTime( m_hmd, 0 );
+        ovrTrackingState hmdState = ovr_GetTrackingState( m_hmd, timing, ovrTrue );
         
 		ovr_CalcEyePoses( hmdState.HeadPose.ThePose, HmdToEyeViewOffset, eyePose );
 
 		// Update the layer information with our new pose information.
 
-		for (int eye = 0; eye < 2; eye++)
-        {
-            //ld.ColorTexture[eye] = pEyeRenderTexture[eye]->TextureSet;
-            //ld.Viewport[eye]     = eyeRenderViewport[eye];
-            //ld.Fov[eye]          = HMD->DefaultEyeFov[eye];
+		for ( int eye = 0; eye < 2; eye++ ) {
             layer.RenderPose[eye]   = eyePose[eye];
         }
 
@@ -149,7 +146,11 @@ struct RiftHMD::Impl
 	Matrix3f GetOrientation( double time )
 	{
 		// Query the HMD for the sensor state at a given time. "0.0" means "most recent time".
-		ovrTrackingState ts = ovr_GetTrackingState( m_hmd, time );
+		// The last parameter indicates if this is the call to get the tracking state
+		// immediately before rendering, which in this case it is not.  That is in the
+		// ReadEyeData function above.
+
+		ovrTrackingState ts = ovr_GetTrackingState( m_hmd, time, ovrFalse );
 
 		Matrix3f orientation;
 		orientation.MakeIdentity();
@@ -212,18 +213,13 @@ struct RiftHMD::Impl
 	//--------------------------------------------------------------------------------
 	Matrix4f GetEyeTranslation( unsigned int eye )
 	{
-		return Matrix4f::TranslationMatrix( eyeRenderDesc[eye].HmdToEyeViewOffset.x,
-											eyeRenderDesc[eye].HmdToEyeViewOffset.y,
-											eyeRenderDesc[eye].HmdToEyeViewOffset.z );
+		return Matrix4f::TranslationMatrix( eyeRenderDesc[eye].HmdToEyeOffset.x,
+											eyeRenderDesc[eye].HmdToEyeOffset.y,
+											eyeRenderDesc[eye].HmdToEyeOffset.z );
 	}
 	//--------------------------------------------------------------------------------
 	Matrix4f GetEyeSpatialState( unsigned int eye )
 	{
-		// The eye pose is read out from the API using RiftHMD::ReadEyeData() which 
-		// collects the information for both eyes simultaneously.
-
-		ReadEyeData();
-
 		float yaw, eyePitch, eyeRoll = 0.0f;
 		OVR::Posef pose = eyePose[eye];
 		
@@ -248,26 +244,94 @@ struct RiftHMD::Impl
 
 		frame++;
 
-		ovrFrameTiming frameTiming = ovr_GetFrameTiming( m_hmd, frame );
+		double frame_time = ovr_GetPredictedDisplayTime( m_hmd, frame );
 
-		float delta = static_cast<float>( frameTiming.DisplayMidpointSeconds - frame_time );
-		frame_time = frameTiming.DisplayMidpointSeconds;
 
-		// Increment the texture slot to use, and automatically roll over the count
-		// based on the number of slots available.
+		// The delta time is returned to the application, and is subsequently used
+		// to update the state of the application.
 
-		pTextureSets[0]->CurrentIndex = (pTextureSets[0]->CurrentIndex + 1) % pTextureSets[0]->TextureCount;
-		pTextureSets[1]->CurrentIndex = (pTextureSets[1]->CurrentIndex + 1) % pTextureSets[1]->TextureCount;
+		float delta = static_cast<float>( frame_time - last_frame_time );
+		last_frame_time = frame_time;
+
+
+		// The eye pose is read out from the API using RiftHMD::ReadEyeData() which 
+		// collects the information for both eyes simultaneously.
+
+		ReadEyeData();
+
 
 		return( delta );
 	}
 	//--------------------------------------------------------------------------------
 	void EndFrame()
 	{
+		// Commit the current swap chain buffers for each eye.
+		//
+		// TODO: It may be worth it to move this to its own method in RiftHMD (something
+		//       like RiftHMD::EyeRenderComplete() or similar) if there is a performance
+		//       difference.  This needs to be tested, then either remove this note, or
+		//       move the commit calls.
+
+		ovr_CommitTextureSwapChain( m_hmd, textureSets[ovrEye_Left] );
+		ovr_CommitTextureSwapChain( m_hmd, textureSets[ovrEye_Right] );
+
 		const unsigned int layer_count = 1;
 
 		ovrLayerHeader* headers[layer_count] = { &layer.Header };
 		ovrResult result = ovr_SubmitFrame( m_hmd, frame, nullptr, headers, layer_count );
+	}
+	//--------------------------------------------------------------------------------
+	ovrTextureFormat TranslateDXGItoOVR( DXGI_FORMAT format )
+	{
+		ovrTextureFormat ovrFormat = ovrTextureFormat::OVR_FORMAT_UNKNOWN;
+
+		switch ( format )
+		{
+		case DXGI_FORMAT_B5G6R5_UNORM:
+			ovrFormat = OVR_FORMAT_B5G6R5_UNORM;    ///< Not currently supported on PC. Would require a DirectX 11.1 device.
+			break;
+		case DXGI_FORMAT_B5G5R5A1_UNORM:
+			ovrFormat = OVR_FORMAT_B5G5R5A1_UNORM;  ///< Not currently supported on PC. Would require a DirectX 11.1 device.
+			break;
+		case DXGI_FORMAT_B4G4R4A4_UNORM:
+			ovrFormat = OVR_FORMAT_B4G4R4A4_UNORM;  ///< Not currently supported on PC. Would require a DirectX 11.1 device.
+			break;
+		case DXGI_FORMAT_R8G8B8A8_UNORM:
+			ovrFormat = OVR_FORMAT_R8G8B8A8_UNORM;
+			break;
+		case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
+			ovrFormat = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
+			break;
+		case DXGI_FORMAT_B8G8R8A8_UNORM:
+			ovrFormat = OVR_FORMAT_B8G8R8A8_UNORM;
+			break;
+		case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
+			ovrFormat = OVR_FORMAT_B8G8R8A8_UNORM_SRGB; ///< Not supported for OpenGL applications
+			break;
+		case DXGI_FORMAT_B8G8R8X8_UNORM:
+			ovrFormat = OVR_FORMAT_B8G8R8X8_UNORM;      ///< Not supported for OpenGL applications
+			break;
+		case DXGI_FORMAT_B8G8R8X8_UNORM_SRGB:
+			ovrFormat = OVR_FORMAT_B8G8R8X8_UNORM_SRGB; ///< Not supported for OpenGL applications
+			break;
+		case DXGI_FORMAT_R16G16B16A16_FLOAT:
+			ovrFormat = OVR_FORMAT_R16G16B16A16_FLOAT;
+			break;
+		case DXGI_FORMAT_D16_UNORM:
+			ovrFormat = OVR_FORMAT_D16_UNORM;
+			break;
+		case DXGI_FORMAT_D24_UNORM_S8_UINT:
+			ovrFormat = OVR_FORMAT_D24_UNORM_S8_UINT;
+			break;
+		case DXGI_FORMAT_D32_FLOAT:
+			ovrFormat = OVR_FORMAT_D32_FLOAT;
+			break;
+		case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
+			ovrFormat = OVR_FORMAT_D32_FLOAT_S8X24_UINT;
+			break;
+		}
+
+		return ovrFormat;
 	}
 	//--------------------------------------------------------------------------------
 	void ConfigureRendering( unsigned int max_w, unsigned int max_h, DXGI_FORMAT format )
@@ -291,22 +355,27 @@ struct RiftHMD::Impl
 		// render target and shader resource bind points so that they can be used by
 		// the Oculus SDK to do the distortion rendering at the end of the frame.
 
-		pTextureSets[0] = nullptr;
-		pTextureSets[1] = nullptr;
+		textureSets[0] = nullptr;
+		textureSets[1] = nullptr;
 
-		Texture2dConfigDX11 renderConfig;
-		renderConfig.SetWidth( width );
-		renderConfig.SetHeight( height );
-		renderConfig.SetFormat( format );
-		renderConfig.SetBindFlags( D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE );
-		D3D11_TEXTURE2D_DESC desc = renderConfig.GetTextureDesc();
+		ovrTextureSwapChainDesc config;
+		config.Type = ovrTexture_2D;
+		config.Format = TranslateDXGItoOVR( format );
+		config.ArraySize = 1;
+		config.Width = width;
+		config.Height = height;
+		config.MipLevels = 1;
+		config.SampleCount = 1;
+		config.StaticImage = ovrFalse;
+		config.MiscFlags = ovrTextureMisc_None;
+		config.BindFlags = ovrTextureBind_DX_RenderTarget;
 
-
-		if ( ovr_CreateSwapTextureSetD3D11( m_hmd, RendererDX11::Get()->GetDevice(), &desc, 0, &pTextureSets[0] ) != ovrSuccess ) {
+		
+		if ( ovr_CreateTextureSwapChainDX( m_hmd, RendererDX11::Get()->GetDevice(), &config, &textureSets[0] ) != ovrSuccess ) {
 			Log::Get().Write( L"ERROR: Could not create swap texture sets!" );
 		}
 
-		if ( ovr_CreateSwapTextureSetD3D11( m_hmd, RendererDX11::Get()->GetDevice(), &desc, 0, &pTextureSets[1] ) != ovrSuccess ) {
+		if ( ovr_CreateTextureSwapChainDX( m_hmd, RendererDX11::Get()->GetDevice(), &config, &textureSets[1] ) != ovrSuccess ) {
 			Log::Get().Write( L"ERROR: Could not create swap texture sets!" );
 		}
 
@@ -317,15 +386,22 @@ struct RiftHMD::Impl
 		
 		for ( unsigned int eye = 0; eye < 2; ++eye )
 		{
-			for ( int i = 0; i < pTextureSets[0]->TextureCount; ++i )
+			int count = 0;
+			ovr_GetTextureSwapChainLength( m_hmd, textureSets[eye], &count );
+
+			for ( int i = 0; i < count; ++i )
 			{
-				ovrD3D11Texture* tex = (ovrD3D11Texture*)&pTextureSets[eye]->Textures[i];
-				ResourcePtr resource = RendererDX11::Get()->LoadTexture( tex->D3D11.pTexture );
+				ID3D11Texture2D* texture = nullptr;
+				ovr_GetTextureSwapChainBufferDX( m_hmd, textureSets[eye], i, IID_PPV_ARGS(&texture));
+				
+				ResourcePtr resource = RendererDX11::Get()->LoadTexture( texture );
 
 				resource->m_iResourceRTV = 
 					RendererDX11::Get()->CreateRenderTargetView(resource->m_iResource, nullptr );
 
 				textureRTVs[eye].push_back( resource );
+
+				texture->Release(); 
 			}
 		}
 
@@ -333,8 +409,8 @@ struct RiftHMD::Impl
 		
 		layer.Header.Type = ovrLayerType_EyeFov;
 		layer.Header.Flags = 0;
-		layer.ColorTexture[0] = pTextureSets[0];
-		layer.ColorTexture[1] = pTextureSets[1];
+		layer.ColorTexture[0] = textureSets[0];
+		layer.ColorTexture[1] = textureSets[1];
 		layer.Fov[0] = eyeRenderDesc[0].Fov;
 		layer.Fov[1] = eyeRenderDesc[1].Fov;
 		layer.Viewport[0] = OVR::Recti(0, 0, width, height);
@@ -345,56 +421,58 @@ struct RiftHMD::Impl
 	{
 		assert( eye == 0 || eye == 1 );
 
-		return textureRTVs[eye][pTextureSets[eye]->CurrentIndex];
+		int currentIndex = 0;
+		ovr_GetTextureSwapChainCurrentIndex( m_hmd, textureSets[eye], &currentIndex );
+
+		return textureRTVs[eye][currentIndex];
 	}
 	//--------------------------------------------------------------------------------
 	ResourcePtr GetMirrorTexture( unsigned int w, unsigned int h, DXGI_FORMAT format )
 	{
-		// If the texture already exists, then check if it matches the right size.  If
-		// it doesn't match, then delete it.
+		// If the texture already exists, then delete it.
 		if ( mirrorTexture != nullptr )
 		{
-			if ( mirrorTexture->Header.TextureSize.w != w || mirrorTexture->Header.TextureSize.h != h ) {
-				ovr_DestroyMirrorTexture( m_hmd, mirrorTexture );
-				mirrorTexture = nullptr;
-			}
+			ovr_DestroyMirrorTexture( m_hmd, mirrorTexture );
+			mirrorTexture = nullptr;
 		}
 
 		// Ensure that an appropriately sized mirror texture is available.
 		if ( mirrorTexture == nullptr )
 		{
-			D3D11_TEXTURE2D_DESC desc = { };
-			desc.ArraySize        = 1;
-			desc.Format           = format;
-			desc.Width            = w;
-			desc.Height           = h;
-			desc.Usage            = D3D11_USAGE_DEFAULT;
-			desc.SampleDesc.Count = 1;
-			desc.MipLevels        = 1;
-			ovr_CreateMirrorTextureD3D11( m_hmd, RendererDX11::Get()->GetDevice(), &desc, 0, &mirrorTexture );
+			ovrMirrorTextureDesc config = { };
+			config.Format = TranslateDXGItoOVR( format );
+			config.Width = w;
+			config.Height = h;
+			config.MiscFlags = 0;
+
+			ovr_CreateMirrorTextureDX( m_hmd, RendererDX11::Get()->GetDevice(), &config, &mirrorTexture );
 		}
 
-        ovrD3D11Texture* tex = (ovrD3D11Texture*)mirrorTexture;
-		ResourcePtr resource = RendererDX11::Get()->LoadTexture( tex->D3D11.pTexture );
+        ID3D11Texture2D* tex = nullptr;
+
+        ovr_GetMirrorTextureBufferDX( m_hmd, mirrorTexture, IID_PPV_ARGS(&tex));
+		ResourcePtr resource = RendererDX11::Get()->LoadTexture( tex );
+
+		tex->Release();
 
 		return resource;
 	}
 	//--------------------------------------------------------------------------------
 	RiftManagerPtr m_RiftMgr;
-	ovrHmd m_hmd;
+	ovrSession m_hmd;
 	ovrGraphicsLuid m_luid;
 	ovrFovPort eyeFov[2];
 	ovrEyeRenderDesc eyeRenderDesc[2];
 	ovrPosef eyePose[2];
 	
 	ovrLayerEyeFov layer;
-	ovrSwapTextureSet* pTextureSets[2];
+	ovrTextureSwapChain textureSets[2];
 	std::vector<ResourcePtr> textureRTVs[2];
 	
-	ovrTexture* mirrorTexture;
+	ovrMirrorTexture mirrorTexture;
 
 	unsigned int frame;
-	double frame_time;
+	double last_frame_time;
 };
 //--------------------------------------------------------------------------------
 

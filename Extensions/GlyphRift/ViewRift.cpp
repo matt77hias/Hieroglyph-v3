@@ -184,9 +184,6 @@ void ViewRift::Resize( UINT width, UINT height )
 {
 	// These sizes are determined by the Rift Headset, and should not change
 	// with window size changes.
-
-	//RendererDX11::Get()->ResizeTexture( m_DepthTarget, width, height );
-	//RendererDX11::Get()->ResizeViewport( m_iViewports[0], width, height );
 }
 //--------------------------------------------------------------------------------
 std::wstring ViewRift::GetName()

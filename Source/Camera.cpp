@@ -76,7 +76,7 @@ void Camera::RenderFrame( RendererDX11* pRenderer )
 		// Set the view position in the parameter system, for use by any of the
 		// views being used in this frame.
 
-		Vector3f p = GetNode()->Transform.Position() + GetBody()->Transform.Position();
+		Vector3f p = GetBody()->Transform.LocalPointToWorldSpace( Vector3f( 0.0f, 0.0f, 0.0f ) );
 		m_pViewPositionWriter->SetValue( Vector4f( p.x, p.y, p.z, 1.0f ) );
 
 		Parameters.InitRenderParams();
