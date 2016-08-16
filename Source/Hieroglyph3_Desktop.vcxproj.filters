@@ -806,6 +806,9 @@
     <ClCompile Include="AxisAlignedBox.cpp">
       <Filter>Geometry</Filter>
     </ClCompile>
+    <ClCompile Include="BezierCubic.cpp">
+      <Filter>Mathematics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\Animation.h">
@@ -1509,6 +1512,9 @@
     </ClInclude>
     <ClInclude Include="..\Include\AxisAlignedBox.h">
       <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\BezierCubic.h">
+      <Filter>Mathematics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

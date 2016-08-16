@@ -206,6 +206,18 @@ void App::Initialize()
 	}
 
 
+	BezierCubic curve;
+	curve.points[0] = Vector3f( 0.0f, 0.0f, 0.0f );
+	curve.points[1] = Vector3f( 5.0f, 5.0f, 0.0f );
+	curve.points[2] = Vector3f( 5.0f, 10.0f, 0.0f );
+	curve.points[3] = Vector3f( 0.0f, 10.0f, 0.0f );
+	
+	GeometryActor* curveActor = new GeometryActor();
+	curveActor->SetPrimitiveType( D3D_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST );
+	curveActor->SetColor( Vector4f( 0.0f, 1.0f, 0.0f, 1.0f ) );
+	curveActor->DrawBezierCurve( curve, 0.0f, 1.0f, 200 );
+	m_pScene->AddActor( curveActor );
+
 
 	ResourcePtr skyboxTexture = m_pRenderer11->LoadTexture( L"TropicalSunnyDay.dds" );
 	SkyboxActor* skybox = new SkyboxActor( skyboxTexture, 10.0f );

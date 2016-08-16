@@ -586,6 +586,24 @@ void GeometryActor::DrawArrow(const Vector3f& base, const Vector3f& point, const
 	DrawDisc( shaft_end, -unit_arrow, head_radius );
 }
 //--------------------------------------------------------------------------------
+void GeometryActor::DrawBezierCurve( const BezierCubic& curve, float t0, float t1, unsigned int segments )
+{
+	unsigned int baseVertex = m_pGeometry->GetVertexCount();
+
+	float step = (t1 - t0) / segments;
+
+	for ( int i = 0; i < segments+1; ++i )
+	{
+		Vector3f point = curve.sample( t0 + step*static_cast<float>(i) );
+		AddVertex( point );
+	}
+
+	for ( int i = 0; i < segments; ++i )
+	{
+		AddIndices( baseVertex+i, baseVertex+i+1 );
+	}
+}
+//--------------------------------------------------------------------------------
 void GeometryActor::UseSolidMaterial()
 {
 	GetBody()->Visual.SetMaterial( m_pSolidMaterial );

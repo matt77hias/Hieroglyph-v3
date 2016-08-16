@@ -26,6 +26,7 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="AxisAlignedBox.cpp" />
     <ClCompile Include="BasicVertexDX11.cpp" />
+    <ClCompile Include="BezierCubic.cpp" />
     <ClCompile Include="BlendStateConfigDX11.cpp" />
     <ClCompile Include="BoundsVisualizerActor.cpp" />
     <ClCompile Include="Box3f.cpp" />
@@ -237,6 +238,7 @@
     <ClInclude Include="..\Include\AttributeEvaluator2f.h" />
     <ClInclude Include="..\Include\AxisAlignedBox.h" />
     <ClInclude Include="..\Include\BasicVertexDX11.h" />
+    <ClInclude Include="..\Include\BezierCubic.h" />
     <ClInclude Include="..\Include\BlendStateConfigDX11.h" />
     <ClInclude Include="..\Include\BoundsVisualizerActor.h" />
     <ClInclude Include="..\Include\Box3f.h" />
