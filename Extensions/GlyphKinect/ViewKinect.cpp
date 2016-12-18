@@ -260,6 +260,8 @@ void ViewKinect::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterM
 
 	if ( pKinectManager->GetSysMemSkeletonBuffer() == NULL ) {
 		
+		latest_skeleton_frame = *(NUI_SKELETON_FRAME*)m_pSysSkeleton;
+
 		// Our pointer is now filled with data - we need to do something with it.
 		for( int i = 0 ; i < NUI_SKELETON_COUNT ; i++ )
 		{

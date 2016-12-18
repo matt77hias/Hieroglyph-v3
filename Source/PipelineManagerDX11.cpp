@@ -583,11 +583,10 @@ void PipelineManagerDX11::CopyStructureCount( ResourcePtr dest, UINT offset, Res
 	}
 }
 //--------------------------------------------------------------------------------
-void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth, UINT stencil )
+void PipelineManagerDX11::ClearColorBuffers( const Vector4f& color )
 {
 	// Get the current render target view and depth stencil view from the OM stage.
     ID3D11RenderTargetView* pRenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { NULL };
-	ID3D11DepthStencilView* pDepthStencilView = 0;
 
 	// Our output merger class manages the current render targets bound to the pipeline.
 	// The number of views that are currently set refers to the views that the application
@@ -607,6 +606,11 @@ void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth, UINT stenci
 			m_pContext->ClearRenderTargetView( pRenderTargetViews[i], clearColours );
 		}
 	}
+}
+//--------------------------------------------------------------------------------
+void PipelineManagerDX11::ClearDepthStencilBuffers( float depth, UINT stencil )
+{
+	ID3D11DepthStencilView* pDepthStencilView = 0;
 
 	// Check if the output merger currently has a depth target set, and if so clear it.
 
@@ -619,6 +623,12 @@ void PipelineManagerDX11::ClearBuffers( Vector4f color, float depth, UINT stenci
 			m_pContext->ClearDepthStencilView( pDepthStencilView, D3D11_CLEAR_DEPTH, depth, stencil );
 		}
 	}
+}
+//--------------------------------------------------------------------------------
+void PipelineManagerDX11::ClearBuffers( const Vector4f& color, float depth, UINT stencil )
+{
+	ClearColorBuffers( color );
+	ClearDepthStencilBuffers( depth, stencil );
 }
 //--------------------------------------------------------------------------------
 void PipelineManagerDX11::BindShader( ShaderType type, int ID, IParameterManager* pParamManager )

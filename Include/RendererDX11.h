@@ -303,13 +303,18 @@ namespace Glyph3
 		// destroying many resources, and allow the renderer clients to have greater access
 		// the objects without querying the renderer.
 
-		std::vector<BlendStateComPtr>			m_vBlendStates;
-		std::vector<DepthStencilStateComPtr>	m_vDepthStencilStates;
-		std::vector<RasterizerStateComPtr>		m_vRasterizerStates;
+		std::vector<BlendStateComPtr>				m_BlendStates;
+		std::map<BlendStateConfigDX11,int>			m_BlendStateLookup;
 
-		std::vector<InputLayoutComPtr>			m_vInputLayouts;
-		std::vector<SamplerStateComPtr>			m_vSamplerStates;
-		std::vector<ViewPortDX11>				m_vViewPorts;
+		std::vector<DepthStencilStateComPtr>		m_DepthStencilStates;
+		std::map<DepthStencilStateConfigDX11,int>	m_DepthStencilStateLookup;
+
+		std::vector<RasterizerStateComPtr>			m_RasterizerStates;
+		std::map<RasterizerStateConfigDX11,int>		m_RasterizerStateLookup;
+
+		std::vector<InputLayoutComPtr>				m_vInputLayouts;
+		std::vector<SamplerStateComPtr>				m_vSamplerStates;
+		std::vector<ViewPortDX11>					m_vViewPorts;
 
 	public:
 		IParameterManager*						m_pParamMgr;

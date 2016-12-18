@@ -40,8 +40,6 @@ namespace Glyph3
 	public:
 		enum ENTITYTYPE
 		{
-			GUI_TEXT,
-			GUI,
 			ALPHA,
 			SKY,
 			BACKGROUND,

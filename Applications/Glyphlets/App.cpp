@@ -74,7 +74,7 @@ void App::Initialize()
 	// from the camera's point of view of the scene.
 
 	m_pCamera->Spatial().SetTranslation( Vector3f( 0.0f, 5.0f, -10.0f ) );
-	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.4f, 0.0f ) );
+	m_pRenderView->SetColorClearValue( Vector4f( 0.2f, 0.2f, 0.4f, 0.0f ) );
 
 	// Create the actor to hold the immediate geometry.  
 

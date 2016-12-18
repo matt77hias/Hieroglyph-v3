@@ -39,7 +39,7 @@ void ScriptedGlyphlet::Initialize()
 	//m_pCamera->Spatial().SetRotation( Vector3f( 0.307f, 0.707f, 0.0f ) );
 	//m_pCamera->Spatial().SetTranslation( Vector3f( -10.0f, 6.5f, -10.0f ) );
 
-	m_pRenderView->SetBackColor( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
+	m_pRenderView->SetColorClearValue( Vector4f( 0.0f, 0.0f, 0.0f, 0.0f ) );
 
 	// Create the scene and add the entities to it.  Then add the camera to the
 	// scene so that it will be updated via the scene interface instead of 

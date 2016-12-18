@@ -30,7 +30,7 @@ void ParticleStormGlyphlet::Initialize()
 
 	m_pCamera->Spatial().SetRotation( Vector3f( 0.307f, 0.707f, 0.0f ) );
 	m_pCamera->Spatial().SetTranslation( Vector3f( -100.0f, 60.5f, -100.0f ) );
-	m_pRenderView->SetBackColor( Vector4f( 0.0f, 0.0f, 0.0f, 1.0f ) );
+	m_pRenderView->SetColorClearValue( Vector4f( 0.0f, 0.0f, 0.0f, 1.0f ) );
 
 	// Create the scene and add the entities to it.  Then add the camera to the
 	// scene so that it will be updated via the scene interface instead of 

@@ -23,14 +23,8 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ViewTextOverlay::ViewTextOverlay( RendererDX11& Renderer, ResourcePtr RenderTarget )
 {
-	//m_sParams.iViewType = VT_GUI_SKIN;
-
 	m_RenderTarget = RenderTarget;
 
-	//ViewMatrix.MakeIdentity();
-	//ProjMatrix.MakeIdentity();
-
-	//m_pEntity = 0;
 	m_vColor.MakeZero();
 
 	ResourceDX11* pResource = Renderer.GetResourceByIndex( m_RenderTarget->m_iResource );

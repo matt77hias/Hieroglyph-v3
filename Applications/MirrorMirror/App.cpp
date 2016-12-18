@@ -76,7 +76,7 @@ void App::Initialize()
 
 	m_pCamera->Spatial().SetRotation( Vector3f( static_cast<float>( GLYPH_PI ) / 6.0f, static_cast<float>( GLYPH_PI ) / 4.0f, 0.0f ) );
 	m_pCamera->Spatial().SetTranslation( Vector3f( -5.0f, 5.0f, -5.0f ) );
-	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.2f, 0.2f ) );
+	m_pRenderView->SetColorClearValue( Vector4f( 0.2f, 0.2f, 0.2f, 0.2f ) );
 
 
 	// Create the scene and add the entities to it.  Then add the camera to the
@@ -119,9 +119,9 @@ void App::Initialize()
 	m_vReflectors[1]->Transform.Position() = Vector3f( 1.0, 1.0f, 1.0f );
 	m_vReflectors[2]->Transform.Position() = Vector3f( 0.0, -1.0f, 1.0f );
 
-	m_vReflectors[0]->m_pParaboloidView->SetBackColor( Vector4f( 0.75f, 0.0f, 0.0f, 1.0f ) );
-	m_vReflectors[1]->m_pParaboloidView->SetBackColor( Vector4f( 0.0f, 0.75f, 0.0f, 1.0f ) );
-	m_vReflectors[2]->m_pParaboloidView->SetBackColor( Vector4f( 0.0f, 0.0f, 0.75f, 1.0f ) );
+	m_vReflectors[0]->m_pParaboloidView->SetColorClearValue( Vector4f( 0.75f, 0.0f, 0.0f, 1.0f ) );
+	m_vReflectors[1]->m_pParaboloidView->SetColorClearValue( Vector4f( 0.0f, 0.75f, 0.0f, 1.0f ) );
+	m_vReflectors[2]->m_pParaboloidView->SetColorClearValue( Vector4f( 0.0f, 0.0f, 0.75f, 1.0f ) );
 
 	m_pScene->AddActor( m_pDiffuseActor );
 	m_pScene->AddActor( m_pActor );

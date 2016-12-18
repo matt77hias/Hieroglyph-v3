@@ -91,6 +91,7 @@
     <ClCompile Include="HullShaderDX11.cpp" />
     <ClCompile Include="HullStageDX11.cpp" />
     <ClCompile Include="IEventListener.cpp" />
+    <ClCompile Include="ImageProcessor.cpp" />
     <ClCompile Include="IndexBufferDX11.cpp" />
     <ClCompile Include="IndirectArgsBufferDX11.cpp" />
     <ClCompile Include="InputAssemblerStageDX11.cpp" />
@@ -218,6 +219,7 @@
     <ClCompile Include="VertexStageDX11.cpp" />
     <ClCompile Include="ViewAmbientOcclusion.cpp" />
     <ClCompile Include="ViewDepthNormal.cpp" />
+    <ClCompile Include="ViewHighDynamicRange.cpp" />
     <ClCompile Include="ViewOcclusion.cpp" />
     <ClCompile Include="ViewPerspective.cpp" />
     <ClCompile Include="ViewPerspectiveHighlight.cpp" />
@@ -311,6 +313,7 @@
     <ClInclude Include="..\Include\IController.h" />
     <ClInclude Include="..\Include\IEvent.h" />
     <ClInclude Include="..\Include\IEventListener.h" />
+    <ClInclude Include="..\Include\ImageProcessor.h" />
     <ClInclude Include="..\Include\IndexBufferDX11.h" />
     <ClInclude Include="..\Include\IndirectArgsBufferDX11.h" />
     <ClInclude Include="..\Include\InputAssemblerStageDX11.h" />
@@ -410,6 +413,7 @@
     <ClInclude Include="..\Include\SpriteFontLoaderDX11.h" />
     <ClInclude Include="..\Include\SpriteRendererDX11.h" />
     <ClInclude Include="..\Include\SpriteVertexDX11.h" />
+    <ClInclude Include="..\Include\StatefulSetpointController.h" />
     <ClInclude Include="..\Include\StreamOutputStageDX11.h" />
     <ClInclude Include="..\Include\StreamOutputStageStateDX11.h" />
     <ClInclude Include="..\Include\StructuredBufferDX11.h" />
@@ -437,6 +441,7 @@
     <ClInclude Include="..\Include\Triangle3f.h" />
     <ClInclude Include="..\Include\TriangleIndices.h" />
     <ClInclude Include="..\Include\TStateArrayMonitor.h" />
+    <ClInclude Include="..\Include\TStateCache.h" />
     <ClInclude Include="..\Include\TStateMonitor.h" />
     <ClInclude Include="..\Include\Tween.h" />
     <ClInclude Include="..\Include\UnorderedAccessParameterDX11.h" />
@@ -455,6 +460,7 @@
     <ClInclude Include="..\Include\VertexStageDX11.h" />
     <ClInclude Include="..\Include\ViewAmbientOcclusion.h" />
     <ClInclude Include="..\Include\ViewDepthNormal.h" />
+    <ClInclude Include="..\Include\ViewHighDynamicRange.h" />
     <ClInclude Include="..\Include\ViewOcclusion.h" />
     <ClInclude Include="..\Include\ViewPerspective.h" />
     <ClInclude Include="..\Include\ViewPerspectiveHighlight.h" />
@@ -479,12 +485,14 @@
     <None Include="..\Include\SetpointController.inl" />
     <None Include="..\Include\SkinnedBoneController.inl" />
     <None Include="..\Include\SpatialController.inl" />
+    <None Include="..\Include\StatefulSetpointController.inl" />
     <None Include="..\Include\TConfiguration.inl" />
     <None Include="..\Include\TGrowableBufferDX11.inl" />
     <None Include="..\Include\TGrowableIndexBufferDX11.inl" />
     <None Include="..\Include\TGrowableStructuredBufferDX11.inl" />
     <None Include="..\Include\TGrowableVertexBufferDX11.inl" />
     <None Include="..\Include\TStateArrayMonitor.inl" />
+    <None Include="..\Include\TStateCache.inl" />
     <None Include="..\Include\TStateMonitor.inl" />
     <None Include="..\Include\Tween.inl" />
     <None Include="packages.config" />

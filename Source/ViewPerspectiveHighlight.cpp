@@ -28,12 +28,6 @@ using namespace Glyph3;
 //--------------------------------------------------------------------------------
 ViewPerspectiveHighlight::ViewPerspectiveHighlight( RendererDX11& Renderer, ResourcePtr RenderTarget, ResourcePtr DepthTarget )
 {
-	ViewMatrix.MakeIdentity();
-	ProjMatrix.MakeIdentity();
-
-	m_pEntity = 0;
-	m_vColor.MakeZero();
-
 	SetRenderTargets( RenderTarget, DepthTarget );
 
 	// Configure a material for our fullscreen actor.
@@ -189,7 +183,9 @@ void ViewPerspectiveHighlight::ExecuteTask( PipelineManagerDX11* pPipelineManage
 		pPipelineManager->OutputMergerStage.DesiredState.DepthTargetViews.SetState( m_DepthTarget->m_iResourceDSV );
 		pPipelineManager->ApplyRenderTargets();
 
-		pPipelineManager->ClearBuffers( m_vColor, 1.0f );
+		// Clear the color and depth targets if requested.
+		if ( m_bEnableColorClear ) { pPipelineManager->ClearColorBuffers( m_BufferClearColor ); }
+		if ( m_bEnableDepthClear ) { pPipelineManager->ClearDepthStencilBuffers( m_fDepthClearValue ); }
 
 		// Configure the desired viewports in this pipeline
 		ConfigureViewports( pPipelineManager );

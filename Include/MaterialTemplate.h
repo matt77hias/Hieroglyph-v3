@@ -27,36 +27,65 @@ namespace Glyph3
 	//       It may also be interesting to insert options for a quality level here
 	//       as well.
 
+	enum ColorMode
+	{
+		ObjectColor,
+		VertexColor,
+		TexturedColor
+	};
+
+	enum LightingMode
+	{
+		Flat,
+		Point
+	};
+
+	enum TransparencyMode
+	{
+		Opaque,
+		Alpha
+	};
+
 	class MaterialTemplate
 	{
 	public:
 		MaterialTemplate();
 		~MaterialTemplate();
 
-		enum ColorMode
-		{
-			ObjectColor,
-			VertexColor,
-			TexturedColor
-		};
-
-		enum LightingMode
-		{
-			Flat,
-			Point
-		};
-
-		enum TransparencyMode
-		{
-			Off,
-			Alpha
-		};
-
 		void SetColorMode( ColorMode mode );
 		void SetLightingMode( LightingMode mode );
 		void SetTransparencyMode( TransparencyMode mode );
+		
+		
+		void ApplyShaders();
 
-		MaterialPtr	material;
+		ColorMode			color_mode;
+		LightingMode		lighting_mode;
+		TransparencyMode	transparency_mode;
+
+		MaterialPtr			material;
+
+	private:
+		int opaque_blendstate;
+		int alpha_blendstate;
+
+		int objectcolor_pointlight_vs;
+		int objectcolor_pointlight_ps;
+
+		int vertexcolor_pointlight_vs;
+		int vertexcolor_pointlight_ps;
+
+		int texturecolor_pointlight_vs;
+		int texturecolor_pointlight_ps;
+
+		int objectcolor_flat_vs;
+		int objectcolor_flat_ps;
+
+		int vertexcolor_flat_vs;
+		int vertexcolor_flat_ps;
+
+		int texturecolor_flat_vs;
+		int texturecolor_flat_ps;
 	};
 };
 //--------------------------------------------------------------------------------

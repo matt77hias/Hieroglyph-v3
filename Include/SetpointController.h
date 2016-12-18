@@ -18,7 +18,6 @@
 #include "IController.h"
 #include <functional>
 #include <queue>
-//#include "Entity3D.h"
 #include "Tween.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
@@ -53,8 +52,8 @@ namespace Glyph3
 		bool			m_bActive;
 
 		std::function<T(U*)>			m_get;
-		std::function<void(U*,T)>	m_set;
-		std::function<T(T,T,float)>			m_default;
+		std::function<void(U*,T)>		m_set;
+		std::function<T(T,T,float)>		m_default;
 
 
 		std::queue<Setpoint> m_SetpointQueue;

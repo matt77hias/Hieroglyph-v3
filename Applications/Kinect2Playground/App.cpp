@@ -57,7 +57,7 @@ void App::Initialize()
 
 	m_pCamera->Spatial().SetTranslation( Vector3f( 2.0f, 2.0f, -2.0f ) );
 	m_pCamera->Spatial().SetRotation( Vector3f( 0.3f, -0.4f, 0.0f ) );
-	m_pRenderView->SetBackColor( Vector4f( 0.1f, 0.1f, 0.3f, 0.0f ) );
+	m_pRenderView->SetColorClearValue( Vector4f( 0.1f, 0.1f, 0.3f, 0.0f ) );
 
 
 	// Add a single point light to the scene.

@@ -47,6 +47,7 @@ TextActor::TextActor()
 
 	GetBody()->Visual.SetGeometry( m_pGeometry );
 	GetBody()->Visual.SetMaterial( m_pMaterial );
+	GetBody()->Visual.iPass = Renderable::ALPHA;
 
 	SpriteFontPtr pSpriteFont = SpriteFontLoaderDX11::LoadFont( std::wstring( L"Consolas" ), 40.0f, 0, true );
 	SetFont( pSpriteFont );

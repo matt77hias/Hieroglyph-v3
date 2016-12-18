@@ -131,7 +131,9 @@ void ViewParaboloidEnvMap::ExecuteTask( PipelineManagerDX11* pPipelineManager, I
 		// Configure the desired viewports in this pipeline
 		ConfigureViewports( pPipelineManager );
 
-		pPipelineManager->ClearBuffers( m_vColor, 1.0f );
+		// Clear the color and depth targets if requested.
+		if ( m_bEnableColorClear ) { pPipelineManager->ClearColorBuffers( m_BufferClearColor ); }
+		if ( m_bEnableDepthClear ) { pPipelineManager->ClearDepthStencilBuffers( m_fDepthClearValue ); }
 
 		// Set this view's render parameters
 		SetRenderParams( pParamManager );

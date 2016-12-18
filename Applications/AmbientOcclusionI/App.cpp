@@ -64,7 +64,7 @@ bool App::ConfigureRenderingSetup()
 	// from the camera's point of view of the scene.
 
 	m_pRenderView = new ViewAmbientOcclusion( *m_pRenderer11, m_BackBuffer );
-	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
+	m_pRenderView->SetColorClearValue( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
 
 	m_pTextOverlayView = new ViewTextOverlay( *m_pRenderer11, m_BackBuffer );
 

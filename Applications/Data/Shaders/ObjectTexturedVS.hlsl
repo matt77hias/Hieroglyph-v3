@@ -9,7 +9,7 @@
 //--------------------------------------------------------------------------------
 
 
-cbuffer Transforms
+cbuffer Transforms2
 {
 	matrix WorldViewProjMatrix;	
 	matrix WorldViewMatrix;

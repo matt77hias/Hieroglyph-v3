@@ -21,7 +21,13 @@ SingleWindowGlyphlet::SingleWindowGlyphlet()
 {
 	SetEventManager( &EvtManager );
 
-	RequestEvent( SYSTEM_KEYBOARD_KEYDOWN );
+	RequestEvent( eEVENT::SYSTEM_KEYBOARD_KEYDOWN );
+	RequestEvent( eEVENT::SYSTEM_KEYBOARD_KEYUP );
+	RequestEvent( eEVENT::SYSTEM_LBUTTON_DOWN );
+	RequestEvent( eEVENT::SYSTEM_LBUTTON_UP );
+    RequestEvent( eEVENT::SYSTEM_RBUTTON_DOWN );
+    RequestEvent( eEVENT::SYSTEM_RBUTTON_UP );
+    RequestEvent( eEVENT::SYSTEM_MOUSE_MOVE );
 
 
 	RendererDX11* pRenderer = RendererDX11::Get();
@@ -29,7 +35,7 @@ SingleWindowGlyphlet::SingleWindowGlyphlet()
 	m_pScene = new Scene();
 
 	ViewPerspective* pPerspectiveView = new ViewPerspective( *pRenderer, m_RenderTarget );
-	pPerspectiveView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
+	pPerspectiveView->SetColorClearValue( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
 	m_pRenderView = pPerspectiveView;
 
 	m_pCamera = new FirstPersonCamera();

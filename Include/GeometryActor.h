@@ -19,6 +19,7 @@
 #include "BasicVertexDX11.h"
 #include "DrawIndexedExecutorDX11.h"
 #include "BezierCubic.h"
+#include "MaterialTemplate.h"
 //--------------------------------------------------------------------------------
 namespace Glyph3
 {
@@ -61,7 +62,7 @@ namespace Glyph3
 		void DrawBox( const Vector3f& center, const Vector3f& extents );
 		void DrawAxisAlignedBox( const Vector3f& pt1, const Vector3f& pt2 );
 
-		void DrawRect( const Vector3f& center, const Vector3f& xdir, const Vector3f& ydir, const Vector2f& extents, const Vector2f& texscale = Vector2f( 1.0f,1.0f ) );
+		void DrawRect( const Vector3f& center, const Vector3f& xdir, const Vector3f& ydir, const Vector2f& extents, const Vector2f& texscale = Vector2f( 1.0f, 1.0f ) );
 
 		void DrawArrow( const Vector3f& base, const Vector3f& point, const float shaft_radius, const float head_radius, const float head_length );
 
@@ -76,7 +77,11 @@ namespace Glyph3
 		Vector4f GetSpecular( ) const;
 		void SetDiffuse( const Vector4f& color );
 		Vector4f GetDiffuse( ) const;
-		
+		void SetRoughness( const float roughness );
+		float GetRoughness( ) const;
+		void SetMetallic( const float metallic );
+		float GetMetallic( ) const;
+
 		void SetColor( const Vector4f& color );
 		Vector4f GetColor( );
 
@@ -84,10 +89,8 @@ namespace Glyph3
 		void ReserveIndexCount( unsigned int count );
 
 		IndexedImmediateGeometryPtr				m_pGeometry;
-		MaterialPtr								m_pSolidMaterial;
-		MaterialPtr								m_pTexturedMaterial;
-		MaterialPtr								m_pTransparentMaterial;
-		MaterialPtr								m_pTransparentFlatMaterial;
+
+		MaterialTemplate						material_template;
 
 		Vector4f								m_Color;
 	};

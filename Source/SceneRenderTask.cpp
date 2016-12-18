@@ -24,12 +24,18 @@ SceneRenderTask::SceneRenderTask( ) :
 	m_pScene( nullptr ),
 	m_bDebugViewEnabled( false ),
 	m_pDebugVisualizer( new BoundsVisualizerActor() ),
-	m_vColor( ),
 	m_iViewports(),
 	m_uiViewportCount( 1 ),
 	ViewMatrix(),
-	ProjMatrix()
+	ProjMatrix(),
+	m_BufferClearColor( 0.0f, 0.0f, 0.0f, 1.0f ),
+	m_fDepthClearValue( 1.0f ),
+	m_uiStencilClearValue( 0 ),
+	m_bEnableColorClear( true ),
+	m_bEnableDepthClear( true )
 {
+	ViewMatrix.MakeIdentity();
+	ProjMatrix.MakeIdentity();
 }
 //--------------------------------------------------------------------------------
 SceneRenderTask::~SceneRenderTask( )
@@ -78,9 +84,29 @@ Matrix4f SceneRenderTask::GetProjMatrix( )
 	return( ProjMatrix );
 }
 //--------------------------------------------------------------------------------
-void SceneRenderTask::SetBackColor( const Vector4f& color )
+void SceneRenderTask::SetColorClearValue( const Vector4f& color )
 {
-	m_vColor = color;
+	m_BufferClearColor = color;
+}
+//--------------------------------------------------------------------------------
+void SceneRenderTask::SetDepthClearValue( const float depth )
+{
+	m_fDepthClearValue = depth;
+}
+//--------------------------------------------------------------------------------
+void SceneRenderTask::SetStencilClearValue( const UINT stencil )
+{
+	m_uiStencilClearValue = stencil;
+}
+//--------------------------------------------------------------------------------
+void SceneRenderTask::EnableColorClearing( const bool enable )
+{
+	m_bEnableColorClear = enable;
+}
+//--------------------------------------------------------------------------------
+void SceneRenderTask::EnableDepthClearing( const bool enable )
+{
+	m_bEnableDepthClear = enable;
 }
 //--------------------------------------------------------------------------------
 void SceneRenderTask::SetViewPort( int viewport, unsigned int index )

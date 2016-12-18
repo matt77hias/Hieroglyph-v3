@@ -31,6 +31,37 @@ namespace Glyph3
 
 		friend RendererDX11;
 	};
+
+	inline bool operator==(const RasterizerStateConfigDX11& lhs, const RasterizerStateConfigDX11& rhs)
+	{
+		return
+			lhs.AntialiasedLineEnable == rhs.AntialiasedLineEnable &&
+			lhs.CullMode == rhs.CullMode &&
+			lhs.DepthBias == rhs.DepthBias &&
+			lhs.DepthBiasClamp == rhs.DepthBiasClamp &&
+			lhs.DepthClipEnable == rhs.DepthClipEnable &&
+			lhs.FillMode == rhs.FillMode &&
+			lhs.FrontCounterClockwise == rhs.FrontCounterClockwise &&
+			lhs.MultisampleEnable == rhs.MultisampleEnable &&
+			lhs.ScissorEnable == rhs.ScissorEnable &&
+			lhs.SlopeScaledDepthBias == rhs.SlopeScaledDepthBias;
+	}
+
+	inline bool operator<(const RasterizerStateConfigDX11& lhs, const RasterizerStateConfigDX11& rhs)
+	{
+		return memcmp(&lhs, &rhs, sizeof(lhs) ) < 0;
+		//return
+		//	lhs.AntialiasedLineEnable < rhs.AntialiasedLineEnable ||
+		//	lhs.CullMode < rhs.CullMode ||
+		//	lhs.DepthBias < rhs.DepthBias ||
+		//	lhs.DepthBiasClamp < rhs.DepthBiasClamp ||
+		//	lhs.DepthClipEnable < rhs.DepthClipEnable ||
+		//	lhs.FillMode < rhs.FillMode ||
+		//	lhs.FrontCounterClockwise < rhs.FrontCounterClockwise ||
+		//	lhs.MultisampleEnable < rhs.MultisampleEnable ||
+		//	lhs.ScissorEnable < rhs.ScissorEnable ||
+		//	lhs.SlopeScaledDepthBias < rhs.SlopeScaledDepthBias;
+	}
 };
 //--------------------------------------------------------------------------------
 #endif // RasterizerStateConfigDX11_h

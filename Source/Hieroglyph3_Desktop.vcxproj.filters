@@ -198,6 +198,9 @@
     <Filter Include="Rendering\Pipeline System\Executors\Basis Objects">
       <UniqueIdentifier>{9e97739e-4186-4dac-8ecc-9c3e6d85d4b6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering\Image Processing Toolkit">
+      <UniqueIdentifier>{b514b42e-8b36-4fcc-b2f6-b108498b9729}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp">
@@ -808,6 +811,12 @@
     </ClCompile>
     <ClCompile Include="BezierCubic.cpp">
       <Filter>Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewHighDynamicRange.cpp">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageProcessor.cpp">
+      <Filter>Rendering\Image Processing Toolkit</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1516,6 +1525,18 @@
     <ClInclude Include="..\Include\BezierCubic.h">
       <Filter>Mathematics</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\ViewHighDynamicRange.h">
+      <Filter>Rendering\Material System\Components\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ImageProcessor.h">
+      <Filter>Rendering\Image Processing Toolkit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\StatefulSetpointController.h">
+      <Filter>Objects\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TStateCache.h">
+      <Filter>Rendering\Resource System\State Objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -1580,5 +1601,11 @@
       <Filter>Rendering\Pipeline System\Stages\Common</Filter>
     </None>
     <None Include="Source.licenseheader" />
+    <None Include="..\Include\StatefulSetpointController.inl">
+      <Filter>Objects\Controllers</Filter>
+    </None>
+    <None Include="..\Include\TStateCache.inl">
+      <Filter>Rendering\Resource System\State Objects</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -48,7 +48,7 @@ float4 PSMAIN( in VS_OUTPUT input ) : SV_Target
 	float4 sampledColor = ColorTexture.Sample( LinearSampler, input.tex );
 	float4 mixedColor = sampledColor * input.color;
 
-	clip( mixedColor.a - 0.05f );
+	clip( mixedColor.a - 0.01f );
 	
 	return( mixedColor );
 }

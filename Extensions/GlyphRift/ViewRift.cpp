@@ -133,7 +133,11 @@ void ViewRift::ExecuteTask( PipelineManagerDX11* pPipelineManager, IParameterMan
 			pPipelineManager->OutputMergerStage.DesiredState.RenderTargetViews.SetState( 0, m_pHmd->GetEyeTexture(eye)->m_iResourceRTV );
 			pPipelineManager->OutputMergerStage.DesiredState.DepthTargetViews.SetState( m_DepthTarget->m_iResourceDSV );
 			pPipelineManager->ApplyRenderTargets();
-			pPipelineManager->ClearBuffers( m_vColor, 1.0f );
+
+			// Clear the color and depth targets if requested.
+			if ( m_bEnableColorClear ) { pPipelineManager->ClearColorBuffers( m_BufferClearColor ); }
+			if ( m_bEnableDepthClear ) { pPipelineManager->ClearDepthStencilBuffers( m_fDepthClearValue ); }
+
 
 			// Set this view's render parameters
 			SetViewMatrix( m_view[eye] );

@@ -30,7 +30,7 @@ namespace Glyph3
 		void SetColor( const Vector4f& color );
 		Vector4f GetColor( );
 
-	protected:
+	public:
 
 		typedef std::shared_ptr<DrawExecutorDX11<TexturedVertex::Vertex>> DrawGeometryPtr;
 

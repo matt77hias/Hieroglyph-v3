@@ -138,7 +138,8 @@ bool RenderApplication::ConfigureRenderingSetup()
 	// from the camera's point of view of the scene.
 
 	ViewPerspective* pPerspectiveView = new ViewPerspective( *m_pRenderer11, m_BackBuffer );
-	pPerspectiveView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
+	pPerspectiveView->SetColorClearValue( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
+
 	m_pRenderView = pPerspectiveView;
 
 	m_pTextOverlayView = new ViewTextOverlay( *m_pRenderer11, m_BackBuffer );

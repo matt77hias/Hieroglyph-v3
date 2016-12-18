@@ -187,7 +187,7 @@ void App::Initialize()
 	m_pCamera->Spatial().SetRotation( Vector3f( 0.307f, 0.0f, 0.0f ) );
 	m_pCamera->Spatial().SetTranslation( Vector3f( 0.0f, 2.5f, -5.0f ) );
 	m_pRenderView = new ViewPerspective( *m_pRenderer11, m_OffscreenTexture, m_DepthTarget );
-	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );
+	m_pRenderView->SetColorClearValue( Vector4f( 0.6f, 0.6f, 0.6f, 0.6f ) );
 	m_pCamera->SetCameraView( m_pRenderView );
 	m_pCamera->SetProjectionParams( 0.1f, 100.0f, m_DesktopRes.x / m_DesktopRes.y, static_cast<float>( GLYPH_PI ) / 2.0f );
 

@@ -58,7 +58,10 @@ namespace Glyph3
 
 		void SetSkeletonActor( KinectSkeletonActor* pActor );
 
+
 		virtual std::wstring GetName();
+
+		NUI_SKELETON_FRAME latest_skeleton_frame;
 
 	protected:
 		

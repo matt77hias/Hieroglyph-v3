@@ -30,7 +30,7 @@ namespace Glyph3
 		void SetTexture( ResourcePtr texture );
 		ResourcePtr GetTexture( );
 
-	protected:
+	public:
 
 		typedef std::shared_ptr<DrawExecutorDX11<TexturedVertex::Vertex>> DrawGeometryPtr;
 

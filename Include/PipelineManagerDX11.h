@@ -144,7 +144,9 @@ namespace Glyph3
 		// Clear buffers does what it says - the currently bound render target views and depth
 		// stencil view are cleared to the provided values.
 
-		void ClearBuffers( Vector4f color, float depth = 1.0f, UINT stencil = 0 );
+		void ClearBuffers( const Vector4f& color, float depth = 1.0f, UINT stencil = 0 );
+		void ClearColorBuffers( const Vector4f& color );
+		void ClearDepthStencilBuffers( float depth = 1.0f, UINT stencil = 0 );
 		
 		// Resources can be mapped in order to manually modify or read their contents.  The 
 		// returned structure provides information about the resource including the pitch and

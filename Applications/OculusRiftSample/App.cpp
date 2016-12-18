@@ -169,7 +169,7 @@ bool App::ConfigureRenderingSetup()
 		m_pRenderView = new ViewPerspective( *m_pRenderer11, m_BackBuffer );
 	}
 
-	m_pRenderView->SetBackColor( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
+	m_pRenderView->SetColorClearValue( Vector4f( 0.6f, 0.6f, 0.9f, 1.0f ) );
 
 
 	// TODO: we need a special way to interact with the text overlay, since
@@ -213,7 +213,7 @@ void App::Initialize()
 
 	//m_pCamera->Spatial().SetRotation( Vector3f( 0.5f, 0.3f, 0.0f ) );
 	m_pCamera->Spatial().SetTranslation( Vector3f( -1.5f, 6.0f, -7.5f ) );
-	m_pRenderView->SetBackColor( Vector4f( 0.2f, 0.2f, 0.4f, 0.0f ) );
+	m_pRenderView->SetColorClearValue( Vector4f( 0.2f, 0.2f, 0.4f, 0.0f ) );
 
 
 	// Create the actor to hold the immediate geometry.  

@@ -79,7 +79,7 @@ ReflectiveSphereEntity::ReflectiveSphereEntity()
 
 	m_pParaboloidView = new ViewParaboloidEnvMap( *pRenderer11, ColorTarget, DepthTarget );
 	m_pParaboloidView->SetEntity( this );
-	m_pParaboloidView->SetBackColor( Vector4f( 0.1f, 0.1f, 0.3f, 1.0f ) );
+	m_pParaboloidView->SetColorClearValue( Vector4f( 0.1f, 0.1f, 0.3f, 1.0f ) );
 
 	// Enable the material to render the given view type, and set its effect.
 	

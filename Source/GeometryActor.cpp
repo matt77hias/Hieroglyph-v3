@@ -31,17 +31,44 @@ GeometryActor::GeometryActor() :
 	
 	SetColor( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
-	m_pSolidMaterial = MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *pRenderer );
-	m_pTexturedMaterial = MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( *pRenderer );
-	m_pTransparentMaterial = MaterialGeneratorDX11::GenerateImmediateGeometryTransparentMaterial( *pRenderer );
-	m_pTransparentFlatMaterial = MaterialGeneratorDX11::GenerateImmediateGeometryTransparentFlatMaterial( *pRenderer );
+	// TODO:
+	// The GeometryActor is migrating towards a more standardized set of material
+	// options.  This should provide a more coherent method of thinking about
+	// how the materials work.  It will be a work in progress, but will eventually
+	// be expanded and available for other Actors to utilize.
+	//
+	// Shader naming convention is albedo.geometric.lighting.purpose.shader-stage.hlsl
+	// Material variations that will be supported include the following:
+	// Albedo: object, vertex, procedural, textured, multi-textured
+	// Geometric: vertex-normals, normal-mapping, parallax-mapping, displacement-mapping, tessellated, volumetric
+	// Lighting: point-light, directional-light, spot-light, full-light
+	// Purpose: perspective, depth-only, etc...
+	//
+	// Other options include:
+	// Transparency (on/off)
+	// Wireframe (on/off)
+	// Culling mode (front/back/none)
+	// Enabled (on/off)
+	// Depth writes (on/off)
+	// Depth culling (on/off)
+	
+
+	
+	//m_pSolidMaterial = MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( *pRenderer );
+	//m_pTexturedMaterial = MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( *pRenderer );
+	//m_pTransparentMaterial = MaterialGeneratorDX11::GenerateImmediateGeometryTransparentMaterial( *pRenderer );
+	//m_pTransparentFlatMaterial = MaterialGeneratorDX11::GenerateImmediateGeometryTransparentFlatMaterial( *pRenderer );
 
 
 	GetBody()->Visual.SetGeometry( m_pGeometry );
+	GetBody()->Visual.SetMaterial( material_template.material );
 
 	UseSolidMaterial();
 	SetDiffuse( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	SetSpecular( Vector4f( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
+	//GetBody()->Parameters.SetVectorParameter( L"object_material", Vector4f( 0.3f, 0.8f, 0.0f, 0.0f ) );
+	GetBody()->Parameters.SetVectorParameter( L"object_material", Vector4f( 0.3f, 0.0f, 0.0f, 0.0f ) );
 }
 //--------------------------------------------------------------------------------
 GeometryActor::~GeometryActor()
@@ -606,21 +633,30 @@ void GeometryActor::DrawBezierCurve( const BezierCubic& curve, float t0, float t
 //--------------------------------------------------------------------------------
 void GeometryActor::UseSolidMaterial()
 {
-	GetBody()->Visual.SetMaterial( m_pSolidMaterial );
+	//GetBody()->Visual.SetMaterial( m_pSolidMaterial );
+	material_template.SetTransparencyMode( TransparencyMode::Opaque );
+	material_template.SetColorMode( ColorMode::VertexColor );
+	material_template.SetLightingMode( LightingMode::Point );
+
 	GetBody()->Visual.iPass = Renderable::GEOMETRY;
 }
 //--------------------------------------------------------------------------------
 void GeometryActor::UseTexturedMaterial( ResourcePtr texture )
 {
-	GetBody()->Visual.SetMaterial( m_pTexturedMaterial );
+	//GetBody()->Visual.SetMaterial( m_pTexturedMaterial );
+	material_template.SetTransparencyMode( TransparencyMode::Opaque );
+	material_template.SetColorMode( ColorMode::TexturedColor );
+	material_template.SetLightingMode( LightingMode::Point );
+
 	GetBody()->Visual.iPass = Renderable::GEOMETRY;
 
 	// Set the texture to be used if the passed in texture is not null...
 	if ( nullptr != texture ) {
 
+		material_template.material->Parameters.SetShaderResourceParameter( L"ColorTexture", texture );
 		ShaderResourceParameterWriterDX11* pWriter = 
 			dynamic_cast<ShaderResourceParameterWriterDX11*> (
-				m_pTexturedMaterial->Parameters.GetRenderParameter( std::wstring( L"ColorTexture" ) )
+				GetBody()->Visual.GetMaterial()->Parameters.GetRenderParameter( std::wstring( L"ColorTexture" ) )
 			);
 
 		pWriter->SetValue( texture );
@@ -629,13 +665,21 @@ void GeometryActor::UseTexturedMaterial( ResourcePtr texture )
 //--------------------------------------------------------------------------------
 void GeometryActor::UseTransparentMaterial( )
 {
-	GetBody()->Visual.SetMaterial( m_pTransparentMaterial );
+	//GetBody()->Visual.SetMaterial( m_pTransparentMaterial );
+	material_template.SetTransparencyMode( TransparencyMode::Alpha );
+	material_template.SetColorMode( ColorMode::VertexColor );
+	material_template.SetLightingMode( LightingMode::Point );
+
 	GetBody()->Visual.iPass = Renderable::ALPHA;
 }
 //--------------------------------------------------------------------------------
 void GeometryActor::UseTransparentFlatMaterial()
 {
-	GetBody()->Visual.SetMaterial( m_pTransparentFlatMaterial );
+	//GetBody()->Visual.SetMaterial( m_pTransparentFlatMaterial );
+	material_template.SetTransparencyMode( TransparencyMode::Alpha );
+	material_template.SetColorMode( ColorMode::VertexColor );
+	material_template.SetLightingMode( LightingMode::Flat );
+
 	GetBody()->Visual.iPass = Renderable::ALPHA;
 }
 //--------------------------------------------------------------------------------
@@ -652,10 +696,51 @@ Vector4f GeometryActor::GetSpecular( ) const
 void GeometryActor::SetDiffuse( const Vector4f& color )
 {
 	GetBody()->Parameters.SetVectorParameter( L"Kd", color );
+	GetBody()->Parameters.SetVectorParameter( L"object_albedo", color );
 }
 //--------------------------------------------------------------------------------
 Vector4f GeometryActor::GetDiffuse( ) const
 {
 	return( GetBody()->Parameters.GetVectorParameterWriter( L"Kd" )->GetValue( ) );
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::SetRoughness( const float roughness )
+{
+	// TODO: These would be better represented as just a float value.  If we can
+	//       update the parameter system with floats, then we should be able to 
+	//       modify the roughness and metallic properties to operate in the same
+	//       way the Diffuse and Specular properties are used.
+	Vector4f properties = GetBody()->Parameters.GetVectorParameterWriter( L"object_material" )->GetValue( );
+	properties.x = roughness;
+	GetBody()->Parameters.SetVectorParameter( L"object_material", properties );
+}
+//--------------------------------------------------------------------------------
+float GeometryActor::GetRoughness( ) const
+{
+	// TODO: These would be better represented as just a float value.  If we can
+	//       update the parameter system with floats, then we should be able to 
+	//       modify the roughness and metallic properties to operate in the same
+	//       way the Diffuse and Specular properties are used.
+	return GetBody()->Parameters.GetVectorParameterWriter( L"object_material" )->GetValue( ).x;
+}
+//--------------------------------------------------------------------------------
+void GeometryActor::SetMetallic( const float metallic )
+{
+	// TODO: These would be better represented as just a float value.  If we can
+	//       update the parameter system with floats, then we should be able to 
+	//       modify the roughness and metallic properties to operate in the same
+	//       way the Diffuse and Specular properties are used.
+	Vector4f properties = GetBody()->Parameters.GetVectorParameterWriter( L"object_material" )->GetValue( );
+	properties.y = metallic;
+	GetBody()->Parameters.SetVectorParameter( L"object_material", properties );
+}
+//--------------------------------------------------------------------------------
+float GeometryActor::GetMetallic( ) const
+{
+	// TODO: These would be better represented as just a float value.  If we can
+	//       update the parameter system with floats, then we should be able to 
+	//       modify the roughness and metallic properties to operate in the same
+	//       way the Diffuse and Specular properties are used.
+	return GetBody()->Parameters.GetVectorParameterWriter( L"object_material" )->GetValue( ).y;
 }
 //--------------------------------------------------------------------------------

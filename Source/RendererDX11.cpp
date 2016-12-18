@@ -429,9 +429,9 @@ void RendererDX11::Shutdown()
 	// Since these are all managed with smart pointers, we just empty the
 	// container and the objects will automatically be deleted.
 
-	m_vBlendStates.clear();
-	m_vDepthStencilStates.clear();
-	m_vRasterizerStates.clear();
+	m_BlendStates.clear();
+	m_DepthStencilStates.clear();
+	m_RasterizerStates.clear();
 	m_vSamplerStates.clear();
 	m_vInputLayouts.clear();
 	m_vViewPorts.clear();
@@ -1382,6 +1382,16 @@ ResourcePtr RendererDX11::LoadTexture( ID3D11Texture2D* pTexture )
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateBlendState( BlendStateConfigDX11* pConfig )
 {
+	// If this state has already been created before, just return the index.
+
+	auto entry = m_BlendStateLookup.find( *pConfig );
+
+	if ( entry != m_BlendStateLookup.end() ) {
+		return entry->second;
+	}
+
+	// If it hasn't been created before, create it, then store it, and return it.
+
 	BlendStateComPtr pState;
 
 	HRESULT hr = m_pDevice->CreateBlendState( dynamic_cast<D3D11_BLEND_DESC*>( pConfig ), pState.GetAddressOf() );
@@ -1392,13 +1402,26 @@ int RendererDX11::CreateBlendState( BlendStateConfigDX11* pConfig )
 		return( -1 );
 	}
 
-	m_vBlendStates.push_back( pState );
+	m_BlendStates.push_back( pState );
 
-	return( m_vBlendStates.size() - 1 );
+	int id = m_BlendStates.size() - 1;
+	m_BlendStateLookup[*pConfig] = id;
+
+	return id;
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateDepthStencilState( DepthStencilStateConfigDX11* pConfig )
 {
+	// If this state has already been created before, just return the index.
+
+	auto entry = m_DepthStencilStateLookup.find( *pConfig );
+
+	if ( entry != m_DepthStencilStateLookup.end() ) {
+		return entry->second;
+	}
+
+	// If it hasn't been created before, create it, then store it, and return it.
+
 	DepthStencilStateComPtr pState;
 
 	HRESULT hr = m_pDevice->CreateDepthStencilState( dynamic_cast<D3D11_DEPTH_STENCIL_DESC*>( pConfig ), pState.GetAddressOf() );
@@ -1409,13 +1432,26 @@ int RendererDX11::CreateDepthStencilState( DepthStencilStateConfigDX11* pConfig 
 		return( -1 );
 	}
 
-	m_vDepthStencilStates.push_back( pState );
+	m_DepthStencilStates.push_back( pState );
 
-	return( m_vDepthStencilStates.size() - 1 );
+	int id = m_DepthStencilStates.size() - 1;
+	m_DepthStencilStateLookup[*pConfig] = id;
+
+	return id;
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateRasterizerState( RasterizerStateConfigDX11* pConfig )
 {
+	// If this state has already been created before, just return the index.
+
+	auto entry = m_RasterizerStateLookup.find( *pConfig );
+
+	if ( entry != m_RasterizerStateLookup.end() ) {
+		return entry->second;
+	}
+
+	// If it hasn't been created before, create it, then store it, and return it.
+
 	RasterizerStateComPtr pState;
 
 	HRESULT hr = m_pDevice->CreateRasterizerState( dynamic_cast<D3D11_RASTERIZER_DESC*>( pConfig ), pState.GetAddressOf() );
@@ -1426,9 +1462,12 @@ int RendererDX11::CreateRasterizerState( RasterizerStateConfigDX11* pConfig )
 		return( -1 );
 	}
 
-	m_vRasterizerStates.push_back( pState );
+	m_RasterizerStates.push_back( pState );
 
-	return( m_vRasterizerStates.size() - 1 );
+	int id = m_RasterizerStates.size() - 1;
+	m_RasterizerStateLookup[*pConfig] = id;
+
+	return id;
 }
 //--------------------------------------------------------------------------------
 int RendererDX11::CreateSamplerState( D3D11_SAMPLER_DESC* pDesc )
@@ -1497,9 +1536,9 @@ BlendStateComPtr RendererDX11::GetBlendState( int index )
 	//       put the blend state into the default D3D11 state...
 
 	if ( index >= 0 )
-		return( m_vBlendStates[index] ); 
+		return( m_BlendStates[index] ); 
 	else
-		return( m_vBlendStates[0] );
+		return( m_BlendStates[0] );
 }
 //--------------------------------------------------------------------------------
 DepthStencilStateComPtr RendererDX11::GetDepthState( int index )
@@ -1508,9 +1547,9 @@ DepthStencilStateComPtr RendererDX11::GetDepthState( int index )
 	//       put the blend state into the default D3D11 state...
 
 	if ( index >= 0 )
-		return( m_vDepthStencilStates[index] );
+		return( m_DepthStencilStates[index] );
 	else
-		return( m_vDepthStencilStates[0] );
+		return( m_DepthStencilStates[0] );
 }
 //--------------------------------------------------------------------------------
 RasterizerStateComPtr RendererDX11::GetRasterizerState( int index )
@@ -1519,9 +1558,9 @@ RasterizerStateComPtr RendererDX11::GetRasterizerState( int index )
 	//       put the blend state into the default D3D11 state...
 
 	if ( index >= 0 )
-		return( m_vRasterizerStates[index] );
+		return( m_RasterizerStates[index] );
 	else
-		return( m_vRasterizerStates[0] );
+		return( m_RasterizerStates[0] );
 }
 //--------------------------------------------------------------------------------
 const ViewPortDX11& RendererDX11::GetViewPort( int ID )

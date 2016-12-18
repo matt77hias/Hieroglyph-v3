@@ -82,7 +82,7 @@ void App::Initialize()
 
 	m_pCamera->Spatial().SetRotation( Vector3f( 0.7f, 0.0f, 0.0f ) );
 	m_pCamera->Spatial().SetTranslation( Vector3f( 0.0f, 50.0f, -20.0f ) );
-	m_pRenderView->SetBackColor( Vector4f( 0.1f, 0.1f, 0.3f, 0.0f ) );
+	m_pRenderView->SetColorClearValue( Vector4f( 0.1f, 0.1f, 0.3f, 0.0f ) );
 
 
 

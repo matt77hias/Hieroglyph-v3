@@ -323,7 +323,7 @@ MaterialPtr MaterialGeneratorDX11::GenerateKinectReconstructionMaterial( Rendere
 
 	DepthStencilStateConfigDX11 ds;
 	ds.DepthEnable = false;
-	pEffect->m_iDepthStencilState = Renderer.CreateDepthStencilState( &ds );
+	//pEffect->m_iDepthStencilState = Renderer.CreateDepthStencilState( &ds );
 
 
 	// Enable the material to render the given view type, and set its effect.
@@ -375,14 +375,12 @@ MaterialPtr MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( Rende
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 
 	pEffect->SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
-		//std::wstring( L"ImmediateGeometrySolid.hlsl" ),
-		std::wstring( L"PBR_test.hlsl" ),
+		std::wstring( L"vertex-color.vertex-normal.point-light.perspective.vs.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_4_0" ) ) );
 
 	pEffect->SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
-		//std::wstring( L"ImmediateGeometrySolid.hlsl" ),
-		std::wstring( L"PBR_test.hlsl" ),
+		std::wstring( L"vertex-color.vertex-normal.point-light.perspective.ps.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_4_0" ) ) );
 
@@ -390,13 +388,12 @@ MaterialPtr MaterialGeneratorDX11::GenerateImmediateGeometrySolidMaterial( Rende
 	RS.FillMode = D3D11_FILL_WIREFRAME;
 	RS.CullMode = D3D11_CULL_NONE;
 
-	//pEffect->m_iRasterizerState = 
-	//	Renderer.CreateRasterizerState( &RS );
-
 
 	// Enable the material to render the given view type, and set its effect.
 	pMaterial->Params[VT_PERSPECTIVE].bRender = true;
 	pMaterial->Params[VT_PERSPECTIVE].pEffect = pEffect;
+
+	pMaterial->Parameters.SetVectorParameter( L"object_material", Vector4f( 1.0f, 0.0f, 0.0f, 0.0f ) );
 
 	return( pMaterial );
 }
@@ -410,12 +407,12 @@ MaterialPtr MaterialGeneratorDX11::GenerateImmediateGeometryTexturedMaterial( Re
 	RenderEffectDX11* pEffect = new RenderEffectDX11();
 
 	pEffect->SetVertexShader( Renderer.LoadShader( VERTEX_SHADER,
-		std::wstring( L"ImmediateGeometryTextured.hlsl" ),
+		std::wstring( L"textured.vertex-normal.point-light.perspective.vs.hlsl" ),
 		std::wstring( L"VSMAIN" ),
 		std::wstring( L"vs_4_0" ) ) );
 
 	pEffect->SetPixelShader( Renderer.LoadShader( PIXEL_SHADER,
-		std::wstring( L"ImmediateGeometryTextured.hlsl" ),
+		std::wstring( L"textured.vertex-normal.point-light.perspective.ps.hlsl" ),
 		std::wstring( L"PSMAIN" ),
 		std::wstring( L"ps_4_0" ) ) );
 
@@ -604,7 +601,7 @@ MaterialPtr MaterialGeneratorDX11::GenerateTextMaterial( RendererDX11& Renderer 
 	SamplerStateConfigDX11 SamplerConfig;
 	SamplerConfig.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	SamplerConfig.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	SamplerConfig.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	SamplerConfig.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
 	SamplerConfig.MaxAnisotropy = 0;
 
 	int LinearSampler = RendererDX11::Get()->CreateSamplerState( &SamplerConfig );

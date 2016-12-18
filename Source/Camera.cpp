@@ -66,13 +66,6 @@ void Camera::RenderFrame( RendererDX11* pRenderer )
 
 	if ( m_pCameraView )
 	{
-		// Set the scene's root into the render view
-
-		if ( m_pScene ) {
-			m_pCameraView->SetScene( m_pScene );
-		}
-
-
 		// Set the view position in the parameter system, for use by any of the
 		// views being used in this frame.
 
@@ -80,6 +73,12 @@ void Camera::RenderFrame( RendererDX11* pRenderer )
 		m_pViewPositionWriter->SetValue( Vector4f( p.x, p.y, p.z, 1.0f ) );
 
 		Parameters.InitRenderParams();
+
+		// Set the scene's root into the render view
+
+		if ( m_pScene ) {
+			m_pCameraView->SetScene( m_pScene );
+		}
 
 		// Use the pre-draw method to queue any needed render views in the scene.
 		// This is followed by rendering all of the views to generate the current

@@ -89,7 +89,12 @@ namespace Glyph3
 		const ViewPortDX11& GetViewPort( unsigned int index );
 
 
-		virtual void SetBackColor( const Vector4f& color );
+		virtual void SetColorClearValue( const Vector4f& color );
+		virtual void SetDepthClearValue( const float depth );
+		virtual void SetStencilClearValue( const UINT stencil );
+
+		virtual void EnableColorClearing( const bool enable );
+		virtual void EnableDepthClearing( const bool enable );
 
 		virtual void SetViewMatrix( const Matrix4f& matrix );
 		virtual void SetProjMatrix( const Matrix4f& matrix );
@@ -106,7 +111,12 @@ namespace Glyph3
 
 		BoundsVisualizerActor* m_pDebugVisualizer;
 
-		Vector4f		m_vColor;
+		Vector4f		m_BufferClearColor;
+		float			m_fDepthClearValue;
+		UINT			m_uiStencilClearValue;
+		bool			m_bEnableColorClear;
+		bool			m_bEnableDepthClear;
+
 		int				m_iViewports[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
 		unsigned int	m_uiViewportCount;
 

@@ -46,7 +46,7 @@ namespace Glyph3
 
 		EventManager			EvtManager;
 
-	protected:
+	public:
 
 		Scene*					m_pScene;
 		FirstPersonCamera*		m_pCamera;
