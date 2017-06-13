@@ -1,7 +1,6 @@
-Welcome to the Hieroglyph 3 Rendering Engine!
+#Hieroglyph 3 Rendering Engine
 
-Introduction:
--------------
+##Introduction
 
 This library has been written by Jason Zink with the intention of promoting the use of Direct3D 11, and at the same time having a common framework with which to make demo programs and quickly prototype new algorithms.
 
@@ -9,28 +8,7 @@ The library itself is written in C++ and utilizes DirectX 11, Lua, and the Direc
 
 To run the demo programs, just open the Hieroglyph3_Desktop.sln file, build the solution, then run the desired demo.  There are a number of demo programs that are intended to be demonstrative of how to use the engine, as well as a growing number of more advanced demos.  If you want to try out the Kinect based samples, open the Hieroglyph3_Desktop_Kinect.sln file.  This solution will contain all of the pre-requisites for the libraries and samples which use the Kinect.  For the Oculus Rift based samples, please open the Hieroglyph3_desktop_Rift.sln file.
 
-The current status of the engine is alpha, but is becoming much more stable.   
-
-If you have any comments, bugs to report, or suggestions, please feel free to contact me on the gamedev.net private message system (my ID is 'Jason Z'), post a comment in my gamedev.net journal, or start a discussion on the codeplex discussion tabs.  I hope you enjoy using the library as much as I have enjoyed writing it!
-
-Acknowledgements:
------------------
-
-I have been a long-time fan of Dave Eberly, and his WildMagic engine.  Several of the math classes in Hieroglyph are based on his implementations, and his vast engine provides a wealth of knowledge.  If you haven't seen it yet, go to his website and see what you think: http://www.geometrictools.com
-
-I also use Lua, which is a fanstastic scripting language for use with C/C++.  If you haven't used it before, take the time to look around here: http://www.lua.org.
-
-I have also included the DirectXTK library, which is a common replacement for the old D3DX functionality.  Please check it out at its codeplex page here: http://directxtk.codeplex.com/.
-
-Hieroglyph 3 is also starting to get contributions from some of its users.  I would like to list the names of the contributors here as a small token of appreciation for their help, and also to provide their contact information if they choose to list it (if you have contributed and would like to be added to the list, please let me know!):
-
-Matt Pettineo
-Jack Hoxley
-Francois Piette, (francois.piette@overbyte.be, www.overbyte.be)
-
-
-Building Instructions:
-----------------------
+##Building Instructions
 
 Hieroglyph requires the use of VS2012 for building.  In addition, the following items need to be available to the linker/compiler:
 
