@@ -1,6 +1,6 @@
-#Hieroglyph 3 Rendering Engine
+# Hieroglyph 3 Rendering Engine
 
-##Introduction
+## Introduction
 
 This library has been written by Jason Zink with the intention of promoting the use of Direct3D 11, and at the same time having a common framework with which to make demo programs and quickly prototype new algorithms.
 
@@ -8,7 +8,7 @@ The library itself is written in C++ and utilizes DirectX 11, Lua, and the Direc
 
 To run the demo programs, just open the Hieroglyph3_Desktop.sln file, build the solution, then run the desired demo.  There are a number of demo programs that are intended to be demonstrative of how to use the engine, as well as a growing number of more advanced demos.  If you want to try out the Kinect based samples, open the Hieroglyph3_Desktop_Kinect.sln file.  This solution will contain all of the pre-requisites for the libraries and samples which use the Kinect.  For the Oculus Rift based samples, please open the Hieroglyph3_desktop_Rift.sln file.
 
-##Building Instructions
+## Building Instructions
 
 Hieroglyph requires the use of VS2012 for building.  In addition, the following items need to be available to the linker/compiler:
 
